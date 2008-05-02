@@ -1,0 +1,1249 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>Algorithms</title>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <br/><br/>
+
+         <p>
+            This page documents library components that are all basically just implementations of 
+            mathematical functions or algorithms without any really significant data structures 
+            associated with them. So this includes things like checksums, cryptographic hashes, sorting, etc...
+         </p>
+
+         <p>
+         Everything in this section basically follows the same conventions as 
+         the rest of the library.   So to get a bigint for example you would need to write something 
+         like <tt>typedef dlib::bigint::kernel_2a bint;</tt> and from then on make your big ints like 
+         <tt>bint my_bigint;</tt>.  
+         </p>
+
+   </body>
+
+   <!-- ************************************************************************* -->
+
+   <menu width="150">
+    <top>
+      <section>
+         <name>Objects</name>
+         <item>bigint</item> 
+         <item>crc32</item> 
+         <item>rand</item> 
+         <item>mlp</item> 
+         <item nolink="true">
+            <name>Geometry</name>
+            <sub>
+               <item>rectangle</item> 
+               <item>vector</item> 
+               <item>point</item> 
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Bayes Utilities</name>
+            <sub>
+               <item>assignment</item>
+               <item>joint_probability_table</item>
+               <item>conditional_probability_table</item>
+               <item>bayes_node</item>
+               <item>bayesian_network_gibbs_sampler</item>
+               <item>bayesian_network_join_tree</item>
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>SVM Utilities</name>
+            <sub>
+               <item>radial_basis_kernel</item>
+               <item>polynomial_kernel</item>
+               <item>linear_kernel</item>
+               <item>decision_function</item>
+               <item>probabilistic_decision_function</item>
+            </sub>
+         </item>
+      </section>
+ 
+      <section>
+         <name>Global Functions</name>
+         <item>randomize_samples</item> 
+         <item>hsort_array</item> 
+         <item>isort_array</item> 
+         <item>md5</item> 
+         <item>median</item> 
+         <item>qsort_array</item> 
+         <item>square_root</item> 
+         <item nolink="true">
+            <name>Geometry</name>
+            <sub>
+               <item>centered_rect</item> 
+               <item>translate_rect</item> 
+               <item>resize_rect</item> 
+               <item>resize_rect_width</item> 
+               <item>resize_rect_height</item> 
+               <item>move_rect</item> 
+               <item>nearest_point</item> 
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>SVM Utilities</name>
+            <sub>
+               <item>svm_nu_train</item> 
+               <item>svm_nu_train_prob</item> 
+               <item>svm_nu_cross_validate</item> 
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Set Utilities</name>
+            <sub>
+               <item>set_intersection_size</item> 
+               <item>set_intersection</item> 
+               <item>set_union</item> 
+               <item>set_difference</item> 
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Graph Utilities</name>
+            <sub>
+               <item>graph_contains_directed_cycle</item> 
+               <item>graph_contains_undirected_cycle</item> 
+               <item>create_moral_graph</item> 
+               <item>triangulate_graph_and_find_cliques</item> 
+               <item>graph_contains_length_one_cycle</item> 
+               <item>find_connected_nodes</item> 
+               <item>graph_is_connected</item> 
+               <item>is_clique</item> 
+               <item>is_maximal_clique</item> 
+               <item>copy_graph_structure</item> 
+               <item>edge</item> 
+               <item>is_join_tree</item> 
+               <item>create_join_tree</item> 
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Bayes Node Utilities</name>
+            <sub>
+               <item>set_node_value</item>
+               <item>node_value</item>
+               <item>node_is_evidence</item>
+               <item>set_node_as_evidence</item>
+               <item>set_node_as_nonevidence</item>
+               <item>set_node_num_values</item>
+               <item>node_num_values</item>
+               <item>node_probability</item>
+               <item>set_node_probability</item>
+               <item>node_first_parent_assignment</item>
+               <item>node_next_parent_assignment</item>
+               <item>node_cpt_filled_out</item>
+            </sub>
+         </item>
+      </section>
+
+
+    </top>  
+   </menu>
+
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
+   <components>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bayesian_network_join_tree</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object represents an implementation of the join tree algorithm 
+            (a.k.a. the junction tree algorithm)
+            for inference in bayesian networks.  
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+            <example>bayes_net_gui_ex.cpp.html</example>
+            <example>bayes_net_from_disk_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bayesian_network_gibbs_sampler</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object performs Markov Chain Monte Carlo sampling of a bayesian
+            network using the Gibbs sampling technique. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bayes_node</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object represents a node in a bayesian network.  It is
+            intended to be used inside the <a href="containers.html#directed_graph">directed_graph</a> object to
+            represent bayesian networks.
+         </description>
+                                 
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>conditional_probability_table</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object represents a conditional probability table.
+         </description>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>joint_probability_table</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object represents a joint probability table.  
+         </description>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>assignment</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object models an assignment of random variables to particular values.
+            It is used with the <a href="#joint_probability_table">joint_probability_table</a> and 
+            <a href="#conditional_probability_table">conditional_probability_table</a>
+            objects to represent assignments of various random variables to actual values.
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_probability</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily set the probability of a  
+            <a href="#bayes_node">bayes_node</a> given its parents when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_first_parent_assignment</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain an <a href="#assignment">assignment</a>
+            that contains all the parents of a node in a bayesian network.
+         </description>
+         <examples>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_next_parent_assignment</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily loop through all the parent <a href="#assignment">assignments</a>
+            of a node in a bayesian network.
+         </description>
+         <examples>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
+         <name>node_cpt_filled_out</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily verify that a node
+            in a bayesian network has its <a href="#conditional_probability_table">conditional_probability_table</a> 
+            completely filled out.
+         </description>
+         <examples>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
+         <name>node_probability</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain the probability of a  
+            <a href="#bayes_node">bayes_node</a> given its parents when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+                                 
+      </component>
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_num_values</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain the number of values of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+                                 
+      </component>
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_num_values</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily set the number of values of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_as_nonevidence</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily remove the evidence flag of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_as_evidence</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily set the evidence flag of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_is_evidence</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily determine if a  
+            <a href="#bayes_node">bayes_node</a> is evidence when it is inside 
+            a <a href="containers.html#directed_graph"> directed_graph</a> object. 
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_value</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain the value of a 
+            <a href="#bayes_node">bayes_node</a> when it is inside a <a href="containers.html#directed_graph">
+            directed_graph</a> object. 
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_value</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily modify the value of a 
+            <a href="#bayes_node">bayes_node</a> when it is inside a <a href="containers.html#directed_graph">
+            directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component checked="true">
+         <name>bigint</name>
+         <file>dlib/bigint.h</file>
+         <spec_file>dlib/bigint/bigint_kernel_abstract.h</spec_file>
+         <description>
+            This object represents an arbitrary precision unsigned integer.  It's pretty simple.  
+            It's interface is just like a normal int, you don't have to tell it how much memory
+            to use or anything unusual.  It just goes :)       
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>bigint_kernel_1</name>
+               <file>dlib/bigint/bigint_kernel_1.h</file>
+               <description> 
+                  This implementation is done using an array of unsigned shorts.  It is also reference counted.  
+                  For further details see the above link.  Also note that kernel_2 should be 
+      faster in almost every case so you should really just use that version of the bigint object.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for bigint_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>bigint_kernel_2</name>
+               <file>dlib/bigint/bigint_kernel_2.h</file>
+               <description> 
+                  This implementation is basically the same as kernel_1 except it uses the 
+                  Fast Fourier Transform to perform multiplcations much faster.  
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for bigint_kernel_2</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                           
+                        
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>crc32</name>
+         <file>dlib/crc32.h</file>
+         <spec_file>dlib/crc32/crc32_kernel_abstract.h</spec_file>
+         <description>
+            This object represents the CRC-32 algorithm for calculating
+                        checksums.   
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>crc32_kernel_1</name>
+               <file>dlib/crc32/crc32_kernel_1.h</file>
+               <description> 
+                  This implementation uses the polynomial 0xedb88320. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for crc32_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation>                                  
+         </implementations>
+                        
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rand</name>
+         <file>dlib/rand.h</file>
+         <spec_file>dlib/rand/rand_kernel_abstract.h</spec_file>
+         <description>
+            This object represents a pseudorandom number generator.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>rand_kernel_1</name>
+               <file>dlib/rand/rand_kernel_1.h</file>
+               <description> 
+                  This implementation is done using the Mersenne Twister algorithm.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for rand_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+         
+         <extensions>
+      
+            <extension>
+               <name>rand_float</name>
+               <spec_file>dlib/rand/rand_float_abstract.h</spec_file>
+               <description> 
+                  This extension gives rand the ability to generate random floating point numbers.
+               </description> 
+
+               <implementations>
+                  <implementation>
+                     <name>rand_float_1</name>
+                     <file>dlib/rand/rand_float_1.h</file>
+                     <description> 
+                        The implementation is obvious.  Click on the link if you want to see.                        
+                     </description> 
+
+                     <typedefs>
+                        <typedef>
+                           <name>float_1a</name>
+                           <description>is a typedef for rand_kernel_1a extended by rand_float_1</description>
+                        </typedef>
+                     </typedefs>                
+                     
+                  </implementation> 
+                           
+               </implementations>
+   
+               
+            </extension>
+         </extensions>
+               
+                        
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rectangle</name>
+         <file>dlib/geometry.h</file>
+         <spec_file>dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>
+            This object represents a rectangular region inside a cartesian 
+            coordinate system.  It allows you to easily represent and manipulate
+            rectangles.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>mlp</name>
+         <file>dlib/mlp.h</file>
+         <spec_file>dlib/mlp/mlp_kernel_abstract.h</spec_file>
+         <description>
+                This object represents a multilayer layer perceptron network that is
+                trained using the back propagation algorithm.  The training algorithm also
+                incorporates the momentum method.  That is, each round of back propagation
+                training also adds a fraction of the previous update.  This fraction
+                is controlled by the momentum term set in the constructor.  
+         </description>
+
+         <examples>
+            <example>mlp_ex.cpp.html</example>
+         </examples>
+         
+         <implementations>
+            <implementation>
+               <name>mlp_kernel_1</name>
+               <file>dlib/mlp/mlp_kernel_1.h</file>
+               <description> 
+                  This is implemented in the obvious way.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for mlp_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>vector</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <description>
+            This object represents a three dimensional vector.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>point</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <description>
+               This object represents a point inside a Cartesian coordinate system.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>svm_nu_train_prob</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+            <p>
+               Trains a nu support vector classifier and outputs a <a href="#probabilistic_decision_function">
+                  probabilistic_decision_function</a>.
+            </p>
+            This function uses the <a href="#svm_nu_train">svm_nu_train</a> function and creates the 
+            probability model using the technique described in the paper:
+            <blockquote>
+                Probabilistic Outputs for Support Vector Machines and
+                Comparisons to Regularized Likelihood Methods by 
+                John C. Platt.  Match 26, 1999
+            </blockquote>
+         </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>svm_nu_train</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+            <p>
+               Trains a nu support vector classifier and outputs a <a href="#decision_function">decision_function</a>. 
+            </p>
+               The implementation of the nu-svm training algorithm used by this library is based
+               on the following excellent papers:
+               <ul>
+                  <li>Chang and Lin, Training {nu}-Support Vector Classifiers: Theory and Algorithms</li>
+                  <li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                     machines, 2001. Software available at 
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
+               </ul>
+         </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>probabilistic_decision_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+                This object represents a binary decision function for use with
+                support vector machines.  It returns an 
+                estimate of the probability that a given sample is in the +1 class. 
+         </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>decision_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+                This object represents a binary decision function for use with
+                support vector machines.
+         </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>linear_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+                This object represents a linear function kernel for use with
+                support vector machines.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>polynomial_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+                This object represents a polynomial kernel for use with
+                support vector machines.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>radial_basis_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+                This object represents a radial basis function kernel for use with
+                support vector machines.
+         </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>randomize_samples</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+               Randomizes the order of samples in a column vector containing sample data.
+         </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>svm_nu_cross_validate</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+               Performs k-fold cross validation using the svm_nu_train() function.
+         </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>hsort_array</name>
+         <file>dlib/sort.h</file>
+         <spec_file link="true">dlib/sort.h</spec_file>
+         <description>
+            hsort_array is an implementation of the heapsort algorithm.  It will sort anything that has an 
+            array like operator[] interface.  
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>isort_array</name>
+         <file>dlib/sort.h</file>
+         <spec_file link="true">dlib/sort.h</spec_file>
+         <description>
+            isort_array is an implementation of the insertion sort algorithm.  It will sort anything that has an 
+            array like operator[] interface.   
+         </description>
+                                 
+      </component>
+               
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>qsort_array</name>
+         <file>dlib/sort.h</file>
+         <spec_file link="true">dlib/sort.h</spec_file>
+         <description>
+            qsort_array is an implementation of the QuickSort algorithm.  It will sort anything that has an array like 
+            operator[] interface.  If the quick sort becomes unstable then it switches to a heap sort.  This 
+            way sorting is guaranteed to take at most N*log(N) time.
+         </description>
+                                 
+      </component>
+            
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>md5</name>
+         <file>dlib/md5.h</file>
+         <spec_file>dlib/md5/md5_kernel_abstract.h</spec_file>
+         <description>
+            This is an implementation of The MD5 Message-Digest Algorithm as described in rfc1321.   
+         </description>
+                                 
+      </component>
+            
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>median</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This function takes three paramaters and finds the median of the three.  The median is swapped into
+            the first parameter and the first parameter ends up in one of the other two, unless the first parameter was
+            the median to begin with of course. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>square_root</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>        
+            square_root is a function which takes an unsigned long and returns the square root of it or
+            if the root is not an integer then it is rounded up to the next integer.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>edge</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> object and a 
+            pair of indices.  It returns a reference to the edge object between the two nodes
+            with the given indices. 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_join_tree</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes two <a href="containers.html#graph">graph</a> objects and
+            checks if the second of the two graphs is a valid join tree (aka tree decomposition)
+            of the first graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>create_join_tree</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> object and
+            creates a join tree for that graph.  Or in other words, this function finds a 
+            tree decomposition of the given graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_contains_directed_cycle</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function checks a <a href="containers.html#directed_graph">directed_graph</a> for directed cycles.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>set_intersection</name>
+         <file>dlib/set_utils.h</file>
+         <spec_file link="true">dlib/set_utils/set_utils_abstract.h</spec_file>
+         <description>        
+            This function takes two <a href="containers.html#set">set</a> objects and 
+            gives you their intersection.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>set_union</name>
+         <file>dlib/set_utils.h</file>
+         <spec_file link="true">dlib/set_utils/set_utils_abstract.h</spec_file>
+         <description>        
+            This function takes two <a href="containers.html#set">set</a> objects and 
+            gives you their union.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>set_difference</name>
+         <file>dlib/set_utils.h</file>
+         <spec_file link="true">dlib/set_utils/set_utils_abstract.h</spec_file>
+         <description>        
+            This function takes two <a href="containers.html#set">set</a> objects and 
+            gives you their difference.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>set_intersection_size</name>
+         <file>dlib/set_utils.h</file>
+         <spec_file link="true">dlib/set_utils/set_utils_abstract.h</spec_file>
+         <description>        
+            This function takes two <a href="containers.html#set">set</a> objects and tells you
+            how many items they have in common.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>triangulate_graph_and_find_cliques</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> and
+            turns it into a chordal graph.  It also returns a 
+            <a href="containers.html#set">set</a> that contains
+            all the cliques present in the choral graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>create_moral_graph</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#directed_graph">directed_graph</a>
+            and returns the moralized version of the graph in the form of a 
+            <a href="containers.html#graph">graph</a> object.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_contains_length_one_cycle</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a>
+            or <a href="containers.html#directed_graph">directed_graph</a> object and
+            returns true if and only if the graph contains a node that has an edge that
+            links back to itself.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_connected_nodes</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a node from a <a href="containers.html#graph">graph</a>
+            or <a href="containers.html#directed_graph">directed_graph</a> object and a 
+            <a href="containers.html#set">set</a> of unsigned longs.  It finds all the
+            nodes in the given graph that are connected to the given node by an 
+            undirected path and returns them in the set (also note that the
+            original query node is also returned in this set).
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_is_connected</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> or
+            <a href="containers.html#directed_graph">directed_graph</a> object and
+            determines if the graph is connected.  That is, it returns true if and only if
+            there is an undirected path between any two nodes in the given graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_clique</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> and a 
+            <a href="containers.html#set">set</a> of node index values and checks 
+            if the specified set of nodes is a clique in the graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>copy_graph_structure</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> and copies  
+            its structure to another graph or directed_graph object.  The only 
+            restriction is that you can't copy the structure of a graph into a
+            directed_graph.  The three other possible combinations are allowed
+            however.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_maximal_clique</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> and a 
+            <a href="containers.html#set">set</a> of node index values and checks 
+            if the specified set of nodes is a maximal clique in the graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>nearest_point</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> and a 
+            <a href="#point">point</a> and returns the point in the given 
+            rectangle that is nearst to the given point.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>move_rect</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> and moves
+            it so that it's upper left corner occupies the given location.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>resize_rect_height</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> and 
+            returns a new rectangle with the given height but otherwise with the 
+            same edge points as the original rectangle. 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>resize_rect_width</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> and 
+            returns a new rectangle with the given width but otherwise with the 
+            same edge points as the original rectangle. 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>resize_rect</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> and 
+            returns a new rectangle with the given size but with the same upper
+            left corner as the original rectangle.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>translate_rect</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> and moves
+            it by a given number of units along the x and y axis relative to
+            where it was before the move.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>centered_rect</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            There are various overloads of this function but the basic idea is
+            that it returns a <a href="#rectangle">rectangle</a> with a given 
+            width and height and centered about a given point.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_contains_undirected_cycle</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function checks a <a href="containers.html#directed_graph">directed_graph</a> for undirected cycles.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+   </components>
+
+   <!-- ************************************************************************* -->
+
+
+</doc>
+

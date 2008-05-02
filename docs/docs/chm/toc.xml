@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="htmlhelp_stylesheet.xsl"?>
+
+<htmlhelp_toc>
+   <docs_folder>docs</docs_folder>
+   <main_menu_file>../main_menu.xml</main_menu_file>
+   <show_include_file>false</show_include_file>
+</htmlhelp_toc>
+
+

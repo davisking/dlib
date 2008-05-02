@@ -1,0 +1,52 @@
+[OPTIONS]
+Binary TOC=Yes
+Compatibility=1.1 or later
+Compiled file=help.chm
+Contents file=Table of Contents.hhc
+Default topic=docs/index.html
+Display compile progress=Yes
+Full-text search=Yes
+Language=0x409 English (United States)
+Title=dLib
+
+
+[FILES]
+docs/api.html
+docs/dlib/test/makefile
+docs/right.gif
+docs/down.gif
+docs/plus.gif
+docs/minus.gif
+docs/change_log.html
+docs/compile.html
+docs/compress_stream_ex.cpp.html
+docs/compression.html
+docs/containers.html
+docs/dir_nav_ex.cpp.html
+docs/gui_api_ex.cpp.html
+docs/index.html
+docs/intro.html
+docs/kernel_1a.html
+docs/kernel_1b.html
+docs/kernel_1c.html
+docs/kernel_1da.html
+docs/kernel_1db.html
+docs/kernel_1ea.html
+docs/kernel_1eb.html
+docs/kernel_1ec.html
+docs/kernel_2a.html
+docs/kernel_3a.html
+docs/kernel_3b.html
+docs/license.html
+docs/network.html
+docs/other.html
+docs/metaprogramming.html
+docs/imaging.html
+docs/parsing.html
+docs/queue_ex.cpp.html
+docs/release_notes.html
+docs/old_release_notes.html
+docs/sockets_ex.cpp.html
+
+[INFOTYPES]
+

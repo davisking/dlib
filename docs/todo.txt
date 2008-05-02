@@ -1,0 +1,795 @@
+
+
+make the popup menus from the menu_bar always put themselves on the screen
+add toggle menu item styles
+improve unicode support in on_keydown()
+make widgets take ustring as well as std::string
+add a popup menu region sort of like the tooltip widget
+make other widgets have a user settable style
+
+
+
+find all uses of std::rand() and replace them with rand_kernel_1
+
+
+
+
+add a function to display an image in a window.
+
+
+
+
+
+
+
+
+
+make the binary search tree's add function return a
+pointer to the thing it just added
+
+
+
+
+add an object that represents an atomic counter so I can make some thread
+safe reference counting stuff.  Probably use the one from boost.
+
+
+
+
+
+
+
+
+add an option to the logger to send log messages
+to a thread instead of writing them directly
+to the ostream.  Or maybe make a threaded streambuf
+that sits on top of a normal stream buffer but
+adds a thread for the io...
+
+
+
+
+
+
+make the matrix have a template argument that determined if the data is stored
+in row_major or column_major order.
+
+
+
+
+
+
+maybe add an enable_events() function to base_window
+
+
+
+
+
+
+add a toolbar_button that has a picture and text in it.
+
+
+make an ostream_fork object that lets you make an ostream that writes to two 
+other ostream objects.
+
+
+
+
+make something that parses strings of the form "key ='value'  key2='value'"
+
+
+
+add some sha-256 stuff
+
+
+
+uulib-threadsafe implementation
+http://www.fpx.de/fp/Software/UUDeview/
+
+
+
+add an example that uses the new checking extension for the cmd_line_parser.  maybe make a 
+program that adds numbers and whatnot as an example and have it validate the numbers or something.
+
+
+
+
+
+
+
+
+
+
+
+add some extensions to the dir_nav stuff that know how to pull out various parts of a path.
+like the parent directory of a file and such.
+
+
+
+
+
+
+
+
+
+make a widget that lets you use the mouse to define geometric shapes on the screen
+
+
+
+
+
+
+
+
+
+modify the if in the reference_counter::modify() function so that it works
+better with the branch predictor
+
+
+
+
+
+
+
+
+
+
+
+Add a progress bar and password field to the gui_widgets
+
+
+
+
+
+
+
+
+
+
+make sure constructors that take parameters that need to be checked
+get checked *before* they are passed on to the base class constructors.
+
+
+
+
+
+
+
+
+
+
+
+
+
+make the hashing objects take a normal size rather than expnum
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+make a linear hashing object on top of the array and use a binary search tree
+for pathological buckets.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+*********************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+make conditioning_class_kernel_3 have a pointer into its array that tells it how many 
+elements are used.   this way it doesn't need to zero everything on construction.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+a command line "percent complete bar".   something that uses \r and looks like
+|==========                       | 25%
+or something like that.   that would be nice.   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+some object that abstracts configuration managment.  like windows has the registry and
+linux and posix stuff has basically nothing except for /etc and ~/.yourprogram sort of crap.
+I should make an object that lets you "save" information to disk and then get it later.  but
+you shouldn't need to know if you are using windows or a posix OS or any of that crap
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+the parsing end event in the xml parser should tell you the line number that parsing eneded on
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+an object which can fill an array of unsigned longs with primes
+
+
+
+
+
+
+
+look for places to remove the use of references to arguments. use a 
+temporary where appropriate
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+make an implementation of sequence that is just an array with slack on each end
+
+
+
+
+
+
+
+
+
+
+something that mesures cpu clock ticks
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+something that helps you make pdf files.  Just read the PDF standard and think
+up cool stuff. :)
+
+
+
+
+
+
+
+english word set with perfect hashing
+
+
+something that helps you find perfect hash functions for a given data set
+
+
+
+
+
+
+
+
+
+make something like the linker object but that has some events that tell you
+when data is being sent so you can see what each side is sending. 
+
+
+
+
+
+
+modify sequence_kernel_1 so that when you access the same element more than once at a time
+it takes O(1) time
+
+
+
+
+
+
+
+
+
+
+
+
+make some bayesian text categorizer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+implement the hash table described on comp.programming.  the one
+that uses an "infinite" array of buckets of sizes that are powers 
+of two with the watermark.
+also change the specs for hash table to say that the num_of_buckets is
+an initial suggestion as to the size of the hash table.  not an absolute 
+rule for the implementation.  say that it is a guaranteed lower bound or something
+
+
+
+
+
+
+
+
+
+
+
+
+an object that makes it easy to save data to the end of an executable file.
+
+
+
+
+
+
+
+
+
+
+email objects
+
+
+new sockets stuff, UDP sockets, non-blocking sockets, IO multiplexing, negal alg on/off
+
+
+
+
+
+
+make a priority queue
+
+
+an echo object for networking shit.   holds connections and echos any data from one connection
+to all the others
+
+a broadcast object.   holds connections and allows you to send data to all of them easily
+
+
+
+
+
+
+file sender function
+
+
+
+
+
+
+
+
+
+
+
+
+
+an object which represents a file containing many text lines
+like an array of strings which represents a file.
+
+
+
+
+
+
+make an object that facilitates the creation of a gnutelli like broadcast network.
+could be useful for making someting like a distributed server.  and that only requires a
+few computers so its something actually doable without the support of 100,000 people
+
+a few ideas about this.  when you connect to the first person on the network you then send
+out a ping message and the pong messages you get back are from people who want more
+connections,  the message tells you how many hops away they are and how many connections
+they currently have.  you pick the one that is the farthest away and then to break any
+ties you pick the one with the least number of connections.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+an object which allows you to replace strings in a file with something else.  possibly event driven.
+you give it a set of strings to look for and when it finds them you get an event and can write
+whatever you want and then it continues on looking for more strings.
+
+
+
+
+
+
+an object which will pick out all the links in an html file and any other convenient information from
+the file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+make numerical stuff like, a big integer, big real, integration stuff, differentiation stuff,
+matrix stuff, etc...
+
+
+
+
+
+
+
+
+
+
+
+
+
+make a framework for creating web page interfaces to a program.  have stuff like buttons,
+listboxes, dropdown boxes, checkboxes, etc...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+a kind of pop3 proxy that can perform mail filtering.  like picking out and taging spam
+so that crappy email clients like netscape can put the spam into a folder
+
+the filter could also buffer stuff it thought as spam for a while.  like hold it for a few hours and then let it be passed on.  this way all the spam comes wrapped together.  and so most of the time you get a flag saying you have mail it won't be spam.  only somtimes will it be the packet of spam.   
+
+
+
+
+for the bigint object:
+also consider adding a function which returns an unsigned short which contains the two least significant bytes from the bigint
+
+
+
+
+
+
+
+
+
+
+an object which knows all about the different time zones and what not.  it could convert time from GMT to whatever local timezone you are in.  and any other useful conversions
+
+
+
+
+

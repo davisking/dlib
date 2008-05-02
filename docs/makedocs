@@ -1,0 +1,180 @@
+#!/bin/bash
+
+report_failure ()
+{
+    echo "  **** failed to complete **** "
+    exit 1
+}
+
+htmlify_cmake ()
+{
+    echo "<html><head><title>" > $1.html;
+    echo $1 >> $1.html;
+    echo "</title></head><body bgcolor='white'><pre>" >> $1.html;
+
+#  line 1: make comments green
+#  line 2: add links into the add_subdirectory directives
+#  line 3: make literal quotes red
+#  line 4: make the directives show up blue
+#  line 5: make variable names show up purple
+    sed -e "s/^\([ ]*#.*\)/<font color='#009900'>\1<\/font>/" \
+        -e "s/add_subdirectory\([ ]*\)(\([ ]*\)\([^ ]*\)\([ ]*\)\([^ )]*\)/add_subdirectory\1(\2\3\4<a href='\3\/CMakeLists.txt.html'>\5<\/a>/"  \
+        -e "s/\"\([^\"]*\)\"/\"<font color='#CC0000'>\1<\/font>\"/g"  \
+        -e "s/^\([ ]*[^( ]*[ ]*\)(/<font color='blue'>\1<\/font>(/" \
+        -e "s/{\([^}]*\)}/\{<font color='#BB00BB'>\1<\/font>}/g"  \
+        $1 >> $1.html;
+
+    echo "</pre></body></html>" >> $1;
+}
+
+makedocs ()
+{
+#make sure the .docs_last_update_rev file exists
+    if [ ! -f .docs_last_update_rev  ]
+    then
+        echo 0 > .docs_last_update_rev
+    fi;
+
+
+    COUNTER_FILE=.current_release_number
+    MINOR_COUTNER_FILE=.current_minor_release_number
+    REVNUM_FILE=.logger_revnum
+    DOCS_LAST_UPDATE_REV=$(cat .docs_last_update_rev)
+
+
+
+    LOGGER_REVNUM=`cat $REVNUM_FILE`
+    XSLT_OPTIONS="--nodtdattr   --nonet   --novalid"
+    DATE=`date --date= "+%b %d, %Y"`;
+
+
+
+# root dlib repository URL
+    DLIB_REPOS=`svn info | grep Root | awk '{print $3}'`
+
+# The revision number we are currently at
+    REVISION=`svn info | grep Revision | awk '{ print $2 }'`
+
+
+    if [ "$1" = "snapshot" ] 
+        then
+        RELEASE="developmental snapshot $REVISION"
+    else
+        MAJOR_NUM=`cat $COUNTER_FILE` 
+        MINOR_NUM=`cat $MINOR_COUTNER_FILE` 
+        RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
+    fi;
+
+
+# update the cache of the library files from subversion if they aren't from the current revision 
+    if [ $DOCS_LAST_UPDATE_REV -ne $REVISION ] 
+    then
+        echo Getting the subversion change logs
+        svn log $DLIB_REPOS/dlib -v --xml -r$LOGGER_REVNUM:$REVISION > docs/svnlog.txt || report_failure
+        svn log $DLIB_REPOS/dlib -v --xml -r1000:$LOGGER_REVNUM > docs/old_svnlog.txt || report_failure 
+
+        rm -rf docs/cache
+
+        echo $REVISION > .docs_last_update_rev
+
+        echo Getting a copy of the source from subversion
+        svn export -r $REVISION $DLIB_REPOS/examples docs/cache/examples > /dev/null || report_failure
+        svn export -r $REVISION $DLIB_REPOS/dlib docs/cache/dlib > /dev/null || report_failure
+    fi;
+
+    rm -rf docs/web/*
+    rm -rf docs/chm/docs/*
+
+    echo Creating HTML version of the source
+    htmlify --title "dlib C++ Library - " -i docs/cache -o htmltemp.$$
+
+    echo Copying files around...
+    cp -r htmltemp.$$/dlib docs/web
+    cp -r htmltemp.$$/dlib docs/chm/docs
+    cp -r htmltemp.$$/examples/* docs/web
+    cp -r htmltemp.$$/examples/* docs/chm/docs
+    rm -rf htmltemp.$$
+
+    cp docs/cache/dlib/test/makefile docs/web/dlib/test
+    cp docs/cache/dlib/test/makefile docs/chm/docs/dlib/test
+
+    cp docs/cache/dlib/test/CMakeLists.txt docs/web/dlib/test
+    cp docs/cache/dlib/test/CMakeLists.txt docs/chm/docs/dlib/test
+    cp docs/cache/dlib/CMakeLists.txt docs/web/dlib
+    cp docs/cache/dlib/CMakeLists.txt docs/chm/docs/dlib
+    mkdir docs/web/examples || report_failure
+    cp docs/cache/examples/CMakeLists.txt docs/web/examples
+    mkdir docs/chm/docs/examples || report_failure 
+    cp docs/cache/examples/CMakeLists.txt docs/chm/docs/examples
+    cp docs/*.gif docs/web
+    cp docs/*.gif docs/chm/docs
+    cp docs/*.html docs/web
+    cp docs/*.html docs/chm/docs
+    cp docs/*.png docs/web
+    cp docs/*.png docs/chm/docs
+
+    cd docs/chm/docs || report_failure 
+    htmlify_cmake dlib/CMakeLists.txt;
+    htmlify_cmake examples/CMakeLists.txt;
+    htmlify_cmake dlib/test/CMakeLists.txt;
+    cd ../../.. || report_failure
+    cd docs/web || report_failure
+    htmlify_cmake dlib/CMakeLists.txt;
+    htmlify_cmake examples/CMakeLists.txt;
+    htmlify_cmake dlib/test/CMakeLists.txt;
+    cd ../.. || report_failure
+
+    find docs/web docs/chm -name "CMakeLists.txt" | xargs rm
+
+
+
+    # make the web page version
+    echo Generate web page from XML and XSLT style sheet
+    cat docs/stylesheet.xsl | sed -e 's/"is_chm">[^<]*/"is_chm">false/' -e "s/_CURRENT_RELEASE_/$RELEASE/" -e "s/_LAST_MODIFIED_DATE_/$DATE/" \
+        > docs/stylesheet.$$.xsl
+    \ls docs/*.xml | xargs -i echo -o {} docs/stylesheet.$$.xsl {} | \
+        sed -e "s/\.xml /\.html /" | sed -e "s/-o docs/-o docs\/web/" | \
+        grep -v main_menu. |\
+        xargs -l xsltproc $XSLT_OPTIONS
+    rm docs/stylesheet.$$.xsl
+
+    # make the chm version
+    echo Generate non-web page version from XML and XSLT style sheet
+    cat docs/stylesheet.xsl | sed -e 's/"is_chm">[^<]*/"is_chm">true/' -e "s/_CURRENT_RELEASE_/$RELEASE/" -e "s/_LAST_MODIFIED_DATE_/$DATE/" \
+        > docs/stylesheet.$$.xsl
+    \ls docs/*.xml | xargs -i echo -o {} docs/stylesheet.$$.xsl {} | \
+        sed -e "s/\.xml /\.html /" | sed -e "s/-o docs/-o docs\/chm\/docs/" | \
+        grep -v main_menu. |\
+        xargs -l xsltproc $XSLT_OPTIONS
+    rm docs/stylesheet.$$.xsl
+
+
+    FILES=`find docs/chm docs/web -iname "*.html" -type f`
+    for i in $FILES
+    do
+        sed -e '/<!DOCTYPE/d' ${i} > temp.$$;
+        mv temp.$$ ${i};
+    done
+
+
+    echo Generating sitemap
+    cd docs/web || report_failure
+    find . -name "*.html" |  awk '{ print "http://dclib.sourceforge.net" substr($1,2)}' > sitemap.txt
+    cd ../..
+}
+
+
+./testenv || report_failure
+
+
+#echo Update the docs to the newest version in subversion
+#svn update || report_failure
+
+
+# build all the html documentation
+makedocs $1;
+
+# now make the table of contents for the chm file
+echo Generating the table of contents for the chm file
+xsltproc -o docs/chm/Table\ of\ Contents.hhc docs/chm/htmlhelp_stylesheet.xsl docs/chm/toc.xml
+

@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>Metaprogramming</title>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <br/><br/>
+
+         <p>
+         This page documents library components that provide metaprogramming sorts of functionality.  For
+         the most part they are useful for putting design by contract checks into code or doing various kinds of
+         clever things with templates. 
+         </p>
+         <p>
+            For example, you might have a templated function that is templated on a type T and you want to
+            make sure that T is either a char or wchar_t type.  You could place the following into your code
+            and it would cause the compile to error out when T was set to something other than char or wchar_t.
+            <br/>
+            <tt>COMPILE_TIME_ASSERT((is_same_type&lt;T,char&gt;::value || is_same_type&lt;T,wchar_t&gt;::value));</tt>
+         </p>
+
+   </body>
+
+   <!-- ************************************************************************* -->
+
+   <menu width="200">
+    <top>
+      <section>
+         <name>Objects</name>
+         <item>is_pointer_type</item>
+         <item>is_same_type</item>
+         <item>is_signed_type</item>
+         <item>is_unsigned_type</item>
+         <item>static_switch</item>
+         <item>noncopyable</item>
+         <item>enable_if</item>
+         <item>is_graph</item>
+         <item>is_matrix</item>
+         <item>is_directed_graph</item>
+         <item>is_built_in_scalar_type</item>
+         <item>unsigned_type</item> 
+      </section>
+ 
+      <section>
+         <name>Global Functions</name>
+         <item>DLIB_ASSERT</item> 
+         <item>DLIB_CASSERT</item> 
+         <item>COMPILE_TIME_ASSERT</item> 
+         <item>ASSERT_ARE_SAME_TYPE</item> 
+         <item>ASSERT_ARE_NOT_SAME_TYPE</item> 
+         <item>_dT</item> 
+         <item>TIME_THIS</item> 
+         <item>assign_zero_if_built_in_scalar_type</item>
+      </section>
+
+      <section>
+         <name>Other</name>
+         <item>portability_macros</item>
+      </section>
+
+    </top>  
+   </menu>
+
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
+   <components>
+   
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>unsigned_type</name>
+         <file>dlib/uintn.h</file>
+         <spec_file link="true">dlib/uintn.h</spec_file>
+         <description>
+            This is a template that allows you to obtain the unsigned version 
+            of any integral type.  For example, unsigned_type&lt;signed short&gt;::type ==
+            unsigned short.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>static_switch</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+        To use this template you give it some number of boolean expressions and it
+        tells you which one of them is true.   If more than one of them is true then
+        it causes a compile time error.  It is useful for cases where you want to
+        specialize a template and you want to specialize it not by
+        the type of object it gets per say but instead according to the values of some
+        type traits associated with the various template arguments.  A simple example of
+        this can be seen in the <a href="imaging.html#assign_pixel">assign_pixel</a>'s
+        implementation which can be found at the bottom of the <a href="dlib/pixel.h.html">
+        dlib/pixel.h</a> file.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>enable_if</name>
+         <file>dlib/enable_if.h</file>
+         <description>
+            This is a family of templates from the Boost C++ libraries that makes it somewhat easier to control
+            template specilization.  For the details see <a href="enable_if.html">
+               this page</a>.  Note that the header <tt>dlib/enable_if.h</tt> brings
+               these templates into the dlib namespace.<br/>
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>noncopyable</name>
+         <file>dlib/noncopyable.h</file>
+         <spec_file link="true">dlib/noncopyable.h</spec_file>
+         <description>
+            This is a simple class that makes it easy to declare a non-copyable object.
+            To use it to make your own class non-copyable just inherit from it.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_same_type</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template where is_same_type&lt;T,U&gt;::value == true when T and U are 
+            the same type and false otherwise. 
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_signed_type</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template where is_signed_type&lt;T&gt;::value == true when T is
+            a signed integral type and false when it is an unsigned integral
+            type.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_unsigned_type</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template where is_unsigned_type&lt;T&gt;::value == true when T is
+            an unsigned integral type and false when it is a signed integral
+            type.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_directed_graph</name>
+         <file>dlib/is_kind.h</file>
+         <spec_file link="true">dlib/is_kind.h</spec_file>
+         <description>
+            This is a template where is_directed_graph&lt;T&gt;::value == true when T
+            is a <a href="containers.html#directed_graph">directed_graph</a> object.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_built_in_scalar_type</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template where is_built_in_scalar_type&lt;T&gt;::value == true when T
+            is a built in scalar type such as int, char, float, etc...
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
+         <name>is_matrix</name>
+         <file>dlib/is_kind.h</file>
+         <spec_file link="true">dlib/is_kind.h</spec_file>
+         <description>
+            This is a template where is_matrix&lt;T&gt;::value == true when T
+            is a <a href="containers.html#matrix">matrix</a> object.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
+         <name>is_graph</name>
+         <file>dlib/is_kind.h</file>
+         <spec_file link="true">dlib/is_kind.h</spec_file>
+         <description>
+            This is a template where is_graph&lt;T&gt;::value == true when T
+            is a <a href="containers.html#graph">graph</a> object.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_pointer_type</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template where is_pointer_type&lt;T&gt;::value == true when T is a pointer 
+            type ane false otherwise.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>ASSERT_ARE_NOT_SAME_TYPE</name>
+         <file>dlib/assert.h</file>
+         <spec_file>dlib/assert.h</spec_file>
+         <description>
+      <p>
+            This is a macro function for debuging.  Its form is <tt>ASSERT_ARE_NOT_SAME_TYPE(type1, type2)</tt>.  
+            If type1 and type2 are the same type then the compile will fail.  This is sometimes useful 
+            in validating template arguments.
+      </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>ASSERT_ARE_SAME_TYPE</name>
+         <file>dlib/assert.h</file>
+         <spec_file>dlib/assert.h</spec_file>
+         <description>
+      <p>
+            This is a macro function for debuging.  Its form is <tt>ASSERT_ARE_SAME_TYPE(type1, type2)</tt>.  
+            If type1 and type2 are not the same type then the compile will fail.  This is sometimes useful 
+            in validating template arguments.
+      </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>COMPILE_TIME_ASSERT</name>
+         <file>dlib/assert.h</file>
+         <spec_file>dlib/assert.h</spec_file>
+         <description>
+      <p>
+            This is a macro function for debuging.  Its form is <tt>COMPILE_TIME_ASSERT(condition that should 
+            be true)</tt>.  The condition must be a compile time constant and if it is false then the compile
+            will fail.
+      </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>DLIB_CASSERT</name>
+         <file>dlib/assert.h</file>
+         <spec_file>dlib/assert.h</spec_file>
+         <description>
+      <p>
+         This is a macro function that is identicial to the <a href="#DLIB_ASSERT">DLIB_ASSERT</a> macro
+         except that it is always enabled.  Even if _DEBUG, DEBUG and ENABLE_ASSERTS are not defined.
+      </p>
+      <p>
+         Note that when this macro fails and throws an exception it also calls the global
+         C function dlib_assert_breakpoint().  This behavior makes it easy to set a debugging
+         tool to break when DLIB_CASSERT fails by setting a breakpoing on dlib_assert_breakpoint().
+      </p>
+         </description>
+                                 
+      </component>
+            
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>DLIB_ASSERT</name>
+         <file>dlib/assert.h</file>
+         <spec_file>dlib/assert.h</spec_file>
+         <description>
+      <p>
+            This is a macro function for debuging.  Its form is <tt>DLIB_ASSERT(condition that should be 
+            true,error message)</tt>.  If the condition is false DLIB_ASSERT throws an exception of type 
+            dlib::fatal_error with fatal_error::type == EBROKEN_ASSERT.  An error message detailing
+            the nature of the problem is stored in the member variable info which is of type std::string.  
+            Look in the following file for more details.  The exception classes are defined 
+            <a href="dlib/error.h.html#error">here</a>.
+      </p>
+      <p>
+         This macro is only enabled if _DEBUG, DEBUG or ENABLE_ASSERTS is defined.  Also, if this macro <i>is</i>
+         enabled then ENABLE_ASSERTS will be defined even if you didn't define it.
+      </p>
+      <p>
+         Note that when this macro fails and throws an exception it also calls the global
+         C function dlib_assert_breakpoint().  This behavior makes it easy to set a debugging
+         tool to break when DLIB_CASSERT fails by setting a breakpoing on dlib_assert_breakpoint().
+      </p>
+         </description>
+                                 
+      </component>
+            
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>_dT</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a macro function for converting a string/character literal to either a char or wchar_t literal. 
+   Its form is <tt>_dT(target character type,string or character literal)</tt>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>assign_zero_if_built_in_scalar_type</name>
+         <file>dlib/algs.h</file>
+         <spec_file>dlib/algs.h</spec_file>
+         <description>        
+            <p>
+               This function assigns its argument the value of 0 if it is a built in scalar
+               type according to the <a href="#is_built_in_scalar_type">is_built_in_scalar_type</a>
+               template.  If it isn't a built in scalar type then it does nothing.
+            </p>
+            <p>
+               This function is useful for suppressing compiler warnings about uninitialized 
+               types inside of templates that are designed to accept the built in types
+               as well as user defined classes.
+            </p>
+            
+         </description>
+                                 
+      </component>
+            
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>TIME_THIS</name>
+         <file>dlib/time_this.h</file>
+         <spec_file>dlib/time_this.h</spec_file>
+         <description>        
+            <p>
+            This is a macro function for timing blocks of code.  Its form is <tt>TIME_THIS(whatever you want to time)</tt>
+            It's pretty straight forward. It just prints the time it took to std::cout.
+            </p>
+            <p>
+            There is another version of this function called TIME_THIS_TO which takes as a parameter an ostream
+            object to write its output to.  Its form is <tt>TIME_THIS_TO(what you want to time, the output stream)</tt>;
+            </p>
+            
+         </description>
+                                 
+      </component>
+            
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>portability_macros</name>
+         <file>dlib/platform.h</file>
+         <spec_file>dlib/platform.h</spec_file>
+         <description>        
+            This file #defines various macros depending on the platform being compiled under. 
+            See the file itself for the specifics.
+         </description>
+                                 
+      </component>
+            
+         
+   <!-- ************************************************************************* -->
+      
+   </components>
+
+   <!-- ************************************************************************* -->
+
+
+</doc>
+

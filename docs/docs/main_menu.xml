@@ -1,0 +1,259 @@
+<?html version="1.0" encoding="ISO-8859-1"?>
+
+<doc>
+   <menu width="145">
+    <top>
+      <section>
+         <name>The Library</name>
+         <item>
+            <name>Algorithms</name>
+            <link>algorithms.html</link>
+            <chm_sub>algorithms.xml</chm_sub>
+         </item>
+         <item>
+            <name>Containers</name>
+            <link>containers.html</link>
+            <chm_sub>containers.xml</chm_sub>
+         </item>
+         <item>
+            <name>API Wrappers</name>
+            <link>api.html</link>
+            <chm_sub>api.xml</chm_sub>
+         </item>
+         <item>
+            <name>Network</name>
+            <link>network.html</link>
+            <chm_sub>network.xml</chm_sub>
+         </item>
+         <item>
+            <name>Compression</name>
+            <link>compression.html</link>
+            <chm_sub>compression.xml</chm_sub>
+         </item>
+         <item>
+            <name>Parsing</name>
+            <link>parsing.html</link>
+            <chm_sub>parsing.xml</chm_sub>
+         </item>
+         <item>
+            <name>Imaging</name>
+            <link>imaging.html</link>
+            <chm_sub>imaging.xml</chm_sub>
+         </item>
+         <item>
+            <name>Metaprogramming</name>
+            <link>metaprogramming.html</link>
+            <chm_sub>metaprogramming.xml</chm_sub>
+         </item>
+         <item>
+            <name>Miscellaneous</name>
+            <link>other.html</link>
+            <chm_sub>other.xml</chm_sub>
+         </item>
+      </section>
+ 
+
+      <section>
+         <name>Help/Info</name>
+         <item>
+            <name>Home</name>
+            <link>index.html</link>
+         </item>
+         <item>
+            <name>Introduction</name>
+            <link>intro.html</link>
+            <chm_sub>intro.xml</chm_sub>
+         </item>
+         <item>
+            <name>How to compile</name>
+            <link>compile.html</link>
+         </item>
+         <item>
+            <name>License</name>
+            <link>license.html</link>
+         </item>
+         <item>
+            <name>Index</name>
+            <link>term_index.html</link>
+         </item>
+         <item nolink="true">
+            <name>Examples</name>
+            <sub>
+               <item>
+                  <name>Member_Function_Pointer</name>
+                  <link>member_function_pointer_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Matrix</name>
+                  <link>matrix_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Image</name>
+                  <link>image_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Support_Vector_Machine</name>
+                  <link>svm_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Neural_Network</name>
+                  <link>mlp_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Bayesian_Network_From_Disk</name>
+                  <link>bayes_net_from_disk_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Bayesian_Network_GUI</name>
+                  <link>bayes_net_gui_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Bayesian_Network</name>
+                  <link>bayes_net_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Std_C++_Allocator</name>
+                  <link>std_allocator_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>HTTP_Server</name>
+                  <link>server_http_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Base64_Encoder</name>
+                  <link>file_to_code_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Sockstreambuf</name>
+                  <link>sockstreambuf_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Logger</name>
+                  <link>logger_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Logger_Advanced</name>
+                  <link>logger_ex_2.cpp.html</link>
+               </item>
+               <item>
+                  <name>XML_Parser</name>
+                  <link>xml_parser_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Threads</name>
+                  <link>threads_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Directory_Navigation</name>
+                  <link>dir_nav_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>GUI</name>
+                  <link>gui_api_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Sockets</name>
+                  <link>sockets_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Sockets_2</name>
+                  <link>sockets_ex_2.cpp.html</link>
+               </item>
+               <item>
+                  <name>Queue</name>
+                  <link>queue_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Pipe</name>
+                  <link>pipe_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Timer</name>
+                  <link>timer_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Compress_Stream</name>
+                  <link>compress_stream_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Cmd_Line_Parser</name>
+                  <link>compress_stream_ex.cpp.html#_top</link>
+               </item>
+               <item>
+                  <name>Threaded_Object</name>
+                  <link>threaded_object_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Thread_Function</name>
+                  <link>thread_function_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Multithreaded_Object</name>
+                  <link>multithreaded_object_ex.cpp.html</link>
+               </item>
+            </sub>
+         </item>
+      </section>
+ 
+      <section>
+         <name>Current Release</name>
+         <item nolink="true">Version: <current_release/></item> 
+         <item>
+            <name>Release Notes</name>
+            <link>release_notes.html</link>
+         </item>
+         <item>
+            <name>Change Log</name>
+            <link>change_log.html</link>
+         </item>
+      
+      </section>
+
+
+      <web>
+         <section>
+            <name>Sourceforge</name>
+            <item>
+               <name>Summary</name>
+               <link>http://sourceforge.net/projects/dclib/</link>
+            </item>
+            <item>
+               <name>Forums</name>
+               <link>http://sourceforge.net/forum/?group_id=130373</link>
+            </item>
+            <item>
+               <name>Download Files</name>
+               <link>http://sourceforge.net/project/platformdownload.php?group_id=130373</link>
+            </item>
+         </section>
+
+      </web>
+    </top>
+
+   <bottom>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <web>
+<a href="http://www.ohloh.net/projects/3306?ref=WidgetProjectThinBadge"><img width='100' height='16' src='http://www.ohloh.net/projects/3306/widgets/project_thin_badge.gif' alt="Ohloh project report for dlib C++ Library" /></a>
+
+         <br/>
+         <a href="http://sourceforge.net/"><img src="http://sourceforge.net/sflogo.php?group_id=130373&amp;type=1"/></a>
+         <br/>
+      </web>
+      Last Modified:<br/>
+      <last_modified_date/>
+      <br/>
+      <br/>
+   </bottom>
+   
+   </menu>
+
+</doc>
+

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <center><h1>dlib C++ library</h1></center>
+      <br/><br/>
+
+
+      <p>
+         <web>Welcome to the dlib C++ library's homepage. </web>
+         <chm>Welcome to the dlib C++ library documentation.</chm>
+
+      It is a modern C++ library with a focus on portability
+      and program correctness.  It strives to be easy to use right and hard to use wrong. 
+      Thus, it comes with extensive documentation and thorough debugging modes. 
+      </p>
+
+      <p>
+      The library is open source software and is licensed
+      under the <a href="license.html">Boost Software License</a>.
+
+      The <a href="intro.html">introduction</a> contains everything you need to know to get
+      started using the library.  However, if you have any questions, comments, or complaints feel free to 
+      <a href='mailto:davisking@users.sourceforge.net'>email me</a><web> or post in the 
+      sourceforge <a href='http://sourceforge.net/forum/?group_id=130373'>Forums</a></web>.
+      
+      
+      </p>
+
+      <chm>
+         <p>
+            For updates to this project check its sourceforge page at <a href="http://dclib.sourceforge.net">http://dclib.sourceforge.net</a>.
+         </p>
+      </chm>
+
+      <br/>
+
+      <p>
+         <h2>Major Features</h2>
+         <ul>
+            <li><b>Documentation</b>
+            <ul>
+               <li>Unlike a lot of open source projects, this one provides complete and precise 
+                  documentation for every class and function.   There are also debugging modes that check the 
+                  documented preconditions for functions.  When this is enabled it will catch the vast majority of
+                  bugs caused by calling functions incorrectly or using objects in an incorrect manner.  
+               </li>
+               <li>Lots of example programs are provided</li>
+               <li><i>I consider the documentation to be the most important part of the library</i>.  So if you find anything 
+                  that isn't documented, isn't clear, or has out of date documentation, tell me and I will fix it.
+               </li>
+            </ul>
+            </li>
+
+            <li><b>Portable Code</b>
+               <ul>
+                  <li>All non ISO C++ code is isolated inside the OS abstraction layers which are kept as small as possible.   
+                     The rest of the library is either layered on top of the OS 
+                     abstraction layers or is pure ISO C++.  </li>
+                  <li>Big/little endian agnostic</li>
+                  <li>No other packages are required to use the library.  Only APIs that are
+                     provided by an out of the box OS are used. </li> 
+                  <li>The library is tested regularly on win32, Linux, and Mac OS X systems.  However, it should 
+                     work on any POSIX system and has been tested on Solaris, HPUX, and the BSDs.</li>
+               </ul>
+            </li>
+            <li><b>Threading</b>
+               <ul>
+                  <li>The library provides a portable and simple <a href="api.html#threads">threading API</a></li>
+                  <li>A <a href="other.html#pipe">pipe</a> for inter-thread communication</li>
+                  <li>A <a href="other.html#timer">timer</a> object capable of generating events that are regularly spaced in time</li>
+                  <li><a href="api.html#thread_specific_data">Thread specific data</a></li>
+                  <li><a href="api.html#threaded_object">Threaded objects</a></li>
+                  <li><a href="api.html#thread_function">Threaded functions</a></li>
+               </ul>
+            </li>
+
+            <li><b>Networking</b>
+               <ul>
+                  <li>The library provides a portable and simple <a href="api.html#sockets">TCP sockets API</a></li>
+                  <li>An object to help you make TCP based <a href="network.html#server">servers</a></li>
+                  <li>A <a href="network.html#sockstreambuf">streambuf</a> object that enables TCP sockets 
+                  to interoperate with the C++ iostreams library </li>
+                  <li>A simple <a href="network.html#http">HTTP server</a> object you can use to embed a 
+                  web server into your applications</li> 
+               </ul>
+            </li>
+
+            <li><b>Graphical User Interfaces</b>
+               <ul>
+                  <li>The library provides a portable and simple core <a href="api.html#gui_core">GUI API</a></li>
+                  <li>Implemented on top of the core GUI API are numerous <a href="api.html#gui_widgets">widgets</a></li>
+                  <li>Unlike many other GUI toolkits, the entire dlib GUI toolkit is threadsafe</li>
+               </ul>
+            </li>
+
+
+            <li><b>Numerical Algorithms</b>
+               <ul>
+                  <li>A fast <a href="containers.html#matrix">matrix</a> object implemented using the expression templates technique</li>
+                  <li>Numerous linear algebra and mathematical operations are defined for the matrix object such as the 
+                     <a href="dlib/matrix/matrix_utilities_abstract.h.html#svd">singular value decomposition</a>, 
+                     <a href="dlib/matrix/matrix_utilities_abstract.h.html#trans">transpose</a>, 
+                     <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc...</li>
+                  <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
+                  <li>A <a href="algorithms.html#rand">random number</a> object</li>
+               </ul>
+            </li>
+
+            <li><b>Machine Learning Algorithms</b>
+               <ul>
+                  <li><a href="algorithms.html#mlp">multi layer perceptrons</a> </li>  
+                  <li><a href="algorithms.html#svm_nu_train">nu support vector machines</a></li>
+                  <li>Bayesian Network inference algorithms such as the 
+                     <a href="algorithms.html#bayesian_network_join_tree">join tree</a> algorithm and 
+                     <a href="algorithms.html#bayesian_network_gibbs_sampler">Gibbs sampler</a> Markov Chain Monte Carlo algorithm</li>
+               </ul>
+            </li>
+
+            <li><b>Image Processing</b>
+               <ul>
+                  <li>Windows BMP <a href="imaging.html#load_bmp">read</a> and <a href="imaging.html#save_bmp">write</a> support</li>
+                  <li>Automatic color space conversion between various pixel types</li>  
+                  <li>Common image operations such as edge finding and morphological operations</li>
+               </ul>
+            </li>
+
+            <li><b>Data Compression and Integrity Algorithms</b>
+               <ul>
+                  <li>A <a href="algorithms.html#crc32">CRC 32</a> object</li>  
+                  <li><a href="algorithms.html#md5">MD5</a> functions</li>
+                  <li>Various abstracted objects representing parts of <a href="compression.html">data compression</a> 
+                  algorithms.  Many forms of the PPM algorithm are included.  </li>
+               </ul>
+            </li>
+
+            <li><b>Testing</b>
+               <ul>
+                  <li>A thread safe <a href="other.html#logger">logger</a> object styled after the popular Java logger log4j</li>
+                  <li>A modular <a href="other.html#dlib_testing_suite">unit testing framework</a></li>
+                  <li>Various <a href="metaprogramming.html">assert</a> macros useful for testing preconditions</li>
+               </ul>
+            </li>
+
+            <li><b>General Utilities</b>
+               <ul>
+                  <li>A type-safe <a href="other.html#byte_orderer">object</a> to convert between big and little endian byte orderings</li>
+                  <li>A <a href="parsing.html#cmd_line_parser">command line parser</a> with the ability to 
+                  parse and validate command lines with various types of arguments and options</li>
+                  <li>An <a href="parsing.html#xml_parser">XML parser</a></li>
+                  <li>An object that can perform <a href="parsing.html#base64">base64</a> conversions</li>
+                  <li>Many <a href="containers.html">container classes</a></li>
+                  <li><a href="other.html#serialize">Serialization support</a></li>
+                  <li>Many <a href="other.html#memory_manager">memory manager</a> objects that implement 
+                  differnt memory pooling strategies</li>
+               </ul>
+            </li>
+         </ul>
+
+      </p>
+
+   
+   </body>
+
+   <!-- ************************************************************************* -->
+
+</doc>

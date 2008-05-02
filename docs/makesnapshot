@@ -1,0 +1,51 @@
+#!/bin/bash
+
+report_failure ()
+{
+    echo "  **** failed to complete **** "
+    exit 1
+}
+
+
+./testenv || report_failure
+
+./makedocs snapshot || exit 1 
+
+
+
+REVISION=`svn info | grep Revision | awk '{ print $2 }'`
+
+
+DLIB_REPOS=`svn info | grep Root | awk '{print $3}'`
+
+
+
+cd release || report_failure
+rm -rf *
+RELDIR=`echo dlib_snapshot-rev$REVISION`
+mkdir $RELDIR
+cd $RELDIR || report_failure
+cp -r ../../docs/cache/dlib . || report_failure
+cp -r ../../docs/cache/examples . || report_failure
+
+echo This copy of dlib C++ library is a developmental snapshot. >> dlib/README.txt
+echo Subversion Revision Number: $REVISION >> dlib/README.txt
+
+
+SOURCE_ZIP=`echo $RELDIR.zip`
+SOURCE_TAR=`echo $RELDIR.tar`
+tar -C ../../docs/chm -cf - docs/ documentation.html --exclude=".svn" | tar -xf -
+cd .. || report_failure
+
+tar -cf $SOURCE_TAR $RELDIR 
+# flip everything to MS-DOS line endings 
+find $RELDIR -name "*.cpp" -or -name "*.h" -or -name "*.txt" -or -name "*.html" | xargs flip -m
+zip -r9 $SOURCE_ZIP $RELDIR > /dev/null
+bzip2 $SOURCE_TAR
+
+rm -rf $RELDIR
+
+wine ../docs/chm/htmlhelp/hhc.exe ../docs/chm/lib.hhp
+mv ../docs/chm/help.chm dlib_documentation_snapshot-rev$REVISION.chm
+
+

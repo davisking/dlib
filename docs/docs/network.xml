@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>Networking</title>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <br/><br/>
+      <p>
+      To use any of these objects all you need to do is #include the file indicated in the 
+      short section about the component you would like to use. Pick which implementation you 
+      would like and typedef it to something nice. Here is an example of creating a typedef for 
+      a linker using the first kernel implementation. <br/>
+      <tt>typedef dlib::linker::kernel_1a linker1;</tt> 
+      </p>
+
+   </body>
+
+   <!-- ************************************************************************* -->
+
+   <menu width="150">
+      <top>
+         <section>
+            <name>Objects</name>
+            <item>linker</item> 
+            <item>server</item> 
+            <item>sockstreambuf</item> 
+
+         </section>
+
+      </top>
+
+   </menu>
+
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
+   <components>
+   
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>linker</name>
+         <file>dlib/linker.h</file>
+         <spec_file>dlib/linker/linker_kernel_abstract.h</spec_file>
+         <description>
+            This object represents something that takes two connections and lets
+            them talk to each other.  ie. any incoming data from one connection is
+            passed unaltered to the other and vice versa.         
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>linker_kernel_1</name>
+               <file>dlib/linker/linker_kernel_1.h</file>
+               <description> 
+                  This implementation is done just using the objects defined in the 
+                  <a href="api.html#sockets">sockets</a> and <a href="api.html#threads">threads</a> packages.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for linker_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>server</name>
+         <file>dlib/server.h</file>
+         <spec_file>dlib/server/server_kernel_abstract.h</spec_file>
+         <description>
+                This object represents a server that listens on a port and spawns new
+                threads to handle each new connection. It also manages the connections
+                and threads for you.
+         </description>
+
+         <examples>
+            <example>sockets_ex.cpp.html</example>
+            <example>sockstreambuf_ex.cpp.html</example>
+            <example>server_http_ex.cpp.html</example>
+         </examples>
+         
+         <implementations>
+            <implementation>
+               <name>server_kernel_1</name>
+               <file>dlib/server/server_kernel_1.h</file>
+               <description> 
+                  This implementation is done using the objects defined in the 
+                  <a href="api.html#sockets">sockets</a> and <a href="api.html#threads">threads</a> packages.
+                  It also uses a <a href="containers.html#set">set</a> to keep track of the connections.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for server_kernel_1 that uses set_kernel_1a</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+        
+         <extensions>
+            <extension>
+               <name>iostream</name>
+               <spec_file>dlib/server/server_iostream_abstract.h</spec_file>
+               <description> 
+                This extension redefines the on_connect() function so that
+                instead of giving you a connection object you get an istream 
+                and ostream object.
+               </description> 
+
+               <implementations>
+                  <implementation>
+                     <name>server_iostream_1</name>
+                     <file>dlib/server/server_iostream_1.h</file>
+                     <description> 
+                        This is implemented in the obvious way using the <a href="#sockstreambuf">sockstreambuf</a> object.
+                     </description> 
+
+                     <typedefs>
+                        <typedef>
+                           <name>iostream_1a</name>
+                           <description>is a typedef for server_kernel_1a extended by server_iostream_1 that uses
+                              sockstreambuf_kernel_2a</description>
+                        </typedef>
+                     </typedefs>                
+                     
+                  </implementation> 
+
+
+               </implementations>
+   
+            </extension>
+
+            <extension>
+               <name>http</name>
+               <spec_file>dlib/server/server_http_abstract.h</spec_file>
+               <description> 
+                This extension turns the server object into a simple HTTP server.
+               </description> 
+
+               <examples>
+                  <example>server_http_ex.cpp.html</example>
+               </examples>
+
+               <implementations>
+                  <implementation>
+                     <name>server_http_1</name>
+                     <file>dlib/server/server_http_1.h</file>
+                     <description> 
+                        This is implemented in the obvious way.
+                     </description> 
+
+                     <typedefs>
+                        <typedef>
+                           <name>http_1a</name>
+                           <description>is a typedef for server_iostream_1a extended by server_http_1 </description>
+                        </typedef>
+                     </typedefs>                
+                     
+                  </implementation> 
+
+
+               </implementations>
+   
+            </extension>
+
+         </extensions>
+
+
+
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>sockstreambuf</name>
+         <file>dlib/sockstreambuf.h</file>
+         <spec_file>dlib/sockstreambuf/sockstreambuf_kernel_abstract.h</spec_file>
+         <description>
+            This object represents a stream buffer for connection objects.
+         </description>
+         
+         <examples>
+            <example>sockstreambuf_ex.cpp.html</example>
+            <example>sockets_ex_2.cpp.html</example>
+         </examples>
+
+         <implementations>
+            <implementation>
+               <name>sockstreambuf_kernel_1</name>
+               <file>dlib/sockstreambuf/sockstreambuf_kernel_1.h</file>
+               <description> 
+                  This implementation is done in the obvious way without any sort of buffering. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for sockstreambuf_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>sockstreambuf_kernel_2</name>
+               <file>dlib/sockstreambuf/sockstreambuf_kernel_2.h</file>
+               <description> 
+                  This implementation is done in the obvious way but <i>with</i> buffering.  Thus, it is
+                  considerably faster than the unbuffered version of this object.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for sockstreambuf_kernel_2</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+      
+   <!-- ************************************************************************* -->
+      
+   </components>
+
+   <!-- ************************************************************************* -->
+
+
+</doc>

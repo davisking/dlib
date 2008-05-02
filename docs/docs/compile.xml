@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+    <title>How to compile</title>
+
+
+
+
+
+    <!-- ************************************************************************* -->
+
+    <body>
+        <br/><br/>
+        
+
+
+        <p>
+           To use this library all you have to do is extract the library somewhere, make sure the folder <i>containing</i> 
+           the dlib folder is in your include path, and finally add <a href="dlib/all/source.cpp.html">dlib/all/source.cpp</a> 
+           to your project.   
+        </p>
+        <p>
+            An example makefile that uses this library can be found here: 
+            <a href="dlib/test/makefile">dlib/test/makefile</a>.  It is the makefile used to build the regression 
+            test suite for this library.  There is also a 
+            <web> <a href="http://www.cmake.org">CMake</a> </web> <chm>CMake</chm> makefile that builds the 
+            regression test suite at <a href="dlib/test/CMakeLists.txt.html">dlib/test/CMakeLists.txt</a> and another
+            CMake makefile that builds all the example programs at 
+            <a href="examples/CMakeLists.txt.html">examples/CMakeLists.txt</a>
+        </p>
+        <p>
+        I try to make sure everything compiles fine under Visual Studio .NET 2003 (and above) and gcc.  The compilers that will give you trouble are listed at the bottom of the page.
+        </p>
+        <p>
+           Again, note that you should <b><i>not</i></b> add the dlib folder itself to your compiler's include path.  
+           Doing so will cause the
+           build to fail because of name collisions (such as dlib/string.h and string.h from the standard library).  
+           Instead you should add the folder that contains the dlib folder to your include search path and then use 
+           include statements of the form <tt>#include &lt;dlib/queue.h&gt;</tt>.  This will ensure that everything 
+           builds correctly.
+        </p>
+
+
+        <center><h1>Preprocessor Directives</h1></center>
+
+         <p>
+            There are a few preprocessor directives that you can supply during the build process to cause the
+            library to build in various optional ways.  The most people will probably not want
+            to mess with these at all and just use the library in its default build.  But they are listed
+            here in the event that you need to use them.
+         </p>
+
+         <anchor>DLIB_THREAD_POOL_TIMEOUT</anchor>
+        <h3>#define DLIB_ISO_CPP_ONLY</h3>
+        <p>
+           This is a #define directive that you can set to cause the library to exclude all non ISO C++ code (The things in the <a href="api.html">API wrappers</a> section and any objects that depend on those wrappers).
+           This is useful if you are trying to build on a system that isn't fully supported by the library or if you 
+           just decide you don't want any of that stuff compiled into your program for your own reasons.
+        </p>
+         <anchor>DLIB_NO_GUI_SUPPORT</anchor>
+        <h3>#define DLIB_NO_GUI_SUPPORT</h3>
+        <p>
+           This is just like the DLIB_ISO_CPP_ONLY option except that it excludes only the GUI part of the library.
+           An example of when you might want to use this would be if you don't need GUI support and you are building
+           on a UNIX platform that doesn't have the X11 headers installed.
+        </p>
+         <anchor>NO_MAKEFILE</anchor>
+        <h3>#define NO_MAKEFILE</h3>
+        <p>
+           This preprocessor directive causes the dlib headers to pull in all the 
+           code that would normally be built in dlib/all/source.cpp.  Thus if you #define NO_MAKEFILE you won't 
+           have to add dlib/all/source.cpp to your project.  The <i>only</i> time this is useful is when your 
+           project consists of a single translation unit (i.e. a single cpp file).  In this instance NO_MAKEFILE
+           allows you to easily build your project on the command line by saying something like <tt>g++ -DNO_MAKEFILE
+           project.cpp</tt>.  But again, this is only for single cpp file projects.  If you use NO_MAKEFILE with projects 
+           that contain more than one cpp file you will get linker errors about multiply defined symbols.
+        </p>
+         <anchor>DLIB_THREAD_POOL_TIMEOUT</anchor>
+        <h3>#define DLIB_THREAD_POOL_TIMEOUT &lt;time-in-milliseconds&gt;</h3>
+        <p>
+           If you use the <a href="dlib/threads/threads_kernel_abstract.h#create_new_thread">create_new_thread</a> function
+           to create your threads then you receive the benefit of the dlib thread pool.  This pool enables the create_new_thread
+           function to spawn new threads very rapidly since it draws threads back out of its thread pool when the pool isn't
+           empty. 
+        </p>
+        <p>
+           Thus, when a thread that was created by create_new_thread ends it actually goes back into the dlib thread pool
+           and waits DLIB_THREAD_POOL_TIMEOUT milliseconds before totally terminating and releasing its resources back
+           to the operating system.  The default timeout used by this library is 30,000 milliseconds (30 seconds).  You
+           may however change this to whatever you like by defining DLIB_THREAD_POOL_TIMEOUT to some new value.  
+        </p>
+         <anchor>DLIB_PNG_SUPPORT</anchor>
+        <h3>#define DLIB_PNG_SUPPORT</h3>
+        <p>
+           This preprocessor directive enables support for Portable Network Graphics (PNG) image files.  So if you want
+           to be able to read them via the <a href="imaging.html#png_loader">png_loader</a> object you must
+           define this preprocessor directive.  You must also ensure that you link to the 
+           <a href="http://www.libpng.org/pub/png/libpng.html">libpng</a> library.  Note that if you build using
+           the CMake file provided with the library it will automatically handle these things if libpng is
+           installed on your system.
+        </p>
+
+
+        <center><h1>Compilers</h1></center>
+
+
+
+
+
+        <h2>Visual Studio .NET 2003</h2>
+        <p>You need to link to one of the multithreaded C run-time libraries if you are using the threading stuff.  You can do 
+        this by setting it in the project options.  If you don't you will get some error about _beginthreadex not linking.
+        </p>
+
+
+
+        <h2>Visual C++ toolkit 2003</h2>
+        <p>
+           This is a pretty good compiler and it is free.  But it can be a major pain to use.
+           To get it working you have to download the platform sdk along with the toolkit itself.
+           both of these things are available from the microsoft web page for free.
+        </p>
+        <p>
+           Once you have the toolkit and platform sdk installed you should be ready to go.
+           Go to start -> programs -> microsoft visual c++ toolkit 2003 -> Visual C++ Toolkit 2003 Command Prompt.  Then switch to the directory that contains your source and the dlib folder.
+        </p>
+        <p>
+           The following is the command I use and yours should look similar:
+           <tt>cl /O2 -DNO_MAKEFILE /EHsc /MT "%1"</tt> <br/>
+               The %1 should be replaced with the cpp file(s) you want to compile.    
+         </p>
+         
+         <p>
+            You may also have to tell the compiler where the include and lib folders are in the platform sdk.
+            If the above command doesn't work try this one (change paths appropriately for your system):
+           <tt>cl /O2 -DNO_MAKEFILE /EHsc /MT /I"C:\Program Files\Microsoft Platform SDK\Include" "%1"  /link /LIBPATH:"C:\Program Files\Microsoft Platform SDK\Lib\" </tt>
+        </p>
+
+
+
+
+
+
+        <h2>gcc</h2>
+        <p>
+        I generally use gcc version 4.1 but most other versions of gcc work just fine also (except 2.95, see below).
+        </p>
+        <p>
+        The command line I generally use is "g++ -D NO_MAKEFILE -lnsl -lpthread file.cpp" I think you need to
+        tell it to link nsl to make the threading stuff work right, I honestly can't remember what part of 
+        the library requires it I have just been doing it for so long :)
+        </p>
+        <p>
+        If you are using the sockets stuff then on some platforms you need to supply the -lsocket option.  Or if you are using the gui stuff you will need to supply the -lX11 option.
+        </p>
+        <p>
+           If you compile on solaris you have to give the -lsocket 
+           option if you use the sockets API.
+        </p>
+        <h2>gcc on windows</h2>
+        <p>
+            The commands for gcc on windows are the same as above but you may also have to link (via the -l option) to the following libraries: gdi32, 
+            comctl32, user32, or ws2_32.
+        </p>
+
+
+
+
+         
+
+
+
+
+
+
+
+
+
+
+
+
+        <center><h1>Problem Compilers</h1></center>
+        <p>
+        Below is a list of the problems I can remember with various compilers.  All the problems here are
+        bugs in the compiler and are a pain to write workarounds for (or the workarounds are slow/unsatisfactory) so I have no plans to deal with them.  Just avoid these compilers in the
+        given situations.
+        </p>
+
+
+
+
+
+        <li/> <b> Visual Studio .NET and earlier versions </b>
+        <ul>
+        These compilers don't compile standard C++ very well.  Visual Studio 6 
+        doesn't even make any pretenses about being standards compliant.  Visual Studio .NET is a lot 
+        better but has some bugs with how it implements namespace lookups so most of my code will not
+        compile in Visual Studio .NET.   (Note that Visual Studio .NET <I>2003</I> works just fine)
+        </ul>
+
+
+
+
+
+        <li/> <b> gcc 2.95 </b>
+        <ul>
+           <p>
+        The dir_nav component will not be able to list directories that contain files bigger than 4GB because
+        I had to use stat() rather than stat64() when compiling under this compiler.  
+           </p>
+           <p>
+              There are also some other problems with gcc 2.95.  
+              I believe all the containers work and all the API wrappers 
+              but the GUI stuff works.  It is sort of touch and go though.   
+           </p>
+        </ul>
+
+
+
+
+
+    
+    </body>
+
+
+
+    <!-- ************************************************************************* -->
+
+</doc>

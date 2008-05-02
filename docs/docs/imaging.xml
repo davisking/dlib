@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>Imaging</title>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <br/><br/>
+
+         <p>
+            This page documents the functionality present in this library that deals with the
+            management and manipulation of images.  One thing to note is that there is no 
+            explicit image object.  Instead, everything deals with <a href="containers.html#array2d">
+            array2d</a> objects that contain various kinds of pixels.  
+         </p>
+
+   </body>
+
+   <!-- ************************************************************************* -->
+
+   <menu width="150">
+    <top>
+      <section>
+         <name>Objects</name>
+         <item>rgb_pixel</item>
+         <item>rgb_alpha_pixel</item>
+         <item>hsi_pixel</item>
+         <item>pixel_traits</item>
+         <item>png_loader</item>
+      </section>
+ 
+      <section>
+         <name>Global Functions</name>
+         <item>assign_pixel</item> 
+         <item>assign_pixel_intensity</item> 
+         <item>get_pixel_intensity</item> 
+         <item>load_bmp</item> 
+         <item>draw_line</item> 
+         <item>save_bmp</item> 
+         <item>load_dng</item> 
+         <item>save_dng</item> 
+         <item>assign_image</item> 
+         <item>assign_all_pixels</item> 
+         <item>assign_border_pixels</item> 
+         <item>equalize_histogram</item> 
+         <item>edge_orientation</item> 
+         <item>get_histogram</item> 
+         <item>spatially_filter_image</item> 
+
+         <item>hysteresis_threshold</item> 
+         <item>sobel_edge_detector</item> 
+         <item>suppress_non_maximum_edges</item> 
+         <item>zero_border_pixels</item> 
+
+         <item>threshold_image</item>
+         <item>auto_threshold_image</item>
+         <item>binary_dilation</item>
+         <item>binary_erosion</item>
+         <item>binary_open</item>
+         <item>binary_close</item>
+         <item>binary_intersection</item>
+         <item>binary_union</item>
+         <item>binary_difference</item>
+         <item>binary_complement</item>
+      </section>
+
+    </top>  
+   </menu>
+
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
+   <components>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>pixel_traits</name>
+         <file>dlib/pixel.h</file>
+         <spec_file>dlib/pixel.h</spec_file>
+         <description>
+            As the name implies, this is a traits class for pixel types. It allows you
+            to determine what sort of pixel type you are dealing with.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>hsi_pixel</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            This is a simple struct that represents an HSI colored graphical pixel.  Note that
+            since this is just a struct with no member functions there is only one 
+            "implementation" of this object.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rgb_alpha_pixel</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            This is a simple struct that represents an RGB colored graphical pixel with an 
+            alpha channel.  Note that
+            since this is just a struct with no member functions there is only one 
+            "implementation" of this object.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rgb_pixel</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            This is a simple struct that represents an RGB colored graphical pixel.  Note that
+            since this is just a struct with no member functions there is only one 
+            "implementation" of this object.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>assign_pixel</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            assign_pixel() is a templated function that can assign any pixel type to another pixel type.
+            It will perform whatever conversion is necessary to make the assignment work.  (E.g. color to 
+            grayscale conversion)
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>assign_pixel_intensity</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            assign_pixel_intensity() is a templated function that can change the
+            intensity of a pixel.  So if the pixel in question is a grayscale pixel
+            then it simply assigns that pixel the given value.  However, if the
+            pixel is not a grayscale pixel then it converts the pixel to the
+            HSI color space and sets the I channel to the given intensity
+            and then converts this HSI value back to the original pixel's 
+            color space.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>get_pixel_intensity</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            get_pixel_intensity() is a templated function that 
+            returns the grayscale intensity of a pixel.  If the pixel isn't a grayscale
+            pixel then it converts the pixel to the HSI color space and returns the
+            obtained intensity value.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>png_loader</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_loader/png_loader_abstract.h</spec_file>
+         <description>        
+            This object loads a Portable Network Graphics (PNG) image file into 
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_PNG_SUPPORT if you want to use this object.  You
+               must also set your build environment to link to the libpng library.
+            </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>load_dng</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_loader/image_loader_abstract.h</spec_file>
+         <description>        
+      This global function loads a dlib DNG file (a lossless compressed image format) into 
+      an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>save_dng</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_saver/image_saver_abstract.h</spec_file>
+         <description>        
+      This global function writes an image out to an ostream as a dlib DNG file (a lossless 
+      compressed image format). 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>load_bmp</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_loader/image_loader_abstract.h</spec_file>
+         <description>        
+      This global function loads a MS Windows BMP file into an <a href="containers.html#array2d">array2d</a> of 
+      <a href="dlib/pixel.h.html">pixels</a>.
+         </description>
+
+         <examples>
+            <example>image_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>save_bmp</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_saver/image_saver_abstract.h</spec_file>
+         <description>        
+      This global function writes an image out to an ostream as a MS Windows BMP file. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>draw_line</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
+         <description>        
+            This global function draws a line onto an image.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>assign_border_pixels</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/assign_image_abstract.h</spec_file>
+         <description>        
+            This global function assigns all the pixels in the border of an image to 
+            a specific value.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
+         <name>assign_all_pixels</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/assign_image_abstract.h</spec_file>
+         <description>        
+            This global function assigns all the pixels in an image a specific value.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>assign_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/assign_image_abstract.h</spec_file>
+         <description>        
+            This global function copies one image into another and performs any
+            necessary color space conversions to make it work right. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>get_histogram</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/equalize_histogram_abstract.h</spec_file>
+         <description>        
+            This global function computes an image's histogram and returns it in the
+            form of a column or row <a href="containers.html#matrix">matrix</a> object.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>edge_orientation</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>        
+            This global function takes horizontal and vertical gradient magnitude
+            values and returns the orientation of the gradient. 
+         </description>
+                                 
+      </component>
+            
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>equalize_histogram</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/equalize_histogram_abstract.h</spec_file>
+         <description>        
+            This global function performs histogram equalization on an image. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>hysteresis_threshold</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/thresholding_abstract.h</spec_file>
+         <description>        
+            This global function performs hysteresis thresholding on an image. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>sobel_edge_detector</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>        
+            This global function performs spatial filtering on an image using the
+            sobel edge detection filters.
+         </description>
+                                 
+         <examples>
+            <example>image_ex.cpp.html</example>
+         </examples>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>suppress_non_maximum_edges</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>        
+            This global function performs non-maximum suppression on a gradient
+            image.  
+         </description>
+
+         <examples>
+            <example>image_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>zero_border_pixels</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/assign_image_abstract.h</spec_file>
+         <description>        
+            This global function zeros the pixels on the border of an image.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>spatially_filter_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/spatial_filtering_abstract.h</spec_file>
+         <description>        
+            This global function performs spatial filtering on an image with a user
+            supplied filter.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>auto_threshold_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/thresholding_abstract.h</spec_file>
+         <description>        
+            This global function performs a simple binary thresholding on an image with a user
+            supplied threshold.  However, instead of taking a user supplied threshold
+            it computes one from the image using k-means clustering.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>threshold_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/thresholding_abstract.h</spec_file>
+         <description>        
+            This global function performs a simple binary thresholding on an image with a user
+            supplied threshold.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>binary_dilation</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>        
+            This global function performs the morphological operation of dilation on an image. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>binary_erosion</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>        
+            This global function performs the morphological operation of erosion on an image. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>binary_open</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>        
+            This global function performs a morphological opening on an image. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>binary_close</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>        
+            This global function performs a morphological closing on an image. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>binary_intersection</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>        
+            This global function computes the intersection of two binary images. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>binary_union</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>        
+            This global function computes the union of two binary images. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>binary_difference</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>        
+            This global function computes the difference of two binary images. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>binary_complement</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>        
+            This global function computes the complement of a binary image. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+   </components>
+
+   <!-- ************************************************************************* -->
+
+
+</doc>
+

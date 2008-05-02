@@ -1,0 +1,5 @@
+REGEDIT4
+
+
+[HKEY_CURRENT_USER\Software\Wine\AppDefaults\hhc.exe\DllOverrides]
+"itss"="native"

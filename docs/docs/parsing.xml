@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>Parsing</title>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <br/><br/>
+
+      <p>
+      This page documents the objects and functions that in some way deal with parsing or otherwise 
+      manipulating text.  
+      Everything here follows the same conventions as the rest of the library.
+      </p>
+
+
+   
+   </body>
+
+   <!-- ************************************************************************* -->
+
+   <menu width="150">
+    <top>
+      <section>
+         <name>Objects</name>
+         <item>cmd_line_parser</item> 
+         <item>config_reader</item> 
+         <item>cpp_pretty_printer</item> 
+         <item>cpp_tokenizer</item> 
+         <item>tokenizer</item> 
+         <item>xml_parser</item> 
+         <item>base64</item>
+         <item>unichar</item>
+         <item>ustring</item>
+         <item>basic_utf8_ifstream</item>
+      
+      </section>
+
+      <section>
+         <name>Global Functions</name>
+         <item>string_cast</item>
+         <item>cast_to_string</item>
+         <item>cast_to_wstring</item>
+         <item>wrap_string</item>
+         <item>narrow</item> 
+         <item>trim</item> 
+         <item>ltrim</item> 
+         <item>rtrim</item> 
+         <item>pad</item> 
+         <item>lpad</item> 
+         <item>rpad</item> 
+         <item>left_substr</item> 
+         <item>right_substr</item> 
+         <item>tolower</item> 
+         <item>toupper</item> 
+         <item>convert_utf8_to_utf32</item> 
+         <item>is_combining_char</item> 
+      </section>
+    </top>
+   </menu>
+
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
+   <components>
+   
+            
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>toupper</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to convert a string to all uppercase.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>tolower</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to convert a string to all lowercase.
+         </description>
+                                 
+      </component>
+            
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>right_substr</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to return the part of a string to the right of a user supplied delimiter.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      <component>
+         <name>left_substr</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to return the part of a string to the left of a user supplied delimiter.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rpad</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to pad whitespace (or user specfied characters) onto the right most end of a string.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>lpad</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to pad whitespace (or user specfied characters) onto the left most end of a string.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>pad</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to pad whitespace (or user specfied characters) onto the ends of a string.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rtrim</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to remove the whitespace (or user specfied characters) from the right most end of a string.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>ltrim</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to remove the whitespace (or user specfied characters) from the left most end of a string.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>trim</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function to remove the whitespace (or user specfied characters) from the ends of a string.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>narrow</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+            This is a function for converting a string of type std::string or std::wstring 
+    to a plain std::string. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>wrap_string</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>        
+            wrap_string is a function that takes a string and breaks it into a number of
+            lines of a given length.  You can use this to make a string
+            fit nicely into a command prompt window for example.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>cast_to_wstring</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>        
+            cast_to_string is a templated function which makes it easy to convert arbitrary objects to 
+            std::wstring strings.  The types supported are any types that can be written to std::wostream via 
+            operator&lt;&lt;.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>cast_to_string</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>        
+            cast_to_string is a templated function which makes it easy to convert arbitrary objects to 
+            std::string strings.  The types supported are any types that can be written to std::ostream via 
+            operator&lt;&lt;.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>string_cast</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>        
+            string_cast is a templated function which make it easy to convert strings to 
+            other types.  The types supported are any types that can be read by the basic_istream operator>>.  It
+            also supports casting between wstring, string, and ustring objects.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>unichar</name>
+         <file>dlib/unicode.h</file>
+         <spec_file link="true">dlib/unicode/unicode_abstract.h</spec_file>
+         <description>        
+            This is a typedef for an unsigned 32bit integer which we use to store
+            Unicode values.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>basic_utf8_ifstream</name>
+         <file>dlib/unicode.h</file>
+         <spec_file link="true">dlib/unicode/unicode_abstract.h</spec_file>
+         <description>        
+                This object represents an input file stream much like the
+                normal std::ifstream except that it knows how to read UTF-8 
+                data.  So when you read characters out of this stream it will
+                automatically convert them from the UTF-8 multibyte encoding
+                into a fixed width wide character encoding.
+                
+               <p>
+                  There are also two typedefs of this object.  The first is utf8_wifstream which is a
+                  typedef for wchar_t as the wide character to read into.  The second is utf8_uifstream 
+                  which uses unichar instead of wchar_t.
+               </p>
+         </description>
+                                 
+      </component>
+            
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>ustring</name>
+         <file>dlib/unicode.h</file>
+         <spec_file link="true">dlib/unicode/unicode_abstract.h</spec_file>
+         <description>        
+            This is a typedef for a std::basic_string&lt;unichar&gt;.  That is, it is a typedef
+            for a string object that stores unichar Unicode characters. 
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+   
+      <component>
+         <name>is_combining_char</name>
+         <file>dlib/unicode.h</file>
+         <spec_file link="true">dlib/unicode/unicode_abstract.h</spec_file>
+         <description>        
+            This is a global function that can tell you if a character is a Unicode 
+            combining character or not.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>convert_utf8_to_utf32</name>
+         <file>dlib/unicode.h</file>
+         <spec_file link="true">dlib/unicode/unicode_abstract.h</spec_file>
+         <description>        
+            This is a global function that can convert UTF-8 strings into strings
+            of 32bit unichar characters. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>base64</name>
+         <file>dlib/base64.h</file>
+         <spec_file>dlib/base64/base64_kernel_abstract.h</spec_file>
+         <description>
+                This object allows you to encode and decode data to and from
+                the Base64 Content-Transfer-Encoding defined in section 6.8 of
+                rfc2045.
+         </description>
+
+         <examples>
+            <example>file_to_code_ex.cpp.html</example>
+         </examples>
+         
+         <implementations>
+            <implementation>
+               <name>base64_kernel_1</name>
+               <file>dlib/base64/base64_kernel_1.h</file>
+               <description> 
+                  This implementation is done using a lookup table in the obvious way.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for base64_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                     
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>cmd_line_parser</name>
+         <file>dlib/cmd_line_parser.h</file>
+         <spec_file>dlib/cmd_line_parser/cmd_line_parser_kernel_abstract.h</spec_file>
+         <description>
+            This object allows you to easily parse a command line.         
+         </description>
+         
+         <examples>
+            <example>compress_stream_ex.cpp.html</example>
+         </examples>
+
+         <implementations>
+            <implementation>
+               <name>cmd_line_parser_kernel_1</name>
+               <file>dlib/cmd_line_parser/cmd_line_parser_kernel_1.h</file>
+               <description> 
+                  This implementation uses the <a href="containers.html#map">map</a> and <a href="containers.html#sequence">sequence</a> 
+                  containers to keep track of the command line options and arguments.  For further details see the above link.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for cmd_line_parser_kernel_1 that uses map_kernel_1a and sequence_kernel_2a</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                     
+
+         <extensions>
+            <extension>
+               <name>cmd_line_parser_check</name>
+               <spec_file>dlib/cmd_line_parser/cmd_line_parser_check_abstract.h</spec_file>
+               <description>
+                This gives a cmd_line_parser object the ability to easily perform various
+                kinds of validation on the command line input.
+               </description>
+               <implementations>
+                  <implementation>
+                     <name>cmd_line_parser_check_1</name>
+                     <file>dlib/cmd_line_parser/cmd_line_parser_check_1.h</file>
+                     <description>This implementation is done in the obvious way.  See the source for details</description>
+                     <typedefs>
+                        <typedef>
+                           <name>check_1a</name>
+                           <description>is a typedef for cmd_line_parser_print_1 extended by cmd_line_parser_check_1</description>
+                        </typedef>
+                     </typedefs>
+                  </implementation>
+               </implementations>
+            </extension>
+
+            <extension>
+               <name>cmd_line_parser_print</name>
+               <spec_file>dlib/cmd_line_parser/cmd_line_parser_print_abstract.h</spec_file>
+               <description>This extension gives a cmd_line_parser object the ability to print its command line options 
+               in a nice format.</description>
+               <implementations>
+                  <implementation>
+                     <name>cmd_line_parser_print_1</name>
+                     <file>dlib/cmd_line_parser/cmd_line_parser_print_1.h</file>
+                     <description>This implementation is done by enumerating the options of the parser and printing them.</description>
+                     <typedefs>
+                        <typedef>
+                           <name>print_1a</name>
+                           <description>is a typedef for cmd_line_parser_kernel_1 extended by cmd_line_parser_print_1</description>
+                        </typedef>
+                     </typedefs>
+                  </implementation>
+               </implementations>
+            </extension>
+         </extensions>              
+                                    
+                        
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>config_reader</name>
+         <file>dlib/config_reader.h</file>
+         <spec_file>dlib/config_reader/config_reader_kernel_abstract.h</spec_file>
+         <description>
+            This object represents something which is intended to be used to read
+                         text configuration files.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>config_reader_kernel_1</name>
+               <file>dlib/config_reader/config_reader_kernel_1.h</file>
+               <description> 
+                  This implementation is done using the <a href="containers.html#map">map</a> object in the obvious way.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for config_reader_kernel_1 that uses map_kernel_1b</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+               
+         <extensions>
+            <extension>
+               <name>config_reader_thread_safe</name>
+               <spec_file>dlib/config_reader/config_reader_thread_safe_abstract.h</spec_file>
+               <description>
+                This object extends a normal config_reader by simply wrapping all 
+                its member functions inside mutex locks to make it safe to use
+                in a threaded program.  
+               </description>
+               <implementations>
+                  <implementation>
+                     <name>config_reader_thread_safe_1</name>
+                     <file>dlib/config_reader/config_reader_thread_safe_1.h</file>
+                     <description>This implementation is done in the obvious way.  See the source for details</description>
+                     <typedefs>
+                        <typedef>
+                           <name>thread_safe_1a</name>
+                           <description>is a typedef for config_reader_kernel_1 extended by config_reader_thread_safe_1</description>
+                        </typedef>
+                     </typedefs>
+                  </implementation>
+               </implementations>
+            </extension>
+         </extensions>
+         
+               
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>cpp_pretty_printer</name>
+         <file>dlib/cpp_pretty_printer.h</file>
+         <spec_file>dlib/cpp_pretty_printer/cpp_pretty_printer_kernel_abstract.h</spec_file>
+         <description>
+            This object represents an HTML pretty printer for C++ source code.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>cpp_pretty_printer_kernel_1</name>
+               <file>dlib/cpp_pretty_printer/cpp_pretty_printer_kernel_1.h</file>
+               <description> 
+                  This is implemented by using the <a href="#cpp_tokenizer">cpp_tokenizer</a> object.  
+                  This is the pretty printer I use on all the source in this library.  It applies a color scheme, turns
+                  include directives such as #include "file.h" into links to file.h.html and puts HTML anchor points
+                  on function and class declarations.  It also looks for comments starting with /*!A and puts an anchor
+                  before the comment using the word following the A as the name of the anchor.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for cpp_pretty_printer_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+            <implementation>
+               <name>cpp_pretty_printer_kernel_2</name>
+               <file>dlib/cpp_pretty_printer/cpp_pretty_printer_kernel_2.h</file>
+               <description> 
+                  This is implemented by using the <a href="#cpp_tokenizer">cpp_tokenizer</a> object.  
+                  It applies a black and white color scheme suitable 
+                  for printing on a black and white printer.  It also places the document title 
+                  prominently at the top of the pretty printed source file.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for cpp_pretty_printer_kernel_2</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>cpp_tokenizer</name>
+         <file>dlib/cpp_tokenizer.h</file>
+         <spec_file>dlib/cpp_tokenizer/cpp_tokenizer_kernel_abstract.h</spec_file>
+         <description>
+                This object represents a simple tokenizer for C++ source code. 
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>cpp_tokenizer_kernel_1</name>
+               <file>dlib/cpp_tokenizer/cpp_tokenizer_kernel_1.h</file>
+               <description> 
+                  This is implemented by using the <a href="#tokenizer">tokenizer</a> object in the obvious way. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for cpp_tokenizer_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>tokenizer</name>
+         <file>dlib/tokenizer.h</file>
+         <spec_file>dlib/tokenizer/tokenizer_kernel_abstract.h</spec_file>
+         <description>
+            This object represents a simple tokenizer for textual data.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>tokenizer_kernel_1</name>
+               <file>dlib/tokenizer/tokenizer_kernel_1.h</file>
+               <description> 
+                  This is implemented in the obvious way. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for tokenizer_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>xml_parser</name>
+         <file>dlib/xml_parser.h</file>
+         <spec_file>dlib/xml_parser/xml_parser_kernel_abstract.h</spec_file>
+         <description>
+            
+                This object represents a simple SAX style event driven XML parser.  
+                It takes its input from an input stream object and sends events to all 
+                registered document_handler and error_handler objects.
+            <br/><br/>
+            
+            The xml_parser object also uses the interface classes 
+            <a href="dlib/xml_parser/xml_parser_kernel_interfaces.h.html#document_handler">document_handler</a>
+            and 
+            <a href="dlib/xml_parser/xml_parser_kernel_interfaces.h.html#error_handler">error_handler</a>.
+            Subclasses of these classes are passed to the xml_parser which generates events while it's
+            parsing and sends them to the appropriate handler.
+            
+         </description>
+
+         <examples>
+            <example>xml_parser_ex.cpp.html</example>
+         </examples>
+         
+         <implementations>
+            <implementation>
+               <name>xml_parser_kernel_1</name>
+               <file>dlib/xml_parser/xml_parser_kernel_1.h</file>
+               <description> 
+                  This implementation is done using a <a href="containers.html#stack">stack</a> (as opposed to recursive descent) to parse
+                  xml documents.  It also uses a <a href="containers.html#map">map</a> to implement the attribute_list interface and 
+                  internally uses the <a href="containers.html#sequence">sequence</a> object to keep track of all registered document and error
+                  handlers.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for xml_parser_kernel_1 that uses map_kernel_1a, stack_kernel_1a, and sequence_kernel_2a</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+      
+   <!-- ************************************************************************* -->
+      
+   </components>
+
+   <!-- ************************************************************************* -->
+
+
+</doc>

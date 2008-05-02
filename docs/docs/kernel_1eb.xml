@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>kernel_1eb</title>
+   <body from_file="kernel_1eb.txt"/>
+   <menu from_file="compression.xml"/>
+</doc>

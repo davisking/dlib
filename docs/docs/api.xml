@@ -1,0 +1,1089 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>API Wrappers</title>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <br/><br/>
+
+      <p>
+
+      These wrappers provide a portable object oriented interface for networking, multithreading,  
+      GUI development, and file browsing.
+      Programs written using them can be compiled under POSIX or MS Windows platforms without changing the code.
+      </p>
+
+   
+
+        <p>One important thing to note about the API wrappers (except the threading wrappers)
+         is that some platforms
+        need to be initialized in some way or another before the API will work right.
+        Because of this it is never safe to call API wrapper functions before
+        main() has been entered.  This means no global objects with
+        constructors that call them or any weird stuff like that.</p>
+
+
+
+   
+   </body>
+
+   <!-- ************************************************************************* -->
+
+   <menu width="180">
+    <top>
+      <section>
+         <name>API</name>
+                 
+         
+                    
+         <item>
+               <name>gui_widgets</name>
+               <sub>
+                   <item nolink="true">
+                       <name>widgets</name>
+                       <sub>
+                           <item>
+                               <name>dragable</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#dragable</link>
+                           </item>
+                           <item>
+                               <name>arrow_button</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#arrow_button</link>
+                           </item>
+                           <item>
+                               <name>tooltip</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#tooltip</link>
+                           </item>
+                           <item>
+                               <name>button_action</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#button_action</link>
+                           </item>
+                           <item>
+                               <name>scrollable_region</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#scrollable_region</link>
+                           </item>
+                           <item>
+                               <name>zoomable_region</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#zoomable_region</link>
+                           </item>
+                           <item>
+                               <name>mouse_over_event</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#mouse_over_event</link>
+                           </item>
+                           <item>
+                               <name>scroll_bar</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#scroll_bar</link>
+                           </item>
+                           <item>
+                               <name>widget_group</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#widget_group</link>
+                           </item>
+                           <item>
+                               <name>image_widget</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#image_widget</link>
+                           </item>
+                           <item>
+                               <name>popup_menu</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#popup_menu</link>
+                           </item>
+                           <item>
+                               <name>menu_item</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#menu_item</link>
+                           </item>
+                           <item>
+                               <name>menu_item_text</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#menu_item_text</link>
+                           </item>
+                           <item>
+                               <name>menu_item_separator</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#menu_item_separator</link>
+                           </item>
+                           <item>
+                               <name>menu_item_submenu</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#menu_item_submenu</link>
+                           </item>
+                           <item>
+                               <name>named_rectangle</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#named_rectangle</link>
+                           </item>
+                           <item>
+                               <name>menu_bar</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#menu_bar</link>
+                           </item>
+                           <item>
+                               <name>message_box</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#message_box</link>
+                           </item>
+                           <item>
+                               <name>message_box_blocking</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#message_box</link>
+                           </item>
+                           <item>
+                               <name>open_file_box</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#open_file_box</link>
+                           </item>
+                           <item>
+                               <name>open_existing_file_box</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#open_existing_file_box</link>
+                           </item>
+                           <item>
+                               <name>save_file_box</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#save_file_box</link>
+                           </item>
+                           <item>
+                               <name>label</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#label</link>
+                           </item>
+                           <item>
+                               <name>button</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#button</link>
+                           </item>
+                           <item>
+                               <name>toggle_button</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#toggle_button</link>
+                           </item>
+                           <item>
+                               <name>text_grid</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#text_grid</link>
+                           </item>
+                           <item>
+                               <name>directed_graph_drawer</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#directed_graph_drawer</link>
+                           </item>
+                           <item>
+                               <name>list_box</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#list_box</link>
+                           </item>
+                           <item>
+                               <name>check_box</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#check_box</link>
+                           </item>
+                           <item>
+                               <name>radio_button</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#radio_button</link>
+                           </item>
+                           <item>
+                               <name>text_field</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#text_field</link>
+                           </item>
+                           <item>
+                               <name>tabbed_display</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#tabbed_display</link>
+                           </item>
+                           <item>
+                               <name>mouse_tracker</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#mouse_tracker</link>
+                           </item>
+                       </sub>
+                   </item>
+                  <item nolink="true">
+                     <name>styles</name>
+                     <sub>
+                        <item>
+                           <name>button_style</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#button_style</link>
+                        </item>
+                        <item>
+                           <name>button_style_default</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_default</link>
+                        </item>
+                        <item>
+                           <name>button_style_toolbar1</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_toolbar1</link>
+                        </item>
+                        <item>
+                           <name>button_style_toolbar_icon1</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_toolbar_icon1</link>
+                        </item>
+                        <item>
+                           <name>toggle_button_style</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#toggle_button_style</link>
+                        </item>
+                        <item>
+                           <name>toggle_button_style_default</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#toggle_button_style_default</link>
+                        </item>
+                        <item>
+                           <name>toggle_button_style_check_box</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#toggle_button_style_check_box</link>
+                        </item>
+                        <item>
+                           <name>toggle_button_style_radio_button</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#toggle_button_style_radio_button</link>
+                        </item>
+                     </sub>
+                  </item>
+                  <item nolink="true">
+                     <name>canvas drawing functions</name>
+                     <sub>
+                     <item>
+                        <name>draw_line</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_line</link>
+                     </item>
+                     <item>
+                        <name>draw_rectangle</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_rectangle</link>
+                     </item>
+                     <item>
+                        <name>draw_circle</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_circle</link>
+                     </item>
+                     <item>
+                        <name>draw_pixel</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_pixel</link>
+                     </item>
+                     <item>
+                        <name>draw_solid_circle</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_solid_circle</link>
+                     </item>
+                     <item>
+                        <name>draw_button_down</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_button_down</link>
+                     </item>
+                     <item>
+                        <name>draw_sunken_rectangle</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_sunken_rectangle</link>
+                     </item>
+                     <item>
+                        <name>draw_button_up</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_button_up</link>
+                     </item>
+                     <item>
+                        <name>draw_checkered</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_checkered</link>
+                     </item>
+                     <item>
+                        <name>draw_image</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_image</link>
+                     </item>
+                     <item>
+                        <name>fill_rect</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#fill_rect</link>
+                     </item>
+                     <item>
+                        <name>fill_rect_with_vertical_gradient</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#fill_rect_with_vertical_gradient</link>
+                     </item>
+                     <item>
+                        <name>fill_gradient_rounded</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#fill_gradient_rounded</link>
+                     </item>
+                     <item>
+                        <name>draw_rounded_rectangle</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_rounded_rectangle</link>
+                     </item>
+                     </sub>
+                  </item>
+                  <item>
+                        <name>drawable</name>
+                        <link>dlib/gui_widgets/drawable_abstract.h.html#drawable</link>
+                        <sub>
+                           <item>
+                              <name>set_main_font</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#set_main_font</link>
+                           </item>
+                           <item>
+                              <name>main_font</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#main_font</link>
+                           </item>
+                           <item>
+                              <name>z_order</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#z_order</link>
+                           </item>
+                           <item>
+                              <name>next_free_user_event_number</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#next_free_user_event_number</link>
+                           </item>
+                           <item>
+                              <name>set_z_order</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#set_z_order</link>
+                           </item>
+                           <item nolink="true">
+                              <name>shape</name>
+                              <sub>
+                              <item>
+                                 <name>get_rect</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#get_rect</link>
+                              </item>
+                              <item>
+                                 <name>bottom</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#bottom</link>
+                              </item>
+                              <item>
+                                 <name>top</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#top</link>
+                              </item>
+                              <item>
+                                 <name>left</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#left</link>
+                              </item>
+                              <item>
+                                 <name>right</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#right</link>
+                              </item>
+                              <item>
+                                 <name>width</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#width</link>
+                              </item>
+                              <item>
+                                 <name>height</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#height</link>
+                              </item>
+                              </sub>
+                           </item>
+                           <item>
+                              <name>set_pos</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#set_pos</link>
+                           </item>
+                           <item>
+                              <name>is_enabled</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#is_enabled</link>
+                           </item>
+                           <item>
+                              <name>enable</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#enable</link>
+                           </item>
+                           <item>
+                              <name>disable</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#disable</link>
+                           </item>
+                           <item>
+                              <name>is_hidden</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#is_hidden</link>
+                           </item>
+                           <item>
+                              <name>show</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#show</link>
+                           </item>
+                           <item>
+                              <name>hide</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#hide</link>
+                           </item>
+                           <item>
+                              <name>parent_window</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#parent_window</link>
+                           </item>
+                           <item>
+                              <name>enable_events</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#enable_events</link>
+                           </item>
+                           <item>
+                              <name>events_are_enabled</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#events_are_enabled</link>
+                           </item>
+                           <item>
+                              <name>disable_events</name>
+                              <link>dlib/gui_widgets/drawable_abstract.h.html#disable_events</link>
+                           </item>
+                           <item nolink="true">
+                              <name>events</name>
+                              <sub>
+                              <item>
+                                 <name>on_window_resized</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_window_resized</link>
+                              </item>
+                              <item>
+                                 <name>on_window_moved</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_window_moved</link>
+                              </item>
+                              <item>
+                                 <name>on_focus_gained</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_focus_gained</link>
+                              </item>
+                              <item>
+                                 <name>on_focus_lost</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_focus_lost</link>
+                              </item>
+                              <item>
+                                 <name>on_mouse_up</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_mouse_up</link>
+                              </item>
+                              <item>
+                                 <name>on_mouse_move</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_mouse_move</link>
+                              </item>
+                              <item>
+                                 <name>on_mouse_enter</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_mouse_enter</link>
+                              </item>
+                              <item>
+                                 <name>on_mouse_leave</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_mouse_leave</link>
+                              </item>
+                              <item>
+                                 <name>on_mouse_down</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_mouse_down</link>
+                              </item>
+                              <item>
+                                 <name>on_wheel_up</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_wheel_up</link>
+                              </item>
+                              <item>
+                                 <name>on_wheel_down</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_wheel_down</link>
+                              </item>
+                              <item>
+                                 <name>on_keydown</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_keydown</link>
+                              </item>
+                              <item>
+                                 <name>on_user_event</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_user_event</link>
+                              </item>
+                              <item>
+                                 <name>draw</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#draw</link>
+                              </item>
+                              </sub>
+                           </item>
+                        </sub>
+                  </item>    
+                  <item>
+                        <name>drawable_window</name>
+                        <link>dlib/gui_widgets/drawable_abstract.h.html#drawable_window</link>
+                  </item>                      
+                   <item nolink="true">
+                       <name>fonts</name>
+                       <sub>
+                           <item>
+                               <name>letter</name>
+                               <link>dlib/gui_widgets/fonts_abstract.h.html#letter</link>
+                           </item>
+                           <item>
+                               <name>font</name>
+                               <link>dlib/gui_widgets/fonts_abstract.h.html#font</link>
+                           </item>
+                           <item>
+                               <name>default_font</name>
+                               <link>dlib/gui_widgets/fonts_abstract.h.html#default_font</link>
+                           </item>                      
+                           <item>
+                               <name>bdf_font</name>
+                               <link>dlib/gui_widgets/fonts_abstract.h.html#bdf_font</link>
+                           </item>                      
+                       </sub>
+                   </item>                 
+               </sub>
+           </item>         
+            
+           <item>
+               <name>gui_core</name>
+               <sub>
+                   <item>
+                       <name>base_window</name>
+                       <link>dlib/gui_core/gui_core_kernel_abstract.h.html#base_window</link>
+                   </item>
+                   <item>
+                       <name>canvas</name>
+                       <link>dlib/gui_core/gui_core_kernel_abstract.h.html#canvas</link>
+                   </item>
+                   <item>
+                       <name>get_from_clipboard</name>
+                       <link>dlib/gui_core/gui_core_kernel_abstract.h.html#get_from_clipboard</link>
+                   </item>
+                   <item>
+                       <name>put_on_clipboard</name>
+                       <link>dlib/gui_core/gui_core_kernel_abstract.h.html#put_on_clipboard</link>
+                   </item>
+               </sub>
+           </item>         
+         
+         <item>
+            <name>dir_nav</name>
+            <sub>
+               <item>
+                  <name>get_filesystem_roots</name>
+                  <link>dlib/dir_nav/dir_nav_kernel_abstract.h.html#get_filesystem_roots</link>
+               </item>
+               <item>
+                  <name>file</name>
+                  <link>dlib/dir_nav/dir_nav_kernel_abstract.h.html#file</link>
+               </item>
+               <item>
+                  <name>directory</name>
+                  <link>dlib/dir_nav/dir_nav_kernel_abstract.h.html#directory</link>
+               </item>
+            </sub>
+         </item>
+         <item>
+            <name>misc_api</name>
+            <sub>
+               <item>
+                  <name>sleep</name>
+                  <link>dlib/misc_api/misc_api_kernel_abstract.h.html#sleep</link>
+               </item>
+               <item>
+                  <name>get_current_dir</name>
+                  <link>dlib/misc_api/misc_api_kernel_abstract.h.html#get_current_dir</link>
+               </item>
+               <item>
+                  <name>create_directory</name>
+                  <link>dlib/misc_api/misc_api_kernel_abstract.h.html#create_directory</link>
+               </item>
+               <item>
+                  <name>timestamper</name>
+                  <link>dlib/misc_api/misc_api_kernel_abstract.h.html#timestamper</link>
+               </item>
+            </sub>
+         </item>
+         <item>
+            <name>threads</name>
+            <sub>
+               <item nolink="true">
+                  <name>extensions</name>
+                  <sub>
+                     <item>   
+                        <name>thread_specific_data</name>
+                        <link>dlib/threads/thread_specific_data_extension_abstract.h.html</link>
+                     </item>
+                     <item>   
+                        <name>create_new_thread extension</name>
+                        <link>dlib/threads/create_new_thread_extension_abstract.h.html#create_new_thread</link>
+                     </item>
+                     <item>   
+                        <name>rsignaler</name>
+                        <link>dlib/threads/rsignaler_extension_abstract.h.html#rsignaler</link>
+                     </item>
+                     <item>   
+                        <name>rmutex</name>
+                        <link>dlib/threads/rmutex_extension_abstract.h.html#rmutex</link>
+                     </item>
+                     <item>   
+                        <name>auto_mutex</name>
+                        <link>dlib/threads/auto_mutex_extension_abstract.h.html#auto_mutex</link>
+                     </item>
+                     <item>   
+                        <name>auto_unlock</name>
+                        <link>dlib/threads/auto_unlock_extension_abstract.h.html#auto_unlock</link>
+                     </item>
+                     <item>   
+                        <name>threaded_object</name>
+                        <link>dlib/threads/threaded_object_extension_abstract.h.html#threaded_object</link>
+                     </item>
+                     <item>   
+                        <name>thread_function</name>
+                        <link>dlib/threads/thread_function_extension_abstract.h.html#thread_function</link>
+                     </item>
+                     <item>   
+                        <name>multithreaded_object</name>
+                        <link>dlib/threads/multithreaded_object_extension_abstract.h.html#multithreaded_object</link>
+                     </item>
+                  </sub>
+               </item>
+               <item>   
+                  <name>is_dlib_thread</name>
+                  <link>dlib/threads/threads_kernel_abstract.h.html#is_dlib_thread</link>
+               </item>
+               <item>   
+                  <name>create_new_thread</name>
+                  <link>dlib/threads/threads_kernel_abstract.h.html#create_new_thread</link>
+               </item>
+               <item>   
+                  <name>mutex</name>
+                  <link>dlib/threads/threads_kernel_abstract.h.html#mutex</link>
+               </item>
+               <item>   
+                  <name>register_thread_end_handler</name>
+                  <link>dlib/threads/threads_kernel_abstract.h.html#register_thread_end_handler</link>
+               </item>
+               <item>   
+                  <name>register_program_ending_handler</name>
+                  <link>dlib/threads/threads_kernel_abstract.h.html#register_program_ending_handler</link>
+               </item>
+               <item>   
+                  <name>signaler</name>
+                  <link>dlib/threads/threads_kernel_abstract.h.html#signaler</link>
+               </item>
+               <item>   
+                  <name>get_thread_id</name>
+                  <link>dlib/threads/threads_kernel_abstract.h.html#get_thread_id</link>
+               </item>
+            </sub>
+         </item>
+         <item>
+            <name>sockets</name>
+            <sub>
+               <item nolink="true">
+                  <name>extensions</name>
+                  <sub>
+                     <item>   
+                        <name>connect</name>
+                        <link>dlib/sockets/sockets_extensions_abstract.h.html#connect</link>
+                     </item>
+                     <item>   
+                        <name>is_ip_address</name>
+                        <link>dlib/sockets/sockets_extensions_abstract.h.html#is_ip_address</link>
+                     </item>
+                     <item>   
+                        <name>close_gracefully</name>
+                        <link>dlib/sockets/sockets_extensions_abstract.h.html#close_gracefully</link>
+                     </item>
+                  </sub>
+               </item>
+               <item nolink="true">
+                  <name>objects</name>
+                  <sub>
+                     <item>   
+                        <name>connection</name>
+                        <link>dlib/sockets/sockets_kernel_abstract.h.html#connection</link>
+                     </item>
+                     <item>   
+                        <name>listener</name>
+                        <link>dlib/sockets/sockets_kernel_abstract.h.html#listener</link>
+                     </item>
+                  </sub>
+               </item>
+               <item nolink="true">
+                  <name>functions</name>
+                  <sub>
+                     <item>   
+                        <name>create_connection</name>
+                        <link>dlib/sockets/sockets_kernel_abstract.h.html#create_connection</link>
+                     </item>
+                     <item>   
+                        <name>create_listener</name>
+                        <link>dlib/sockets/sockets_kernel_abstract.h.html#create_listener</link>
+                     </item>
+                     <item>   
+                        <name>get_local_hostname</name>
+                        <link>dlib/sockets/sockets_kernel_abstract.h.html#get_local_hostname</link>
+                     </item>
+                     <item>   
+                        <name>hostname_to_ip</name>
+                        <link>dlib/sockets/sockets_kernel_abstract.h.html#hostname_to_ip</link>
+                     </item>
+                     <item>   
+                        <name>ip_to_hostname</name>
+                        <link>dlib/sockets/sockets_kernel_abstract.h.html#ip_to_hostname</link>
+                     </item>
+                  </sub>
+               </item>
+            </sub>
+         </item>
+      </section>
+    </top>  
+   </menu>
+
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
+   <components>
+   
+      <component>
+         <name>dir_nav</name>
+         <file>dlib/dir_nav.h</file>
+         <spec_file>dlib/dir_nav/dir_nav_kernel_abstract.h</spec_file>
+         <description>
+            This is a set of objects that provide an easy and portable way to traverse a directory tree. 
+         </description>
+
+         <examples>
+            <example>dir_nav_ex.cpp.html</example>
+         </examples>
+         
+         <implementations>
+            <implementation>
+               <name>dir_nav_kernel_1</name>
+               <file>dlib/dir_nav/dir_nav_kernel_1.h</file>
+               <description> 
+                  MS Windows implementation
+               </description> 
+               
+            </implementation> 
+            <implementation>
+               <name>dir_nav_kernel_2</name>
+               <file>dlib/dir_nav/dir_nav_kernel_2.h</file>
+               <description> 
+                  POSIX implementation
+               </description> 
+               
+            </implementation>          
+         </implementations>
+         
+               
+      </component>
+         
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>gui_core</name>
+         <file>dlib/gui_core.h</file>
+         <spec_file>dlib/gui_core/gui_core_kernel_abstract.h</spec_file>
+         <description>
+                This is a set of objects and functions which provide a very basic
+                framework for manipulating windows.  It is intended to provide a portable
+                interface which can be used to build a more complex windowing toolkit.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>gui_core_kernel_1</name>
+               <file>dlib/gui_core/gui_core_kernel_1.h</file>
+               <description> 
+                  MS Windows implementation
+               </description> 
+               
+            </implementation> 
+            <implementation>
+               <name>gui_core_kernel_2</name>
+               <file>dlib/gui_core/gui_core_kernel_2.h</file>
+               <description> 
+                  X Windows implementation
+               </description> 
+               
+            </implementation>          
+         </implementations>
+         
+               
+      </component>
+         
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>misc_api</name>
+         <file>dlib/misc_api.h</file>
+         <spec_file>dlib/misc_api/misc_api_kernel_abstract.h</spec_file>
+         <description>
+            This is just a collection of miscellaneous APIs that were small/simple 
+            enough not to warrant their own module.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>misc_api_kernel_1</name>
+               <file>dlib/misc_api/misc_api_kernel_1.h</file>
+               <description> 
+                  MS Windows implementation
+               </description> 
+               
+            </implementation> 
+            <implementation>
+               <name>misc_api_kernel_2</name>
+               <file>dlib/misc_api/misc_api_kernel_2.h</file>
+               <description> 
+                  POSIX implementation
+               </description> 
+               
+            </implementation>          
+         </implementations>
+         
+               
+      </component>
+         
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>sockets</name>
+         <file>dlib/sockets.h</file>
+         <spec_file>dlib/sockets/sockets_kernel_abstract.h</spec_file>
+         <description>
+            This is a set of objects that provides an easy to use and object oriented 
+            interface for dealing with TCP networking. There are currently two implementations,
+            one for UNIX and another for all versions of Windows after Windows95.
+            Both provide the exact same interface so programs written with them can be
+            recompiled on either platform without a problem.
+            <p>
+              You also may want to take note of the <a href="other.html#timeout">timeout</a> object.
+              It provides a mechanism which you can use to add a timeout to a network operation.  
+            </p>
+         </description>
+
+         <examples>
+            <example>sockets_ex.cpp.html</example>
+            <example>sockstreambuf_ex.cpp.html</example>
+            <example>sockets_ex_2.cpp.html</example>
+         </examples>
+         
+         <implementations>
+            <implementation>
+               <name>sockets_kernel_1</name>
+               <file>dlib/sockets/sockets_kernel_1.h</file>
+               <description> 
+                  MS Windows implementation
+               </description> 
+               
+            </implementation> 
+            <implementation>
+               <name>sockets_kernel_2</name>
+               <file>dlib/sockets/sockets_kernel_2.h</file>
+               <description> 
+                  POSIX implementation
+               </description> 
+               
+            </implementation>          
+         </implementations>
+         
+         
+         <extensions>
+            <extension>
+               <name>sockets_extensions</name>
+               <spec_file>dlib/sockets/sockets_extensions_abstract.h</spec_file>
+               <description> 
+                   <p>
+                     This is just some miscellaneous extensions to the socket api.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/sockets/sockets_extensions.h.html">here</a>.
+               </description> 
+            </extension>
+
+         </extensions>
+         
+               
+      </component>
+         
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>threads</name>
+         <file>dlib/threads.h</file>
+         <spec_file>dlib/threads/threads_kernel_abstract.h</spec_file>
+         <description>
+            This is a set of objects that provides an easy to use and object oriented interface 
+            for creating multi-threaded programs. There are currently two implementations, one 
+            for UNIX and another for any variant of MS Windows after Windows 95. Both provide 
+            the exact same interface so programs written with them can be recompiled on either 
+            platform without a problem. Both implementations also pool their threads so repeated 
+            calls to create_new_thread are nice and speedy :) 
+            <p>
+              You also probably want to take note of the <a href="other.html#pipe">pipe</a> object.
+              It provides an easy to use typesafe mechanism to send messages between threads.
+            </p>
+         </description>
+
+         <examples>
+            <example>threads_ex.cpp.html</example>
+            <example>logger_ex_2.cpp.html</example>
+            <example>pipe_ex.cpp.html</example>
+            <example>threaded_object_ex.cpp.html</example>
+            <example>multithreaded_object_ex.cpp.html</example>
+            <example>thread_function_ex.cpp.html</example>
+         </examples>
+         
+         <implementations>
+            <implementation>
+               <name>threads_kernel_1</name>
+               <file>dlib/threads/threads_kernel_1.h</file>
+               <description> 
+                  MS Windows implementation
+               </description> 
+               
+            </implementation> 
+            <implementation>
+               <name>threads_kernel_2</name>
+               <file>dlib/threads/threads_kernel_2.h</file>
+               <description> 
+                  POSIX implementation
+               </description> 
+               
+            </implementation>          
+         </implementations>
+         
+         
+         <extensions>
+            <extension>
+               <name>rsignaler</name>
+               <spec_file>dlib/threads/rsignaler_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                  This extension adds a signaler object that can be used with the rmutex object. 
+                  Also note that this extension is included by dlib/threads.h so you don't have to include 
+                  anything extra to get it.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/rsignaler_extension.h.html">here</a>.
+               </description> 
+            </extension>
+
+
+            <extension>
+               <name>thread_specific_data</name>
+               <spec_file>dlib/threads/thread_specific_data_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                     This extension adds the ability to easily create thread specific data.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/thread_specific_data_extension.h.html">here</a>.
+               </description> 
+            </extension>
+
+
+            <extension>
+               <name>rmutex</name>
+               <spec_file>dlib/threads/rmutex_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                  This extension adds a mutex object that can handle recursive calls
+                  to lock().  
+                  Also note that this extension is included by dlib/threads.h so you don't have to include 
+                  anything extra to get it.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/rmutex_extension.h.html">here</a>.
+               </description> 
+            </extension>
+
+            <extension>
+               <name>create_new_thread extension</name>
+               <spec_file>dlib/threads/create_new_thread_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                  This extension adds some templated overloads to the 
+                  <a href="dlib/threads/threads_kernel_abstract.h.html#create_new_thread">create_new_thread()</a> function.  They allow you to create new threads using member functions from a class.
+                  Also note that this extension is included by dlib/threads.h so you don't have to include 
+                  anything extra to get it.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/create_new_thread_extension.h.html">here</a>.
+               </description> 
+
+               
+            </extension>
+
+            <extension>
+               <name>auto_mutex</name>
+               <spec_file>dlib/threads/auto_mutex_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                  This extension adds a mechanism to automatically lock and unlock a mutex.
+                  Also note that this extension is included by dlib/threads.h so you don't have to include 
+                  anything extra to get it.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/auto_mutex_extension.h.html">here</a>.
+               </description> 
+
+               
+            </extension>
+            <extension>
+               <name>thread_function</name>
+               <spec_file>dlib/threads/thread_function_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                This object represents a thread on a global C++ function.  That is, it allows you 
+                to run a global function in its own thread.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/thread_function_extension.h.html">here</a>.
+               </description> 
+
+               <examples>
+                  <example>thread_function_ex.cpp.html</example>
+               </examples>
+
+               
+            </extension>
+
+            <extension>
+               <name>threaded_object</name>
+               <spec_file>dlib/threads/threaded_object_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                     This extension represents a simple threaded object.  It provides a convenient 
+                     mechanism to create an object that contains a thread.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/threaded_object_extension.h.html">here</a>.
+               </description> 
+
+               <examples>
+                  <example>threaded_object_ex.cpp.html</example>
+               </examples>
+
+               
+            </extension>
+
+            <extension>
+               <name>multithreaded_object</name>
+               <spec_file>dlib/threads/multithreaded_object_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                This object represents a multithreaded object.  It is similar to 
+                the <a href="#threaded_object">threaded_object</a> except it allows you to have many threads in a 
+                single object rather than just one.  
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/multithreaded_object_extension.h.html">here</a>.
+               </description> 
+
+               <examples>
+                  <example>multithreaded_object_ex.cpp.html</example>
+                  <example>pipe_ex.cpp.html</example>
+               </examples>
+            </extension>
+
+            <extension>
+               <name>auto_unlock</name>
+               <spec_file>dlib/threads/auto_unlock_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                  This extension adds a mechanism to automatically unlock a mutex.
+                  Also note that this extension is included by dlib/threads.h so you don't have to include 
+                  anything extra to get it.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/auto_unlock_extension.h.html">here</a>.
+               </description> 
+
+               
+            </extension>
+         </extensions>
+         
+               
+               
+      </component>
+         
+
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>gui_widgets</name>
+         <file>dlib/gui_widgets.h</file>
+         <description>
+         <p>
+            This component is a collection of various windowing widgets such as buttons,
+            labels, text boxes, and so on.  It also includes the drawable
+            interface, drawable_window, and font handling objects.  
+            <a href="dlib/gui_widgets/widgets_abstract.h.html">dlib/gui_widgets/widgets_abstract.h</a> 
+            defines all of the high level graphical widgets provided by this
+            component that can appear in a drawable_window.  To view the specifications for the other members of this 
+            component look at <a href="dlib/gui_widgets/fonts_abstract.h.html">dlib/gui_widgets/fonts_abstract.h</a>,  
+            <a href="dlib/gui_widgets/drawable_abstract.h.html">dlib/gui_widgets/drawable_abstract.h</a>, 
+            and <a href="dlib/gui_widgets/base_widgets_abstract.h.html">dlib/gui_widgets/base_widgets_abstract.h</a>.
+            </p>
+            <p>This component isn't actually a wrapper on top of OS APIs.  Rather, it is
+            implemented on top of the <a href="#gui_core">gui_core</a> 
+            component.  I put it on this page just because I expect that people would
+            look here when searching for the sort of functionality provided by this component. 
+            </p>
+         </description>
+         
+         <examples>
+            <example>gui_api_ex.cpp.html</example>
+            <example>image_ex.cpp.html</example>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+      </component>
+      
+               
+         
+   <!-- ************************************************************************* -->
+      
+   </components>
+
+   <!-- ************************************************************************* -->
+
+
+</doc>

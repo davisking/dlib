@@ -1,0 +1,78 @@
+<text>
+
+
+	The Canterbury Corpus
+
+file      size      packed size      bpb         corruption
+
+text:      152089      86995       4.576          no             
+play:      125179      75430       4.82062        no             
+html:      24603       16209       5.27058        no             
+Csrc:      11150       7084        5.08269        no             
+list:      3721        2224        4.78151        no             
+Excl:      1029744     440758      3.42421        no             
+tech:      426754      248345      4.65552        no             
+poem:      481861      273394      4.53897        no             
+fax:       513216      75036       1.16966        no             
+SPRC:      38240       25660       5.3682         no             
+man:       4227        2663        5.03998        no             
+
+average: 4.42981
+
+time: 875ms
+
+
+
+	The Calgary Corpus
+
+file      size      packed size      bpb         corruption
+
+bib:       111261      72533       5.21534        no             
+book1:     768771      435527      4.53219        no             
+book2:     610856      364597      4.7749         no             
+geo:       102400      72600       5.67188        no             
+news:      377109      244377      5.18422        no             
+obj1:      21504       16183       6.02046        no             
+obj2:      246814      189902      6.15531        no             
+paper1:    53161       33144       4.98772        no             
+paper2:    82199       47398       4.613          no             
+pic:       513216      75036       1.16966        no             
+progc:     39611       25885       5.22784        no             
+progl:     71646       42688       4.76655        no             
+progp:     49379       30180       4.88953        no             
+trans:     93695       64603       5.51603        no             
+
+average: 4.9089
+
+time: 1.11sec
+
+
+
+	The Artificial Corpus
+
+file      size      packed size      bpb         corruption
+
+a:         1           7           56             no             
+aaa:       100000      20          0.0016         no             
+alphabet:  100000      58912       4.71296        no             
+random:    100000      75202       6.01616        no             
+
+average: 16.6827
+
+time: 93ms
+
+
+
+	The Large Corpus 
+
+file      size      packed size      bpb         corruption
+
+E.coli:    4638690     1162352     2.00462        no             
+bible:     4047392     2194059     4.33674        no             
+word:      2473400     1542086     4.98774        no             
+
+average: 3.77637
+
+time: 3.766sec
+
+</text>

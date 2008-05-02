@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# if the first argument to this script is the word major then the 
+# major version number is updated and the minor is set back to 0
+
+report_failure ()
+{
+    echo "  **** failed to complete **** "
+    exit 1
+}
+
+
+./testenv || report_failure
+
+
+
+REVNUM_FILE=.logger_revnum
+COUNTER_FILE=.current_release_number
+MINOR_COUTNER_FILE=.current_minor_release_number
+
+
+RELEASE=`cat $COUNTER_FILE | awk '{ print $1 + 1}'` 
+
+if [ "$1" = "major" ] 
+    then
+    MAJOR_NUM=`cat $COUNTER_FILE | awk '{print $1 + 1}'` 
+    MINOR_NUM=0 
+    echo $MAJOR_NUM > $COUNTER_FILE
+    echo $MINOR_NUM > $MINOR_COUTNER_FILE
+    ./makedocs major || exit 1
+else 
+    MAJOR_NUM=`cat $COUNTER_FILE` 
+    MINOR_NUM=`cat $MINOR_COUTNER_FILE | awk '{print $1 + 1}'` 
+    echo $MINOR_NUM > $MINOR_COUTNER_FILE
+    ./makedocs || exit 1
+fi;
+
+rm -rf release/* || report_failure
+
+RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
+
+
+DLIB_REPOS=`svn info | grep Root | awk '{print $3}'`
+
+
+REVISION=`svn info | grep Revision | awk '{ print $2}'`
+
+svn log -v -r $REVISION:`cat $REVNUM_FILE` $DLIB_REPOS/dlib > release/change_log.txt || report_failure
+flip -m release/change_log.txt
+
+echo $REVISION | awk '{ print $1 + 1}' > $REVNUM_FILE
+
+cd release || report_failure
+RELDIR=`echo dlib-$RELEASE`
+mkdir $RELDIR
+cd $RELDIR || report_failure
+cp -r ../../docs/cache/dlib . || report_failure
+cp -r ../../docs/cache/examples . || report_failure
+
+echo Version: $RELEASE >> dlib/README.txt
+echo Subversion Revision Number: $REVISION >> dlib/README.txt
+
+
+
+WEBPAGE=`echo dlib_webpage-$RELEASE.tar`
+SOURCE_ZIP=`echo $RELDIR.zip`
+SOURCE_TAR=`echo $RELDIR.tar`
+tar -C ../../docs/chm -cf - docs/ documentation.html --exclude=".svn" | tar -xf - || report_failure
+cd .. || report_failure
+
+tar -cf $SOURCE_TAR $RELDIR  || report_failure
+# flip everything to MS-DOS line endings 
+find $RELDIR -name "*.cpp" -or -name "*.h" -or -name "*.txt" -or -name "*.html" | xargs flip -m
+
+zip -r9 $SOURCE_ZIP $RELDIR > /dev/null || report_failure
+tar -C ../docs -cf $WEBPAGE --exclude=".svn" web || report_failure
+bzip2 $SOURCE_TAR || report_failure
+bzip2 $WEBPAGE || report_failure
+
+rm -rf $RELDIR
+
+wine ../docs/chm/htmlhelp/hhc.exe ../docs/chm/lib.hhp 
+mv ../docs/chm/help.chm dlib_documentation-$RELEASE.chm || report_failure
+

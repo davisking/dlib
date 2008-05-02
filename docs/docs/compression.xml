@@ -1,0 +1,882 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>Data Compression</title>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <br/><br/>
+  <p>
+     This page contains a bunch of objects that implement various parts of compression algorithms.  
+     They can be put together in different ways to construct many different algorithms.  
+     Note that the <a href="#compress_stream">compress_stream</a> object contains complete compression algorithms.  So if you
+     just want to compress some data then you can easily use that object and not bother with the others.
+  </p>
+      <p>
+      In the column to the right you can see benchmark data for each of the compress_stream 
+      typedefs.  The times measured are the time it takes to compress and then
+      decompress each file.  It was run on a 3.0ghz P4.   For reference see the Canterbury corpus 
+      <a href="http://corpus.canterbury.ac.nz/">web site</a>.
+      </p>
+
+
+   
+   </body>
+
+   <!-- ************************************************************************* -->
+
+   <menu width="200">
+    <top>
+      <section>
+         <name>Objects</name>
+         <item>compress_stream</item>
+         <item>conditioning_class</item>
+         <item>entropy_decoder</item>
+         <item>entropy_encoder</item>
+         <item>entropy_decoder_model</item>
+         <item>entropy_encoder_model</item>
+         <item>lz77_buffer</item>
+         <item>lzp_buffer</item>
+      </section>
+ 
+ 
+ 
+ 
+      <section>
+         <name>Benchmarks</name>
+         <item>
+            <name>kernel_1a</name>
+            <link>kernel_1a.html</link>
+         </item>
+         <item>
+            <name>kernel_1b</name>
+            <link>kernel_1b.html</link>
+         </item>
+         <item>
+            <name>kernel_1c</name>
+            <link>kernel_1c.html</link>
+         </item>
+         <item>
+            <name>kernel_1da</name>
+            <link>kernel_1da.html</link>
+         </item>
+         <item>
+            <name>kernel_1db</name>
+            <link>kernel_1db.html</link>
+         </item>
+         <item>
+            <name>kernel_1ea</name>
+            <link>kernel_1ea.html</link>
+         </item>
+         <item>
+            <name>kernel_1eb</name>
+            <link>kernel_1eb.html</link>
+         </item>
+         <item>
+            <name>kernel_1ec</name>
+            <link>kernel_1ec.html</link>
+         </item>
+         <item>
+            <name>kernel_2a</name>
+            <link>kernel_2a.html</link>
+         </item>
+         <item>
+            <name>kernel_3a</name>
+            <link>kernel_3a.html</link>
+         </item>
+         <item>
+            <name>kernel_3b</name>
+            <link>kernel_3b.html</link>
+         </item>
+      </section>
+    </top>  
+   </menu>
+
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
+   <components>
+   
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>compress_stream</name>
+         <file>dlib/compress_stream.h</file>
+         <spec_file>dlib/compress_stream/compress_stream_kernel_abstract.h</spec_file>
+         <description>
+            This object is pretty straight forward.  It has no state and just 
+            contains the functions compress and decompress.
+            They do just what their names imply to iostream objects.       
+         </description>
+         
+         <examples>
+            <example>compress_stream_ex.cpp.html</example>
+            <example>file_to_code_ex.cpp.html</example>
+         </examples>
+
+         <implementations>
+            <implementation>
+               <name>compress_stream_kernel_1</name>
+               <file>dlib/compress_stream/compress_stream_kernel_1.h</file>
+               <description> 
+                  This implementation is done using the <a href="#entropy_encoder_model">entropy_encoder_model</a> and 
+                  <a href="#entropy_decoder_model">entropy_decoder_model</a> objects.
+               </description> 
+   
+
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_1b and entropy_decoder_model_kernel_1b</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1b</name>
+                     <description>is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_2b and entropy_decoder_model_kernel_2b  </description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1c</name>
+                     <description>is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_3b and entropy_decoder_model_kernel_3b  </description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1da</name>
+                     <description>is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_4a and entropy_decoder_model_kernel_4a  </description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1db</name>
+                     <description>is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_4b and entropy_decoder_model_kernel_4b  </description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1ea</name>
+                     <description>is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_5a and entropy_decoder_model_kernel_5a  </description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1eb</name>
+                     <description>is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_5b and entropy_decoder_model_kernel_5b  </description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1ec</name>
+                     <description>is a typedef for compress_stream_kernel_1 which uses entropy_decoder_model_kernel_5c and entropy_decoder_model_kernel_5c  </description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>compress_stream_kernel_2</name>
+               <file>dlib/compress_stream/compress_stream_kernel_2.h</file>
+               <description> 
+                  This implementation is done using the <a href="#entropy_encoder_model">entropy_encoder_model</a> and 
+                  <a href="#entropy_decoder_model">entropy_decoder_model</a> objects.  It also uses the
+                  <a href="#lz77_buffer">lz77_buffer</a> object.  It uses the entropy coder models to
+                  encode symbols when there is no match found by the lz77_buffer.  
+               </description> 
+  
+
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for compress_stream_kernel_2 which uses entropy_encoder_model_kernel_2b, entropy_decoder_model_kernel_2b, and lz77_buffer_kernel_2a.</description>
+                  </typedef>
+                  
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>compress_stream_kernel_3</name>
+               <file>dlib/compress_stream/compress_stream_kernel_3.h</file>
+               <description> 
+                  This implementation is done using the the <a href="#lzp_buffer">lzp_buffer</a> object and
+                  <a href="other.html#crc32">crc32</a> object.  It does not use any sort of entropy coding, instead
+                  a byte aligned output method is used.
+               </description> 
+  
+
+               <typedefs>
+                  <typedef>
+                     <name>kernel_3a</name>
+                     <description>is a typedef for compress_stream_kernel_3 which uses lzp_buffer_kernel_1.</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_3b</name>
+                     <description>is a typedef for compress_stream_kernel_3 which uses lzp_buffer_kernel_2.</description>
+                  </typedef>
+                  
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>conditioning_class</name>
+         <file>dlib/conditioning_class.h</file>
+         <spec_file>dlib/conditioning_class/conditioning_class_kernel_abstract.h</spec_file>
+         <description>
+                This object represents a conditioning class used for arithmetic style
+                compression.  It maintains the cumulative counts which are needed
+                by the entropy_encoder and entropy_decoder objects below.  
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>conditioning_class_kernel_1</name>
+               <file>dlib/conditioning_class/conditioning_class_kernel_1.h</file>
+               <description> 
+                  This implementation is done using an array to store all the counts and they are summed 
+                  whenever the cumulative counts are requested.  It's pretty straight forward.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for conditioning_class_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+            <implementation>
+               <name>conditioning_class_kernel_2</name>
+               <file>dlib/conditioning_class/conditioning_class_kernel_2.h</file>
+               <description> 
+                  This implementation is done using a binary tree where each node in the tree represents one symbol and
+                  contains that symbols count and the sum of all the counts for the nodes to the left.  This way
+                  when you request a cumulative count it can be computed by visiting log n nodes where n is the 
+                  size of the alphabet.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for conditioning_class_kernel_2</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                        
+            <implementation>
+               <name>conditioning_class_kernel_3</name>
+               <file>dlib/conditioning_class/conditioning_class_kernel_3.h</file>
+               <description> 
+                  This implementation is done using an array to store all the counts and they are 
+                  summed whenever the cumulative counts are requested. The counts are also kept in 
+                  semi-sorted order to speed up the calculation of the cumulative count.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_3a</name>
+                     <description>is a typedef for conditioning_class_kernel_3</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>conditioning_class_kernel_4</name>
+               <file>dlib/conditioning_class/conditioning_class_kernel_4.h</file>
+               <description> 
+                  This implementation is done using a linked list to store all the counts and they are 
+                  summed whenever the cumulative counts are requested. The counts are also kept in 
+                  semi-sorted order to speed up the calculation of the cumulative count.  This implementation
+                  also uses the <a href="other.html#memory_manager">memory_manager</a> component to create a 
+                  memory pool of linked list nodes.  This implementation is especially useful for high order
+                  contexts and/or very large and sparce alphabets.
+               </description> 
+    
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_4a</name>
+                     <description>is a typedef for conditioning_class_kernel_4 with a memory pool of 10,000 nodes.</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_4b</name>
+                     <description>is a typedef for conditioning_class_kernel_4 with a memory pool of 100,000 nodes.</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_4c</name>
+                     <description>is a typedef for conditioning_class_kernel_4 with a memory pool of 1,000,000 nodes.</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_4d</name>
+                     <description>is a typedef for conditioning_class_kernel_4 with a memory pool of 10,000,000 nodes.</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>entropy_decoder</name>
+         <file>dlib/entropy_decoder.h</file>
+         <spec_file>dlib/entropy_decoder/entropy_decoder_kernel_abstract.h</spec_file>
+         <description>
+            This object represents an entropy decoder.  E.g. the decoding part of 
+            an arithmetic coder.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>entropy_decoder_kernel_1</name>
+               <file>dlib/entropy_decoder/entropy_decoder_kernel_1.h</file>
+               <description> 
+                  This object is implemented using arithmetic coding and is done in the 
+                  straight forward way using integers and fixed precision math. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for entropy_decoder_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation>
+            <implementation>
+               <name>entropy_decoder_kernel_2</name>
+               <file>dlib/entropy_decoder/entropy_decoder_kernel_2.h</file>
+               <description> 
+                  This object is implemented using "range" coding and is done 
+                  in the straight forward way using integers and fixed precision math. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for entropy_decoder_kernel_2</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>entropy_encoder</name>
+         <file>dlib/entropy_encoder.h</file>
+         <spec_file>dlib/entropy_encoder/entropy_encoder_kernel_abstract.h</spec_file>
+         <description>
+            This object represents an entropy encoder.  E.g. the encoding part of 
+            an arithmetic coder.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>entropy_encoder_kernel_1</name>
+               <file>dlib/entropy_encoder/entropy_encoder_kernel_1.h</file>
+               <description> 
+                  This object is implemented using arithmetic coding and is done in the 
+                  straight forward way using integers and fixed precision math. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for entropy_encoder_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation>
+            <implementation>
+               <name>entropy_encoder_kernel_2</name>
+               <file>dlib/entropy_encoder/entropy_encoder_kernel_2.h</file>
+               <description> 
+                  This object is implemented using "range" coding and is done 
+                  in the straight forward way using integers and fixed precision math. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for entropy_encoder_kernel_2</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>entropy_decoder_model</name>
+         <file>dlib/entropy_decoder_model.h</file>
+         <spec_file>dlib/entropy_decoder_model/entropy_decoder_model_kernel_abstract.h</spec_file>
+         <description>
+                This object represents some kind of statistical model.  You
+                can use it to read symbols from an entropy_decoder and it will calculate
+                the cumulative counts/probabilities and manage contexts for you.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>entropy_decoder_model_kernel_1</name>
+               <file>dlib/entropy_decoder_model/entropy_decoder_model_kernel_1.h</file>
+               <description> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for entropy_decoder_model_kernel_1 that uses conditioning_class_kernel_1a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1b</name>
+                     <description>is a typedef for entropy_decoder_model_kernel_1 that uses conditioning_class_kernel_2a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1c</name>
+                     <description>is a typedef for entropy_decoder_model_kernel_1 that uses conditioning_class_kernel_3a</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>entropy_decoder_model_kernel_2</name>
+               <file>dlib/entropy_decoder_model/entropy_decoder_model_kernel_2.h</file>
+               <description> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-1-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for entropy_decoder_model_kernel_2 that uses conditioning_class_kernel_1a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_2b</name>
+                     <description>is a typedef for entropy_decoder_model_kernel_2 that uses conditioning_class_kernel_2a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_2c</name>
+                     <description>is a typedef for entropy_decoder_model_kernel_2 that uses conditioning_class_kernel_3a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_2d</name>
+                     <description>is a typedef for entropy_decoder_model_kernel_2 that uses conditioning_class_kernel_2a for its order-0
+                         context and conditioning_class_kernel_4b for its order-1 context.</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>entropy_decoder_model_kernel_3</name>
+               <file>dlib/entropy_decoder_model/entropy_decoder_model_kernel_3.h</file>
+               <description> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-2-1-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_3a</name>
+                     <description>   is a typedef for entropy_decoder_model_kernel_3 that uses conditioning_class_kernel_1a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_3b</name>
+                     <description>   is a typedef for entropy_decoder_model_kernel_3 that uses conditioning_class_kernel_2a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_3c</name>
+                     <description>   is a typedef for entropy_decoder_model_kernel_3 that uses conditioning_class_kernel_3a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>entropy_decoder_model_kernel_4</name>
+               <file>dlib/entropy_decoder_model/entropy_decoder_model_kernel_4.h</file>
+               <description> 
+                  This object is implemented using a variation of the PPM algorithm described by Alistair Moffat in his paper "Implementing 
+                  the PPM data compression scheme."
+                  It provides template arguments to select the maximum order and maximum memory to use.  For speed,
+                  exclusions are not used.  The escape method used is method D.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_4a</name>
+                     <description>   is a typedef for entropy_decoder_model_kernel_4 with the max order set to 4 and the max number
+                        of nodes set to 200,000</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_4b</name>
+                     <description>   is a typedef for entropy_decoder_model_kernel_4 with the max order set to 5 and the max number
+                        of nodes set to 1,000,000</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation>    
+                     
+            <implementation>
+               <name>entropy_decoder_model_kernel_5</name>
+               <file>dlib/entropy_decoder_model/entropy_decoder_model_kernel_5.h</file>
+               <description> 
+                  This object is implemented using a variation of the PPM algorithm described by Alistair Moffat in his paper "Implementing 
+                  the PPM data compression scheme."
+                  It provides template arguments to select the maximum order and maximum memory to use.  Exclusions are used. The escape method used is method D.
+                  This implementation is very much like kernel_4 except it is tuned for higher compression rather than speed.
+                  This also uses Dmitry Shkarin's Information Inheritance scheme.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_5a</name>
+                     <description>   is a typedef for entropy_decoder_model_kernel_5 with the max order set to 4 and the max number
+                        of nodes set to 200,000</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_5b</name>
+                     <description>   is a typedef for entropy_decoder_model_kernel_5 with the max order set to 5 and the max number
+                         of nodes set to 1,000,000</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_5c</name>
+                     <description>   is a typedef for entropy_decoder_model_kernel_5 with the max order set to 7 and the max number
+                         of nodes set to 2,500,000</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation>    
+                     
+            <implementation>
+               <name>entropy_decoder_model_kernel_6</name>
+               <file>dlib/entropy_decoder_model/entropy_decoder_model_kernel_6.h</file>
+               <description> 
+                  This object just assigns every symbol the same probability.  I.e. it uses an <i>order-(-1)</i> model.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_6a</name>
+                     <description>is a typedef for entropy_decoder_model_kernel_6</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>entropy_encoder_model</name>
+         <file>dlib/entropy_encoder_model.h</file>
+         <spec_file>dlib/entropy_encoder_model/entropy_encoder_model_kernel_abstract.h</spec_file>
+         <description>
+                This object represents some kind of statistical model.  You
+                can use it to write symbols to an entropy_encoder and it will calculate
+                the cumulative counts/probabilities and manage contexts for you.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>entropy_encoder_model_kernel_1</name>
+               <file>dlib/entropy_encoder_model/entropy_encoder_model_kernel_1.h</file>
+               <description> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for entropy_encoder_model_kernel_1 that uses conditioning_class_kernel_1a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1b</name>
+                     <description>is a typedef for entropy_encoder_model_kernel_1 that uses conditioning_class_kernel_2a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_1c</name>
+                     <description>is a typedef for entropy_encoder_model_kernel_1 that uses conditioning_class_kernel_3a</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>entropy_encoder_model_kernel_2</name>
+               <file>dlib/entropy_encoder_model/entropy_encoder_model_kernel_2.h</file>
+               <description> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-1-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for entropy_encoder_model_kernel_2 that uses conditioning_class_kernel_1a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_2b</name>
+                     <description>is a typedef for entropy_encoder_model_kernel_2 that uses conditioning_class_kernel_2a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_2c</name>
+                     <description>is a typedef for entropy_encoder_model_kernel_2 that uses conditioning_class_kernel_3a</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_2d</name>
+                     <description>is a typedef for entropy_encoder_model_kernel_2 that uses conditioning_class_kernel_2a for its order-0
+                         context and conditioning_class_kernel_4b for its order-1 context.</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>entropy_encoder_model_kernel_3</name>
+               <file>dlib/entropy_encoder_model/entropy_encoder_model_kernel_3.h</file>
+               <description> 
+                  This object is implemented using the <a href="#conditioning_class">conditioning_class</a> component.
+                  It implements an <i>order-2-1-0</i> finite context model and uses lazy exclusions and update exclusions.  
+                  The escape method used is method D.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_3a</name>
+                     <description>   is a typedef for entropy_encoder_model_kernel_3 that uses conditioning_class_kernel_1a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_3b</name>
+                     <description>   is a typedef for entropy_encoder_model_kernel_3 that uses conditioning_class_kernel_2a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_3c</name>
+                     <description>   is a typedef for entropy_encoder_model_kernel_3 that uses conditioning_class_kernel_3a for orders 0 and 1
+                        and conditioning_class_kernel_4b for order-2.</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+            <implementation>
+               <name>entropy_encoder_model_kernel_4</name>
+               <file>dlib/entropy_encoder_model/entropy_encoder_model_kernel_4.h</file>
+               <description> 
+                  This object is implemented using a variation of the PPM algorithm described by Alistair Moffat in his paper "Implementing 
+                  the PPM data compression scheme."
+                  It provides template arguments to select the maximum order and maximum memory to use.  For speed,
+                  exclusions are not used.  The escape method used is method D.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_4a</name>
+                     <description>   is a typedef for entropy_encoder_model_kernel_4 with the max order set to 4 and the max number
+                        of nodes set to 200,000</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_4b</name>
+                     <description>   is a typedef for entropy_encoder_model_kernel_4 with the max order set to 5 and the max number
+                        of nodes set to 1,000,000</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation>    
+                     
+            <implementation>
+               <name>entropy_encoder_model_kernel_5</name>
+               <file>dlib/entropy_encoder_model/entropy_encoder_model_kernel_5.h</file>
+               <description> 
+                  This object is implemented using a variation of the PPM algorithm described by Alistair Moffat in his paper "Implementing 
+                  the PPM data compression scheme."
+                  It provides template arguments to select the maximum order and maximum memory to use.  Exclusions are used. The escape method used is method D.
+                  This implementation is very much like kernel_4 except it is tuned for higher compression rather than speed.
+                  This also uses Dmitry Shkarin's Information Inheritance scheme.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_5a</name>
+                     <description>   is a typedef for entropy_encoder_model_kernel_5 with the max order set to 4 and the max number
+                        of nodes set to 200,000</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_5b</name>
+                     <description>   is a typedef for entropy_encoder_model_kernel_5 with the max order set to 5 and the max number
+                         of nodes set to 1,000,000</description>
+                  </typedef>
+                  <typedef>
+                     <name>kernel_5c</name>
+                     <description>   is a typedef for entropy_encoder_model_kernel_5 with the max order set to 7 and the max number
+                         of nodes set to 2,500,000</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation>    
+                     
+            <implementation>
+               <name>entropy_encoder_model_kernel_6</name>
+               <file>dlib/entropy_encoder_model/entropy_encoder_model_kernel_6.h</file>
+               <description> 
+                  This object just assigns every symbol the same probability.  I.e. it uses an <i>order-(-1)</i> model.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_6a</name>
+                     <description>is a typedef for entropy_encoder_model_kernel_6</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>lz77_buffer</name>
+         <file>dlib/lz77_buffer.h</file>
+         <spec_file>dlib/lz77_buffer/lz77_buffer_kernel_abstract.h</spec_file>
+         <description>
+            This object represents a pair of buffers (history and lookahead buffers) 
+                used during lz77 style compression.
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>lz77_buffer_kernel_1</name>
+               <file>dlib/lz77_buffer/lz77_buffer_kernel_1.h</file>
+               <description> 
+                  This object is implemented using the <a href="containers.html#sliding_buffer">sliding_buffer</a> and it 
+                  just does simple linear searches of the history buffer to find matches. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for lz77_buffer_kernel_1 that uses sliding_buffer_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+            <implementation>
+               <name>lz77_buffer_kernel_2</name>
+               <file>dlib/lz77_buffer/lz77_buffer_kernel_2.h</file>
+               <description> 
+                  This object is implemented using the <a href="containers.html#sliding_buffer">sliding_buffer</a>.  It
+                  finds matches by using a hash table. 
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for lz77_buffer_kernel_2 that uses sliding_buffer_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+      
+   <!-- ************************************************************************* -->
+      
+      <component checked="true">
+         <name>lzp_buffer</name>
+         <file>dlib/lzp_buffer.h</file>
+         <spec_file>dlib/lzp_buffer/lzp_buffer_kernel_abstract.h</spec_file>
+         <description>
+                This object represents some varation on the LZP algorithm
+                described by Charles Bloom in his paper "LZP: a new data
+                compression algorithm"
+         </description>
+         
+         <implementations>
+            <implementation>
+               <name>lzp_buffer_kernel_1</name>
+               <file>dlib/lzp_buffer/lzp_buffer_kernel_1.h</file>
+               <description> 
+                  This object is implemented using the <a href="containers.html#sliding_buffer">sliding_buffer</a> and uses
+                  an order-3 model to predict matches.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_1a</name>
+                     <description>is a typedef for lzp_buffer_kernel_1 that uses sliding_buffer_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+            <implementation>
+               <name>lzp_buffer_kernel_2</name>
+               <file>dlib/lzp_buffer/lzp_buffer_kernel_2.h</file>
+               <description> 
+                  This object is implemented using the <a href="containers.html#sliding_buffer">sliding_buffer</a> and uses
+                  an order-5-4-3 model to predict matches.
+               </description> 
+    
+               <typedefs>
+                  <typedef>
+                     <name>kernel_2a</name>
+                     <description>is a typedef for lzp_buffer_kernel_2 that uses sliding_buffer_kernel_1</description>
+                  </typedef>
+               </typedefs>                
+               
+            </implementation> 
+                     
+         </implementations>
+                        
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+   </components>
+
+   <!-- ************************************************************************* -->
+
+
+</doc>
