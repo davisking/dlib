@@ -50,7 +50,7 @@ makedocs ()
 
 
 # root dlib repository URL
-    DLIB_REPOS=`svn info | grep Root | awk '{print $3}'`
+    DLIB_REPOS=`svn info | grep URL | awk '{print $2}' | sed -e 's/\/docs$//'  `
 
 # The revision number we are currently at
     REVISION=`svn info | grep Revision | awk '{ print $2 }'`
