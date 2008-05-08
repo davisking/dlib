@@ -1,4 +1,44 @@
 
+fix the evidence nodes not green on open bayes net
+Add a stack trace thing
+
+holding delete and selecting nodes in the bayes net gui throws exception
+
+
+************************
+
+Add asserts to text_grid and also
+move all the function bodies to cpp.
+
+Hide all windows header files in a cpp file.
+
+
+
+
+add a quadratic classifier
+
+
+
+
+
+make a multiline text field
+
+
+
+
+make htmlify work right on tempalte function calls
+
+
+
+
+mutual information based feature selection
+
+
+
+
+
+
+
 
 make the popup menus from the menu_bar always put themselves on the screen
 add toggle menu item styles

@@ -32,6 +32,14 @@
          char, etc...) and std::string will not cause operator&lt; or swap() to throw.
          </p>
 
+         <p>
+            Note also that most of the containers inherit from the <a href="#enumerable">enumerable</a>
+            interface.  Thus, all the member functions inherited from enumerable are defined
+            in the enumerable class and their documentation is not repeated in each 
+            container's documentation.  This includes the size() member function in each
+            container.
+         </p>
+
    
    </body>
 
