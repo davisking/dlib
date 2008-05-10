@@ -2607,6 +2607,7 @@ namespace dlib
                     graph_.remove_node(selected_node);
                     external_graph.remove_node(selected_node);
                     selected_node = graph_.number_of_nodes();
+                    mouse_drag = false;
                     if (graph_modified_handler.is_set())
                         graph_modified_handler();
                     if (node_deleted_handler.is_set())
@@ -2987,6 +2988,7 @@ namespace dlib
             serialize(item.p, out);
             serialize(item.name, out);
             serialize(item.str_rect, out);
+            serialize(item.color, out);
         }
 
         friend void deserialize(data& item, std::istream& in)
@@ -2994,6 +2996,7 @@ namespace dlib
             deserialize(item.p, in);
             deserialize(item.name, in);
             deserialize(item.str_rect, in);
+            deserialize(item.color, in);
         }
 
         mutable std::ostringstream sout;
