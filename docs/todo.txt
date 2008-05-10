@@ -1,11 +1,4 @@
 
-fix the evidence nodes not green on open bayes net
-Add a stack trace thing
-
-holding delete and selecting nodes in the bayes net gui throws exception
-
-
-************************
 
 Add asserts to text_grid and also
 move all the function bodies to cpp.
