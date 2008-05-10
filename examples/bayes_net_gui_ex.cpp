@@ -626,6 +626,7 @@ on_menu_help_about (
 {
     message_box("About","This application is the GUI front end to the dlib C++ Library's\n"
                 "Bayesian Network inference utilities\n\n"
+                "Version 1.1\n\n"
                 "See http://dclib.sourceforge.net for updates");
 }
 

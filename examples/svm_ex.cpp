@@ -144,6 +144,7 @@ int main()
     // We can also train a decision function that reports a well conditioned probability instead of just a number
     // > 0 for the +1 class and < 0 for the -1 class.  An example of doing that follows:
     probabilistic_decision_function<kernel_type> learned_probabilistic_decision_function = svm_nu_train_prob(samples, labels, kernel_type(0.1), 0.1, 3);
+    // Now we have a function that returns the probability that a given sample is of the +1 class.  
 
     // print out the number of support vectors in the resulting decision function.  (it should be the same as in the one above)
     cout << "\nnumber of support vectors in our learned_probabilistic_decision_function is " 
