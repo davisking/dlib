@@ -1338,13 +1338,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename value_type 
+        typename value_type,
+        typename alloc
         >
-    const matrix_exp<matrix_std_vector_exp<std::vector<value_type> > > vector_to_matrix (
-        const std::vector<value_type>& vector
+    const matrix_exp<matrix_std_vector_exp<std::vector<value_type,alloc> > > vector_to_matrix (
+        const std::vector<value_type,alloc>& vector
     )
     {
-        typedef matrix_std_vector_exp<std::vector<value_type> > exp;
+        typedef matrix_std_vector_exp<std::vector<value_type,alloc> > exp;
         return matrix_exp<exp>(exp(vector));
     }
 
