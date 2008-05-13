@@ -62,8 +62,8 @@ namespace dlib
                 - y(i) == -1 or +1
                 - y(i) is the class that should be assigned to training example x(i)
             - 0 < nu < maximum_nu(y) 
-            - kernel_function == a kernel function object type as defined at the top 
-              of this document.
+            - kernel_function == a kernel function object type as defined at the
+              top of dlib/svm/kernel_abstract.h
         ensures
             - trains a nu support vector classifier given the training samples in x and 
               labels in y.  Training is done when the error is less than eps.
@@ -112,8 +112,8 @@ namespace dlib
                 - y(i) == -1 or +1
                 - y(i) is the class that should be assigned to training example x(i)
             - 0 < nu < maximum_nu(y) 
-            - kernel_function == a kernel function object type as defined at the top 
-              of this document.
+            - kernel_function == a kernel function object type as defined at the
+              top of dlib/svm/kernel_abstract.h
         ensures
             - trains a nu support vector classifier given the training samples in x and 
               labels in y.  Training is done when the error is less than eps.
@@ -158,8 +158,8 @@ namespace dlib
                 - y(i) == -1 or +1
                 - y(i) is the class that should be assigned to training example x(i)
             - 0 < nu < maximum_nu(y) 
-            - kernel_function == a kernel function object type as defined at the top 
-              of this document.
+            - kernel_function == a kernel function object type as defined at the
+              top of dlib/svm/kernel_abstract.h
         ensures
             - performs k-fold cross validation by training a nu-svm using the svm_nu_train()
               function.  Each fold is tested using the learned decision_function and the

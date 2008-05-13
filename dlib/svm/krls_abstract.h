@@ -7,6 +7,7 @@
 #include "../matrix/matrix_abstract.h"
 #include "../algs.h"
 #include "../serialize.h"
+#include "kernel_abstract.h"
 
 namespace dlib
 {
@@ -17,6 +18,9 @@ namespace dlib
     class krls
     {
         /*!
+            REQUIREMENTS ON kernel_type
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+
             INITIAL VALUE
                 - dictionary_size() == 0
 
