@@ -376,12 +376,14 @@
          <term link="algorithms.html#point" name="point"/>
          
          <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>
-         <term link="dlib/svm/svm_abstract.h.html#decision_function" name="decision_function"/>
-         <term link="dlib/svm/svm_abstract.h.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
-         <term link="dlib/svm/svm_abstract.h.html#linear_kernel" name="linear_kernel"/>
-         <term link="dlib/svm/svm_abstract.h.html#polynomial_kernel" name="polynomial_kernel"/>
-         <term link="dlib/svm/svm_abstract.h.html#radial_basis_kernel" name="radial_basis_kernel"/>
-         <term link="dlib/svm/svm_abstract.h.html#Kernel_Function_Objects" name="Kernel Function Objects"/>
+
+         <term link="dlib/svm/function_abstract.h.html#decision_function" name="decision_function"/>
+         <term link="dlib/svm/function_abstract.h.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
+
+         <term link="dlib/svm/kernel_abstract.h.html#linear_kernel" name="linear_kernel"/>
+         <term link="dlib/svm/kernel_abstract.h.html#polynomial_kernel" name="polynomial_kernel"/>
+         <term link="dlib/svm/kernel_abstract.h.html#radial_basis_kernel" name="radial_basis_kernel"/>
+         <term link="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects" name="Kernel Function Objects"/>
 
 
 

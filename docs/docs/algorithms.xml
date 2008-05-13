@@ -719,7 +719,7 @@
       <component>
          <name>probabilistic_decision_function</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
          <description>
                 This object represents a binary decision function for use with
                 support vector machines.  It returns an 
@@ -736,7 +736,7 @@
       <component>
          <name>decision_function</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
          <description>
                 This object represents a binary decision function for use with
                 support vector machines.
@@ -752,7 +752,7 @@
       <component>
          <name>linear_kernel</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
          <description>
                 This object represents a linear function kernel for use with
                 support vector machines.
@@ -765,7 +765,7 @@
       <component>
          <name>polynomial_kernel</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
          <description>
                 This object represents a polynomial kernel for use with
                 support vector machines.
@@ -778,7 +778,7 @@
       <component>
          <name>radial_basis_kernel</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
          <description>
                 This object represents a radial basis function kernel for use with
                 support vector machines.
