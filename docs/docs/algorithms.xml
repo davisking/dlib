@@ -12,14 +12,8 @@
          <p>
             This page documents library components that are all basically just implementations of 
             mathematical functions or algorithms without any really significant data structures 
-            associated with them. So this includes things like checksums, cryptographic hashes, sorting, etc...
-         </p>
-
-         <p>
-         Everything in this section basically follows the same conventions as 
-         the rest of the library.   So to get a bigint for example you would need to write something 
-         like <tt>typedef dlib::bigint::kernel_2a bint;</tt> and from then on make your big ints like 
-         <tt>bint my_bigint;</tt>.  
+            associated with them. So this includes things like checksums, cryptographic hashes, 
+            machine learning algorithms, sorting, etc...
          </p>
 
    </body>
@@ -61,6 +55,7 @@
                <item>linear_kernel</item>
                <item>decision_function</item>
                <item>probabilistic_decision_function</item>
+               <item>krls</item>
             </sub>
          </item>
       </section>
@@ -663,6 +658,25 @@
                This object represents a point inside a Cartesian coordinate system.
          </description>
       </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>krls</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/krls_abstract.h</spec_file>
+         <description>
+                This is an implementation of the kernel recursive least squares algorithm 
+                described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
+            <p>
+                The long and short of this algorithm is that it is an online kernel based 
+                regression algorithm.  You give it samples (x,y) and it learns the function
+                f(x) == y.  For a detailed description of the algorithm read the above paper.
+            </p>
+         </description>
+                                 
+      </component>
+      
       
    <!-- ************************************************************************* -->
       

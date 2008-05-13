@@ -12,12 +12,23 @@
 
 <current>
 New Stuff:
+   - Added an implementation of the kernel recursive least squares algorithm
 
 Non-Backwards Compatible Changes:
+   - Broke backwards compatability in the directed_graph_drawer's serialization
+     format when I fixed the bug below.  
 
 Bug fixes:
+   - Fixed two bugs in the directed_graph_drawer widget.  First, it sometimes 
+     threw a dlib::fatal_error due to a race condition.  Second, the color of 
+     the nodes wasn't being serialized when save_graph() was called.  
+   - Made vector_to_matrix() work for std::vector objects that have non-default 
+     allocators.
 
 Other:
+   - Added some stuff to make people get a really obvious error message
+     when they set up the include path incorrectly.
+
 </current>
 
 <!-- *******************************************************************************  -->

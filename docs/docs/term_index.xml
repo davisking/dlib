@@ -374,6 +374,7 @@
          <term link="algorithms.html#svm_nu_train" name="support vector machine"/>
          <term link="algorithms.html#vector" name="vector"/>
          <term link="algorithms.html#point" name="point"/>
+         <term link="algorithms.html#krls" name="krls"/>
          
          <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>
 
