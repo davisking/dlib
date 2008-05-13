@@ -11,7 +11,7 @@
 #include "../algs.h"
 #include "../serialize.h"
 #include "../rand.h"
-#include "dlib/std_allocator.h"
+#include "../std_allocator.h"
 #include "function.h"
 #include "kernel.h"
 
