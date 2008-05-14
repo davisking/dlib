@@ -29,7 +29,7 @@
         DLIB_STACK_TRACE;
 
         // you may print the current stack trace as follows. 
-        std::cout << get_stack_trace() << endl;
+        std::cout << dlib::get_stack_trace() << endl;
     }
 
     void funct()
