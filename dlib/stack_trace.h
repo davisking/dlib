@@ -96,8 +96,8 @@ namespace dlib
     };
 }
 
-#define DLIB_STACK_TRACE_NAMED(x) stack_tracer dlib_stack_tracer_object(x,__FILE__,__LINE__)
-#define DLIB_STACK_TRACE stack_tracer dlib_stack_tracer_object(DLIB_FUNCTION_NAME,__FILE__,__LINE__)
+#define DLIB_STACK_TRACE_NAMED(x) dlib::stack_tracer dlib_stack_tracer_object(x,__FILE__,__LINE__)
+#define DLIB_STACK_TRACE dlib::stack_tracer dlib_stack_tracer_object(DLIB_FUNCTION_NAME,__FILE__,__LINE__)
 
 #else // don't do anything if ENABLE_ASSERTS isn't defined
 #define DLIB_STACK_TRACE_NAMED(x) 
