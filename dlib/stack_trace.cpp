@@ -10,16 +10,27 @@
 #include "stack_trace.h"
 #include "threads.h"
 #include "stack.h"
+#include "memory_manager.h"
 
 namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
-    thread_specific_data<stack<std::string>::kernel_1a>& get_dlib_stack_trace_stack()
+    namespace 
     {
-        static thread_specific_data<stack<std::string>::kernel_1a> a;
-        return a;
+        struct stack_tracer_data
+        {
+            const char* funct_name;
+            const char* file_name;
+            int line_number;
+        };
+
+        thread_specific_data<stack<stack_tracer_data,memory_manager<char>::kernel_2a>::kernel_1a>& get_dlib_stack_trace_stack()
+        {
+            static thread_specific_data<stack<stack_tracer_data,memory_manager<char>::kernel_2a>::kernel_1a> a;
+            return a;
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -31,16 +42,13 @@ namespace dlib
         const int line_number
     )
     {
-        std::ostringstream sout;
-        // if the function name isn't really long then put this all on a single line
-        if (std::strlen(funct_name) < 40)
-            sout << file_name << ":" << line_number << ": " << funct_name;
-        else
-            sout << file_name << ":" << line_number << "\n" << funct_name;
+        stack_tracer_data data;
+        data.funct_name = funct_name;
+        data.file_name = file_name;
+        data.line_number = line_number;
 
-        // pop the string onto the function stack trace
-        std::string temp(sout.str());
-        get_dlib_stack_trace_stack().data().push(temp);
+        // pop the info onto the function stack trace
+        get_dlib_stack_trace_stack().data().push(data);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -48,7 +56,7 @@ namespace dlib
     stack_tracer::
     ~stack_tracer()
     {
-        std::string temp;
+        stack_tracer_data temp;
         get_dlib_stack_trace_stack().data().pop(temp);
     }
 
@@ -60,7 +68,8 @@ namespace dlib
         get_dlib_stack_trace_stack().data().reset();
         while (get_dlib_stack_trace_stack().data().move_next())
         {
-            sout << get_dlib_stack_trace_stack().data().element() << "\n";
+            stack_tracer_data data = get_dlib_stack_trace_stack().data().element();
+            sout << data.file_name << ":" << data.line_number << "\n    " << data.funct_name;
         }
         return sout.str();
     }
