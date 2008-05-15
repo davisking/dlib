@@ -49,18 +49,16 @@
 !*/
 
 
-#include <sstream>
-#include <cstring>
 #include <string>
 #include "assert.h"
 
 // only setup the stack trace stuff if the asserts are enabled (which happens in debug mode
-// basically)
-#ifdef DLIB_ENABLE_STACK_TRACE 
+// basically).  Also, this stuff doesn't work if you use NO_MAKEFILE
+#if defined(DLIB_ENABLE_STACK_TRACE) && !defined(NO_MAKEFILE)
 
 namespace dlib
 {
-    inline const std::string get_stack_trace();
+    const std::string get_stack_trace();
 }
 
 // redefine the DLIB_CASSERT macro to include the stack trace
@@ -80,8 +78,6 @@ namespace dlib
     }}                                                                      
 
 
-#include "threads.h"
-#include "stack.h"
 
 namespace dlib
 {
@@ -93,52 +89,11 @@ namespace dlib
             const char* funct_name,
             const char* file_name,
             const int line_number
-        )
-        {
-            std::ostringstream sout;
-            // if the function name isn't really long then put this all on a single line
-            if (std::strlen(funct_name) < 40)
-                sout << file_name << ":" << line_number << ": " << funct_name;
-            else
-                sout << file_name << ":" << line_number << "\n" << funct_name;
+        );
 
-            // pop the string onto the function stack trace
-            std::string temp(sout.str());
-            trace().data().push(temp);
-        }
+        ~stack_tracer();
 
-        ~stack_tracer()
-        {
-            std::string temp;
-            trace().data().pop(temp);
-        }
-
-        static const std::string get_stack_trace()
-        {
-            std::ostringstream sout;
-            trace().data().reset();
-            while (trace().data().move_next())
-            {
-                sout << trace().data().element() << "\n";
-            }
-            return sout.str();
-        }
-
-    private:
-
-        typedef stack<std::string>::kernel_1a_c stack_of_string;
-        static thread_specific_data<stack_of_string>& trace()
-        {
-            static thread_specific_data<stack_of_string> a;
-            return a;
-        }
     };
-
-    inline const std::string get_stack_trace()
-    {
-        return stack_tracer::get_stack_trace();
-    }
-
 }
 
 #define DLIB_STACK_TRACE_NAMED(x) stack_tracer dlib_stack_tracer_object(x,__FILE__,__LINE__)

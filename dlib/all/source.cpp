@@ -41,6 +41,7 @@
 #include "../threads/threads_kernel_2.cpp"
 #include "../threads/threads_kernel_shared.cpp"
 #include "../timer/timer_kernel_2.cpp"
+#include "../stack_trace.cpp"
 
 #ifdef DLIB_PNG_SUPPORT
 #include "../image_loader/png_loader.cpp"

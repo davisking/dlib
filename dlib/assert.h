@@ -106,5 +106,7 @@ extern "C"
 
 // -----------------------------
 
+#include "stack_trace.h"
+
 #endif // DLIB_ASSERt_
 
