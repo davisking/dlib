@@ -47,6 +47,9 @@
       <section>
          <name>Global Functions</name>
          <item>DLIB_ASSERT</item> 
+         <item>DLIB_STACK_TRACE</item> 
+         <item>DLIB_STACK_TRACE_NAMED</item> 
+         <item>get_stack_trace</item> 
          <item>DLIB_CASSERT</item> 
          <item>COMPILE_TIME_ASSERT</item> 
          <item>ASSERT_ARE_SAME_TYPE</item> 
@@ -332,6 +335,63 @@
          C function dlib_assert_breakpoint().  This behavior makes it easy to set a debugging
          tool to break when DLIB_CASSERT fails by setting a breakpoing on dlib_assert_breakpoint().
       </p>
+         </description>
+                                 
+      </component>
+            
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>DLIB_STACK_TRACE</name>
+         <file>dlib/assert.h</file>
+         <spec_file>dlib/stack_trace.h</spec_file>
+         <description>
+         <p>
+            This is a preprocessor macro that allows you to tag a function so 
+            that dlib will keep track of it in a function call stack.  That is,
+            you will be able to see a stack trace by calling <a href="#get_stack_trace">get_stack_trace</a>
+            if you put this macro at the top of your functions.
+         </p>
+         <p>
+            This macro is only enabled if DLIB_ENABLE_STACK_TRACE is defined.  If it isn't defined then
+            this macro doesn't do anything.  Also note that when this macro is defined it will
+            cause <a href="#DLIB_ASSERT">DLIB_ASSERT</a> and <a href="#DLIB_CASSERT">DLIB_CASSERT</a>
+            to include a stack trace in their error messages.
+         </p>
+         </description>
+                                 
+      </component>
+            
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>DLIB_STACK_TRACE_NAMED</name>
+         <file>dlib/assert.h</file>
+         <spec_file>dlib/stack_trace.h</spec_file>
+         <description>
+            This is a preprocessor macro just like <a href="#DLIB_STACK_TRACE">DLIB_STACK_TRACE</a>
+            except that it allows you to supply your own string to use as the function name
+            in the stack trace instead of the one deduced by DLIB_STACK_TRACE.
+            <p>
+               This macro is only enabled if DLIB_ENABLE_STACK_TRACE is defined.  
+            </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>get_stack_trace</name>
+         <file>dlib/assert.h</file>
+         <spec_file>dlib/stack_trace.h</spec_file>
+         <description>
+            This function allows you to query the current stack trace.
+            <p>
+               This macro is only enabled if DLIB_ENABLE_STACK_TRACE is defined.  
+            </p>
          </description>
                                  
       </component>

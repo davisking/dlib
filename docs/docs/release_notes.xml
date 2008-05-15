@@ -12,6 +12,20 @@
 
 <current>
 New Stuff:
+   - Added some macros that allow dlib to create a stack trace
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.4" date="May 12, 2008">
+New Stuff:
    - Added an implementation of the kernel recursive least squares algorithm
 
 Non-Backwards Compatible Changes:
@@ -29,7 +43,7 @@ Other:
    - Added some stuff to make people get a really obvious error message
      when they set up the include path incorrectly.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
