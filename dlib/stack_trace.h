@@ -72,7 +72,7 @@ namespace dlib
         dlib__out << "Error occurred in function " << DLIB_FUNCTION_NAME << ".\n\n";      \
         dlib__out << "Failing expression was " << #_exp << ".\n";           \
         dlib__out << _message << "\n\n";                                      \
-        dlib__out << "Stack Trace: \n" << get_stack_trace() << "\n";        \
+        dlib__out << "Stack Trace: \n" << dlib::get_stack_trace() << "\n";        \
         dlib_assert_breakpoint();                                           \
         throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib__out.str());      \
     }}                                                                      
