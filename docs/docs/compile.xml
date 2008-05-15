@@ -76,6 +76,10 @@
            project.cpp</tt>.  But again, this is only for single cpp file projects.  If you use NO_MAKEFILE with projects 
            that contain more than one cpp file you will get linker errors about multiply defined symbols.
         </p>
+        <p>
+           Also note that if you use this macro then the <a href="metaprogramming.html#DLIB_STACK_TRACE">stack trace</a>
+           functionality in the library will be disabled.   
+        </p>
          <anchor>DLIB_THREAD_POOL_TIMEOUT</anchor>
         <h3>#define DLIB_THREAD_POOL_TIMEOUT &lt;time-in-milliseconds&gt;</h3>
         <p>
