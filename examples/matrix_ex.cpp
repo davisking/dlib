@@ -173,7 +173,7 @@ int main()
 
 
 
-        The is only one caveat in all of this.  It is for statements that involve 
+        There is only one caveat in all of this.  It is for statements that involve 
         the multiplication of a complex matrix_exp such as the following:
     */
         x = M*(M+M+M+M+M+M+M);
