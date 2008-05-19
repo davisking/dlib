@@ -225,6 +225,10 @@
                <name>Download Files</name>
                <link>http://sourceforge.net/project/platformdownload.php?group_id=130373</link>
             </item>
+            <item>
+               <name>Known Users</name>
+               <link>http://dclib.wiki.sourceforge.net/dlib_users</link>
+            </item>
          </section>
 
       </web>
