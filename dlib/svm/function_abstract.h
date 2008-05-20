@@ -22,8 +22,8 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON K
-                K must be a kernel function object type as defined at the top 
-                of this document.
+                K must be a kernel function object type as defined at the
+                top of dlib/svm/kernel_abstract.h
 
             WHAT THIS OBJECT REPRESENTS 
                 This object represents a decision or regression function that was 
@@ -128,8 +128,8 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON K
-                K must be a kernel function object type as defined at the top 
-                of this document.
+                K must be a kernel function object type as defined at the
+                top of dlib/svm/kernel_abstract.h
 
             WHAT THIS OBJECT REPRESENTS 
                 This object represents a binary decision function that returns an 
