@@ -375,6 +375,7 @@
          <term link="algorithms.html#vector" name="vector"/>
          <term link="algorithms.html#point" name="point"/>
          <term link="algorithms.html#krls" name="krls"/>
+         <term link="algorithms.html#one_class" name="one_class"/>
          
          <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>
 
