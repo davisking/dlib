@@ -5,6 +5,7 @@
 
 #include "svm/svm.h"
 #include "svm/krls.h"
+#include "svm/one_class.h"
 
 #endif // DLIB_SVm_HEADER
 
