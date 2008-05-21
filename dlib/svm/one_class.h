@@ -39,13 +39,21 @@ namespace dlib
             scalar_type tolerance_ = 0.001
         ) : 
             kernel(kernel_), 
-            tolerance(tolerance_)
+            tolerance(tolerance_),
+            max_dis(1e6)
         {
-            clear();
+            clear_dictionary();
         }
 
         void set_tolerance (scalar_type tolerance_)
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(tolerance_ >= 0,
+                "\tvoid one_class::set_tolerance"
+                << "\n\tinvalid tolerance value"
+                << "\n\ttolerance: " << tolerance_
+                << "\n\tthis: " << this
+                );
             tolerance = tolerance_;
         }
 
@@ -54,7 +62,29 @@ namespace dlib
             return tolerance;
         }
 
-        void clear ()
+        void set_max_discount (
+            scalar_type value 
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(value >= 0,
+                "\tvoid one_class::set_max_discount"
+                << "\n\tinvalid discount value"
+                << "\n\tvalue: " << value 
+                << "\n\tthis: " << this
+                );
+            max_dis = value;
+            if (samples_seen > value)
+                samples_seen = value;
+        }
+
+        scalar_type get_max_discount(
+        ) const
+        {
+            return max_dis;
+        }
+
+        void clear_dictionary ()
         {
             dictionary.clear();
             alpha.clear();
@@ -177,10 +207,13 @@ namespace dlib
                 }
             }
 
+            ++samples_seen;
+
             // recompute the bias term
             bias = sum(pointwise_multiply(K, vector_to_matrix(alpha)*trans(vector_to_matrix(alpha))));
             
-            ++samples_seen;
+            if (samples_seen > max_dis)
+                samples_seen = max_dis;
         }
 
         void swap (
@@ -195,6 +228,7 @@ namespace dlib
             exchange(tolerance, item.tolerance);
             exchange(samples_seen, item.samples_seen);
             exchange(bias, item.bias);
+            exchange(max_dis, item.max_dis);
             a.swap(item.a);
             k.swap(item.k);
         }
@@ -212,6 +246,7 @@ namespace dlib
             serialize(item.tolerance, out);
             serialize(item.samples_seen, out);
             serialize(item.bias, out);
+            serialize(item.max_dis, out);
         }
 
         friend void deserialize(one_class& item, std::istream& in)
@@ -224,6 +259,7 @@ namespace dlib
             deserialize(item.tolerance, in);
             deserialize(item.samples_seen, in);
             deserialize(item.bias, in);
+            deserialize(item.max_dis, in);
         }
 
     private:
@@ -245,6 +281,7 @@ namespace dlib
         scalar_type tolerance;
         scalar_type samples_seen;
         scalar_type bias;
+        scalar_type max_dis;
 
 
         // temp variables here just so we don't have to reconstruct them over and over.  Thus, 

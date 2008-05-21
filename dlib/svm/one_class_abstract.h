@@ -23,6 +23,7 @@ namespace dlib
 
             INITIAL VALUE
                 - dictionary_size() == 0
+                - max_discount() == 1e6
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of an online algorithm for recursively estimating the
@@ -57,6 +58,8 @@ namespace dlib
             scalar_type tolerance_
         );
         /*!
+            requires
+                - tolerance_ >= 0
             ensures
                 - #get_tolerance() == tolerance_
         !*/
@@ -74,14 +77,42 @@ namespace dlib
                   less accurate estimate but also in less support vectors.
         !*/
 
-        void clear (
+        void set_max_discount (
+            scalar_type value 
+        );
+        /*!
+            requires
+                - value > 0
+            ensures
+                - #get_max_discount() == value 
+        !*/
+
+        scalar_type get_max_discount(
+        ) const;
+        /*!
+            ensures
+                - If you have shown this object N samples so far then it has found 
+                  the centroid of those N samples.  That is, it has found the average 
+                  of all of them in some high dimensional feature space. 
+                - if (N <= get_max_discount()) then
+                    - The next sample you show this object will be added to the centroid 
+                      with a weight of 1/(N+1).  
+                - else
+                    - The next sample you show this object will be added to the centroid 
+                      with a weight of 1/(get_max_discount()+1).  
+
+                - If you think your samples are from a stationary source then you
+                  should set the max discount to some really big number.  However, 
+                  if you think the source isn't stationary then use a smaller number.
+                  This will cause the centroid in this object to be closer to the 
+                  centroid of the more recent points.
+        !*/
+
+        void clear_dictionary (
         );
         /*!
             ensures
-                - clears out all learned data and puts this object back to its
-                  initial state.  (e.g. #dictionary_size() == 0)
-                - #get_tolerance() == get_tolerance()
-                  (i.e. doesn't change the value of the tolerance)
+                - clears out all learned data (e.g. #dictionary_size() == 0)
         !*/
 
         scalar_type operator() (
