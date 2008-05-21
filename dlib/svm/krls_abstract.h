@@ -56,6 +56,8 @@ namespace dlib
             scalar_type tolerance_
         );
         /*!
+            requires
+                - tolerance_ >= 0
             ensures
                 - #get_tolerance() == tolerance_
         !*/
@@ -73,15 +75,12 @@ namespace dlib
                   less accurate decision function but also in less support vectors.
         !*/
 
-        void clear (
+        void clear_dictionary (
         );
         /*!
             ensures
-                - clears out all learned data and puts this object back to its
-                  initial state.
+                - clears out all learned data 
                   (e.g. #get_decision_function().support_vectors.size() == 0)
-                - #get_tolerance() == get_tolerance()
-                  (i.e. doesn't change the value of the tolerance)
         !*/
 
         scalar_type operator() (

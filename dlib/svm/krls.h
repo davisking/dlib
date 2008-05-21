@@ -36,11 +36,18 @@ namespace dlib
             kernel(kernel_), 
             tolerance(tolerance_)
         {
-            clear();
+            clear_dictionary();
         }
 
         void set_tolerance (scalar_type tolerance_)
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(tolerance_ >= 0,
+                "\tvoid krls::set_tolerance"
+                << "\n\tinvalid tolerance value"
+                << "\n\ttolerance: " << tolerance_
+                << "\n\tthis: " << this
+                );
             tolerance = tolerance_;
         }
 
@@ -49,7 +56,7 @@ namespace dlib
             return tolerance;
         }
 
-        void clear ()
+        void clear_dictionary ()
         {
             dictionary.clear();
             alpha.clear();
