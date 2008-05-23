@@ -1,11 +1,11 @@
 // Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_ONE_CLASs_
-#define DLIB_ONE_CLASs_
+#ifndef DLIB_KCENTROId_
+#define DLIB_KCENTROId_
 
 #include <vector>
 
-#include "one_class_abstract.h"
+#include "kcentroid_abstract.h"
 #include "../matrix.h"
 #include "function.h"
 #include "../std_allocator.h"
@@ -16,11 +16,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename kernel_type>
-    class one_class
+    class kcentroid
     {
         /*!
             This is an implementation of an online algorithm for recursively estimating the
-            center of mass of a sequence of training points.  It uses the sparsification technique
+            centroid of a sequence of training points.  It uses the sparsification technique
             described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
 
             To understand the code it would also be useful to consult page 114 of the book Kernel 
@@ -34,7 +34,7 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
 
-        explicit one_class (
+        explicit kcentroid (
             const kernel_type& kernel_, 
             scalar_type tolerance_ = 0.001
         ) : 
@@ -49,7 +49,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(tolerance_ >= 0,
-                "\tvoid one_class::set_tolerance"
+                "\tvoid kcentroid::set_tolerance"
                 << "\n\tinvalid tolerance value"
                 << "\n\ttolerance: " << tolerance_
                 << "\n\tthis: " << this
@@ -68,7 +68,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(value >= 0,
-                "\tvoid one_class::set_max_discount"
+                "\tvoid kcentroid::set_max_discount"
                 << "\n\tinvalid discount value"
                 << "\n\tvalue: " << value 
                 << "\n\tthis: " << this
@@ -120,7 +120,7 @@ namespace dlib
         }
 
         void swap (
-            one_class& item
+            kcentroid& item
         )
         {
             exchange(kernel, item.kernel);
@@ -139,7 +139,7 @@ namespace dlib
         unsigned long dictionary_size (
         ) const { return dictionary.size(); }
 
-        friend void serialize(const one_class& item, std::ostream& out)
+        friend void serialize(const kcentroid& item, std::ostream& out)
         {
             serialize(item.kernel, out);
             serialize(item.dictionary, out);
@@ -152,7 +152,7 @@ namespace dlib
             serialize(item.max_dis, out);
         }
 
-        friend void deserialize(one_class& item, std::istream& in)
+        friend void deserialize(kcentroid& item, std::istream& in)
         {
             deserialize(item.kernel, in);
             deserialize(item.dictionary, in);
@@ -317,12 +317,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename kernel_type>
-    void swap(one_class<kernel_type>& a, one_class<kernel_type>& b)
+    void swap(kcentroid<kernel_type>& a, kcentroid<kernel_type>& b)
     { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
 }
 
-#endif // DLIB_ONE_CLASs_
+#endif // DLIB_KCENTROId_
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_ONE_CLASs_ABSTRACT_
-#ifdef DLIB_ONE_CLASs_ABSTRACT_
+#undef DLIB_KCENTROId_ABSTRACT_
+#ifdef DLIB_KCENTROId_ABSTRACT_
 
 #include <cmath>
 #include "../matrix/matrix_abstract.h"
@@ -15,7 +15,7 @@ namespace dlib
     template <
         typename kernel_type
         >
-    class one_class
+    class kcentroid
     {
         /*!
             REQUIREMENTS ON kernel_type
@@ -27,10 +27,10 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of an online algorithm for recursively estimating the
-                center of mass of a sequence of training points.  It uses the sparsification technique
+                centroid of a sequence of training points.  It uses the sparsification technique
                 described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
 
-                This object then allows you to compute the distance between the center of mass
+                This object then allows you to compute the distance between the centroid 
                 and any test points.  So you can use this object to predict how similar a test
                 point is to the data this object has been trained on (larger distances from the
                 centroid indicate dissimilarity/anomalous points).
@@ -42,7 +42,7 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
 
-        explicit one_class (
+        explicit kcentroid (
             const kernel_type& kernel_, 
             scalar_type tolerance_ = 0.001
         );
@@ -146,7 +146,7 @@ namespace dlib
         !*/
 
         void swap (
-            one_class& item
+            kcentroid& item
         );
         /*!
             ensures
@@ -168,8 +168,8 @@ namespace dlib
         typename kernel_type
         >
     void swap(
-        one_class<kernel_type>& a, 
-        one_class<kernel_type>& b
+        kcentroid<kernel_type>& a, 
+        kcentroid<kernel_type>& b
     ) { a.swap(b); }
     /*!
         provides a global swap function
@@ -179,27 +179,27 @@ namespace dlib
         typename kernel_type
         >
     void serialize (
-        const one_class<kernel_type>& item,
+        const kcentroid<kernel_type>& item,
         std::ostream& out
     );
     /*!
-        provides serialization support for one_class objects
+        provides serialization support for kcentroid objects
     !*/
 
     template <
         typename kernel_type 
         >
     void deserialize (
-        one_class<kernel_type>& item,
+        kcentroid<kernel_type>& item,
         std::istream& in 
     );
     /*!
-        provides serialization support for one_class objects
+        provides serialization support for kcentroid objects
     !*/
 
 // ----------------------------------------------------------------------------------------
 
 }
 
-#endif // DLIB_ONE_CLASs_ABSTRACT_
+#endif // DLIB_KCENTROId_ABSTRACT_
 
