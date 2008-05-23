@@ -125,6 +125,18 @@ namespace dlib
                   to this object so far.
         !*/
 
+        scalar_type test_and_train (
+            const sample_type& x
+        );
+        /*!
+            ensures
+                - calls train(x)
+                - returns (*this)(x)
+                - The reason this function exists is because train() and operator() 
+                  both compute some of the same things.  So this function is more efficient
+                  than calling both individually.
+        !*/
+
         void train (
             const sample_type& x
         );
