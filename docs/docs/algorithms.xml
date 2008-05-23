@@ -675,6 +675,10 @@
                 f(x) == y.  For a detailed description of the algorithm read the above paper.
             </p>
          </description>
+
+         <examples>
+            <example>krls_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       

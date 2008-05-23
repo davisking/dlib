@@ -84,6 +84,10 @@
                   <link>member_function_pointer_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Kernel_RLS_Regression</name>
+                  <link>krls_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Matrix</name>
                   <link>matrix_ex.cpp.html</link>
                </item>
