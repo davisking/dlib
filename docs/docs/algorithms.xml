@@ -701,6 +701,10 @@
                 centroid indicate dissimilarity/anomalous points).
             </p>
          </description>
+
+         <examples>
+            <example>kcentroid_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       

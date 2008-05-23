@@ -88,6 +88,10 @@
                   <link>krls_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Kernel_Centroid</name>
+                  <link>kcentroid_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Matrix</name>
                   <link>matrix_ex.cpp.html</link>
                </item>
