@@ -47,7 +47,7 @@ namespace dlib
     struct is_matrix : public default_is_kind_value  
     {
         /*!
-            - if (T is an implementation of matrix/matrix_abstract.h) then
+            - if (T is some kind of matrix expression from the matrix/matrix_abstract.h component) then
                 - is_matrix<T>::value == true
             - else
                 - is_matrix<T>::value == false
