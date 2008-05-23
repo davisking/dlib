@@ -210,7 +210,8 @@
          <spec_file link="true">dlib/is_kind.h</spec_file>
          <description>
             This is a template where is_matrix&lt;T&gt;::value == true when T
-            is a <a href="containers.html#matrix">matrix</a> object.
+            is a <a href="containers.html#matrix">matrix</a> object or some kind
+            of matrix expression.
          </description>
          
       </component>
