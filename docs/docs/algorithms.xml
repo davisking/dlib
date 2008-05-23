@@ -56,7 +56,7 @@
                <item>decision_function</item>
                <item>probabilistic_decision_function</item>
                <item>krls</item>
-               <item>one_class</item>
+               <item>kcentroid</item>
             </sub>
          </item>
       </section>
@@ -682,12 +682,12 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>one_class</name>
+         <name>kcentroid</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/one_class_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/kcentroid_abstract.h</spec_file>
          <description>
                 This is an implementation of an online algorithm for recursively estimating the
-                center of mass of a sequence of training points.  It uses the sparsification technique
+                centroid of a sequence of training points.  It uses the sparsification technique
                 described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
 
             <p>
