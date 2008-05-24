@@ -26,6 +26,12 @@ namespace dlib
     struct is_matrix<matrix_ref<T,NR,NC,mm> > { static const bool value = true; }; 
     template <typename T, long NR, long NC, typename mm>
     struct is_matrix<matrix<T,NR,NC,mm> > { static const bool value = true; }; 
+    template <typename T>
+    struct is_matrix<T&> { static const bool value = is_matrix<T>::value; }; 
+    template <typename T>
+    struct is_matrix<const T&> { static const bool value = is_matrix<T>::value; }; 
+    template <typename T>
+    struct is_matrix<const T> { static const bool value = is_matrix<T>::value; }; 
     /*
         is_matrix<T>::value == 1 if T is a matrix type else 0
     */
