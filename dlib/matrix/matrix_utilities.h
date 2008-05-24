@@ -2412,6 +2412,39 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T 
+        >
+    struct op_identity_matrix_2 : has_nondestructive_aliasing 
+    {
+        const static long NR = 0;
+        const static long NC = 0;
+        typedef typename memory_manager<char>::kernel_1a mem_manager_type;
+        typedef T type;
+        static type apply (const T&, long r, long c)
+        { return static_cast<type>(r == c); }
+    };
+
+    template <
+        typename T
+        >
+    const matrix_exp<dynamic_matrix_scalar_unary_exp<T,op_identity_matrix_2<T> > > identity_matrix (
+        const long& size 
+    )
+    {
+        DLIB_ASSERT(size > 0, 
+            "\tconst matrix_exp identity_matrix<T>(size)"
+            << "\n\tsize must be bigger than 0"
+            << "\n\tsize: " << size 
+            );
+        typedef dynamic_matrix_scalar_unary_exp<T,op_identity_matrix_2<T> > exp;
+        // the scalar value of the dynamic_matrix_scalar_unary_exp just isn't
+        // used by this operator
+        return matrix_exp<exp>(exp(size,size,0));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T, 
         long N
         >

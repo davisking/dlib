@@ -93,6 +93,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T
+        >
+    const matrix_exp identity_matrix (
+        long N
+    );
+    /*!
+        requires
+            - N > 0
+        ensures
+            - returns an N by N identity matrix with elements of type T.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T, 
         long N
         >
