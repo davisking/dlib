@@ -292,7 +292,6 @@ namespace dlib
 
                 alpha = put_in_range(first,last,alpha);
 
-                alpha = (first+last)/2;
 
                 last_alpha = temp;
             }
@@ -315,7 +314,6 @@ namespace dlib
             // use interpolation to pick alpha between first and last
             alpha = a + (b-a)*poly_min_extrap(a_val, a_val_der, b_val, b_val_der);
             alpha = put_in_range(first,last,alpha);
-            //alpha = (first+last)/2;
 
             const double val = f(alpha);
             const double val_der = der(alpha);
