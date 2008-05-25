@@ -209,7 +209,9 @@ namespace dlib
         double alpha = mu*poly_min_extrap(f0, d0, f1, d1);
         alpha = put_in_range(0.1*mu, 0.9*mu, alpha);
 
-        DLIB_CASSERT(alpha < std::numeric_limits<double>::infinity(), alpha);
+        DLIB_CASSERT(alpha < std::numeric_limits<double>::infinity(), 
+                     "alpha: " << alpha << " mu: " << mu << " f0: " << f0 << " d0: " << d0 << " f1: " << f1 << " d1: " << d1
+                     );
 
         double last_alpha = 0;
         double last_val = f0;
@@ -302,12 +304,16 @@ namespace dlib
         }
 
 
-        DLIB_CASSERT(alpha < std::numeric_limits<double>::infinity(), alpha);
+        DLIB_CASSERT(alpha < std::numeric_limits<double>::infinity(), 
+                     "alpha: " << alpha << " mu: " << mu << " f0: " << f0 << " d0: " << d0 << " f1: " << f1 << " d1: " << d1
+                     );
 
         // Now do the sectioning phase from 2.6.4
         while (true)
         {
-            DLIB_CASSERT(alpha < std::numeric_limits<double>::infinity(), alpha);
+            DLIB_CASSERT(alpha < std::numeric_limits<double>::infinity(), 
+                        "alpha: " << alpha << " mu: " << mu << " f0: " << f0 << " d0: " << d0 << " f1: " << f1 << " d1: " << d1
+                     );
             double first = a + tau2*(b-a);
             double last = b - tau3*(b-a);
 
@@ -358,7 +364,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    double find_min_quasi_newton (
+    void find_min_quasi_newton (
         const funct& f, 
         const funct_der& der, 
         T& x, 
@@ -423,7 +429,6 @@ namespace dlib
             g.swap(g2);
         }
 
-        return f_value;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -433,7 +438,7 @@ namespace dlib
         typename funct_der,
         typename T
         >
-    double find_min_conjugate_gradient (
+    void find_min_conjugate_gradient (
         const funct& f,
         const funct_der& der,
         T& x,
@@ -477,7 +482,6 @@ namespace dlib
             g.swap(g2);
         }
 
-        return f_value;
     }
 
 // ----------------------------------------------------------------------------------------

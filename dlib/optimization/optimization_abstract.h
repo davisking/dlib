@@ -149,7 +149,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    double find_min_quasi_newton (
+    void find_min_quasi_newton (
         const funct& f, 
         const funct_der& der, 
         T& x, 
@@ -171,7 +171,6 @@ namespace dlib
                 - the change in f() from one iteration to the next is less than min_delta
                 - f(#x) <= min_f
             - #x == the value of x that was found to minimize f()
-            - returns f(#x) 
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -181,7 +180,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    double find_min_conjugate_gradient (
+    void find_min_conjugate_gradient (
         const funct& f, 
         const funct_der& der, 
         T& x, 
@@ -203,7 +202,6 @@ namespace dlib
                 - the change in f() from one iteration to the next is less than min_delta
                 - f(#x) <= min_f
             - #x == the value of x that was found to minimize f()
-            - returns f(#x) 
     !*/
 
 // ----------------------------------------------------------------------------------------
