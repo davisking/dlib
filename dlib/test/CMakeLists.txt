@@ -42,6 +42,7 @@ set (tests
    member_function_pointer.cpp
    metaprogramming.cpp
    multithreaded_object.cpp
+   optimization.cpp
    pipe.cpp
    pixel.cpp
    queue.cpp

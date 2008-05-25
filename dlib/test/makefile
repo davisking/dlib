@@ -56,6 +56,7 @@ SRC += md5.cpp
 SRC += member_function_pointer.cpp
 SRC += metaprogramming.cpp
 SRC += multithreaded_object.cpp
+SRC += optimization.cpp
 SRC += pipe.cpp
 SRC += pixel.cpp
 SRC += queue.cpp
