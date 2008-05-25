@@ -23,17 +23,35 @@
    <menu width="150">
     <top>
       <section>
-         <name>Objects</name>
+         <name>Tools</name>
          <item>bigint</item> 
          <item>crc32</item> 
          <item>rand</item> 
          <item>mlp</item> 
+         <item nolink="true">
+            <name>Optimization</name>
+            <sub>
+               <item>derivative</item> 
+               <item>make_line_search_function</item> 
+               <item>poly_min_extrap</item> 
+               <item>line_search</item> 
+               <item>find_min_quasi_newton</item> 
+               <item>find_min_conjugate_gradient</item> 
+            </sub>
+         </item>
          <item nolink="true">
             <name>Geometry</name>
             <sub>
                <item>rectangle</item> 
                <item>vector</item> 
                <item>point</item> 
+               <item>centered_rect</item> 
+               <item>translate_rect</item> 
+               <item>resize_rect</item> 
+               <item>resize_rect_width</item> 
+               <item>resize_rect_height</item> 
+               <item>move_rect</item> 
+               <item>nearest_point</item> 
             </sub>
          </item>
          <item nolink="true">
@@ -45,58 +63,23 @@
                <item>bayes_node</item>
                <item>bayesian_network_gibbs_sampler</item>
                <item>bayesian_network_join_tree</item>
-            </sub>
-         </item>
-         <item nolink="true">
-            <name>SVM Utilities</name>
-            <sub>
-               <item>radial_basis_kernel</item>
-               <item>polynomial_kernel</item>
-               <item>linear_kernel</item>
-               <item>decision_function</item>
-               <item>probabilistic_decision_function</item>
-               <item>krls</item>
-               <item>kcentroid</item>
-            </sub>
-         </item>
-      </section>
- 
-      <section>
-         <name>Global Functions</name>
-         <item>randomize_samples</item> 
-         <item>hsort_array</item> 
-         <item>isort_array</item> 
-         <item>md5</item> 
-         <item>median</item> 
-         <item>qsort_array</item> 
-         <item>square_root</item> 
-         <item nolink="true">
-            <name>Geometry</name>
-            <sub>
-               <item>centered_rect</item> 
-               <item>translate_rect</item> 
-               <item>resize_rect</item> 
-               <item>resize_rect_width</item> 
-               <item>resize_rect_height</item> 
-               <item>move_rect</item> 
-               <item>nearest_point</item> 
-            </sub>
-         </item>
-         <item nolink="true">
-            <name>SVM Utilities</name>
-            <sub>
-               <item>svm_nu_train</item> 
-               <item>svm_nu_train_prob</item> 
-               <item>svm_nu_cross_validate</item> 
-            </sub>
-         </item>
-         <item nolink="true">
-            <name>Set Utilities</name>
-            <sub>
-               <item>set_intersection_size</item> 
-               <item>set_intersection</item> 
-               <item>set_union</item> 
-               <item>set_difference</item> 
+               <item nolink="true">
+                  <name>Bayes Node Utilities</name>
+                  <sub>
+                     <item>set_node_value</item>
+                     <item>node_value</item>
+                     <item>node_is_evidence</item>
+                     <item>set_node_as_evidence</item>
+                     <item>set_node_as_nonevidence</item>
+                     <item>set_node_num_values</item>
+                     <item>node_num_values</item>
+                     <item>node_probability</item>
+                     <item>set_node_probability</item>
+                     <item>node_first_parent_assignment</item>
+                     <item>node_next_parent_assignment</item>
+                     <item>node_cpt_filled_out</item>
+                  </sub>
+               </item>
             </sub>
          </item>
          <item nolink="true">
@@ -118,24 +101,38 @@
             </sub>
          </item>
          <item nolink="true">
-            <name>Bayes Node Utilities</name>
+            <name>SVM Utilities</name>
             <sub>
-               <item>set_node_value</item>
-               <item>node_value</item>
-               <item>node_is_evidence</item>
-               <item>set_node_as_evidence</item>
-               <item>set_node_as_nonevidence</item>
-               <item>set_node_num_values</item>
-               <item>node_num_values</item>
-               <item>node_probability</item>
-               <item>set_node_probability</item>
-               <item>node_first_parent_assignment</item>
-               <item>node_next_parent_assignment</item>
-               <item>node_cpt_filled_out</item>
+               <item>radial_basis_kernel</item>
+               <item>polynomial_kernel</item>
+               <item>linear_kernel</item>
+               <item>decision_function</item>
+               <item>probabilistic_decision_function</item>
+               <item>krls</item>
+               <item>kcentroid</item>
+               <item>svm_nu_train</item> 
+               <item>svm_nu_train_prob</item> 
+               <item>svm_nu_cross_validate</item> 
+            </sub>
+         </item>
+         <item>randomize_samples</item> 
+         <item>hsort_array</item> 
+         <item>isort_array</item> 
+         <item>put_in_range</item> 
+         <item>md5</item> 
+         <item>median</item> 
+         <item>qsort_array</item> 
+         <item>square_root</item> 
+         <item nolink="true">
+            <name>Set Utilities</name>
+            <sub>
+               <item>set_intersection_size</item> 
+               <item>set_intersection</item> 
+               <item>set_union</item> 
+               <item>set_difference</item> 
             </sub>
          </item>
       </section>
-
 
     </top>  
    </menu>
@@ -222,7 +219,88 @@
          </description>
                                  
       </component>
-   
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>derivative</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+            This is a function that takes another function as input and returns
+            a function object that numerically computes the derivative of the input function.
+         </description>
+                                 
+      </component>
+
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>make_line_search_function</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+            This is a function that takes another function f(x) as input and returns
+            a function object l(z) = f(start + z*direction). 
+         </description>
+                                 
+      </component>
+
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>poly_min_extrap</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+            This function finds the 3rd degree polynomial that interpolates a 
+            set of points and returns you the minimum of that polynomial.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>line_search</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+            Performs a line search on a given function and returns the input
+            that makes the function significantly smaller.
+         </description>
+                                 
+      </component>
+
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_min_quasi_newton</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained minimization of the function f() using a 
+              quasi newton method.  
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_min_conjugate_gradient</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained minimization of the function f() using a 
+              conjugate gradient method. 
+         </description>
+                                 
+      </component>
+
    <!-- ************************************************************************* -->
       
       <component>
@@ -877,6 +955,20 @@
                                  
       </component>
       
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>put_in_range</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a simple function that takes a range and a value and returns the given
+            value if it is within the range.  If it isn't in the range then it returns the  
+            end of range value that is closest.
+         </description>
+                                 
+      </component>
+               
    <!-- ************************************************************************* -->
       
       <component>

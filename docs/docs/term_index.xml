@@ -312,6 +312,18 @@
          <term link="dlib/geometry/rectangle_abstract.h.html#centered_rect" name="centered_rect"/>
          <term link="dlib/geometry/rectangle_abstract.h.html#nearest_point" name="nearest_point"/>
 
+
+         <term link="dlib/optimization/optimization_abstract.h.html#central_differences" name="central_differences"/>
+         <term link="dlib/optimization/optimization_abstract.h.html#line_search_funct" name="line_search_funct"/>
+
+         <term link="algorithms.html#derivative" name="derivative"/>
+         <term link="algorithms.html#make_line_search_function" name="make_line_search_function"/>
+         <term link="algorithms.html#poly_min_extrap" name="poly_min_extrap"/>
+         <term link="algorithms.html#line_search" name="line_search"/>
+         <term link="algorithms.html#find_min_quasi_newton" name="find_min_quasi_newton"/>
+         <term link="algorithms.html#find_min_conjugate_gradient" name="find_min_conjugate_gradient"/>
+
+
          <term link="algorithms.html#rectangle" name="rectangle"/>
          <term link="algorithms.html#set_node_value" name="set_node_value"/>
          <term link="algorithms.html#node_value" name="node_value"/>
@@ -343,6 +355,7 @@
          <term link="algorithms.html#bigint" name="bigint"/>
          <term link="algorithms.html#crc32" name="crc32"/>
          <term link="algorithms.html#hsort_array" name="hsort_array"/>
+         <term link="algorithms.html#put_in_range" name="put_in_range"/>
          <term link="algorithms.html#isort_array" name="isort_array"/>
          <term link="algorithms.html#md5" name="md5"/>
          <term link="algorithms.html#median" name="median"/>
