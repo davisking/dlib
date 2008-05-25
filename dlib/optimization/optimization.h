@@ -56,7 +56,16 @@ namespace dlib
     template <typename funct>
     const central_differences<funct> derivative(const funct& f) { return central_differences<funct>(f); }
     template <typename funct>
-    const central_differences<funct> derivative(const funct& f, double eps) { return central_differences<funct>(f,eps); }
+    const central_differences<funct> derivative(const funct& f, double eps) 
+    { 
+        DLIB_ASSERT (
+            eps > 0,
+            "\tcentral_differences derivative(f,eps)"
+            << "\n\tYou must give an epsilon > 0"
+            << "\n\teps:     " << eps 
+        );
+        return central_differences<funct>(f,eps); 
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -474,6 +483,139 @@ namespace dlib
 
 
             g2 = der(x);
+
+            // Use the Polak-Ribiere (4.1.12) conjugate gradient described by Fletcher on page 83
+            double b = trans(g2-g)*g2/(trans(g)*g);
+            s = -g2 + b*s;
+
+            g.swap(g2);
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct, 
+        typename T
+        >
+    void find_min_quasi_newton (
+        const funct& f, 
+        T& x, 
+        double min_f,
+        double min_delta = 1e-7,
+        double derivative_eps = 1e-7
+    )
+    {
+        COMPILE_TIME_ASSERT(is_matrix<T>::value);
+        DLIB_ASSERT (
+            min_delta >= 0 && x.nc() == 1,
+            "\tdouble find_min_quasi_newton()"
+            << "\n\tYou have to supply column vectors to this function"
+            << "\n\tmin_delta:      " << min_delta
+            << "\n\tx.nc():         " << x.nc()
+            << "\n\tderivative_eps: " << derivative_eps 
+        );
+
+        T g, g2, s, Hg, gH;
+        double alpha = 10;
+
+        matrix<double,T::NR,T::NR> H(x.nr(),x.nr());
+        T delta, gamma;
+
+        H = identity_matrix<double>(H.nr());
+
+        g = derivative(f,derivative_eps)(x);
+
+        double f_value = min_f - 1;
+        double old_f_value = 0;
+
+        // loop until the derivative is almost zero
+        while(std::abs(old_f_value - f_value) > min_delta)
+        {
+            old_f_value = f_value;
+
+            s = -H*g;
+
+            alpha = line_search(
+                            make_line_search_function(f,x,s),
+                            derivative(make_line_search_function(f,x,s),derivative_eps),
+                            0.01, 0.9,min_f, f_value);
+
+            x += alpha*s;
+
+
+            g2 = derivative(f,derivative_eps)(x);
+
+            // update H with the BFGS formula from (3.2.12) on page 55 of Fletcher 
+            delta = alpha*s;
+            gamma = g2-g;
+
+            Hg = H*gamma;
+            gH = trans(trans(gamma)*H);
+            double gHg = trans(gamma)*H*gamma;
+            double dg = trans(delta)*gamma;
+            if (gHg < std::numeric_limits<double>::infinity() && dg < std::numeric_limits<double>::infinity() &&
+                dg != 0)
+            {
+                H += (1 + gHg/dg)*delta*trans(delta)/(dg) - (delta*trans(gH) + Hg*trans(delta))/(dg);
+            }
+            else
+            {
+                H = identity_matrix<double>(H.nr());
+            }
+
+            g.swap(g2);
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct,
+        typename T
+        >
+    void find_min_conjugate_gradient (
+        const funct& f,
+        T& x,
+        double min_f,
+        double min_delta = 1e-7,
+        double derivative_eps = 1e-7
+    )
+    {
+        COMPILE_TIME_ASSERT(is_matrix<T>::value);
+        DLIB_ASSERT (
+            min_delta >= 0 && x.nc() == 1 && derivative_eps > 0,
+            "\tdouble find_min_conjugate_gradient()"
+            << "\n\tYou have to supply column vectors to this function"
+            << "\n\tmin_delta:      " << min_delta
+            << "\n\tx.nc():         " << x.nc()
+            << "\n\tderivative_eps: " << derivative_eps 
+        );
+
+        T g, g2, s;
+        double alpha = 0;
+
+        g = derivative(f,derivative_eps)(x);
+        s = -g;
+
+        double f_value = min_f - 1;
+        double old_f_value = 0;
+
+        // loop until the derivative is almost zero
+        while(std::abs(old_f_value - f_value) > min_delta)
+        {
+            old_f_value = f_value;
+
+            alpha = line_search(
+                        make_line_search_function(f,x,s),
+                        derivative(make_line_search_function(f,x,s),derivative_eps),
+                        0.001, 0.010,min_f, f_value);
+
+            x += alpha*s;
+
+            g2 = derivative(f,derivative_eps)(x);
 
             // Use the Polak-Ribiere (4.1.12) conjugate gradient described by Fletcher on page 83
             double b = trans(g2-g)*g2/(trans(g)*g);

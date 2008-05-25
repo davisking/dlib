@@ -38,6 +38,7 @@ namespace dlib
         requires
             - f == a function that returns a scalar
             - f must take either double or a dlib::matrix that is a column vector
+            - eps > 0
         ensures
             - returns a function that represents the derivative of the function f.  It
               is approximated numerically by:
@@ -143,6 +144,8 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename funct, 
@@ -177,6 +180,39 @@ namespace dlib
 
     template <
         typename funct, 
+        typename T
+        >
+    void find_min_quasi_newton (
+        const funct& f, 
+        T& x, 
+        double min_f, 
+        double min_delta = 1e-7, 
+        const double derivative_eps = 1e-7 
+    );
+    /*!
+        requires
+            - min_delta >= 0 
+            - derivative_eps > 0 
+            - f(x) must be a valid expression that evaluates to a double
+            - is_matrix<T>::value == true (i.e. T must be a dlib::matrix type)
+            - x.nc() == 1 (i.e. x must be a column vector)
+        ensures
+            - Performs an unconstrained minimization of the function f() using a 
+              quasi newton method.  The optimization stops when any of the following
+              conditions are satisfied: 
+                - the change in f() from one iteration to the next is less than min_delta
+                - f(#x) <= min_f
+            - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
+              information
+            - #x == the value of x that was found to minimize f()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct, 
         typename funct_der, 
         typename T
         >
@@ -201,6 +237,39 @@ namespace dlib
               conditions are satisfied: 
                 - the change in f() from one iteration to the next is less than min_delta
                 - f(#x) <= min_f
+            - #x == the value of x that was found to minimize f()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct, 
+        typename T
+        >
+    void find_min_conjugate_gradient (
+        const funct& f, 
+        T& x, 
+        double min_f, 
+        double min_delta = 1e-7,
+        const double derivative_eps = 1e-7 
+    );
+    /*!
+        requires
+            - min_delta >= 0 
+            - derivative_eps > 0
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of
+              f() at x.
+            - is_matrix<T>::value == true (i.e. T must be a dlib::matrix type)
+            - x.nc() == 1 (i.e. x must be a column vector)
+        ensures
+            - Performs an unconstrained minimization of the function f() using a 
+              conjugate gradient method.  The optimization stops when any of the following
+              conditions are satisfied: 
+                - the change in f() from one iteration to the next is less than min_delta
+                - f(#x) <= min_f
+            - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
+              information
             - #x == the value of x that was found to minimize f()
     !*/
 
