@@ -497,6 +497,46 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    T put_in_range (
+        const T& a, 
+        const T& b, 
+        const T& val
+    )
+    /*!
+        requires
+            - T is a type that looks like double, float, int, or so forth
+        ensures
+            - if (val is within the range [a,b]) then
+                - returns val
+            - else 
+                - returns the end of the range [a,b] that is closest to val
+    !*/
+    {
+        if (a < b)
+        {
+            if (val < a)
+                return a;
+            else if (val > b)
+                return b;
+        }
+        else
+        {
+            if (val < b)
+                return b;
+            else if (val > a)
+                return a;
+        }
+
+        return val;
+    }
+
+    // overload for double 
+    inline double put_in_range(const double& a, const double& b, const double& val)
+    { return put_in_range<double>(a,b,val); }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_ALGs_
