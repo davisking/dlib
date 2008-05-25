@@ -198,7 +198,7 @@ namespace dlib
             - x.nc() == 1 (i.e. x must be a column vector)
         ensures
             - Performs an unconstrained minimization of the function f() using a 
-              quasi newton method.  The optimization stops when any of the following
+              conjugate gradient method.  The optimization stops when any of the following
               conditions are satisfied: 
                 - the change in f() from one iteration to the next is less than min_delta
                 - f(#x) <= min_f
