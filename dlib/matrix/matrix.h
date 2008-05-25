@@ -1447,7 +1447,7 @@ namespace dlib
             {
                 DLIB_ASSERT(NC == 0 || NC == length,
                     "\tmatrix::matrix(length)"
-                    << "\n\tSince this is a staticly sized matrix length must equal NC"
+                    << "\n\tSince this is a statically sized matrix length must equal NC"
                     << "\n\tlength: " << length 
                     << "\n\tNR:     " << NR 
                     << "\n\tNC:     " << NC 
@@ -1460,7 +1460,7 @@ namespace dlib
             {
                 DLIB_ASSERT(NR == 0 || NR == length,
                     "\tvoid matrix::set_size(length)"
-                    << "\n\tSince this is a staticly sized matrix length must equal NR"
+                    << "\n\tSince this is a statically sized matrix length must equal NR"
                     << "\n\tlength: " << length 
                     << "\n\tNR:     " << NR 
                     << "\n\tNC:     " << NC 
@@ -1643,7 +1643,7 @@ namespace dlib
             COMPILE_TIME_ASSERT(NR == 1 || NR == 0);
             DLIB_ASSERT( nr() == 1 && nc() == 1 , 
                 "\tmatrix::operator const type"
-                << "\n\tYou can only attempt to implicity convert a matrix to a scalar if"
+                << "\n\tYou can only attempt to implicit convert a matrix to a scalar if"
                 << "\n\tthe matrix is a 1x1 matrix"
                 << "\n\tnr(): " << nr() 
                 << "\n\tnc(): " << nc() 
@@ -1691,7 +1691,7 @@ namespace dlib
             {
                 DLIB_ASSERT(NC == 0 || NC == length,
                     "\tvoid matrix::set_size(length)"
-                    << "\n\tSince this is a staticly sized matrix length must equal NC"
+                    << "\n\tSince this is a statically sized matrix length must equal NC"
                     << "\n\tlength: " << length 
                     << "\n\tNR:     " << NR 
                     << "\n\tNC:     " << NC 
@@ -1705,7 +1705,7 @@ namespace dlib
             {
                 DLIB_ASSERT(NR == 0 || NR == length,
                     "\tvoid matrix::set_size(length)"
-                    << "\n\tSince this is a staticly sized matrix length must equal NR"
+                    << "\n\tSince this is a statically sized matrix length must equal NR"
                     << "\n\tlength: " << length 
                     << "\n\tNR:     " << NR 
                     << "\n\tNC:     " << NC 
