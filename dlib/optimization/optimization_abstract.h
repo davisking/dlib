@@ -149,7 +149,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    double quasi_newton (
+    double find_min_quasi_newton (
         const funct& f, 
         const funct_der& der, 
         T& x, 
@@ -181,7 +181,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    double conjugate_gradient (
+    double find_min_conjugate_gradient (
         const funct& f, 
         const funct_der& der, 
         T& x, 

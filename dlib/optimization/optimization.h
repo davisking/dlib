@@ -360,7 +360,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    double quasi_newton (
+    double find_min_quasi_newton (
         const funct& f, 
         const funct_der& der, 
         T& x, 
@@ -371,7 +371,7 @@ namespace dlib
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             min_delta >= 0 && x.nc() == 1,
-            "\tdouble quasi_newton()"
+            "\tdouble find_min_quasi_newton()"
             << "\n\tYou have to supply column vectors to this function"
             << "\n\tmin_delta: " << min_delta
             << "\n\tx.nc():    " << x.nc()
@@ -435,7 +435,7 @@ namespace dlib
         typename funct_der,
         typename T
         >
-    double conjugate_gradient (
+    double find_min_conjugate_gradient (
         const funct& f,
         const funct_der& der,
         T& x,
@@ -446,7 +446,7 @@ namespace dlib
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             min_delta >= 0 && x.nc() == 1,
-            "\tdouble quasi_newton()"
+            "\tdouble find_min_conjugate_gradient()"
             << "\n\tYou have to supply column vectors to this function"
             << "\n\tmin_delta: " << min_delta
             << "\n\tx.nc():    " << x.nc()
