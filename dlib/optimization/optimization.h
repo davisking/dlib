@@ -22,6 +22,11 @@ namespace dlib
     class central_differences
     {
     public:
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+
         central_differences(const funct& f_, double eps_ = 1e-7) : f(f_), eps(eps_){}
 
         template <typename T>
@@ -58,6 +63,11 @@ namespace dlib
     template <typename funct>
     const central_differences<funct> derivative(const funct& f, double eps) 
     { 
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+
         DLIB_ASSERT (
             eps > 0,
             "\tcentral_differences derivative(f,eps)"
@@ -73,6 +83,11 @@ namespace dlib
     class line_search_funct 
     {
     public:
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+
         line_search_funct(const funct& f_, const T& start_, const T& direction_) : f(f_),start(start_), direction(direction_)
         {}
 
@@ -105,6 +120,11 @@ namespace dlib
     template <typename funct, typename T>
     const line_search_funct<funct,T> make_line_search_function(const funct& f, const T& start, const T& direction) 
     { 
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             start.nc() == 1 && direction.nc() == 1,
@@ -179,6 +199,12 @@ namespace dlib
         double& f0_out
     )
     {
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+        COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
+
         DLIB_ASSERT (
             1 > sigma && sigma > rho && rho > 0,
             "\tdouble line_search()"
@@ -222,6 +248,9 @@ namespace dlib
                      "alpha: " << alpha << " mu: " << mu << " f0: " << f0 << " d0: " << d0 << " f1: " << f1 << " d1: " << d1
                      );
 
+        using namespace std;
+        //cout << "alpha: " << alpha << " mu: " << mu << " f0: " << f0 << " d0: " << d0 << " f1: " << f1 << " d1: " << d1 << endl;
+
         double last_alpha = 0;
         double last_val = f0;
         double last_val_der = d0;
@@ -238,6 +267,7 @@ namespace dlib
         // do the bracketing stage to find the bracket range [a,b]
         while (true)
         {
+            //cout << "alpha: " << alpha << " mu: " << mu << " f0: " << f0 << " d0: " << d0 << " f1: " << f1 << " d1: " << d1 << endl;
             DLIB_CASSERT(alpha < std::numeric_limits<double>::infinity(), alpha);
             const double val = f(alpha);
             const double val_der = der(alpha);
@@ -320,6 +350,7 @@ namespace dlib
         // Now do the sectioning phase from 2.6.4
         while (true)
         {
+            //cout << "alpha: " << alpha << " mu: " << mu << " f0: " << f0 << " d0: " << d0 << " f1: " << f1 << " d1: " << d1 << endl;
             DLIB_CASSERT(alpha < std::numeric_limits<double>::infinity(), 
                         "alpha: " << alpha << " mu: " << mu << " f0: " << f0 << " d0: " << d0 << " f1: " << f1 << " d1: " << d1
                      );
@@ -381,6 +412,12 @@ namespace dlib
         double min_delta = 1e-7 
     )
     {
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+        COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
+
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             min_delta >= 0 && x.nc() == 1,
@@ -455,6 +492,12 @@ namespace dlib
         double min_delta = 1e-7
     )
     {
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+        COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
+
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             min_delta >= 0 && x.nc() == 1,
@@ -499,7 +542,7 @@ namespace dlib
         typename funct, 
         typename T
         >
-    void find_min_quasi_newton (
+    void find_min_quasi_newton2 (
         const funct& f, 
         T& x, 
         double min_f,
@@ -507,6 +550,11 @@ namespace dlib
         double derivative_eps = 1e-7
     )
     {
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             min_delta >= 0 && x.nc() == 1,
@@ -576,7 +624,7 @@ namespace dlib
         typename funct,
         typename T
         >
-    void find_min_conjugate_gradient (
+    void find_min_conjugate_gradient2 (
         const funct& f,
         T& x,
         double min_f,
@@ -584,6 +632,11 @@ namespace dlib
         double derivative_eps = 1e-7
     )
     {
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
         DLIB_ASSERT (
             min_delta >= 0 && x.nc() == 1 && derivative_eps > 0,

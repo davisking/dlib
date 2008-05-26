@@ -216,7 +216,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    void find_min_conjugate_gradient (
+    void find_min_conjugate_gradient2 (
         const funct& f, 
         const funct_der& der, 
         T& x, 
@@ -246,7 +246,7 @@ namespace dlib
         typename funct, 
         typename T
         >
-    void find_min_conjugate_gradient (
+    void find_min_conjugate_gradient2 (
         const funct& f, 
         T& x, 
         double min_f, 
