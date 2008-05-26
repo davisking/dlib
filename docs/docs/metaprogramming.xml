@@ -32,6 +32,7 @@
          <name>Objects</name>
          <item>is_pointer_type</item>
          <item>is_same_type</item>
+         <item>is_function</item>
          <item>is_signed_type</item>
          <item>is_unsigned_type</item>
          <item>static_switch</item>
@@ -57,6 +58,7 @@
          <item>_dT</item> 
          <item>TIME_THIS</item> 
          <item>assign_zero_if_built_in_scalar_type</item>
+         <item>wrap_function</item>
       </section>
 
       <section>
@@ -143,6 +145,19 @@
          <description>
             This is a template where is_same_type&lt;T,U&gt;::value == true when T and U are 
             the same type and false otherwise. 
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_function</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template where is_function&lt;T&gt;::value == true when T is 
+            a function type.  
          </description>
          
       </component>
@@ -416,7 +431,7 @@
       <component>
          <name>assign_zero_if_built_in_scalar_type</name>
          <file>dlib/algs.h</file>
-         <spec_file>dlib/algs.h</spec_file>
+         <spec_file link="true">dlib/algs.h</spec_file>
          <description>        
             <p>
                This function assigns its argument the value of 0 if it is a built in scalar
@@ -429,6 +444,20 @@
                as well as user defined classes.
             </p>
             
+         </description>
+                                 
+      </component>
+            
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>wrap_function</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>        
+            This is a template that allows you to turn a global function into a 
+            function object.  See the specs for more details. 
          </description>
                                  
       </component>

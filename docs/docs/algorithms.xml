@@ -37,6 +37,8 @@
                <item>line_search</item> 
                <item>find_min_quasi_newton</item> 
                <item>find_min_conjugate_gradient</item> 
+               <item>find_min_quasi_newton2</item> 
+               <item>find_min_conjugate_gradient2</item> 
             </sub>
          </item>
          <item nolink="true">
@@ -297,6 +299,34 @@
          <description>
              Performs an unconstrained minimization of the function f() using a 
               conjugate gradient method. 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_min_quasi_newton2</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained minimization of the function f() using a 
+              quasi newton method.  This version doesn't take a gradient function of f()
+              but instead numerically approximates the gradient.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_min_conjugate_gradient2</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained minimization of the function f() using a 
+              conjugate gradient method. This version doesn't take a gradient function of f()
+              but instead numerically approximates the gradient.
          </description>
                                  
       </component>

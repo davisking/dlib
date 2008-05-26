@@ -322,6 +322,8 @@
          <term link="algorithms.html#line_search" name="line_search"/>
          <term link="algorithms.html#find_min_quasi_newton" name="find_min_quasi_newton"/>
          <term link="algorithms.html#find_min_conjugate_gradient" name="find_min_conjugate_gradient"/>
+         <term link="algorithms.html#find_min_quasi_newton2" name="find_min_quasi_newton2"/>
+         <term link="algorithms.html#find_min_conjugate_gradient2" name="find_min_conjugate_gradient2"/>
 
 
          <term link="algorithms.html#rectangle" name="rectangle"/>
@@ -543,6 +545,8 @@
          <term link="metaprogramming.html#_dT" name="_dT"/>
          <term link="metaprogramming.html#is_pointer_type" name="is_pointer_type"/>
          <term link="metaprogramming.html#is_same_type" name="is_same_type"/>
+         <term link="metaprogramming.html#is_function" name="is_function"/>
+         <term link="metaprogramming.html#wrap_function" name="wrap_function"/>
          <term link="metaprogramming.html#is_signed_type" name="is_signed_type"/>
          <term link="metaprogramming.html#is_unsigned_type" name="is_unsigned_type"/>
          <term link="metaprogramming.html#noncopyable" name="noncopyable"/>
