@@ -565,7 +565,7 @@ namespace
             }
             for (unsigned long i = 0; i < 100; ++i)
             {
-                unsigned long a;
+                unsigned long a = 0;
                 a1.pop_back(a);
                 DLIB_CASSERT(a == 99-i,"");
             }
