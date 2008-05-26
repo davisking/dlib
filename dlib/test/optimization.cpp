@@ -128,37 +128,37 @@ namespace
 
         total_count = 0;
         x = p;
-        find_min_quasi_newton(&apq<T>, &der_apq<T>, x, minf, eps);
+        find_min_quasi_newton(wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf, eps);
         DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_quasi_newton got apq in " << total_count;
 
         total_count = 0;
         x = p;
-        find_min_conjugate_gradient(&apq<T>, &der_apq<T>, x, minf, eps);
+        find_min_conjugate_gradient(wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf, eps);
         DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got apq in " << total_count;
 
         total_count = 0;
         x = p;
-        find_min_quasi_newton(&apq<T>, derivative(&apq<T>), x, minf, eps);
+        find_min_quasi_newton(wrap_function(apq<T>), derivative(wrap_function(apq<T>)), x, minf, eps);
         DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_quasi_newton got apq/noder in " << total_count;
 
         total_count = 0;
         x = p;
-        find_min_conjugate_gradient(&apq<T>, derivative(&apq<T>), x, minf, eps);
+        find_min_conjugate_gradient(wrap_function(apq<T>), derivative(wrap_function(apq<T>)), x, minf, eps);
         DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got apq/noder in " << total_count;
 
         total_count = 0;
         x = p;
-        find_min_quasi_newton2(&apq<T>, x, minf, eps);
+        find_min_quasi_newton2(wrap_function(apq<T>), x, minf, eps);
         DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_quasi_newton got apq/noder2 in " << total_count;
 
         total_count = 0;
         x = p;
-        find_min_conjugate_gradient2(&apq<T>, x, minf, eps);
+        find_min_conjugate_gradient2(wrap_function(apq<T>), x, minf, eps);
         DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got apq/noder2 in " << total_count;
     }
@@ -258,7 +258,7 @@ namespace
         const matrix<double,2,1> p
     )
     {
-        const double eps = 1e-12;
+        const double eps = 1e-15;
         const double minf = -10;
         matrix<double,2,1> x, opt;
         opt(0) = 1;
@@ -269,13 +269,13 @@ namespace
         total_count = 0;
         x = p;
         find_min_quasi_newton(&rosen, &der_rosen, x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_CASSERT(dlib::equal(x,opt, 1e-7),opt-x);
         dlog << LINFO << "find_min_quasi_newton got rosen in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient(&rosen, &der_rosen, x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_CASSERT(dlib::equal(x,opt, 1e-7),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got rosen in " << total_count;
 
         total_count = 0;
