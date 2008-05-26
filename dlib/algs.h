@@ -537,6 +537,115 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A is_function 
+        
+        This is a template that allows you to determine if the given type is a function.
+
+        For example,
+            void funct();
+
+            is_built_in_scalar_type<funct>::value == true
+            is_built_in_scalar_type<int>::value == false 
+    !*/
+
+    template <typename T> struct is_function { static const bool value = false; };
+    template <typename T> 
+    struct is_function<T (void)> { static const bool value = true; };
+    template <typename T, typename A0> 
+    struct is_function<T (A0)> { static const bool value = true; };
+    template <typename T, typename A0, typename A1> 
+    struct is_function<T (A0, A1)> { static const bool value = true; };
+    template <typename T, typename A0, typename A1, typename A2> 
+    struct is_function<T (A0, A1, A2)> { static const bool value = true; };
+    template <typename T, typename A0, typename A1, typename A2, typename A3> 
+    struct is_function<T (A0, A1, A2, A3)> { static const bool value = true; };
+    template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4> 
+    struct is_function<T (A0, A1, A2, A3, A4)> { static const bool value = true; };
+
+
+    template <typename T> class funct_wrap0
+    {
+    public:
+        funct_wrap0(T (&f_)()):f(f_){}
+        T operator()() const { return f(); }
+    private:
+        T (&f)();
+    };
+    template <typename T, typename A0> class funct_wrap1
+    {
+    public:
+        funct_wrap1(T (&f_)(A0)):f(f_){}
+        T operator()(A0 a0) const { return f(a0); }
+    private:
+        T (&f)(A0);
+    };
+    template <typename T, typename A0, typename A1> class funct_wrap2
+    {
+    public:
+        funct_wrap2(T (&f_)(A0,A1)):f(f_){}
+        T operator()(A0 a0, A1 a1) const { return f(a0,a1); }
+    private:
+        T (&f)(A0,A1);
+    };
+    template <typename T, typename A0, typename A1, typename A2> class funct_wrap3
+    {
+    public:
+        funct_wrap3(T (&f_)(A0,A1,A2)):f(f_){}
+        T operator()(A0 a0, A1 a1, A2 a2) const { return f(a0,a1,a2); }
+    private:
+        T (&f)(A0,A1,A2);
+    };
+    template <typename T, typename A0, typename A1, typename A2, typename A3> class funct_wrap4
+    {
+    public:
+        funct_wrap4(T (&f_)(A0,A1,A2,A3)):f(f_){}
+        T operator()(A0 a0, A1 a1, A2 a2, A3 a3) const { return f(a0,a1,a2,a3); }
+    private:
+        T (&f)(A0,A1,A2,A3);
+    };
+    template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4> class funct_wrap5
+    {
+    public:
+        funct_wrap5(T (&f_)(A0,A1,A2,A3,A4)):f(f_){}
+        T operator()(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4) const { return f(a0,a1,a2,a3,a4); }
+    private:
+        T (&f)(A0,A1,A2,A3,A4);
+    };
+
+    /*!A wrap_function 
+        
+        This is a template that allows you to turn a global function into a 
+        function object.  The reason for this templates existance is so you can
+        do stuff like this:
+            
+            template <typename T>
+            void call_funct(const T& funct)
+            {  cout << funct(); }
+
+            std::string test() { return "asdfasf"; }
+
+            int main()
+            {
+                call_funct(wrap_function(test));
+            }
+
+        The above code doesn't work right on some compilers if you don't
+        use wrap_function.  
+    !*/
+
+    template <typename T>
+    funct_wrap0<T> wrap_function(T (&f)()) { return funct_wrap0<T>(f); }
+    template <typename T, typename A0>
+    funct_wrap1<T,A0> wrap_function(T (&f)(A0)) { return funct_wrap1<T,A0>(f); }
+    template <typename T, typename A0, typename A1>
+    funct_wrap2<T,A0,A1> wrap_function(T (&f)(A0, A1)) { return funct_wrap2<T,A0,A1>(f); }
+    template <typename T, typename A0, typename A1, typename A2>
+    funct_wrap3<T,A0,A1,A2> wrap_function(T (&f)(A0, A1, A2)) { return funct_wrap3<T,A0,A1,A2>(f); }
+    template <typename T, typename A0, typename A1, typename A2, typename A3>
+    funct_wrap4<T,A0,A1,A2,A3> wrap_function(T (&f)(A0, A1, A2, A3)) { return funct_wrap4<T,A0,A1,A2,A3>(f); }
+    template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4>
+    funct_wrap5<T,A0,A1,A2,A3,A4> wrap_function(T (&f)(A0, A1, A2, A3, A4)) { return funct_wrap5<T,A0,A1,A2,A3,A4>(f); }
+
 }
 
 #endif // DLIB_ALGs_
