@@ -871,6 +871,8 @@ namespace dlib
             highlight_start = 0;
             highlight_end = -1;
 
+            if (focus_lost_handler.is_set())
+                focus_lost_handler();
             parent.invalidate_rectangle(rect);
         }
     }
@@ -1020,6 +1022,11 @@ namespace dlib
                     // send out the text modified event
                     if (text_modified_handler.is_set())
                         text_modified_handler();
+                }
+                else if (key == '\n')
+                {
+                    if (enter_key_handler.is_set())
+                        enter_key_handler();
                 }
             }
             else if (key == base_window::KEY_BACKSPACE)

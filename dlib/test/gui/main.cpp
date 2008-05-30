@@ -591,6 +591,8 @@ public:
         tf.set_text("Davis685g@");
         tf.set_width(500);
         tf.set_text_color(rgb_pixel(255,0,0));
+        tf.set_enter_key_handler(*this,&win::on_enter_key);
+        tf.set_focus_lost_handler(*this,&win::on_tf_focus_lost);
         
 
         button_count = 0;
@@ -624,6 +626,18 @@ public:
     }
 
 private:
+
+
+    void on_enter_key()
+    {
+        cout << "enter key pressed" << endl;
+    }
+
+    void on_tf_focus_lost()
+    {
+        cout << "text field lost focus" << endl;
+    }
+
 
     void on_open_file (const std::string& file)
     {

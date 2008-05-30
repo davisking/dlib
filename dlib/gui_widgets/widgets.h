@@ -519,6 +519,31 @@ namespace dlib
             text_modified_handler.set(object,event_handler);
         }
 
+        template <
+            typename T
+            >
+        void set_enter_key_handler (
+            T& object,
+            void (T::*event_handler)()
+        )
+        {
+            auto_mutex M(m);
+            enter_key_handler.set(object,event_handler);
+        }
+
+
+        template <
+            typename T
+            >
+        void set_focus_lost_handler (
+            T& object,
+            void (T::*event_handler)()
+        )
+        {
+            auto_mutex M(m);
+            focus_lost_handler.set(object,event_handler);
+        }
+
     private:
 
         void on_user_event (
@@ -590,6 +615,8 @@ namespace dlib
         long highlight_end;
         long shift_pos;
         member_function_pointer<>::kernel_1a_c text_modified_handler;
+        member_function_pointer<>::kernel_1a_c enter_key_handler;
+        member_function_pointer<>::kernel_1a_c focus_lost_handler;
 
 
         timer<text_field>::kernel_2a t;

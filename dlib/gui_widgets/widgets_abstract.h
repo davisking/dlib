@@ -701,6 +701,45 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        template <
+            typename T
+            >
+        void set_enter_key_handler (
+            T& object,
+            void (T::*event_handler)()
+        );
+        /*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - the event_handler function is called on object when this text field
+                  has input focus and the user hits the enter key on their keyboard.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        template <
+            typename T
+            >
+        void set_focus_lost_handler (
+            T& object,
+            void (T::*event_handler)()
+        );
+        /*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - the event_handler function is called on object when this object
+                  loses input focus due to the user clicking outside the text field
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
 
     private:
 
