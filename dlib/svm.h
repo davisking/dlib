@@ -6,6 +6,7 @@
 #include "svm/svm.h"
 #include "svm/krls.h"
 #include "svm/kcentroid.h"
+#include "svm/kkmeans.h"
 
 #endif // DLIB_SVm_HEADER
 
