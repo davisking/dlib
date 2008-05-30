@@ -112,6 +112,7 @@
                <item>probabilistic_decision_function</item>
                <item>krls</item>
                <item>kcentroid</item>
+               <item>kkmeans</item>
                <item>svm_nu_train</item> 
                <item>svm_nu_train_prob</item> 
                <item>svm_nu_cross_validate</item> 
@@ -786,6 +787,23 @@
 
          <examples>
             <example>krls_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>kkmeans</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/kkmeans_abstract.h</spec_file>
+         <description>
+                This is an implementation of a kernelized k-means clustering algorithm.  
+                It performs k-means clustering by using the <a href="#kcentroid">kcentroid</a> object.  
+         </description>
+
+         <examples>
+            <example>kkmeans_ex.cpp.html</example>
          </examples>
                                  
       </component>

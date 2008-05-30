@@ -14,6 +14,7 @@
 New Stuff:
    - Added some macros that allow dlib to create a stack trace
    - Added a kernel based centroid estimator/novelty detector
+   - Added a kernel based k-means clustering algorithm
    - Added an identity_matrix() function that can take a runtime defined size.
    - Added a bunch of unconstrained optimization stuff to the library. 
      It now has a conjugate gradient optimization algorithm as well as

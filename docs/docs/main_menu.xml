@@ -92,6 +92,10 @@
                   <link>kcentroid_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Kernel_K-Means_Clustering</name>
+                  <link>kkmeans_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Matrix</name>
                   <link>matrix_ex.cpp.html</link>
                </item>
