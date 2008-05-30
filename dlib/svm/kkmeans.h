@@ -59,8 +59,8 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_CASSERT(num > 0,
-                "\tvoid kkmeans::set_number_of_centers"
+            DLIB_ASSERT(num > 0,
+                "\tvoid kkmeans::set_number_of_centers()"
                 << "\n\tYou can't set the number of centers to zero"
                 << "\n\tthis: " << this
                 );
@@ -86,6 +86,19 @@ namespace dlib
             const matrix_type& initial_centers 
         )
         {
+            COMPILE_TIME_ASSERT((is_same_type<typename matrix_type::type, sample_type>::value));
+
+            // make sure requires clause is not broken
+            DLIB_ASSERT(samples.nc() == 1 && initial_centers.nc() == 1 &&
+                         initial_centers.nr() == number_of_centers(),
+                "\tvoid kkmeans::train()"
+                << "\n\tInvalid arguments to this function"
+                << "\n\tthis: " << this
+                << "\n\tsamples.nc(): " << samples.nc() 
+                << "\n\tinitial_centers.nc(): " << initial_centers.nc() 
+                << "\n\tinitial_centers.nr(): " << initial_centers.nr() 
+                );
+
             // clear out the old data and initialize the centers
             for (unsigned long i = 0; i < centers.size(); ++i)
             {
