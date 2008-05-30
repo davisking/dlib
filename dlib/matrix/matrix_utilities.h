@@ -10,31 +10,12 @@
 #include <limits>
 #include "../pixel.h"
 #include "../geometry.h"
-#include "../is_kind.h"
 #include "../stl_checked.h"
 #include <vector>
 
 
 namespace dlib
 {
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T>
-    struct is_matrix<matrix_exp<T> > { static const bool value = true; }; 
-    template <typename T, long NR, long NC, typename mm>
-    struct is_matrix<matrix_ref<T,NR,NC,mm> > { static const bool value = true; }; 
-    template <typename T, long NR, long NC, typename mm>
-    struct is_matrix<matrix<T,NR,NC,mm> > { static const bool value = true; }; 
-    template <typename T>
-    struct is_matrix<T&> { static const bool value = is_matrix<T>::value; }; 
-    template <typename T>
-    struct is_matrix<const T&> { static const bool value = is_matrix<T>::value; }; 
-    template <typename T>
-    struct is_matrix<const T> { static const bool value = is_matrix<T>::value; }; 
-    /*
-        is_matrix<T>::value == 1 if T is a matrix type else 0
-    */
 
 // ----------------------------------------------------------------------------------------
 
@@ -1671,16 +1652,43 @@ namespace dlib
         typename MM,
         typename U
         >
-    void set_all_elements (
+    typename disable_if<is_matrix<U>,void>::type set_all_elements (
         matrix<T,NR,NC,MM>& m,
-        U value
+        const U& value
+    )
+    {
+        // The value you are trying to assign to each element of the m matrix
+        // doesn't have the appropriate type.
+        COMPILE_TIME_ASSERT(is_matrix<T>::value == is_matrix<U>::value);
+
+        for (long r = 0; r < m.nr(); ++r)
+        {
+            for (long c = 0; c < m.nc(); ++c)
+            {
+                m(r,c) = static_cast<T>(value);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        long NR,
+        long NC,
+        typename MM,
+        typename U
+        >
+    typename enable_if<is_matrix<U>,void>::type set_all_elements (
+        matrix<T,NR,NC,MM>& m,
+        const U& value
     )
     {
         for (long r = 0; r < m.nr(); ++r)
         {
             for (long c = 0; c < m.nc(); ++c)
             {
-                m(r,c) = static_cast<T>(value);
+                m(r,c) = value;
             }
         }
     }

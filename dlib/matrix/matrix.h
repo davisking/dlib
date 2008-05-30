@@ -10,6 +10,7 @@
 #include <sstream>
 #include <algorithm>
 #include "../memory_manager.h"
+#include "../is_kind.h"
 
 #ifdef _MSC_VER
 // Disable the following warnings for Visual Studio
@@ -769,6 +770,24 @@ namespace dlib
         const ref_type ref_;
     };
 
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    struct is_matrix<matrix_exp<T> > { static const bool value = true; }; 
+    template <typename T, long NR, long NC, typename mm>
+    struct is_matrix<matrix_ref<T,NR,NC,mm> > { static const bool value = true; }; 
+    template <typename T, long NR, long NC, typename mm>
+    struct is_matrix<matrix<T,NR,NC,mm> > { static const bool value = true; }; 
+    template <typename T>
+    struct is_matrix<T&> { static const bool value = is_matrix<T>::value; }; 
+    template <typename T>
+    struct is_matrix<const T&> { static const bool value = is_matrix<T>::value; }; 
+    template <typename T>
+    struct is_matrix<const T> { static const bool value = is_matrix<T>::value; }; 
+    /*
+        is_matrix<T>::value == 1 if T is a matrix type else 0
+    */
+
  // ----------------------------------------------------------------------------------------
 
     // This template will perform the needed loop for element multiplication using whichever
@@ -1493,7 +1512,11 @@ namespace dlib
             const matrix_exp<EXP>& m
         ): matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> >(ref_type(*this)) 
         {
-            COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true));
+            // You get an error on this line if the matrix m contains a type that isn't
+            // the same as the type contained in the target matrix.
+            COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true) ||
+                                (is_matrix<typename EXP::type>::value == true));
+
             // The matrix you are trying to assign m to is a statically sized matrix and 
             // m's dimensions don't match that of *this. 
             COMPILE_TIME_ASSERT(EXP::NR == NR || NR == 0 || EXP::NR == 0);
@@ -1749,8 +1772,9 @@ namespace dlib
             const matrix_exp<EXP>& m
         )
         {
-            // The matrix you are trying to assign m to is a statically sized matrix and 
-            // m's dimensions don't match that of *this. 
+            // You get an error on this line if the matrix you are trying to 
+            // assign m to is a statically sized matrix and  m's dimensions don't 
+            // match that of *this. 
             COMPILE_TIME_ASSERT(EXP::NR == NR || NR == 0 || EXP::NR == 0);
             COMPILE_TIME_ASSERT(EXP::NC == NC || NC == 0 || EXP::NC == 0);
             DLIB_ASSERT((NR == 0 || nr() == m.nr()) && 
@@ -1763,7 +1787,11 @@ namespace dlib
                 << "\n\tm.nc(): " << m.nc()
                 << "\n\tthis:   " << this
                 );
-            COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true));
+
+            // You get an error on this line if the matrix m contains a type that isn't
+            // the same as the type contained in the target matrix.
+            COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true) ||
+                                (is_matrix<typename EXP::type>::value == true));
             if (m.destructively_aliases(*this) == false)
             {
                 set_size(m.nr(),m.nc());
