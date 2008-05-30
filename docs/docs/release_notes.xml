@@ -13,12 +13,24 @@
 <current>
 New Stuff:
    - Added some macros that allow dlib to create a stack trace
+   - Added a kernel based centroid estimator/novelty detector
+   - Added an identity_matrix() function that can take a runtime defined size.
+   - Added a bunch of unconstrained optimization stuff to the library. 
+     It now has a conjugate gradient optimization algorithm as well as
+     a quasi-newton algorithm.
+   - Added the wrap_function and is_function templates.
+   - Added two new events to the text_field object.  One for detecting when the 
+     user hits enter and another for detecting when input focus is lost.
 
 Non-Backwards Compatible Changes:
+   - In the krls object:  Added a requires clause to the set_tolerance() member 
+     function and renamed clear() to clear_dictionary().
 
 Bug fixes:
 
 Other:
+   - Added example programs for the krls object as well as the new
+     kcentroid object.
 
 </current>
 
