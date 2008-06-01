@@ -22,6 +22,7 @@ New Stuff:
    - Added the wrap_function and is_function templates.
    - Added two new events to the text_field object.  One for detecting when the 
      user hits enter and another for detecting when input focus is lost.
+   - Added the set_subm, set_rowm, and set_colm functions.
 
 Non-Backwards Compatible Changes:
    - In the krls object:  Added a requires clause to the set_tolerance() member 

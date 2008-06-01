@@ -456,6 +456,9 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#rowm" name="rowm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#colm" name="colm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#subm" name="subm"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_rowm" name="set_rowm"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_colm" name="set_colm"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_subm" name="set_subm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#pointwise_multiply" name="pointwise_multiply"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#equal" name="equal"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv" name="inv"/>
