@@ -204,9 +204,9 @@ namespace dlib
     /*!
         requires
             - row >= 0
-            - row + nr < m.nr()
+            - row + nr <= m.nr()
             - col >= 0
-            - col + nc < m.nc()
+            - col + nc <= m.nc()
         ensures
             - returns a matrix R such that:
                 - R.nr() == nr 
@@ -279,9 +279,9 @@ namespace dlib
     /*!
         requires
             - row >= 0
-            - row + nr < m.nr()
+            - row + nr <= m.nr()
             - col >= 0
-            - col + nc < m.nc()
+            - col + nc <= m.nc()
         ensures
             - statements of the following form:
                 - set_subm(m,row,col,nr,nc) = some_matrix;

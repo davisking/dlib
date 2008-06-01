@@ -1375,7 +1375,7 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(r >= 0 && c >= 0 && r+nr < m.nr() && c+nc < m.nc(), 
+        DLIB_ASSERT(r >= 0 && c >= 0 && r+nr <= m.nr() && c+nc <= m.nc(), 
             "\tconst matrix_exp subm(const matrix_exp& m, r, c, nr, nc)"
             << "\n\tYou have specified invalid sub matrix dimensions"
             << "\n\tm.nr(): " << m.nr()
@@ -1510,7 +1510,7 @@ namespace dlib
             const matrix_exp<EXP>& exp
         ) 
         {
-            DLIB_ASSERT( exp.nr() == rect.height() && exp.nc() == rect.width(),
+            DLIB_ASSERT( exp.nr() == (long)rect.height() && exp.nc() == (long)rect.width(),
                 "\tassignable_matrix_expression set_subm()"
                 << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
                 << "\n\texp.nr() (source matrix): " << exp.nr()
@@ -1552,7 +1552,7 @@ namespace dlib
     private:
 
         matrix<T,NR,NC,mm>& m;
-        const rectangle& rect;
+        const rectangle rect;
     };
 
 
@@ -1587,7 +1587,7 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(r >= 0 && c >= 0 && r+nr < m.nr() && c+nc < m.nc(), 
+        DLIB_ASSERT(r >= 0 && c >= 0 && r+nr <= m.nr() && c+nc <= m.nc(), 
                     "\tassignable_matrix_expression set_subm(matrix& m, r, c, nr, nc)"
                     << "\n\tYou have specified invalid sub matrix dimensions"
                     << "\n\tm.nr(): " << m.nr()
@@ -1688,7 +1688,7 @@ namespace dlib
             const matrix_exp<EXP>& exp
         ) 
         {
-            DLIB_ASSERT( exp.nc() == 1 && exp.nc() == m.nc(),
+            DLIB_ASSERT( exp.nr() == 1 && exp.nc() == m.nc(),
                 "\tassignable_matrix_expression set_rowm()"
                 << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
                 << "\n\texp.nr() (source matrix): " << exp.nr()
