@@ -1178,6 +1178,66 @@ namespace
             DLIB_CASSERT((equal(round_zeros(cos(exp(array_to_matrix(m)))*mi,0.000001) , identity_matrix<double,5>())),"");
         }
 
+
+        {
+            matrix<long,5,5> m1, res;
+            matrix<long,2,2> m2;
+
+            set_all_elements(m1,0);
+
+
+            long res_vals[] = {
+                9, 9, 9, 9, 9,
+                0, 1, 1, 0, 0,
+                0, 1, 1, 0, 2,
+                0, 0, 2, 2, 2,
+                0, 0, 2, 2, 0
+            };
+
+            res = res_vals;
+
+            set_all_elements(m2, 1);
+            set_subm(m1, rectangle(1,1,2,2)) = subm(m2,0,0,2,2);
+            set_all_elements(m2, 2);
+            set_subm(m1, 3,2,2,2) = m2;
+
+            set_colm(m1,4) = trans(rowm(m1,4));
+            set_rowm(m1,0) = 9;
+
+            DLIB_CASSERT(m1 == res, "m1: \n" << m1 << "\nres: \n" << res);
+
+        }
+
+        {
+            matrix<long,5,5> m1, res;
+            matrix<long,2,2> m2;
+
+            set_all_elements(m1,0);
+
+
+            long res_vals[] = {
+                9, 0, 3, 3, 0,
+                9, 2, 2, 2, 0,
+                9, 2, 2, 2, 0,
+                4, 4, 4, 4, 4,
+                9, 0, 3, 3, 0
+            };
+
+            res = res_vals;
+
+            set_all_elements(m2, 1);
+            set_subm(m1, rectangle(1,1,3,2)) = 2;
+            set_all_elements(m2, 2);
+            set_subm(m1, 3,2,2,2) = 3;
+
+            set_colm(m1,0) = 9;
+            set_rowm(m1,0) = rowm(m1,4);
+            set_rowm(m1,3) = 4;
+
+            DLIB_CASSERT(m1 == res, "m1: \n" << m1 << "\nres: \n" << res);
+
+        }
+
     }
 
 
