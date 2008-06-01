@@ -1495,6 +1495,254 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+
+    template <typename T, long NR, long NC, typename mm>
+    class assignable_sub_matrix
+    {
+    public:
+        assignable_sub_matrix(
+            matrix<T,NR,NC,mm>& m_,
+            const rectangle& rect_
+        ) : m(m_), rect(rect_) {}
+
+        template <typename EXP>
+        assignable_sub_matrix& operator= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nr() == rect.height() && exp.nc() == rect.width(),
+                "\tassignable_matrix_expression set_subm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\trect.width() (target matrix):   " << rect.width()
+                << "\n\trect.height() (target matrix):  " << rect.height()
+                );
+
+            long r_exp = 0;
+            for (long r = rect.top(); r <= rect.bottom(); ++r)
+            {
+                long c_exp = 0;
+                for (long c = rect.left(); c <= rect.right(); ++c)
+                {
+                    m(r,c) = exp(r_exp,c_exp);
+                    ++c_exp;
+                }
+                ++r_exp;
+            }
+
+            return *this;
+        }
+
+        assignable_sub_matrix& operator= (
+            const T& value
+        )
+        {
+            for (long r = rect.top(); r <= rect.bottom(); ++r)
+            {
+                for (long c = rect.left(); c <= rect.right(); ++c)
+                {
+                    m(r,c) = value;
+                }
+            }
+
+            return *this;
+        }
+
+    private:
+
+        matrix<T,NR,NC,mm>& m;
+        const rectangle& rect;
+    };
+
+
+    template <typename T, long NR, long NC, typename mm>
+    assignable_sub_matrix<T,NR,NC,mm> set_subm (
+        matrix<T,NR,NC,mm>& m,
+        const rectangle& rect
+    )
+    {
+        DLIB_ASSERT(get_rect(m).contains(rect) == true, 
+            "\tassignable_matrix_expression set_subm(matrix& m, const rectangle& rect)"
+            << "\n\tYou have specified invalid sub matrix dimensions"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\trect.left():   " << rect.left()
+            << "\n\trect.top():    " << rect.top()
+            << "\n\trect.right():  " << rect.right()
+            << "\n\trect.bottom(): " << rect.bottom()
+            );
+
+
+        return assignable_sub_matrix<T,NR,NC,mm>(m,rect);
+    }
+
+
+    template <typename T, long NR, long NC, typename mm>
+    assignable_sub_matrix<T,NR,NC,mm> set_subm (
+        matrix<T,NR,NC,mm>& m,
+        long r, 
+        long c,
+        long nr,
+        long nc
+    )
+    {
+        DLIB_ASSERT(r >= 0 && c >= 0 && r+nr < m.nr() && c+nc < m.nc(), 
+                    "\tassignable_matrix_expression set_subm(matrix& m, r, c, nr, nc)"
+                    << "\n\tYou have specified invalid sub matrix dimensions"
+                    << "\n\tm.nr(): " << m.nr()
+                    << "\n\tm.nc(): " << m.nc() 
+                    << "\n\tr:      " << r 
+                    << "\n\tc:      " << c 
+                    << "\n\tnr:     " << nr 
+                    << "\n\tnc:     " << nc 
+        );
+
+        return assignable_sub_matrix<T,NR,NC,mm>(m,rectangle(c,r, c+nc-1, r+nr-1));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+
+    template <typename T, long NR, long NC, typename mm>
+    class assignable_col_matrix
+    {
+    public:
+        assignable_col_matrix(
+            matrix<T,NR,NC,mm>& m_,
+            const long col_ 
+        ) : m(m_), col(col_) {}
+
+        template <typename EXP>
+        assignable_col_matrix& operator= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nc() == 1 && exp.nr() == m.nr(),
+                "\tassignable_matrix_expression set_colm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\tm.nr() (target matrix):   " << m.nr()
+                );
+
+            for (long i = 0; i < m.nr(); ++i)
+            {
+                m(i,col) = exp(i);
+            }
+
+            return *this;
+        }
+
+        assignable_col_matrix& operator= (
+            const T& value
+        )
+        {
+            for (long i = 0; i < m.nr(); ++i)
+            {
+                m(i,col) = value;
+            }
+
+            return *this;
+        }
+
+    private:
+
+        matrix<T,NR,NC,mm>& m;
+        const long col;
+    };
+
+
+    template <typename T, long NR, long NC, typename mm>
+    assignable_col_matrix<T,NR,NC,mm> set_colm (
+        matrix<T,NR,NC,mm>& m,
+        const long col 
+    )
+    {
+        DLIB_ASSERT(col >= 0 && col < m.nc(), 
+            "\tassignable_matrix_expression set_colm(matrix& m, col)"
+            << "\n\tYou have specified invalid sub matrix dimensions"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tcol:    " << col 
+            );
+
+
+        return assignable_col_matrix<T,NR,NC,mm>(m,col);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+
+    template <typename T, long NR, long NC, typename mm>
+    class assignable_row_matrix
+    {
+    public:
+        assignable_row_matrix(
+            matrix<T,NR,NC,mm>& m_,
+            const long row_ 
+        ) : m(m_), row(row_) {}
+
+        template <typename EXP>
+        assignable_row_matrix& operator= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nc() == 1 && exp.nc() == m.nc(),
+                "\tassignable_matrix_expression set_rowm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\tm.nc() (target matrix):   " << m.nc()
+                );
+
+            for (long i = 0; i < m.nc(); ++i)
+            {
+                m(row,i) = exp(i);
+            }
+
+            return *this;
+        }
+
+        assignable_row_matrix& operator= (
+            const T& value
+        )
+        {
+            for (long i = 0; i < m.nc(); ++i)
+            {
+                m(row,i) = value;
+            }
+
+            return *this;
+        }
+
+    private:
+
+        matrix<T,NR,NC,mm>& m;
+        const long row;
+    };
+
+
+    template <typename T, long NR, long NC, typename mm>
+    assignable_row_matrix<T,NR,NC,mm> set_rowm (
+        matrix<T,NR,NC,mm>& m,
+        const long row 
+    )
+    {
+        DLIB_ASSERT(row >= 0 && row < m.nr(), 
+            "\tassignable_matrix_expression set_rowm(matrix& m, row)"
+            << "\n\tYou have specified invalid sub matrix dimensions"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\trow:    " << row 
+            );
+
+
+        return assignable_row_matrix<T,NR,NC,mm>(m,row);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename EXP>
     struct op_trans : has_destructive_aliasing
     {

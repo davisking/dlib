@@ -269,6 +269,97 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    assignable_matrix_expression set_subm (
+        matrix& m,
+        long row,
+        long col,
+        long nr,
+        long nc
+    );
+    /*!
+        requires
+            - row >= 0
+            - row + nr < m.nr()
+            - col >= 0
+            - col + nc < m.nc()
+        ensures
+            - statements of the following form:
+                - set_subm(m,row,col,nr,nc) = some_matrix;
+              result in it being the case that:
+                - subm(m,row,col,nr,nc) == some_matrix.
+
+            - statements of the following form:
+                - set_subm(m,row,col,nr,nc) = scalar_value;
+              result in it being the case that:
+                - subm(m,row,col,nr,nc) == uniform_matrix<matrix_exp::type>(m.nr(),m.nc(),scalar_value).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    assignable_matrix_expression set_subm (
+        matrix& m,
+        const rectangle& rect
+    );
+    /*!
+        requires
+            - get_rect(m).contains(rect) == true
+              (i.e. rect is a region inside the matrix m)
+        ensures
+            - statements of the following form:
+                - set_subm(m,rect) = some_matrix;
+              result in it being the case that:
+                - subm(m,rect) == some_matrix.
+
+            - statements of the following form:
+                - set_subm(m,rect) = scalar_value;
+              result in it being the case that:
+                - subm(m,rect) == uniform_matrix<matrix_exp::type>(m.nr(),m.nc(),scalar_value).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    assignable_matrix_expression set_rowm (
+        matrix& m,
+        long row
+    );
+    /*!
+        requires
+            - 0 <= row < m.nr()
+        ensures
+            - statements of the following form:
+                - set_rowm(m,row) = some_matrix;
+              result in it being the case that:
+                - rowm(m,row) == some_matrix.
+
+            - statements of the following form:
+                - set_rowm(m,row) = scalar_value;
+              result in it being the case that:
+                - rowm(m,row) == uniform_matrix<matrix_exp::type>(1,m.nc(),scalar_value).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    assignable_matrix_expression set_colm (
+        matrix& m,
+        long col 
+    );
+    /*!
+        requires
+            - 0 <= col < m.nr()
+        ensures
+            - statements of the following form:
+                - set_colm(m,col) = some_matrix;
+              result in it being the case that:
+                - colm(m,col) == some_matrix.
+
+            - statements of the following form:
+                - set_colm(m,col) = scalar_value;
+              result in it being the case that:
+                - colm(m,col) == uniform_matrix<matrix_exp::type>(m.nr(),1,scalar_value).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         long R,
         long C
