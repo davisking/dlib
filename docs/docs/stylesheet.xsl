@@ -7,7 +7,13 @@
    
    <xsl:variable name="is_chm">true</xsl:variable>
    <xsl:variable name="main_menu">main_menu.xml</xsl:variable>
+   <xsl:variable name="project_name">dlib C++ Library</xsl:variable>
    
+   <!-- ************************************************************************* -->
+
+   <!-- This is the ID you get from Google Webmaster Tools -->
+   <xsl:variable name="google_verify_id">02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I=</xsl:variable>
+
    <!-- ************************************************************************* -->
 
    <xsl:variable name="last_modified_date_var">_LAST_MODIFIED_DATE_</xsl:variable>
@@ -21,6 +27,10 @@
    <xsl:variable name="background_color">#EDF3EE</xsl:variable>
    <xsl:variable name="main_width">62em</xsl:variable>
 
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz </xsl:variable>
    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ </xsl:variable>
    
@@ -30,9 +40,9 @@
       <html>
          <head>
             <!-- Verify with Google -->
-            <meta name="verify-v1" content="02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I=" />
+            <meta name="verify-v1" content="{$google_verify_id}" />
             <title>
-               dlib C++ Library 
+               <xsl:value-of select="$project_name"/>
                <xsl:if test="title">
                - <xsl:value-of select="title" />
                </xsl:if>
