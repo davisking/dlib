@@ -505,9 +505,9 @@ namespace dlib
         const long y = box_rect.top();
 
         if (enabled && is_depressed == false)
-            draw_solid_circle(c,point(rect.left()+5,rect.top()+5),5,rgb_pixel(255,255,255));
+            draw_solid_circle(c,point(rect.left()+5,rect.top()+5),4.5,rgb_pixel(255,255,255));
         else
-            draw_solid_circle(c,point(rect.left()+5,rect.top()+5),5,rgb_pixel(212,208,200));
+            draw_solid_circle(c,point(rect.left()+5,rect.top()+5),4.5,rgb_pixel(212,208,200));
 
 
         color = rgb_pixel(128,128,128);
