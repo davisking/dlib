@@ -210,23 +210,17 @@ namespace dlib
                     // add x to the dictionary
                     dictionary.push_back(x);
 
+
                     // update K_inv by computing the new one in the temp matrix (equation 3.14)
                     matrix<scalar_type,0,0,mem_manager_type> temp(K_inv.nr()+1, K_inv.nc()+1);
-                    for (long r = 0; r < K_inv.nr(); ++r)
-                    {
-                        for (long c = 0; c < K_inv.nc(); ++c)
-                        {
-                            temp(r,c) = (K_inv + a*trans(a)/delta)(r,c);
-                        }
-                    }
+                    // update the middle part of the matrix
+                    set_subm(temp, get_rect(K_inv)) = K_inv + a*trans(a)/delta;
+                    // update the right column of the matrix
+                    set_subm(temp, 0, K_inv.nr(),K_inv.nr(),1) = -a/delta;
+                    // update the bottom row of the matrix
+                    set_subm(temp, K_inv.nr(), 0, 1, K_inv.nr()) = trans(-a/delta);
+                    // update the bottom right corner of the matrix
                     temp(K_inv.nr(), K_inv.nc()) = 1/delta;
-
-                    // update the new sides of K_inv
-                    for (long i = 0; i < K_inv.nr(); ++i)
-                    {
-                        temp(K_inv.nr(),i) = -a(i)/delta;
-                        temp(i,K_inv.nr()) = -a(i)/delta;
-                    }
                     // put temp into K_inv
                     temp.swap(K_inv);
 
@@ -234,25 +228,14 @@ namespace dlib
 
                     // update K (the kernel matrix)
                     temp.set_size(K.nr()+1, K.nc()+1);
-                    for (long r = 0; r < K.nr(); ++r)
-                    {
-                        for (long c = 0; c < K.nc(); ++c)
-                        {
-                            temp(r,c) = K(r,c);
-                        }
-                    }
+                    set_subm(temp, get_rect(K)) = K;
+                    // update the right column of the matrix
+                    set_subm(temp, 0, K.nr(),K.nr(),1) = k;
+                    // update the bottom row of the matrix
+                    set_subm(temp, K.nr(), 0, 1, K.nr()) = trans(k);
                     temp(K.nr(), K.nc()) = kx;
-
-                    // update the new sides of K
-                    for (long i = 0; i < K.nr(); ++i)
-                    {
-                        temp(K.nr(),i) = k(i);
-                        temp(i,K.nr()) = k(i);
-                    }
                     // put temp into K
                     temp.swap(K);
-
-
 
 
                     // now update the alpha vector 
