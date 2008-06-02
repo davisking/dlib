@@ -36,11 +36,12 @@ namespace dlib
     template <
         typename in_image_type,
         long R,
-        long C
+        long C,
+        typename MM
         >
     void get_histogram (
         const in_image_type& in_img,
-        matrix<unsigned long,R,C>& hist
+        matrix<unsigned long,R,C,MM>& hist
     );
     /*!
         requires
