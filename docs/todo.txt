@@ -1,7 +1,6 @@
 
 
-Add asserts to text_grid and also
-move all the function bodies to cpp.
+move all the function bodies in widgets.h to cpp.
 
 Hide all windows header files in a cpp file.
 
