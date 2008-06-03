@@ -3177,6 +3177,14 @@ namespace dlib
         ) const
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                    "\tconst std::string text_grid::text(row,col)"
+                    << "\n\trow:              " << row 
+                    << "\n\tcol:              " << col 
+                    << "\n\tnumber_of_rows(): " << number_of_rows() 
+                    << "\n\tnumber_of_columns(): " << number_of_columns() 
+                    << "\n\tthis:             " << this
+                    );
             return grid[row][col].text.c_str();
         }
 
@@ -3187,6 +3195,14 @@ namespace dlib
         ) 
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                    "\tvoid text_grid::set_text(row,col)"
+                    << "\n\trow:              " << row 
+                    << "\n\tcol:              " << col 
+                    << "\n\tnumber_of_rows(): " << number_of_rows() 
+                    << "\n\tnumber_of_columns(): " << number_of_columns() 
+                    << "\n\tthis:             " << this
+                    );
             grid[row][col].text = str.c_str();
             parent.invalidate_rectangle(get_text_rect(row,col));
         }
@@ -3197,6 +3213,14 @@ namespace dlib
         ) const
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                    "\tconst rgb_pixel text_grid::text_color(row,col)"
+                    << "\n\trow:              " << row 
+                    << "\n\tcol:              " << col 
+                    << "\n\tnumber_of_rows(): " << number_of_rows() 
+                    << "\n\tnumber_of_columns(): " << number_of_columns() 
+                    << "\n\tthis:             " << this
+                    );
             return grid[row][col].text_color;
         }
 
@@ -3207,6 +3231,14 @@ namespace dlib
         ) 
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                    "\tvoid text_grid::set_text_color(row,col,color)"
+                    << "\n\trow:              " << row 
+                    << "\n\tcol:              " << col 
+                    << "\n\tnumber_of_rows(): " << number_of_rows() 
+                    << "\n\tnumber_of_columns(): " << number_of_columns() 
+                    << "\n\tthis:             " << this
+                    );
             grid[row][col].text_color = color;
             parent.invalidate_rectangle(get_text_rect(row,col));
         }
@@ -3217,6 +3249,14 @@ namespace dlib
         ) const
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                    "\tconst rgb_pixel text_grid::background_color(row,col,color)"
+                    << "\n\trow:              " << row 
+                    << "\n\tcol:              " << col 
+                    << "\n\tnumber_of_rows(): " << number_of_rows() 
+                    << "\n\tnumber_of_columns(): " << number_of_columns() 
+                    << "\n\tthis:             " << this
+                    );
             return grid[row][col].bg_color;
         }
 
@@ -3227,6 +3267,14 @@ namespace dlib
         ) 
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                    "\tvoid text_grid::set_background_color(row,col,color)"
+                    << "\n\trow:              " << row 
+                    << "\n\tcol:              " << col 
+                    << "\n\tnumber_of_rows(): " << number_of_rows() 
+                    << "\n\tnumber_of_columns(): " << number_of_columns() 
+                    << "\n\tthis:             " << this
+                    );
             grid[row][col].bg_color = color;
             parent.invalidate_rectangle(get_bg_rect(row,col));
         }
@@ -3237,6 +3285,14 @@ namespace dlib
         ) const
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                    "\tbool text_grid::is_editable(row,col)"
+                    << "\n\trow:              " << row 
+                    << "\n\tcol:              " << col 
+                    << "\n\tnumber_of_rows(): " << number_of_rows() 
+                    << "\n\tnumber_of_columns(): " << number_of_columns() 
+                    << "\n\tthis:             " << this
+                    );
             return grid[row][col].is_editable;
         }
 
@@ -3247,6 +3303,15 @@ namespace dlib
         ) 
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                    "\tvoid text_grid::set_editable(row,col,editable)"
+                    << "\n\trow:              " << row 
+                    << "\n\tcol:              " << col 
+                    << "\n\tnumber_of_rows(): " << number_of_rows() 
+                    << "\n\tnumber_of_columns(): " << number_of_columns() 
+                    << "\n\teditable:         " << editable 
+                    << "\n\tthis:             " << this
+                    );
             grid[row][col].is_editable = editable;
             if (has_focus && active_row == static_cast<long>(row) && active_col == static_cast<long>(col))
             {
@@ -3260,6 +3325,13 @@ namespace dlib
         )
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( col < number_of_columns(),
+                    "\tvoid text_grid::set_column_width(col,width)"
+                    << "\n\tcol:              " << col 
+                    << "\n\tnumber_of_columns(): " << number_of_columns() 
+                    << "\n\twidth:            " << width 
+                    << "\n\tthis:             " << this
+                    );
             col_width[col] = width;
             compute_total_rect();
             compute_bg_rects();
@@ -3271,6 +3343,13 @@ namespace dlib
         )
         {
             auto_mutex M(m);
+            DLIB_ASSERT ( row < number_of_rows() ,
+                    "\tvoid text_grid::set_row_height(row,height)"
+                    << "\n\trow:              " << row 
+                    << "\n\tnumber_of_rows(): " << number_of_rows() 
+                    << "\n\theight:           " << height 
+                    << "\n\tthis:             " << this
+                    );
             row_height[row] = height;
             compute_total_rect();
             compute_bg_rects();
