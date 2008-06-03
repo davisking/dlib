@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.5" date="Jun 2, 2008">
+New Stuff:
    - Added some macros that allow dlib to create a stack trace
    - Added the wrap_function and is_function templates.
    - Added two new events to the text_field object.  One for detecting when the 
@@ -38,7 +51,7 @@ Other:
    - Added example programs for the krls object as well as the new
      kcentroid and kkmeans objects.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
