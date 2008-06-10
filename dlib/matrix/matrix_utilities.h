@@ -895,7 +895,7 @@ namespace dlib
 
     template <
         typename M,
-        typename OP
+        typename OP_
         >
     class matrix_unary_exp  
     {
@@ -904,6 +904,8 @@ namespace dlib
                 - must be a matrix_exp or matrix_ref object (or
                   an object with a compatible interface).
         !*/
+        typedef typename OP_::template op<M> OP;
+
     public:
         typedef typename OP::type type;
         typedef matrix_unary_exp ref_type;
@@ -1179,7 +1181,7 @@ namespace dlib
     template <
         typename M,
         typename S,
-        typename OP
+        typename OP_
         >
     class matrix_scalar_binary_exp  
     {
@@ -1188,6 +1190,8 @@ namespace dlib
                 - must be a matrix_exp or matrix_ref object (or
                   an object with a compatible interface).
         !*/
+        typedef typename OP_::template op<M> OP;
+
     public:
         typedef typename OP::type type;
         typedef matrix_scalar_binary_exp ref_type;
@@ -1240,7 +1244,7 @@ namespace dlib
     template <
         typename M1,
         typename M2,
-        typename OP
+        typename OP_
         >
     class matrix_binary_exp  
     {
@@ -1249,6 +1253,8 @@ namespace dlib
                 - must be a matrix_exp or matrix_ref object (or
                   an object with a compatible interface).
         !*/
+        typedef typename OP_::template op<M1,M2> OP;
+
     public:
         typedef typename OP::type type;
         typedef matrix_binary_exp ref_type;
@@ -1743,66 +1749,73 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
-    struct op_trans : has_destructive_aliasing
+    struct op_trans 
     {
-        const static long NR = EXP::NC;
-        const static long NC = EXP::NR;
-        typedef typename EXP::type type;
-        typedef typename EXP::mem_manager_type mem_manager_type;
-        template <typename M>
-        static type apply ( const M& m, long r, long c)
-        { return m(c,r); }
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = EXP::NC;
+            const static long NC = EXP::NR;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { return m(c,r); }
 
-        template <typename M>
-        static long nr (const M& m) { return m.nc(); }
-        template <typename M>
-        static long nc (const M& m) { return m.nr(); }
+            template <typename M>
+            static long nr (const M& m) { return m.nc(); }
+            template <typename M>
+            static long nc (const M& m) { return m.nr(); }
+        }; 
     };
 
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_trans<EXP> > > trans (
+    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_trans> > trans (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_trans<EXP> > exp;
+        typedef matrix_unary_exp<matrix_exp<EXP>,op_trans> exp;
         return matrix_exp<exp>(exp(m));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP, long R, long C>
-    struct op_removerc : has_destructive_aliasing
+    template <long R, long C>
+    struct op_removerc
     {
-        const static long NR = EXP::NR - 1;
-        const static long NC = EXP::NC - 1;
-        typedef typename EXP::type type;
-        typedef typename EXP::mem_manager_type mem_manager_type;
-        template <typename M>
-        static type apply ( const M& m, long r, long c)
-        { 
-            if (r < R)
-            {
-                if (c < C)
-                    return m(r,c); 
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = EXP::NR - 1;
+            const static long NC = EXP::NC - 1;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                if (r < R)
+                {
+                    if (c < C)
+                        return m(r,c); 
+                    else
+                        return m(r,c+1); 
+                }
                 else
-                    return m(r,c+1); 
+                {
+                    if (c < C)
+                        return m(r+1,c); 
+                    else
+                        return m(r+1,c+1); 
+                }
             }
-            else
-            {
-                if (c < C)
-                    return m(r+1,c); 
-                else
-                    return m(r+1,c+1); 
-            }
-        }
 
-        template <typename M>
-        static long nr (const M& m) { return m.nr() - 1; }
-        template <typename M>
-        static long nc (const M& m) { return m.nc() - 1; }
+            template <typename M>
+            static long nr (const M& m) { return m.nr() - 1; }
+            template <typename M>
+            static long nc (const M& m) { return m.nc() - 1; }
+        };
     };
 
     template <
@@ -1810,7 +1823,7 @@ namespace dlib
         long C,
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_removerc<EXP,R,C> > > removerc (
+    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_removerc<R,C> > > removerc (
         const matrix_exp<EXP>& m
     )
     {
@@ -1826,33 +1839,36 @@ namespace dlib
             << "\n\tR:      " << R 
             << "\n\tC:      " << C 
             );
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_removerc<EXP,R,C> > exp;
+        typedef matrix_unary_exp<matrix_exp<EXP>,op_removerc<R,C> > exp;
         return matrix_exp<exp>(exp(m));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
-    struct op_diag : has_destructive_aliasing
+    struct op_diag
     {
-        const static long NR = EXP::NC;
-        const static long NC = 1;
-        typedef typename EXP::type type;
-        typedef typename EXP::mem_manager_type mem_manager_type;
-        template <typename M>
-        static type apply ( const M& m, long r, long c)
-        { return m(r,r); }
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = EXP::NC;
+            const static long NC = 1;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { return m(r,r); }
 
-        template <typename M>
-        static long nr (const M& m) { return m.nr(); }
-        template <typename M>
-        static long nc (const M& m) { return 1; }
+            template <typename M>
+            static long nr (const M& m) { return m.nr(); }
+            template <typename M>
+            static long nc (const M& m) { return 1; }
+        };
     };
 
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_diag<EXP> > > diag (
+    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_diag> > diag (
         const matrix_exp<EXP>& m
     )
     {
@@ -1864,30 +1880,34 @@ namespace dlib
             << "\n\tm.nr(): " << m.nr()
             << "\n\tm.nc(): " << m.nc() 
             );
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_diag<EXP> > exp;
+        typedef matrix_unary_exp<matrix_exp<EXP>,op_diag> exp;
         return matrix_exp<exp>(exp(m));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP, typename target_type>
-    struct op_cast : has_nondestructive_aliasing, preserves_dimensions<EXP>
+    template <typename target_type>
+    struct op_cast
     {
-        typedef target_type type;
-        template <typename M>
-        static type apply ( const M& m, long r, long c)
-        { return static_cast<target_type>(m(r,c)); }
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            typedef target_type type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { return static_cast<target_type>(m(r,c)); }
+        };
     };
 
     template <
         typename target_type,
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_cast<EXP,target_type> > > matrix_cast (
+    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_cast<target_type> > > matrix_cast (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_cast<EXP,target_type> > exp;
+        typedef matrix_unary_exp<matrix_exp<EXP>,op_cast<target_type> > exp;
         return matrix_exp<exp>(exp(m));
     }
 
@@ -2740,13 +2760,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <long R, long C, typename EXP>
-    struct op_rotate : has_destructive_aliasing, preserves_dimensions<EXP>
+    template <long R, long C>
+    struct op_rotate
     {
-        typedef typename EXP::type type;
-        template <typename M>
-        static type apply ( const M& m, long r, long c)
-        { return m((r+R)%m.nr(),(c+C)%m.nc()); }
+        template <typename EXP>
+        struct op : has_destructive_aliasing, preserves_dimensions<EXP>
+        {
+            typedef typename EXP::type type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { return m((r+R)%m.nr(),(c+C)%m.nc()); }
+        };
     };
 
     template <
@@ -2754,7 +2778,7 @@ namespace dlib
         long C,
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_rotate<R,C,EXP> > > rotate (
+    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_rotate<R,C> > > rotate (
         const matrix_exp<EXP>& m
     )
     {
@@ -2770,27 +2794,30 @@ namespace dlib
             << "\n\tR:      " << R 
             << "\n\tC:      " << C 
             );
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_rotate<R,C,EXP> > exp;
+        typedef matrix_unary_exp<matrix_exp<EXP>,op_rotate<R,C> > exp;
         return matrix_exp<exp>(exp(m));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP1, typename EXP2, typename EXP3 = void, typename EXP4 = void>
-    struct op_pointwise_multiply : public has_nondestructive_aliasing, public preserves_dimensions<EXP1,EXP2,EXP3,EXP4>
+    struct op_pointwise_multiply
     {
-        typedef typename EXP1::type type;
+        template <typename EXP1, typename EXP2>
+        struct op : public has_nondestructive_aliasing, public preserves_dimensions<EXP1,EXP2>
+        {
+            typedef typename EXP1::type type;
 
-        template <typename M1, typename M2>
-        static type apply ( const M1& m1, const M2& m2 , long r, long c)
-        { return m1(r,c)*m2(r,c); }
+            template <typename M1, typename M2>
+            static type apply ( const M1& m1, const M2& m2 , long r, long c)
+            { return m1(r,c)*m2(r,c); }
+        };
     };
 
     template <
         typename EXP1,
         typename EXP2
         >
-    inline const matrix_exp<matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_pointwise_multiply<EXP1,EXP2> > > pointwise_multiply (
+    inline const matrix_exp<matrix_binary_exp<EXP1,EXP2,op_pointwise_multiply> > pointwise_multiply (
         const matrix_exp<EXP1>& a,
         const matrix_exp<EXP2>& b 
     )
@@ -2807,8 +2834,8 @@ namespace dlib
             << "\n\tb.nr(): " << b.nr()
             << "\n\tb.nc(): " << b.nc() 
             );
-        typedef matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_pointwise_multiply<EXP1,EXP2> > exp;
-        return matrix_exp<exp>(exp(a,b));
+        typedef matrix_binary_exp<EXP1,EXP2,op_pointwise_multiply> exp;
+        return matrix_exp<exp>(exp(a.ref(),b.ref()));
     }
 
     template <
@@ -2816,9 +2843,7 @@ namespace dlib
         typename EXP2,
         typename EXP3
         >
-    inline const matrix_exp<
-        matrix_binary_exp< matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_pointwise_multiply<EXP1,EXP2> > ,
-                          matrix_exp<EXP3>, op_pointwise_multiply<EXP1,EXP2,EXP3> > >
+    inline const matrix_exp<matrix_binary_exp<matrix_binary_exp<EXP1,EXP2,op_pointwise_multiply>,EXP3,op_pointwise_multiply> >
         pointwise_multiply (
         const matrix_exp<EXP1>& a,
         const matrix_exp<EXP2>& b, 
@@ -2843,10 +2868,10 @@ namespace dlib
             << "\n\tc.nr(): " << c.nr()
             << "\n\tc.nc(): " << c.nc() 
             );
-        typedef  matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_pointwise_multiply<EXP1,EXP2> > exp; 
-        typedef matrix_binary_exp< exp , matrix_exp<EXP3>, op_pointwise_multiply<EXP1,EXP2,EXP3> > exp2;
+        typedef matrix_binary_exp<EXP1,EXP2,op_pointwise_multiply> exp; 
+        typedef matrix_binary_exp<exp , EXP3, op_pointwise_multiply> exp2;
 
-        return matrix_exp<exp2>(exp2(exp(a,b),c));
+        return matrix_exp<exp2>(exp2(exp(a.ref(),b.ref()),c.ref()));
     }
 
     template <
@@ -2856,9 +2881,9 @@ namespace dlib
         typename EXP4
         >
     inline const matrix_exp<
-        matrix_binary_exp< matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_pointwise_multiply<EXP1,EXP2> > ,
-                          matrix_binary_exp<matrix_exp<EXP3>,matrix_exp<EXP4>,op_pointwise_multiply<EXP3,EXP4> >, 
-                          op_pointwise_multiply<EXP1,EXP2,EXP3,EXP4> > >
+        matrix_binary_exp<matrix_binary_exp<EXP1,EXP2,op_pointwise_multiply> ,
+                          matrix_binary_exp<EXP3,EXP4,op_pointwise_multiply>, 
+                          op_pointwise_multiply> >
         pointwise_multiply (
         const matrix_exp<EXP1>& a,
         const matrix_exp<EXP2>& b, 
@@ -2890,11 +2915,11 @@ namespace dlib
             << "\n\td.nr(): " << d.nr()
             << "\n\td.nc(): " << d.nc() 
             );
-        typedef matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_pointwise_multiply<EXP1,EXP2> > exp1;
-        typedef matrix_binary_exp<matrix_exp<EXP3>,matrix_exp<EXP4>,op_pointwise_multiply<EXP3,EXP4> > exp2;
+        typedef matrix_binary_exp<EXP1,EXP2,op_pointwise_multiply> exp1;
+        typedef matrix_binary_exp<EXP3,EXP4,op_pointwise_multiply> exp2;
 
-        typedef matrix_binary_exp<  exp1  ,  exp2, op_pointwise_multiply<EXP1,EXP2,EXP3,EXP4> > exp3;
-        return matrix_exp<exp3>(exp3(exp1(a,b),exp2(c,d)));
+        typedef matrix_binary_exp<  exp1  ,  exp2, op_pointwise_multiply> exp3;
+        return matrix_exp<exp3>(exp3(exp1(a.ref(),b.ref()),exp2(c.ref(),d.ref())));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3072,22 +3097,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <long lower, long upper, typename EXP>
-    struct op_clamp : has_nondestructive_aliasing, preserves_dimensions<EXP>
+    template <long lower, long upper>
+    struct op_clamp
     {
-        typedef typename EXP::type type;
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            typedef typename EXP::type type;
 
-        template <typename M>
-        static type apply ( const M& m, long r, long c)
-        { 
-            const type temp = m(r,c);
-            if (temp > static_cast<type>(upper))
-                return static_cast<type>(upper);
-            else if (temp < static_cast<type>(lower))
-                return static_cast<type>(lower);
-            else
-                return temp;
-        }
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                const type temp = m(r,c);
+                if (temp > static_cast<type>(upper))
+                    return static_cast<type>(upper);
+                else if (temp < static_cast<type>(lower))
+                    return static_cast<type>(lower);
+                else
+                    return temp;
+            }
+        };
     };
 
     template <
@@ -3095,11 +3124,11 @@ namespace dlib
         long u,
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_clamp<l,u,EXP> > > clamp (
+    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_clamp<l,u> > > clamp (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_clamp<l,u,EXP> > exp;
+        typedef matrix_unary_exp<matrix_exp<EXP>,op_clamp<l,u> > exp;
         return matrix_exp<exp>(exp(m));
     }
 
@@ -3134,29 +3163,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP1, typename EXP2>
-    struct op_scale_columns : has_nondestructive_aliasing
+    struct op_scale_columns
     {
-        typedef typename EXP1::type type;
-        typedef typename EXP1::mem_manager_type mem_manager_type;
-        const static long NR = EXP1::NR;
-        const static long NC = EXP1::NC;
+        template <typename EXP1, typename EXP2>
+        struct op : has_nondestructive_aliasing
+        {
+            typedef typename EXP1::type type;
+            typedef typename EXP1::mem_manager_type mem_manager_type;
+            const static long NR = EXP1::NR;
+            const static long NC = EXP1::NC;
 
-        template <typename M1, typename M2>
-        static type apply ( const M1& m1, const M2& m2 , long r, long c)
-        { return m1(r,c)*m2(c); }
+            template <typename M1, typename M2>
+            static type apply ( const M1& m1, const M2& m2 , long r, long c)
+            { return m1(r,c)*m2(c); }
 
-        template <typename M1, typename M2>
-        static long nr (const M1& m1, const M2& ) { return m1.nr(); }
-        template <typename M1, typename M2>
-        static long nc (const M1& m1, const M2& ) { return m1.nc(); }
+            template <typename M1, typename M2>
+            static long nr (const M1& m1, const M2& ) { return m1.nr(); }
+            template <typename M1, typename M2>
+            static long nc (const M1& m1, const M2& ) { return m1.nc(); }
+        };
     };
 
     template <
         typename EXP1,
         typename EXP2
         >
-    const matrix_exp<matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_scale_columns<EXP1,EXP2> > > scale_columns (
+    const matrix_exp<matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_scale_columns> > scale_columns (
         const matrix_exp<EXP1>& m,
         const matrix_exp<EXP2>& v 
     )
@@ -3173,7 +3205,7 @@ namespace dlib
             << "\n\tv.nr(): " << v.nr()
             << "\n\tv.nc(): " << v.nc() 
             );
-        typedef matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_scale_columns<EXP1,EXP2> > exp;
+        typedef matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_scale_columns> exp;
         return matrix_exp<exp>(exp(m,v));
     }
 
