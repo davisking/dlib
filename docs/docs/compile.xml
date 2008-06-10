@@ -94,16 +94,6 @@
            to the operating system.  The default timeout used by this library is 30,000 milliseconds (30 seconds).  You
            may however change this to whatever you like by defining DLIB_THREAD_POOL_TIMEOUT to some new value.  
         </p>
-         <anchor>DLIB_PNG_SUPPORT</anchor>
-        <h3>#define DLIB_PNG_SUPPORT</h3>
-        <p>
-           This preprocessor directive enables support for Portable Network Graphics (PNG) image files.  So if you want
-           to be able to read them via the <a href="imaging.html#png_loader">png_loader</a> object you must
-           define this preprocessor directive.  You must also ensure that you link to the 
-           <a href="http://www.libpng.org/pub/png/libpng.html">libpng</a> library.  Note that if you build using
-           the CMake file provided with the library it will automatically handle these things if libpng is
-           installed on your system.
-        </p>
 
 
         <center><h1>Compilers</h1></center>
