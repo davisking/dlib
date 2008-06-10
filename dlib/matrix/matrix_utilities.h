@@ -1423,27 +1423,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
-    struct op_rowm : has_destructive_aliasing
+    struct op_rowm
     {
-        const static long NR = 1;
-        const static long NC = EXP::NC;
-        typedef typename EXP::type type;
-        typedef typename EXP::mem_manager_type mem_manager_type;
-        template <typename M>
-        static type apply ( const M& m, long row, long, long c)
-        { return m(row,c); }
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = 1;
+            const static long NC = EXP::NC;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long row, long, long c)
+            { return m(row,c); }
 
-        template <typename M>
-        static long nr (const M& m) { return 1; }
-        template <typename M>
-        static long nc (const M& m) { return m.nc(); }
+            template <typename M>
+            static long nr (const M& m) { return 1; }
+            template <typename M>
+            static long nc (const M& m) { return m.nc(); }
+        };
     };
 
     template <
         typename EXP
         >
-    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_rowm<EXP> > > rowm (
+    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_rowm> > rowm (
         const matrix_exp<EXP>& m,
         long row
     )
@@ -1456,33 +1459,36 @@ namespace dlib
             << "\n\trow:    " << row 
             );
 
-        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_rowm<EXP> > exp;
+        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_rowm> exp;
         return matrix_exp<exp>(exp(m,row));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
-    struct op_colm : has_destructive_aliasing
+    struct op_colm
     {
-        const static long NR = EXP::NR;
-        const static long NC = 1;
-        typedef typename EXP::type type;
-        typedef typename EXP::mem_manager_type mem_manager_type;
-        template <typename M>
-        static type apply ( const M& m, long col, long r, long)
-        { return m(r,col); }
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = EXP::NR;
+            const static long NC = 1;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long col, long r, long)
+            { return m(r,col); }
 
-        template <typename M>
-        static long nr (const M& m) { return m.nr(); }
-        template <typename M>
-        static long nc (const M& m) { return 1; }
+            template <typename M>
+            static long nr (const M& m) { return m.nr(); }
+            template <typename M>
+            static long nc (const M& m) { return 1; }
+        };
     };
 
     template <
         typename EXP
         >
-    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_colm<EXP> > > colm (
+    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_colm> > colm (
         const matrix_exp<EXP>& m,
         long col 
     )
@@ -1495,7 +1501,7 @@ namespace dlib
             << "\n\tcol:    " << col 
             );
 
-        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_colm<EXP> > exp;
+        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_colm> exp;
         return matrix_exp<exp>(exp(m,col));
     }
 
