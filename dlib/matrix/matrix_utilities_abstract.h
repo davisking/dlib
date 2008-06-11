@@ -546,6 +546,9 @@ namespace dlib
             - m == #u*#w*trans(#v)
             - trans(#u)*#u == identity matrix
             - trans(#v)*#v == identity matrix
+            - diag(#w) == the eigenvalues of the matrix m in no 
+              particular order.  All non-diagonal elements of #w are
+              set to 0.
             - #u.nr() == m.nr()
             - #u.nc() == m.nc()
             - #w.nr() == m.nc()
