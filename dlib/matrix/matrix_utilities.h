@@ -1531,16 +1531,25 @@ namespace dlib
                 << "\n\trect.height() (target matrix):  " << rect.height()
                 );
 
-            long r_exp = 0;
-            for (long r = rect.top(); r <= rect.bottom(); ++r)
+            if (exp.destructively_aliases(m) == false)
             {
-                long c_exp = 0;
-                for (long c = rect.left(); c <= rect.right(); ++c)
+                long r_exp = 0;
+                for (long r = rect.top(); r <= rect.bottom(); ++r)
                 {
-                    m(r,c) = exp(r_exp,c_exp);
-                    ++c_exp;
+                    long c_exp = 0;
+                    for (long c = rect.left(); c <= rect.right(); ++c)
+                    {
+                        m(r,c) = exp(r_exp,c_exp);
+                        ++c_exp;
+                    }
+                    ++r_exp;
                 }
-                ++r_exp;
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator=(tmp(exp));
             }
 
             return *this;
@@ -1638,9 +1647,18 @@ namespace dlib
                 << "\n\tm.nr() (target matrix):   " << m.nr()
                 );
 
-            for (long i = 0; i < m.nr(); ++i)
+            if (exp.destructively_aliases(m) == false)
             {
-                m(i,col) = exp(i);
+                for (long i = 0; i < m.nr(); ++i)
+                {
+                    m(i,col) = exp(i);
+                }
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator=(tmp(exp));
             }
 
             return *this;
@@ -1708,9 +1726,18 @@ namespace dlib
                 << "\n\tm.nc() (target matrix):   " << m.nc()
                 );
 
-            for (long i = 0; i < m.nc(); ++i)
+            if (exp.destructively_aliases(m) == false)
             {
-                m(row,i) = exp(i);
+                for (long i = 0; i < m.nc(); ++i)
+                {
+                    m(row,i) = exp(i);
+                }
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator=(tmp(exp));
             }
 
             return *this;

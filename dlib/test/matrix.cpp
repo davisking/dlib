@@ -1206,6 +1206,24 @@ namespace
 
             DLIB_CASSERT(m1 == res, "m1: \n" << m1 << "\nres: \n" << res);
 
+            set_subm(m1,0,0,5,5) = m1*m1;
+            DLIB_CASSERT(m1 == res*res, "m1: \n" << m1 << "\nres*res: \n" << res*res);
+
+            m1 = res;
+            set_subm(m1,1,1,2,2) = subm(m1,0,0,2,2);
+
+            long res_vals2[] = {
+                9, 9, 9, 9, 9,
+                0, 9, 9, 0, 0,
+                0, 0, 1, 0, 2,
+                0, 0, 2, 2, 2,
+                0, 0, 2, 2, 0
+            };
+
+            res = res_vals2;
+            DLIB_CASSERT(m1 == res, "m1: \n" << m1 << "\nres: \n" << res);
+
+
         }
 
         {
