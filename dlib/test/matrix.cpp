@@ -1269,6 +1269,19 @@ namespace
             DLIB_CASSERT(remove_row(res,2).nr() == 4,"");
             DLIB_CASSERT(remove_row(res,2).nc() == 5,"");
 
+            temp = matrix<long,5,5>(res_vals);
+            temp = remove_row(res,2);
+            DLIB_CASSERT((temp == matrix<long,4,5>(res_vals_r2)),"");
+            temp = matrix<long,5,5>(res_vals);
+            temp = remove_col(res,3);
+            DLIB_CASSERT((temp == matrix<long,5,4>(res_vals_c3)),"");
+
+            matrix<long,3,1> vect;
+            set_all_elements(vect,1);
+            temp = identity_matrix<long>(3);
+            temp = temp*vect;
+            DLIB_CASSERT(temp == vect,"");
+
             temp = matrix<long,5,4>(res_vals_c3);
             DLIB_CASSERT(remove_col(res,3) == temp,"");
             DLIB_CASSERT(remove_col(res,3)(2,3) == 0,"");

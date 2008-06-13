@@ -253,13 +253,23 @@ namespace dlib
         ) const; 
         /*!
             ensures
-                - returns true if the following expression would evaluate incorrectly and false otherwise:
-                  for (long r = 0; r < nr(); ++r)
-                    for (long c = 0; c < nc(); ++c)
-                      item(r,c) = (*this)(r,c)
-                - That is, if this matrix expression aliases item in such a way that a modification
-                  to element item(r,c) causes a change in the value of something other than
-                  (*this)(r,c) then this function returns true.  Otherwise, returns false
+                - if (aliases(item)) then 
+                    - if (nr() != item.nr() || nc() != item.nc()
+                        - returns true
+                          (i.e. if this expression has different dimensions than item then
+                          we have destructive aliasing)
+
+                    - returns true if the following expression would evaluate incorrectly:
+                      for (long r = 0; r < nr(); ++r)
+                        for (long c = 0; c < nc(); ++c)
+                          item(r,c) = (*this)(r,c)
+                    - That is, if this matrix expression aliases item in such a way that a modification
+                      to element item(r,c) causes a change in the value of something other than
+                      (*this)(r,c) then this function returns true.  
+
+                    - returns false if none of the above conditions say we should return true
+                - else
+                    - returns false
         !*/
 
         const ref_type& ref (
