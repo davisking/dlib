@@ -6,6 +6,21 @@ Hide all windows header files in a cpp file.
 
 
 
+smart pointer that uses a memory manager.   think memory pool with pool pointers
+
+
+make a function to make a vector of vectors look like a matrix
+
+
+implement kmeans++
+
+
+add something to unroll a matrix into a vector
+
+
+add row_cat and col_cat matrix functions
+
+
 
 add a quadratic classifier
 

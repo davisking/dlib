@@ -445,6 +445,8 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#identity_matrix" name="identity_matrix"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#rotate" name="rotate"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#removerc" name="removerc"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#remove_row" name="remove_row"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#remove_col" name="remove_col"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#matrix_cast" name="matrix_cast"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_all_elements" name="set_all_elements"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#tmp" name="tmp"/>
