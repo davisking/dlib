@@ -246,7 +246,7 @@ namespace dlib
                 - R has the same dimensions as m
                 - let eps == 10*std::numeric_limits<matrix_exp::type>::epsilon()
                 - for all valid r and c:
-                    - if (m(r,c) >= eps || m(r,c) <= eps) then
+                    - if (abs(m(r,c)) >= eps) then
                         - R(r,c) == m(r,c)
                     - else
                         - R(r,c) == 0
@@ -266,7 +266,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                    - if (m(r,c) >= eps || m(r,c) <= eps) then
+                    - if (abs(m(r,c)) >= eps) then
                         - R(r,c) == m(r,c)
                     - else
                         - R(r,c) == 0
