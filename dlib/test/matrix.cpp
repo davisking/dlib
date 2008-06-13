@@ -122,6 +122,7 @@ namespace
         matrix<double,2,3> mrc2;
         set_all_elements(mrc2,1);
         DLIB_CASSERT((removerc<1,1>(mrc) == mrc2),"");
+        DLIB_CASSERT((removerc(mrc,1,1) == mrc2),"");
 
         matrix<int,3,3> m4, m5, m6;
         set_all_elements(m4, 4);
@@ -1240,8 +1241,39 @@ namespace
                 4, 4, 4, 4, 4,
                 9, 0, 3, 3, 0
             };
+            long res_vals_c3[] = {
+                9, 0, 3, 0,
+                9, 2, 2, 0,
+                9, 2, 2, 0,
+                4, 4, 4, 4,
+                9, 0, 3, 0
+            };
+            long res_vals_r2[] = {
+                9, 0, 3, 3, 0,
+                9, 2, 2, 2, 0,
+                4, 4, 4, 4, 4,
+                9, 0, 3, 3, 0
+            };
+
+            matrix<long> temp;
 
             res = res_vals;
+
+            temp = matrix<long,4,5>(res_vals_r2);
+            DLIB_CASSERT(remove_row<2>(res) == temp,"");
+            DLIB_CASSERT(remove_row<2>(res)(3,3) == 3,"");
+            DLIB_CASSERT(remove_row<2>(res).nr() == 4,"");
+            DLIB_CASSERT(remove_row<2>(res).nc() == 5,"");
+            DLIB_CASSERT(remove_row(res,2) == temp,"");
+            DLIB_CASSERT(remove_row(res,2)(3,3) == 3,"");
+            DLIB_CASSERT(remove_row(res,2).nr() == 4,"");
+            DLIB_CASSERT(remove_row(res,2).nc() == 5,"");
+
+            temp = matrix<long,5,4>(res_vals_c3);
+            DLIB_CASSERT(remove_col(res,3) == temp,"");
+            DLIB_CASSERT(remove_col(res,3)(2,3) == 0,"");
+            DLIB_CASSERT(remove_col(res,3).nr() == 5,"");
+            DLIB_CASSERT(remove_col(res,3).nc() == 4,"");
 
             set_all_elements(m2, 1);
             set_subm(m1, rectangle(1,1,3,2)) = 2;

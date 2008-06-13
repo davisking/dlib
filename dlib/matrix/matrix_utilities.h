@@ -1177,7 +1177,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-
     template <
         typename M,
         typename S,
@@ -1237,6 +1236,72 @@ namespace dlib
 
         const M m;
         const S s;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename M,
+        typename S,
+        typename OP_
+        >
+    class matrix_scalar_trinary_exp  
+    {
+        /*!
+            REQUIREMENTS ON M 
+                - must be a matrix_exp or matrix_ref object (or
+                  an object with a compatible interface).
+        !*/
+        typedef typename OP_::template op<M> OP;
+
+    public:
+        typedef typename OP::type type;
+        typedef matrix_scalar_trinary_exp ref_type;
+        typedef typename OP::mem_manager_type mem_manager_type;
+        const static long NR = OP::NR;
+        const static long NC = OP::NC;
+
+        matrix_scalar_trinary_exp (
+            const M& m_,
+            const S& s1_,
+            const S& s2_
+        ) :
+            m(m_),
+            s1(s1_),
+            s2(s2_)
+        {
+            COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
+        }
+
+        const typename OP::type operator() (
+            long r, 
+            long c
+        ) const { return OP::apply(m,s1,s2,r,c); }
+
+        template <typename U, long iNR, long iNC, typename MM >
+        bool aliases (
+            const matrix<U,iNR,iNC,MM>& item
+        ) const { return m.aliases(item); }
+
+        template <typename U, long iNR, long iNC , typename MM>
+        bool destructively_aliases (
+            const matrix<U,iNR,iNC,MM>& item
+        ) const { return OP::destructively_aliases(m,item); }
+
+        const ref_type& ref(
+        ) const { return *this; }
+
+        long nr (
+        ) const { return OP::nr(m); }
+
+        long nc (
+        ) const { return OP::nc(m); }
+
+    private:
+
+        const M m;
+        const S s1;
+        const S s2;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -1821,12 +1886,47 @@ namespace dlib
         template <typename EXP>
         struct op : has_destructive_aliasing
         {
-            const static long NR = EXP::NR - 1;
-            const static long NC = EXP::NC - 1;
+            const static long NR = (EXP::NR==0) ? 0 : (EXP::NR - 1);
+            const static long NC = (EXP::NC==0) ? 0 : (EXP::NC - 1);
             typedef typename EXP::type type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
+            { 
+                if (r < R)
+                {
+                    if (c < C)
+                        return m(r,c); 
+                    else
+                        return m(r,c+1); 
+                }
+                else
+                {
+                    if (c < C)
+                        return m(r+1,c); 
+                    else
+                        return m(r+1,c+1); 
+                }
+            }
+
+            template <typename M>
+            static long nr (const M& m) { return m.nr() - 1; }
+            template <typename M>
+            static long nc (const M& m) { return m.nc() - 1; }
+        };
+    };
+
+    struct op_removerc2
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = (EXP::NR==0) ? 0 : (EXP::NR - 1);
+            const static long NC = (EXP::NC==0) ? 0 : (EXP::NC - 1);
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long R, long C, long r, long c)
             { 
                 if (r < R)
                 {
@@ -1861,12 +1961,12 @@ namespace dlib
     )
     {
         // you can't remove a row from a matrix with only one row
-        COMPILE_TIME_ASSERT(EXP::NR > 1 || EXP::NR == 0);
+        COMPILE_TIME_ASSERT(EXP::NR > R || EXP::NR == 0);
         // you can't remove a column from a matrix with only one column 
-        COMPILE_TIME_ASSERT(EXP::NC > 1 || EXP::NR == 0);
-        DLIB_ASSERT(m.nr() > 1 && m.nc() > 1, 
+        COMPILE_TIME_ASSERT(EXP::NC > C || EXP::NR == 0);
+        DLIB_ASSERT(m.nr() > R && m.nc() > C, 
             "\tconst matrix_exp removerc<R,C>(const matrix_exp& m)"
-            << "\n\tYou can't remove a row/column from a matrix with only one row/column"
+            << "\n\tYou can't remove a row/column from a matrix if it doesn't have that row/column"
             << "\n\tm.nr(): " << m.nr()
             << "\n\tm.nc(): " << m.nc() 
             << "\n\tR:      " << R 
@@ -1874,6 +1974,231 @@ namespace dlib
             );
         typedef matrix_unary_exp<matrix_exp<EXP>,op_removerc<R,C> > exp;
         return matrix_exp<exp>(exp(m));
+    }
+
+    template <
+        typename EXP
+        >
+    const matrix_exp<matrix_scalar_trinary_exp<matrix_exp<EXP>,long,op_removerc2> > removerc (
+        const matrix_exp<EXP>& m,
+        long R,
+        long C
+    )
+    {
+        DLIB_ASSERT(m.nr() > R && m.nc() > C, 
+            "\tconst matrix_exp removerc(const matrix_exp& m,R,C)"
+            << "\n\tYou can't remove a row/column from a matrix if it doesn't have that row/column"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tR:      " << R 
+            << "\n\tC:      " << C 
+            );
+        typedef matrix_scalar_trinary_exp<matrix_exp<EXP>,long,op_removerc2 > exp;
+        return matrix_exp<exp>(exp(m,R,C));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <long C>
+    struct op_remove_col
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = EXP::NR;
+            const static long NC = (EXP::NC==0) ? 0 : (EXP::NC - 1);
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                if (c < C)
+                {
+                    return m(r,c); 
+                }
+                else
+                {
+                    return m(r,c+1); 
+                }
+            }
+
+            template <typename M>
+            static long nr (const M& m) { return m.nr(); }
+            template <typename M>
+            static long nc (const M& m) { return m.nc() - 1; }
+        };
+    };
+
+    struct op_remove_col2
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = EXP::NR;
+            const static long NC = (EXP::NC==0) ? 0 : (EXP::NC - 1);
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long C, long r, long c)
+            { 
+                if (c < C)
+                {
+                    return m(r,c); 
+                }
+                else
+                {
+                    return m(r,c+1); 
+                }
+            }
+
+            template <typename M>
+            static long nr (const M& m) { return m.nr(); }
+            template <typename M>
+            static long nc (const M& m) { return m.nc() - 1; }
+        };
+    };
+
+    template <
+        long C,
+        typename EXP
+        >
+    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_remove_col<C> > > remove_col (
+        const matrix_exp<EXP>& m
+    )
+    {
+        // You can't remove the given column from the matrix because the matrix doesn't
+        // have a column with that index.
+        COMPILE_TIME_ASSERT(EXP::NC > C || EXP::NC == 0);
+        DLIB_ASSERT(m.nc() > C , 
+            "\tconst matrix_exp remove_col<C>(const matrix_exp& m)"
+            << "\n\tYou can't remove a col from a matrix if it doesn't have it"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tC:      " << C 
+            );
+        typedef matrix_unary_exp<matrix_exp<EXP>,op_remove_col<C> > exp;
+        return matrix_exp<exp>(exp(m));
+    }
+
+    template <
+        typename EXP
+        >
+    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_remove_col2 > > remove_col (
+        const matrix_exp<EXP>& m,
+        long C
+    )
+    {
+        DLIB_ASSERT(m.nc() > C , 
+            "\tconst matrix_exp remove_col(const matrix_exp& m,C)"
+            << "\n\tYou can't remove a col from a matrix if it doesn't have it"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tC:      " << C 
+            );
+        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_remove_col2 > exp;
+        return matrix_exp<exp>(exp(m,C));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <long R>
+    struct op_remove_row
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = (EXP::NR==0) ? 0 : (EXP::NR - 1);
+            const static long NC = EXP::NC;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                if (r < R)
+                {
+                    return m(r,c); 
+                }
+                else
+                {
+                    return m(r+1,c); 
+                }
+            }
+
+            template <typename M>
+            static long nr (const M& m) { return m.nr() - 1; }
+            template <typename M>
+            static long nc (const M& m) { return m.nc(); }
+        };
+    };
+
+    struct op_remove_row2
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long NR = (EXP::NR==0) ? 0 : (EXP::NR - 1);
+            const static long NC = EXP::NC;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long R, long r, long c)
+            { 
+                if (r < R)
+                {
+                    return m(r,c); 
+                }
+                else
+                {
+                    return m(r+1,c); 
+                }
+            }
+
+            template <typename M>
+            static long nr (const M& m) { return m.nr() - 1; }
+            template <typename M>
+            static long nc (const M& m) { return m.nc(); }
+        };
+    };
+
+    template <
+        long R,
+        typename EXP
+        >
+    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_remove_row<R> > > remove_row (
+        const matrix_exp<EXP>& m
+    )
+    {
+        // You can't remove the given row from the matrix because the matrix doesn't
+        // have a row with that index.
+        COMPILE_TIME_ASSERT(EXP::NR > R || EXP::NR == 0);
+        DLIB_ASSERT(m.nr() > R , 
+            "\tconst matrix_exp remove_row<R>(const matrix_exp& m)"
+            << "\n\tYou can't remove a row from a matrix if it doesn't have it"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tR:      " << R 
+            );
+        typedef matrix_unary_exp<matrix_exp<EXP>,op_remove_row<R> > exp;
+        return matrix_exp<exp>(exp(m));
+    }
+
+    template <
+        typename EXP
+        >
+    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_remove_row2> > remove_row (
+        const matrix_exp<EXP>& m,
+        long R
+    )
+    {
+        DLIB_ASSERT(m.nr() > R , 
+            "\tconst matrix_exp remove_row(const matrix_exp& m, long R)"
+            << "\n\tYou can't remove a row from a matrix if it doesn't have it"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tR:      " << R 
+            );
+        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_remove_row2 > exp;
+        return matrix_exp<exp>(exp(m,R));
     }
 
 // ----------------------------------------------------------------------------------------

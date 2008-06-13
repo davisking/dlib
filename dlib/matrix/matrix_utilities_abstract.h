@@ -369,13 +369,99 @@ namespace dlib
     );
     /*!
         requires
-            - m.nr() > 1
-            - m.nc() > 1
+            - m.nr() > R
+            - m.nc() > C
         ensures
-            - returns a matrix R such that:
-                - R.nr() == m.nr() - 1
-                - R.nc() == m.nc() - 1
-                - R == m with its R row and C column removed
+            - returns a matrix M such that:
+                - M.nr() == m.nr() - 1
+                - M.nc() == m.nc() - 1
+                - M == m with its R row and C column removed
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp removerc (
+        const matrix_exp& m,
+        long R,
+        long C
+    );
+    /*!
+        requires
+            - m.nr() > R
+            - m.nc() > C
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() - 1
+                - M.nc() == m.nc() - 1
+                - M == m with its R row and C column removed
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long R
+        >
+    const matrix_exp remove_row (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.nr() > R
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() - 1
+                - M.nc() == m.nc() 
+                - M == m with its R row removed
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp remove_row (
+        const matrix_exp& m,
+        long R
+    );
+    /*!
+        requires
+            - m.nr() > R
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() - 1
+                - M.nc() == m.nc() 
+                - M == m with its R row removed
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long C
+        >
+    const matrix_exp remove_col (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.nc() > C
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() 
+                - M.nc() == m.nc() - 1 
+                - M == m with its C column removed
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp remove_col (
+        const matrix_exp& m,
+        long C
+    );
+    /*!
+        requires
+            - m.nc() > C
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == m.nr() 
+                - M.nc() == m.nc() - 1 
+                - M == m with its C column removed
     !*/
 
 // ----------------------------------------------------------------------------------------
