@@ -35,20 +35,20 @@ namespace dlib
             unsigned long max_dictionary_size_ = 1000000
         ) : 
             kernel(kernel_), 
-            tolerance(tolerance_),
-            max_dictionary_size(max_dictionary_size_)
+            my_tolerance(tolerance_),
+            my_max_dictionary_size(max_dictionary_size_)
         {
             clear_dictionary();
         }
 
-        scalar_type get_tolerance() const
+        scalar_type tolerance() const
         {
-            return tolerance;
+            return my_tolerance;
         }
 
-        unsigned long get_max_dictionary_size() const
+        unsigned long max_dictionary_size() const
         {
-            return max_dictionary_size;
+            return my_max_dictionary_size;
         }
 
         void clear_dictionary ()
@@ -106,9 +106,9 @@ namespace dlib
 
                 // if this new vector isn't approximately linearly dependent on the vectors
                 // in our dictionary.
-                if (std::abs(delta) > tolerance)
+                if (std::abs(delta) > my_tolerance)
                 {
-                    if (dictionary.size() >= max_dictionary_size)
+                    if (dictionary.size() >= my_max_dictionary_size)
                     {
                         // We need to remove one of the old members of the dictionary before
                         // we proceed with adding a new one.  So remove the oldest one. 
@@ -199,12 +199,12 @@ namespace dlib
             K_inv.swap(item.K_inv);
             K.swap(item.K);
             P.swap(item.P);
-            exchange(tolerance, item.tolerance);
+            exchange(my_tolerance, item.my_tolerance);
             q.swap(item.q);
             a.swap(item.a);
             k.swap(item.k);
             temp_matrix.swap(item.temp_matrix);
-            exchange(max_dictionary_size, item.max_dictionary_size);
+            exchange(my_max_dictionary_size, item.my_max_dictionary_size);
         }
 
         unsigned long dictionary_size (
@@ -229,8 +229,8 @@ namespace dlib
             serialize(item.K_inv, out);
             serialize(item.K, out);
             serialize(item.P, out);
-            serialize(item.tolerance, out);
-            serialize(item.max_dictionary_size, out);
+            serialize(item.my_tolerance, out);
+            serialize(item.my_max_dictionary_size, out);
         }
 
         friend void deserialize(krls& item, std::istream& in)
@@ -241,8 +241,8 @@ namespace dlib
             deserialize(item.K_inv, in);
             deserialize(item.K, in);
             deserialize(item.P, in);
-            deserialize(item.tolerance, in);
-            deserialize(item.max_dictionary_size, in);
+            deserialize(item.my_tolerance, in);
+            deserialize(item.my_max_dictionary_size, in);
         }
 
     private:
@@ -308,8 +308,8 @@ namespace dlib
         matrix<scalar_type,0,0,mem_manager_type> K;
         matrix<scalar_type,0,0,mem_manager_type> P;
 
-        scalar_type tolerance;
-        unsigned long max_dictionary_size;
+        scalar_type my_tolerance;
+        unsigned long my_max_dictionary_size;
 
 
         // temp variables here just so we don't have to reconstruct them over and over.  Thus, 

@@ -55,13 +55,13 @@ namespace dlib
         /*!
             ensures
                 - this object is properly initialized
-                - #get_tolerance() == tolerance_
+                - #tolerance() == tolerance_
                 - #get_decision_function().kernel_function == kernel_
                   (i.e. this object will use the given kernel function)
-                - #get_max_dictionary_size() == max_dictionary_size_
+                - #max_dictionary_size() == max_dictionary_size_
         !*/
 
-        scalar_type get_tolerance(
+        scalar_type tolerance(
         ) const;
         /*!
             ensures
@@ -74,13 +74,13 @@ namespace dlib
                   less accurate decision function but also in less support vectors.
         !*/
 
-        unsigned long get_max_dictionary_size(
+        unsigned long max_dictionary_size(
         ) const;
         /*!
             ensures
                 - returns the maximum number of dictionary vectors this object
                   will use at a time.  That is, dictionary_size() will never be
-                  greater than get_max_dictionary_size().
+                  greater than max_dictionary_size().
         !*/
 
         void clear_dictionary (
@@ -106,7 +106,7 @@ namespace dlib
         /*!
             ensures
                 - trains this object that the given x should be mapped to the given y
-                - if (dictionary_size() == get_max_dictionary_size() and training
+                - if (dictionary_size() == max_dictionary_size() and training
                   would add another dictionary vector to this object) then
                     - discards the oldest dictionary vector so that we can still
                       add a new one and remain below the max number of dictionary

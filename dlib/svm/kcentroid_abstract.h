@@ -57,19 +57,19 @@ namespace dlib
         /*!
             ensures
                 - this object is properly initialized
-                - #get_tolerance() == tolerance_
+                - #tolerance() == tolerance_
                 - #get_decision_function().kernel_function == kernel_
                   (i.e. this object will use the given kernel function)
-                - #get_max_dictionary_size() == max_dictionary_size_
+                - #max_dictionary_size() == max_dictionary_size_
         !*/
 
-        unsigned long get_max_dictionary_size(
+        unsigned long max_dictionary_size(
         ) const;
         /*!
             ensures
                 - returns the maximum number of dictionary vectors this object
                   will use at a time.  That is, dictionary_size() will never be
-                  greater than get_max_dictionary_size().
+                  greater than max_dictionary_size().
         !*/
 
         scalar_type samples_trained (
@@ -79,7 +79,7 @@ namespace dlib
                 - returns the number of samples this object has been trained on so far
         !*/
 
-        scalar_type get_tolerance(
+        scalar_type tolerance(
         ) const;
         /*!
             ensures
