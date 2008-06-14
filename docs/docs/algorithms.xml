@@ -787,6 +787,7 @@
 
          <examples>
             <example>krls_ex.cpp.html</example>
+            <example>krls_filter_ex.cpp.html</example>
          </examples>
                                  
       </component>
