@@ -90,21 +90,26 @@ namespace dlib
         !*/
 
         template <
-            typename matrix_type
+            typename matrix_type,
+            typename matrix_type2
             >
         void train (
             const matrix_type& samples,
-            const matrix_type& initial_centers 
+            const matrix_type2& initial_centers,
+            long max_iter = 1000000
         );
         /*!
             requires
                 - matrix_type::type == sample_type  (i.e. matrix_type should contain sample_type objects)
+                - matrix_type2::type == sample_type (i.e. matrix_type2 should contain sample_type objects)
                 - initial_centers.nc() == 1         (i.e. must be a column vector)
                 - samples.nc() == 1                 (i.e. must be a column vector)
                 - initial_centers.nr() == number_of_centers()
             ensures
                 - performs k-means clustering of the given set of samples.  The initial center points
                   are taken from the initial_centers argument.
+                - loops over the data and continues to refine the clustering until either the cluster centers
+                  don't move or we have done max_iter iterations over the data.
                 - After this function finishes you can call the operator() function below
                   to determine which centroid a given sample is closest to.
         !*/

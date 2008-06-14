@@ -80,13 +80,15 @@ namespace dlib
             return centers.size();
         }
 
-        template <typename matrix_type>
+        template <typename matrix_type, typename matrix_type2>
         void train (
             const matrix_type& samples,
-            const matrix_type& initial_centers 
+            const matrix_type2& initial_centers,
+            long max_iter = 1000000
         )
         {
             COMPILE_TIME_ASSERT((is_same_type<typename matrix_type::type, sample_type>::value));
+            COMPILE_TIME_ASSERT((is_same_type<typename matrix_type2::type, sample_type>::value));
 
             // make sure requires clause is not broken
             DLIB_ASSERT(samples.nc() == 1 && initial_centers.nc() == 1 &&
@@ -111,8 +113,10 @@ namespace dlib
             bool assignment_changed = true;
 
             // loop until the centers stabilize 
-            while (assignment_changed)
+            long count = 0;
+            while (assignment_changed && count < max_iter)
             {
+                ++count;
                 assignment_changed = false;
 
                 // loop over all the samples and assign them to their closest centers
