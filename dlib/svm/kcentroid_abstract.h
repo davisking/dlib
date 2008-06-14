@@ -23,7 +23,7 @@ namespace dlib
 
             INITIAL VALUE
                 - dictionary_size() == 0
-                - max_discount() == 1e6
+                - samples_trained() == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of an online algorithm for recursively estimating the
@@ -34,6 +34,13 @@ namespace dlib
                 and any test points.  So you can use this object to predict how similar a test
                 point is to the data this object has been trained on (larger distances from the
                 centroid indicate dissimilarity/anomalous points).
+
+                Also note that the algorithm internally keeps a set of "dictionary vectors" 
+                that are used to represent the regression function.  You can force the 
+                algorithm to use no more than a set number of vectors by setting 
+                the 3rd constructor argument to whatever you want.  However, note that 
+                doing this causes the algorithm to bias it's results towards more 
+                recent training examples.  
         !*/
 
     public:
@@ -44,7 +51,8 @@ namespace dlib
 
         explicit kcentroid (
             const kernel_type& kernel_, 
-            scalar_type tolerance_ = 0.001
+            scalar_type tolerance_ = 0.001,
+            unsigned long max_dictionary_size_ = 1000000
         );
         /*!
             ensures
@@ -52,16 +60,23 @@ namespace dlib
                 - #get_tolerance() == tolerance_
                 - #get_decision_function().kernel_function == kernel_
                   (i.e. this object will use the given kernel function)
+                - #get_max_dictionary_size() == max_dictionary_size_
         !*/
 
-        void set_tolerance (
-            scalar_type tolerance_
-        );
+        unsigned long get_max_dictionary_size(
+        ) const;
         /*!
-            requires
-                - tolerance_ >= 0
             ensures
-                - #get_tolerance() == tolerance_
+                - returns the maximum number of dictionary vectors this object
+                  will use at a time.  That is, dictionary_size() will never be
+                  greater than get_max_dictionary_size().
+        !*/
+
+        scalar_type samples_trained (
+        ) const;
+        /*!
+            ensures
+                - returns the number of samples this object has been trained on so far
         !*/
 
         scalar_type get_tolerance(
@@ -77,42 +92,12 @@ namespace dlib
                   less accurate estimate but also in less support vectors.
         !*/
 
-        void set_max_discount (
-            scalar_type value 
-        );
-        /*!
-            requires
-                - value > 0
-            ensures
-                - #get_max_discount() == value 
-        !*/
-
-        scalar_type get_max_discount(
-        ) const;
-        /*!
-            ensures
-                - If you have shown this object N samples so far then it has found 
-                  the centroid of those N samples.  That is, it has found the average 
-                  of all of them in some high dimensional feature space. 
-                - if (N <= get_max_discount()) then
-                    - The next sample you show this object will be added to the centroid 
-                      with a weight of 1/(N+1).  
-                - else
-                    - The next sample you show this object will be added to the centroid 
-                      with a weight of 1/(get_max_discount()+1).  
-
-                - If you think your samples are from a stationary source then you
-                  should set the max discount to some really big number.  However, 
-                  if you think the source isn't stationary then use a smaller number.
-                  This will cause the centroid in this object to be closer to the 
-                  centroid of the more recent points.
-        !*/
-
         void clear_dictionary (
         );
         /*!
             ensures
                 - clears out all learned data (e.g. #dictionary_size() == 0)
+                - #samples_seen() == 0
         !*/
 
         scalar_type operator() (
@@ -123,6 +108,31 @@ namespace dlib
                 - returns the distance in feature space between the sample x and the
                   current estimate of the centroid of the training samples given
                   to this object so far.
+        !*/
+
+        void train (
+            const sample_type& x
+        );
+        /*!
+            ensures
+                - adds the sample x into the current estimate of the centroid
+                - also note that calling this function is equivalent to calling
+                  train(x, samples_trained()/(samples_trained()+1.0, 1.0/(samples_trained()+1.0).  
+                  That is, this function finds the normal unweighted centroid of all training points.
+        !*/
+
+        void train (
+            const sample_type& x,
+            double cscale,
+            double xscale
+        );
+        /*!
+            ensures
+                - adds the sample x into the current estimate of the centroid but
+                  uses a user given scale.  That is, this function performs:
+                    - new_centroid = cscale*old_centroid + xscale*x
+                - This function allows you to weight different samples however 
+                  you want.
         !*/
 
         scalar_type test_and_train (
@@ -137,12 +147,18 @@ namespace dlib
                   than calling both individually.
         !*/
 
-        void train (
-            const sample_type& x
+        scalar_type test_and_train (
+            const sample_type& x,
+            double cscale,
+            double xscale
         );
         /*!
             ensures
-                - adds the sample x into the current estimate of the centroid
+                - calls train(x,cscale,xscale)
+                - returns (*this)(x)
+                - The reason this function exists is because train() and operator() 
+                  both compute some of the same things.  So this function is more efficient
+                  than calling both individually.
         !*/
 
         void swap (

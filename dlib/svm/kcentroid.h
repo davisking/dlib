@@ -36,25 +36,14 @@ namespace dlib
 
         explicit kcentroid (
             const kernel_type& kernel_, 
-            scalar_type tolerance_ = 0.001
+            scalar_type tolerance_ = 0.001,
+            unsigned long max_dictionary_size_ = 1000000
         ) : 
             kernel(kernel_), 
             tolerance(tolerance_),
-            max_dis(1e6)
+            max_dictionary_size(max_dictionary_size_)
         {
             clear_dictionary();
-        }
-
-        void set_tolerance (scalar_type tolerance_)
-        {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(tolerance_ >= 0,
-                "\tvoid kcentroid::set_tolerance"
-                << "\n\tinvalid tolerance value"
-                << "\n\ttolerance: " << tolerance_
-                << "\n\tthis: " << this
-                );
-            tolerance = tolerance_;
         }
 
         scalar_type get_tolerance() const
@@ -62,26 +51,9 @@ namespace dlib
             return tolerance;
         }
 
-        void set_max_discount (
-            scalar_type value 
-        )
+        unsigned long get_max_dictionary_size() const
         {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(value >= 0,
-                "\tvoid kcentroid::set_max_discount"
-                << "\n\tinvalid discount value"
-                << "\n\tvalue: " << value 
-                << "\n\tthis: " << this
-                );
-            max_dis = value;
-            if (samples_seen > value)
-                samples_seen = value;
-        }
-
-        scalar_type get_max_discount(
-        ) const
-        {
-            return max_dis;
+            return max_dictionary_size;
         }
 
         void clear_dictionary ()
@@ -90,6 +62,7 @@ namespace dlib
             alpha.clear();
 
             K_inv.set_size(0,0);
+            K.set_size(0,0);
             samples_seen = 0;
             bias = 0;
         }
@@ -105,18 +78,50 @@ namespace dlib
             return std::sqrt(kernel(x,x) + bias - 2*temp);
         }
 
+        double samples_trained (
+        ) const
+        {
+            return samples_seen;
+        }
+
         scalar_type test_and_train (
             const sample_type& x
         )
         {
-            return train_and_maybe_test(x,true);
+            ++samples_seen;
+            const double xscale = 1.0/samples_seen;
+            const double cscale = 1-xscale;
+            return train_and_maybe_test(x,cscale,xscale,true);
         }
 
         void train (
             const sample_type& x
         )
         {
-            train_and_maybe_test(x,false);
+            ++samples_seen;
+            const double xscale = 1.0/samples_seen;
+            const double cscale = 1-xscale;
+            train_and_maybe_test(x,cscale,xscale,false);
+        }
+
+        scalar_type test_and_train (
+            const sample_type& x,
+            double cscale,
+            double xscale
+        )
+        {
+            ++samples_seen;
+            return train_and_maybe_test(x,cscale,xscale,true);
+        }
+
+        void train (
+            const sample_type& x,
+            double cscale,
+            double xscale
+        )
+        {
+            ++samples_seen;
+            train_and_maybe_test(x,cscale,xscale,false);
         }
 
         void swap (
@@ -131,7 +136,6 @@ namespace dlib
             exchange(tolerance, item.tolerance);
             exchange(samples_seen, item.samples_seen);
             exchange(bias, item.bias);
-            exchange(max_dis, item.max_dis);
             a.swap(item.a);
             k.swap(item.k);
         }
@@ -149,7 +153,6 @@ namespace dlib
             serialize(item.tolerance, out);
             serialize(item.samples_seen, out);
             serialize(item.bias, out);
-            serialize(item.max_dis, out);
         }
 
         friend void deserialize(kcentroid& item, std::istream& in)
@@ -162,13 +165,14 @@ namespace dlib
             deserialize(item.tolerance, in);
             deserialize(item.samples_seen, in);
             deserialize(item.bias, in);
-            deserialize(item.max_dis, in);
         }
 
     private:
 
         scalar_type train_and_maybe_test (
             const sample_type& x,
+            double cscale,
+            double xscale,
             bool do_test
         )
         {
@@ -183,7 +187,7 @@ namespace dlib
                 K.set_size(1,1);
                 K(0,0) = kx;
 
-                alpha.push_back(1.0);
+                alpha.push_back(xscale);
                 dictionary.push_back(x);
             }
             else
@@ -201,12 +205,25 @@ namespace dlib
                 // compute the error we would have if we approximated the new x sample
                 // with the dictionary.  That is, do the ALD test from the KRLS paper.
                 a = K_inv*k;
-                const scalar_type delta = kx - trans(k)*a;
+                scalar_type delta = kx - trans(k)*a;
 
                 // if this new vector isn't approximately linearly dependent on the vectors
                 // in our dictionary.
                 if (std::abs(delta) > tolerance)
                 {
+                    if (dictionary.size() >= max_dictionary_size)
+                    {
+                        // We need to remove one of the old members of the dictionary before
+                        // we proceed with adding a new one.  So remove the oldest one. 
+                        remove_dictionary_vector(0);
+
+                        // recompute these guys since they were computed with the old
+                        // kernel matrix
+                        k = remove_row(k,0);
+                        a = K_inv*k;
+                        delta = kx - trans(k)*a;
+                    }
+
                     // add x to the dictionary
                     dictionary.push_back(x);
 
@@ -239,36 +256,67 @@ namespace dlib
 
 
                     // now update the alpha vector 
-                    const double alpha_scale = samples_seen/(samples_seen+1);
                     for (unsigned long i = 0; i < alpha.size(); ++i)
                     {
-                        alpha[i] *= alpha_scale;
+                        alpha[i] *= cscale;
                     }
-                    alpha.push_back(1.0-alpha_scale);
+                    alpha.push_back(xscale);
                 }
                 else
                 {
                     // update the alpha vector so that this new sample has been added into
                     // the mean vector we are accumulating
-                    const double alpha_scale = samples_seen/(samples_seen+1);
-                    const double a_scale = 1.0-alpha_scale;
                     for (unsigned long i = 0; i < alpha.size(); ++i)
                     {
-                        alpha[i] = alpha_scale*alpha[i] + a_scale*a(i);
+                        alpha[i] = cscale*alpha[i] + xscale*a(i);
                     }
                 }
             }
 
-            ++samples_seen;
-
             // recompute the bias term
             bias = sum(pointwise_multiply(K, vector_to_matrix(alpha)*trans(vector_to_matrix(alpha))));
             
-            if (samples_seen > max_dis)
-                samples_seen = max_dis;
-
             return test_result;
         }
+
+        void remove_dictionary_vector (
+            long i
+        )
+        /*!
+            requires
+                - 0 <= i < dictionary.size()
+            ensures
+                - #dictionary.size() == dictionary.size() - 1
+                - #alpha.size() == alpha.size() - 1
+                - updates the K_inv matrix so that it is still a proper inverse of the
+                  kernel matrix
+                - also removes the necessary row and column from the K matrix
+                - uses the this->a variable so after this function runs that variable
+                  will contain a different value.  
+        !*/
+        {
+            // remove the dictionary vector 
+            dictionary.erase(dictionary.begin()+i);
+
+            // remove the i'th vector from the inverse kernel matrix.  This formula is basically
+            // just the reverse of the way K_inv is updated by equation 3.14 during normal training.
+            K_inv = removerc(K_inv,i,i) - remove_row(colm(K_inv,i)/K_inv(i,i),i)*remove_col(rowm(K_inv,i),i);
+
+            // now compute the updated alpha values to take account that we just removed one of 
+            // our dictionary vectors
+            a = (K_inv*remove_row(K,i)*vector_to_matrix(alpha));
+
+            // now copy over the new alpha values
+            alpha.resize(alpha.size()-1);
+            for (unsigned long k = 0; k < alpha.size(); ++k)
+            {
+                alpha[k] = a(k);
+            }
+
+            // update the K matrix as well
+            K = removerc(K,i,i);
+        }
+
 
 
         typedef std_allocator<sample_type, mem_manager_type> alloc_sample_type;
@@ -285,9 +333,9 @@ namespace dlib
         matrix<scalar_type,0,0,mem_manager_type> K;
 
         scalar_type tolerance;
+        unsigned long max_dictionary_size;
         scalar_type samples_seen;
         scalar_type bias;
-        scalar_type max_dis;
 
 
         // temp variables here just so we don't have to reconstruct them over and over.  Thus, 
