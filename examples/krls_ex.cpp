@@ -60,10 +60,11 @@ int main()
     m(0) = 5.0; cout << sinc(m(0)) << "   " << test(m) << endl;
 
     // The output is as follows:
-    // 0.239389   0.238808
-    // 0.998334   0.997779
-    // -0.189201   -0.189754
-    // -0.191785   -0.1979
+    // 0.239389   0.239362
+    // 0.998334   0.998333
+    // -0.189201   -0.189201
+    // -0.191785   -0.197267
+
 
     // The first column is the true value of the sinc function and the second
     // column is the output from the krls estimate.  
