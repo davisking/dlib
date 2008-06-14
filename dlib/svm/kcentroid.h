@@ -214,12 +214,14 @@ namespace dlib
                     if (dictionary.size() >= my_max_dictionary_size)
                     {
                         // We need to remove one of the old members of the dictionary before
-                        // we proceed with adding a new one.  So remove the oldest one. 
-                        remove_dictionary_vector(0);
+                        // we proceed with adding a new one.  So remove the oldest dictionary vector.
+                        const long idx_to_remove = 0;
+
+                        remove_dictionary_vector(idx_to_remove);
 
                         // recompute these guys since they were computed with the old
                         // kernel matrix
-                        k = remove_row(k,0);
+                        k = remove_row(k,idx_to_remove);
                         a = K_inv*k;
                         delta = kx - trans(k)*a;
                     }
