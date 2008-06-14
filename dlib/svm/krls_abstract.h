@@ -32,6 +32,13 @@ namespace dlib
                 The long and short of this algorithm is that it is an online kernel based 
                 regression algorithm.  You give it samples (x,y) and it learns the function
                 f(x) == y.  For a detailed description of the algorithm read the above paper.
+
+                Also note that the algorithm internally keeps a set of "dictionary vectors" 
+                that are used to represent the regression function.  You can force the 
+                algorithm to use no more than a set number of vectors by setting 
+                the 3rd constructor argument to whatever you want.  However, note that 
+                doing this causes the algorithm to bias it's results towards more 
+                recent training examples.  
         !*/
 
     public:
@@ -42,7 +49,8 @@ namespace dlib
 
         explicit krls (
             const kernel_type& kernel_, 
-            scalar_type tolerance_ = 0.001
+            scalar_type tolerance_ = 0.001,
+            unsigned long max_dictionary_size_ = 1000000
         );
         /*!
             ensures
@@ -50,16 +58,7 @@ namespace dlib
                 - #get_tolerance() == tolerance_
                 - #get_decision_function().kernel_function == kernel_
                   (i.e. this object will use the given kernel function)
-        !*/
-
-        void set_tolerance (
-            scalar_type tolerance_
-        );
-        /*!
-            requires
-                - tolerance_ >= 0
-            ensures
-                - #get_tolerance() == tolerance_
+                - #get_max_dictionary_size() == max_dictionary_size_
         !*/
 
         scalar_type get_tolerance(
@@ -73,6 +72,15 @@ namespace dlib
                   estimate while also resulting in a bigger set of support vectors in 
                   the learned decision function.  Bigger tolerances values result in a 
                   less accurate decision function but also in less support vectors.
+        !*/
+
+        unsigned long get_max_dictionary_size(
+        ) const;
+        /*!
+            ensures
+                - returns the maximum number of dictionary vectors this object
+                  will use at a time.  That is, dictionary_size() will never be
+                  greater than get_max_dictionary_size().
         !*/
 
         void clear_dictionary (
@@ -98,6 +106,11 @@ namespace dlib
         /*!
             ensures
                 - trains this object that the given x should be mapped to the given y
+                - if (dictionary_size() == get_max_dictionary_size() and training
+                  would add another dictionary vector to this object) then
+                    - discards the oldest dictionary vector so that we can still
+                      add a new one and remain below the max number of dictionary
+                      vectors.
         !*/
 
         void swap (

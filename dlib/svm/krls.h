@@ -31,29 +31,24 @@ namespace dlib
 
         explicit krls (
             const kernel_type& kernel_, 
-            scalar_type tolerance_ = 0.001
+            scalar_type tolerance_ = 0.001,
+            unsigned long max_dictionary_size_ = 1000000
         ) : 
             kernel(kernel_), 
-            tolerance(tolerance_)
+            tolerance(tolerance_),
+            max_dictionary_size(max_dictionary_size_)
         {
             clear_dictionary();
-        }
-
-        void set_tolerance (scalar_type tolerance_)
-        {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(tolerance_ >= 0,
-                "\tvoid krls::set_tolerance"
-                << "\n\tinvalid tolerance value"
-                << "\n\ttolerance: " << tolerance_
-                << "\n\tthis: " << this
-                );
-            tolerance = tolerance_;
         }
 
         scalar_type get_tolerance() const
         {
             return tolerance;
+        }
+
+        unsigned long get_max_dictionary_size() const
+        {
+            return max_dictionary_size;
         }
 
         void clear_dictionary ()
@@ -62,6 +57,7 @@ namespace dlib
             alpha.clear();
 
             K_inv.set_size(0,0);
+            K.set_size(0,0);
             P.set_size(0,0);
         }
 
@@ -71,7 +67,7 @@ namespace dlib
         {
             scalar_type temp = 0;
             for (unsigned long i = 0; i < alpha.size(); ++i)
-                temp += alpha[i]*kernel(dictionary[i], x);
+                temp += alpha[i]*kern(dictionary[i], x);
 
             return temp;
         }
@@ -88,6 +84,8 @@ namespace dlib
 
                 K_inv.set_size(1,1);
                 K_inv(0,0) = 1/kx;
+                K.set_size(1,1);
+                K(0,0) = kx;
 
                 alpha.push_back(y/kx);
                 dictionary.push_back(x);
@@ -104,12 +102,25 @@ namespace dlib
                 // compute the error we would have if we approximated the new x sample
                 // with the dictionary.  That is, do the ALD test from the KRLS paper.
                 a = K_inv*k;
-                const scalar_type delta = kx - trans(k)*a;
+                scalar_type delta = kx - trans(k)*a;
 
                 // if this new vector isn't approximately linearly dependent on the vectors
                 // in our dictionary.
                 if (std::abs(delta) > tolerance)
                 {
+                    if (dictionary.size() >= max_dictionary_size)
+                    {
+                        // We need to remove one of the old members of the dictionary before
+                        // we proceed with adding a new one.  So remove the oldest one. 
+                        remove_dictionary_vector(0);
+
+                        // recompute these guys since they were computed with the old
+                        // kernel matrix
+                        k = remove_row(k,0);
+                        a = K_inv*k;
+                        delta = kx - trans(k)*a;
+                    }
+
                     // add x to the dictionary
                     dictionary.push_back(x);
 
@@ -125,6 +136,22 @@ namespace dlib
                     temp(K_inv.nr(), K_inv.nc()) = 1/delta;
                     // put temp into K_inv
                     temp.swap(K_inv);
+
+
+
+
+                    // update K (the kernel matrix)
+                    temp.set_size(K.nr()+1, K.nc()+1);
+                    set_subm(temp, get_rect(K)) = K;
+                    // update the right column of the matrix
+                    set_subm(temp, 0, K.nr(),K.nr(),1) = k;
+                    // update the bottom row of the matrix
+                    set_subm(temp, K.nr(), 0, 1, K.nr()) = trans(k);
+                    temp(K.nr(), K.nc()) = kx;
+                    // put temp into K
+                    temp.swap(K);
+
+
 
 
                     // Now update the P matrix (equation 3.15)
@@ -170,12 +197,14 @@ namespace dlib
             dictionary.swap(item.dictionary);
             alpha.swap(item.alpha);
             K_inv.swap(item.K_inv);
+            K.swap(item.K);
             P.swap(item.P);
             exchange(tolerance, item.tolerance);
             q.swap(item.q);
             a.swap(item.a);
             k.swap(item.k);
             temp_matrix.swap(item.temp_matrix);
+            exchange(max_dictionary_size, item.max_dictionary_size);
         }
 
         unsigned long dictionary_size (
@@ -186,7 +215,7 @@ namespace dlib
         {
             return decision_function<kernel_type>(
                 vector_to_matrix(alpha),
-                0, // the KRLS algorithm doesn't have a bias term
+                -sum(vector_to_matrix(alpha))*tau, 
                 kernel,
                 vector_to_matrix(dictionary)
             );
@@ -198,8 +227,10 @@ namespace dlib
             serialize(item.dictionary, out);
             serialize(item.alpha, out);
             serialize(item.K_inv, out);
+            serialize(item.K, out);
             serialize(item.P, out);
             serialize(item.tolerance, out);
+            serialize(item.max_dictionary_size, out);
         }
 
         friend void deserialize(krls& item, std::istream& in)
@@ -208,15 +239,58 @@ namespace dlib
             deserialize(item.dictionary, in);
             deserialize(item.alpha, in);
             deserialize(item.K_inv, in);
+            deserialize(item.K, in);
             deserialize(item.P, in);
             deserialize(item.tolerance, in);
+            deserialize(item.max_dictionary_size, in);
         }
 
     private:
 
         inline scalar_type kern (const sample_type& m1, const sample_type& m2) const
         { 
-            return kernel(m1,m2) + 0.001;
+            return kernel(m1,m2) + tau;
+        }
+
+        void remove_dictionary_vector (
+            long i
+        )
+        /*!
+            requires
+                - 0 <= i < dictionary.size()
+            ensures
+                - #dictionary.size() == dictionary.size() - 1
+                - #alpha.size() == alpha.size() - 1
+                - updates the K_inv matrix so that it is still a proper inverse of the
+                  kernel matrix
+                - also removes the necessary row and column from the K matrix
+                - uses the this->a variable so after this function runs that variable
+                  will contain a different value.  
+        !*/
+        {
+            // remove the dictionary vector 
+            dictionary.erase(dictionary.begin()+i);
+
+            // remove the i'th vector from the inverse kernel matrix.  This formula is basically
+            // just the reverse of the way K_inv is updated by equation 3.14 during normal training.
+            K_inv = removerc(K_inv,i,i) - remove_row(colm(K_inv,i)/K_inv(i,i),i)*remove_col(rowm(K_inv,i),i);
+
+            // now compute the updated alpha values to take account that we just removed one of 
+            // our dictionary vectors
+            a = (K_inv*remove_row(K,i)*vector_to_matrix(alpha));
+
+            // now copy over the new alpha values
+            alpha.resize(alpha.size()-1);
+            for (unsigned long k = 0; k < alpha.size(); ++k)
+            {
+                alpha[k] = a(k);
+            }
+
+            // update the P matrix as well
+            P = removerc(P,i,i);
+
+            // update the K matrix as well
+            K = removerc(K,i,i);
         }
 
 
@@ -231,9 +305,11 @@ namespace dlib
         alpha_vector_type alpha;
 
         matrix<scalar_type,0,0,mem_manager_type> K_inv;
+        matrix<scalar_type,0,0,mem_manager_type> K;
         matrix<scalar_type,0,0,mem_manager_type> P;
 
         scalar_type tolerance;
+        unsigned long max_dictionary_size;
 
 
         // temp variables here just so we don't have to reconstruct them over and over.  Thus, 
@@ -242,6 +318,8 @@ namespace dlib
         matrix<scalar_type,0,1,mem_manager_type> a;
         matrix<scalar_type,0,1,mem_manager_type> k;
         matrix<scalar_type,1,0,mem_manager_type> temp_matrix;
+
+        const static double tau = 0.01;
 
     };
 
