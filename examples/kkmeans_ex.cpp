@@ -101,10 +101,9 @@ int main()
     test.set_number_of_centers(3);
 
     // You need to pick some initial centers for the k-means algorithm.  So here
-    // we will pick a point from each of the classes.
-    initial_centers.push_back(samples[0]);
-    initial_centers.push_back(samples[num]);
-    initial_centers.push_back(samples[num*2]);
+    // we will use the dlib::pick_initial_centers() function which tries to find
+    // n points that are far apart (basically).  
+    pick_initial_centers(3, initial_centers, samples, test.get_kernel());
 
     // now run the k-means algorithm on our set of samples.  Note that the train function expects
     // its arguments to be dlib::matrix objects so since we have our samples in std::vector objects
