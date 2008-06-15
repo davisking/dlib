@@ -247,6 +247,14 @@ namespace dlib
         double percentile = 0.01
     )
     {
+        /*
+            This function is basically just a non-randomized version of the kmeans++ algorithm
+            described in the paper:
+                kmeans++: The Advantages of Careful Seeding by Arthur and Vassilvitskii
+
+        */
+
+
         // make sure requires clause is not broken
         DLIB_CASSERT(num_centers > 1 && 0 <= percentile && percentile < 1 && samples.size() > 1,
             "\tvoid pick_initial_centers()"
