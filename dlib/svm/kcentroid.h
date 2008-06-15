@@ -56,6 +56,12 @@ namespace dlib
             return my_max_dictionary_size;
         }
 
+        const kernel_type& get_kernel (
+        ) const
+        {
+            return kernel;
+        }
+
         void clear_dictionary ()
         {
             dictionary.clear();

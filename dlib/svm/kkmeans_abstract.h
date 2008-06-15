@@ -71,6 +71,13 @@ namespace dlib
                   by the k-means clustering algorithm.
         !*/
 
+        const kernel_type& get_kernel (
+        ) const;
+        /*!
+            ensures
+                - returns a const reference to the kernel used by this object
+        !*/
+
         void set_number_of_centers (
             unsigned long num
         );

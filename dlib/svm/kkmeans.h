@@ -39,6 +39,12 @@ namespace dlib
         {
         }
 
+        const kernel_type& get_kernel (
+        ) const
+        {
+            return kc.get_kernel();
+        }
+
         void set_kcentroid (
             const kcentroid<kernel_type>& kc_
         )
@@ -92,7 +98,7 @@ namespace dlib
 
             // make sure requires clause is not broken
             DLIB_ASSERT(samples.nc() == 1 && initial_centers.nc() == 1 &&
-                         initial_centers.nr() == number_of_centers(),
+                         initial_centers.nr() == static_cast<long>(number_of_centers()),
                 "\tvoid kkmeans::train()"
                 << "\n\tInvalid arguments to this function"
                 << "\n\tthis: " << this

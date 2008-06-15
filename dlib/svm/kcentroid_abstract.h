@@ -58,9 +58,15 @@ namespace dlib
             ensures
                 - this object is properly initialized
                 - #tolerance() == tolerance_
-                - #get_decision_function().kernel_function == kernel_
-                  (i.e. this object will use the given kernel function)
+                - #get_kernel() == kernel_
                 - #max_dictionary_size() == max_dictionary_size_
+        !*/
+
+        const kernel_type& get_kernel (
+        ) const;
+        /*!
+            ensures
+                - returns a const reference to the kernel used by this object
         !*/
 
         unsigned long max_dictionary_size(

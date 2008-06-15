@@ -58,6 +58,7 @@ namespace dlib
                 - #tolerance() == tolerance_
                 - #get_decision_function().kernel_function == kernel_
                   (i.e. this object will use the given kernel function)
+                - #get_kernel() == kernel_
                 - #max_dictionary_size() == max_dictionary_size_
         !*/
 
@@ -72,6 +73,13 @@ namespace dlib
                   estimate while also resulting in a bigger set of support vectors in 
                   the learned decision function.  Bigger tolerances values result in a 
                   less accurate decision function but also in less support vectors.
+        !*/
+
+        const kernel_type& get_kernel (
+        ) const;
+        /*!
+            ensures
+                - returns a const reference to the kernel used by this object
         !*/
 
         unsigned long max_dictionary_size(
