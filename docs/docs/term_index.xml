@@ -392,6 +392,8 @@
          <term link="algorithms.html#krls" name="krls"/>
          <term link="algorithms.html#kcentroid" name="kcentroid"/>
          <term link="algorithms.html#kkmeans" name="kkmeans"/>
+         <term link="algorithms.html#pick_initial_centers" name="pick_initial_centers"/>
+
          
          <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>
 
