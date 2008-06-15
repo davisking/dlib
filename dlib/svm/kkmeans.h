@@ -13,6 +13,7 @@
 #include "kkmeans_abstract.h"
 #include "../noncopyable.h"
 #include "../smart_pointers.h"
+#include <vector>
 
 namespace dlib
 {
@@ -223,6 +224,74 @@ namespace dlib
     template <typename kernel_type>
     void swap(kkmeans<kernel_type>& a, kkmeans<kernel_type>& b)
     { a.swap(b); }
+
+// ----------------------------------------------------------------------------------------
+
+    struct dlib_pick_initial_centers_data
+    {
+        dlib_pick_initial_centers_data():idx(0), dist(1e200){}
+        long idx;
+        double dist;
+        bool operator< (const dlib_pick_initial_centers_data& d) const { return dist < d.dist; }
+    };
+
+    template <
+        typename vector_type, 
+        typename kernel_type
+        >
+    void pick_initial_centers(
+        long num_centers, 
+        vector_type& centers, 
+        const vector_type& samples, 
+        const kernel_type& k, 
+        double percentile = 0.01
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(num_centers > 1 && 0 <= percentile && percentile < 1 && samples.size() > 1,
+            "\tvoid pick_initial_centers()"
+            << "\n\tYou passed invalid arguments to this function"
+            << "\n\tnum_centers: " << num_centers 
+            << "\n\tpercentile: " << percentile 
+            << "\n\tsamples.size(): " << samples.size() 
+            );
+
+        std::vector<dlib_pick_initial_centers_data> scores(samples.size());
+        std::vector<dlib_pick_initial_centers_data> scores_sorted(samples.size());
+        centers.clear();
+
+        // pick the first sample as one of the centers
+        centers.push_back(samples[0]);
+
+        const long best_idx = samples.size() - samples.size()*percentile - 1;
+
+        // pick the next center
+        for (long i = 0; i < num_centers-1; ++i)
+        {
+            // Loop over the samples and compare them to the most recent center.  Store
+            // the distance from each sample to its closest center in scores.
+            const double k_cc = k(centers[i], centers[i]);
+            for (unsigned long s = 0; s < samples.size(); ++s)
+            {
+                // compute the distance between this sample and the current center
+                const double dist = k_cc + k(samples[s],samples[s]) - 2*k(samples[s], centers[i]);
+
+                if (dist < scores[s].dist)
+                {
+                    scores[s].dist = dist;
+                    scores[s].idx = s;
+                }
+            }
+
+            scores_sorted = scores;
+
+            // now find the winning center and add it to centers.  It is the one that is 
+            // far away from all the other centers.
+            sort(scores_sorted.begin(), scores_sorted.end());
+            centers.push_back(samples[scores_sorted[best_idx].idx]);
+        }
+        
+    }
 
 // ----------------------------------------------------------------------------------------
 

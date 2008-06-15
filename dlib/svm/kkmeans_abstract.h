@@ -178,6 +178,38 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename vector_type, 
+        typename kernel_type
+        >
+    void pick_initial_centers(
+        long num_centers, 
+        vector_type& centers, 
+        const vector_type& samples, 
+        const kernel_type& k, 
+        double percentile = 0.01
+    );
+    /*!
+        requires
+            - num_centers > 1
+            - 0 <= percentile < 1
+            - samples.size() > 1
+            - vector_type == something with an interface compatible with std::vector
+            - k(samples[0],samples[0]) must be a valid expression that returns a double
+        ensures
+            - finds num_centers candidate cluster centers in the data in the samples 
+              vector.  Assumes that k is the kernel that will be used during clustering 
+              to define the space in which clustering occurs.
+            - The centers are found by looking for points that are far away from other 
+              candidate centers.  However, if the data is noisy you probably want to 
+              ignore the farthest way points since they will be outliers.  To do this 
+              set percentile to the fraction of outliers you expect the data to contain.
+            - #centers.size() == num_centers
+            - #centers == a vector containing the candidate centers found
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_KKMEANs_ABSTRACT_
