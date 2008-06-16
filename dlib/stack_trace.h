@@ -54,7 +54,10 @@
 
 // only setup the stack trace stuff if the asserts are enabled (which happens in debug mode
 // basically).  Also, this stuff doesn't work if you use NO_MAKEFILE
-#if defined(DLIB_ENABLE_STACK_TRACE) && !defined(NO_MAKEFILE)
+#if defined(DLIB_ENABLE_STACK_TRACE) 
+#ifdef NO_MAKEFILE 
+#error "You can't use the dlib stack trace stuff and NO_MAKEFILE at the same time"
+#endif
 
 namespace dlib
 {

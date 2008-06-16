@@ -69,7 +69,7 @@ namespace dlib
         while (get_dlib_stack_trace_stack().data().move_next())
         {
             stack_tracer_data data = get_dlib_stack_trace_stack().data().element();
-            sout << data.file_name << ":" << data.line_number << "\n    " << data.funct_name;
+            sout << data.file_name << ":" << data.line_number << "\n    " << data.funct_name << "\n";
         }
         return sout.str();
     }
