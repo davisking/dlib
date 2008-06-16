@@ -3,9 +3,9 @@
 #ifndef DLIB_STRINg_
 #define DLIB_STRINg_ 
 
+#include "../algs.h"
 #include <string>
 #include <iostream>
-#include "../algs.h"
 #include "../error.h"
 #include "../assert.h"
 #include "string_abstract.h"
@@ -227,10 +227,12 @@ namespace dlib
         std::string temp;
         temp.reserve(str.size());
         std::string::size_type i;
-        std::basic_ostringstream<charT,traits,alloc> sout;
         for (i = 0; i < str.size(); ++i)
         {
-            temp += sout.narrow(str[i],' ');
+            if (zero_extend_cast<unsigned long>(str[i]) > 255)
+                temp += ' ';
+            else
+                temp += zero_extend_cast<char>(str[i]);
         }
         return temp;
     }

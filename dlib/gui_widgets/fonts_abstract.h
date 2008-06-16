@@ -1,6 +1,5 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), and Nils Labugt
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Nils Labugt, Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
-
 #undef DLIB_FONTs_ABSTRACT_
 #ifdef DLIB_FONTs_ABSTRACT_
 
@@ -379,7 +378,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the Times New Roman font.
+                This is an implementation of the Helvetica 12 point font.
 
             THREAD SAFETY
                 It is safe to call get_font() and access the returned font from any 
@@ -477,6 +476,15 @@ namespace dlib
         bdf_font& operator=( bdf_font& );  // assignment operator
     
     };
+
+// ----------------------------------------------------------------------------------------
+
+    font* get_native_font (
+    );
+    /*!
+        ensures
+            - returns a font object that uses the local font
+    !*/
 
 // ----------------------------------------------------------------------------------------
 

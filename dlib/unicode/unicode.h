@@ -7,6 +7,8 @@
 #include "../algs.h"
 #include "unicode_abstract.h"
 #include <string>
+#include <cstring>
+
 #include <fstream>
 
 namespace dlib
@@ -15,7 +17,94 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     typedef uint32 unichar;
+
+#if defined(__GNUC__) && __GNUC__ < 4 && __GNUC_MINOR__ < 4
+    struct unichar_traits 
+    {
+        typedef dlib::unichar    char_type;
+        typedef dlib::unichar    int_type;
+        typedef std::streamoff   off_type;
+        typedef std::streampos   pos_type;
+        typedef std::mbstate_t   state_type;
+
+        static void assign(char_type& c1, const char_type& c2) { c1 = c2; }
+        static bool eq(const char_type& c1, const char_type& c2) { return c1 == c2; }
+        static bool lt(const char_type& c1, const char_type& c2) { return c1 < c2; }
+        static int compare(const char_type* s1, const char_type* s2, size_t n) 
+        {
+            for (size_t i = 0; i < n; ++i)
+            {
+                if (s1[i] < s2[i])
+                    return -1;
+                else if (s1[i] > s2[i])
+                    return 1;
+            }
+            return 0;
+        }
+
+        static size_t length(const char_type* s)
+        {
+            size_t i = 0;
+            while (s[i] != 0)
+                ++i;
+            return i;
+        }
+
+        static const char_type* find(const char_type* s, size_t n,
+                                     const char_type& a)
+        {
+            for (size_t i = 0; i < n; ++i)
+            {
+                if (s[i] == a)
+                {
+                    return s+i;
+                }
+            }
+            return 0;
+        }
+
+        static char_type* move(char_type* s1, const char_type* s2, size_t n)
+        {
+            return static_cast<char_type*>(std::memmove(s1, s2, sizeof(char_type)*n));
+        }
+
+        static char_type* copy(char_type* s1, const char_type* s2, size_t n)
+        {
+            for (size_t i = 0; i < n; ++i)
+                s1[i] = s2[i];
+
+            return s1;
+        }
+
+        static char_type* assign(char_type* s, size_t n, char_type a)
+        {
+            for (size_t i = 0; i < n; ++i)
+                s[i] = a;
+
+            return s;
+        }
+
+
+        static int_type not_eof(const int_type& c) 
+        {
+            if (!eq_int_type(c,eof()))
+                return to_int_type(c);
+            else
+                return 0;
+        }
+
+        static char_type to_char_type(const int_type& c) { return static_cast<char_type>(c); }
+        static int_type to_int_type(const char_type& c) { return zero_extend_cast<int_type>(c); }
+
+        static bool eq_int_type(const int_type& c1, const int_type& c2) { return c1 == c2; }
+
+        static int_type eof() { return static_cast<int_type>(EOF); }
+    };
+
+    typedef std::basic_string<unichar, unichar_traits> ustring;
+#else
     typedef std::basic_string<unichar> ustring;
+#endif
 
 // ----------------------------------------------------------------------------------------
 
@@ -421,6 +510,31 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool is_surrogate(unichar ch);
+
+    unichar surrogate_pair_to_unichar(unichar first, unichar second);
+
+    void unichar_to_surrogate_pair(unichar unicode, unichar &first, unichar &second);
+
+
+    const ustring convert_wstring_to_utf32 (
+        const std::wstring &wstr
+    );
+
+    const std::wstring convert_utf32_to_wstring (
+        const ustring &src
+    );
+
+    const std::wstring convert_mbstring_to_wstring (
+        const std::string &src
+    );
+
+    const std::string convert_wstring_to_mbstring(
+        const std::wstring &src
+    );
+
+// ----------------------------------------------------------------------------------------
+
     template <typename charT>
     class basic_utf8_ifstream : public std::basic_istream<charT>
     {
@@ -489,6 +603,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 }
+
+#ifdef NO_MAKEFILE
+#include "unicode.cpp"
+#endif
 
 #endif // DLIB_UNICODe_H_
 

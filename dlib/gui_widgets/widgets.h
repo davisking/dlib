@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #ifndef DLIB_WIDGETs_
@@ -63,7 +63,21 @@ namespace dlib
             const std::string& text
         );
 
+        void set_text (
+            const std::wstring& text
+        );
+
+        void set_text (
+            const dlib::ustring& text
+        );
+
         const std::string text (
+        ) const;
+
+        const std::wstring wtext (
+        ) const;
+
+        const dlib::ustring utext (
         ) const;
 
         void set_text_color (
@@ -78,7 +92,7 @@ namespace dlib
         );
 
     private:
-        std::string text_;
+        dlib::ustring text_;
         rgb_pixel text_color_;
 
 
@@ -124,11 +138,33 @@ namespace dlib
             const std::string& name_
         );
 
+        void set_name (
+            const std::wstring& name_
+        );
+
+        void set_name (
+            const dlib::ustring& name_
+        );
+
         const std::string name (
+        ) const;
+
+        const std::wstring wname (
+        ) const;
+
+        const dlib::ustring uname (
         ) const;
 
         void set_tooltip_text (
             const std::string& text
+        );
+
+        void set_tooltip_text (
+            const std::wstring& text
+        );
+
+        void set_tooltip_text (
+            const dlib::ustring& text
         );
 
         void set_pos(
@@ -137,6 +173,12 @@ namespace dlib
         );
 
         const std::string tooltip_text (
+        ) const;
+
+        const std::wstring tooltip_wtext (
+        ) const;
+
+        const dlib::ustring tooltip_utext (
         ) const;
 
         void set_main_font (
@@ -200,7 +242,7 @@ namespace dlib
         button(button&);        // copy constructor
         button& operator=(button&);    // assignment operator
 
-        std::string name_;
+        dlib::ustring name_;
         tooltip btn_tooltip;
 
         member_function_pointer<>::kernel_1a event_handler;
@@ -260,6 +302,14 @@ namespace dlib
             const std::string& name
         );
 
+        void set_name (
+            const std::wstring& name
+        );
+
+        void set_name (
+            const dlib::ustring& name
+        );
+
         void set_size (
             unsigned long width_,
             unsigned long height_
@@ -269,13 +319,33 @@ namespace dlib
             const std::string& text
         );
 
+        void set_tooltip_text (
+            const std::wstring& text
+        );
+
+        void set_tooltip_text (
+            const ustring& text
+        );
+
         const std::string tooltip_text (
+        ) const;
+
+        const std::wstring tooltip_wtext (
+        ) const;
+
+        const dlib::ustring tooltip_utext (
         ) const;
 
         bool is_checked (
         ) const;
 
         const std::string name (
+        ) const;
+
+        const std::wstring wname (
+        ) const;
+
+        const dlib::ustring uname (
         ) const;
 
         void set_checked (
@@ -350,7 +420,7 @@ namespace dlib
         toggle_button(toggle_button&);        // copy constructor
         toggle_button& operator=(toggle_button&);    // assignment operator
 
-        std::string name_;
+        dlib::ustring name_;
         tooltip btn_tooltip;
         bool checked;
 
@@ -436,7 +506,7 @@ namespace dlib
         text_field(
             drawable_window& w
         ) : 
-            drawable(w,MOUSE_CLICK | KEYBOARD_EVENTS | MOUSE_MOVE),
+            drawable(w,MOUSE_CLICK | KEYBOARD_EVENTS | MOUSE_MOVE | STRING_PUT),
             text_color_(0,0,0),
             bg_color_(255,255,255),
             text_width(0),
@@ -470,7 +540,21 @@ namespace dlib
             const std::string& text_
         );
 
+        void set_text (
+            const std::wstring& text_
+        );
+
+        void set_text (
+            const dlib::ustring& text_
+        );
+
         const std::string text (
+        ) const;
+
+        const std::wstring wtext (
+        ) const;
+
+        const dlib::ustring utext (
         ) const;
 
         void set_text_color (
@@ -596,7 +680,7 @@ namespace dlib
                 - returns the rectangle that should contain the text in this widget
         !*/
 
-        std::string text_;
+        dlib::ustring text_;
         rgb_pixel text_color_;
         rgb_pixel bg_color_;
 
@@ -658,6 +742,10 @@ namespace dlib
             unsigned long key,
             bool is_printable,
             unsigned long state
+        );
+
+        void on_string_put (
+            const std::wstring &str
         );
     };
 
@@ -753,13 +841,31 @@ namespace dlib
         unsigned long number_of_tabs (
         ) const;
 
-        const std::string& tab_name (
+        const std::string tab_name (
+            unsigned long idx
+        ) const;
+
+        const std::wstring tab_wname (
+            unsigned long idx
+        ) const;
+
+        const dlib::ustring& tab_uname (
             unsigned long idx
         ) const;
 
         void set_tab_name (
             unsigned long idx,
             const std::string& new_name
+        );
+
+        void set_tab_name (
+            unsigned long idx,
+            const std::wstring& new_name
+        );
+
+        void set_tab_name (
+            unsigned long idx,
+            const dlib::ustring& new_name
         );
 
         void set_pos (
@@ -838,7 +944,7 @@ namespace dlib
         {
             tab_data() : width(0), group(0) {}
 
-            std::string name;
+            dlib::ustring name;
             unsigned long width;
             rectangle rect;
             widget_group* group;
@@ -894,7 +1000,21 @@ namespace dlib
             const std::string& name
         );
 
+        void set_name (
+            const std::wstring& name
+        );
+
+        void set_name (
+            const dlib::ustring& name
+        );
+
         const std::string name (
+        ) const;
+
+        const std::wstring wname (
+        ) const;
+
+        const dlib::ustring uname (
         ) const;
 
         void wrap_around (
@@ -916,7 +1036,7 @@ namespace dlib
         void make_name_fit_in_rect (
         );
 
-        std::string name_;
+        dlib::ustring name_;
         unsigned long name_width;
         unsigned long name_height;
 
@@ -1013,16 +1133,8 @@ namespace dlib
     {
         class box_win : public drawable_window
         {
-        public:
-            box_win (
-                const std::string& title_,
-                const std::string& message_
-            ) : 
-                drawable_window(false),
-                title(title_),
-                message(message_),
-                msg(*this),
-                btn_ok(*this)
+            void initialize (
+            )
             {
                 msg.set_pos(20,20);
                 msg.set_text(message);
@@ -1040,7 +1152,44 @@ namespace dlib
 
 
                 show();
-                set_title(title_);
+                set_title(title);
+            }
+        public:
+            box_win (
+                const std::string& title_,
+                const std::string& message_
+            ) : 
+                drawable_window(false),
+                title(convert_mbstring_to_wstring(title_)),
+                message(convert_mbstring_to_wstring(message_)),
+                msg(*this),
+                btn_ok(*this)
+            {
+                initialize();
+            }
+            box_win (
+                const std::wstring& title_,
+                const std::wstring& message_
+            ) : 
+                drawable_window(false),
+                title(title_),
+                message(message_),
+                msg(*this),
+                btn_ok(*this)
+            {
+                initialize();
+            }
+            box_win (
+                const dlib::ustring& title_,
+                const dlib::ustring& message_
+            ) : 
+                drawable_window(false),
+                title(convert_utf32_to_wstring(title_)),
+                message(convert_utf32_to_wstring(message_)),
+                msg(*this),
+                btn_ok(*this)
+            {
+                initialize();
             }
 
             ~box_win (
@@ -1098,8 +1247,8 @@ namespace dlib
                 return CLOSE_WINDOW;
             }
 
-            const std::string title;
-            const std::string message;
+            const std::wstring title;
+            const std::wstring message;
             label msg;
             button btn_ok;
 
@@ -1108,16 +1257,8 @@ namespace dlib
 
         class blocking_box_win : public drawable_window
         {
-        public:
-            blocking_box_win (
-                const std::string& title_,
-                const std::string& message_
-            ) : 
-                drawable_window(false),
-                title(title_),
-                message(message_),
-                msg(*this),
-                btn_ok(*this)
+            void initialize (
+            )
             {
                 msg.set_pos(20,20);
                 msg.set_text(message);
@@ -1134,8 +1275,47 @@ namespace dlib
                 set_size(size.right()+20,size.bottom()+20);
 
 
-                set_title(title_);
+                set_title(title);
                 show();
+            }
+        public:
+            blocking_box_win (
+                const std::string& title_,
+                const std::string& message_
+            ) : 
+                drawable_window(false),
+                title(convert_mbstring_to_wstring(title_)),
+                message(convert_mbstring_to_wstring(message_)),
+                msg(*this),
+                btn_ok(*this)
+            {
+                initialize();
+            }
+
+            blocking_box_win (
+                const std::wstring& title_,
+                const std::wstring& message_
+            ) : 
+                drawable_window(false),
+                title(title_),
+                message(message_),
+                msg(*this),
+                btn_ok(*this)
+            {
+                initialize();
+            }
+
+            blocking_box_win (
+                const dlib::ustring& title_,
+                const dlib::ustring& message_
+            ) : 
+                drawable_window(false),
+                title(convert_utf32_to_wstring(title_)),
+                message(convert_utf32_to_wstring(message_)),
+                msg(*this),
+                btn_ok(*this)
+            {
+                initialize();
             }
 
             ~blocking_box_win (
@@ -1152,8 +1332,8 @@ namespace dlib
                 close_window();
             }
 
-            const std::string title;
-            const std::string message;
+            const std::wstring title;
+            const std::wstring message;
             label msg;
             button btn_ok;
         };
@@ -1199,8 +1379,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    namespace list_box_helper{
+    template <typename S = std::string>
     class list_box : public drawable, 
-                     public enumerable<const std::string>
+                     public enumerable<const S>
     {
         /*!
             INITIAL VALUE
@@ -1302,7 +1484,7 @@ namespace dlib
             last_selected = 0;
         }
 
-        const std::string& operator[] (
+        const S& operator[] (
             unsigned long index
         ) const;
 
@@ -1340,10 +1522,10 @@ namespace dlib
         bool current_element_valid (
         ) const;
 
-        const std::string& element (
+        const S& element (
         ) const;
 
-        const std::string& element (
+        const S& element (
         );
 
         bool move_next (
@@ -1410,9 +1592,10 @@ namespace dlib
             const canvas& c
         ) const;
 
+        template <typename SS>
         struct data
         {
-            std::string name;
+            SS name;
             bool is_selected;
             unsigned long width;
             unsigned long height;
@@ -1421,7 +1604,7 @@ namespace dlib
         const static long pad = 2;
 
         bool ms_enabled;
-        array<data>::kernel_2a_c items;
+        typename array<data<S> >::kernel_2a_c items;
         member_function_pointer<unsigned long>::kernel_1a event_handler;
         member_function_pointer<unsigned long>::kernel_1a single_click_event_handler;
         unsigned long pos;
@@ -1436,7 +1619,10 @@ namespace dlib
         list_box(list_box&);        // copy constructor
         list_box& operator=(list_box&);    // assignment operator
     };
-
+    }
+    typedef list_box_helper::list_box<std::string> list_box;
+    typedef list_box_helper::list_box<std::wstring> wlist_box;
+    typedef list_box_helper::list_box<dlib::ustring> ulist_box;
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     // function open_file_box() 
@@ -1990,6 +2176,24 @@ namespace dlib
             char underline_ch = '\0'
         )
         {
+            set_menu_name(idx, convert_mbstring_to_wstring(name), underline_ch);
+        }
+
+        void set_menu_name (
+            unsigned long idx,
+            const std::wstring name,
+            char underline_ch = '\0'
+        )
+        {
+            set_menu_name(idx, convert_wstring_to_utf32(name), underline_ch);
+        }
+
+        void set_menu_name (
+            unsigned long idx,
+            const dlib::ustring name,
+            char underline_ch = '\0'
+        )
+        {
             DLIB_ASSERT ( idx < number_of_menus() ,
                     "\tvoid menu_bar::set_menu_name()"
                     << "\n\tidx:               " << idx
@@ -2003,6 +2207,20 @@ namespace dlib
         }
 
         const std::string menu_name (
+            unsigned long idx
+        ) const
+        {
+            return convert_wstring_to_mbstring(menu_wname(idx));
+        }
+
+        const std::wstring menu_wname (
+            unsigned long idx
+        ) const
+        {
+            return convert_utf32_to_wstring(menu_uname(idx));
+        }
+
+        const dlib::ustring menu_uname (
             unsigned long idx
         ) const
         {
@@ -2262,8 +2480,8 @@ namespace dlib
 
         struct menu_data
         {
-            std::string name;
-            std::string::size_type underline_pos;
+            dlib::ustring name;
+            dlib::ustring::size_type underline_pos;
             popup_menu menu;
             rectangle rect;
             rectangle bgrect;
@@ -2499,11 +2717,27 @@ namespace dlib
             const std::string& label
         )
         {
+            set_node_label(i, convert_mbstring_to_wstring(label));
+        }
+
+        void set_node_label (
+            unsigned long i,
+            const std::wstring& label
+        )
+        {
+            set_node_label(i, convert_wstring_to_utf32(label));
+        }
+
+        void set_node_label (
+            unsigned long i,
+            const dlib::ustring& label
+        )
+        {
             auto_mutex M(m);
             DLIB_ASSERT ( i < number_of_nodes() ,
                     "\tvoid directed_graph_drawer::set_node_label(i,label)"
                     << "\n\ti:                 " << i 
-                    << "\n\tlabel:             " << label 
+                    << "\n\tlabel:             " << narrow(label) 
                     << "\n\tnumber_of_nodes(): " << number_of_nodes() 
                     );
             graph_.node(i).data.name = label.c_str();
@@ -2547,7 +2781,27 @@ namespace dlib
         {
             auto_mutex M(m);
             DLIB_ASSERT ( i < number_of_nodes() ,
-                    "\tconst std::string directed_graph_drawer::node_label(i)"
+                    "\tconst std::ustring directed_graph_drawer::node_label(i)"
+                    << "\n\ti:                 " << i 
+                    << "\n\tnumber_of_nodes(): " << number_of_nodes() 
+                    );
+            return narrow(graph_.node(i).data.name);
+        }
+
+        const std::wstring node_wlabel (
+            unsigned long i
+        ) const
+        {
+            return convert_utf32_to_wstring(node_ulabel(i));
+        }
+
+        const dlib::ustring node_ulabel (
+            unsigned long i
+        ) const
+        {
+            auto_mutex M(m);
+            DLIB_ASSERT ( i < number_of_nodes() ,
+                    "\tconst std::ustring directed_graph_drawer::node_label(i)"
                     << "\n\ti:                 " << i 
                     << "\n\tnumber_of_nodes(): " << number_of_nodes() 
                     );
@@ -3005,7 +3259,7 @@ namespace dlib
         {
             data() : color(0,0,0) {}
             vector<double> p;
-            std::string name;
+            dlib::ustring name;
             rectangle str_rect;
             rgb_pixel color;
         };
@@ -3176,6 +3430,22 @@ namespace dlib
             unsigned long col
         ) const
         {
+            return convert_wstring_to_mbstring(wtext(row, col));
+        }
+
+        const std::wstring wtext (
+            unsigned long row,
+            unsigned long col
+        ) const
+        {
+            return convert_utf32_to_wstring(utext(row, col));
+        }
+
+        const dlib::ustring utext (
+            unsigned long row,
+            unsigned long col
+        ) const
+        {
             auto_mutex M(m);
             DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
                     "\tconst std::string text_grid::text(row,col)"
@@ -3192,6 +3462,24 @@ namespace dlib
             unsigned long row,
             unsigned long col,
             const std::string& str
+        ) 
+        {
+            set_text(row, col, convert_mbstring_to_wstring(str));
+        }
+
+        void set_text (
+            unsigned long row,
+            unsigned long col,
+            const std::wstring& str
+        ) 
+        {
+            set_text(row, col, convert_wstring_to_utf32(str));
+        }
+
+        void set_text (
+            unsigned long row,
+            unsigned long col,
+            const dlib::ustring& str
         ) 
         {
             auto_mutex M(m);
@@ -3771,11 +4059,11 @@ namespace dlib
             first(0), is_editable(true) 
             {}
 
-            std::string text;
+            dlib::ustring text;
             rgb_pixel text_color;
             rgb_pixel bg_color;
             rectangle bg_rect;
-            std::string::size_type first;
+            dlib::ustring::size_type first;
             bool is_editable;
         };
 

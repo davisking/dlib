@@ -12,6 +12,7 @@
 #include "../unicode.h"
 #include "../array2d.h"
 #include "../pixel.h"
+#include "fonts.h"
 
 
 namespace dlib
@@ -38,7 +39,7 @@ namespace dlib
         ) const { return false; }
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const = 0;
 
@@ -50,7 +51,7 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed
         ) const = 0;
     };
@@ -70,12 +71,12 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed
         ) const;
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const;
 
@@ -104,7 +105,7 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed
         ) const;
 
@@ -112,7 +113,7 @@ namespace dlib
         ) const { return true; }
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const;
 
@@ -153,7 +154,7 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed
         ) const;
 
@@ -161,7 +162,7 @@ namespace dlib
         ) const { return true; }
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const;
 
@@ -235,7 +236,7 @@ namespace dlib
         ) const { return false; }
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const = 0;
 
@@ -247,7 +248,7 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed,
             const bool is_checked
         ) const = 0;
@@ -268,13 +269,13 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed,
             const bool is_checked
         ) const;
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const;
 
@@ -301,13 +302,13 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed,
             const bool is_checked
         ) const;
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const;
 
@@ -326,13 +327,13 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed,
             const bool is_checked
         ) const;
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const;
 

@@ -33,6 +33,44 @@ namespace dlib
                 - returns false
     !*/
 
+    bool is_surrogate(
+        unichar ch
+    );
+    /*!
+        ensures
+            - if (ch is a unicode surrogate character) then
+                - returns true
+            - else
+                - returns false
+    !*/
+
+    unichar surrogate_pair_to_unichar(
+        unichar first, 
+        unichar second
+    );
+    /*!
+        requires
+            - 0xD800 <= first < 0xDC00
+            - 0xDC00 <= second < 0xE000
+            - is_surrogate(first) == true
+            - is_surrogate(second) == true
+        ensures
+            - converts two surrogates into one unicode character
+    !*/
+
+    void unichar_to_surrogate_pair(
+        unichar ch, 
+        unichar& first, 
+        unichar& second
+    );
+    /*!
+        requires
+            - ch >= 0x10000 (i.e. is not in Basic Multilingual Plane) 
+        ensures
+            - surrogate_pair_to_unichar(#first,#second) == ch
+              (i.e. converts ch into two surrogate characters)
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     class invalid_utf8_error : public error
@@ -51,6 +89,58 @@ namespace dlib
                   unichar string
             - else
                 - throws invalid_utf8_error
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const ustring convert_wstring_to_utf32 (
+        const std::wstring &wstr
+    );
+    /*!
+        requires
+		    - wstr is a valid UTF-16 string when sizeof(wchar_t) == 2
+		    - wstr is a valid UTF-32 string when sizeof(wchar_t) == 4
+        ensures
+            - converts wstr into UTF-32 string
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const std::wstring convert_utf32_to_wstring (
+        const ustring &str
+    );
+    /*!
+        requires
+		    - str is a valid UTF-32 encoded string
+        ensures
+            - converts str into wstring whose encoding is UTF-16 when sizeof(wchar_t) == 2
+            - converts str into wstring whose encoding is UTF-32 when sizeof(wchar_t) == 4
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const std::wstring convert_mbstring_to_wstring (
+        const std::string &str
+    );
+    /*!
+        requires
+		    - str is a valid multibyte string whose encoding is same as current locale setting
+        ensures
+            - converts str into wstring whose encoding is UTF-16 when sizeof(wchar_t) == 2
+            - converts str into wstring whose encoding is UTF-32 when sizeof(wchar_t) == 4
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const std::string convert_wstring_to_mbstring (
+        const std::wstring &src
+    );
+    /*!
+        requires
+		    - str is a valid wide character string string whose encoding is same as current 
+              locale setting
+        ensures
+            - returns a multibyte encoded version of the given string
     !*/
 
 // ----------------------------------------------------------------------------------------

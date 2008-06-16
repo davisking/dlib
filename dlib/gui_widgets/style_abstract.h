@@ -6,6 +6,7 @@
 #include "../algs.h"
 #include "../gui_core.h"
 #include "widgets_abstract.h"
+#include "../unicode/unicode_abstract.h"
 
 namespace dlib
 {
@@ -42,7 +43,7 @@ namespace dlib
         !*/
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const = 0;
         /*!
@@ -61,7 +62,7 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed
         ) const = 0;
         /*!
@@ -153,7 +154,7 @@ namespace dlib
         !*/
 
         virtual rectangle get_min_size (
-            const std::string& name,
+            const ustring& name,
             const font& mfont 
         ) const = 0;
         /*!
@@ -172,7 +173,7 @@ namespace dlib
             const font& mfont,
             const long lastx,
             const long lasty,
-            const std::string& name,
+            const ustring& name,
             const bool is_depressed,
             const bool is_checked 
         ) const = 0;

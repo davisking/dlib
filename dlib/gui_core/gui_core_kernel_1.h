@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki 
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_GUI_CORE_KERNEl_1_
 #define DLIB_GUI_CORE_KERNEl_1_
@@ -38,6 +38,7 @@
 #include "../assert.h"
 #include "../queue.h"
 #include "../pixel.h"
+#include "../unicode.h"
 
 
 namespace dlib
@@ -136,10 +137,26 @@ namespace dlib
         const std::string& str
     );
 
+    void put_on_clipboard (
+        const std::wstring& str
+    );
+
+    void put_on_clipboard (
+        const dlib::ustring& str
+    );
+
 // ----------------------------------------------------------------------------------------
 
     void get_from_clipboard (
         std::string& str
+    );
+
+    void get_from_clipboard (
+        std::wstring& str
+    );
+
+    void get_from_clipboard (
+        dlib::ustring& str
     );
 
 // ----------------------------------------------------------------------------------------
@@ -184,6 +201,14 @@ namespace dlib
 
         void set_title (
             const std::string& title
+        );
+
+        void set_title (
+            const std::wstring& title
+        );
+
+        void set_title (
+            const ustring& title
         );
 
         virtual void show (
@@ -352,6 +377,10 @@ namespace dlib
             unsigned long key,          
             bool is_printable,
             unsigned long state
+        ){}
+            
+        virtual void on_string_put (
+            const std::wstring &str
         ){}
 
     private:

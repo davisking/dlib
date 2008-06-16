@@ -22,7 +22,7 @@ namespace dlib
         const font& mfont,
         const long lastx,
         const long lasty,
-        const std::string& name,
+        const ustring& name,
         const bool is_depressed
     ) const
     {
@@ -87,7 +87,7 @@ namespace dlib
 
     rectangle button_style_default::
     get_min_size (
-        const std::string& name,
+        const ustring& name,
         const font& mfont 
     ) const 
     {
@@ -112,7 +112,7 @@ namespace dlib
         const font& mfont,
         const long lastx,
         const long lasty,
-        const std::string& name,
+        const ustring& name,
         const bool is_depressed
     ) const
     {
@@ -186,7 +186,7 @@ namespace dlib
 
     rectangle button_style_toolbar1::
     get_min_size (
-        const std::string& name,
+        const ustring& name,
         const font& mfont 
     ) const 
     {
@@ -211,7 +211,7 @@ namespace dlib
         const font& mfont,
         const long lastx,
         const long lasty,
-        const std::string& name,
+        const ustring& name,
         const bool is_depressed
     ) const
     {
@@ -268,7 +268,7 @@ namespace dlib
 
     rectangle button_style_toolbar_icon1::
     get_min_size (
-        const std::string& name,
+        const ustring& name,
         const font& mfont 
     ) const 
     {
@@ -289,7 +289,7 @@ namespace dlib
         const font& mfont,
         const long lastx,
         const long lasty,
-        const std::string& name,
+        const ustring& name,
         const bool is_depressed,
         const bool is_checked
     ) const
@@ -355,7 +355,7 @@ namespace dlib
 
     rectangle toggle_button_style_default::
     get_min_size (
-        const std::string& name,
+        const ustring& name,
         const font& mfont 
     ) const 
     {
@@ -380,7 +380,7 @@ namespace dlib
         const font& mfont,
         const long lastx,
         const long lasty,
-        const std::string& name,
+        const ustring& name,
         const bool is_depressed,
         const bool is_checked
     ) const
@@ -447,7 +447,7 @@ namespace dlib
 
     rectangle toggle_button_style_check_box::
     get_min_size (
-        const std::string& name,
+        const ustring& name,
         const font& mfont 
     ) const 
     {
@@ -473,7 +473,7 @@ namespace dlib
         const font& mfont,
         const long lastx,
         const long lasty,
-        const std::string& name,
+        const ustring& name,
         const bool is_depressed,
         const bool is_checked
     ) const
@@ -567,7 +567,7 @@ namespace dlib
 
     rectangle toggle_button_style_radio_button::
     get_min_size (
-        const std::string& name,
+        const ustring& name,
         const font& mfont 
     ) const 
     {

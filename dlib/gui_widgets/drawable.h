@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #ifndef DLIB_DRAWABLe_
@@ -149,6 +149,10 @@ namespace dlib
             unsigned long state
         );
 
+        void on_string_put (
+            const std::wstring &str
+        );
+
         void on_user_event (
             void* p,
             int i
@@ -173,6 +177,7 @@ namespace dlib
         set_of_drawables keyboard;
         set_of_drawables focus;
         set_of_drawables window_moved;
+        set_of_drawables string_put;
 
         long lastx, lasty;
         unsigned long event_id;
@@ -201,7 +206,8 @@ namespace dlib
         WINDOW_RESIZED = 8,
         KEYBOARD_EVENTS = 16,
         FOCUS_EVENTS = 32,
-        WINDOW_MOVED = 64
+        WINDOW_MOVED = 64,
+        STRING_PUT = 128
     };
 
     class drawable 
@@ -495,6 +501,10 @@ namespace dlib
             unsigned long key,
             bool is_printable,
             unsigned long state
+        ){}
+
+        virtual void on_string_put (
+            const std::wstring &str
         ){}
     };
 

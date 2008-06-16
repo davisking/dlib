@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_WIDGETs_CPP_
 #define DLIB_WIDGETs_CPP_
@@ -86,11 +86,45 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void button::
+    set_tooltip_text (
+        const std::wstring& text
+    )
+    {
+        btn_tooltip.set_text(text);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    set_tooltip_text (
+        const ustring& text
+    )
+    {
+        btn_tooltip.set_text(text);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     const std::string button::
     tooltip_text (
     ) const
     {
         return btn_tooltip.text();
+    }
+
+    const std::wstring button::
+    tooltip_wtext (
+    ) const
+    {
+        return btn_tooltip.wtext();
+    }
+
+    const dlib::ustring button::
+    tooltip_utext (
+    ) const
+    {
+        return btn_tooltip.utext();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -125,6 +159,22 @@ namespace dlib
         const std::string& name
     )
     {
+        set_name(convert_mbstring_to_wstring(name));
+    }
+
+    void button::
+    set_name (
+        const std::wstring& name
+    )
+    {
+        set_name(convert_wstring_to_utf32(name));
+    }
+
+    void button::
+    set_name (
+        const ustring& name
+    )
+    {
         auto_mutex M(m);
         name_ = name;
         // do this to get rid of any reference counting that may be present in 
@@ -145,9 +195,35 @@ namespace dlib
     ) const
     {
         auto_mutex M(m);
-        std::string temp = name_;
+        std::string temp = convert_wstring_to_mbstring(wname());
         // do this to get rid of any reference counting that may be present in 
         // the std::string implementation.
+        char c = temp[0];
+        temp[0] = c;
+        return temp;
+    }
+
+    const std::wstring button::
+    wname (
+    ) const
+    {
+        auto_mutex M(m);
+        std::wstring temp = convert_utf32_to_wstring(uname());
+        // do this to get rid of any reference counting that may be present in 
+        // the std::wstring implementation.
+        wchar_t w = temp[0];
+        temp[0] = w;
+        return temp;
+    }
+
+    const dlib::ustring button::
+    uname (
+    ) const
+    {
+        auto_mutex M(m);
+        dlib::ustring temp = name_;
+        // do this to get rid of any reference counting that may be present in 
+        // the dlib::ustring implementation.
         temp[0] = name_[0];
         return temp;
     }
@@ -276,6 +352,22 @@ namespace dlib
         btn_tooltip.set_text(text);
     }
 
+    void toggle_button::
+    set_tooltip_text (
+        const std::wstring& text
+    )
+    {
+        btn_tooltip.set_text(text);
+    }
+
+    void toggle_button::
+    set_tooltip_text (
+        const dlib::ustring& text
+    )
+    {
+        btn_tooltip.set_text(text);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     const std::string toggle_button::
@@ -283,6 +375,20 @@ namespace dlib
     ) const
     {
         return btn_tooltip.text();
+    }
+
+    const std::wstring toggle_button::
+    tooltip_wtext (
+    ) const
+    {
+        return btn_tooltip.wtext();
+    }
+
+    const dlib::ustring toggle_button::
+    tooltip_utext (
+    ) const
+    {
+        return btn_tooltip.utext();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -317,6 +423,22 @@ namespace dlib
         const std::string& name
     )
     {
+        set_name(convert_mbstring_to_wstring(name));
+    }
+
+    void toggle_button::
+    set_name (
+        const std::wstring& name
+    )
+    {
+        set_name(convert_wstring_to_utf32(name));
+    }
+
+    void toggle_button::
+    set_name (
+        const dlib::ustring& name
+    )
+    {
         auto_mutex M(m);
         name_ = name;
         // do this to get rid of any reference counting that may be present in 
@@ -336,8 +458,22 @@ namespace dlib
     name (
     ) const
     {
+        return convert_wstring_to_mbstring(wname());
+    }
+
+    const std::wstring toggle_button::
+    wname (
+    ) const
+    {
+        return convert_utf32_to_wstring(uname());
+    }
+
+    const dlib::ustring toggle_button::
+    uname (
+    ) const
+    {
         auto_mutex M(m);
-        std::string temp = name_;
+        dlib::ustring temp = name_;
         // do this to get rid of any reference counting that may be present in 
         // the std::string implementation.
         temp[0] = name_[0];
@@ -418,9 +554,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+
     void label::
     set_text (
         const std::string& text
+    )
+    {
+        set_text(convert_mbstring_to_wstring(text));
+    }
+
+    void label::
+    set_text (
+        const std::wstring& text
+    )
+    {
+        set_text(convert_wstring_to_utf32(text));
+    }
+
+    void label::
+    set_text (
+        const dlib::ustring& text
     )
     {
         using namespace std;
@@ -448,8 +601,22 @@ namespace dlib
     text (
     ) const
     {
+        return convert_wstring_to_mbstring(wtext());
+    }
+
+    const std::wstring label::
+    wtext (
+    ) const
+    {
+        return convert_utf32_to_wstring(utext());
+    }
+
+    const dlib::ustring label::
+    utext (
+    ) const
+    {
         auto_mutex M(m);
-        std::string temp = text_;
+        dlib::ustring temp = text_;
         // do this to get rid of any reference counting that may be present in 
         // the std::string implementation.
         temp[0] = text_[0];
@@ -634,9 +801,25 @@ namespace dlib
         const std::string& text
     )
     {
+        set_text(convert_mbstring_to_wstring(text));
+    }
+
+    void text_field::
+    set_text (
+        const std::wstring& text
+    )
+    {
+        set_text(convert_wstring_to_utf32(text));
+    }
+
+    void text_field::
+    set_text (
+        const dlib::ustring& text
+    )
+    {
         DLIB_ASSERT ( text.find_first_of('\n') == std::string::npos ,
                 "\tvoid text_field::set_text()"
-                << "\n\ttext:  " << text );
+                << "\n\ttext:  " << narrow(text) );
         auto_mutex M(m);
         // do this to get rid of any reference counting that may be present in 
         // the std::string implementation.
@@ -656,10 +839,26 @@ namespace dlib
     text (
     ) const
     {
+        std::string temp = convert_wstring_to_mbstring(wtext());
+        return temp;
+    }
+
+    const std::wstring text_field::
+    wtext (
+    ) const
+    {
+        std::wstring temp = convert_utf32_to_wstring(utext());
+        return temp;
+    }
+    
+    const dlib::ustring text_field::
+    utext (
+    ) const
+    {
         auto_mutex M(m);
         // do this to get rid of any reference counting that may be present in 
-        // the std::string implementation.
-        std::string temp = text_.c_str();
+        // the dlib::ustring implementation.
+        dlib::ustring temp = text_.c_str();
         return temp;
     }
 
@@ -807,8 +1006,9 @@ namespace dlib
             {
                 // highlight the double clicked word
                 string::size_type first, last;
-                first = text_.substr(0,cursor_pos).find_last_of(" \t\n");
-                last = text_.find_first_of(" \t\n",cursor_pos);
+                const ustring ustr = convert_utf8_to_utf32(std::string(" \t\n"));
+                first = text_.substr(0,cursor_pos).find_last_of(ustr.c_str());
+                last = text_.find_first_of(ustr.c_str(),cursor_pos);
                 long f = static_cast<long>(first);
                 long l = static_cast<long>(last);
                 if (first == string::npos)
@@ -886,6 +1086,7 @@ namespace dlib
         unsigned long state
     )
     {
+        const ustring space_str = convert_utf8_to_utf32(std::string(" \t\n"));
         const bool shift = (state&base_window::KBD_MOD_SHIFT) != 0;
         const bool ctrl = (state&base_window::KBD_MOD_CONTROL) != 0;
         if (has_focus && enabled && !hidden)
@@ -921,10 +1122,10 @@ namespace dlib
                     if (ctrl)
                     {
                         // find the first non-whitespace to our left
-                        std::string::size_type pos = text_.find_last_not_of(" \t\n",cursor_pos);
+                        std::string::size_type pos = text_.find_last_not_of(space_str.c_str(),cursor_pos);
                         if (pos != std::string::npos)
                         {
-                            pos = text_.find_last_of(" \n\t",pos);
+                            pos = text_.find_last_of(space_str.c_str(),pos);
                             if (pos != std::string::npos)
                                 new_pos = static_cast<unsigned long>(pos);
                             else
@@ -959,10 +1160,10 @@ namespace dlib
                     if (ctrl)
                     {
                         // find the first non-whitespace to our left
-                        std::string::size_type pos = text_.find_first_not_of(" \t\n",cursor_pos);
+                        std::string::size_type pos = text_.find_first_not_of(space_str.c_str(),cursor_pos);
                         if (pos != std::string::npos)
                         {
-                            pos = text_.find_first_of(" \n\t",pos);
+                            pos = text_.find_first_of(space_str.c_str(),pos);
                             if (pos != std::string::npos)
                                 new_pos = static_cast<unsigned long>(pos+1);
                             else
@@ -1003,7 +1204,7 @@ namespace dlib
                 {
                     if (highlight_start <= highlight_end)
                     {
-                        text_ = text_.substr(0,highlight_start) + static_cast<char>(key) +
+                        text_ = text_.substr(0,highlight_start) + static_cast<unichar>(key) +
                             text_.substr(highlight_end+1,text_.size()-highlight_end-1);
                         move_cursor(highlight_start+1);
                         highlight_start = 0;
@@ -1012,7 +1213,7 @@ namespace dlib
                     }
                     else
                     {
-                        text_ = text_.substr(0,cursor_pos) + static_cast<char>(key) +
+                        text_ = text_.substr(0,cursor_pos) + static_cast<unichar>(key) +
                             text_.substr(cursor_pos,text_.size()-cursor_pos);
                         move_cursor(cursor_pos+1);
                     }
@@ -1119,6 +1320,39 @@ namespace dlib
         }
     }
 
+// ---------------------------------------------------------------------------------------- 
+
+    void text_field::
+    on_string_put(
+        const std::wstring &str
+    )
+    {
+        if (has_focus && enabled && !hidden){
+            ustring ustr = convert_wstring_to_utf32(str);
+            if (highlight_start <= highlight_end)
+            {
+                text_ = text_.substr(0,highlight_start) + ustr +
+                    text_.substr(highlight_end+1,text_.size()-highlight_end-1);
+                move_cursor(highlight_start+ustr.size());
+                highlight_start = 0;
+                highlight_end = -1;
+                parent.invalidate_rectangle(rect);
+            }
+            else
+            {
+                text_ = text_.substr(0,cursor_pos) + ustr +
+                    text_.substr(cursor_pos,text_.size()-cursor_pos);
+                move_cursor(cursor_pos+ustr.size());
+            }
+            unsigned long height;
+            mfont->compute_size(text_,text_width,height,text_pos);
+
+            // send out the text modified event
+            if (text_modified_handler.is_set())
+                text_modified_handler();
+        }
+    }
+    
 // ----------------------------------------------------------------------------------------
 
     void text_field::
@@ -1339,8 +1573,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const std::string& tabbed_display::
+    const std::string tabbed_display::
     tab_name (
+        unsigned long idx
+    ) const
+    {
+        return convert_wstring_to_mbstring(tab_wname(idx));
+    }
+    
+    const std::wstring tabbed_display::
+    tab_wname (
+        unsigned long idx
+    ) const
+    {
+        return convert_utf32_to_wstring(tab_uname(idx));
+    }
+    
+    const dlib::ustring& tabbed_display::
+    tab_uname (
         unsigned long idx
     ) const
     {
@@ -1360,6 +1610,24 @@ namespace dlib
     set_tab_name (
         unsigned long idx,
         const std::string& new_name
+    )
+    {
+        set_tab_name(idx, convert_mbstring_to_wstring(new_name));
+    }
+
+    void tabbed_display::
+    set_tab_name (
+        unsigned long idx,
+        const std::wstring& new_name
+    )
+    {
+        set_tab_name(idx, convert_wstring_to_utf32(new_name));
+    }
+
+    void tabbed_display::
+    set_tab_name (
+        unsigned long idx,
+        const dlib::ustring& new_name
     )
     {
         auto_mutex M(m);
@@ -1751,6 +2019,22 @@ namespace dlib
         const std::string& name
     )
     {
+        set_name(convert_mbstring_to_wstring(name));
+    }
+
+    void named_rectangle::
+    set_name (
+        const std::wstring& name
+    )
+    {
+        set_name(convert_wstring_to_utf32(name));
+    }
+
+    void named_rectangle::
+    set_name (
+        const dlib::ustring& name
+    )
+    {
         auto_mutex M(m);
         name_ = name.c_str();
         mfont->compute_size(name_,name_width,name_height);
@@ -1765,8 +2049,22 @@ namespace dlib
     name (
     ) const
     {
+        return convert_wstring_to_mbstring(wname());
+    }
+
+    const std::wstring named_rectangle::
+    wname (
+    ) const
+    {
+        return convert_utf32_to_wstring(uname());
+    }
+
+    const dlib::ustring named_rectangle::
+    uname (
+    ) const
+    {
         auto_mutex M(m);
-        return std::string(name_.c_str());
+        return dlib::ustring(name_.c_str());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2039,7 +2337,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    list_box::
+    namespace list_box_helper{
+    template <typename S>
+    list_box<S>::
     list_box(  
         drawable_window& w
     ) : 
@@ -2059,7 +2359,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    list_box::
+    template <typename S>
+    list_box<S>::
     ~list_box(
     )
     {
@@ -2069,7 +2370,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     set_main_font (
         const font* f
     )
@@ -2087,7 +2389,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     set_size (
         unsigned long width_,
         unsigned long height_
@@ -2106,7 +2409,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool list_box::
+    template <typename S>
+    bool list_box<S>::
     is_selected (
         unsigned long index
     ) const
@@ -2122,7 +2426,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     select (
         unsigned long index 
     )
@@ -2139,7 +2444,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     unselect (
         unsigned long index 
     )
@@ -2155,7 +2461,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const std::string& list_box::operator [] (
+    template <typename S>
+    const S& list_box<S>::operator [] (
         unsigned long index
     ) const
     {
@@ -2169,7 +2476,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool list_box::
+    template <typename S>
+    bool list_box<S>::
     multiple_select_enabled (
     ) const
     {
@@ -2179,7 +2487,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     enable_multiple_select (
     ) 
     {
@@ -2189,7 +2498,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     disable_multiple_select (
     )
     {
@@ -2199,7 +2509,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool list_box::
+    template <typename S>
+    bool list_box<S>::
     at_start (
     ) const
     {
@@ -2209,7 +2520,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     reset (
     ) const
     {
@@ -2219,7 +2531,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool list_box::
+    template <typename S>
+    bool list_box<S>::
     current_element_valid (
     ) const
     {
@@ -2229,7 +2542,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const std::string& list_box::
+    template <typename S>
+    const S &list_box<S>::
     element (
     ) const
     {
@@ -2242,7 +2556,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const std::string& list_box::
+    template <typename S>
+    const S &list_box<S>::
     element (
     )
     {
@@ -2255,7 +2570,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool list_box::
+    template <typename S>
+    bool list_box<S>::
     move_next (
     ) const
     {
@@ -2265,7 +2581,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long list_box::
+    template <typename S>
+    unsigned long list_box<S>::
     size (
     ) const
     {
@@ -2275,7 +2592,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     draw (
         const canvas& c
     ) const
@@ -2327,7 +2645,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     hide (
     )
     {
@@ -2339,7 +2658,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     show (
     )
     {
@@ -2351,7 +2671,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     disable (
     ) 
     {
@@ -2362,7 +2683,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     enable (
     ) 
     {
@@ -2373,7 +2695,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     set_pos (
         long x,
         long y
@@ -2386,7 +2709,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     adjust_sliders (
     ) 
     {
@@ -2453,7 +2777,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     sbh_handler (
     )
     {
@@ -2463,7 +2788,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     sbv_handler (
     )
     {
@@ -2473,7 +2799,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     on_wheel_up (
     )
     {
@@ -2491,7 +2818,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     on_wheel_down (
     )
     {
@@ -2509,7 +2837,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     on_mouse_down (
         unsigned long btn,
         unsigned long state,
@@ -2584,7 +2913,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void list_box::
+    template <typename S>
+    void list_box<S>::
     set_z_order (
         long order
     )
@@ -2596,7 +2926,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long list_box::
+    template <typename S>
+    unsigned long list_box<S>::
     get_selected (
     ) const
     {
@@ -2611,9 +2942,13 @@ namespace dlib
         }
         return items.size();
     }
-
 // ----------------------------------------------------------------------------------------
 
+   // making instance of template
+   template class list_box<std::string>;
+   template class list_box<std::wstring>;
+   template class list_box<dlib::ustring>;
+   }
 }
 
 #endif // DLIB_WIDGETs_CPP_

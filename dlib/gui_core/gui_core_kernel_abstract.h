@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_GUI_CORE_KERNEl_ABSTRACT_
 #ifdef DLIB_GUI_CORE_KERNEl_ABSTRACT_
@@ -6,6 +6,7 @@
 #include <string>
 #include "../algs.h"
 #include "../geometry/rectangle_abstract.h"
+#include "../unicode/unicode_abstract.h"
 
 namespace dlib
 {
@@ -61,6 +62,10 @@ namespace dlib
             - dlib::thread_error
     !*/
 
+    // overloads for wide character strings
+    void put_on_clipboard (const std::wstring& str);
+    void put_on_clipboard (const dlib::ustring& str);
+
 // ----------------------------------------------------------------------------------------
 
     void get_from_clipboard (
@@ -77,6 +82,10 @@ namespace dlib
             - dlib::gui_error
             - dlib::thread_error
     !*/
+
+    // overloads for wide character strings
+    void get_from_clipboard (std::wtring& str);
+    void get_from_clipboard (dlib::utring& str);
 
 // ----------------------------------------------------------------------------------------
 
@@ -348,6 +357,26 @@ namespace dlib
 
         void set_title (
             const std::string& title
+        );
+        /*!
+            requires
+                - is_closed() == false
+            ensures
+                - sets the title of the window
+        !*/
+
+        void set_title (
+            const std::wstring& title
+        );
+        /*!
+            requires
+                - is_closed() == false
+            ensures
+                - sets the title of the window
+        !*/
+
+        void set_title (
+            const dlib::ustring& title
         );
         /*!
             requires
@@ -704,6 +733,20 @@ namespace dlib
                         - (state & KBD_MOD_SHIFT) == 0 
                 - else
                     - the state of the shift key is implementation defined
+            ensures
+                - does not change the state of mutex wm
+        !*/
+
+        virtual void on_string_put (
+            const std::wstring &str
+        ){}
+        /*!
+            requires
+                - is_closed() == false
+                - mutex wm is locked
+                - is called when a wide/multibyte character input method determines a string
+                  that is being input to the window.
+                - str == the string that is being input
             ensures
                 - does not change the state of mutex wm
         !*/

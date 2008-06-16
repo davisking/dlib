@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_BASE_WIDGETs_ABSTRACT_
 #ifdef DLIB_BASE_WIDGETs_ABSTRACT_
@@ -907,7 +907,32 @@ namespace dlib
                   will display on the screen when the user hovers the mouse over it
         !*/
 
+        // overloads for wide character strings
+        void set_text (
+            const std::wstring& str
+        );
+
+        void set_text (
+            const dlib::ustring& str
+        );
+
         const std::string text (
+        ) const;
+        /*!
+            ensures
+                - returns the text that is displayed inside this
+                  tooltip
+        !*/
+
+        const std::wstring wtext (
+        ) const;
+        /*!
+            ensures
+                - returns the text that is displayed inside this
+                  tooltip
+        !*/
+
+        const dlib::ustring utext (
         ) const;
         /*!
             ensures
@@ -1102,6 +1127,27 @@ namespace dlib
                   clicked by the user.
                 - #get_hot_key() == hotkey
         !*/
+        
+        // overloads for wide charactor strings
+        template <
+            typename T
+            >
+        menu_item_text (
+            const std::wstring& str,
+            T& object,
+            void (T::*on_click_handler)(),
+            unichar hotkey = 0
+        ); 
+
+        template <
+            typename T
+            >
+        menu_item_text (
+            const dlib::ustring& str,
+            T& object,
+            void (T::*on_click_handler)(),
+            unichar hotkey = 0
+        ); 
     };
 
 // ----------------------------------------------------------------------------------------
@@ -1126,6 +1172,17 @@ namespace dlib
                   clicked by the user.
                 - #get_hot_key() == hotkey
         !*/
+
+        //overloads for wide charactor strings
+        menu_item_submenu (
+            const std::wstring& str,
+            unichar hotkey = 0
+        ); 
+
+        menu_item_submenu (
+            const dlib::ustring& str,
+            unichar hotkey = 0
+        ); 
     };
 
 // ----------------------------------------------------------------------------------------

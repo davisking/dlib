@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #ifndef DLIB_BASE_WIDGETs_
@@ -16,6 +16,7 @@
 #include "../image_transforms.h"
 #include "../array.h" 
 #include "../smart_pointers.h"
+#include "../unicode.h"
 #include <cctype>
 
 
@@ -982,6 +983,20 @@ namespace dlib
             const std::string& str
         )
         {
+            set_text(convert_mbstring_to_wstring(str));
+        }
+
+        void set_text (
+            const std::wstring& str
+        )
+        {
+            set_text(convert_wstring_to_utf32(str));
+        }
+
+        void set_text (
+            const ustring& str
+        )
+        {
             auto_mutex M(m);
             if (!stuff)
             {
@@ -995,8 +1010,20 @@ namespace dlib
         const std::string text (
         ) const
         {
+            return convert_wstring_to_mbstring(wtext());
+        }
+
+        const std::wstring wtext (
+        ) const
+        {
+            return convert_utf32_to_wstring(utext());
+        }
+
+        const dlib::ustring utext (
+        ) const
+        {
             auto_mutex M(m);
-            std::string temp;
+            dlib::ustring temp;
             if (stuff)
             {
                 temp = stuff->win.text;
@@ -1067,14 +1094,28 @@ namespace dlib
             {
             }
 
-            std::string text;
+            ustring text;
             rectangle rect_all;
             rectangle rect_text;
             const unsigned long pad;
             const font* mfont;
-
+            
             void set_text (
                 const std::string& str
+            )
+            {
+                set_text(convert_mbstring_to_wstring(str));
+            }
+
+            void set_text (
+                const std::wstring& str
+            )
+            {
+                set_text(convert_wstring_to_utf32(str));
+            }
+
+            void set_text (
+                const dlib::ustring& str
             )
             {
                 text = str.c_str();
@@ -1227,15 +1268,11 @@ namespace dlib
 
     class menu_item_submenu : public menu_item
     {
-    public:
-        menu_item_submenu (
-            const std::string& str,
-            unichar hk = 0
-        ) : 
-            text(str),
-            f(default_font::get_font()),
-            hotkey(hk)
+        void initialize (
+            unichar hk
+        )
         {
+            const dlib::ustring &str = text;
             if (hk != 0)
             {
                 std::string::size_type pos = str.find_first_of(hk);
@@ -1251,6 +1288,39 @@ namespace dlib
                     underline_p2.y() = r2.bottom()-f->height()+f->ascender()+2;
                 }
             }
+        }
+    public:
+        menu_item_submenu (
+            const std::string& str,
+            unichar hk = 0
+        ) : 
+            text(convert_wstring_to_utf32(convert_mbstring_to_wstring(str))),
+            f(default_font::get_font()),
+            hotkey(hk)
+        {
+            initialize(hk);
+        }
+
+        menu_item_submenu (
+            const std::wstring& str,
+            unichar hk = 0
+        ) : 
+            text(convert_wstring_to_utf32(str)),
+            f(default_font::get_font()),
+            hotkey(hk)
+        {
+            initialize(hk);
+        }
+
+        menu_item_submenu (
+            const dlib::ustring& str,
+            unichar hk = 0
+        ) : 
+            text(str),
+            f(default_font::get_font()),
+            hotkey(hk)
+        {
+            initialize(hk);
         }
 
         virtual unichar get_hot_key (
@@ -1337,7 +1407,7 @@ namespace dlib
         }
 
     private:
-        std::string text;
+        dlib::ustring text;
         const font* f;
         member_function_pointer<>::kernel_1a action;
         unichar hotkey;
@@ -1349,18 +1419,14 @@ namespace dlib
 
     class menu_item_text : public menu_item
     {
-    public:
         template <typename T>
-        menu_item_text (
-            const std::string& str,
-            T& object,
+        void initialize (
+            T &object,
             void (T::*event_handler_)(),
-            unichar hk = 0
-        ) : 
-            text(str),
-            f(default_font::get_font()),
-            hotkey(hk)
+            unichar hk
+        )
         {
+            dlib::ustring &str = text;
             action.set(object,event_handler_);
 
             if (hk != 0)
@@ -1378,6 +1444,49 @@ namespace dlib
                     underline_p2.y() = r2.bottom()-f->height()+f->ascender()+2;
                 }
             }
+        }
+
+    public:
+        template <typename T>
+        menu_item_text (
+            const std::string& str,
+            T& object,
+            void (T::*event_handler_)(),
+            unichar hk = 0
+        ) : 
+            text(convert_wstring_to_utf32(convert_mbstring_to_wstring(str))),
+            f(default_font::get_font()),
+            hotkey(hk)
+        {
+            initialize(object, event_handler_, hk);
+        }
+
+        template <typename T>
+        menu_item_text (
+            const std::wstring& str,
+            T& object,
+            void (T::*event_handler_)(),
+            unichar hk = 0
+        ) : 
+            text(convert_wstring_to_utf32(str)),
+            f(default_font::get_font()),
+            hotkey(hk)
+        {
+            initialize(object, event_handler_, hk);
+        }
+
+        template <typename T>
+        menu_item_text (
+            const dlib::ustring& str,
+            T& object,
+            void (T::*event_handler_)(),
+            unichar hk = 0
+        ) : 
+            text(str),
+            f(default_font::get_font()),
+            hotkey(hk)
+        {
+            initialize(object, event_handler_, hk);
         }
 
         virtual unichar get_hot_key (
@@ -1444,7 +1553,7 @@ namespace dlib
         ) const { return true; }
 
     private:
-        std::string text;
+        dlib::ustring text;
         const font* f;
         member_function_pointer<>::kernel_1a action;
         unichar hotkey;

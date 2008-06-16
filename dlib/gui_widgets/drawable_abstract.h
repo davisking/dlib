@@ -132,7 +132,8 @@ namespace dlib
         WINDOW_RESIZED = 8,
         KEYBOARD_EVENTS = 16,
         FOCUS_EVENTS = 32,
-        WINDOW_MOVED = 64
+        WINDOW_MOVED = 64,
+        STRING_PUT = 128
     };
 
     class drawable 
@@ -660,6 +661,19 @@ namespace dlib
                 - events_are_enabled() == true
                 - mutex m is locked
                 - this is just the base_window::on_keydown() event forwarded to 
+                  this object.  See the gui_core specs for the details about this event.
+            ensures
+                - does not change the state of mutex m. 
+        !*/
+
+        virtual void on_string_put (
+            const std::wstring &str
+        ){}
+        /*!
+            requires
+                - events_are_enabled() == true
+                - mutex m is locked
+                - this is just the base_window::on_put_string() event forwarded to 
                   this object.  See the gui_core specs for the details about this event.
             ensures
                 - does not change the state of mutex m. 

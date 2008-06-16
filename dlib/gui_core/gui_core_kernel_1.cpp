@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_GUI_CORE_KERNEL_1_CPp_
 #define DLIB_GUI_CORE_KERNEL_1_CPp_
@@ -14,6 +14,7 @@
 #pragma comment (lib, "gdi32.lib")
 #pragma comment (lib, "comctl32.lib")
 #pragma comment (lib, "user32.lib")
+#pragma comment (lib, "imm32.lib")
 #endif
 
 
@@ -44,7 +45,7 @@ namespace dlib
         static bool core_has_been_initialized = false;
         static bool quit_windows_loop = false;
         static bool set_window_title_done = true;
-        static std::string window_title;
+        static std::wstring window_title;
         static bool move_window_done = true;
         static HWND move_window_hwnd = NULL;
         static int move_window_width = 0;
@@ -54,6 +55,7 @@ namespace dlib
         static bool request_new_window = false;
         static DWORD dwStyle;
         static HWND new_window = NULL;
+        static bool in_ime_composition = false;
         // the window_table.get_mutex() mutex locks the above 11 variables
 
 
@@ -549,7 +551,7 @@ namespace dlib
                     case WM_USER+CALL_SET_WINDOW_TITLE:
                         if (hwnd == helper_window)
                         {                            
-                            SetWindowText((HWND)wParam,window_title.c_str());
+                            SetWindowTextW((HWND)wParam,window_title.c_str());
                             set_window_title_done = true;
                             et_signaler.broadcast();
                         }
@@ -588,6 +590,8 @@ namespace dlib
                     case WM_SYSKEYDOWN:
                     case WM_KEYDOWN:
                         {
+                            if (in_ime_composition) break;
+
                             base_window** win_ = window_table[hwnd];
                             base_window* win;
                             if (win_)
@@ -1109,6 +1113,39 @@ namespace dlib
                         }
                         return DefWindowProc (hwnd, message, wParam, lParam);
 
+                    case WM_IME_STARTCOMPOSITION:
+                        in_ime_composition = true;
+                        break;
+
+                    case WM_IME_COMPOSITION:
+                        {
+                        in_ime_composition = false;
+                        base_window** win_ = window_table[hwnd];
+                        base_window* win;
+                        if (win_)
+                            win = *win_;
+                        else
+                            break;
+                        HIMC hImc = ImmGetContext(hwnd);
+                        if (lParam & GCS_RESULTSTR){
+                            WCHAR wc;
+                            LONG bufbyte = ImmGetCompositionStringW(hImc, GCS_RESULTSTR, &wc, 0);
+                            if (bufbyte != IMM_ERROR_NODATA && bufbyte != IMM_ERROR_GENERAL){
+                                bufbyte += sizeof(WCHAR);
+
+
+                                WCHAR *buf = new WCHAR[bufbyte / sizeof(WCHAR)];
+                                ImmGetCompositionStringW(hImc, GCS_RESULTSTR, buf, bufbyte);
+                                buf[bufbyte / sizeof(WCHAR) - 1] = L'\0';
+
+                                // signal the putstring event
+                                win->on_string_put(std::wstring(buf));
+                                delete [] buf;
+                            }
+                        }
+                        ImmReleaseContext(hwnd, hImc);
+                        }
+                        break;
 
                     default:
                         break;
@@ -1578,7 +1615,23 @@ namespace dlib
 
     void base_window::
     set_title (
-        const std::string& title
+        const std::string &title
+    )
+    {
+        set_title(convert_mbstring_to_wstring(title));
+    }
+
+    void base_window::
+    set_title (
+        const ustring &title
+    )
+    {
+        set_title(convert_utf32_to_wstring(title));
+    }
+
+    void base_window::
+    set_title (
+        const std::wstring& title
     )
     {
         DLIB_ASSERT(is_closed() == false,
@@ -1596,7 +1649,7 @@ namespace dlib
 
         if (get_thread_id() == gui_core_kernel_1_globals::event_thread_id)
         {
-            SetWindowText(hwnd,title.c_str());
+            SetWindowTextW(hwnd,title.c_str());
         }
         else
         {
@@ -1903,6 +1956,20 @@ namespace dlib
         const std::string& str
     )
     {
+        put_on_clipboard(convert_mbstring_to_wstring(str));
+    }
+
+    void put_on_clipboard (
+        const dlib::ustring& str
+    )
+    {
+        put_on_clipboard(convert_utf32_to_wstring(str));
+    }
+
+    void put_on_clipboard (
+        const std::wstring& str
+    )
+    {
         using namespace gui_core_kernel_1_globals;
         using namespace std;
 
@@ -1913,34 +1980,34 @@ namespace dlib
             EmptyClipboard();
             auto_mutex M(window_table.get_mutex());
 
-            const unsigned long newlines = count(str.begin(),str.end(),'\n');
+            const unsigned long newlines = count(str.begin(),str.end(),L'\n');
 
-            HGLOBAL mem = GlobalAlloc(GMEM_MOVEABLE,str.size()+newlines+1);
+            HGLOBAL mem = GlobalAlloc(GMEM_MOVEABLE,(str.size()+newlines+1)*sizeof(wchar_t));
             if (mem != NULL)
             {
-                char* buf = reinterpret_cast<char*>(GlobalLock(mem));
+                wchar_t* buf = reinterpret_cast<wchar_t*>(GlobalLock(mem));
 
                 if (buf != NULL)
                 {
                     // copy str into buf while also replacing all the \n with \r\n
-                    for (string::size_type i = 0; i < str.size(); ++i)
+                    for (wstring::size_type i = 0; i < str.size(); ++i)
                     {
-                        if (str[i] != '\n')
+                        if (str[i] != L'\n')
                         {
                             *buf = str[i];
                             ++buf;
                         }
                         else
                         {
-                            *buf = '\r';
+                            *buf = L'\r';
                             ++buf;
-                            *buf = '\n';
+                            *buf = L'\n';
                             ++buf;
                         }
                     }
-                    *buf = '\0';
+                    *buf = L'\0';
                     GlobalUnlock(mem);
-                    SetClipboardData(CF_TEXT,mem);
+                    SetClipboardData(CF_UNICODETEXT,mem);
                 }
             }
             CloseClipboard();
@@ -1953,6 +2020,24 @@ namespace dlib
         std::string& str
     )
     {
+        std::wstring wstr;
+        get_from_clipboard(wstr);
+        str = convert_wstring_to_mbstring(wstr);
+    }
+
+    void get_from_clipboard (
+        dlib::ustring& str
+    )
+    {
+        std::wstring wstr;
+        get_from_clipboard(wstr);
+        str = convert_wstring_to_utf32(wstr);
+    }
+
+    void get_from_clipboard (
+        std::wstring& str
+    )
+    {
         using namespace gui_core_kernel_1_globals;
         using namespace std;
 
@@ -1962,19 +2047,19 @@ namespace dlib
         if (OpenClipboard(helper_window))
         {
 
-            HANDLE data = GetClipboardData(CF_TEXT);
+            HANDLE data = GetClipboardData(CF_UNICODETEXT);
             if (data != NULL)
             {
-                char* buf = reinterpret_cast<char*>(GlobalLock(data));
+                wchar_t* buf = reinterpret_cast<wchar_t*>(GlobalLock(data));
                 if (buf != 0)
                 {
                     str.clear();
 
                     // copy the data from buf into str while also removing any '\r' 
                     // characters.
-                    while (*buf != '\0')
+                    while (*buf != L'\0')
                     {
-                        if (*buf != '\r')
+                        if (*buf != L'\r')
                             str += *buf;
                         ++buf;
                     }

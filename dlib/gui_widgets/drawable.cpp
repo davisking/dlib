@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_DRAWABLe_CPP_
 #define DLIB_DRAWABLe_CPP_
@@ -331,6 +331,25 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    void drawable_window::
+    on_string_put (
+        const std::wstring &str
+    )
+    {
+        ++event_id;
+        string_put.reset();
+        while (string_put.move_next())
+        {
+            if (string_put.element()->event_id != event_id)
+            {
+                string_put.element()->event_id = event_id;
+                string_put.element()->on_string_put(str);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // -----------  drawable object  ----------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -398,6 +417,11 @@ namespace dlib
             {
                 temp = this;
                 parent.window_moved.add(temp);
+            }
+            if (events & STRING_PUT)
+            {
+                temp = this;
+                parent.string_put.add(temp);
             }
             parent.invalidate_rectangle(rect);
         }
@@ -481,6 +505,8 @@ namespace dlib
                 parent.focus.remove(this,junk);
             if (events & WINDOW_MOVED)
                 parent.window_moved.remove(this,junk);
+            if (events & STRING_PUT)
+                parent.string_put.remove(this,junk);
         }
     }
 

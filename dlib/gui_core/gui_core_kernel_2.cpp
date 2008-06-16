@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_GUI_CORE_KERNEL_2_CPp_
 #define DLIB_GUI_CORE_KERNEL_2_CPp_
@@ -12,6 +12,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+#include <X11/Xlocale.h>
+#include <poll.h>
 #include <iostream>
 #include "../assert.h"
 #include "../queue.h"
@@ -37,6 +39,7 @@ namespace dlib
         {
             Window hwnd;
             Time last_click_time;
+            XIC xic;
         };
 
         typedef sync_extension<binary_search_tree<Window,base_window*>::kernel_1a>::kernel_1a 
@@ -44,11 +47,12 @@ namespace dlib
 
         int depth;
         Display* disp;
+        XIM xim;
         static Screen* screen;
 
         Atom delete_window; 
         static Window exit_window;
-        static std::string clipboard;
+        static std::wstring clipboard;
         static bool core_has_been_initialized = false;
 
         static int alt_mask = 0;
@@ -369,12 +373,27 @@ namespace dlib
                 bool quit_event_loop = false;
                 while (quit_event_loop == false)
                 {
-                    XEvent ev;                
-                    XNextEvent(disp,&ev);
-
-
                     // get a lock on the window_table's mutex
                     auto_mutex window_table_locker(window_table.get_mutex());
+
+                    XEvent ev;                
+                    while (XPending(disp) == 0){
+                        window_table.get_mutex().unlock();
+                        // wait until receiving X11 next event
+                        struct pollfd pfd;
+                        pfd.fd = ConnectionNumber(disp);
+                        pfd.events = POLLIN | POLLPRI;
+                        poll(&pfd, 1, -1);  
+                        
+                        window_table.get_mutex().lock();
+                    }
+                    XNextEvent(disp,&ev);
+
+                    // pass events to input method.
+                    // if this event is needed by input method, XFilterEvent returns True
+                    if (XFilterEvent(&ev, None) == True){
+                        continue;
+                    }
 
                     // if this event is for one of the windows in the window_table
                     // then get that window out of the table and put it into win.
@@ -398,6 +417,7 @@ namespace dlib
 
                     case SelectionRequest:
                         {
+                            Atom a_ct = XInternAtom(disp, "COMPOUND_TEXT", False);
                             XSelectionRequestEvent* req = reinterpret_cast<XSelectionRequestEvent*>(&ev.xselectionrequest);
                             XEvent respond;
 
@@ -408,6 +428,18 @@ namespace dlib
                                                  req->property,
                                                  XA_STRING,
                                                  8,
+                                                 PropModeReplace,
+                                                 reinterpret_cast<const unsigned char*>(convert_wstring_to_mbstring(clipboard).c_str()),
+                                                 clipboard.size()+1);
+                                respond.xselection.property=req->property;
+                            }
+                            else if (req->target == a_ct)
+                            {
+                                XChangeProperty (disp,
+                                                 req->requestor,
+                                                 req->property,
+                                                 a_ct,
+                                                 sizeof(wchar_t)*8,
                                                  PropModeReplace,
                                                  reinterpret_cast<const unsigned char*>(clipboard.c_str()),
                                                  clipboard.size()+1);
@@ -494,17 +526,30 @@ namespace dlib
                             if((e->state & scroll_lock_mask)!=0)
                                 state |= base_window::KBD_MOD_SCROLL_LOCK;
 
-                            char buffer[2];
                             KeySym key;
-                            XLookupString(e,buffer,2,&key,NULL);
+                            Status status;
 
-                            bool is_printable;
-                            unsigned long result;
+                            std::wstring wstr;
+                            wstr.resize(2);
+                            int len = XwcLookupString(win->x11_stuff.xic,e,&wstr[0],wstr.size(),&key,&status);
+                            if (status == XBufferOverflow){
+                                wstr.resize(len);
+                                len = XwcLookupString(win->x11_stuff.xic,e,&wstr[0],wstr.size(),&key,&status);
+                            }
+                            if (status == XLookupChars){
+                                win->on_string_put(wstr);
+                            }
 
-                            if (map_keys(key,shift,caps,result,is_printable))
-                            {
-                                // signal the keyboard event
-                                win->on_keydown(result,is_printable,state);
+                            else if (status == XLookupKeySym || status == XLookupBoth){
+
+                                bool is_printable;
+                                unsigned long result;
+
+                                if (map_keys(key,shift,caps,result,is_printable))
+                                {
+                                    // signal the keyboard event
+                                    win->on_keydown(result,is_printable,state);
+                                }
                             }
                             
                         } break;
@@ -1009,6 +1054,9 @@ namespace dlib
                 using namespace gui_core_kernel_2_globals;
                 try
                 {
+
+/*
+                    // causes dead-lock when using with XIM
                     if (XInitThreads() == 0)
                     {
                         dlog << LFATAL << "Unable to initialize threading support.";
@@ -1019,12 +1067,16 @@ namespace dlib
                         window_table.get_mutex().unlock();
                         return;
                     }
+*/
 
-
+                    window_table.get_mutex().lock();
                     disp = XOpenDisplay(NULL);
+                    window_table.get_mutex().unlock();
                     if (disp == 0)
                     {
+                        window_table.get_mutex().lock();
                         disp = XOpenDisplay(":0.0");
+                        window_table.get_mutex().unlock();
                         if (disp == 0)
                         {
                             dlog << LFATAL << "Unable to connect to the X display.";
@@ -1037,14 +1089,23 @@ namespace dlib
                         }
                     }
 
+                    window_table.get_mutex().lock();
                     screen = DefaultScreenOfDisplay(disp);
                     depth = DefaultDepthOfScreen(screen);
                     delete_window = XInternAtom(disp,"WM_DELETE_WINDOW",1); 
+                    window_table.get_mutex().unlock();
 
+                    xim = NULL;
+                    window_table.get_mutex().lock();
+                    if (setlocale( LC_CTYPE, "" ) && XSupportsLocale() && XSetLocaleModifiers("")){
+                            xim = XOpenIM(disp, NULL, NULL, NULL);
+                    }
+                    window_table.get_mutex().unlock();
 
                     // make this window just so we can send messages to it and trigger
                     // events in the event thread
                     XSetWindowAttributes attr;
+                    window_table.get_mutex().lock();
                     exit_window = XCreateWindow(
                         disp,
                         DefaultRootWindow(disp),
@@ -1059,6 +1120,7 @@ namespace dlib
                         0,
                         &attr
                     );
+                    window_table.get_mutex().unlock();
 
                     // signal that the event thread is now up and running
                     window_table.get_mutex().lock();
@@ -1204,6 +1266,20 @@ namespace dlib
         const std::string& str
     )
     {
+        put_on_clipboard(convert_mbstring_to_wstring(str));
+    }
+
+    void put_on_clipboard (
+        const dlib::ustring& str
+    )
+    {
+        put_on_clipboard(convert_utf32_to_wstring(str));
+    }
+
+    void put_on_clipboard (
+        const std::wstring& str
+    )
+    {
         using namespace gui_core_kernel_2_globals;
         init_gui_core();
         auto_mutex M(window_table.get_mutex());
@@ -1235,11 +1311,30 @@ namespace dlib
         std::string& str
     )
     {
+        std::wstring wstr;
+        get_from_clipboard(wstr);
+        str = convert_wstring_to_mbstring(wstr);
+    }
+
+    void get_from_clipboard (
+        dlib::ustring& str
+    )
+    {
+        std::wstring wstr;
+        get_from_clipboard(wstr);
+        str = convert_wstring_to_utf32(wstr);
+    }
+
+    void get_from_clipboard (
+        std::wstring& str
+    )
+    {
         using namespace gui_core_kernel_2_globals;
         init_gui_core();
         auto_mutex M(window_table.get_mutex());
         str.clear();
         unsigned char *data = 0;
+        wchar_t **plist = 0;
         Window sown;
         Atom  type;
         int format, result;
@@ -1248,6 +1343,7 @@ namespace dlib
 
         try
         {
+            Atom atom_ct = XInternAtom(disp, "COMPOUND_TEXT", False);
             sown = XGetSelectionOwner (disp, XA_PRIMARY);
             if (sown == exit_window)
             {
@@ -1261,7 +1357,7 @@ namespace dlib
                 // of the exit_window.  It doesn't matter what window we put it in 
                 // so long as it is one under the control of this process and exit_window
                 // is easy to use here so that is what I'm using.
-                XConvertSelection (disp, XA_PRIMARY, XA_STRING, XA_PRIMARY,
+                XConvertSelection (disp, XA_PRIMARY, atom_ct, XA_PRIMARY,
                                    exit_window, CurrentTime);
 
                 // This will wait until we get a SelectionNotify event which should happen
@@ -1283,20 +1379,23 @@ namespace dlib
                     XFree(data);
                     data = 0;
                 }
-                if (bytes_left > 0 && type == XA_STRING)
+                if (bytes_left > 0 && type == atom_ct)
                 {
+                    XTextProperty p;
                     result = XGetWindowProperty (disp, exit_window, 
                                                  XA_PRIMARY, 0,bytes_left,0,
-                                                 AnyPropertyType, &type,&format,
-                                                 &len, &dummy, &data);
-                    if (result == Success && type == XA_STRING)
+                                                 AnyPropertyType, &p.encoding,&p.format,
+                                                 &p.nitems, &dummy, &p.value);
+                    if (result == Success && p.encoding == atom_ct)
                     {
-                        str = (char*)data;
+                        int n;
+                        XwcTextPropertyToTextList(disp, &p, &plist, &n);
+                        str = plist[0];
                     }
-                    if (data)
+                    if (plist)
                     {
-                        XFree(data);
-                        data = 0;
+                        XwcFreeStringList(plist);
+                        plist = 0;
                     }
                 }
             }
@@ -1305,6 +1404,11 @@ namespace dlib
         {
             if (data) 
                 XFree(data);
+            if (plist)
+            {
+                XwcFreeStringList(plist);
+                plist = 0;
+            }
         }
     }
 
@@ -1421,16 +1525,31 @@ namespace dlib
                         &attr
                         );
 
+        x11_stuff.xic = NULL;
+        if (gui_core_kernel_2_globals::xim)
+        {
+            x11_stuff.xic = XCreateIC(
+                gui_core_kernel_2_globals::xim,
+                XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
+                XNClientWindow, x11_stuff.hwnd,
+                NULL
+                );
+        }
+
         Window temp = x11_stuff.hwnd;
         base_window* ttemp = this;
         gui_core_kernel_2_globals::window_table.add(temp,ttemp);
+        
+        // query event mask required by input method
+        unsigned long event_xim = 0;
+        XGetICValues( x11_stuff.xic, XNFilterEvents, &event_xim, NULL );
         
         XSelectInput(
             gui_core_kernel_2_globals::disp,
             x11_stuff.hwnd,
             StructureNotifyMask|ExposureMask|ButtonPressMask|ButtonReleaseMask|
             PointerMotionMask|LeaveWindowMask|EnterWindowMask|KeyPressMask|
-            KeyReleaseMask| FocusChangeMask
+            KeyReleaseMask| FocusChangeMask | event_xim
             );
 
         XSetWMProtocols(
@@ -1483,6 +1602,9 @@ namespace dlib
 
             gui_core_kernel_2_globals::window_table.destroy(x11_stuff.hwnd);           
 
+            XDestroyIC(x11_stuff.xic);
+            x11_stuff.xic = 0;
+
             XDestroyWindow(gui_core_kernel_2_globals::disp,x11_stuff.hwnd);
             x11_stuff.hwnd = 0;
             gui_core_kernel_2_globals::window_close_signaler.broadcast();
@@ -1506,6 +1628,23 @@ namespace dlib
         const std::string& title_
     )
     {
+        set_title(convert_mbstring_to_wstring(title_));
+    }
+
+    void base_window::
+    set_title (
+        const ustring& title_
+    )
+    {
+        set_title(convert_utf32_to_wstring(title_));
+    }
+
+    void base_window::
+    set_title (
+        const std::wstring& title_
+    )
+    {
+        auto_mutex M(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::set_title"
             << "\n\tYou can't do this to a window that has been closed."
@@ -1513,9 +1652,9 @@ namespace dlib
             );
         // I'm pretty sure the pointer won't be modified even though
         // it isn't const anymore.
-        char *title = const_cast<char*>(title_.c_str());
+        wchar_t *title = const_cast<wchar_t *>(title_.c_str());
         XTextProperty property;
-        XStringListToTextProperty(&title,1,&property);
+        XwcTextListToTextProperty(gui_core_kernel_2_globals::disp,&title,1,XStdICCTextStyle, &property);
         XSetWMName(gui_core_kernel_2_globals::disp,x11_stuff.hwnd,&property);
         XFree(property.value);
         XFlush(gui_core_kernel_2_globals::disp);
@@ -1527,6 +1666,7 @@ namespace dlib
     show (
     )    
     {
+        auto_mutex M(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::show"
             << "\n\tYou can't do this to a window that has been closed."
@@ -1553,6 +1693,7 @@ namespace dlib
     hide (
     )    
     {
+        auto_mutex M(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::hide"
             << "\n\tYou can't do this to a window that has been closed."

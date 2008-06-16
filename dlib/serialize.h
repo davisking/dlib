@@ -118,6 +118,7 @@
 #include "interfaces/enumerable.h"
 #include "interfaces/map_pair.h"
 #include "enable_if.h"
+#include "unicode.h"
 
 namespace dlib
 {
@@ -763,6 +764,40 @@ namespace dlib
             deserialize(item[i],in);
 
         if (!in) throw serialization_error("Error deserializing object of type std::wstring");
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void serialize (
+        const ustring& item,
+        std::ostream& out
+    )
+    {
+        const unsigned long size = static_cast<unsigned long>(item.size());
+        try{ serialize(size,out); }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type ustring"); }
+
+        for (unsigned long i = 0; i < item.size(); ++i)
+            serialize(item[i], out);
+        if (!out) throw serialization_error("Error serializing object of type ustring");
+    }
+
+    inline void deserialize (
+        ustring& item,
+        std::istream& in
+    )
+    {
+        unsigned long size;
+        try { deserialize(size,in); }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type ustring"); }
+
+        item.resize(size);
+        for (unsigned long i = 0; i < item.size(); ++i)
+            deserialize(item[i],in);
+
+        if (!in) throw serialization_error("Error deserializing object of type ustring");
     }
 
 // ----------------------------------------------------------------------------------------

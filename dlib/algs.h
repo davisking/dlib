@@ -6,19 +6,6 @@
 // this file contains miscellaneous stuff                      
 
 
-#include <algorithm>    // for std::swap
-#include <new>          // for std::bad_alloc
-#include <string>       // for the exceptions
-#include <cstdlib>
-#include "platform.h"
-#include "assert.h"
-#include "error.h"
-#include "noncopyable.h"
-#include "enable_if.h"
-#include "uintn.h"
-
-
-
 #ifdef _MSC_VER
 // Disable the following warnings for Visual Studio
 
@@ -54,6 +41,19 @@
 #pragma option -w-8027
 #pragma option -w-8026 
 #endif
+
+
+#include <algorithm>    // for std::swap
+#include <new>          // for std::bad_alloc
+#include <string>       // for the exceptions
+#include <cstdlib>
+#include "platform.h"
+#include "assert.h"
+#include "error.h"
+#include "noncopyable.h"
+#include "enable_if.h"
+#include "uintn.h"
+
 
 
 // ----------------------------------------------------------------------------------------

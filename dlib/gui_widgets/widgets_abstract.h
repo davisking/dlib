@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #undef DLIB_WIDGETs_ABSTRACT_
@@ -204,7 +204,45 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_text (
+            const std::wstring& text
+        );
+        /*!
+            ensures
+                - #text() == text
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_text (
+            const dlib::ustring& text
+        );
+        /*!
+            ensures
+                - #text() == text
+            throws
+                - std::bad_alloc
+        !*/
+
         const std::string text (
+        ) const;
+        /*!
+            ensures
+                - returns the text of this label
+            throws
+                - std::bad_alloc
+        !*/
+
+        const std::wstring wtext (
+        ) const;
+        /*!
+            ensures
+                - returns the text of this label
+            throws
+                - std::bad_alloc
+        !*/
+
+        const dlib::ustring utext (
         ) const;
         /*!
             ensures
@@ -303,7 +341,49 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_name (
+            const std::wstring& name
+        );
+        /*!
+            ensures
+                - #name() == name
+                - this button has been resized such that it is big enough to contain
+                  the new name.
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_name (
+            const dlib::ustring& name
+        );
+        /*!
+            ensures
+                - #name() == name
+                - this button has been resized such that it is big enough to contain
+                  the new name.
+            throws
+                - std::bad_alloc
+        !*/
+
         const std::string name (
+        ) const;
+        /*!
+            ensures
+                - returns the name of this button
+            throws
+                - std::bad_alloc
+        !*/
+
+        const std::wstring wname (
+        ) const;
+        /*!
+            ensures
+                - returns the name of this button
+            throws
+                - std::bad_alloc
+        !*/
+
+        const dlib::string uname (
         ) const;
         /*!
             ensures
@@ -322,6 +402,20 @@ namespace dlib
         !*/
 
         const std::string tooltip_text (
+        ) const;
+        /*!
+            ensures
+                - returns the text that is displayed in the tooltip for this button
+        !*/
+
+        const std::wstring tooltip_wtext (
+        ) const;
+        /*!
+            ensures
+                - returns the text that is displayed in the tooltip for this button
+        !*/
+
+        const dlib::ustring tooltip_utext (
         ) const;
         /*!
             ensures
@@ -445,6 +539,30 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_name (
+            const std::wstring& name
+        );
+        /*!
+            ensures
+                - #name() == name
+                - this toggle_button has been resized such that it is big enough to contain
+                  the new name.
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_name (
+            const dlib::ustring& name
+        );
+        /*!
+            ensures
+                - #name() == name
+                - this toggle_button has been resized such that it is big enough to contain
+                  the new name.
+            throws
+                - std::bad_alloc
+        !*/
+
         void set_size (
             unsigned long width_,
             unsigned long height_
@@ -462,6 +580,24 @@ namespace dlib
 
         void set_tooltip_text (
             const std::string& text
+        );
+        /*!
+            ensures
+                - #tooltip_text() == text
+                - enables the tooltip for this toggle_button
+        !*/
+
+        void set_tooltip_text (
+            const std::wstring& text
+        );
+        /*!
+            ensures
+                - #tooltip_text() == text
+                - enables the tooltip for this toggle_button
+        !*/
+
+        void set_tooltip_text (
+            const dlib::ustring& text
         );
         /*!
             ensures
@@ -501,6 +637,26 @@ namespace dlib
         !*/
 
         const std::string name (
+        ) const;
+        /*!
+            ensures
+                - returns the name of this toggle_button.  The name is a string
+                  that appears to the right of the actual check box.
+            throws
+                - std::bad_alloc
+        !*/
+
+        const std::wstring wname (
+        ) const;
+        /*!
+            ensures
+                - returns the name of this toggle_button.  The name is a string
+                  that appears to the right of the actual check box.
+            throws
+                - std::bad_alloc
+        !*/
+
+        const dlib::ustring uname (
         ) const;
         /*!
             ensures
@@ -628,7 +784,51 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_text (
+            const std::wstring& text
+        );
+        /*!
+            requires
+                - text.find_first_of('\n') == std::wstring::npos 
+                  (i.e. there aren't any new lines in text)
+            ensures
+                - #text() == text
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_text (
+            const dlib::ustring& text
+        );
+        /*!
+            requires
+                - text.find_first_of('\n') == dlib::ustring::npos 
+                  (i.e. there aren't any new lines in text)
+            ensures
+                - #text() == text
+            throws
+                - std::bad_alloc
+        !*/
+
         const std::string text (
+        ) const;
+        /*!
+            ensures
+                - returns the text of this text_field
+            throws
+                - std::bad_alloc
+        !*/
+
+        const std::wstring wtext (
+        ) const;
+        /*!
+            ensures
+                - returns the text of this text_field
+            throws
+                - std::bad_alloc
+        !*/
+
+        const dlib::ustring utext (
         ) const;
         /*!
             ensures
@@ -871,9 +1071,55 @@ namespace dlib
                 - returns a const reference to the name of the tab given by idx
         !*/
 
+        const std::wstring& tab_wname (
+            unsigned long idx
+        ) const;
+        /*!
+            requires
+                - idx < number_of_tabs()
+            ensures
+                - returns a const reference to the name of the tab given by idx
+        !*/
+
+        const dlib::ustring& tab_uname (
+            unsigned long idx
+        ) const;
+        /*!
+            requires
+                - idx < number_of_tabs()
+            ensures
+                - returns a const reference to the name of the tab given by idx
+        !*/
+
         void set_tab_name (
             unsigned long idx,
             const std::string& new_name
+        );
+        /*!
+            requires
+                - idx < number_of_tabs()
+            ensures
+                - #tab_name(idx) == new_name
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_tab_name (
+            unsigned long idx,
+            const std::wstring& new_name
+        );
+        /*!
+            requires
+                - idx < number_of_tabs()
+            ensures
+                - #tab_name(idx) == new_name
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_tab_name (
+            unsigned long idx,
+            const dlib::ustring& new_name
         );
         /*!
             requires
@@ -1015,7 +1261,45 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_name (
+            const std::wstring& name
+        );
+        /*!
+            ensures
+                - #name() == name
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_name (
+            const dlib::ustring& name
+        );
+        /*!
+            ensures
+                - #name() == name
+            throws
+                - std::bad_alloc
+        !*/
+
         const std::string name (
+        ) const;
+        /*!
+            ensures
+                - returns the name of this named_rectangle
+            throws
+                - std::bad_alloc
+        !*/
+
+        const std::wstring wname (
+        ) const;
+        /*!
+            ensures
+                - returns the name of this named_rectangle
+            throws
+                - std::bad_alloc
+        !*/
+
+        const dlib::ustring uname (
         ) const;
         /*!
             ensures
@@ -1296,6 +1580,18 @@ namespace dlib
         list_box& operator=(list_box&);    // assignment operator
     };
 
+    class wlist_box : public drawable, 
+    public enumerable<const std::wstring>;
+    /*!
+        same as list_box except for std::wstring instead of std::string
+    !*/
+
+    class ulist_box : public drawable, 
+    public enumerable<const dlib::ustring>;
+    /*!
+        same as list_box except for dlib::ustring instead of std::string
+    !*/
+    
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     // class menu_bar 
@@ -1367,6 +1663,26 @@ namespace dlib
         !*/
 
         const std::string menu_name (
+            unsigned long idx
+        ) const;
+        /*!
+            requires
+                - idx < number_of_menus()
+            ensures
+                - returns the name of the menu with index idx
+        !*/
+
+        const std::wstring menu_wname (
+            unsigned long idx
+        ) const;
+        /*!
+            requires
+                - idx < number_of_menus()
+            ensures
+                - returns the name of the menu with index idx
+        !*/
+
+        const dlib::ustring menu_uname (
             unsigned long idx
         ) const;
         /*!
@@ -1530,6 +1846,28 @@ namespace dlib
                 - #node_label(i) == label
         !*/
 
+        void set_node_label (
+            unsigned long i,
+            const std::wstring& label
+        );
+        /*!
+            requires
+                - i < number_of_nodes()
+            ensures
+                - #node_label(i) == label
+        !*/
+
+        void set_node_label (
+            unsigned long i,
+            const dlib::ustring& label
+        );
+        /*!
+            requires
+                - i < number_of_nodes()
+            ensures
+                - #node_label(i) == label
+        !*/
+
         void set_node_color (
             unsigned long i,
             rgb_pixel color
@@ -1552,6 +1890,26 @@ namespace dlib
         !*/
 
         const std::string node_label (
+            unsigned long i
+        ) const;
+        /*!
+            requires
+                - i < number_of_nodes()
+            ensures
+                - returns the text label for node graph_node(i)
+        !*/
+
+        const std::wstring node_wlabel (
+            unsigned long i
+        ) const;
+        /*!
+            requires
+                - i < number_of_nodes()
+            ensures
+                - returns the text label for node graph_node(i)
+        !*/
+
+        const dlib::ustring node_ulabel (
             unsigned long i
         ) const;
         /*!
@@ -1749,10 +2107,60 @@ namespace dlib
                 - returns the text in the given grid location
         !*/
 
+        const std::wstring wtext (
+            unsigned long row,
+            unsigned long col
+        ) const;
+        /*!
+            requires
+                - row < number_of_rows()
+                - col < number_of_columns()
+            ensures
+                - returns the text in the given grid location
+        !*/
+
+        const dlib::ustring utext (
+            unsigned long row,
+            unsigned long col
+        ) const;
+        /*!
+            requires
+                - row < number_of_rows()
+                - col < number_of_columns()
+            ensures
+                - returns the text in the given grid location
+        !*/
+
         void set_text (
             unsigned long row,
             unsigned long col,
             const std::string& str
+        );
+        /*!
+            requires
+                - row < number_of_rows()
+                - col < number_of_columns()
+            ensures
+                - #text(row,col) == str
+        !*/
+
+        void set_text (
+            unsigned long row,
+            unsigned long col,
+            const std::wstring& str
+        );
+        /*!
+            requires
+                - row < number_of_rows()
+                - col < number_of_columns()
+            ensures
+                - #text(row,col) == str
+        !*/
+
+        void set_text (
+            unsigned long row,
+            unsigned long col,
+            const dlib::ustring& str
         );
         /*!
             requires

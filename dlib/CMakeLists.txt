@@ -51,7 +51,7 @@ IF (NOT DLIB_ISO_CPP_ONLY)
       if (DLIB_NO_GUI_SUPPORT)
          set (dlib_needed_libraries ws2_32)
       else()
-         set (dlib_needed_libraries ws2_32 comctl32 gdi32)
+         set (dlib_needed_libraries ws2_32 comctl32 gdi32 imm32)
       endif()
    ELSEIF(APPLE) ############################################################################
       FIND_LIBRARY(pthreadlib pthread)
