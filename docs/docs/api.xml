@@ -430,6 +430,10 @@
                                  <link>dlib/gui_widgets/drawable_abstract.h.html#on_keydown</link>
                               </item>
                               <item>
+                                 <name>on_string_put</name>
+                                 <link>dlib/gui_widgets/drawable_abstract.h.html#on_string_put</link>
+                              </item>
+                              <item>
                                  <name>on_user_event</name>
                                  <link>dlib/gui_widgets/drawable_abstract.h.html#on_user_event</link>
                               </item>
@@ -459,6 +463,10 @@
                            <item>
                                <name>default_font</name>
                                <link>dlib/gui_widgets/fonts_abstract.h.html#default_font</link>
+                           </item>                      
+                           <item>
+                               <name>get_native_font</name>
+                               <link>dlib/gui_widgets/fonts_abstract.h.html#get_native_font</link>
                            </item>                      
                            <item>
                                <name>bdf_font</name>

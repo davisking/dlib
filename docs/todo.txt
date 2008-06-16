@@ -12,8 +12,6 @@ smart pointer that uses a memory manager.   think memory pool with pool pointers
 make a function to make a vector of vectors look like a matrix
 
 
-implement kmeans++
-
 
 add something to unroll a matrix into a vector
 

@@ -145,6 +145,12 @@
             <term link="dlib/gui_widgets/drawable_abstract.h.html#on_keydown" name="in drawable object"/>
          </term>
 
+         <term name="on_string_put">
+            <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#on_string_put" name="in base_window object"/>
+            <term link="dlib/gui_widgets/drawable_abstract.h.html#on_string_put" name="in drawable object"/>
+         </term>
+
+
          <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#paint" name="paint"/>
 
 
@@ -267,6 +273,7 @@
          <term link="dlib/gui_widgets/fonts_abstract.h.html#letter" name="letter"/>
          <term link="dlib/gui_widgets/fonts_abstract.h.html#font" name="font"/>
          <term link="dlib/gui_widgets/fonts_abstract.h.html#default_font" name="default_font"/>
+         <term link="dlib/gui_widgets/fonts_abstract.h.html#get_native_font" name="get_native_font"/>
          <term link="dlib/gui_widgets/fonts_abstract.h.html#bdf_font" name="bdf_font"/>
 
 
