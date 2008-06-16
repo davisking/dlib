@@ -479,7 +479,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    font* get_native_font (
+    const font* get_native_font (
     );
     /*!
         ensures
