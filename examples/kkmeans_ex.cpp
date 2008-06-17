@@ -56,15 +56,18 @@ int main()
 
     dlib::rand::float_1a rnd;
 
-    // we will make 25 points from each class
-    const long num = 25;
+    // we will make 50 points from each class
+    const long num = 50;
 
     // make some samples near the origin
     double radius = 0.5;
     for (long i = 0; i < num; ++i)
     {
+        double sign = 1;
+        if (rnd.get_random_double() < 0.5)
+            sign = -1;
         m(0) = 2*radius*rnd.get_random_double()-radius;
-        m(1) = sqrt(radius*radius - m(0)*m(0));
+        m(1) = sign*sqrt(radius*radius - m(0)*m(0));
 
         // add this sample to our set of samples we will run k-means 
         samples.push_back(m);
@@ -74,19 +77,25 @@ int main()
     radius = 10.0;
     for (long i = 0; i < num; ++i)
     {
+        double sign = 1;
+        if (rnd.get_random_double() < 0.5)
+            sign = -1;
         m(0) = 2*radius*rnd.get_random_double()-radius;
-        m(1) = sqrt(radius*radius - m(0)*m(0));
+        m(1) = sign*sqrt(radius*radius - m(0)*m(0));
 
         // add this sample to our set of samples we will run k-means 
         samples.push_back(m);
     }
 
-    // make some samples in a circle around the point (20,20) 
+    // make some samples in a circle around the point (25,25) 
     radius = 4.0;
     for (long i = 0; i < num; ++i)
     {
+        double sign = 1;
+        if (rnd.get_random_double() < 0.5)
+            sign = -1;
         m(0) = 2*radius*rnd.get_random_double()-radius;
-        m(1) = sqrt(radius*radius - m(0)*m(0));
+        m(1) = sign*sqrt(radius*radius - m(0)*m(0));
 
         // translate this point away from the origin
         m(0) += 25;
