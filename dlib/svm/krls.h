@@ -325,9 +325,12 @@ namespace dlib
         matrix<scalar_type,0,1,mem_manager_type> k;
         matrix<scalar_type,1,0,mem_manager_type> temp_matrix;
 
-        const static double tau = 0.01;
+        const static double tau;
 
     };
+
+    template <typename kernel_type>
+    const double krls<kernel_type>::tau = 0.01;
 
 // ----------------------------------------------------------------------------------------
 
