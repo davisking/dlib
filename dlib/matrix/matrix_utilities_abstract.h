@@ -682,6 +682,8 @@ namespace dlib
         const matrix_exp& m
     );
     /*!
+        requires
+            - m.size() > 0
         ensures
             - returns the value of the smallest element of m
     !*/
@@ -692,6 +694,8 @@ namespace dlib
         const matrix_exp& m
     );
     /*!
+        requires
+            - m.size() > 0
         ensures
             - returns the value of the biggest element of m
     !*/

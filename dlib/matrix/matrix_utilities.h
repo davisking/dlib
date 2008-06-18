@@ -171,6 +171,11 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
+        DLIB_ASSERT(m.size() > 0, 
+            "\ttype max(const matrix_exp& m)"
+            << "\n\tYou can't ask for the max() of an empty matrix"
+            << "\n\tm.size():     " << m.size() 
+            );
         typedef typename matrix_exp<EXP>::type type;
 
         type val = m(0,0);
@@ -195,6 +200,11 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
+        DLIB_ASSERT(m.size() > 0, 
+            "\ttype min(const matrix_exp& m)"
+            << "\n\tYou can't ask for the min() of an empty matrix"
+            << "\n\tm.size():     " << m.size() 
+            );
         typedef typename matrix_exp<EXP>::type type;
 
         type val = m(0,0);
