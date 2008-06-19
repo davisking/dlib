@@ -1,0 +1,120 @@
+// Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
+#ifndef DLIB_STATISTICs_
+#define DLIB_STATISTICs_
+
+#include "statistics_abstract.h"
+#include <limits>
+#include <cmath>
+#include "../algs.h"
+
+namespace dlib
+{
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    class running_stats
+    {
+    public:
+
+        running_stats()
+        {
+            clear();
+
+            COMPILE_TIME_ASSERT ((
+                    is_same_type<float,T>::value ||
+                    is_same_type<double,T>::value ||
+                    is_same_type<long double,T>::value 
+            ));
+        }
+
+        void clear()
+        {
+            sum = 0;
+            sum_sqr = 0;
+            n = 0;
+            maximum_n = std::numeric_limits<T>::max();
+        }
+
+        void set_max_n (
+            const T& val
+        )
+        {
+            maximum_n = val;
+        }
+
+        void add (
+            const T& val
+        )
+        {
+            const T div_n   = 1/(n+1);
+            const T n_div_n = n*div_n;
+
+            sum     = n_div_n*sum     + val*div_n;
+            sum_sqr = n_div_n*sum_sqr + val*div_n*val;
+
+            if (n < maximum_n)
+                ++n;
+        }
+
+        T max_n (
+        ) const
+        {
+            return max_n;
+        }
+
+        T current_n (
+        ) const
+        {
+            return n;
+        }
+
+        T mean (
+        ) const
+        {
+            return sum;
+        }
+
+        T variance (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_stats::variance"
+                << "\n\tsize of queue should not be zero"
+                << "\n\tthis: " << this
+                );
+
+            const T temp = n/(n-1);
+            return temp*(sum_sqr - sum*sum);
+        }
+
+        T scale (
+            const T& val
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_stats::variance"
+                << "\n\tsize of queue should not be zero"
+                << "\n\tthis: " << this
+                );
+            return (val-mean())/std::sqrt(variance());
+        }
+
+    private:
+        T sum;
+        T sum_sqr;
+        T n;
+        T maximum_n;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+}
+
+#endif // DLIB_STATISTICs_
+
