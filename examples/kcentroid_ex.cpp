@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "dlib/svm.h"
+#include "dlib/statistics.h"
 
 using namespace std;
 using namespace dlib;
@@ -56,31 +57,60 @@ int main()
         test.train(m);
     }
 
+    running_stats<double> rs;
 
-    // lets output the distance from the centroid to some points that are from the sinc function.
-    // These numbers should all be similar
+    // Now lets output the distance from the centroid to some points that are from the sinc function.
+    // These numbers should all be similar.  We will also calculate the statistics of these numbers
+    // by accumulating them into the running_stats object called rs.  This will let us easily
+    // find the mean and standard deviation of the distances for use below.
     cout << "Points that are on the sinc function:\n";
-    m(0) = -1.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;
-    m(0) = -1.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;
-    m(0) = -0;   m(1) = sinc(m(0)); cout << "   " << test(m) << endl;
-    m(0) = -0.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;
-    m(0) = -4.1; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;
-    m(0) = -1.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;
-    m(0) = -0.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;
+    m(0) = -1.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;  rs.add(test(m));
+    m(0) = -1.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;  rs.add(test(m));
+    m(0) = -0;   m(1) = sinc(m(0)); cout << "   " << test(m) << endl;  rs.add(test(m));
+    m(0) = -0.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;  rs.add(test(m));
+    m(0) = -4.1; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;  rs.add(test(m));
+    m(0) = -1.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;  rs.add(test(m));
+    m(0) = -0.5; m(1) = sinc(m(0)); cout << "   " << test(m) << endl;  rs.add(test(m));
 
-    // lets output the distance from the centroid to some points that are NOT from the sinc function.
-    // These numbers should all be bigger than previous set of numbers.  In fact, if you computed the
-    // standard deviation of the above set of numbers you would note that these following numbers
-    // are many standard deviations away from them which indicates that they are highly unlike
-    // the set of points from above.
+    cout << endl;
+    // Lets output the distance from the centroid to some points that are NOT from the sinc function.
+    // These numbers should all be significantly bigger than previous set of numbers.  We will also
+    // use the rs.scale() function to find out how many standard deviations they are away from the 
+    // mean of the test points from the sinc function.  So in this case our criterion for "significantly bigger"
+    // is > 3 or 4 standard deviations away from the above points that actually are on the sinc function.
     cout << "Points that are NOT on the sinc function:\n";
-    m(0) = -1.5; m(1) = sinc(m(0))+4;   cout << "   " << test(m) << endl;
-    m(0) = -1.5; m(1) = sinc(m(0))+3;   cout << "   " << test(m) << endl;
-    m(0) = -0;   m(1) = -sinc(m(0));    cout << "   " << test(m) << endl;
-    m(0) = -0.5; m(1) = -sinc(m(0));    cout << "   " << test(m) << endl;
-    m(0) = -4.1; m(1) = sinc(m(0))+2;   cout << "   " << test(m) << endl;
-    m(0) = -1.5; m(1) = sinc(m(0))+0.9; cout << "   " << test(m) << endl;
-    m(0) = -0.5; m(1) = sinc(m(0))+1;   cout << "   " << test(m) << endl;
+    m(0) = -1.5; m(1) = sinc(m(0))+4;   cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
+    m(0) = -1.5; m(1) = sinc(m(0))+3;   cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
+    m(0) = -0;   m(1) = -sinc(m(0));    cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
+    m(0) = -0.5; m(1) = -sinc(m(0));    cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
+    m(0) = -4.1; m(1) = sinc(m(0))+2;   cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
+    m(0) = -1.5; m(1) = sinc(m(0))+0.9; cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
+    m(0) = -0.5; m(1) = sinc(m(0))+1;   cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
+
+    // The output is as follows:
+    /*
+        Points that are on the sinc function:
+            0.869861
+            0.869861
+            0.873182
+            0.872628
+            0.870352
+            0.869861
+            0.872628
+
+        Points that are NOT on the sinc function:
+            1.06306 is standard deviations from sinc: 125.137
+            1.0215 is standard deviations from sinc: 98.0313
+            0.92136 is standard deviations from sinc: 32.717
+            0.918282 is standard deviations from sinc: 30.7096
+            0.930931 is standard deviations from sinc: 38.9595
+            0.897916 is standard deviations from sinc: 17.4264
+            0.913855 is standard deviations from sinc: 27.822
+
+    */
+
+    // So we can see that in this example the kcentroid object correctly indicates that 
+    // the non-sinc points are definitely not points from the sinc function.
 }
 
 
