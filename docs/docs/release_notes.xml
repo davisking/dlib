@@ -20,6 +20,7 @@ New Stuff:
      serialization format of the objects.  
    - Added the pick_initial_centers() function
    - Merged in Keita Mochizuki's unicode patches to the GUI components
+   - Added the running_stats object
 
 Non-Backwards Compatible Changes:
    - Changed the interface to the krls and kcentroid objects somewhat.

@@ -398,6 +398,7 @@
          <term link="algorithms.html#point" name="point"/>
          <term link="algorithms.html#krls" name="krls"/>
          <term link="algorithms.html#kcentroid" name="kcentroid"/>
+         <term link="algorithms.html#running_stats" name="running_stats"/>
          <term link="algorithms.html#kkmeans" name="kkmeans"/>
          <term link="algorithms.html#pick_initial_centers" name="pick_initial_centers"/>
 

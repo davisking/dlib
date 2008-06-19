@@ -27,6 +27,7 @@
          <item>bigint</item> 
          <item>crc32</item> 
          <item>rand</item> 
+         <item>running_stats</item> 
          <item>mlp</item> 
          <item nolink="true">
             <name>Optimization</name>
@@ -805,6 +806,24 @@
 
          <examples>
             <example>kkmeans_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>running_stats</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object represents something that can compute the running mean and
+                variance of a stream of real numbers.  
+         </description>
+
+         <examples>
+            <example>kcentroid_ex.cpp.html</example>
          </examples>
                                  
       </component>
