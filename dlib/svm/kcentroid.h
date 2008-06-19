@@ -110,7 +110,7 @@ namespace dlib
         )
         {
             ++samples_seen;
-            const scalar_type xscale = 1.0/samples_seen;
+            const scalar_type xscale = 1/samples_seen;
             const scalar_type cscale = 1-xscale;
             train_and_maybe_test(x,cscale,xscale,false);
         }

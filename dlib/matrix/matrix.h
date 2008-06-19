@@ -1347,7 +1347,7 @@ namespace dlib
     )
     {
         typedef matrix_mulscal_exp<matrix_exp<EXP>,float >  exp;
-        return matrix_exp<exp>(exp(m,1.0/s));
+        return matrix_exp<exp>(exp(m,1/s));
     }
 
     template <
