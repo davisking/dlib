@@ -78,13 +78,18 @@ namespace dlib
         ) const
         {
             scalar_type temp = 0;
+            const scalar_type kxx = kernel(x,x);
             for (unsigned long i = 0; i < alpha.size(); ++i)
                 temp += alpha[i]*kernel(dictionary[i], x);
 
-            return std::sqrt(kernel(x,x) + bias - 2*temp);
+            temp = kxx + bias - 2*temp;
+            if (temp > 0)
+                return std::sqrt(temp);
+            else
+                return 0;
         }
 
-        double samples_trained (
+        scalar_type samples_trained (
         ) const
         {
             return samples_seen;
@@ -95,8 +100,8 @@ namespace dlib
         )
         {
             ++samples_seen;
-            const double xscale = 1.0/samples_seen;
-            const double cscale = 1-xscale;
+            const scalar_type xscale = 1/samples_seen;
+            const scalar_type cscale = 1-xscale;
             return train_and_maybe_test(x,cscale,xscale,true);
         }
 
@@ -105,15 +110,15 @@ namespace dlib
         )
         {
             ++samples_seen;
-            const double xscale = 1.0/samples_seen;
-            const double cscale = 1-xscale;
+            const scalar_type xscale = 1.0/samples_seen;
+            const scalar_type cscale = 1-xscale;
             train_and_maybe_test(x,cscale,xscale,false);
         }
 
         scalar_type test_and_train (
             const sample_type& x,
-            double cscale,
-            double xscale
+            scalar_type cscale,
+            scalar_type xscale
         )
         {
             ++samples_seen;
@@ -122,8 +127,8 @@ namespace dlib
 
         void train (
             const sample_type& x,
-            double cscale,
-            double xscale
+            scalar_type cscale,
+            scalar_type xscale
         )
         {
             ++samples_seen;
@@ -177,8 +182,8 @@ namespace dlib
 
         scalar_type train_and_maybe_test (
             const sample_type& x,
-            double cscale,
-            double xscale,
+            scalar_type cscale,
+            scalar_type xscale,
             bool do_test
         )
         {

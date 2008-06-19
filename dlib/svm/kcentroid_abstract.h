@@ -129,8 +129,8 @@ namespace dlib
 
         void train (
             const sample_type& x,
-            double cscale,
-            double xscale
+            scalar_type cscale,
+            scalar_type xscale
         );
         /*!
             ensures
@@ -155,8 +155,8 @@ namespace dlib
 
         scalar_type test_and_train (
             const sample_type& x,
-            double cscale,
-            double xscale
+            scalar_type cscale,
+            scalar_type xscale
         );
         /*!
             ensures
