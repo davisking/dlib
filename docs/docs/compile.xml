@@ -154,8 +154,7 @@
         </p>
         <h2>gcc on windows</h2>
         <p>
-            The commands for gcc on windows are the same as above but you may also have to link (via the -l option) to the following libraries: gdi32, 
-            comctl32, user32, or ws2_32.
+            The commands for gcc on windows are the same as above but you may also have to link (via the -l option) to the following libraries: gdi32, comctl32, user32, ws2_32, or imm32.
         </p>
 
 
