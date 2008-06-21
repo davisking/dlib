@@ -75,6 +75,8 @@ int main(int argc, char** argv)
             return 1;
         }
 
+        // Here we open the image file.  Note that when you open a binary file with 
+        // the C++ ifstream you must suplly the ios::binary flag.
         ifstream fin(argv[1],ios::binary);
         if (!fin)
         {

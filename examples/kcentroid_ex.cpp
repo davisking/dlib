@@ -79,13 +79,13 @@ int main()
     // mean of the test points from the sinc function.  So in this case our criterion for "significantly bigger"
     // is > 3 or 4 standard deviations away from the above points that actually are on the sinc function.
     cout << "Points that are NOT on the sinc function:\n";
-    m(0) = -1.5; m(1) = sinc(m(0))+4;   cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
-    m(0) = -1.5; m(1) = sinc(m(0))+3;   cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
-    m(0) = -0;   m(1) = -sinc(m(0));    cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
-    m(0) = -0.5; m(1) = -sinc(m(0));    cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
-    m(0) = -4.1; m(1) = sinc(m(0))+2;   cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
-    m(0) = -1.5; m(1) = sinc(m(0))+0.9; cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
-    m(0) = -0.5; m(1) = sinc(m(0))+1;   cout << "   " << test(m) << " is standard deviations from sinc: " << rs.scale(test(m)) << endl;
+    m(0) = -1.5; m(1) = sinc(m(0))+4;   cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
+    m(0) = -1.5; m(1) = sinc(m(0))+3;   cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
+    m(0) = -0;   m(1) = -sinc(m(0));    cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
+    m(0) = -0.5; m(1) = -sinc(m(0));    cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
+    m(0) = -4.1; m(1) = sinc(m(0))+2;   cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
+    m(0) = -1.5; m(1) = sinc(m(0))+0.9; cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
+    m(0) = -0.5; m(1) = sinc(m(0))+1;   cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
 
     // The output is as follows:
     /*
@@ -99,14 +99,13 @@ int main()
             0.872628
 
         Points that are NOT on the sinc function:
-            1.06306 is standard deviations from sinc: 125.137
-            1.0215 is standard deviations from sinc: 98.0313
-            0.92136 is standard deviations from sinc: 32.717
-            0.918282 is standard deviations from sinc: 30.7096
-            0.930931 is standard deviations from sinc: 38.9595
-            0.897916 is standard deviations from sinc: 17.4264
-            0.913855 is standard deviations from sinc: 27.822
-
+            1.06306 is 125.137 standard deviations from sinc.
+            1.0215 is 98.0313 standard deviations from sinc.
+            0.92136 is 32.717 standard deviations from sinc.
+            0.918282 is 30.7096 standard deviations from sinc.
+            0.930931 is 38.9595 standard deviations from sinc.
+            0.897916 is 17.4264 standard deviations from sinc.
+            0.913855 is 27.822 standard deviations from sinc.
     */
 
     // So we can see that in this example the kcentroid object correctly indicates that 
