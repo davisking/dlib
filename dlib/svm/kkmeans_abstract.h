@@ -15,9 +15,9 @@ namespace dlib
 {
 
     template <
-        typename kernel_type : public noncopyable
+        typename kernel_type 
         >
-    class kkmeans
+    class kkmeans : public noncopyable
     {
         /*!
             REQUIREMENTS ON kernel_type
