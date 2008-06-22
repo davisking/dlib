@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.6" date="Jun 22, 2008">
+New Stuff:
    - Merged in Keita Mochizuki's unicode patches to the GUI components.  So
      the dlib GUI now has better unicode support.
    - Added the remove_row and remove_col matrix functions.  Also made all
@@ -45,7 +58,7 @@ Other:
      avoids some compiler warnings from visual studio and even some potential
      internal compiler errors in some instances.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
