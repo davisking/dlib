@@ -12,14 +12,14 @@
 
 <current>
 New Stuff:
+   - Merged in Keita Mochizuki's unicode patches to the GUI components.  So
+     the dlib GUI now has better unicode support.
    - Added the remove_row and remove_col matrix functions.  Also made all
      three of the above functions capable of taking arguments at run time 
      as well as compile time.
    - Added the ability to cap the number of dictionary vectors used by the krls
-     and kcentroid object at a user specified number.  This changes the 
-     serialization format of the objects.  
+     and kcentroid object at a user specified number.   
    - Added the pick_initial_centers() function
-   - Merged in Keita Mochizuki's unicode patches to the GUI components
    - Added the running_stats object
 
 Non-Backwards Compatible Changes:
@@ -27,6 +27,10 @@ Non-Backwards Compatible Changes:
    - All of the style objects in the GUI part of the library now use 
      dlib::ustring instead of std::string.  This only matters to you if 
      you have made your own style objects.
+   - Changed the serialization format of the krls, kcentroid, and
+     directed_graph_drawer objects.  Note that is also means that the
+     files saved by previous versions of the bayes_net_gui_ex program
+     won't load with the current version.
 
 Bug fixes:
    - Fixed an aliasing bug in the set_subm(), set_rowm(), and set_colm() 

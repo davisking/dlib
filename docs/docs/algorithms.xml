@@ -28,6 +28,7 @@
          <item>crc32</item> 
          <item>rand</item> 
          <item>running_stats</item> 
+         <item>pick_initial_centers</item> 
          <item>mlp</item> 
          <item nolink="true">
             <name>Optimization</name>
@@ -248,6 +249,25 @@
             This is a function that takes another function f(x) as input and returns
             a function object l(z) = f(start + z*direction). 
          </description>
+                                 
+      </component>
+
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>pick_initial_centers</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/kkmeans_abstract.h</spec_file>
+         <description>
+            This is a function that you can use to seed data clustering algorithms
+            like the <a href="#kkmeans">kkmeans</a> clustering method.  What it 
+            does is pick reasonable starting points for clustering by basically
+            trying to find a set of points that are all far away from each other.
+         </description>
+         <examples>
+            <example>kkmeans_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
