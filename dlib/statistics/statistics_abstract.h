@@ -115,6 +115,24 @@ namespace dlib
                   object so far.
         !*/
 
+        T max (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the largest value presented to this object so far.
+        !*/
+
+        T min (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the smallest value presented to this object so far.
+        !*/
+
         T scale (
             const T& val
         ) const;

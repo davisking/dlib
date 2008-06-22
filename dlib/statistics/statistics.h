@@ -37,6 +37,8 @@ namespace dlib
             sum_sqr = 0;
             n = 0;
             maximum_n = std::numeric_limits<T>::max();
+            min_value = std::numeric_limits<T>::max();
+            max_value = std::numeric_limits<T>::min();
         }
 
         void set_max_n (
@@ -55,6 +57,11 @@ namespace dlib
 
             sum     = n_div_n*sum     + val*div_n;
             sum_sqr = n_div_n*sum_sqr + val*div_n*val;
+
+            if (val < min_value)
+                min_value = val;
+            if (val > max_value)
+                max_value = val;
 
             if (n < maximum_n)
                 ++n;
@@ -78,13 +85,39 @@ namespace dlib
             return sum;
         }
 
+        T max (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_stats::max"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return max_value;
+        }
+
+        T min (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_stats::min"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return min_value;
+        }
+
         T variance (
         ) const
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(current_n() > 1,
                 "\tT running_stats::variance"
-                << "\n\tsize of queue should not be zero"
+                << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
                 );
 
@@ -99,7 +132,7 @@ namespace dlib
             // make sure requires clause is not broken
             DLIB_ASSERT(current_n() > 1,
                 "\tT running_stats::variance"
-                << "\n\tsize of queue should not be zero"
+                << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
                 );
             return (val-mean())/std::sqrt(variance());
@@ -110,6 +143,8 @@ namespace dlib
         T sum_sqr;
         T n;
         T maximum_n;
+        T min_value;
+        T max_value;
     };
 
 // ----------------------------------------------------------------------------------------
