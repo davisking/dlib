@@ -213,6 +213,7 @@ int WINAPI WinMain (
 )
 {
     main();
+    return 0;
 }
 #endif
 

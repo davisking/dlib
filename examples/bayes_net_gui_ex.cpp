@@ -159,6 +159,7 @@ int main()
 int WINAPI WinMain (HINSTANCE, HINSTANCE, PSTR cmds, int)
 {
     main();
+    return 0;
 }
 #endif
 
