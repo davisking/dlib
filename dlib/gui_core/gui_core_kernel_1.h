@@ -178,7 +178,7 @@ namespace dlib
         // this is a copy of the last inputs we sent to the on_mouse_move() event.
         long prevx;
         long prevy;
-        long prev_state;
+        unsigned long prev_state;
 
     protected:
         const rmutex& wm;

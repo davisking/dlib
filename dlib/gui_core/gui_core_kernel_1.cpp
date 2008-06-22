@@ -1528,10 +1528,10 @@ namespace dlib
         bool undecorated 
     ) :
         has_been_destroyed(false),
-        wm(gui_core_kernel_1_globals::window_table.get_mutex()),
         prevx(-1),
         prevy(-1),
-        prev_state(0)
+        prev_state(0),
+        wm(gui_core_kernel_1_globals::window_table.get_mutex())
     {
         DLIB_ASSERT(!(undecorated == true && resizable == true),
             "\tbase_window::base_window()"
