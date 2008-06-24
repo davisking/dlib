@@ -37,8 +37,8 @@ namespace dlib
             sum_sqr = 0;
             n = 0;
             maximum_n = std::numeric_limits<T>::max();
-            min_value = std::numeric_limits<T>::max();
-            max_value = std::numeric_limits<T>::min();
+            min_value = std::numeric_limits<T>::infinity();
+            max_value = -std::numeric_limits<T>::infinity();
         }
 
         void set_max_n (
