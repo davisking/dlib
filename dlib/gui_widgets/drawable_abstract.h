@@ -140,10 +140,10 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                top() == 1
-                left() == 1
-                right() == 0
-                bottom() == 0
+                top() == 0
+                left() == 0
+                right() == -1 
+                bottom() == -1 
                 get_rect().is_empty() == true
                 is_hidden() == false 
                 is_enabled() == true
@@ -224,6 +224,10 @@ namespace dlib
                     - once events_are_enabled() == true this drawable will receive 
                       the following event related to its parent window moving:  
                       on_window_moved.    
+                - if (events & STRING_PUT) then
+                    - once events_are_enabled() == true this drawable will receive 
+                      the following event related to wide character string input:  
+                      on_string_put.    
             throws
                 - std::bad_alloc
                 - dlib::thread_error
