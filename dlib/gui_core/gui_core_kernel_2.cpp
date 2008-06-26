@@ -24,6 +24,7 @@
 #include "../logger.h"
 #include <vector>
 #include <set>
+#include "../gui_widgets/fonts.h"
 
 namespace dlib
 {
