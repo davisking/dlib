@@ -2,6 +2,8 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_IGG_FONT_RENDERER_H_
 #define DLIB_IGG_FONT_RENDERER_H_
+#include "../platform.h"
+
 
 #include "../gui_widgets.h"
 #include "../unicode.h"
@@ -13,10 +15,10 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#ifdef WIN32
+#if defined(WIN32)
 #include <windows.h>
 #include <mbstring.h>
-#else
+#elif defined(POSIX)
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -41,28 +43,28 @@ namespace nativefont
 
 #ifdef WIN32
         template <typename T> struct input2native_trait{
-            };
+        };
         template <> struct input2native_trait<char>{
-                typedef char type_t;
+            typedef char type_t;
         };
         template <> struct input2native_trait<wchar_t>{
-                typedef wchar_t type_t;
+            typedef wchar_t type_t;
         };
         template <> struct input2native_trait<dlib::unichar>{
-                typedef wchar_t type_t;
+            typedef wchar_t type_t;
         };
 #endif
         // T : N : sizeof_source_type
         template <int N> struct size2inner_trait{
-            };
+        };
         template <> struct size2inner_trait<1>{
-                typedef char type_t;
+            typedef char type_t;
         };
         template <> struct size2inner_trait<2>{
-                typedef uint16_t type_t;
+            typedef uint16_t type_t;
         };
         template <> struct size2inner_trait<4>{
-                typedef dlib::unichar type_t;
+            typedef dlib::unichar type_t;
         };
 
 
@@ -70,69 +72,67 @@ namespace nativefont
 
         template <int N> struct create_helper{ };
         template <> struct create_helper<1>{
-                    typedef char type_t;
-                    type_t *istr;
-                    int len;
-                    create_helper(char *str){
-                        len = (int)strlen(str);
-                        istr = str;
-                    }
-                    ~create_helper(){}
+            typedef char type_t;
+            type_t *istr;
+            int len;
+            create_helper(char *str){
+                len = (int)strlen(str);
+                istr = str;
+            }
+            ~create_helper(){}
         };
         template <> struct create_helper<2>{
-                    typedef wchar_t type_t;
-                    type_t *istr;
-                    bool allocated;
-                    int len;
-                    create_helper(wchar_t *str){
-                        allocated = false;
-                        len = (int)wcslen(str);
-                        istr = str;
+            typedef wchar_t type_t;
+            type_t *istr;
+            bool allocated;
+            int len;
+            create_helper(wchar_t *str){
+                allocated = false;
+                len = (int)wcslen(str);
+                istr = str;
+            }
+            create_helper(dlib::unichar *str){
+                allocated = true;
+                len = 0;
+                int unicount = 0;
+                dlib::unichar *p = str;
+                while(*p){
+                    if (*p > 0xffff){
+                        len += 2;
+                    }else{
+                        len++;
                     }
-                    create_helper(dlib::unichar *str){
-                        allocated = true;
-                        len = 0;
-                        int unicount = 0;
-                        dlib::unichar *p = str;
-                        while(*p){
-                            if (*p > 0xffff){
-                                len += 2;
-                            }else{
-                                len++;
-                            }
-                            unicount++;
-                            p++;
-                        }
-                        istr = new wchar_t[len+1];
-                        for (int i = 0, wi = 0; i < unicount; ++i){
-                            dlib::unichar high, low;
-                            if (str[i] > 0xffff){
-                                dlib::unichar_to_surrogate_pair(str[i], high, low);
-                                istr[wi] = (wchar_t)high, istr[wi+1] = (wchar_t)low;
-                                wi += 2;
-                            }else{
-                                istr[wi] = (wchar_t)str[i];
-                                wi += 1;
-                            }
-                        }
-                        istr[len] = L'\0';
-                        //                      printf("unicount:%d, len:%d wcslen:%d\n", unicount, len, wcslen(istr));
+                    unicount++;
+                    p++;
+                }
+                istr = new wchar_t[len+1];
+                for (int i = 0, wi = 0; i < unicount; ++i){
+                    dlib::unichar high, low;
+                    if (str[i] > 0xffff){
+                        dlib::unichar_to_surrogate_pair(str[i], high, low);
+                        istr[wi] = (wchar_t)high, istr[wi+1] = (wchar_t)low;
+                        wi += 2;
+                    }else{
+                        istr[wi] = (wchar_t)str[i];
+                        wi += 1;
                     }
+                }
+                istr[len] = L'\0';
+            }
 
-                    ~create_helper(){
-                        if (allocated) delete[] istr;
-                    }
+            ~create_helper(){
+                if (allocated) delete[] istr;
+            }
         };
         template <> struct create_helper<4>{
-                    typedef wchar_t type_t;
-                    type_t *istr;
-                    int len;
-                    create_helper(dlib::unichar *str){
-                        len = (int)wcslen((wchar_t *)str);
-                        istr = (type_t *)str;
-                        //                      printf("len:%d\n", len);
-                    }
-                    ~create_helper(){}
+            typedef wchar_t type_t;
+            type_t *istr;
+            int len;
+            create_helper(dlib::unichar *str){
+                len = (int)wcslen((wchar_t *)str);
+                istr = (type_t *)str;
+            }
+            ~create_helper(){}
         };
 
 // ----------------------------------------------------------------------------------------
@@ -298,7 +298,7 @@ namespace nativefont
                 ~vals_internal(){
                     destroy();
                 }
-#else
+#elif defined(POSIX)
                 XImage *ximg;
                 Display *d;
                 GC gc;
@@ -588,13 +588,6 @@ namespace nativefont
 // ----------------------------------------------------------------------------------------
 
 }
-// history
-// 2006/07/10 ver 1.10 Win32 と X11 で共通している部分の重複を無くした
-// 2007/08/15 dlib用に修正
-// 2007/12/16 unicode(UTF32)に対応した
-// 2008/01/02 ver 2.00 dlib ver 16.1 で任意のフォントクラスをアプリケーション側で
-//            指定できるようになり、dlibとこのクラスを分離して扱えるよう
-//            になった。この変更に合わせて、名前空間を変更した。
 
 #endif // DLIB_IGG_FONT_RENDERER_H_
 

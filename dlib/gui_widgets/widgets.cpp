@@ -1410,6 +1410,8 @@ namespace dlib
             mfont->compute_size(text_,text_width,height,text_pos);
         }
 
+        parent.set_im_pos(rect.left()+cursor_x, rect.top());
+
         if (old_cursor_pos != cursor_pos)
         {
             if (shift_pos != -1)

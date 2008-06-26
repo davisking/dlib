@@ -262,6 +262,11 @@ namespace dlib
         void wait_until_closed (
         ) const;
 
+        void set_im_pos (
+            long x_,
+            long y_
+        );
+
         bool is_closed (
         ) const;
 

@@ -23,6 +23,7 @@
 #include "../sync_extension.h"
 #include "../logger.h"
 #include <vector>
+#include <set>
 
 namespace dlib
 {
@@ -47,7 +48,8 @@ namespace dlib
 
         int depth;
         Display* disp;
-        XIM xim;
+        static XIM xim;
+        static XIMStyle xim_style;
         static Screen* screen;
 
         Atom delete_window; 
@@ -529,18 +531,24 @@ namespace dlib
                             KeySym key;
                             Status status;
 
-                            std::wstring wstr;
-                            wstr.resize(2);
-                            int len = XwcLookupString(win->x11_stuff.xic,e,&wstr[0],wstr.size(),&key,&status);
-                            if (status == XBufferOverflow){
-                                wstr.resize(len);
-                                len = XwcLookupString(win->x11_stuff.xic,e,&wstr[0],wstr.size(),&key,&status);
-                            }
-                            if (status == XLookupChars){
-                                win->on_string_put(wstr);
+                            if (win->x11_stuff.xic) {
+                                std::wstring wstr;
+                                wstr.resize(2);
+                                int len = XwcLookupString(win->x11_stuff.xic,e,&wstr[0],wstr.size(),&key,&status);
+                                if (status == XBufferOverflow){
+                                    wstr.resize(len);
+                                    len = XwcLookupString(win->x11_stuff.xic,e,&wstr[0],wstr.size(),&key,&status);
+                                }
+                                if (status == XLookupChars){
+                                    win->on_string_put(wstr);
+                                }
+                            } else {
+                                char buffer[2];
+                                XLookupString(e, buffer, sizeof(buffer), &key, NULL);
+                                status = XLookupKeySym;
                             }
 
-                            else if (status == XLookupKeySym || status == XLookupBoth){
+                            if (status == XLookupKeySym || status == XLookupBoth){
 
                                 bool is_printable;
                                 unsigned long result;
@@ -1098,9 +1106,35 @@ namespace dlib
                     xim = NULL;
                     window_table.get_mutex().lock();
                     if (setlocale( LC_CTYPE, "" ) && XSupportsLocale() && XSetLocaleModifiers("")){
-                            xim = XOpenIM(disp, NULL, NULL, NULL);
+                        xim = XOpenIM(disp, NULL, NULL, NULL);
                     }
                     window_table.get_mutex().unlock();
+
+                    if (xim)
+                    {
+                        const static XIMStyle preedit_styles[] =
+                            {XIMPreeditPosition, XIMPreeditNothing, XIMPreeditNone, 0};
+                        const static XIMStyle status_styles[] =
+                            {XIMStatusNothing, XIMStatusNone, 0};
+                        xim_style = 0;
+
+                        XIMStyles *xim_styles;
+                        window_table.get_mutex().lock();
+
+                        XGetIMValues (xim, XNQueryInputStyle, &xim_styles, NULL);
+                        window_table.get_mutex().unlock();
+                        std::set<XIMStyle> xims;
+                        for (int i = 0; i < xim_styles->count_styles; ++i){
+                            xims.insert(xim_styles->supported_styles[i]);
+                        }
+                        for (int j = 0; status_styles[j]; ++j){
+                            for (int i = 0; preedit_styles[i]; ++i){
+                                xim_style = (status_styles[j] | preedit_styles[i]);
+                                if (xims.count(xim_style)) break;
+                            }
+                            if (xim_style) break;
+                        }
+                    }
 
                     // make this window just so we can send messages to it and trigger
                     // events in the event thread
@@ -1528,12 +1562,26 @@ namespace dlib
         x11_stuff.xic = NULL;
         if (gui_core_kernel_2_globals::xim)
         {
+            XVaNestedList   xva_nlist;
+            XPoint          xpoint;
+
+            char **mlist;
+            int mcount;
+            char *def_str;
+            char fontset[256];
+            sprintf(fontset, "-*-*-medium-r-normal--%lu-*-*-*-", get_native_font()->height());
+            XFontSet fs = XCreateFontSet(gui_core_kernel_2_globals::disp, fontset, &mlist, &mcount, &def_str);
+            xpoint.x = 0;
+            xpoint.y = 0;
+            xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, XNFontSet, fs, NULL);
             x11_stuff.xic = XCreateIC(
                 gui_core_kernel_2_globals::xim,
-                XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
+                XNInputStyle, gui_core_kernel_2_globals::xim_style,
                 XNClientWindow, x11_stuff.hwnd,
+                XNPreeditAttributes, xva_nlist,
                 NULL
                 );
+            XFree(xva_nlist);
         }
 
         Window temp = x11_stuff.hwnd;
@@ -1542,7 +1590,8 @@ namespace dlib
         
         // query event mask required by input method
         unsigned long event_xim = 0;
-        XGetICValues( x11_stuff.xic, XNFilterEvents, &event_xim, NULL );
+        if (x11_stuff.xic)
+             XGetICValues( x11_stuff.xic, XNFilterEvents, &event_xim, NULL );
         
         XSelectInput(
             gui_core_kernel_2_globals::disp,
@@ -1601,9 +1650,11 @@ namespace dlib
             has_been_destroyed = true;
 
             gui_core_kernel_2_globals::window_table.destroy(x11_stuff.hwnd);           
-
-            XDestroyIC(x11_stuff.xic);
-            x11_stuff.xic = 0;
+            if (x11_stuff.xic)
+            {
+                XDestroyIC(x11_stuff.xic);
+                x11_stuff.xic = 0;
+            }
 
             XDestroyWindow(gui_core_kernel_2_globals::disp,x11_stuff.hwnd);
             x11_stuff.hwnd = 0;
@@ -1862,6 +1913,28 @@ namespace dlib
             XClearArea(gui_core_kernel_2_globals::disp,x11_stuff.hwnd,x,y,width,height,1);
             XFlush(gui_core_kernel_2_globals::disp);
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void base_window::
+    set_im_pos (
+        long x,
+        long y
+    )
+    {
+        auto_mutex a(wm);
+        if (!x11_stuff.xic || !(gui_core_kernel_2_globals::xim_style & XIMPreeditPosition)) return;
+
+        XVaNestedList   xva_nlist;
+        XPoint          xpoint;
+
+        xpoint.x = x;
+        xpoint.y = y;
+
+        xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, NULL);
+        XSetICValues(x11_stuff.xic, XNPreeditAttributes, xva_nlist, NULL);
+        XFree(xva_nlist);
     }
 
 }

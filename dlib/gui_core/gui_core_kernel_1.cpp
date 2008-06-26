@@ -1952,6 +1952,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void base_window::
+    set_im_pos (
+        long x,
+        long y
+    )
+    {
+        HIMC hImc = ImmGetContext(hwnd);
+
+        COMPOSITIONFORM cf;
+        cf.dwStyle = CFS_POINT;
+        cf.ptCurrentPos.x = x;
+        cf.ptCurrentPos.y = y;
+        ImmSetCompositionWindow(hImc, &cf);
+        ImmReleaseContext(hwnd, hImc);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void put_on_clipboard (
         const std::string& str
     )

@@ -254,6 +254,11 @@ namespace dlib
         void wait_until_closed (
         ) const;
 
+        void set_im_pos (
+            long x_,
+            long y_
+        );
+
         enum on_close_return_code
         {
             DO_NOT_CLOSE_WINDOW,

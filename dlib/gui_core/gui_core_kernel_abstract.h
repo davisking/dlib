@@ -498,6 +498,16 @@ namespace dlib
                       the given arguments.
         !*/
 
+        void set_im_pos (
+            long x_,
+            long y_
+        );
+        /*!
+            ensures
+                - sets the left-top position of input method rectangle used
+                  for wide character input methods.
+        !*/
+
     protected:
         const rmutex& wm;
 
