@@ -69,7 +69,7 @@
 
         <h1>Notation</h1>
         <p>
-        For the most part I try to document my code in a way that any C++ programmer would understand 
+        For the most part I try to document my code in a way that any C++ programmer would understand, 
         but for the sake of brevity I use some of the following uncommon notation.
         </p>
 
