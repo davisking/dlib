@@ -74,6 +74,33 @@ namespace dlib
         }
 
         scalar_type operator() (
+            const kcentroid& x
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(x.get_kernel() == get_kernel(),
+                "\tscalar_type kcentroid::operator()(const kcentroid& x)"
+                << "\n\tYou can only compare two kcentroid objects if they use the same kernel"
+                << "\n\tthis: " << this
+                );
+
+            scalar_type temp = 0;
+            for (unsigned long i = 0; i < alpha.size(); ++i)
+            {
+                for (unsigned long j = 0; j < x.alpha.size(); ++j)
+                {
+                    temp += alpha[i]*x.alpha[j]*kernel(dictionary[i], x.dictionary[j]);
+                }
+            }
+
+            temp = x.bias + bias - 2*temp;
+            if (temp > 0)
+                return std::sqrt(temp);
+            else
+                return 0;
+        }
+
+        scalar_type operator() (
             const sample_type& x
         ) const
         {

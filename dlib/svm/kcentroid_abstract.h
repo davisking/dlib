@@ -107,11 +107,22 @@ namespace dlib
         !*/
 
         scalar_type operator() (
+            const kcentroid& x
+        ) const;
+        /*!
+            requires
+                - x.get_kernel() == get_kernel()
+            ensures
+                - returns the distance in kernel feature space between this centroid and the
+                  centroid represented by x.  
+        !*/
+
+        scalar_type operator() (
             const sample_type& x
         ) const;
         /*!
             ensures
-                - returns the distance in feature space between the sample x and the
+                - returns the distance in kernel feature space between the sample x and the
                   current estimate of the centroid of the training samples given
                   to this object so far.
         !*/
