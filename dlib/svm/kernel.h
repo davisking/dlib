@@ -50,6 +50,13 @@ namespace dlib
             const_cast<scalar_type&>(gamma) = k.gamma;
             return *this;
         }
+
+        bool operator== (
+            const radial_basis_kernel& k
+        ) const
+        {
+            return gamma == k.gamma;
+        }
     };
 
     template <
@@ -128,6 +135,13 @@ namespace dlib
             const_cast<scalar_type&>(degree) = k.degree;
             return *this;
         }
+
+        bool operator== (
+            const polynomial_kernel& k
+        ) const
+        {
+            return (gamma == k.gamma) && (coef == k.coef) && (degree == k.degree);
+        }
     };
 
     template <
@@ -186,6 +200,13 @@ namespace dlib
         ) const
         { 
             return trans(a)*b;
+        }
+
+        bool operator== (
+            const linear_kernel& k
+        ) const
+        {
+            return true;
         }
     };
 

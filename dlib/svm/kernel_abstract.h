@@ -34,6 +34,8 @@ namespace dlib
                   dlib/memory_manager/memory_manager_kernel_abstract.h or
                   dlib/memory_manager_global/memory_manager_global_kernel_abstract.h or
                   dlib/memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                - an overloaded == operator that tells you if two kernels are
+                  identical or not.
 
         For examples of kernel functions see the following objects
         (e.g. the radial_basis_kernel).
@@ -101,6 +103,17 @@ namespace dlib
             ensures
                 - #gamma = k.gamma
                 - returns *this
+        !*/
+
+        bool operator== (
+            const radial_basis_kernel& k
+        ) const;
+        /*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
         !*/
 
     };
@@ -203,6 +216,16 @@ namespace dlib
                 - returns *this
         !*/
 
+        bool operator== (
+            const polynomial_kernel& k
+        ) const;
+        /*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
     };
 
     template <
@@ -257,6 +280,14 @@ namespace dlib
                 - a.nr() == b.nr()
             ensures
                 - returns trans(a)*b
+        !*/
+
+        bool operator== (
+            const linear_kernel& k
+        ) const;
+        /*!
+            ensures
+                - returns true
         !*/
     };
 
