@@ -121,8 +121,14 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
 
-            const T temp = n/(n-1);
-            return temp*(sum_sqr - sum*sum);
+            T temp = n/(n-1);
+            temp = temp*(sum_sqr - sum*sum);
+            // make sure the variance is never negative.  This might
+            // happen due to numerical errors.
+            if (temp >= 0)
+                return temp;
+            else
+                return 0;
         }
 
         T scale (
