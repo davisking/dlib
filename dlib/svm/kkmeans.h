@@ -58,6 +58,15 @@ namespace dlib
             unsigned long i
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(i < number_of_centers(),
+                "\tkcentroid kkmeans::get_kcentroid(i)"
+                << "\n\tYou have given an invalid value for i"
+                << "\n\ti:                   " << i 
+                << "\n\tnumber_of_centers(): " << number_of_centers() 
+                << "\n\tthis:                " << this
+                );
+
             return *centers[i];
         }
 

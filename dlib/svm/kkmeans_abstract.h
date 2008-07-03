@@ -65,6 +65,8 @@ namespace dlib
             unsigned long i
         ) const;
         /*!
+            requires
+                - i < number_of_centers()
             ensures
                 - returns a const reference to the ith kcentroid object contained in
                   this object.  Each kcentroid represents one of the centers found
