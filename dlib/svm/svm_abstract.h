@@ -203,6 +203,60 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    void randomize_samples (
+        T& samples
+    );
+    /*!
+        requires
+            - T == a matrix object that contains a swappable type
+            - samples.nc() == 1
+        ensures
+            - randomizes the order of the elements inside samples 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U
+        >
+    void randomize_samples (
+        T& samples,
+        U& labels 
+    );
+    /*!
+        requires
+            - T == an object compatible with std::vector that contains a swappable type 
+            - U == an object compatible with std::vector that contains a swappable type 
+            - samples.size() == labels.size()
+        ensures
+            - randomizes the order of the samples and labels but preserves
+              the pairing between each sample and its label
+            - for all valid i:
+                - let r == the random index samples[i] was moved to.  then:
+                    - #labels[r] == labels[i]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    void randomize_samples (
+        T& samples
+    );
+    /*!
+        requires
+            - T == an object compatible with std::vector that contains a swappable type 
+        ensures
+            - randomizes the order of the elements inside samples 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_ABSTRACT_

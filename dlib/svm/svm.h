@@ -14,6 +14,7 @@
 #include "../std_allocator.h"
 #include "function.h"
 #include "kernel.h"
+#include "../enable_if.h"
 
 namespace dlib
 {
@@ -1123,7 +1124,7 @@ namespace dlib
         typename T,
         typename U
         >
-    void randomize_samples (
+    typename enable_if<is_matrix<T>,void>::type randomize_samples (
         T& t,
         U& u
     )
@@ -1142,6 +1143,90 @@ namespace dlib
             // swap our randomly selected index into the n position
             exchange(t(idx), t(n));
             exchange(u(idx), u(n));
+
+            --n;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U
+        >
+    typename disable_if<is_matrix<T>,void>::type randomize_samples (
+        T& t,
+        U& u
+    )
+    {
+        rand::kernel_1a r;
+
+        long n = t.size()-1;
+        while (n > 0)
+        {
+            // put a random integer into idx
+            unsigned long idx = r.get_random_32bit_number();
+
+            // make idx be less than n
+            idx %= n;
+
+            // swap our randomly selected index into the n position
+            exchange(t[idx], t[n]);
+            exchange(u[idx], u[n]);
+
+            --n;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    typename enable_if<is_matrix<T>,void>::type randomize_samples (
+        T& t
+    )
+    {
+        rand::kernel_1a r;
+
+        long n = t.nr()-1;
+        while (n > 0)
+        {
+            // put a random integer into idx
+            unsigned long idx = r.get_random_32bit_number();
+
+            // make idx be less than n
+            idx %= n;
+
+            // swap our randomly selected index into the n position
+            exchange(t(idx), t(n));
+
+            --n;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    typename disable_if<is_matrix<T>,void>::type randomize_samples (
+        T& t
+    )
+    {
+        rand::kernel_1a r;
+
+        long n = t.size()-1;
+        while (n > 0)
+        {
+            // put a random integer into idx
+            unsigned long idx = r.get_random_32bit_number();
+
+            // make idx be less than n
+            idx %= n;
+
+            // swap our randomly selected index into the n position
+            exchange(t[idx], t[n]);
 
             --n;
         }
