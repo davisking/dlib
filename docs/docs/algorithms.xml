@@ -306,8 +306,8 @@
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the function f() using a 
-              quasi newton method.  
+             Performs an unconstrained minimization of the function f() using the 
+             BFGS quasi newton method.  
          </description>
                                  
       </component>
@@ -332,8 +332,8 @@
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the function f() using a 
-              quasi newton method.  This version doesn't take a gradient function of f()
+             Performs an unconstrained minimization of the function f() using the
+             BFGS quasi newton method.  This version doesn't take a gradient function of f()
               but instead numerically approximates the gradient.
          </description>
                                  
