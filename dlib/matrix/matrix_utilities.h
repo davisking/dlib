@@ -1382,7 +1382,21 @@ namespace dlib
     template <
         typename array_type
         >
-    const matrix_exp<matrix_array_exp<array_type> > array_to_matrix (
+    const typename enable_if<is_matrix<array_type>,array_type>::type& 
+    array_to_matrix (
+        const array_type& array
+    )
+    {
+        return array;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename array_type
+        >
+    const typename disable_if<is_matrix<array_type>,matrix_exp<matrix_array_exp<array_type> > >::type 
+    array_to_matrix (
         const array_type& array
     )
     {
@@ -1395,12 +1409,25 @@ namespace dlib
     template <
         typename vector_type
         >
-    const matrix_exp<matrix_vector_exp<vector_type> > vector_to_matrix (
+    const typename disable_if<is_matrix<vector_type>,matrix_exp<matrix_vector_exp<vector_type> > >::type 
+    vector_to_matrix (
         const vector_type& vector
     )
     {
         typedef matrix_vector_exp<vector_type> exp;
         return matrix_exp<exp>(exp(vector));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename vector_type
+        >
+    const typename enable_if<is_matrix<vector_type>,vector_type>::type& vector_to_matrix (
+        const vector_type& vector
+    )
+    {
+        return vector;
     }
 
 // ----------------------------------------------------------------------------------------

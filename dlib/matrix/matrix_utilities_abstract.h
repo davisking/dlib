@@ -152,13 +152,16 @@ namespace dlib
     /*!
         requires
             - vector_type is an implementation of array/array_kernel_abstract.h or
-              std::vector or dlib::std_vector_c
+              std::vector or dlib::std_vector_c or dlib::matrix
         ensures
-            - returns a matrix R such that:
-                - R.nr() == vector.size() 
-                - R.nc() == 1 
-                - for all valid r:
-                  R(r) == vector[r]
+            - if (vector_type is a dlib::matrix) then
+                - returns a reference to vector
+            - else
+                - returns a matrix R such that:
+                    - R.nr() == vector.size() 
+                    - R.nc() == 1 
+                    - for all valid r:
+                      R(r) == vector[r]
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -172,12 +175,16 @@ namespace dlib
     /*!
         requires
             - array_type is an implementation of array2d/array2d_kernel_abstract.h
+              or dlib::matrix
         ensures
-            - returns a matrix R such that:
-                - R.nr() == array.nr() 
-                - R.nc() == array.nc()
-                - for all valid r and c:
-                  R(r, c) == array[r][c]
+            - if (array_type is a dlib::matrix) then
+                - returns a reference to array 
+            - else
+                - returns a matrix R such that:
+                    - R.nr() == array.nr() 
+                    - R.nc() == array.nc()
+                    - for all valid r and c:
+                      R(r, c) == array[r][c]
     !*/
 
 // ----------------------------------------------------------------------------------------
