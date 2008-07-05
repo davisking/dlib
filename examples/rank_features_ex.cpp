@@ -104,12 +104,8 @@ int main()
     kcentroid<kernel_type> kc(kernel_type(0.05), 0.001);
 
     // And finally we get to the feature ranking. Here we call rank_features() with the kcentroid we just made,
-    // the samples and labels we made above, and the number of features we want it to rank.  Note that
-    // rank_features() operates on dlib::matrix objects so we need to use the vector_to_matrix() function
-    // to cast the std::vector objects to dlib::matrix.  Also note that the vector_to_matrix() doesn't actually
-    // copy the std::vector, but instead it uses a template expression technique to recast it as a dlib::matrix
-    // object. (see the dlib::matrix example and documentation for more details on template expressions).
-    cout << rank_features(kc, vector_to_matrix(samples), vector_to_matrix(labels), 4) << endl;
+    // the samples and labels we made above, and the number of features we want it to rank.  
+    cout << rank_features(kc, samples, labels, 4) << endl;
 
     // The output is:
     /*
