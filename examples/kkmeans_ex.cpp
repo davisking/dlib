@@ -114,10 +114,8 @@ int main()
     // n points that are far apart (basically).  
     pick_initial_centers(3, initial_centers, samples, test.get_kernel());
 
-    // now run the k-means algorithm on our set of samples.  Note that the train function expects
-    // its arguments to be dlib::matrix objects so since we have our samples in std::vector objects
-    // we need to turn them into matrix objects.  The vector_to_matrix() function does this for us.
-    test.train(vector_to_matrix(samples),vector_to_matrix(initial_centers));
+    // now run the k-means algorithm on our set of samples.  
+    test.train(samples,initial_centers);
 
     // now loop over all our samples and print out their predicted class.  In this example
     // all points are correctly identified.
