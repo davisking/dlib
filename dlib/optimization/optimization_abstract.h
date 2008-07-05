@@ -168,7 +168,7 @@ namespace dlib
             - is_matrix<T>::value == true (i.e. T must be a dlib::matrix type)
             - x.nc() == 1 (i.e. x must be a column vector)
         ensures
-            - Performs an unconstrained minimization of the function f() using a 
+            - Performs an unconstrained minimization of the function f() using the BFGS 
               quasi newton method.  The optimization stops when any of the following
               conditions are satisfied: 
                 - the change in f() from one iteration to the next is less than min_delta
