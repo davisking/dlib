@@ -27,12 +27,11 @@ namespace dlib
     );
     /*!
         requires
-            - is_matrix<sample_matrix_type>::value == true
-              (i.e. samples must be a dlib matrix object)
-            - is_matrix<sample_matrix_type::type>::value == true
-              (i.e. samples must also contain dlib matrix objects)
-            - is_matrix<label_matrix_type>::value == true
-              (i.e. labels must be a dlib matrix object)
+            - vector_to_matrix(samples) == a valid matrix object
+            - vector_to_matrix(samples(0)) == a valid matrix object
+            - vector_to_matrix(labels) == a valid matrix object
+              (i.e. the 3 above things must either be dlib::matrix objects or be
+              convertable to them via the vector_to_matrix() function)
             - samples.nc() == 1 && labels.nc() == 1
               (i.e. samples and labels must be column vectors)
             - samples.size() == labels.size()

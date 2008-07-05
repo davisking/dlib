@@ -19,7 +19,7 @@ namespace dlib
         typename sample_matrix_type,
         typename label_matrix_type
         >
-    matrix<typename kernel_type::scalar_type,0,2,typename kernel_type::mem_manager_type> rank_features (
+    matrix<typename kernel_type::scalar_type,0,2,typename kernel_type::mem_manager_type> rank_features_impl (
         const kcentroid<kernel_type>& kc,
         const sample_matrix_type& samples,
         const label_matrix_type& labels,
@@ -129,6 +129,23 @@ namespace dlib
         }
 
         return results;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename kernel_type,
+        typename sample_matrix_type,
+        typename label_matrix_type
+        >
+    matrix<typename kernel_type::scalar_type,0,2,typename kernel_type::mem_manager_type> rank_features (
+        const kcentroid<kernel_type>& kc,
+        const sample_matrix_type& samples,
+        const label_matrix_type& labels,
+        const long num_features
+    )
+    {
+        return rank_features_impl(kc, vector_to_matrix(samples), vector_to_matrix(labels), num_features);
     }
 
 // ----------------------------------------------------------------------------------------
