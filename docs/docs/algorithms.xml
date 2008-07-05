@@ -118,6 +118,7 @@
                <item>svm_nu_train</item> 
                <item>svm_nu_train_prob</item> 
                <item>svm_nu_cross_validate</item> 
+               <item>rank_features</item> 
             </sub>
          </item>
          <item>randomize_samples</item> 
@@ -1011,6 +1012,25 @@
          </description>
          <examples>
             <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rank_features</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/feature_ranking_abstract.h</spec_file>
+         <description>
+             Finds a ranking of the top N (a user supplied parameter) features in a set of data 
+             from a two class classification problem.  It  
+              does this by computing the distance between the centroids of both classes in kernel defined 
+              feature space.  Good features are then ones that result in the biggest separation between
+              the two centroids. 
+         </description>
+         <examples>
+            <example>rank_features_ex.cpp.html</example>
          </examples>
                                  
       </component>

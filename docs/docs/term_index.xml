@@ -401,6 +401,7 @@
          <term link="algorithms.html#running_stats" name="running_stats"/>
          <term link="algorithms.html#kkmeans" name="kkmeans"/>
          <term link="algorithms.html#pick_initial_centers" name="pick_initial_centers"/>
+         <term link="algorithms.html#rank_features" name="rank_features"/>
 
          
          <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>

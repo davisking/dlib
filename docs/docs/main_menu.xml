@@ -108,6 +108,10 @@
                   <link>image_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Rank_Features</name>
+                  <link>rank_features_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Support_Vector_Machine</name>
                   <link>svm_ex.cpp.html</link>
                </item>

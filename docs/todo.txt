@@ -36,10 +36,6 @@ make htmlify work right on tempalte function calls
 
 
 
-mutual information based feature selection
-
-
-
 
 
 
