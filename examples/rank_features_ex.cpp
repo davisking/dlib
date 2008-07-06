@@ -75,7 +75,7 @@ int main()
     }
 
 
-    // Here we normalize all the samples by subtracting the mean and dividing by the standard deviation.
+    // Here we normalize all the samples by subtracting their mean and dividing by their standard deviation.
     // This is generally a good idea since it often heads off numerical stability problems and also 
     // prevents one large feature from smothering others.
     const sample_type m(mean(vector_to_matrix(samples)));  // compute a mean vector
