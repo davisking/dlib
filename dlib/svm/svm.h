@@ -21,10 +21,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class invalid_svm_nu_error : public dlib::error 
+    { 
+    public: 
+        invalid_svm_nu_error(const std::string& msg, double nu_) : dlib::error(msg), nu(nu_) {};
+        const double nu;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T
         >
-    typename T::type maximum_nu (
+    typename T::type maximum_nu_impl (
         const T& y
     )
     {
@@ -63,10 +72,67 @@ namespace dlib
         return static_cast<scalar_type>(2.0*(scalar_type)std::min(pos_count,neg_count)/(scalar_type)y.nr());
     }
 
+    template <
+        typename T
+        >
+    typename T::type maximum_nu (
+        const T& y
+    )
+    {
+        return maximum_nu_impl(vector_to_matrix(y));
+    }
+
+    template <
+        typename T
+        >
+    typename T::value_type maximum_nu (
+        const T& y
+    )
+    {
+        return maximum_nu_impl(vector_to_matrix(y));
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K
+        typename T,
+        typename U
+        >
+    bool is_binary_classification_problem_impl (
+        const T& x,
+        const U& x_labels
+    )
+    {
+        if (x.nc() != 1 || x_labels.nc() != 1) return false; 
+        if (x.nr() != x_labels.nr()) return false;
+        if (x.nr() <= 1) return false;
+        for (long r = 0; r < x_labels.nr(); ++r)
+        {
+            if (x_labels(r) != -1 && x_labels(r) != 1)
+                return false;
+        }
+
+        return true;
+    }
+
+    template <
+        typename T,
+        typename U
+        >
+    bool is_binary_classification_problem (
+        const T& x,
+        const U& x_labels
+    )
+    {
+        return is_binary_classification_problem_impl(vector_to_matrix(x), vector_to_matrix(x_labels));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename K,
+        typename sample_vector_type,
+        typename scalar_vector_type
         >
     class kernel_matrix_cache
     {
@@ -74,8 +140,8 @@ namespace dlib
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
 
-        const matrix<sample_type,0,1,mem_manager_type>& x;
-        const matrix<scalar_type,0,1,mem_manager_type>& y;
+        const sample_vector_type& x;
+        const scalar_vector_type& y;
         K kernel_function;
 
         mutable matrix<scalar_type,0,0,mem_manager_type> cache;
@@ -104,8 +170,8 @@ namespace dlib
 
     public:
         kernel_matrix_cache (
-            const matrix<sample_type,0,1,mem_manager_type>& x_,
-            const matrix<scalar_type,0,1,mem_manager_type>& y_,
+            const sample_vector_type& x_,
+            const scalar_vector_type& y_,
             K kernel_function_,
             long max_size_megabytes
         ) : x(x_), y(y_), kernel_function(kernel_function_) 
@@ -180,530 +246,37 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename scalar_type,
-        typename scalar_vector_type
+        typename trainer_type,
+        typename in_sample_vector_type,
+        typename in_scalar_vector_type
         >
-    inline void set_initial_alpha (
-        const scalar_vector_type& y,
-        const scalar_type nu,
-        scalar_vector_type& alpha
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    cross_validate_trainer_impl (
+        const trainer_type& trainer,
+        const in_sample_vector_type& x,
+        const in_scalar_vector_type& y,
+        const long folds
     )
     {
-        set_all_elements(alpha,0);
-        const scalar_type l = y.nr();
-        scalar_type temp = nu*l/2;
-        long num = (long)std::floor(temp);
-        long num_total = (long)std::ceil(temp);
-
-        int count = 0;
-        for (int i = 0; i < alpha.nr(); ++i)
-        {
-            if (y(i) == 1)
-            {
-                if (count < num)
-                {
-                    ++count;
-                    alpha(i) = 1;
-                }
-                else 
-                {
-                    if (temp > num)
-                    {
-                        ++count;
-                        alpha(i) = temp - std::floor(temp);
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (count != num_total)
-        {
-            std::ostringstream sout;
-            sout << "invalid nu of " << nu << ".  Must be between 0 and " << (scalar_type)count/y.nr();
-            throw error(sout.str());
-        }
-
-        count = 0;
-        for (int i = 0; i < alpha.nr(); ++i)
-        {
-            if (y(i) == -1)
-            {
-                if (count < num)
-                {
-                    ++count;
-                    alpha(i) = 1;
-                }
-                else 
-                {
-                    if (temp > num)
-                    {
-                        ++count;
-                        alpha(i) = temp - std::floor(temp);
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (count != num_total)
-        {
-            std::ostringstream sout;
-            sout << "invalid nu of " << nu << ".  Must be between 0 and " << (scalar_type)count/y.nr();
-            throw error(sout.str());
-        }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename K,
-        typename scalar_vector_type,
-        typename scalar_type
-        >
-    inline bool find_working_group (
-        const scalar_vector_type& y,
-        const scalar_vector_type& alpha,
-        const kernel_matrix_cache<K>& Q,
-        const scalar_vector_type& df,
-        const scalar_type tau,
-        const scalar_type eps,
-        long& i_out,
-        long& j_out
-    )
-    {
-        using namespace std;
-        long ip = -1;
-        long jp = -1;
-        long in = -1;
-        long jn = -1;
-
-        scalar_type ip_val = -numeric_limits<scalar_type>::infinity();
-        scalar_type jp_val = numeric_limits<scalar_type>::infinity();
-        scalar_type in_val = -numeric_limits<scalar_type>::infinity();
-        scalar_type jn_val = numeric_limits<scalar_type>::infinity();
-
-        // loop over the alphas and find the maximum ip and in indices.
-        for (long i = 0; i < alpha.nr(); ++i)
-        {
-            if (y(i) == 1)
-            {
-                if (alpha(i) < 1.0)
-                {
-                    if (-df(i) > ip_val)
-                    {
-                        ip_val = -df(i);
-                        ip = i;
-                    }
-                }
-            }
-            else
-            {
-                if (alpha(i) > 0.0)
-                {
-                    if (df(i) > in_val)
-                    {
-                        in_val = df(i);
-                        in = i;
-                    }
-                }
-            }
-        }
-
-        scalar_type Mp = numeric_limits<scalar_type>::infinity();
-        scalar_type Mn = numeric_limits<scalar_type>::infinity();
-        scalar_type bp = -numeric_limits<scalar_type>::infinity();
-        scalar_type bn = -numeric_limits<scalar_type>::infinity();
-
-        // now we need to find the minimum jp and jn indices
-        for (long j = 0; j < alpha.nr(); ++j)
-        {
-            if (y(j) == 1)
-            {
-                if (alpha(j) > 0.0)
-                {
-                    scalar_type b = ip_val + df(j);
-                    if (-df(j) < Mp)
-                        Mp = -df(j);
-
-                    if (b > 0 && (Q.is_cached(j) || b > bp || jp == -1 ))
-                    {
-                        bp = b;
-                        scalar_type a = Q(ip,ip) + Q(j,j) - 2*Q(j,ip); 
-                        if (a <= 0)
-                            a = tau;
-                        scalar_type temp = -b*b/a;
-                        if (temp < jp_val)
-                        {
-                            jp_val = temp;
-                            jp = j;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (alpha(j) < 1.0)
-                {
-                    scalar_type b = in_val - df(j);
-                    if (df(j) < Mn)
-                        Mn = df(j);
-
-                    if (b > 0 && (Q.is_cached(j) || b > bn || jn == -1 ))
-                    {
-                        bn = b;
-                        scalar_type a = Q(in,in) + Q(j,j) - 2*Q(j,in); 
-                        if (a <= 0)
-                            a = tau;
-                        scalar_type temp = -b*b/a;
-                        if (temp < jn_val)
-                        {
-                            jn_val = temp;
-                            jn = j;
-                        }
-                    }
-                }
-            }
-        }
-
-        // if we are at the optimal point then return false so the caller knows
-        // to stop optimizing
-        if (std::max(ip_val - Mp, in_val - Mn) < eps)
-            return false;
-
-        if (jp_val < jn_val)
-        {
-            i_out = ip;
-            j_out = jp;
-        }
-        else
-        {
-            i_out = in;
-            j_out = jn;
-        }
-
-        if (j_out >= 0 && i_out >= 0)
-            return true;
-        else
-            return false;
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename scalar_vector_type,
-        typename scalar_type
-        >
-    void calculate_rho_and_b(
-        const scalar_vector_type& y,
-        const scalar_vector_type& alpha,
-        const scalar_vector_type& df,
-        scalar_type& rho, 
-        scalar_type& b
-    )
-    {
-        using namespace std;
-        long num_p_free = 0;
-        long num_n_free = 0;
-        scalar_type sum_p_free = 0;
-        scalar_type sum_n_free = 0;
-
-        scalar_type upper_bound_p = -numeric_limits<scalar_type>::infinity();
-        scalar_type upper_bound_n = -numeric_limits<scalar_type>::infinity();
-        scalar_type lower_bound_p = numeric_limits<scalar_type>::infinity();
-        scalar_type lower_bound_n = numeric_limits<scalar_type>::infinity();
-
-        for(long i = 0; i < alpha.nr(); ++i)
-        {
-            if(y(i) == 1)
-            {
-                if(alpha(i) == 1)
-                {
-                    if (df(i) > upper_bound_p)
-                        upper_bound_p = df(i);
-                }
-                else if(alpha(i) == 0)
-                {
-                    if (df(i) < lower_bound_p)
-                        lower_bound_p = df(i);
-                }
-                else
-                {
-                    ++num_p_free;
-                    sum_p_free += df(i);
-                }
-            }
-            else
-            {
-                if(alpha(i) == 1)
-                {
-                    if (df(i) > upper_bound_n)
-                        upper_bound_n = df(i);
-                }
-                else if(alpha(i) == 0)
-                {
-                    if (df(i) < lower_bound_n)
-                        lower_bound_n = df(i);
-                }
-                else
-                {
-                    ++num_n_free;
-                    sum_n_free += df(i);
-                }
-            }
-        }
-
-        scalar_type r1,r2;
-        if(num_p_free > 0)
-            r1 = sum_p_free/num_p_free;
-        else
-            r1 = (upper_bound_p+lower_bound_p)/2;
-
-        if(num_n_free > 0)
-            r2 = sum_n_free/num_n_free;
-        else
-            r2 = (upper_bound_n+lower_bound_n)/2;
-
-        rho = (r1+r2)/2;
-        b = (r1-r2)/2/rho;
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename K,
-        typename scalar_vector_type,
-        typename scalar_type
-        >
-    inline void optimize_working_pair (
-        const scalar_vector_type& y,
-        scalar_vector_type& alpha,
-        const kernel_matrix_cache<K>& Q,
-        const scalar_vector_type& df,
-        const scalar_type tau,
-        const long i,
-        const long j
-    )
-    {
-        scalar_type quad_coef = Q(i,i)+Q(j,j)-2*Q(j,i);
-        if (quad_coef <= 0)
-            quad_coef = tau;
-        scalar_type delta = (df(i)-df(j))/quad_coef;
-        scalar_type sum = alpha(i) + alpha(j);
-        alpha(i) -= delta;
-        alpha(j) += delta;
-
-        if(sum > 1)
-        {
-            if(alpha(i) > 1)
-            {
-                alpha(i) = 1;
-                alpha(j) = sum - 1;
-            }
-            else if(alpha(j) > 1)
-            {
-                alpha(j) = 1;
-                alpha(i) = sum - 1;
-            }
-        }
-        else
-        {
-            if(alpha(j) < 0)
-            {
-                alpha(j) = 0;
-                alpha(i) = sum;
-            }
-            else if(alpha(i) < 0)
-            {
-                alpha(i) = 0;
-                alpha(j) = sum;
-            }
-        }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename K
-        >
-    const decision_function<K> svm_nu_train (
-        const typename decision_function<K>::sample_vector_type& x,
-        const typename decision_function<K>::scalar_vector_type& y,
-        const K& kernel_function,
-        const typename K::scalar_type nu,
-        const long cache_size = 200,
-        const typename K::scalar_type eps = 0.001
-    )
-    {
-        typedef typename K::scalar_type scalar_type;
-        typedef typename decision_function<K>::sample_vector_type sample_vector_type;
-        typedef typename decision_function<K>::scalar_vector_type scalar_vector_type;
+        typedef typename trainer_type::scalar_type scalar_type;
+        typedef typename trainer_type::sample_type sample_type;
+        typedef typename trainer_type::mem_manager_type mem_manager_type;
+        typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
+        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
 
         // make sure requires clause is not broken
-#ifdef ENABLE_ASSERTS
-        for (long r = 0; r < y.nr(); ++r)
-        {
-            DLIB_ASSERT(y(r) == -1.0 || y(r) == 1.0,
-                   "\tdecision_function svm_nu_train()"
-                   << "\n\tinvalid inputs were given to this function"
-                   << "\n\tr:    " << r 
-                   << "\n\ty(r): " << y(r) 
+        DLIB_ASSERT(is_binary_classification_problem(x,y) == true &&
+                    1 < folds && folds <= x.nr(),
+            "\tmatrix cross_validate_trainer()"
+            << "\n\t invalid inputs were given to this function"
+            << "\n\t x.nr(): " << x.nr() 
+            << "\n\t y.nr(): " << y.nr() 
+            << "\n\t x.nc(): " << x.nc() 
+            << "\n\t y.nc(): " << y.nc() 
+            << "\n\t folds:  " << folds 
+            << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
             );
 
-        }
-#endif
-
-        DLIB_ASSERT(x.nr() > 1 &&  y.nr() == x.nr(),
-            "\tdecision_function svm_nu_train()"
-            << "\n\tinvalid inputs were given to this function"
-            << "\n\tx.nr(): " << x.nr() 
-            << "\n\ty.nr(): " << y.nr() 
-            << "\n\tx.nc(): " << x.nc() 
-            << "\n\ty.nc(): " << y.nc() 
-            );
-
-        DLIB_ASSERT(eps > 0 && 
-               cache_size > 0 && 
-               0 < nu && nu < maximum_nu(y),
-            "\tdecision_function svm_nu_train()"
-            << "\n\tinvalid inputs were given to this function"
-            << "\n\teps: " << eps 
-            << "\n\tcache_size:    " << cache_size
-            << "\n\tnu:            " << nu 
-            << "\n\tmaximum_nu(y): " << maximum_nu(y) 
-            );
-
-
-        const scalar_type tau = 1e-12;
-        scalar_vector_type df; // delta f(alpha)
-        scalar_vector_type alpha;
-
-        kernel_matrix_cache<K> Q(x,y,kernel_function,cache_size);
-
-        alpha.set_size(x.nr());
-        df.set_size(x.nr());
-
-        // now initialize alpha
-        set_initial_alpha(y, nu, alpha);
-
-
-        // initialize df.  Compute df = Q*alpha
-        for (long r = 0; r < df.nr(); ++r)
-        {
-            df(r) = 0;
-            for (long c = 0; c < alpha.nr(); ++c)
-            {
-                if (alpha(c) != 0)
-                    df(r) += Q(c,r)*alpha(c);
-            }
-        }
-
-        // now perform the actual optimization of alpha
-        long i, j;
-        while (find_working_group(y,alpha,Q,df,tau,eps,i,j))
-        {
-            const scalar_type old_alpha_i = alpha(i);
-            const scalar_type old_alpha_j = alpha(j);
-
-            optimize_working_pair(y,alpha,Q,df,tau,i,j);
-
-            // update the df vector now that we have modified alpha(i) and alpha(j)
-            scalar_type delta_alpha_i = alpha(i) - old_alpha_i;
-            scalar_type delta_alpha_j = alpha(j) - old_alpha_j;
-            for(long k = 0; k < df.nr(); ++k)
-                df(k) += Q(k,i)*delta_alpha_i + Q(k,j)*delta_alpha_j;
-
-        }
-
-        scalar_type rho, b;
-        calculate_rho_and_b(y,alpha,df,rho,b);
-        alpha = pointwise_multiply(alpha,y)/rho;
-
-        // count the number of support vectors
-        long sv_count = 0;
-        for (long i = 0; i < alpha.nr(); ++i)
-        {
-            if (alpha(i) != 0)
-                ++sv_count;
-        }
-
-        scalar_vector_type sv_alpha;
-        sample_vector_type support_vectors;
-
-        // size these column vectors so that they have an entry for each support vector
-        sv_alpha.set_size(sv_count);
-        support_vectors.set_size(sv_count);
-
-        // load the support vectors and their alpha values into these new column matrices
-        long idx = 0;
-        for (long i = 0; i < alpha.nr(); ++i)
-        {
-            if (alpha(i) != 0)
-            {
-                sv_alpha(idx) = alpha(i);
-                support_vectors(idx) = x(i);
-                ++idx;
-            }
-        }
-
-        // now return the decision function
-        return decision_function<K> (sv_alpha, b, kernel_function, support_vectors);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename K
-        >
-    const matrix<typename K::scalar_type, 1, 2, typename K::mem_manager_type> svm_nu_cross_validate (
-        const typename decision_function<K>::sample_vector_type& x,
-        const typename decision_function<K>::scalar_vector_type& y,
-        const K& kernel_function,
-        const typename K::scalar_type nu,
-        const long folds,
-        const long cache_size = 200,
-        const typename K::scalar_type eps = 0.001
-    )
-    {
-        typedef typename K::scalar_type scalar_type;
-        typedef typename decision_function<K>::sample_vector_type sample_vector_type;
-        typedef typename decision_function<K>::scalar_vector_type scalar_vector_type;
-
-        // make sure requires clause is not broken
-#ifdef ENABLE_ASSERTS
-        for (long r = 0; r < y.nr(); ++r)
-        {
-            DLIB_ASSERT(y(r) == -1.0 || y(r) == 1.0,
-                   "\tdecision_function svm_nu_cross_validate()"
-                   << "\n\tinvalid inputs were given to this function"
-                   << "\n\tr:    " << r 
-                   << "\n\ty(r): " << y(r) 
-            );
-
-        }
-#endif
-
-        DLIB_ASSERT(x.nr() > 1 &&  y.nr() == x.nr(),
-            "\tdecision_function svm_nu_cross_validate()"
-            << "\n\tinvalid inputs were given to this function"
-            << "\n\tx.nr(): " << x.nr() 
-            << "\n\ty.nr(): " << y.nr() 
-            << "\n\tx.nc(): " << x.nc() 
-            << "\n\ty.nc(): " << y.nc() 
-            );
-
-        DLIB_ASSERT(eps > 0 && 
-               folds > 1 && folds <= x.nr() &&
-               cache_size > 0 && 
-               0 < nu && nu < maximum_nu(y),
-            "\tdecision_function svm_nu_cross_validate()"
-            << "\n\tinvalid inputs were given to this function"
-            << "\n\teps: " << eps 
-            << "\n\tfolds:         " << folds 
-            << "\n\tcache_size:    " << cache_size
-            << "\n\tnu:            " << nu 
-            << "\n\tmaximum_nu(y): " << maximum_nu(y) 
-            );
 
         // count the number of positive and negative examples
         long num_pos = 0;
@@ -725,9 +298,9 @@ namespace dlib
         long num_pos_correct = 0;
         long num_neg_correct = 0;
 
-        decision_function<K> d;
-        typename decision_function<K>::sample_vector_type x_test, x_train;
-        typename decision_function<K>::scalar_vector_type y_test, y_train;
+        typename trainer_type::trained_function_type d;
+        sample_vector_type x_test, x_train;
+        scalar_vector_type y_test, y_train;
         x_test.set_size (num_pos_test_samples  + num_neg_test_samples);
         y_test.set_size (num_pos_test_samples  + num_neg_test_samples);
         x_train.set_size(num_pos_train_samples + num_neg_train_samples);
@@ -795,7 +368,7 @@ namespace dlib
             }
 
             // do the training
-            d = svm_nu_train (x_train,y_train,kernel_function,nu,cache_size,eps);
+            d = trainer.train(x_train,y_train);
 
             // now test this fold 
             for (long i = 0; i < x_test.nr(); ++i)
@@ -813,37 +386,56 @@ namespace dlib
                 }
                 else
                 {
-                    throw dlib::error("invalid input labels to the svm_nu_cross_validate() function");
+                    throw dlib::error("invalid input labels to the cross_validate_trainer() function");
                 }
             }
 
         } // for (long i = 0; i < folds; ++i)
 
-        matrix<typename K::scalar_type, 1, 2, typename K::mem_manager_type> res;
+        matrix<scalar_type, 1, 2, mem_manager_type> res;
         res(0) = (scalar_type)num_pos_correct/(scalar_type)(num_pos_test_samples*folds); 
         res(1) = (scalar_type)num_neg_correct/(scalar_type)(num_neg_test_samples*folds); 
         return res;
     }
 
+    template <
+        typename trainer_type,
+        typename in_sample_vector_type,
+        typename in_scalar_vector_type
+        >
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    cross_validate_trainer (
+        const trainer_type& trainer,
+        const in_sample_vector_type& x,
+        const in_scalar_vector_type& y,
+        const long folds
+    )
+    {
+        return cross_validate_trainer_impl(trainer,
+                                           vector_to_matrix(x),
+                                           vector_to_matrix(y),
+                                           folds);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K
+        typename trainer_type,
+        typename in_sample_vector_type,
+        typename in_scalar_vector_type
         >
-    const probabilistic_decision_function<K>  svm_nu_train_prob (
-        const typename decision_function<K>::sample_vector_type& x,
-        const typename decision_function<K>::scalar_vector_type& y,
-        const K& kernel_function,
-        const typename K::scalar_type nu,
-        const long folds,
-        const long cache_size = 200,
-        const typename K::scalar_type eps = 0.001
+    const probabilistic_decision_function<typename trainer_type::kernel_type> train_probabilistic_decision_function_impl (
+        const trainer_type& trainer,
+        const in_sample_vector_type& x,
+        const in_scalar_vector_type& y,
+        const long folds
     )
     {
-        typedef typename K::scalar_type scalar_type;
-        typedef typename K::mem_manager_type mem_manager_type;
-        typedef typename decision_function<K>::sample_vector_type sample_vector_type;
-        typedef typename decision_function<K>::scalar_vector_type scalar_vector_type;
+        typedef typename trainer_type::sample_type sample_type;
+        typedef typename trainer_type::scalar_type scalar_type;
+        typedef typename trainer_type::mem_manager_type mem_manager_type;
+        typedef typename trainer_type::kernel_type K;
+
 
         /*
             This function fits a sigmoid function to the output of the 
@@ -856,39 +448,16 @@ namespace dlib
         */
 
         // make sure requires clause is not broken
-#ifdef ENABLE_ASSERTS
-        for (long r = 0; r < y.nr(); ++r)
-        {
-            DLIB_ASSERT(y(r) == -1.0 || y(r) == 1.0,
-                   "\tdecision_function svm_nu_train()"
-                   << "\n\tinvalid inputs were given to this function"
-                   << "\n\tr:    " << r 
-                   << "\n\ty(r): " << y(r) 
-            );
-
-        }
-#endif
-
-        DLIB_ASSERT(x.nr() > 1 &&  y.nr() == x.nr(),
-            "\tdecision_function svm_nu_train()"
-            << "\n\tinvalid inputs were given to this function"
-            << "\n\tx.nr(): " << x.nr() 
-            << "\n\ty.nr(): " << y.nr() 
-            << "\n\tx.nc(): " << x.nc() 
-            << "\n\ty.nc(): " << y.nc() 
-            );
-
-        DLIB_ASSERT(eps > 0 && 
-               folds > 1 && folds <= x.nr() &&
-               cache_size > 0 && 
-               0 < nu && nu < maximum_nu(y),
-            "\tdecision_function svm_nu_train()"
-            << "\n\tinvalid inputs were given to this function"
-            << "\n\teps: " << eps 
-            << "\n\tfolds:         " << folds 
-            << "\n\tcache_size:    " << cache_size
-            << "\n\tnu:            " << nu 
-            << "\n\tmaximum_nu(y): " << maximum_nu(y) 
+        DLIB_ASSERT(is_binary_classification_problem(x,y) == true &&
+                    1 < folds && folds <= x.nr(),
+            "\tprobabilistic_decision_function train_probabilistic_decision_function()"
+            << "\n\t invalid inputs were given to this function"
+            << "\n\t x.nr(): " << x.nr() 
+            << "\n\t y.nr(): " << y.nr() 
+            << "\n\t x.nc(): " << x.nc() 
+            << "\n\t y.nc(): " << y.nc() 
+            << "\n\t folds:  " << folds 
+            << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
             );
 
         // count the number of positive and negative examples
@@ -986,7 +555,7 @@ namespace dlib
             }
 
             // do the training
-            d = svm_nu_train (x_train,y_train,kernel_function,nu,cache_size,eps);
+            d = trainer.train (x_train,y_train);
 
             // now test this fold 
             for (long i = 0; i < x_test.nr(); ++i)
@@ -1003,7 +572,7 @@ namespace dlib
                 }
                 else
                 {
-                    throw dlib::error("invalid input labels to the svm_nu_train_prob() function");
+                    throw dlib::error("invalid input labels to the train_probabilistic_decision_function() function");
                 }
             }
 
@@ -1113,9 +682,25 @@ namespace dlib
                 break;
         }
 
-        return probabilistic_decision_function<K>(
-                    A, B,
-                    svm_nu_train (x,y,kernel_function,nu,cache_size,eps) );
+        return probabilistic_decision_function<K>( A, B, trainer.train(x,y) );
+    }
+
+    template <
+        typename trainer_type,
+        typename in_sample_vector_type,
+        typename in_scalar_vector_type
+        >
+    const probabilistic_decision_function<typename trainer_type::kernel_type> train_probabilistic_decision_function (
+        const trainer_type& trainer,
+        const in_sample_vector_type& x,
+        const in_scalar_vector_type& y,
+        const long folds
+    )
+    {
+        return train_probabilistic_decision_function_impl(trainer,
+                                                          vector_to_matrix(x),
+                                                          vector_to_matrix(y),
+                                                          folds);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1231,6 +816,576 @@ namespace dlib
             --n;
         }
     }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename K 
+        >
+    class svm_nu_trainer
+    {
+    public:
+        typedef K kernel_type;
+        typedef typename kernel_type::scalar_type scalar_type;
+        typedef typename kernel_type::sample_type sample_type;
+        typedef typename kernel_type::mem_manager_type mem_manager_type;
+        typedef decision_function<kernel_type> trained_function_type;
+
+        svm_nu_trainer (
+        ) :
+            nu(0.1),
+            cache_size(200),
+            eps(0.001)
+        {
+        }
+
+        svm_nu_trainer (
+            const kernel_type& kernel_, 
+            const scalar_type& nu_
+        ) :
+            kernel_function(kernel_),
+            nu(nu_),
+            cache_size(200),
+            eps(0.001)
+        {
+        }
+
+        void set_cache_size (
+            long cache_size_
+        )
+        {
+            cache_size = cache_size_;
+        }
+
+        const long get_cache_size (
+        ) const
+        {
+            return cache_size;
+        }
+
+        void set_epsilon (
+            scalar_type eps_
+        )
+        {
+            eps = eps_;
+        }
+
+        const scalar_type get_epsilon (
+        ) const
+        { 
+            return eps;
+        }
+
+        void set_kernel (
+            const kernel_type& k
+        )
+        {
+            kernel_function = k;
+        }
+
+        const kernel_type& get_kernel (
+        ) const
+        {
+            return kernel_function;
+        }
+
+        void set_nu (
+            scalar_type nu_
+        )
+        {
+            nu = nu_;
+        }
+
+        const scalar_type get_nu (
+        ) const
+        {
+            return nu;
+        }
+
+        template <
+            typename in_sample_vector_type,
+            typename in_scalar_vector_type
+            >
+        const decision_function<kernel_type> train (
+            const in_sample_vector_type& x,
+            const in_scalar_vector_type& y
+        ) const
+        {
+            return do_train(vector_to_matrix(x), vector_to_matrix(y));
+        }
+
+        void swap (
+            svm_nu_trainer& item
+        )
+        {
+            exchange(kernel_function, item.kernel_function);
+            exchange(nu,              item.nu);
+            exchange(cache_size,      item.cache_size);
+            exchange(eps,             item.eps);
+        }
+
+    private:
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename in_sample_vector_type,
+            typename in_scalar_vector_type
+            >
+        const decision_function<kernel_type> do_train (
+            const in_sample_vector_type& x,
+            const in_scalar_vector_type& y
+        ) const
+        {
+            typedef typename K::scalar_type scalar_type;
+            typedef typename decision_function<K>::sample_vector_type sample_vector_type;
+            typedef typename decision_function<K>::scalar_vector_type scalar_vector_type;
+
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
+                "\tdecision_function svm_nu_trainer::train(x,y)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t x.nr(): " << x.nr() 
+                << "\n\t y.nr(): " << y.nr() 
+                << "\n\t x.nc(): " << x.nc() 
+                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
+                );
+
+
+            const scalar_type tau = 1e-12;
+            scalar_vector_type df; // delta f(alpha)
+            scalar_vector_type alpha;
+
+            kernel_matrix_cache<K, in_sample_vector_type, in_scalar_vector_type> Q(x,y,kernel_function,cache_size);
+
+            alpha.set_size(x.nr());
+            df.set_size(x.nr());
+
+            // now initialize alpha
+            set_initial_alpha(y, nu, alpha);
+
+
+            // initialize df.  Compute df = Q*alpha
+            for (long r = 0; r < df.nr(); ++r)
+            {
+                df(r) = 0;
+                for (long c = 0; c < alpha.nr(); ++c)
+                {
+                    if (alpha(c) != 0)
+                        df(r) += Q(c,r)*alpha(c);
+                }
+            }
+
+            // now perform the actual optimization of alpha
+            long i, j;
+            while (find_working_group(y,alpha,Q,df,tau,eps,i,j))
+            {
+                const scalar_type old_alpha_i = alpha(i);
+                const scalar_type old_alpha_j = alpha(j);
+
+                optimize_working_pair(y,alpha,Q,df,tau,i,j);
+
+                // update the df vector now that we have modified alpha(i) and alpha(j)
+                scalar_type delta_alpha_i = alpha(i) - old_alpha_i;
+                scalar_type delta_alpha_j = alpha(j) - old_alpha_j;
+                for(long k = 0; k < df.nr(); ++k)
+                    df(k) += Q(k,i)*delta_alpha_i + Q(k,j)*delta_alpha_j;
+
+            }
+
+            scalar_type rho, b;
+            calculate_rho_and_b(y,alpha,df,rho,b);
+            alpha = pointwise_multiply(alpha,y)/rho;
+
+            // count the number of support vectors
+            long sv_count = 0;
+            for (long i = 0; i < alpha.nr(); ++i)
+            {
+                if (alpha(i) != 0)
+                    ++sv_count;
+            }
+
+            scalar_vector_type sv_alpha;
+            sample_vector_type support_vectors;
+
+            // size these column vectors so that they have an entry for each support vector
+            sv_alpha.set_size(sv_count);
+            support_vectors.set_size(sv_count);
+
+            // load the support vectors and their alpha values into these new column matrices
+            long idx = 0;
+            for (long i = 0; i < alpha.nr(); ++i)
+            {
+                if (alpha(i) != 0)
+                {
+                    sv_alpha(idx) = alpha(i);
+                    support_vectors(idx) = x(i);
+                    ++idx;
+                }
+            }
+
+            // now return the decision function
+            return decision_function<K> (sv_alpha, b, kernel_function, support_vectors);
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename scalar_type,
+            typename scalar_vector_type,
+            typename scalar_vector_type2
+            >
+        inline void set_initial_alpha (
+            const scalar_vector_type& y,
+            const scalar_type nu,
+            scalar_vector_type2& alpha
+        ) const
+        {
+            set_all_elements(alpha,0);
+            const scalar_type l = y.nr();
+            scalar_type temp = nu*l/2;
+            long num = (long)std::floor(temp);
+            long num_total = (long)std::ceil(temp);
+
+            int count = 0;
+            for (int i = 0; i < alpha.nr(); ++i)
+            {
+                if (y(i) == 1)
+                {
+                    if (count < num)
+                    {
+                        ++count;
+                        alpha(i) = 1;
+                    }
+                    else 
+                    {
+                        if (temp > num)
+                        {
+                            ++count;
+                            alpha(i) = temp - std::floor(temp);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (count != num_total)
+            {
+                std::ostringstream sout;
+                sout << "invalid nu of " << nu << ".  Must be between 0 and " << (scalar_type)count/y.nr();
+                throw invalid_svm_nu_error(sout.str(),nu);
+            }
+
+            count = 0;
+            for (int i = 0; i < alpha.nr(); ++i)
+            {
+                if (y(i) == -1)
+                {
+                    if (count < num)
+                    {
+                        ++count;
+                        alpha(i) = 1;
+                    }
+                    else 
+                    {
+                        if (temp > num)
+                        {
+                            ++count;
+                            alpha(i) = temp - std::floor(temp);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (count != num_total)
+            {
+                std::ostringstream sout;
+                sout << "invalid nu of " << nu << ".  Must be between 0 and " << (scalar_type)count/y.nr();
+                throw invalid_svm_nu_error(sout.str(),nu);
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename sample_vector_type,
+            typename scalar_vector_type,
+            typename scalar_vector_type2,
+            typename scalar_type
+            >
+        inline bool find_working_group (
+            const scalar_vector_type2& y,
+            const scalar_vector_type& alpha,
+            const kernel_matrix_cache<K,sample_vector_type, scalar_vector_type2>& Q,
+            const scalar_vector_type& df,
+            const scalar_type tau,
+            const scalar_type eps,
+            long& i_out,
+            long& j_out
+        ) const
+        {
+            using namespace std;
+            long ip = -1;
+            long jp = -1;
+            long in = -1;
+            long jn = -1;
+
+            scalar_type ip_val = -numeric_limits<scalar_type>::infinity();
+            scalar_type jp_val = numeric_limits<scalar_type>::infinity();
+            scalar_type in_val = -numeric_limits<scalar_type>::infinity();
+            scalar_type jn_val = numeric_limits<scalar_type>::infinity();
+
+            // loop over the alphas and find the maximum ip and in indices.
+            for (long i = 0; i < alpha.nr(); ++i)
+            {
+                if (y(i) == 1)
+                {
+                    if (alpha(i) < 1.0)
+                    {
+                        if (-df(i) > ip_val)
+                        {
+                            ip_val = -df(i);
+                            ip = i;
+                        }
+                    }
+                }
+                else
+                {
+                    if (alpha(i) > 0.0)
+                    {
+                        if (df(i) > in_val)
+                        {
+                            in_val = df(i);
+                            in = i;
+                        }
+                    }
+                }
+            }
+
+            scalar_type Mp = numeric_limits<scalar_type>::infinity();
+            scalar_type Mn = numeric_limits<scalar_type>::infinity();
+            scalar_type bp = -numeric_limits<scalar_type>::infinity();
+            scalar_type bn = -numeric_limits<scalar_type>::infinity();
+
+            // now we need to find the minimum jp and jn indices
+            for (long j = 0; j < alpha.nr(); ++j)
+            {
+                if (y(j) == 1)
+                {
+                    if (alpha(j) > 0.0)
+                    {
+                        scalar_type b = ip_val + df(j);
+                        if (-df(j) < Mp)
+                            Mp = -df(j);
+
+                        if (b > 0 && (Q.is_cached(j) || b > bp || jp == -1 ))
+                        {
+                            bp = b;
+                            scalar_type a = Q(ip,ip) + Q(j,j) - 2*Q(j,ip); 
+                            if (a <= 0)
+                                a = tau;
+                            scalar_type temp = -b*b/a;
+                            if (temp < jp_val)
+                            {
+                                jp_val = temp;
+                                jp = j;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (alpha(j) < 1.0)
+                    {
+                        scalar_type b = in_val - df(j);
+                        if (df(j) < Mn)
+                            Mn = df(j);
+
+                        if (b > 0 && (Q.is_cached(j) || b > bn || jn == -1 ))
+                        {
+                            bn = b;
+                            scalar_type a = Q(in,in) + Q(j,j) - 2*Q(j,in); 
+                            if (a <= 0)
+                                a = tau;
+                            scalar_type temp = -b*b/a;
+                            if (temp < jn_val)
+                            {
+                                jn_val = temp;
+                                jn = j;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // if we are at the optimal point then return false so the caller knows
+            // to stop optimizing
+            if (std::max(ip_val - Mp, in_val - Mn) < eps)
+                return false;
+
+            if (jp_val < jn_val)
+            {
+                i_out = ip;
+                j_out = jp;
+            }
+            else
+            {
+                i_out = in;
+                j_out = jn;
+            }
+
+            if (j_out >= 0 && i_out >= 0)
+                return true;
+            else
+                return false;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename scalar_vector_type,
+            typename scalar_vector_type2,
+            typename scalar_type
+            >
+        void calculate_rho_and_b(
+            const scalar_vector_type2& y,
+            const scalar_vector_type& alpha,
+            const scalar_vector_type& df,
+            scalar_type& rho, 
+            scalar_type& b
+        ) const
+        {
+            using namespace std;
+            long num_p_free = 0;
+            long num_n_free = 0;
+            scalar_type sum_p_free = 0;
+            scalar_type sum_n_free = 0;
+
+            scalar_type upper_bound_p = -numeric_limits<scalar_type>::infinity();
+            scalar_type upper_bound_n = -numeric_limits<scalar_type>::infinity();
+            scalar_type lower_bound_p = numeric_limits<scalar_type>::infinity();
+            scalar_type lower_bound_n = numeric_limits<scalar_type>::infinity();
+
+            for(long i = 0; i < alpha.nr(); ++i)
+            {
+                if(y(i) == 1)
+                {
+                    if(alpha(i) == 1)
+                    {
+                        if (df(i) > upper_bound_p)
+                            upper_bound_p = df(i);
+                    }
+                    else if(alpha(i) == 0)
+                    {
+                        if (df(i) < lower_bound_p)
+                            lower_bound_p = df(i);
+                    }
+                    else
+                    {
+                        ++num_p_free;
+                        sum_p_free += df(i);
+                    }
+                }
+                else
+                {
+                    if(alpha(i) == 1)
+                    {
+                        if (df(i) > upper_bound_n)
+                            upper_bound_n = df(i);
+                    }
+                    else if(alpha(i) == 0)
+                    {
+                        if (df(i) < lower_bound_n)
+                            lower_bound_n = df(i);
+                    }
+                    else
+                    {
+                        ++num_n_free;
+                        sum_n_free += df(i);
+                    }
+                }
+            }
+
+            scalar_type r1,r2;
+            if(num_p_free > 0)
+                r1 = sum_p_free/num_p_free;
+            else
+                r1 = (upper_bound_p+lower_bound_p)/2;
+
+            if(num_n_free > 0)
+                r2 = sum_n_free/num_n_free;
+            else
+                r2 = (upper_bound_n+lower_bound_n)/2;
+
+            rho = (r1+r2)/2;
+            b = (r1-r2)/2/rho;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename sample_vector_type,
+            typename scalar_vector_type,
+            typename scalar_vector_type2,
+            typename scalar_type
+            >
+        inline void optimize_working_pair (
+            const scalar_vector_type2& y,
+            scalar_vector_type& alpha,
+            const kernel_matrix_cache<K, sample_vector_type, scalar_vector_type2>& Q,
+            const scalar_vector_type& df,
+            const scalar_type tau,
+            const long i,
+            const long j
+        ) const
+        {
+            scalar_type quad_coef = Q(i,i)+Q(j,j)-2*Q(j,i);
+            if (quad_coef <= 0)
+                quad_coef = tau;
+            scalar_type delta = (df(i)-df(j))/quad_coef;
+            scalar_type sum = alpha(i) + alpha(j);
+            alpha(i) -= delta;
+            alpha(j) += delta;
+
+            if(sum > 1)
+            {
+                if(alpha(i) > 1)
+                {
+                    alpha(i) = 1;
+                    alpha(j) = sum - 1;
+                }
+                else if(alpha(j) > 1)
+                {
+                    alpha(j) = 1;
+                    alpha(i) = sum - 1;
+                }
+            }
+            else
+            {
+                if(alpha(j) < 0)
+                {
+                    alpha(j) = 0;
+                    alpha(i) = sum;
+                }
+                else if(alpha(i) < 0)
+                {
+                    alpha(i) = 0;
+                    alpha(j) = sum;
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        kernel_type kernel_function;
+        scalar_type nu;
+        long cache_size;
+        scalar_type eps;
+    }; // end of class svm_nu_trainer
 
 // ----------------------------------------------------------------------------------------
 
