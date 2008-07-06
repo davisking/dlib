@@ -115,13 +115,14 @@
                <item>krls</item>
                <item>kcentroid</item>
                <item>kkmeans</item>
-               <item>svm_nu_train</item> 
-               <item>svm_nu_train_prob</item> 
-               <item>svm_nu_cross_validate</item> 
+               <item>svm_nu_trainer</item> 
+               <item>train_probabilistic_decision_function</item> 
+               <item>cross_validate_trainer</item> 
                <item>rank_features</item> 
             </sub>
          </item>
          <item>randomize_samples</item> 
+         <item>is_binary_classification_problem</item> 
          <item>hsort_array</item> 
          <item>isort_array</item> 
          <item>put_in_range</item> 
@@ -879,16 +880,15 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>svm_nu_train_prob</name>
+         <name>train_probabilistic_decision_function</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
          <description>
             <p>
-               Trains a nu support vector classifier and outputs a <a href="#probabilistic_decision_function">
-                  probabilistic_decision_function</a>.
+               Trains a <a href="#probabilistic_decision_function">probabilistic_decision_function</a> using 
+               some sort of trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a>.
             </p>
-            This function uses the <a href="#svm_nu_train">svm_nu_train</a> function and creates the 
-            probability model using the technique described in the paper:
+            The probability model is created by using the technique described in the paper:
             <blockquote>
                 Probabilistic Outputs for Support Vector Machines and
                 Comparisons to Regularized Likelihood Methods by 
@@ -904,7 +904,7 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>svm_nu_train</name>
+         <name>svm_nu_trainer</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
          <description>
@@ -1001,6 +1001,21 @@
                                  
       </component>
       
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_binary_classification_problem</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+             This function simply takes two vectors, the first containing veature vectors and
+             the second containing labels, and reports back if the two could possibly 
+             contain data for a well formed classification problem.
+         </description>
+                                 
+      </component>
+      
    <!-- ************************************************************************* -->
       
       <component>
@@ -1038,11 +1053,12 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>svm_nu_cross_validate</name>
+         <name>cross_validate_trainer</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
          <description>
-               Performs k-fold cross validation using the svm_nu_train() function.
+               Performs k-fold cross validation on a user supplied trainer object such
+               as the <a href="#svm_nu_trainer">svm_nu_trainer</a>.
          </description>
          <examples>
             <example>svm_ex.cpp.html</example>
