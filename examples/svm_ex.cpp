@@ -26,18 +26,15 @@ using namespace dlib;
 
 int main()
 {
-    // The svm functions use column vectors to contain a lot of the data they operate on
-    // So the first thing we do here is declare some convenient typedefs for matrix objects
-    // we will be using.
+    // The svm functions use column vectors to contain a lot of the data on which they they 
+    // operate. So the first thing we do here is declare a convenient typedef.  
 
-    // This first typedef declares a matrix with 2 rows and 1 column.  It will be the
+    // This typedef declares a matrix with 2 rows and 1 column.  It will be the
     // object that contains each of our 2 dimensional samples.   (Note that if you wanted 
-    // more than 2 features in this vector you can simply change the 2 to something else)
+    // more than 2 features in this vector you can simply change the 2 to something else.
+    // Or if you don't know how many features you want until runtime then you can put a 0
+    // here and use the matrix.set_size() member function)
     typedef matrix<double, 2, 1> sample_type;
-
-    // This is a typedef for a column vector of unknown length that contains our
-    // sample_type objects.  Instances of this object will contain our sample data.
-    typedef matrix<sample_type,0,1> samples_type;
 
     // This is a typedef for the type of kernel we are going to use in this example.
     // In this case I have selected the radial basis kernel that can operate on our
@@ -45,40 +42,49 @@ int main()
     typedef radial_basis_kernel<sample_type> kernel_type;
 
 
-    // Now we make a samples_type object as well as a column vector to 
-    // store the label for each sample in samples.
-    samples_type samples;
-    matrix<double, 0,1> labels;
-
+    // Now we make objects to contain our samples and their respective labels.
+    std::vector<sample_type> samples;
+    std::vector<double> labels;
 
     // Now lets put some data into our samples and labels objects.  We do this
-    // by looping over 41*41 points and labeling them according to their
+    // by looping over a bunch of points and labeling them according to their
     // distance from the origin.
-    samples.set_size(41*41);
-    labels.set_size(41*41);
-    int count = 0;
     for (int r = -20; r <= 20; ++r)
     {
         for (int c = -20; c <= 20; ++c)
         {
-            samples(count)(0) = r;
-            samples(count)(1) = c;
+            sample_type samp;
+            samp(0) = r;
+            samp(1) = c;
+            samples.push_back(samp);
 
             // if this point is less than 10 from the origin
             if (sqrt((double)r*r + c*c) <= 10)
-                labels(count) = +1;
+                labels.push_back(+1);
             else
-                labels(count) = -1;
+                labels.push_back(-1);
 
-            ++count;
         }
     }
+
+
+    // Here we normalize all the samples by subtracting their mean and dividing by their standard deviation.
+    // This is generally a good idea since it often heads off numerical stability problems and also 
+    // prevents one large feature from smothering others.  Doing this doesn't matter much in this example
+    // so I'm just doing this here so you can see an easy way to accomplish this with 
+    // the library.  
+    const sample_type m(mean(vector_to_matrix(samples)));  // compute a mean vector
+    const sample_type sd(reciprocal(sqrt(variance(vector_to_matrix(samples))))); // compute a standard deviation vector
+    // now normalize each sample
+    for (unsigned long i = 0; i < samples.size(); ++i)
+        samples[i] = pointwise_multiply(samples[i] - m, sd); 
+
 
 
     // Now that we have some data we want to train on it.  However, there are two parameters to the 
     // training.  These are the nu and gamma parameters.  Our choice for these parameters will 
     // influence how good the resulting decision function is.  To test how good a particular choice 
-    // of these parameters are we can use the svm_nu_cross_validate() function to perform n-fold cross
+    // of these parameters are we can use the cross_validate_trainer() function to perform n-fold cross
     // validation on our training data.  However, there is a problem with the way we have sampled 
     // our distribution above.  The problem is that there is a definite ordering to the samples.  
     // That is, the first half of the samples look like they are from a different distribution 
@@ -91,6 +97,9 @@ int main()
     // labels in the training data.  This function finds that value.
     const double max_nu = maximum_nu(labels);
 
+    // here we make an instance of the svm_nu_trainer object that uses our kernel type.
+    svm_nu_trainer<kernel_type> trainer;
+
     // Now we loop over some different nu and gamma values to see how good they are.  Note
     // that this is just a simple brute force way to try out a few possible parameter 
     // choices.  You may want to investigate more sophisticated strategies for determining 
@@ -100,12 +109,16 @@ int main()
     {
         for (double nu = 0.00001; nu < max_nu; nu += 0.1)
         {
+            // tell the trainer the parameters we want to use
+            trainer.set_kernel(kernel_type(gamma));
+            trainer.set_nu(nu);
+
             cout << "gamma: " << gamma << "    nu: " << nu;
             // Print out the cross validation accuracy for 3-fold cross validation using the current gamma and nu.  
-            // svm_nu_cross_validate() returns a column vector.  The first element of the vector is the fraction
+            // cross_validate_trainer() returns a column vector.  The first element of the vector is the fraction
             // of +1 training examples correctly classified and the second number is the fraction of -1 training 
             // examples correctly classified.
-            cout << "     cross validation accuracy: " << svm_nu_cross_validate(samples, labels, kernel_type(gamma), nu, 3);
+            cout << "     cross validation accuracy: " << cross_validate_trainer(trainer, samples, labels, 3);
         }
     }
 
@@ -116,55 +129,75 @@ int main()
     // Now we train on the full set of data and obtain the resulting decision function.  We use the
     // value of 0.1 for nu and gamma.  The decision function will return values >= 0 for samples it predicts
     // are in the +1 class and numbers < 0 for samples it predicts to be in the -1 class.
-    decision_function<kernel_type> learned_decision_function = svm_nu_train(samples, labels, kernel_type(0.1), 0.1);
+    trainer.set_kernel(kernel_type(0.1));
+    trainer.set_nu(0.1);
+    decision_function<kernel_type> learned_decision_function = trainer.train(samples, labels);
 
     // print out the number of support vectors in the resulting decision function
-    cout << "\nnumber of support vectors in our learned_decision_function is " << learned_decision_function.support_vectors.nr() << endl;
+    cout << "\nnumber of support vectors in our learned_decision_function is " 
+         << learned_decision_function.support_vectors.nr() << endl;
 
     // now lets try this decision_function on some samples we haven't seen before 
     sample_type sample;
 
     sample(0) = 3.123;
     sample(1) = 2;
+    // don't forget that we have to normalize each new sample the same way we did for the training samples.
+    sample = pointwise_multiply(sample-m, sd);
+
     cout << "This sample should be >= 0 and it is classified as a " << learned_decision_function(sample) << endl;
 
     sample(0) = 3.123;
     sample(1) = 9.3545;
+    sample = pointwise_multiply(sample-m, sd);
     cout << "This sample should be >= 0 and it is classified as a " << learned_decision_function(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 9.3545;
+    sample = pointwise_multiply(sample-m, sd);
     cout << "This sample should be < 0 and it is classified as a " << learned_decision_function(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 0;
+    sample = pointwise_multiply(sample-m, sd);
     cout << "This sample should be < 0 and it is classified as a " << learned_decision_function(sample) << endl;
 
 
-    // We can also train a decision function that reports a well conditioned probability instead of just a number
-    // > 0 for the +1 class and < 0 for the -1 class.  An example of doing that follows:
-    probabilistic_decision_function<kernel_type> learned_probabilistic_decision_function = svm_nu_train_prob(samples, labels, kernel_type(0.1), 0.1, 3);
+    // We can also train a decision function that reports a well conditioned probability 
+    // instead of just a number > 0 for the +1 class and < 0 for the -1 class.  An example 
+    // of doing that follows:
+    probabilistic_decision_function<kernel_type> learned_probabilistic_decision_function;  
+    learned_probabilistic_decision_function = train_probabilistic_decision_function(trainer, samples, labels, 3);
     // Now we have a function that returns the probability that a given sample is of the +1 class.  
 
-    // print out the number of support vectors in the resulting decision function.  (it should be the same as in the one above)
+    // print out the number of support vectors in the resulting decision function.  
+    // (it should be the same as in the one above)
     cout << "\nnumber of support vectors in our learned_probabilistic_decision_function is " 
          << learned_probabilistic_decision_function.decision_funct.support_vectors.nr() << endl;
 
     sample(0) = 3.123;
     sample(1) = 2;
-    cout << "This +1 example should have high probability.  It's probability is: " << learned_probabilistic_decision_function(sample) << endl;
+    sample = pointwise_multiply(sample-m, sd);
+    cout << "This +1 example should have high probability.  It's probability is: " 
+         << learned_probabilistic_decision_function(sample) << endl;
 
     sample(0) = 3.123;
     sample(1) = 9.3545;
-    cout << "This +1 example should have high probability.  It's probability is: " << learned_probabilistic_decision_function(sample) << endl;
+    sample = pointwise_multiply(sample-m, sd);
+    cout << "This +1 example should have high probability.  It's probability is: " 
+         << learned_probabilistic_decision_function(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 9.3545;
-    cout << "This -1 example should have low probability.  It's probability is: " << learned_probabilistic_decision_function(sample) << endl;
+    sample = pointwise_multiply(sample-m, sd);
+    cout << "This -1 example should have low probability.  It's probability is: " 
+         << learned_probabilistic_decision_function(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 0;
-    cout << "This -1 example should have low probability.  It's probability is: " << learned_probabilistic_decision_function(sample) << endl;
+    sample = pointwise_multiply(sample-m, sd);
+    cout << "This -1 example should have low probability.  It's probability is: " 
+         << learned_probabilistic_decision_function(sample) << endl;
 
 
 }
