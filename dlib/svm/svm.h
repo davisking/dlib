@@ -850,12 +850,24 @@ namespace dlib
             cache_size(200),
             eps(0.001)
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 < nu && nu <= 1,
+                "\tsvm_nu_trainer::svm_nu_trainer(kernel,nu)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t nu: " << nu 
+                );
         }
 
         void set_cache_size (
             long cache_size_
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(cache_size_ > 0,
+                "\tvoid svm_nu_trainer::set_cache_size(cache_size_)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t cache_size: " << cache_size_ 
+                );
             cache_size = cache_size_;
         }
 
@@ -869,6 +881,12 @@ namespace dlib
             scalar_type eps_
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(eps_ > 0,
+                "\tvoid svm_nu_trainer::set_epsilon(eps_)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t eps: " << eps_ 
+                );
             eps = eps_;
         }
 
@@ -895,6 +913,12 @@ namespace dlib
             scalar_type nu_
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 < nu_ && nu_ <= 1,
+                "\tvoid svm_nu_trainer::set_nu(nu_)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t nu: " << nu_ 
+                );
             nu = nu_;
         }
 
@@ -1386,6 +1410,14 @@ namespace dlib
         long cache_size;
         scalar_type eps;
     }; // end of class svm_nu_trainer
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename K>
+    void swap (
+        svm_nu_trainer<K>& a,
+        svm_nu_trainer<K>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 

@@ -157,9 +157,9 @@ namespace dlib
             ensures
                 - returns the number of megabytes of cache this object will use
                   when it performs training via the this->train() function.
-                  (bigger values of this may make training go faster but doesn't affect 
+                  (bigger values of this may make training go faster but won't affect 
                   the result.  However, too big a value will cause you to run out of 
-                  memory obviously.)
+                  memory, obviously.)
         !*/
 
         void set_epsilon (
@@ -251,6 +251,15 @@ namespace dlib
                 - swaps *this and item
         !*/
     }; 
+
+    template <typename K>
+    void swap (
+        svm_nu_trainer<K>& a,
+        svm_nu_trainer<K>& b
+    ) { a.swap(b); }
+    /*!
+        provides a global swap
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
