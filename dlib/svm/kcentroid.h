@@ -215,6 +215,16 @@ namespace dlib
             item.bias_is_stale = true;
         }
 
+        distance_function<kernel_type> get_distance_function (
+        ) const
+        {
+            refresh_bias();
+            return distance_function<kernel_type>(vector_to_matrix(alpha),
+                                                  bias, 
+                                                  kernel, 
+                                                  vector_to_matrix(dictionary));
+        }
+
     private:
 
         void refresh_bias (

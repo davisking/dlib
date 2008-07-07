@@ -193,6 +193,16 @@ namespace dlib
                 - returns the number of "support vectors" in the dictionary.  
         !*/
 
+        distance_function<kernel_type> get_distance_function (
+        ) const;
+        /*!
+            ensures
+                - returns a distance function F that represents the point learned
+                  by this object so far.  I.e. it is the case that:
+                    - for all x: F(x) == (*this)(x)
+        !*/
+
+
     };
 
 // ----------------------------------------------------------------------------------------

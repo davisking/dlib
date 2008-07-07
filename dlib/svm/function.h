@@ -233,6 +233,144 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename K
+        >
+    struct distance_function
+    {
+        typedef typename K::scalar_type scalar_type;
+        typedef typename K::sample_type sample_type;
+        typedef typename K::mem_manager_type mem_manager_type;
+
+        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
+        typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
+
+        const scalar_vector_type alpha;
+        const scalar_type b;
+        const K kernel_function;
+        const sample_vector_type support_vectors;
+
+        distance_function (
+        ) : b(0), kernel_function(K()) {}
+
+        distance_function (
+            const distance_function& d
+        ) : 
+            alpha(d.alpha), 
+            b(d.b),
+            kernel_function(d.kernel_function),
+            support_vectors(d.support_vectors) 
+        {}
+
+        distance_function (
+            const scalar_vector_type& alpha_,
+            const scalar_type& b_,
+            const K& kernel_function_,
+            const sample_vector_type& support_vectors_
+        ) :
+            alpha(alpha_),
+            b(b_),
+            kernel_function(kernel_function_),
+            support_vectors(support_vectors_)
+        {}
+
+        distance_function& operator= (
+            const distance_function& d
+        )
+        {
+            if (this != &d)
+            {
+                const_cast<scalar_vector_type&>(alpha) = d.alpha;
+                const_cast<scalar_type&>(b) = d.b;
+                const_cast<K&>(kernel_function) = d.kernel_function;
+                const_cast<sample_vector_type&>(support_vectors) = d.support_vectors;
+            }
+            return *this;
+        }
+
+        scalar_type operator() (
+            const sample_type& x
+        ) const
+        {
+            scalar_type temp = 0;
+            for (long i = 0; i < alpha.nr(); ++i)
+                temp += alpha(i) * kernel_function(x,support_vectors(i));
+
+            temp = b + kernel_function(x,x) - 2*temp; 
+            if (temp > 0)
+                return std::sqrt(temp);
+            else
+                return 0;
+        }
+
+        scalar_type operator() (
+            const distance_function& x
+        ) const
+        {
+            scalar_type temp = 0;
+            for (long i = 0; i < alpha.nr(); ++i)
+                for (long j = 0; j < x.alpha.nr(); ++j)
+                    temp += alpha(i)*x.alpha(j) * kernel_function(support_vectors(i), x.support_vectors(j));
+
+            temp = b + x.b - 2*temp;
+            if (temp > 0)
+                return std::sqrt(temp);
+            else
+                return 0;
+        }
+    };
+
+    template <
+        typename K
+        >
+    void serialize (
+        const distance_function<K>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.alpha, out);
+            serialize(item.b,     out);
+            serialize(item.kernel_function, out);
+            serialize(item.support_vectors, out);
+        }
+        catch (serialization_error e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type distance_function"); 
+        }
+    }
+
+    template <
+        typename K
+        >
+    void deserialize (
+        distance_function<K>& item,
+        std::istream& in 
+    )
+    {
+        typedef typename K::scalar_type scalar_type;
+        typedef typename K::sample_type sample_type;
+        typedef typename K::mem_manager_type mem_manager_type;
+
+        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
+        typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
+        try
+        {
+            deserialize(const_cast<scalar_vector_type&>(item.alpha), in);
+            deserialize(const_cast<scalar_type&>(item.b), in);
+            deserialize(const_cast<K&>(item.kernel_function), in);
+            deserialize(const_cast<sample_vector_type&>(item.support_vectors), in);
+        }
+        catch (serialization_error e)
+        { 
+            throw serialization_error(e.info + "\n   while deserializing object of type distance_function"); 
+        }
+    }
+
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_FUNCTION
