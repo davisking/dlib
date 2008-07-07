@@ -98,8 +98,8 @@ namespace dlib
     );
     /*!
         requires
-		    - wstr is a valid UTF-16 string when sizeof(wchar_t) == 2
-		    - wstr is a valid UTF-32 string when sizeof(wchar_t) == 4
+            - wstr is a valid UTF-16 string when sizeof(wchar_t) == 2
+            - wstr is a valid UTF-32 string when sizeof(wchar_t) == 4
         ensures
             - converts wstr into UTF-32 string
     !*/
@@ -111,7 +111,7 @@ namespace dlib
     );
     /*!
         requires
-		    - str is a valid UTF-32 encoded string
+            - str is a valid UTF-32 encoded string
         ensures
             - converts str into wstring whose encoding is UTF-16 when sizeof(wchar_t) == 2
             - converts str into wstring whose encoding is UTF-32 when sizeof(wchar_t) == 4
@@ -124,7 +124,7 @@ namespace dlib
     );
     /*!
         requires
-		    - str is a valid multibyte string whose encoding is same as current locale setting
+            - str is a valid multibyte string whose encoding is same as current locale setting
         ensures
             - converts str into wstring whose encoding is UTF-16 when sizeof(wchar_t) == 2
             - converts str into wstring whose encoding is UTF-32 when sizeof(wchar_t) == 4
@@ -137,7 +137,7 @@ namespace dlib
     );
     /*!
         requires
-		    - str is a valid wide character string string whose encoding is same as current 
+            - str is a valid wide character string string whose encoding is same as current 
               locale setting
         ensures
             - returns a multibyte encoded version of the given string
