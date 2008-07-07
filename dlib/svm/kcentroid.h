@@ -71,6 +71,7 @@ namespace dlib
             K.set_size(0,0);
             samples_seen = 0;
             bias = 0;
+            bias_is_stale = false;
         }
 
         scalar_type operator() (
@@ -83,6 +84,10 @@ namespace dlib
                 << "\n\tYou can only compare two kcentroid objects if they use the same kernel"
                 << "\n\tthis: " << this
                 );
+
+            // make sure the bias terms are up to date
+            refresh_bias();
+            x.refresh_bias();
 
             scalar_type temp = 0;
             for (unsigned long i = 0; i < alpha.size(); ++i)
@@ -104,6 +109,9 @@ namespace dlib
             const sample_type& x
         ) const
         {
+            // make sure the bias terms are up to date
+            refresh_bias();
+
             scalar_type temp = 0;
             const scalar_type kxx = kernel(x,x);
             for (unsigned long i = 0; i < alpha.size(); ++i)
@@ -176,6 +184,7 @@ namespace dlib
             exchange(bias, item.bias);
             a.swap(item.a);
             k.swap(item.k);
+            exchange(bias_is_stale, item.bias_is_stale);
         }
 
         unsigned long dictionary_size (
@@ -203,9 +212,21 @@ namespace dlib
             deserialize(item.my_tolerance, in);
             deserialize(item.samples_seen, in);
             deserialize(item.bias, in);
+            item.bias_is_stale = true;
         }
 
     private:
+
+        void refresh_bias (
+        ) const 
+        {
+            if (bias_is_stale)
+            {
+                bias_is_stale = false;
+                // recompute the bias term
+                bias = sum(pointwise_multiply(K, vector_to_matrix(alpha)*trans(vector_to_matrix(alpha))));
+            }
+        }
 
         scalar_type train_and_maybe_test (
             const sample_type& x,
@@ -313,8 +334,7 @@ namespace dlib
                 }
             }
 
-            // recompute the bias term
-            bias = sum(pointwise_multiply(K, vector_to_matrix(alpha)*trans(vector_to_matrix(alpha))));
+            bias_is_stale = true;
             
             return test_result;
         }
@@ -375,7 +395,8 @@ namespace dlib
         scalar_type my_tolerance;
         unsigned long my_max_dictionary_size;
         scalar_type samples_seen;
-        scalar_type bias;
+        mutable scalar_type bias;
+        mutable bool bias_is_stale;
 
 
         // temp variables here just so we don't have to reconstruct them over and over.  Thus, 
