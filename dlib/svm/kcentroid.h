@@ -286,7 +286,7 @@ namespace dlib
 
                 // if this new vector isn't approximately linearly dependent on the vectors
                 // in our dictionary.
-                if (std::abs(delta) > my_tolerance)
+                if (delta > my_tolerance)
                 {
                     if (dictionary.size() >= my_max_dictionary_size)
                     {
