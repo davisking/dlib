@@ -85,7 +85,7 @@ int main()
         samples[i] = pointwise_multiply(samples[i] - m, sd); 
 
     // This is another thing that is often good to do from a numerical stability point of view.  
-    // In our case it doesn't really matter.  
+    // However, in our case it doesn't really matter.  
     randomize_samples(samples,labels);
 
 
