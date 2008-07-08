@@ -120,6 +120,8 @@
                <item>train_probabilistic_decision_function</item> 
                <item>cross_validate_trainer</item> 
                <item>rank_features</item> 
+               <item>reduced_decision_function_trainer</item> 
+               <item>reduced</item> 
             </sub>
          </item>
          <item>randomize_samples</item> 
@@ -1062,6 +1064,36 @@
          <examples>
             <example>rank_features_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>reduced</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+            This is a convenience function for creating 
+            <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
+            objects.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>reduced_decision_function_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+               This is a trainer object that is meant to wrap other trainer objects 
+               that create <a href="#decision_function">decision_function</a> objects.
+               It performs post processing on the output decision_function objects 
+               with the intent of representing the decision_function with fewer 
+               support vectors.
+         </description>
                                  
       </component>
       
