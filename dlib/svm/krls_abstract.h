@@ -53,6 +53,8 @@ namespace dlib
             unsigned long max_dictionary_size_ = 1000000
         );
         /*!
+            requires
+                - tolerance >= 0
             ensures
                 - this object is properly initialized
                 - #tolerance() == tolerance_

@@ -43,6 +43,14 @@ namespace dlib
             my_tolerance(tolerance_),
             my_max_dictionary_size(max_dictionary_size_)
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(tolerance_ >= 0,
+                "\tkcentroid::kcentroid()"
+                << "\n\t You have to give a positive tolerance"
+                << "\n\t this: " << this
+                << "\n\t tolerance: " << tolerance_ 
+                );
+
             clear_dictionary();
         }
 
