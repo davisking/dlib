@@ -111,6 +111,7 @@
                <item>polynomial_kernel</item>
                <item>linear_kernel</item>
                <item>decision_function</item>
+               <item>distance_function</item>
                <item>probabilistic_decision_function</item>
                <item>krls</item>
                <item>kcentroid</item>
@@ -940,6 +941,20 @@
          <examples>
             <example>svm_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>distance_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
+         <description>
+                This object represents a point in kernel induced feature space. 
+                You may use this object to find the distance from the point it 
+                represents to points in input space.
+         </description>
                                  
       </component>
       

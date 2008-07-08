@@ -408,6 +408,7 @@
          <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>
 
          <term link="dlib/svm/function_abstract.h.html#decision_function" name="decision_function"/>
+         <term link="dlib/svm/function_abstract.h.html#distance_function" name="distance_function"/>
          <term link="dlib/svm/function_abstract.h.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
 
          <term link="dlib/svm/kernel_abstract.h.html#linear_kernel" name="linear_kernel"/>
@@ -506,6 +507,10 @@
 
 
 
+         <term link="dlib/image_transforms/thresholding_abstract.h.html" name="on_pixel"/>
+         <term link="dlib/image_transforms/thresholding_abstract.h.html" name="off_pixel"/>
+    
+
          <term link="imaging.html#assign_image" name="assign_image"/>
          <term link="imaging.html#assign_all_pixels" name="assign_all_pixels"/>
          <term link="imaging.html#assign_border_pixels" name="assign_border_pixels"/>
@@ -544,6 +549,8 @@
 
 
 
+         <term link="metaprogramming.html#enable_if" name="enable_if"/>
+         <term link="metaprogramming.html#disable_if" name="disable_if"/>
          <term link="metaprogramming.html#DLIB_STACK_TRACE" name="DLIB_ENABLE_STACK_TRACE"/>
          <term link="metaprogramming.html#DLIB_STACK_TRACE" name="DLIB_STACK_TRACE"/>
          <term link="metaprogramming.html#DLIB_STACK_TRACE" name="Stack Trace"/>
