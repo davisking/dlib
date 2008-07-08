@@ -1026,7 +1026,7 @@
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
          <description>
-             This function simply takes two vectors, the first containing veature vectors and
+             This function simply takes two vectors, the first containing feature vectors and
              the second containing labels, and reports back if the two could possibly 
              contain data for a well formed classification problem.
          </description>
