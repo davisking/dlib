@@ -46,14 +46,15 @@ namespace dlib
     /*!
         requires
             - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - hist must be capable of representing a vector of length 
+            - hist must be capable of representing a column vector of length 
               pixel_traits<typename in_image_type>::max(). I.e. if R and C are nonzero
               then they must be values that don't conflict with the previous sentence.
         ensures
             - #hist.size() == pixel_traits<typename in_image_type>::max()
+            - #hist.nc() == 1 || #hist.nr() == 1 (i.e. hist is either a row or column vector)
             - #hist == the histogram for in_img.  I.e. it is the case that for all
               valid i:
-                - hist[i] == the number of times a pixel with intensity i appears
+                - hist(i) == the number of times a pixel with intensity i appears
                   in in_img
     !*/
 
