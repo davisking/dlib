@@ -392,6 +392,7 @@
          <term link="algorithms.html#is_binary_classification_problem" name="is_binary_classification_problem"/>
          <term link="algorithms.html#square_root" name="square_root"/>
          <term link="algorithms.html#svm_nu_trainer" name="svm_nu_trainer"/>
+         <term link="algorithms.html#rbf_network_trainer" name="rbf_network_trainer"/>
          <term link="algorithms.html#reduced" name="reduced"/>
          <term link="algorithms.html#reduced_decision_function_trainer" name="reduced_decision_function_trainer"/>
          <term link="algorithms.html#train_probabilistic_decision_function" name="train_probabilistic_decision_function"/>

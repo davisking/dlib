@@ -117,6 +117,7 @@
                <item>kcentroid</item>
                <item>kkmeans</item>
                <item>svm_nu_trainer</item> 
+               <item>rbf_network_trainer</item> 
                <item>train_probabilistic_decision_function</item> 
                <item>cross_validate_trainer</item> 
                <item>rank_features</item> 
@@ -905,6 +906,18 @@
       </component>
       
    <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rbf_network_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/rbf_network_abstract.h</spec_file>
+         <description>
+               Trains a radial basis function network and outputs a <a href="#decision_function">decision_function</a>. 
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
       
       <component>
          <name>svm_nu_trainer</name>
