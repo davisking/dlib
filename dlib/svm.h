@@ -8,6 +8,7 @@
 #include "svm/kcentroid.h"
 #include "svm/kkmeans.h"
 #include "svm/feature_ranking.h"
+#include "svm/rbf_network.h"
 
 #endif // DLIB_SVm_HEADER
 
