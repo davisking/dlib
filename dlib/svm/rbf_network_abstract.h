@@ -34,11 +34,11 @@ namespace dlib
                 about RBF networks.  
         !*/
     public:
-        typedef radial_basis_kernel<sample_type_> kernel_type;
-        typedef typename kernel_type::scalar_type scalar_type;
-        typedef typename kernel_type::sample_type sample_type;
-        typedef typename kernel_type::mem_manager_type mem_manager_type;
-        typedef decision_function<kernel_type> trained_function_type;
+        typedef radial_basis_kernel<sample_type_>      kernel_type;
+        typedef          sample_type_                  sample_type;
+        typedef typename sample_type::type             scalar_type;
+        typedef typename sample_type::mem_manager_type mem_manager_type;
+        typedef decision_function<kernel_type>         trained_function_type;
 
         rbf_network_trainer (
         ); 
@@ -93,10 +93,10 @@ namespace dlib
         ) const
         /*!
             requires
-                - in_sample_vector_type == a matrix or something convertable to a matrix
-                  via vector_to_matrix()
-                - in_scalar_vector_type == a matrix or something convertable to a matrix
-                  via vector_to_matrix()
+                - x == a matrix or something convertable to a matrix via vector_to_matrix().
+                  Also, x should contain sample_type objects.
+                - y == a matrix or something convertable to a matrix via vector_to_matrix().
+                  Also, y should contain scalar_type objects.
                 - x.nr() > 1
                 - x.nr() == y.nr() && x.nc() == 1 && y.nc() == 1 
                   (i.e. x and y are both column vectors of the same length)

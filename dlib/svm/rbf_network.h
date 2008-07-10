@@ -27,11 +27,11 @@ namespace dlib
         !*/
 
     public:
-        typedef radial_basis_kernel<sample_type_> kernel_type;
-        typedef typename kernel_type::scalar_type scalar_type;
-        typedef typename kernel_type::sample_type sample_type;
-        typedef typename kernel_type::mem_manager_type mem_manager_type;
-        typedef decision_function<kernel_type> trained_function_type;
+        typedef radial_basis_kernel<sample_type_>      kernel_type;
+        typedef sample_type_                           sample_type;
+        typedef typename sample_type::type             scalar_type;
+        typedef typename sample_type::mem_manager_type mem_manager_type;
+        typedef decision_function<kernel_type>         trained_function_type;
 
         rbf_network_trainer (
         ) :

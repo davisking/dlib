@@ -229,6 +229,10 @@ namespace dlib
         /*!
             requires
                 - is_binary_classification_problem(x,y) == true
+                - x == a matrix or something convertable to a matrix via vector_to_matrix().
+                  Also, x should contain sample_type objects.
+                - y == a matrix or something convertable to a matrix via vector_to_matrix().
+                  Also, y should contain scalar_type objects.
             ensures
                 - trains a nu support vector classifier given the training samples in x and 
                   labels in y.  Training is done when the error is less than get_epsilon().
