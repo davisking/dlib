@@ -27,8 +27,7 @@ namespace dlib
                 - get_tolerance() == 0.01
 
             WHAT THIS OBJECT REPRESENTS
-                This object implements a trainer for radial basis function network for 
-                solving binary classification problems.
+                This object implements a trainer for an radial basis function network.
 
                 The implementation of this algorithm follows the normal RBF training 
                 process.  For more details see the code or the Wikipedia article
@@ -94,7 +93,13 @@ namespace dlib
         ) const
         /*!
             requires
-                - is_binary_classification_problem(x,y) == true
+                - in_sample_vector_type == a matrix or something convertable to a matrix
+                  via vector_to_matrix()
+                - in_scalar_vector_type == a matrix or something convertable to a matrix
+                  via vector_to_matrix()
+                - x.nr() > 1
+                - x.nr() == y.nr() && x.nc() == 1 && y.nc() == 1 
+                  (i.e. x and y are both column vectors of the same length)
             ensures
                 - trains a RBF network given the training samples in x and 
                   labels in y.  

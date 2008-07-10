@@ -108,14 +108,13 @@ namespace dlib
             typedef typename decision_function<kernel_type>::scalar_vector_type scalar_vector_type;
 
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
+            DLIB_ASSERT(x.nr() > 1 && x.nr() == y.nr() && x.nc() == 1 && y.nc() == 1,
                 "\tdecision_function rbf_network_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
                 << "\n\t x.nr(): " << x.nr() 
                 << "\n\t y.nr(): " << y.nr() 
                 << "\n\t x.nc(): " << x.nc() 
                 << "\n\t y.nc(): " << y.nc() 
-                << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
                 );
 
             // first run all the sampes through a kcentroid object to find the rbf centers
