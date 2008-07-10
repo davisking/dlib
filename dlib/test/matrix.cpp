@@ -912,6 +912,7 @@ namespace
             matrix<double> mi = pinv(m ); 
             DLIB_CASSERT(mi.nr() == m.nc(),"");
             DLIB_CASSERT(mi.nc() == m.nr(),"");
+            DLIB_CASSERT((equal(round_zeros(mi*m,0.000001) , identity_matrix<double,2>())),"");
         }
 
         {

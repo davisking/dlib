@@ -2412,19 +2412,28 @@ namespace dlib
     )
     { 
         typename matrix_exp<EXP>::matrix_type u;
-        matrix<typename EXP::type, EXP::NC, EXP::NC, typename EXP::mem_manager_type> w, v;
-        svd(m,u,w,v);
+        typedef typename EXP::mem_manager_type MM1;
+        matrix<typename EXP::type, EXP::NC, EXP::NC,MM1 > v;
+
+        typedef typename matrix_exp<EXP>::type T;
+
+        v.set_size(m.nc(),m.nc());
+
+        typedef typename matrix_exp<EXP>::type T;
+        u = m;
+
+        matrix<T,matrix_exp<EXP>::NC,1,MM1> w(m.nc(),1);
+        matrix<T,matrix_exp<EXP>::NC,1,MM1> rv1(m.nc(),1);
+
+        nric::svdcmp(u,w,v,rv1);
 
         const double machine_eps = std::numeric_limits<typename EXP::type>::epsilon();
         // compute a reasonable epsilon below which we round to zero before doing the
         // reciprocal
-        const double eps = machine_eps*std::max(m.nr(),m.nc())*max(diag(w));
-
-        // compute the reciprocal of the diagonal of w
-        matrix<typename EXP::type,EXP::NC,1, typename EXP::mem_manager_type> w_diag = reciprocal(round_zeros(diag(w),eps));
+        const double eps = machine_eps*std::max(m.nr(),m.nc())*max(w);
 
         // now compute the pseudoinverse
-        return tmp(scale_columns(v,w_diag))*trans(u);
+        return tmp(scale_columns(v,reciprocal(round_zeros(w,eps))))*trans(u);
     }
 
 // ----------------------------------------------------------------------------------------
