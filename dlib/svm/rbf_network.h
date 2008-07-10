@@ -16,7 +16,7 @@ namespace dlib
 // ------------------------------------------------------------------------------
 
     template <
-        typename sample_type_
+        typename K 
         >
     class rbf_network_trainer 
     {
@@ -27,36 +27,29 @@ namespace dlib
         !*/
 
     public:
-        typedef radial_basis_kernel<sample_type_>      kernel_type;
-        typedef sample_type_                           sample_type;
-        typedef typename sample_type::type             scalar_type;
-        typedef typename sample_type::mem_manager_type mem_manager_type;
-        typedef decision_function<kernel_type>         trained_function_type;
+        typedef K kernel_type;
+        typedef typename kernel_type::scalar_type scalar_type;
+        typedef typename kernel_type::sample_type sample_type;
+        typedef typename kernel_type::mem_manager_type mem_manager_type;
+        typedef decision_function<kernel_type> trained_function_type;
 
         rbf_network_trainer (
         ) :
-            gamma(0.1),
-            tolerance(0.01)
+            tolerance(0.1)
         {
         }
 
-        void set_gamma (
-            scalar_type gamma_ 
+        void set_kernel (
+            const kernel_type& k
         )
         {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(gamma_ > 0,
-                "\tvoid rbf_network_trainer::set_gamma(gamma_)"
-                << "\n\t invalid inputs were given to this function"
-                << "\n\t gamma: " << gamma_
-                );
-            gamma = gamma_;
+            kernel = k;
         }
 
-        const scalar_type get_gamma (
+        const kernel_type& get_kernel (
         ) const
-        { 
-            return gamma;
+        {
+            return kernel;
         }
 
         void set_tolerance (
@@ -88,7 +81,7 @@ namespace dlib
             rbf_network_trainer& item
         )
         {
-            exchange(gamma, item.gamma);
+            exchange(kernel, item.kernel);
             exchange(tolerance, item.tolerance);
         }
 
@@ -118,7 +111,6 @@ namespace dlib
                 );
 
             // first run all the sampes through a kcentroid object to find the rbf centers
-            const kernel_type kernel(gamma);
             kcentroid<kernel_type> kc(kernel,tolerance);
             for (long i = 0; i < x.size(); ++i)
             {
@@ -154,7 +146,7 @@ namespace dlib
 
         }
 
-        scalar_type gamma;
+        kernel_type kernel;
         scalar_type tolerance;
 
     }; // end of class rbf_network_trainer 

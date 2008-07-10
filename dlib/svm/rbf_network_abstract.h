@@ -14,17 +14,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sample_type_
+        typename K 
         >
     class rbf_network_trainer 
     {
         /*!
-            REQUIREMENTS ON sample_type_
-                is a dlib::matrix type  
+            REQUIREMENTS ON K 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+                (since this is supposed to be a RBF network it is probably reasonable
+                to use some sort of radial basis kernel)
 
             INITIAL VALUE
                 - get_gamma() == 0.1
-                - get_tolerance() == 0.01
+                - get_tolerance() == 0.1
 
             WHAT THIS OBJECT REPRESENTS
                 This object implements a trainer for an radial basis function network.
@@ -34,11 +36,11 @@ namespace dlib
                 about RBF networks.  
         !*/
     public:
-        typedef radial_basis_kernel<sample_type_>      kernel_type;
-        typedef          sample_type_                  sample_type;
-        typedef typename sample_type::type             scalar_type;
-        typedef typename sample_type::mem_manager_type mem_manager_type;
-        typedef decision_function<kernel_type>         trained_function_type;
+        typedef K kernel_type;
+        typedef typename kernel_type::scalar_type scalar_type;
+        typedef typename kernel_type::sample_type sample_type;
+        typedef typename kernel_type::mem_manager_type mem_manager_type;
+        typedef decision_function<kernel_type> trained_function_type;
 
         rbf_network_trainer (
         ); 
@@ -47,22 +49,19 @@ namespace dlib
                 - this object is properly initialized
         !*/
 
-        void set_gamma (
-            scalar_type gamma
+        void set_kernel (
+            const kernel_type& k
         );
         /*!
-            requires
-                - gamma > 0
             ensures
-                - #get_gamma() == gamma
+                - #get_kernel() == k 
         !*/
 
-        const scalar_type get_gamma (
-        ) const
+        const kernel_type& get_kernel (
+        ) const;
         /*!
             ensures
-                - returns the gamma argument used in the radial_basis_kernel used
-                  to represent each node in an RBF network.
+                - returns a copy of the kernel function in use by this object
         !*/
 
         void set_tolerance (
@@ -102,12 +101,7 @@ namespace dlib
                   (i.e. x and y are both column vectors of the same length)
             ensures
                 - trains a RBF network given the training samples in x and 
-                  labels in y.  
-                - returns a decision function F with the following properties:
-                    - if (new_x is a sample predicted have +1 label) then
-                        - F(new_x) >= 0
-                    - else
-                        - F(new_x) < 0
+                  labels in y and returns the resulting decision_function
             throws
                 - std::bad_alloc
         !*/
