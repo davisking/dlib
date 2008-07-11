@@ -680,6 +680,38 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    const matrix_exp::matrix_type inv_lower_triangular (
+        const matrix_exp& A
+    );
+    /*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A is lower triangular) then
+                - returns the inverse of A. 
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be an inverse.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp::matrix_type inv_upper_triangular (
+        const matrix_exp& A
+    );
+    /*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A is upper triangular) then
+                - returns the inverse of A. 
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be an inverse.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 //                              Statistics
 // ----------------------------------------------------------------------------------------

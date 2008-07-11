@@ -2617,6 +2617,93 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP>
+    const typename matrix_exp<EXP>::matrix_type  inv_lower_triangular (
+        const matrix_exp<EXP>& A 
+    )
+    {
+        DLIB_ASSERT(A.nr() == A.nc(), 
+            "\tconst matrix inv_lower_triangular(const matrix_exp& A)"
+            << "\n\tA must be a square matrix"
+            << "\n\tA.nr(): " << A.nr()
+            << "\n\tA.nc(): " << A.nc() 
+            );
+
+        typedef typename matrix_exp<EXP>::matrix_type matrix_type;
+        typedef typename matrix_type::type type;
+
+        matrix_type m(A);
+
+        for(long c = 0; c < m.nc(); ++c)
+        {
+            if( m(c,c) == 0 )
+            {
+                // there isn't an inverse so just give up
+                return m;
+            }
+
+            // compute m(c,c)
+            m(c,c) = 1/m(c,c);
+
+            // compute the values in column c that are below m(c,c).
+            // We do this by just doing the same thing we do for upper triangular
+            // matrices because we take the transpose of m which turns m into an
+            // upper triangular matrix.
+            for(long r = 0; r < c; ++r)
+            {
+                const long n = c-r;
+                m(c,r) = -m(c,c)*subm(trans(m),r,r,1,n)*subm(trans(m),r,c,n,1);
+            }
+        }
+
+        return m;
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP>
+    const typename matrix_exp<EXP>::matrix_type  inv_upper_triangular (
+        const matrix_exp<EXP>& A 
+    )
+    {
+        DLIB_ASSERT(A.nr() == A.nc(), 
+            "\tconst matrix inv_upper_triangular(const matrix_exp& A)"
+            << "\n\tA must be a square matrix"
+            << "\n\tA.nr(): " << A.nr()
+            << "\n\tA.nc(): " << A.nc() 
+            );
+
+        typedef typename matrix_exp<EXP>::matrix_type matrix_type;
+        typedef typename matrix_type::type type;
+
+        matrix_type m(A);
+
+        for(long c = 0; c < m.nc(); ++c)
+        {
+            if( m(c,c) == 0 )
+            {
+                // there isn't an inverse so just give up
+                return m;
+            }
+
+            // compute m(c,c)
+            m(c,c) = 1/m(c,c);
+
+            // compute the values in column c that are above m(c,c)
+            for(long r = 0; r < c; ++r)
+            {
+                const long n = c-r;
+                m(r,c) = -m(c,c)*subm(m,r,r,1,n)*subm(m,r,c,n,1);
+            }
+        }
+
+        return m;
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename EXP
         >

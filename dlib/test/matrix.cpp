@@ -1302,6 +1302,82 @@ namespace
 
         }
 
+
+        {
+
+            const double stuff[] = { 
+                1, 2, 3,
+                6, 3, 3, 
+                7, 3, 9};
+
+            matrix<double,3,3> m(stuff);
+
+            // make m be symmetric
+            m = m*trans(m);
+
+            matrix<double> L = cholesky_decomposition(m);
+            DLIB_CASSERT(equal(L*trans(L), m), "");
+
+            DLIB_CASSERT(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "") 
+            DLIB_CASSERT(equal(round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10), identity_matrix<double>(3), 1e-10),""); 
+            DLIB_CASSERT(equal(round_zeros(inv_lower_triangular((L))*(L),1e-10) ,identity_matrix<double>(3),1e-10),""); 
+
+        }
+
+        {
+
+            const double stuff[] = { 
+                1, 2, 3, 6, 3, 4,
+                6, 3, 3, 1, 2, 3,
+                7, 3, 9, 54.3, 5, 3,
+                -6, 3, -3, 1, 2, 3,
+                1, 2, 3, 5, -3, 3,
+                7, 3, -9, 54.3, 5, 3
+                };
+
+            matrix<double,6,6> m(stuff);
+
+            // make m be symmetric
+            m = m*trans(m);
+
+            matrix<double> L = cholesky_decomposition(m);
+            DLIB_CASSERT(equal(L*trans(L), m, 1e-10), L*trans(L)-m);
+
+            DLIB_CASSERT(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "") 
+            DLIB_CASSERT(equal(inv(m), trans(inv_lower_triangular(L))*inv_lower_triangular((L))), "") 
+            DLIB_CASSERT(equal(inv(m), trans(inv_lower_triangular(L))*trans(inv_upper_triangular(trans(L)))), "") 
+            DLIB_CASSERT(equal(round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10) , identity_matrix<double>(6), 1e-10),
+                         round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10)); 
+            DLIB_CASSERT(equal(round_zeros(inv_lower_triangular((L))*(L),1e-10) ,identity_matrix<double>(6), 1e-10),
+                         round_zeros(inv_lower_triangular((L))*(L),1e-10)); 
+
+        }
+
+        {
+
+            matrix<double,6,6> m(identity_matrix<double>(6)*4.5);
+
+            matrix<double> L = cholesky_decomposition(m);
+            DLIB_CASSERT(equal(L*trans(L), m, 1e-10), L*trans(L)-m);
+
+            DLIB_CASSERT(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "") 
+            DLIB_CASSERT(equal(round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10) , identity_matrix<double>(6), 1e-10),
+                         round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10)); 
+            DLIB_CASSERT(equal(round_zeros(inv_lower_triangular((L))*(L),1e-10) ,identity_matrix<double>(6), 1e-10),
+                         round_zeros(inv_lower_triangular((L))*(L),1e-10)); 
+
+        }
+
+        {
+
+            matrix<double,6,6> m(identity_matrix<double>(6)*4.5);
+            m(1,4) = 2;
+
+            DLIB_CASSERT(dlib::equal(inv_upper_triangular(m), inv(m),1e-10), inv_upper_triangular(m)-inv(m));
+            DLIB_CASSERT(dlib::equal(inv_lower_triangular(trans(m)), inv(trans(m)),1e-10), inv_lower_triangular(trans(m))-inv(trans(m)));
+
+        }
+
     }
 
 
