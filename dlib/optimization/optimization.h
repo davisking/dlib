@@ -527,8 +527,13 @@ namespace dlib
 
             g2 = der(x);
 
+            const double temp = trans(g)*g;
+            // just stop if this value hits zero
+            if (std::abs(temp) < std::numeric_limits<double>::epsilon())
+                break;
+
             // Use the Polak-Ribiere (4.1.12) conjugate gradient described by Fletcher on page 83
-            double b = trans(g2-g)*g2/(trans(g)*g);
+            double b = trans(g2-g)*g2/(temp);
             s = -g2 + b*s;
 
             g.swap(g2);
@@ -671,7 +676,12 @@ namespace dlib
             g2 = derivative(f,derivative_eps)(x);
 
             // Use the Polak-Ribiere (4.1.12) conjugate gradient described by Fletcher on page 83
-            double b = trans(g2-g)*g2/(trans(g)*g);
+            const double temp = trans(g)*g;
+            // just stop if this value hits zero
+            if (std::abs(temp) < std::numeric_limits<double>::epsilon())
+                break;
+
+            double b = trans(g2-g)*g2/(temp);
             s = -g2 + b*s;
 
             g.swap(g2);
