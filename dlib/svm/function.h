@@ -29,10 +29,10 @@ namespace dlib
         typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
 
-        const scalar_vector_type alpha;
-        const scalar_type b;
-        const K kernel_function;
-        const sample_vector_type support_vectors;
+        scalar_vector_type alpha;
+        scalar_type b;
+        K kernel_function;
+        sample_vector_type support_vectors;
 
         decision_function (
         ) : b(0), kernel_function(K()) {}
@@ -64,10 +64,10 @@ namespace dlib
         {
             if (this != &d)
             {
-                const_cast<scalar_vector_type&>(alpha) = d.alpha;
-                const_cast<scalar_type&>(b) = d.b;
-                const_cast<K&>(kernel_function) = d.kernel_function;
-                const_cast<sample_vector_type&>(support_vectors) = d.support_vectors;
+                alpha = d.alpha;
+                b = d.b;
+                kernel_function = d.kernel_function;
+                support_vectors = d.support_vectors;
             }
             return *this;
         }
@@ -121,10 +121,10 @@ namespace dlib
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
         try
         {
-            deserialize(const_cast<scalar_vector_type&>(item.alpha), in);
-            deserialize(const_cast<scalar_type&>(item.b), in);
-            deserialize(const_cast<K&>(item.kernel_function), in);
-            deserialize(const_cast<sample_vector_type&>(item.support_vectors), in);
+            deserialize(item.alpha, in);
+            deserialize(item.b, in);
+            deserialize(item.kernel_function, in);
+            deserialize(item.support_vectors, in);
         }
         catch (serialization_error e)
         { 
@@ -143,9 +143,9 @@ namespace dlib
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
 
-        const scalar_type a;
-        const scalar_type b;
-        const decision_function<K> decision_funct;
+        scalar_type a;
+        scalar_type b;
+        decision_function<K> decision_funct;
 
         probabilistic_decision_function (
         ) : a(0), b(0), decision_funct(decision_function<K>()) {}
@@ -174,9 +174,9 @@ namespace dlib
         {
             if (this != &d)
             {
-                const_cast<scalar_type&>(a) = d.a;
-                const_cast<scalar_type&>(b) = d.b;
-                const_cast<decision_function<K>&>(decision_funct) = d.decision_funct;
+                a = d.a;
+                b = d.b;
+                decision_funct = d.decision_funct;
             }
             return *this;
         }
@@ -221,9 +221,9 @@ namespace dlib
         typedef typename K::scalar_type scalar_type;
         try
         {
-            deserialize(const_cast<scalar_type&>(item.a), in);
-            deserialize(const_cast<scalar_type&>(item.b), in);
-            deserialize(const_cast<decision_function<K>&>(item.decision_funct), in);
+            deserialize(item.a, in);
+            deserialize(item.b, in);
+            deserialize(item.decision_funct, in);
         }
         catch (serialization_error& e)
         { 
@@ -245,10 +245,10 @@ namespace dlib
         typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
 
-        const scalar_vector_type alpha;
-        const scalar_type b;
-        const K kernel_function;
-        const sample_vector_type support_vectors;
+        scalar_vector_type alpha;
+        scalar_type b;
+        K kernel_function;
+        sample_vector_type support_vectors;
 
         distance_function (
         ) : b(0), kernel_function(K()) {}
@@ -280,10 +280,10 @@ namespace dlib
         {
             if (this != &d)
             {
-                const_cast<scalar_vector_type&>(alpha) = d.alpha;
-                const_cast<scalar_type&>(b) = d.b;
-                const_cast<K&>(kernel_function) = d.kernel_function;
-                const_cast<sample_vector_type&>(support_vectors) = d.support_vectors;
+                alpha = d.alpha;
+                b = d.b;
+                kernel_function = d.kernel_function;
+                support_vectors = d.support_vectors;
             }
             return *this;
         }
@@ -357,10 +357,10 @@ namespace dlib
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
         try
         {
-            deserialize(const_cast<scalar_vector_type&>(item.alpha), in);
-            deserialize(const_cast<scalar_type&>(item.b), in);
-            deserialize(const_cast<K&>(item.kernel_function), in);
-            deserialize(const_cast<sample_vector_type&>(item.support_vectors), in);
+            deserialize(item.alpha, in);
+            deserialize(item.b, in);
+            deserialize(item.kernel_function, in);
+            deserialize(item.support_vectors, in);
         }
         catch (serialization_error e)
         { 

@@ -37,10 +37,10 @@ namespace dlib
         typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
 
-        const scalar_vector_type alpha;
-        const scalar_type        b;
-        const K                  kernel_function;
-        const sample_vector_type support_vectors;
+        scalar_vector_type alpha;
+        scalar_type        b;
+        K                  kernel_function;
+        sample_vector_type support_vectors;
 
         decision_function (
         );
@@ -140,9 +140,9 @@ namespace dlib
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
 
-        const scalar_type a;
-        const scalar_type b;
-        const decision_function<K> decision_funct;
+        scalar_type a;
+        scalar_type b;
+        decision_function<K> decision_funct;
 
         probabilistic_decision_function (
         );
@@ -248,10 +248,10 @@ namespace dlib
         typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
 
-        const scalar_vector_type alpha;
-        const scalar_type        b;
-        const K                  kernel_function;
-        const sample_vector_type support_vectors;
+        scalar_vector_type alpha;
+        scalar_type        b;
+        K                  kernel_function;
+        sample_vector_type support_vectors;
 
         distance_function (
         );
@@ -319,7 +319,7 @@ namespace dlib
         ) const
         /*!
             ensures
-                - returns the distance between the point in kernel space represented by *this and x.
+                - returns the distance between the points in kernel space represented by *this and x.
         !*/
         {
             scalar_type temp = 0;
