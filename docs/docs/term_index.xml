@@ -480,6 +480,8 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#pointwise_multiply" name="pointwise_multiply"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#equal" name="equal"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv" name="inv"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv_lower_triangular" name="inv_lower_triangular"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv_upper_triangular" name="inv_upper_triangular"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#pinv" name="pinv"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd" name="svd"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#det" name="det"/>
