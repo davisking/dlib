@@ -807,6 +807,14 @@ namespace
             m(0,0) = uniform_matrix<double,3,1>(9);
             DLIB_CASSERT((round_zeros(variance(m)) == uniform_matrix<double,3,1>(16)),"");
             DLIB_CASSERT((round_zeros(mean(m)) == uniform_matrix<double,3,1>(3)),"");
+
+            matrix<matrix<double> > m2(2,2);
+            set_all_elements(m2,uniform_matrix<double,3,1>(1));
+            DLIB_CASSERT((round_zeros(variance(m2)) == uniform_matrix<double,3,1>(0)),"");
+            DLIB_CASSERT((round_zeros(mean(m2)) == uniform_matrix<double,3,1>(1)),"");
+            m2(0,0) = uniform_matrix<double,3,1>(9);
+            DLIB_CASSERT((round_zeros(variance(m2)) == uniform_matrix<double,3,1>(16)),"");
+            DLIB_CASSERT((round_zeros(mean(m2)) == uniform_matrix<double,3,1>(3)),"");
         }
 
         {

@@ -2813,7 +2813,10 @@ namespace dlib
         typedef typename matrix_exp<EXP>::type type;
 
         type val;
+        if (m.size() > 0)
+            val.set_size(m(0,0).nr(),m(0,0).nc()); 
         set_all_elements(val,0);
+
         for (long r = 0; r < m.nr(); ++r)
         {
             for (long c = 0; c < m.nc(); ++c)
@@ -2876,6 +2879,9 @@ namespace dlib
         typedef typename matrix_exp<EXP>::type type;
 
         type val;
+        if (m.size() > 0)
+            val.set_size(m(0,0).nr(), m(0,0).nc());
+
         set_all_elements(val,0);
         for (long r = 0; r < m.nr(); ++r)
         {
@@ -2885,7 +2891,7 @@ namespace dlib
             }
         }
 
-        if (m.nr() * m.nc() == 1)
+        if (m.nr() * m.nc() <= 1)
             return val;
         else
             return val/(m.nr()*m.nc() - 1);
