@@ -3,7 +3,6 @@
 #undef DLIB_RBf_NETWORK_ABSTRACT_
 #ifdef DLIB_RBf_NETWORK_ABSTRACT_
 
-#include "../matrix/matrix_abstract.h"
 #include "../algs.h"
 #include "function_abstract.h"
 #include "kernel_abstract.h"
@@ -25,16 +24,16 @@ namespace dlib
                 to use some sort of radial basis kernel)
 
             INITIAL VALUE
-                - get_gamma() == 0.1
-                - get_tolerance() == 0.1
+                - get_num_centers() == 10 
 
             WHAT THIS OBJECT REPRESENTS
-                This object implements a trainer for an radial basis function network.
+                This object implements a trainer for a radial basis function network.
 
                 The implementation of this algorithm follows the normal RBF training 
                 process.  For more details see the code or the Wikipedia article
                 about RBF networks.  
         !*/
+
     public:
         typedef K kernel_type;
         typedef typename kernel_type::scalar_type scalar_type;
@@ -64,22 +63,20 @@ namespace dlib
                 - returns a copy of the kernel function in use by this object
         !*/
 
-        void set_tolerance (
-            const scalar_type& tol 
+        void set_num_centers (
+            const unsigned long num_centers
         );
         /*!
             ensures
-                - #get_tolerance() == tol
+                - #get_num_centers() == num_centers
         !*/
 
-        const scalar_type& get_tolerance (
+        const unsigned long get_num_centers (
         ) const;
         /*!
             ensures
-                - returns the tolerance parameter.  This parameter controls how many
-                  RBF centers (a.k.a. support_vectors in the trained decision_function)
-                  you get when you call the train function.  A smaller tolerance
-                  results in more centers while a bigger number results in fewer.
+                - returns the number of centers (a.k.a. support_vectors in the 
+                  trained decision_function) you will get when you train this object on data.
         !*/
 
         template <
@@ -118,10 +115,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename sample_type>
+    template <typename K>
     void swap (
-        rbf_network_trainer<sample_type>& a,
-        rbf_network_trainer<sample_type>& b
+        rbf_network_trainer<K>& a,
+        rbf_network_trainer<K>& b
     ) { a.swap(b); }
     /*!
         provides a global swap
