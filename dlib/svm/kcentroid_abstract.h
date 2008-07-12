@@ -3,8 +3,6 @@
 #undef DLIB_KCENTROId_ABSTRACT_
 #ifdef DLIB_KCENTROId_ABSTRACT_
 
-#include <cmath>
-#include "../matrix/matrix_abstract.h"
 #include "../algs.h"
 #include "../serialize.h"
 #include "kernel_abstract.h"
