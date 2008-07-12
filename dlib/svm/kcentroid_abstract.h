@@ -34,11 +34,10 @@ namespace dlib
                 centroid indicate dissimilarity/anomalous points).
 
                 Also note that the algorithm internally keeps a set of "dictionary vectors" 
-                that are used to represent the regression function.  You can force the 
-                algorithm to use no more than a set number of vectors by setting 
-                the 3rd constructor argument to whatever you want.  However, note that 
-                doing this causes the algorithm to bias it's results towards more 
-                recent training examples.  
+                that are used to represent the centroid.  You can force the algorithm to use 
+                no more than a set number of vectors by setting the 3rd constructor argument 
+                to whatever you want.  However, note that doing this causes the algorithm 
+                to bias it's results towards more recent training examples.  
         !*/
 
     public:
