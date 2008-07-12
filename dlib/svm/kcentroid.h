@@ -193,6 +193,7 @@ namespace dlib
             a.swap(item.a);
             k.swap(item.k);
             exchange(bias_is_stale, item.bias_is_stale);
+            exchange(my_max_dictionary_size, item.my_max_dictionary_size);
         }
 
         unsigned long dictionary_size (
@@ -208,6 +209,8 @@ namespace dlib
             serialize(item.my_tolerance, out);
             serialize(item.samples_seen, out);
             serialize(item.bias, out);
+            serialize(item.bias_is_stale, out);
+            serialize(item.my_max_dictionary_size, out);
         }
 
         friend void deserialize(kcentroid& item, std::istream& in)
@@ -220,7 +223,8 @@ namespace dlib
             deserialize(item.my_tolerance, in);
             deserialize(item.samples_seen, in);
             deserialize(item.bias, in);
-            item.bias_is_stale = true;
+            deserialize(item.bias_is_stale, out);
+            deserialize(item.my_max_dictionary_size, out);
         }
 
         distance_function<kernel_type> get_distance_function (
