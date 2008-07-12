@@ -16,6 +16,7 @@
 #include "kernel.h"
 #include "../enable_if.h"
 #include "kcentroid.h"
+#include "linearly_independent_subset_finder.h"
 
 namespace dlib
 {
@@ -1438,10 +1439,10 @@ namespace dlib
 
         explicit reduced_decision_function_trainer (
             const trainer_type& trainer_,
-            const scalar_type tolerance_ = 0.001
+            const unsigned long num_sv_ 
         ) :
             trainer(trainer_),
-            tolerance(tolerance_)
+            num_sv(num_sv_)
         {
         }
 
@@ -1481,27 +1482,73 @@ namespace dlib
                 << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
                 );
 
+            // get the decision function object we are going to try and approximate
+            const decision_function<kernel_type> dec_funct = trainer.train(x,y);
             
-            kcentroid<kernel_type> kc(trainer.get_kernel(), tolerance);
-            decision_function<kernel_type> dec_funct = trainer.train(x,y);
-
-            // find the point in kernel space that is approximately the same as what is in the decision_function
-            // already.
-            for (long i = 0; i < dec_funct.support_vectors.nr(); ++i)
+            // now find a linearly independent subset of the training points of num_sv points.
+            linearly_independent_subset_finder<kernel_type> lisf(trainer.get_kernel(), num_sv);
+            for (long i = 0; i < x.nr(); ++i)
             {
-                kc.train(dec_funct.support_vectors(i), 1, dec_funct.alpha(i));
+                lisf.add(x(i));
             }
 
-            distance_function<kernel_type> dist_funct = kc.get_distance_function();
+            // make num be the number of points in the lisf object.  Just do this so we don't have
+            // to write out lisf.dictionary_size() all over the place.
+            const long num = lisf.dictionary_size();
 
-            return decision_function<kernel_type> (dist_funct.alpha, 
-                                                   dec_funct.b,
-                                                   dist_funct.kernel_function, 
-                                                   dist_funct.support_vectors);
+            // The next few blocks of code just find the best weights with which to approximate 
+            // the dec_funct object with the smaller set of vectors in the lisf dictionary.  This
+            // is really just a simple application of some linear algebra.  For the details 
+            // see page 554 of Learning with kernels by Scholkopf and Smola where they talk 
+            // about "Optimal Expansion Coefficients."
+            matrix<scalar_type, 0, 0, mem_manager_type> K_inv(num, num); 
+            matrix<scalar_type, 0, 0, mem_manager_type> K(num, dec_funct.alpha.size()); 
+
+            const kernel_type kernel(trainer.get_kernel());
+
+            for (long r = 0; r < K_inv.nr(); ++r)
+            {
+                for (long c = 0; c < K_inv.nc(); ++c)
+                {
+                    K_inv(r,c) = kernel(lisf[r], lisf[c]);
+                }
+            }
+            K_inv = pinv(K_inv);
+
+
+            for (long r = 0; r < K.nr(); ++r)
+            {
+                for (long c = 0; c < K.nc(); ++c)
+                {
+                    K(r,c) = kernel(lisf[r], dec_funct.support_vectors(c));
+                }
+            }
+
+
+            // Now we compute the approximate decision function.  Note that the weights come out
+            // of the expression K_inv*K*dec_funct.alpha.
+            decision_function<kernel_type> new_df(K_inv*K*dec_funct.alpha, 
+                                                  0,
+                                                  kernel, 
+                                                  lisf.get_dictionary());
+
+            // now we have to figure out what the new bias should be.  It might be a little
+            // different since we just messed with all the weights and vectors.
+            double bias = 0;
+            for (long i = 0; i < x.nr(); ++i)
+            {
+                bias += new_df(x(i)) - dec_funct(x(i));
+            }
+            
+            new_df.b = bias/x.nr();
+
+            return new_df;
         }
 
+    // ------------------------------------------------------------------------------------
+
         const trainer_type& trainer;
-        const scalar_type tolerance;
+        const unsigned long num_sv; 
 
 
     }; // end of class reduced_decision_function_trainer
@@ -1509,10 +1556,10 @@ namespace dlib
     template <typename trainer_type>
     const reduced_decision_function_trainer<trainer_type> reduced (
         const trainer_type& trainer,
-        const typename trainer_type::scalar_type& tolerance = 0.001
+        const unsigned long num_sv
     )
     {
-        return reduced_decision_function_trainer<trainer_type>(trainer, tolerance);
+        return reduced_decision_function_trainer<trainer_type>(trainer, num_sv);
     }
 
 // ----------------------------------------------------------------------------------------
