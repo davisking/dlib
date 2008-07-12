@@ -9,6 +9,7 @@
 #include "svm/kkmeans.h"
 #include "svm/feature_ranking.h"
 #include "svm/rbf_network.h"
+#include "svm/linearly_independent_subset_finder.h"
 
 #endif // DLIB_SVm_HEADER
 
