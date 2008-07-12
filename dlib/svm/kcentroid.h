@@ -223,8 +223,8 @@ namespace dlib
             deserialize(item.my_tolerance, in);
             deserialize(item.samples_seen, in);
             deserialize(item.bias, in);
-            deserialize(item.bias_is_stale, out);
-            deserialize(item.my_max_dictionary_size, out);
+            deserialize(item.bias_is_stale, in);
+            deserialize(item.my_max_dictionary_size, in);
         }
 
         distance_function<kernel_type> get_distance_function (
