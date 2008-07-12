@@ -39,14 +39,13 @@ namespace dlib
                     - K(r,c) == kernel(dictionary[r], dictionary[c])
                 - K_inv == inv(K)
 
-                - strengths.size() == dictionary.size()
-                - if (strengths.size() == my_max_dictionary_size) then
-                    - for all valid i:
-                        - strengths[i] == the delta (i.e. Approximately Linearly Dependent value) you
-                          would get if you removed dictionary[i] from this object and then tried to 
-                          add it back in.
-                        - min_strength == the minimum value from strengths
-                        - min_vect_idx == the index of the element in strengths with the smallest value
+                - if (dictionary.size() == my_max_dictionary_size) then
+                    - for all valid 0 < i < dictionary.size():
+                        - Let STRENGTHS[i] == the delta you would get for dictionary[i] (i.e. Approximately 
+                          Linearly Dependent value) if you removed dictionary[i] from this object and then 
+                          tried to add it back in.
+                        - min_strength == the minimum value from STRENGTHS
+                        - min_vect_idx == the index of the element in STRENGTHS with the smallest value
         !*/
 
     public:
@@ -81,7 +80,6 @@ namespace dlib
             dictionary.clear();
             min_strength = 0;
             min_vect_idx = 0;
-            strengths.clear();
 
             K_inv.set_size(0,0);
             K.set_size(0,0);
@@ -169,7 +167,7 @@ namespace dlib
                     }
                     else
                     {
-                        // update K_inv by computing the new one in the temp matrix (equation 3.14)
+                        // update K_inv by computing the new one in the temp matrix (equation 3.14 from Engel)
                         temp.set_size(K_inv.nr()+1, K_inv.nc()+1);
                         // update the middle part of the matrix
                         set_subm(temp, get_rect(K_inv)) = K_inv + a*trans(a)/delta;
@@ -200,10 +198,10 @@ namespace dlib
 
                     }
 
-                    // now we have to recompute the strengths in this case
+                    // now we have to recompute the min_strength in this case
                     if (dictionary.size() == my_max_dictionary_size)
                     {
-                        recompute_strengths();
+                        recompute_min_strength();
                     }
 
                 }
@@ -216,7 +214,6 @@ namespace dlib
         {
             exchange(kernel, item.kernel);
             dictionary.swap(item.dictionary);
-            strengths.swap(item.strengths);
             exchange(min_strength, item.min_strength);
             exchange(min_vect_idx, item.min_vect_idx);
             K_inv.swap(item.K_inv);
@@ -244,7 +241,6 @@ namespace dlib
         {
             serialize(item.kernel, out);
             serialize(item.dictionary, out);
-            serialize(item.strengths, out);
             serialize(item.min_strength, out);
             serialize(item.min_vect_idx, out);
             serialize(item.K_inv, out);
@@ -256,7 +252,6 @@ namespace dlib
         {
             deserialize(item.kernel, in);
             deserialize(item.dictionary, in);
-            deserialize(item.strengths, in);
             deserialize(item.min_strength, in);
             deserialize(item.min_vect_idx, in);
             deserialize(item.K_inv, in);
@@ -278,31 +273,25 @@ namespace dlib
         typedef std::vector<sample_type,alloc_sample_type> dictionary_vector_type;
         typedef std::vector<scalar_type,alloc_scalar_type> scalar_vector_type;
 
-        void recompute_strengths (
+        void recompute_min_strength (
         )
         /*!
             ensures
-                - #strengths.size() == dictionary.size()
-                - #min_strength == the minimum value in #strengths
-                - #min_vect_idx == the index of the minimum value in #strengths
-                - for all valid i:
-                    - #strengths[i] == the delta you would get if you removed dictionary[i] and
-                      tried to add it back into this object
+                - recomputes the min_strength and min_vect_idx values
+                  so that they are correct with respect to the CONVENTION
         !*/
         {
-            strengths.resize(dictionary.size());
             min_strength = std::numeric_limits<scalar_type>::max();
 
             // here we loop over each dictionary vector and compute what its delta would be if
             // we were to remove it from the dictionary and then try to add it back in.
-            for (unsigned long i = 0; i < strengths.size(); ++i)
+            for (unsigned long i = 0; i < dictionary.size(); ++i)
             {
                 // compute a2 = K_inv*k but where dictionary vector i has been removed
                 a2 = (removerc(K_inv,i,i) - remove_row(colm(K_inv,i)/K_inv(i,i),i)*remove_col(rowm(K_inv,i),i)) *
                     (remove_row(colm(K,i),i));
                 scalar_type delta = K(i,i) - trans(remove_row(colm(K,i),i))*a2;
 
-                strengths[i] = delta;
                 if (delta < min_strength)
                 {
                     min_strength = delta;
@@ -314,7 +303,6 @@ namespace dlib
 
         kernel_type kernel;
         dictionary_vector_type dictionary;
-        scalar_vector_type strengths;
         scalar_type min_strength;
         unsigned long min_vect_idx;
 
