@@ -1129,7 +1129,7 @@
       <component>
          <name>reduced</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/reduced_abstract.h</spec_file>
          <description>
             This is a convenience function for creating 
             <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
@@ -1143,7 +1143,7 @@
       <component>
          <name>reduced_decision_function_trainer</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/reduced_abstract.h</spec_file>
          <description>
                This is a trainer object that is meant to wrap other trainer objects 
                that create <a href="#decision_function">decision_function</a> objects.

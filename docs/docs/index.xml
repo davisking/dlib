@@ -118,8 +118,9 @@
                   <li><a href="algorithms.html#mlp">multi layer perceptrons</a> </li>  
                   <li><a href="algorithms.html#svm_nu_trainer">nu support vector machines</a> for classification</li>
                   <li>An online <a href="algorithms.html#krls">kernel RLS regression</a> algorithm</li>
-                  <li>An online kernelized <a href="algorithms.html#kcentroid">centroid estimator</a></li>
+                  <li>An online kernelized <a href="algorithms.html#kcentroid">centroid estimator</a>/novelty detector</li>
                   <li>A kernelized <a href="algorithms.html#kkmeans">k-means</a> clustering algorithm</li>
+                  <li><a href="algorithms.html#rbf_network_trainer">Radial Basis Function Networks</a></li>
                   <li>Bayesian Network inference algorithms such as the 
                      <a href="algorithms.html#bayesian_network_join_tree">join tree</a> algorithm and 
                      <a href="algorithms.html#bayesian_network_gibbs_sampler">Gibbs sampler</a> Markov Chain Monte Carlo algorithm</li>
