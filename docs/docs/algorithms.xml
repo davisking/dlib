@@ -134,6 +134,8 @@
                <item>rank_features</item> 
                <item>reduced_decision_function_trainer</item> 
                <item>reduced</item> 
+               <item>reduced_decision_function_trainer2</item> 
+               <item>reduced2</item> 
             </sub>
          </item>
          <item>randomize_samples</item> 
@@ -1150,6 +1152,44 @@
                It performs post processing on the output decision_function objects 
                with the intent of representing the decision_function with fewer 
                support vectors.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>reduced2</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/reduced_abstract.h</spec_file>
+         <description>
+            This is a convenience function for creating 
+            <a href="#reduced_decision_function_trainer2">reduced_decision_function_trainer2</a>
+            objects.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>reduced_decision_function_trainer2</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/reduced_abstract.h</spec_file>
+         <description>
+               <p>
+               This is a trainer object that is meant to wrap other trainer objects 
+               that create <a href="#decision_function">decision_function</a> objects.
+               It performs post processing on the output decision_function objects 
+               with the intent of representing the decision_function with fewer 
+               support vectors.  
+               </p>
+               <p>
+               It begins by performing the same post processing as
+               the <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
+               object but it also performs a global gradient based optimization 
+               to further improve the results.
+               </p>
          </description>
                                  
       </component>

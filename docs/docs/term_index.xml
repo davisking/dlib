@@ -395,6 +395,8 @@
          <term link="algorithms.html#rbf_network_trainer" name="rbf_network_trainer"/>
          <term link="algorithms.html#reduced" name="reduced"/>
          <term link="algorithms.html#reduced_decision_function_trainer" name="reduced_decision_function_trainer"/>
+         <term link="algorithms.html#reduced2" name="reduced2"/>
+         <term link="algorithms.html#reduced_decision_function_trainer2" name="reduced_decision_function_trainer2"/>
          <term link="algorithms.html#train_probabilistic_decision_function" name="train_probabilistic_decision_function"/>
          <term link="algorithms.html#cross_validate_trainer" name="cross_validate_trainer"/>
          <term link="algorithms.html#svm_nu_trainer" name="support vector machine"/>
@@ -418,6 +420,7 @@
          <term link="dlib/svm/kernel_abstract.h.html#linear_kernel" name="linear_kernel"/>
          <term link="dlib/svm/kernel_abstract.h.html#polynomial_kernel" name="polynomial_kernel"/>
          <term link="dlib/svm/kernel_abstract.h.html#radial_basis_kernel" name="radial_basis_kernel"/>
+         <term link="dlib/svm/kernel_abstract.h.html#kernel_derivative" name="kernel_derivative"/>
          <term link="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects" name="Kernel Function Objects"/>
 
 
