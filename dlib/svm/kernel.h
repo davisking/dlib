@@ -16,6 +16,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template < typename kernel_type > struct kernel_derivative;
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T
         >
@@ -95,6 +99,28 @@ namespace dlib
             throw serialization_error(e.info + "\n   while deserializing object of type radial_basis_kernel"); 
         }
     }
+
+    template <
+        typename T 
+        >
+    struct kernel_derivative<radial_basis_kernel<T> >
+    {
+        typedef typename T::type scalar_type;
+        typedef T sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        kernel_derivative(const radial_basis_kernel<T>& k_) : k(k_){}
+
+        const sample_type& operator() (const sample_type& x, const sample_type& y) const
+        {
+            // return the derivative of the rbf kernel
+            temp = 2*k.gamma*(x-y)*k(x,y);
+            return temp;
+        }
+
+        const radial_basis_kernel<T>& k;
+        mutable sample_type temp;
+    };
 
 // ----------------------------------------------------------------------------------------
 

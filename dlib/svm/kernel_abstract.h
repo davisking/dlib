@@ -315,6 +315,48 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename kernel_type
+        >
+    struct kernel_derivative
+    {
+        /*!
+            REQUIREMENTS ON kernel_type
+                kernel_type must be one of the following kernel types:
+                    - radial_basis_kernel
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a function object that computes the derivative of a kernel 
+                function object.
+        !*/
+
+        typedef typename kernel_type::scalar_type scalar_type;
+        typedef typename kernel_type::sample_type sample_type;
+        typedef typename kernel_type::mem_manager_type mem_manager_type;
+
+        kernel_derivative(
+            const kernel_type& k_
+        ); 
+        /*!
+            ensures
+                - this object will return derivatives of the kernel object k_
+                - #k == k_
+        !*/
+
+        const sample_type operator() (
+            const sample_type& x, 
+            const sample_type& y
+        ) const;
+        /*!
+            ensures
+                - returns the derivative of k with respect to y.  Or in other words, k(x, y+dy)/dy 
+        !*/
+
+        const kernel_type& k;
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_KERNEL_ABSTRACT_

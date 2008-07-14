@@ -16,6 +16,8 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename trainer_type 
@@ -29,13 +31,19 @@ namespace dlib
         typedef typename trainer_type::mem_manager_type mem_manager_type;
         typedef typename trainer_type::trained_function_type trained_function_type;
 
-        explicit reduced_decision_function_trainer (
+        reduced_decision_function_trainer (
             const trainer_type& trainer_,
             const unsigned long num_sv_ 
         ) :
             trainer(trainer_),
             num_sv(num_sv_)
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(num_sv > 0,
+                        "\t reduced_decision_function_trainer()"
+                        << "\n\t you have given invalid arguments to this function"
+                        << "\n\t num_sv: " << num_sv 
+            );
         }
 
         template <
@@ -140,9 +148,18 @@ namespace dlib
         const unsigned long num_sv
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(num_sv > 0,
+                    "\tconst reduced_decision_function_trainer reduced()"
+                    << "\n\t you have given invalid arguments to this function"
+                    << "\n\t num_sv: " << num_sv 
+        );
+
         return reduced_decision_function_trainer<trainer_type>(trainer, num_sv);
     }
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 
@@ -158,13 +175,24 @@ namespace dlib
         typedef typename trainer_type::mem_manager_type mem_manager_type;
         typedef typename trainer_type::trained_function_type trained_function_type;
 
-        explicit reduced_decision_function_trainer2 (
+        reduced_decision_function_trainer2 (
             const trainer_type& trainer_,
-            const long num_ 
+            const long num_sv_,
+            const double eps_
         ) :
             trainer(trainer_),
-            num(num_)
+            num_sv(num_sv_),
+            eps(eps_)
         {
+            COMPILE_TIME_ASSERT(is_matrix<sample_type>::value);
+
+            // make sure requires clause is not broken
+            DLIB_ASSERT(num_sv > 0,
+                        "\t reduced_decision_function_trainer2()"
+                        << "\n\t you have given invalid arguments to this function"
+                        << "\n\t num_sv: " << num_sv 
+                        << "\n\t eps:    " << eps 
+            );
         }
 
         template <
@@ -185,38 +213,256 @@ namespace dlib
 
         class objective
         {
+            /*
+                This object represents the objective function we will try to
+                minimize in the final stage of this reduced set method.  
+
+                The objective is the distance, in kernel induced feature space, between
+                the original decision function and the approximated version.
+
+            */
         public:
             objective(
                 const decision_function<kernel_type>& dec_funct_,
-                const matrix<scalar_type,0,1,mem_manager_type>& b_,
-                const std::vector<sample_type>& out_vectors_
+                matrix<scalar_type,0,1,mem_manager_type>& b_,
+                matrix<sample_type,0,1,mem_manager_type>& out_vectors_
             ) :
                 dec_funct(dec_funct_),
                 b(b_),
                 out_vectors(out_vectors_)
-            {}
+            {
+                const kernel_type k(dec_funct.kernel_function);
+                // here we compute a term in the objective function that is a constant.  So
+                // do it in the constructor so we don't have to recompute it every time
+                // the objective is evaluated.
+                bias = 0;
+                for (long i = 0; i < dec_funct.alpha.size(); ++i)
+                {
+                    for (long j = 0; j < dec_funct.alpha.size(); ++j)
+                    {
+                        bias += dec_funct.alpha(i)*dec_funct.alpha(j)*
+                            k(dec_funct.support_vectors(i), dec_funct.support_vectors(j));
+                    }
+                }
+            }
+
+            const matrix<scalar_type, 0, 1, mem_manager_type> state_to_vector (
+            ) const
+            /*!
+                ensures
+                    - returns a vector that contains all the information necessary to
+                      reproduce the current state of the approximated decision function
+            !*/
+            {
+                matrix<scalar_type, 0, 1, mem_manager_type> z(b.nr() + out_vectors.size()*out_vectors(0).nr());
+                long i = 0;
+                for (long j = 0; j < b.nr(); ++j)
+                {
+                    z(i) = b(j);
+                    ++i;
+                }
+
+                for (long j = 0; j < out_vectors.size(); ++j)
+                {
+                    for (long k = 0; k < out_vectors(j).size(); ++k)
+                    {
+                        z(i) = out_vectors(j)(k);
+                        ++i;
+                    }
+                }
+                return z;
+            }
+
+
+            void vector_to_state (
+                const matrix<scalar_type, 0, 1, mem_manager_type>& z
+            ) const
+            /*!
+                requires
+                    - z came from the state_to_vector() function or has a compatible format
+                ensures
+                    - loads the vector z into the state variables of the approximate
+                      decision function (i.e. b and out_vectors)
+            !*/
+            {
+                long i = 0;
+                for (long j = 0; j < b.nr(); ++j)
+                {
+                    b(j) = z(i);
+                    ++i;
+                }
+
+                for (long j = 0; j < out_vectors.size(); ++j)
+                {
+                    for (long k = 0; k < out_vectors(j).size(); ++k)
+                    {
+                        out_vectors(j)(k) = z(i);
+                        ++i;
+                    }
+                }
+            }
 
             double operator() (
-                const sample_type& z
+                const matrix<scalar_type, 0, 1, mem_manager_type>& z
             ) const
+            /*!
+                ensures
+                    - loads the current approximate decision function with z
+                    - returns the distance between the original decision function
+                      and the approximate one.
+            !*/
             {
-                // compute and return the error between the vector represented
-                // by the decision_function and the vector represented by
-                // the combination of the out_vectors and b objects.
-                const double kzz = dec_funct.kernel_function(z,z); 
+                vector_to_state(z);
+                const kernel_type k(dec_funct.kernel_function);
 
-                double temp = dec_funct(z)+dec_funct.b;
-                for (long i = 0; i < b.size(); ++i)
-                    temp -= b(i)*dec_funct.kernel_function(z,out_vectors[i]);
+                double temp = 0;
+                for (long i = 0; i < out_vectors.size(); ++i)
+                {
+                    for (long j = 0; j < dec_funct.support_vectors.nr(); ++j)
+                    {
+                        temp -= b(i)*dec_funct.alpha(j)*k(out_vectors(i), dec_funct.support_vectors(j));
+                    }
+                }
 
-                return -temp*temp/kzz;
+                temp *= 2;
+
+                for (long i = 0; i < out_vectors.size(); ++i)
+                {
+                    for (long j = 0; j < out_vectors.size(); ++j)
+                    {
+                        temp += b(i)*b(j)*k(out_vectors(i), out_vectors(j));
+                    }
+                }
+
+                return temp + bias;
             }
 
         private:
 
+            scalar_type bias;
+
             const decision_function<kernel_type>& dec_funct;
-            const matrix<scalar_type,0,1,mem_manager_type>& b;
-            const std::vector<sample_type>& out_vectors;
+            mutable matrix<scalar_type,0,1,mem_manager_type>& b;
+            mutable matrix<sample_type,0,1,mem_manager_type>& out_vectors;
+
+        };
+
+    // ------------------------------------------------------------------------------------
+
+        class objective_derivative
+        {
+            /*!
+                This object represents the derivative of the objective object
+            !*/
+        public:
+
+
+            objective_derivative(
+                const decision_function<kernel_type>& dec_funct_,
+                matrix<scalar_type,0,1,mem_manager_type>& b_,
+                matrix<sample_type,0,1,mem_manager_type>& out_vectors_
+            ) :
+                dec_funct(dec_funct_),
+                b(b_),
+                out_vectors(out_vectors_)
+            {
+            }
+
+            void vector_to_state (
+                const matrix<scalar_type, 0, 1, mem_manager_type>& z
+            ) const
+            /*!
+                requires
+                    - z came from the state_to_vector() function or has a compatible format
+                ensures
+                    - loads the vector z into the state variables of the approximate
+                      decision function (i.e. b and out_vectors)
+            !*/
+            {
+                long i = 0;
+                for (long j = 0; j < b.nr(); ++j)
+                {
+                    b(j) = z(i);
+                    ++i;
+                }
+
+                for (long j = 0; j < out_vectors.size(); ++j)
+                {
+                    for (long k = 0; k < out_vectors(j).size(); ++k)
+                    {
+                        out_vectors(j)(k) = z(i);
+                        ++i;
+                    }
+                }
+            }
+
+            const matrix<scalar_type,0,1,mem_manager_type>& operator() (
+                const matrix<scalar_type, 0, 1, mem_manager_type>& z
+            ) const
+            /*!
+                ensures
+                    - loads the current approximate decision function with z
+                    - returns the derivative of the distance between the original 
+                      decision function and the approximate one.
+            !*/
+            {
+                vector_to_state(z);
+                res.set_size(z.nr());
+                set_all_elements(res,0);
+                const kernel_type k(dec_funct.kernel_function);
+                const kernel_derivative<kernel_type> K_der(k);
+
+                // first compute the gradient for the beta weights
+                for (long i = 0; i < out_vectors.size(); ++i)
+                {
+                    for (long j = 0; j < out_vectors.size(); ++j)
+                    {
+                        res(i) += b(j)*k(out_vectors(i), out_vectors(j)); 
+                    }
+                }
+                for (long i = 0; i < out_vectors.size(); ++i)
+                {
+                    for (long j = 0; j < dec_funct.support_vectors.size(); ++j)
+                    {
+                        res(i) -= dec_funct.alpha(j)*k(out_vectors(i), dec_funct.support_vectors(j)); 
+                    }
+                }
+
+
+                // now compute the gradient of the actual vectors that go into the kernel functions
+                long pos = out_vectors.size();
+                const long num = out_vectors(0).nr();
+                temp.set_size(num,1);
+                for (long i = 0; i < out_vectors.size(); ++i)
+                {
+                    set_all_elements(temp,0);
+                    for (long j = 0; j < out_vectors.size(); ++j)
+                    {
+                        temp += b(j)*K_der(out_vectors(j), out_vectors(i));
+                    }
+                    for (long j = 0; j < dec_funct.support_vectors.nr(); ++j)
+                    {
+                        temp -= dec_funct.alpha(j)*K_der(dec_funct.support_vectors(j), out_vectors(i) );
+                    }
+
+                    // store the gradient for out_vectors[i] into result in the proper spot
+                    set_subm(res,pos,0,num,1) = b(i)*temp;
+                    pos += num;
+                }
+
+
+                res *= 2;
+                return res;
+            }
+
+        private:
+
+            mutable matrix<scalar_type, 0, 1, mem_manager_type> res;
+            mutable sample_type temp;
+
+            const decision_function<kernel_type>& dec_funct;
+            mutable matrix<scalar_type,0,1,mem_manager_type>& b;
+            mutable matrix<sample_type,0,1,mem_manager_type>& out_vectors;
 
         };
 
@@ -231,132 +477,74 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const
         {
-            using namespace std;
-
-            matrix<scalar_type,0,0,mem_manager_type> K_inv, K;
-            matrix<scalar_type,0,1,mem_manager_type> a, b, k;
-            std::vector<sample_type> out_vectors;
-
-            decision_function<kernel_type> dec_funct = trainer.train(x,y);
-            dlib::rand::kernel_1a rnd;
-            sample_type sample, best_sample;
-
-            const long num_in_vects = dec_funct.support_vectors.nr();
-
-
-            const objective obj(dec_funct, b, out_vectors);
-            const kernel_type kernel(dec_funct.kernel_function);
-
-            // find the minimum possilbe value of the objective
-            double min_obj = -1; // add a -1 here instead of 0 for good measure
-            for (long i = 0; i < num_in_vects; ++i)
+            // get the decision function object we are going to try and approximate
+            const decision_function<kernel_type> dec_funct = trainer.train(x,y);
+            
+            // now find a linearly independent subset of the training points of num_sv points.
+            linearly_independent_subset_finder<kernel_type> lisf(trainer.get_kernel(), num_sv);
+            for (long i = 0; i < x.nr(); ++i)
             {
-                for (long j = 0; j < num_in_vects; ++j)
+                lisf.add(x(i));
+            }
+
+            // make num be the number of points in the lisf object.  Just do this so we don't have
+            // to write out lisf.dictionary_size() all over the place.
+            const long num = lisf.dictionary_size();
+
+            // The next few blocks of code just find the best weights with which to approximate 
+            // the dec_funct object with the smaller set of vectors in the lisf dictionary.  This
+            // is really just a simple application of some linear algebra.  For the details 
+            // see page 554 of Learning with kernels by Scholkopf and Smola where they talk 
+            // about "Optimal Expansion Coefficients."
+            matrix<scalar_type, 0, 0, mem_manager_type> K_inv(num, num); 
+            matrix<scalar_type, 0, 0, mem_manager_type> K(num, dec_funct.alpha.size()); 
+
+            const kernel_type kernel(trainer.get_kernel());
+
+            for (long r = 0; r < K_inv.nr(); ++r)
+            {
+                for (long c = 0; c < K_inv.nc(); ++c)
                 {
-                    min_obj -= dec_funct.alpha(i)*dec_funct.alpha(j)*
-                                kernel(dec_funct.support_vectors(i), dec_funct.support_vectors(j));
+                    K_inv(r,c) = kernel(lisf[r], lisf[c]);
+                }
+            }
+            K_inv = pinv(K_inv);
+
+
+            for (long r = 0; r < K.nr(); ++r)
+            {
+                for (long c = 0; c < K.nc(); ++c)
+                {
+                    K(r,c) = kernel(lisf[r], dec_funct.support_vectors(c));
                 }
             }
 
-            cout << "min_obj: " << min_obj << endl;
-
-            for (long i = 0; i < num; ++i)
-            {
-                double best_error = std::numeric_limits<double>::max();
-                // select the next vector 
-                for (long j = 0; j < 6; ++j)
-                {
-                    // pick a random vector from the decision function
-                    const long random_index = rnd.get_random_32bit_number()%num_in_vects;
-                    sample = dec_funct.support_vectors(random_index);
-                    find_min_conjugate_gradient2(obj, sample, min_obj ); 
-
-                    const double obj_value = obj(sample);
-                    cout << "obj(sample): " << obj_value << endl;
-                    if (obj_value < best_error)
-                    {
-                        best_error = obj_value;
-                        best_sample = sample;
-                    }
-                }
-
-                cout << "best_sample:  " << trans(best_sample);
-                const scalar_type k_bs = kernel(best_sample,best_sample);
-
-                // Now we need to update the K and K_inv matrices 
-                if (i == 0)
-                {
-                    K_inv.set_size(1,1);
-                    K_inv(0,0) = 1/k_bs;
-
-                    K.set_size(1,num_in_vects);
-                    for (long c = 0; c < K.nc(); ++c)
-                        K(K.nr()-1,c) = kernel(best_sample, dec_funct.support_vectors(c));
-                }
-                else
-                {
-                    // fill in k
-                    k.set_size(out_vectors.size());
-                    for (long r = 0; r < k.nr(); ++r)
-                        k(r) = kernel(best_sample,out_vectors[r]);
-
-                    // compute the error we would have if we approximated the new x sample
-                    // with the dictionary.  That is, do the ALD test from the KRLS paper.
-                    a = K_inv*k;
-                    const scalar_type delta = k_bs - trans(k)*a;
-
-                    using namespace std;
-                    cout << "delta: " << delta << endl;
-                    if (delta > std::numeric_limits<scalar_type>::epsilon())
-                    {
-
-                        // update K_inv by computing the new one in the temp matrix (equation 3.14)
-                        matrix<scalar_type,0,0,mem_manager_type> temp(K_inv.nr()+1, K_inv.nc()+1);
-                        // update the middle part of the matrix
-                        set_subm(temp, get_rect(K_inv)) = K_inv + a*trans(a)/delta;
-                        // update the right column of the matrix
-                        set_subm(temp, 0, K_inv.nr(),K_inv.nr(),1) = -a/delta;
-                        // update the bottom row of the matrix
-                        set_subm(temp, K_inv.nr(), 0, 1, K_inv.nr()) = trans(-a/delta);
-                        // update the bottom right corner of the matrix
-                        temp(K_inv.nr(), K_inv.nc()) = 1/delta;
-                        // put temp into K_inv
-                        temp.swap(K_inv);
+            // Now we compute the fist approximate decision function.  
+            matrix<scalar_type,0,1,mem_manager_type> beta(K_inv*K*dec_funct.alpha);
+            matrix<sample_type,0,1,mem_manager_type> out_vectors(lisf.get_dictionary());
 
 
-                        // now update the K matrix
-                        temp.set_size(K.nr()+1, K.nc());
-                        // copy over the old K matrix into the top of temp
-                        set_subm(temp, get_rect(K)) = K;
-                        // put temp into K
-                        temp.swap(K);
-                        for (long c = 0; c < K.nc(); ++c)
-                            K(K.nr()-1,c) = kernel(best_sample, dec_funct.support_vectors(c));
-                    }
-                    else
-                    {
-                        // this last vector we tried to add is a linear combination of the 
-                        // previous vectors so we should just stop now since there isn't
-                        // any point in adding any more vectors.
-                        break;
-                    }
+            // Now setup to do a global optimization of all the parameters in the approximate 
+            // decision function.  
+            const objective obj(dec_funct, beta, out_vectors);
+            const objective_derivative obj_der(dec_funct, beta, out_vectors);
+            matrix<scalar_type,0,1,mem_manager_type> opt_starting_point(obj.state_to_vector());
 
-                }
 
-                // now that we have updated the K and K_inv matrices we can update
-                // the b vector.
-                b = K_inv*K*dec_funct.alpha;
+            // perform the actual optimization
+            find_min_conjugate_gradient(obj, obj_der, opt_starting_point, 0, eps); 
 
-                // also record this new vector
-                out_vectors.push_back(best_sample);
-            }
+            // now make sure that the final optimized value is loaded into the beta and
+            // out_vectors matrices
+            obj.vector_to_state(opt_starting_point);
 
-            decision_function<kernel_type> new_df(b, 
+            decision_function<kernel_type> new_df(beta, 
                                                   0,
                                                   kernel, 
-                                                  vector_to_matrix(out_vectors));
+                                                  out_vectors);
 
-            // now we have to figure out what the new bias should be
+            // now we have to figure out what the new bias should be.  It might be a little
+            // different since we just messed with all the weights and vectors.
             double bias = 0;
             for (long i = 0; i < x.nr(); ++i)
             {
@@ -366,10 +554,14 @@ namespace dlib
             new_df.b = bias/x.nr();
 
             return new_df;
+
         }
 
+    // ------------------------------------------------------------------------------------
+
         const trainer_type& trainer;
-        const long num;
+        const long num_sv;
+        const double eps;
 
 
     }; // end of class reduced_decision_function_trainer2
@@ -377,12 +569,25 @@ namespace dlib
     template <typename trainer_type>
     const reduced_decision_function_trainer2<trainer_type> reduced2 (
         const trainer_type& trainer,
-        const long num 
+        const long num_sv,
+        double eps = 1e-5
     )
     {
-        return reduced_decision_function_trainer2<trainer_type>(trainer, num);
+        COMPILE_TIME_ASSERT(is_matrix<typename trainer_type::sample_type>::value);
+
+        // make sure requires clause is not broken
+        DLIB_ASSERT(num_sv > 0,
+                    "\tconst reduced_decision_function_trainer2 reduced2()"
+                    << "\n\t you have given invalid arguments to this function"
+                    << "\n\t num_sv: " << num_sv 
+                    << "\n\t eps:    " << eps 
+        );
+
+        return reduced_decision_function_trainer2<trainer_type>(trainer, num_sv, eps);
     }
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }
