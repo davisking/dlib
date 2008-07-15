@@ -115,7 +115,7 @@ int main()
 
             cout << "gamma: " << gamma << "    nu: " << nu;
             // Print out the cross validation accuracy for 3-fold cross validation using the current gamma and nu.  
-            // cross_validate_trainer() returns a column vector.  The first element of the vector is the fraction
+            // cross_validate_trainer() returns a row vector.  The first element of the vector is the fraction
             // of +1 training examples correctly classified and the second number is the fraction of -1 training 
             // examples correctly classified.
             cout << "     cross validation accuracy: " << cross_validate_trainer(trainer, samples, labels, 3);

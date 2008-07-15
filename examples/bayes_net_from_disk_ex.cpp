@@ -51,7 +51,7 @@ int main(int argc, char** argv)
         typedef graph<set<unsigned long>::compare_1b_c, set<unsigned long>::compare_1b_c>::kernel_1a_c join_tree_type;
         join_tree_type join_tree;
 
-        // Now we need populate the join_tree with data from our bayesian network.  The next to 
+        // Now we need to populate the join_tree with data from our bayesian network.  The next two 
         // function calls do this.  Explaining exactly what they do is outside the scope of this
         // example.  Just think of them as filling join_tree with information that is useful 
         // later on for dealing with our bayesian network.  
