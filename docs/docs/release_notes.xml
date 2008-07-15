@@ -12,10 +12,33 @@
 
 <current>
 New Stuff:
+   - Machine Learning
+      - Added the ability to compare kcentroid objects to each other
+      - Added the rank_features() function
+      - Added the distance_function object
+      - Added the reduced_decision_function_trainer object and 
+        reduced() function
+      - Added the reduced_decision_function_trainer2 object and 
+        reduced2() function
+      - Added a radial basis function network trainer
+      - Added the linearly_independent_subset_finder object
+   - Matrix Utilities
+      - Added the inv_upper_triangular() and inv_upper_triangular()
+        functions.
 
 Non-Backwards Compatible Changes:
+   - Refactored a bunch of the kernel learning code into a much cleaner form.
+     But this does change the interface to all the training functions.  
 
 Bug fixes:
+   - Fixed a bug in the min and max calculation in the running_stats object
+   - Removed a bug in the sum() and variance() functions that
+     caused them to seg fault when they were used on certain 
+     matrix of matrix objects.
+   - Added a missing check for division by zero to the conjugate gradient
+     optimization functions.
+   - Added some missing member variables to the .swap and serialization 
+     functions.  So now they should work right.
 
 Other:
 
