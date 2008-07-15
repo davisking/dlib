@@ -54,6 +54,14 @@ namespace dlib
                   decision_function objects with fewer support vectors.
                 - The reduced decision functions that are output will have at most
                   num_sv support vectors.
+                - #get_kernel() == trainer.get_kernel()
+        !*/
+
+        const kernel_type& get_kernel (
+        ) const;
+        /*!
+            ensures
+                - returns the kernel used by this trainer object
         !*/
 
         template <
@@ -140,12 +148,24 @@ namespace dlib
         /*!
             requires
                 - num_sv > 0
+                - eps > 0
             ensures
                 - returns a trainer object that applies post processing to the decision_function
                   objects created by the given trainer object with the goal of creating
                   decision_function objects with fewer support vectors.
                 - The reduced decision functions that are output will have at most
                   num_sv support vectors.
+                - the gradient based optimization will continue until the change in the
+                  objective function is less than eps.  So smaller values of eps will
+                  give better results but take longer to compute.
+                - #get_kernel() == trainer.get_kernel()
+        !*/
+
+        const kernel_type& get_kernel (
+        ) const;
+        /*!
+            ensures
+                - returns the kernel used by this trainer object
         !*/
 
         template <
@@ -184,6 +204,7 @@ namespace dlib
             - trainer_type == some kind of trainer object that creates decision_function
               objects (e.g. svm_nu_trainer)
             - kernel_derivative<trainer_type::kernel_type> is defined
+            - eps > 0
         ensures
             - returns a reduced_decision_function_trainer2 object that has been
               instantiated with the given arguments.

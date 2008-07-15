@@ -46,6 +46,12 @@ namespace dlib
             );
         }
 
+        const kernel_type& get_kernel (
+        ) const
+        {
+            return trainer.get_kernel();
+        }
+
         template <
             typename in_sample_vector_type,
             typename in_scalar_vector_type
@@ -187,12 +193,18 @@ namespace dlib
             COMPILE_TIME_ASSERT(is_matrix<sample_type>::value);
 
             // make sure requires clause is not broken
-            DLIB_ASSERT(num_sv > 0,
+            DLIB_ASSERT(num_sv > 0 && eps > 0,
                         "\t reduced_decision_function_trainer2()"
                         << "\n\t you have given invalid arguments to this function"
                         << "\n\t num_sv: " << num_sv 
                         << "\n\t eps:    " << eps 
             );
+        }
+
+        const kernel_type& get_kernel (
+        ) const
+        {
+            return trainer.get_kernel();
         }
 
         template <
@@ -576,7 +588,7 @@ namespace dlib
         COMPILE_TIME_ASSERT(is_matrix<typename trainer_type::sample_type>::value);
 
         // make sure requires clause is not broken
-        DLIB_ASSERT(num_sv > 0,
+        DLIB_ASSERT(num_sv > 0 && eps > 0,
                     "\tconst reduced_decision_function_trainer2 reduced2()"
                     << "\n\t you have given invalid arguments to this function"
                     << "\n\t num_sv: " << num_sv 
