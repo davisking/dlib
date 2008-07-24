@@ -45,9 +45,9 @@
         <center><h1>Preprocessor Directives</h1></center>
 
          <p>
-            There are a few preprocessor directives that you can supply during the build process to cause the
-            library to build in various optional ways.  The most people will probably not want
-            to mess with these at all and just use the library in its default build.  But they are listed
+            There are a few preprocessor directives you can supply during the build process to cause the
+            library to build in various optional ways.  Most people will probably not want
+            to mess with these at all and will just use the library in its default build.  But they are listed
             here in the event that you need to use them.
          </p>
 
