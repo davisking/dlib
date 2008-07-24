@@ -38,15 +38,15 @@ set (DLIB_ISO_CPP_ONLY_STR
 "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)" )
 set (DLIB_NO_GUI_SUPPORT_STR 
 "Enable this if you don't want to compile any of the dlib GUI code" )
-set (DLIB_ENABLE_STACK_TRACE 
+set (DLIB_ENABLE_STACK_TRACE_STR 
 "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
-set (DLIB_ENABLE_ASSERTS 
+set (DLIB_ENABLE_ASSERTS_STR 
 "Enable this if you want to turn on the DLIB_ASSERT macro" )
 
 OPTION(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
 OPTION(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
-OPTION(DLIB_ENABLE_STACK_TRACE ${DLIB_NO_GUI_SUPPORT_STR} OFF)
-OPTION(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS} OFF)
+OPTION(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
+OPTION(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
 
 
 add_library(dlib all/source.cpp )
