@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <dlib/string.h>
+#include <dlib/matrix.h>
 
 #include "tester.h"
 
@@ -101,6 +102,32 @@ namespace
         DLIB_CASSERT(v2 == v1,"");
         DLIB_CASSERT(sin,"");
         DLIB_CASSERT(sin.get() == EOF,"");
+
+
+        v1.x() = 1;
+        v1.y() = 2;
+        v1.z() = 3;
+
+        matrix<double> mv = v1;
+        DLIB_CASSERT(mv.nr() == 3,"");
+        DLIB_CASSERT(mv.nc() == 1,"");
+        DLIB_CASSERT(mv(0) == 1,"");
+        DLIB_CASSERT(mv(1) == 2,"");
+        DLIB_CASSERT(mv(2) == 3,"");
+
+        set_all_elements(mv,0);
+        DLIB_CASSERT(mv(0) == 0,"");
+        DLIB_CASSERT(mv(1) == 0,"");
+        DLIB_CASSERT(mv(2) == 0,"");
+
+        mv(0) = 5;
+        mv(1) = 6;
+        mv(2) = 7;
+
+        v1 = mv;
+        DLIB_CASSERT(v1.x() == 5,"");
+        DLIB_CASSERT(v1.y() == 6,"");
+        DLIB_CASSERT(v1.z() == 7,"");
 
     }
 

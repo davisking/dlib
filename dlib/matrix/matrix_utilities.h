@@ -9,7 +9,7 @@
 #include <complex>
 #include <limits>
 #include "../pixel.h"
-#include "../geometry.h"
+#include "../geometry/rectangle.h"
 #include "../stl_checked.h"
 #include <vector>
 

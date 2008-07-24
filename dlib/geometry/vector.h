@@ -9,6 +9,7 @@
 #include "../serialize.h"
 #include <functional>
 #include <iostream>
+#include "../matrix/matrix.h"
 
 namespace dlib
 {
@@ -70,6 +71,35 @@ namespace dlib
         inline vector (
             const point& p
         );
+
+        // ---------------------------------------
+
+        template <typename EXP>
+        vector ( const matrix_exp<EXP>& m)
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT((m.nr() == 1 || m.nc() == 1) && m.size() == 3,
+                "\t vector(const matrix_exp& m)"
+                << "\n\t the given matrix is of the wrong size"
+                << "\n\t m.nr():   " << m.nr() 
+                << "\n\t m.nc():   " << m.nc() 
+                << "\n\t m.size(): " << m.size() 
+                << "\n\t this: " << this
+                );
+            x_value = m(0);
+            y_value = m(1);
+            z_value = m(2);
+        }
+
+        template <long NR, long NC, typename MM>
+        operator matrix<T,NR, NC, MM> () const
+        {
+            matrix<T,3,1> m;
+            m(0) = x_value;
+            m(1) = y_value;
+            m(2) = z_value;
+            return m;
+        }
 
         // ---------------------------------------
 

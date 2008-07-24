@@ -6,6 +6,7 @@
 #include "../serialize.h"
 #include <functional>
 #include <iostream>
+#include "../matrix/matrix_abstract.h"
 
 namespace dlib
 {
@@ -78,6 +79,35 @@ namespace dlib
                 - #x() == v.x() 
                 - #y() == v.y() 
                 - #z() == v.z() 
+        !*/
+
+        template <typename EXP>
+        vector ( 
+            const matrix_exp<EXP>& m
+        );
+        /*!
+            requires
+                - m.size() == 3
+                - m.nr() == 1 || m.nc() == 1 (i.e. m must be a row or column matrix)
+            ensures
+                - #x() == m(0)
+                - #y() == m(1)
+                - #z() == m(2)
+        !*/
+
+        template <long NR, long NC, typename MM>
+        operator matrix<T,NR, NC, MM> (
+        ) const;
+        /*!
+            ensures
+                - provides automatic conversions from a vector object to a column 
+                  matrix
+                - returns a matrix object m such that:
+                    - m.nr() == 3
+                    - m.nc() == 1
+                    - m(0) == x()
+                    - m(1) == y()
+                    - m(2) == z()
         !*/
 
         ~vector (
