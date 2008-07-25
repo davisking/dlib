@@ -25,6 +25,10 @@ namespace dlib
     /*!
         This is a function object that represents the derivative of some other
         function. 
+
+        Note that if funct is a function of a double then the derivative of 
+        funct is just a double but if funct is a function of a dlib::matrix (i.e. a
+        function of many variables) then its derivative is a gradient vector.
     !*/
 
     template <
@@ -65,8 +69,10 @@ namespace dlib
         >
     class line_search_funct; 
     /*!
-        This is a function object l(double x) == f(start + x*direction).  That is, it 
-        represents the function l(double x) and takes f, start, and direction as arguments.
+        This object is a function object that represents a line search function.
+
+        It represents a function with the signature:
+            double l(double x)
     !*/
 
     template <
@@ -80,18 +86,24 @@ namespace dlib
     ); 
     /*!
         requires
-            - f == a function that returns a scalar
-            - f must take a dlib::matrix that is a column vector
             - is_matrix<T>::value == true (i.e. T must be a dlib::matrix)
+            - f must take a dlib::matrix that is a column vector
             - start.nc() == 1  
             - direction.nc() == 1
               (i.e. start and direction should be column vectors)
-            - f(start + 1.5*direction) should be a valid expression that
-              evaluates to a double
+            - f must return either a double or a column vector the same length and
+              type as start
+            - f(start + 1.5*direction) should be a valid expression
         ensures
-            - returns a function that represents the function l(double x) 
-              that is defined as:
-                - l(x) == f(start + x*direction)
+            - if (f returns a double) then
+                - returns a line search function that computes l(x) == f(start + x*direction)
+            - else
+                - returns a line search function that computes l(x) == trans(f(start + x*direction))*direction
+                - We assume that f is the derivative of some other function and that what
+                  f returns is a gradient vector. 
+                  So the following two expressions both create the derivative of l(x): 
+                    - derivative(make_line_search_function(funct,start,direction))
+                    - make_line_search_function(derivative(funct),start,direction)
     !*/
 
 // ----------------------------------------------------------------------------------------

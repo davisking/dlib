@@ -398,6 +398,39 @@ namespace
         p(3) = 1;
         test_powell(p);
 
+        {
+            matrix<double,2,1> m;
+            m(0) = -0.43;
+            m(1) = 0.919;
+            DLIB_CASSERT(dlib::equal(der_rosen(m) , derivative(&rosen)(m),1e-5),"");
+
+            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
+                                  make_line_search_function(derivative(&rosen),m,m)(0)) < 1e-5,"");
+            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
+                                  make_line_search_function(derivative(&rosen),m,m)(1)) < 1e-5,"");
+
+            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
+                                  make_line_search_function(&der_rosen,m,m)(0)) < 1e-5,"");
+            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
+                                  make_line_search_function(&der_rosen,m,m)(1)) < 1e-5,"");
+        }
+        {
+            matrix<double,2,1> m;
+            m(0) = 1;
+            m(1) = 2;
+            DLIB_CASSERT(dlib::equal(der_rosen(m) , derivative(&rosen)(m),1e-5),"");
+
+            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
+                                  make_line_search_function(derivative(&rosen),m,m)(0)) < 1e-5,"");
+            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
+                                  make_line_search_function(derivative(&rosen),m,m)(1)) < 1e-5,"");
+
+            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
+                                  make_line_search_function(&der_rosen,m,m)(0)) < 1e-5,"");
+            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
+                                  make_line_search_function(&der_rosen,m,m)(1)) < 1e-5,"");
+        }
+
     }
 
 
