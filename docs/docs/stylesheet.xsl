@@ -159,6 +159,7 @@
                div#entire_page {
                   width:<xsl:value-of select="$main_width"/>;  
                   text-align: left;
+                  margin-top: 0.4em;
                   margin-left: auto;
                   margin-right: auto;
                }
