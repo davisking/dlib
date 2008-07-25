@@ -275,7 +275,7 @@ namespace
         total_count = 0;
         x = p;
         find_min_conjugate_gradient(&rosen, &der_rosen, x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got rosen in " << total_count;
 
         total_count = 0;
