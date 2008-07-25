@@ -143,7 +143,7 @@ namespace dlib
         reduced_decision_function_trainer2 (
             const trainer_type& trainer,
             const unsigned long num_sv,
-            double eps = 1e-5
+            double eps = 1e-3
         );
         /*!
             requires
@@ -196,7 +196,7 @@ namespace dlib
     const reduced_decision_function_trainer2<trainer_type> reduced2 (
         const trainer_type& trainer,
         const unsigned long num_sv,
-        double eps = 1e-5
+        double eps = 1e-3
     ) { return reduced_decision_function_trainer2<trainer_type>(trainer, num_sv, eps); }
     /*!
         requires

@@ -184,7 +184,7 @@ namespace dlib
         reduced_decision_function_trainer2 (
             const trainer_type& trainer_,
             const long num_sv_,
-            const double eps_
+            const double eps_ = 1e-3
         ) :
             trainer(trainer_),
             num_sv(num_sv_),
@@ -582,7 +582,7 @@ namespace dlib
     const reduced_decision_function_trainer2<trainer_type> reduced2 (
         const trainer_type& trainer,
         const long num_sv,
-        double eps = 1e-5
+        double eps = 1e-3
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<typename trainer_type::sample_type>::value);
