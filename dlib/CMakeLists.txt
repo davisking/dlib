@@ -54,7 +54,7 @@ add_library(dlib all/source.cpp )
 
 IF (NOT DLIB_ISO_CPP_ONLY)
    # we want to link to the right stuff depending on our platform.  
-   IF (WIN32) ###############################################################################
+   IF (WIN32 AND NOT CYGWIN) ###############################################################################
       if (DLIB_NO_GUI_SUPPORT)
          set (dlib_needed_libraries ws2_32)
       else()

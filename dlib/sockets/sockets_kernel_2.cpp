@@ -80,6 +80,9 @@ namespace dlib
 
 // -----------------
 
+// cygwin currently doesn't support the getaddrinfo stuff
+#ifndef __CYGWIN__
+
     int 
     hostname_to_ip (
         const std::string& hostname,
@@ -143,6 +146,7 @@ namespace dlib
         return 0;
     }
 
+
 // -----------------
 
     int
@@ -185,6 +189,109 @@ namespace dlib
         }
         return 0;
     }
+#else
+    int 
+    hostname_to_ip (
+        const std::string& hostname,
+        std::string& ip,
+        int n
+    )
+    {
+        // ensure that WSAStartup has been called and WSACleanup will eventually 
+        // be called when program ends
+        sockets_startup();
+
+        try 
+        {
+
+            // if no hostname was given then return error
+            if ( hostname.empty())
+                return OTHER_ERROR;
+
+            hostent* address;
+            address = gethostbyname(hostname.c_str());
+            
+            if (address == 0)
+            {
+                return OTHER_ERROR;
+            }
+
+            // find the nth address
+            in_addr* addr = reinterpret_cast<in_addr*>(address->h_addr_list[0]);
+            for (int i = 1; i <= n; ++i)
+            {
+                addr = reinterpret_cast<in_addr*>(address->h_addr_list[i]);
+
+                // if there is no nth address then return error
+                if (addr == 0)
+                    return OTHER_ERROR;
+            }
+
+            char* resolved_ip = inet_ntoa(*addr);
+
+            // check if inet_ntoa returned an error
+            if (resolved_ip == NULL)
+            {
+                return OTHER_ERROR;
+            }
+
+            ip.assign(resolved_ip);
+
+        }
+        catch(...)
+        {
+            return OTHER_ERROR;
+        }
+
+        return 0;
+    }
+
+// -----------------
+
+    int
+    ip_to_hostname (
+        const std::string& ip,
+        std::string& hostname
+    )
+    {
+        // ensure that WSAStartup has been called and WSACleanup will eventually 
+        // be called when program ends
+        sockets_startup();
+
+        try 
+        {
+
+            // if no ip was given then return error
+            if (ip.empty())
+                return OTHER_ERROR;
+
+            hostent* address;
+            unsigned long ipnum = inet_addr(ip.c_str());
+
+            // if inet_addr coudln't convert ip then return an error
+            if (ipnum == INADDR_NONE)
+            {
+                return OTHER_ERROR;
+            }
+            address = gethostbyaddr(reinterpret_cast<char*>(&ipnum),4,AF_INET);
+
+            // check if gethostbyaddr returned an error
+            if (address == 0)
+            {
+                return OTHER_ERROR;
+            }
+            hostname.assign(address->h_name);
+
+        }
+        catch (...)
+        {
+            return OTHER_ERROR;
+        }
+        return 0;
+
+    }
+
+#endif // __CYGWIN__
 
 // ----------------------------------------------------------------------------------------
 

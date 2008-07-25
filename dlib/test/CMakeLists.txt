@@ -5,6 +5,7 @@
 
 # setting this makes CMake allow normal looking IF ELSE statements
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+cmake_minimum_required(VERSION 2.4)
 
 # This variable contains a list of all the tests we are building
 # into the regression test suite.

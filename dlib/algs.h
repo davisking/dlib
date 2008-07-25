@@ -42,10 +42,19 @@
 #pragma option -w-8026 
 #endif
 
+#include <string>       // for the exceptions
+
+#ifdef __CYGWIN__
+namespace std
+{
+   typedef std::basic_string<wchar_t> wstring;
+}
+#endif
+
+
 
 #include <algorithm>    // for std::swap
 #include <new>          // for std::bad_alloc
-#include <string>       // for the exceptions
 #include <cstdlib>
 #include "platform.h"
 #include "assert.h"
