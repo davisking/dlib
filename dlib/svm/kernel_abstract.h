@@ -145,6 +145,113 @@ namespace dlib
     template <
         typename T
         >
+    struct sigmoid_kernel
+    {
+        /*!
+            REQUIREMENTS ON T
+                T must be a dlib::matrix object 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a sigmoid kernel
+        !*/
+
+        typedef typename T::type scalar_type;
+        typedef T sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        const scalar_type gamma;
+        const scalar_type coef;
+
+        sigmoid_kernel(
+        );
+        /*!
+            ensures
+                - #gamma == 0.1 
+                - #coef == -1.0 
+        !*/
+
+        sigmoid_kernel(
+            const radial_basis_kernel& k
+        );
+        /*!
+            ensures
+                - #gamma == k.gamma
+                - #coef == k.coef
+        !*/
+
+        sigmoid_kernel(
+            const scalar_type g,
+            const scalar_type c
+        );
+        /*!
+            ensures
+                - #gamma == g
+                - #coef == c
+        !*/
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const;
+        /*!
+            requires
+                - a.nc() == 1
+                - b.nc() == 1
+                - a.nr() == b.nr()
+            ensures
+                - returns tanh(gamma*trans(a)*b + coef)
+        !*/
+
+        sigmoid_kernel& operator= (
+            const sigmoid_kernel& k
+        );
+        /*!
+            ensures
+                - #gamma = k.gamma
+                - #coef = k.coef
+                - returns *this
+        !*/
+
+        bool operator== (
+            const sigmoid_kernel& k
+        ) const;
+        /*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const sigmoid_kernel<T>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for sigmoid_kernel
+    !*/
+
+    template <
+        typename K
+        >
+    void deserialize (
+        sigmoid_kernel<T>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support for sigmoid_kernel
+    !*/
+
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
     struct polynomial_kernel
     {
         /*!
@@ -178,6 +285,8 @@ namespace dlib
         /*!
             ensures
                 - #gamma == k.gamma
+                - #coef == k.coef
+                - #degree == k.degree
         !*/
 
         polynomial_kernel(
@@ -324,6 +433,7 @@ namespace dlib
             REQUIREMENTS ON kernel_type
                 kernel_type must be one of the following kernel types:
                     - radial_basis_kernel
+                    - polynomial_kernel 
 
             WHAT THIS OBJECT REPRESENTS
                 This is a function object that computes the derivative of a kernel 

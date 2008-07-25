@@ -211,6 +211,113 @@ namespace dlib
         }
     }
 
+    template <
+        typename T 
+        >
+    struct kernel_derivative<polynomial_kernel<T> >
+    {
+        typedef typename T::type scalar_type;
+        typedef T sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        kernel_derivative(const polynomial_kernel<T>& k_) : k(k_){}
+
+        const sample_type& operator() (const sample_type& x, const sample_type& y) const
+        {
+            // return the derivative of the rbf kernel
+            temp = k.degree*k.gamma*x*std::pow(k.gamma*(trans(x)*y) + k.coef, k.degree-1);
+            return temp;
+        }
+
+        const polynomial_kernel<T>& k;
+        mutable sample_type temp;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    struct sigmoid_kernel
+    {
+        typedef typename T::type scalar_type;
+        typedef T sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        sigmoid_kernel(const scalar_type g, const scalar_type c) : gamma(g), coef(c) {}
+        sigmoid_kernel() : gamma(0.1), coef(-1.0) {}
+        sigmoid_kernel(
+            const sigmoid_kernel& k
+        ) : gamma(k.gamma), coef(k.coef) {}
+
+        typedef T type;
+        const scalar_type gamma;
+        const scalar_type coef;
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const
+        { 
+            return std::tanh(gamma*(trans(a)*b) + coef);
+        }
+
+        sigmoid_kernel& operator= (
+            const sigmoid_kernel& k
+        )
+        {
+            const_cast<scalar_type&>(gamma) = k.gamma;
+            const_cast<scalar_type&>(coef) = k.coef;
+            return *this;
+        }
+
+        bool operator== (
+            const sigmoid_kernel& k
+        ) const
+        {
+            return (gamma == k.gamma) && (coef == k.coef);
+        }
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const sigmoid_kernel<T>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.gamma, out);
+            serialize(item.coef, out);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type sigmoid_kernel"); 
+        }
+    }
+
+    template <
+        typename T
+        >
+    void deserialize (
+        sigmoid_kernel<T>& item,
+        std::istream& in 
+    )
+    {
+        typedef typename T::type scalar_type;
+        try
+        {
+            deserialize(const_cast<scalar_type&>(item.gamma), in);
+            deserialize(const_cast<scalar_type&>(item.coef), in);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while deserializing object of type sigmoid_kernel"); 
+        }
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
