@@ -1377,7 +1377,7 @@ namespace dlib
                 rectangle and the value of min_zoom_scale() which determines how far 
                 out you can zoom.
 
-                Also note that while vector<double> is used to represent graph points
+                Also note that while dlib::vector<double> is used to represent graph points
                 the z field is always ignored by this object.
         */
 
@@ -1593,8 +1593,8 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents a 2D region of arbitrary size that is displayed
                 within a possibly smaller scrollable gui widget.  That is, it is a 
-                graphical a widget that draws a rectangle with a horizontal and vertical 
-                scroll bar that allow the user to scroll around on a region that is much 
+                graphical widget that draws a rectangle with a horizontal and vertical 
+                scroll bar that allows the user to scroll around on a region that is much 
                 larger than the actual area occupied by this object on the screen. 
                 
                 To use this object you inherit from it and make use of its public and
