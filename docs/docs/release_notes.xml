@@ -22,6 +22,7 @@ New Stuff:
         reduced2() function
       - Added a radial basis function network trainer
       - Added the linearly_independent_subset_finder object
+      - Added the sigmoid_kernel
    - Matrix Utilities
       - Added the inv_upper_triangular() and inv_upper_triangular()
         functions.
@@ -38,9 +39,12 @@ Bug fixes:
    - Added a missing check for division by zero to the conjugate gradient
      optimization functions.
    - Added some missing member variables to the .swap and serialization 
-     functions.  So now they should work right.
+     functions for the kcentroid object.  So now they should work right.
 
 Other:
+   - Added an option to the cmake file to toggle the DLIB_ASSERT macro
+   - Added an option to the cmake file to toggle the dlib stack trace macros
+   - Made the library compile in Cygwin
 
 </current>
 

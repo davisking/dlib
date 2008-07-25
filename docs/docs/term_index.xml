@@ -413,15 +413,16 @@
          
          <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>
 
-         <term link="dlib/svm/function_abstract.h.html#decision_function" name="decision_function"/>
-         <term link="dlib/svm/function_abstract.h.html#distance_function" name="distance_function"/>
-         <term link="dlib/svm/function_abstract.h.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
+         <term link="algorithms.html#decision_function" name="decision_function"/>
+         <term link="algorithms.html#distance_function" name="distance_function"/>
+         <term link="algorithms.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
+         <term link="algorithms.html#linear_kernel" name="linear_kernel"/>
+         <term link="algorithms.html#polynomial_kernel" name="polynomial_kernel"/>
+         <term link="algorithms.html#sigmoid_kernel" name="sigmoid_kernel"/>
+         <term link="algorithms.html#radial_basis_kernel" name="radial_basis_kernel"/>
 
-         <term link="dlib/svm/kernel_abstract.h.html#linear_kernel" name="linear_kernel"/>
-         <term link="dlib/svm/kernel_abstract.h.html#polynomial_kernel" name="polynomial_kernel"/>
-         <term link="dlib/svm/kernel_abstract.h.html#radial_basis_kernel" name="radial_basis_kernel"/>
-         <term link="dlib/svm/kernel_abstract.h.html#kernel_derivative" name="kernel_derivative"/>
          <term link="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects" name="Kernel Function Objects"/>
+         <term link="dlib/svm/kernel_abstract.h.html#kernel_derivative" name="kernel_derivative"/>
 
 
 

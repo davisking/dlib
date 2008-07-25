@@ -111,6 +111,7 @@
                   <sub>
                      <item>radial_basis_kernel</item>
                      <item>polynomial_kernel</item>
+                     <item>sigmoid_kernel</item>
                      <item>linear_kernel</item>
                   </sub>
                </item>
@@ -1043,7 +1044,20 @@
          <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
          <description>
                 This object represents a linear function kernel for use with
-                support vector machines.
+                kernel learning machines.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>sigmoid_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
+         <description>
+                This object represents a sigmoid kernel for use with
+                kernel learning machines.
          </description>
                                  
       </component>
@@ -1056,7 +1070,7 @@
          <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
          <description>
                 This object represents a polynomial kernel for use with
-                support vector machines.
+                kernel learning machines.
          </description>
                                  
       </component>
@@ -1069,7 +1083,7 @@
          <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
          <description>
                 This object represents a radial basis function kernel for use with
-                support vector machines.
+                kernel learning machines.
          </description>
          <examples>
             <example>svm_ex.cpp.html</example>
