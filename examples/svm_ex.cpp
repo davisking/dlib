@@ -200,5 +200,35 @@ int main()
          << learned_probabilistic_decision_function(sample) << endl;
 
 
+
+
+    // Lastly, note that the decision functions we trained above involved well over 100 
+    // support vectors.  Support vector machines in general tend to find decision functions
+    // that involve a lot of support vectors.  This is significant because the more 
+    // support vectors in a decision function, the longer it takes to classify new examples.
+    // So dlib provides the ability to find an approximation to the normal output of a
+    // support vector machine using fewer support vectors.  
+
+    // Here we determine the cross validation accuracy when we approximate the output
+    // using only 10 support vectors.  To do this we use the reduced2() function.  It
+    // takes a trainer object and the number of support vectors to use and returns 
+    // a new trainer object that applies the necessary post processing during the creation
+    // of decision function objects.
+    cout << "\ncross validation accuracy with only 10 support vectors: " 
+         << cross_validate_trainer(reduced2(trainer,10), samples, labels, 3);
+
+    // Lets print out the original cross validation score too for comparison.
+    cout << "cross validation accuracy with all the original support vectors: " 
+         << cross_validate_trainer(trainer, samples, labels, 3);
+
+    // When you run this program you should see that, for this problem, you can reduce 
+    // the number of support vectors down to 10 without hurting the cross validation
+    // accuracy. 
+
+
+    // To get the reduced decision function out we would just do this:
+    learned_decision_function = reduced2(trainer,10).train(samples, labels);
+    // And similarly for the probabilistic_decision_function: 
+    learned_probabilistic_decision_function = train_probabilistic_decision_function(reduced2(trainer,10), samples, labels, 3);
 }
 
