@@ -335,6 +335,15 @@ namespace nativefont
                     setlocale(LC_CTYPE, "");
                     if (d == NULL){
                         d = XOpenDisplay(NULL);
+                        if (d == 0)
+                        {
+                            d = XOpenDisplay(":0.0");
+                            if (d == 0)
+                            {
+                                throw dlib::gui_error("Unable to connect to the X display.");
+                            }
+                        }
+
                         cmap = DefaultColormap(d, DefaultScreen(d));
                     }
                     char fontset[256];
