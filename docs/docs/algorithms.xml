@@ -937,7 +937,8 @@
          <description>
             <p>
                Trains a <a href="#probabilistic_decision_function">probabilistic_decision_function</a> using 
-               some sort of trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a>.
+               some sort of trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or
+               <a href="#rbf_network_trainer">rbf_network_trainer</a>.
             </p>
             The probability model is created by using the technique described in the paper:
             <blockquote>
@@ -1181,6 +1182,9 @@
             <a href="#reduced_decision_function_trainer2">reduced_decision_function_trainer2</a>
             objects.
          </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -1205,6 +1209,9 @@
                to further improve the results.
                </p>
          </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -1216,7 +1223,7 @@
          <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
          <description>
                Performs k-fold cross validation on a user supplied trainer object such
-               as the <a href="#svm_nu_trainer">svm_nu_trainer</a>.
+               as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.
          </description>
          <examples>
             <example>svm_ex.cpp.html</example>
