@@ -109,10 +109,15 @@ namespace dlib
         static void error_box_helper(void* param)
         {
             ebh_param& p = *reinterpret_cast<ebh_param*>(param);
-
-            MessageBox (NULL, TEXT (p.text.c_str()), 
+#ifdef UNICODE
+            MessageBox (NULL,  convert_mbstring_to_wstring(p.text).c_str(), 
+                        convert_mbstring_to_wstring(p.title).c_str(), MB_OK|MB_ICONERROR|MB_SYSTEMMODAL 
+                        ); 
+#else
+            MessageBox (NULL,  p.text.c_str(), 
                         p.title.c_str(), MB_OK|MB_ICONERROR|MB_SYSTEMMODAL 
                         ); 
+#endif
             delete &p;
         }
 
@@ -133,9 +138,16 @@ namespace dlib
                 }
                 else
                 {
-                    MessageBox (NULL, TEXT (text), 
+#ifdef UNICODE
+                    MessageBox (NULL, convert_mbstring_to_wstring(text).c_str(), 
+                                convert_mbstring_to_wstring(title).c_str(), 
+                                MB_OK|MB_ICONERROR|MB_SYSTEMMODAL 
+                                ); 
+#else
+                    MessageBox (NULL,  text, 
                                 title, MB_OK|MB_ICONERROR|MB_SYSTEMMODAL 
                                 ); 
+#endif
                 }
             }
             catch (...)
@@ -565,7 +577,8 @@ namespace dlib
                             // if this is stupposed to be a popup window then do the popup window thing
                             if (dwStyle == WS_CHILD)
                             {
-                                new_window = CreateWindowEx (WS_EX_TOOLWINDOW,window_class_name, "",
+                                TCHAR nothing[] = TEXT("");
+                                new_window = CreateWindowEx (WS_EX_TOOLWINDOW,window_class_name, nothing,
                                     dwStyle,
                                     CW_USEDEFAULT, CW_USEDEFAULT,
                                     CW_USEDEFAULT, CW_USEDEFAULT,
@@ -574,7 +587,8 @@ namespace dlib
                             }
                             else
                             {
-                                new_window = CreateWindow (window_class_name, "",
+                                TCHAR nothing[] = TEXT("");
+                                new_window = CreateWindow (window_class_name, nothing,
                                     dwStyle,
                                     CW_USEDEFAULT, CW_USEDEFAULT,
                                     CW_USEDEFAULT, CW_USEDEFAULT,
@@ -1240,7 +1254,8 @@ namespace dlib
                 // if this is stupposed to be a popup window then do the popup window thing
                 if (dwStyle_ == WS_CHILD)
                 {
-                    HWND tmp = CreateWindowEx (WS_EX_TOOLWINDOW|WS_EX_TOPMOST, window_class_name, "",
+                    TCHAR nothing[] = TEXT("");
+                    HWND tmp = CreateWindowEx (WS_EX_TOOLWINDOW|WS_EX_TOPMOST, window_class_name, nothing,
                             dwStyle_,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
@@ -1250,7 +1265,8 @@ namespace dlib
                 }
                 else
                 {
-                    return CreateWindow (window_class_name, "",
+                    TCHAR nothing[] = TEXT("");
+                    return CreateWindow (window_class_name, nothing,
                             dwStyle_,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
@@ -1384,7 +1400,8 @@ namespace dlib
 
                 // make the helper window that is used to trigger events in the
                 // event handler loop from other threads
-                helper_window = CreateWindow(window_class_name,"",WS_DISABLED,0,0,0,0,HWND_MESSAGE,NULL,hInstance,NULL);
+                TCHAR nothing[] = TEXT("");
+                helper_window = CreateWindow(window_class_name,nothing,WS_DISABLED,0,0,0,0,HWND_MESSAGE,NULL,hInstance,NULL);
                 if (helper_window == NULL)
                 {
                     dlog << LFATAL << "Error gathering needed resources";
