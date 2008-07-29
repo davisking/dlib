@@ -400,7 +400,7 @@
          <term link="algorithms.html#train_probabilistic_decision_function" name="train_probabilistic_decision_function"/>
          <term link="algorithms.html#cross_validate_trainer" name="cross_validate_trainer"/>
          <term link="algorithms.html#cross_validate_trainer_threaded" name="cross_validate_trainer_threaded"/>
-         <term link="algorithms.html#test_trainer" name="test_trainer"/>
+         <term link="algorithms.html#test_binary_decision_function" name="test_binary_decision_function"/>
          <term link="algorithms.html#svm_nu_trainer" name="support vector machine"/>
          <term link="algorithms.html#vector" name="vector"/>
          <term link="algorithms.html#point" name="point"/>

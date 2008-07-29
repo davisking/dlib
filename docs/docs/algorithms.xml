@@ -132,7 +132,7 @@
                <item>rbf_network_trainer</item> 
                <item>train_probabilistic_decision_function</item> 
                <item>cross_validate_trainer</item> 
-               <item>test_trainer</item> 
+               <item>test_binary_decision_function</item> 
                <item>cross_validate_trainer_threaded</item> 
                <item>rank_features</item> 
                <item>reduced_decision_function_trainer</item> 
@@ -1221,12 +1221,12 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>test_trainer</name>
+         <name>test_binary_decision_function</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
          <description>
-            Trains and tests the output <a href="#decision_function">decision_function</a> of a trainer object such
-               as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.  
+            Tests a <a href="#decision_function">decision_function</a> that represents a binary decision function and
+            returns the test accuracy.  
 
          </description>
                                  
