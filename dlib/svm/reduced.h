@@ -32,6 +32,9 @@ namespace dlib
         typedef typename trainer_type::trained_function_type trained_function_type;
 
         reduced_decision_function_trainer (
+        ) :num_sv(0) {}
+
+        reduced_decision_function_trainer (
             const trainer_type& trainer_,
             const unsigned long num_sv_ 
         ) :
@@ -61,6 +64,11 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(num_sv > 0,
+                        "\t reduced_decision_function_trainer::train(x,y)"
+                        << "\n\t You have tried to use an uninitialized version of this object"
+                        << "\n\t num_sv: " << num_sv );
             return do_train(vector_to_matrix(x), vector_to_matrix(y));
         }
 
@@ -142,8 +150,8 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        const trainer_type& trainer;
-        const unsigned long num_sv; 
+        trainer_type trainer;
+        unsigned long num_sv; 
 
 
     }; // end of class reduced_decision_function_trainer
@@ -181,6 +189,7 @@ namespace dlib
         typedef typename trainer_type::mem_manager_type mem_manager_type;
         typedef typename trainer_type::trained_function_type trained_function_type;
 
+        reduced_decision_function_trainer2 () : num_sv(0) {}
         reduced_decision_function_trainer2 (
             const trainer_type& trainer_,
             const long num_sv_,
@@ -216,6 +225,11 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(num_sv > 0,
+                        "\t reduced_decision_function_trainer2::train(x,y)"
+                        << "\n\t You have tried to use an uninitialized version of this object"
+                        << "\n\t num_sv: " << num_sv );
             return do_train(vector_to_matrix(x), vector_to_matrix(y));
         }
 
@@ -571,9 +585,9 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        const trainer_type& trainer;
-        const long num_sv;
-        const double eps;
+        trainer_type trainer;
+        long num_sv;
+        double eps;
 
 
     }; // end of class reduced_decision_function_trainer2

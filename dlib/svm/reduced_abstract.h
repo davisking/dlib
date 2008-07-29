@@ -42,6 +42,15 @@ namespace dlib
         typedef typename trainer_type::trained_function_type trained_function_type;
 
         reduced_decision_function_trainer (
+        );
+        /*!
+            ensures
+                - This object is in an uninitialized state.  You must
+                  construct a real one with the other constructor and assign it
+                  to this instance before you use this object.
+        !*/
+
+        reduced_decision_function_trainer (
             const trainer_type& trainer,
             const unsigned long num_sv 
         );
@@ -139,6 +148,15 @@ namespace dlib
         typedef typename trainer_type::sample_type sample_type;
         typedef typename trainer_type::mem_manager_type mem_manager_type;
         typedef typename trainer_type::trained_function_type trained_function_type;
+
+        reduced_decision_function_trainer2 (
+        );
+        /*!
+            ensures
+                - This object is in an uninitialized state.  You must
+                  construct a real one with the other constructor and assign it
+                  to this instance before you use this object.
+        !*/
 
         reduced_decision_function_trainer2 (
             const trainer_type& trainer,
