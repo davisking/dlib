@@ -89,7 +89,7 @@ namespace dlib
                 matrix<scalar_type, 1, 2, mem_manager_type> temp_res;
                 while (job_pipe.dequeue(j))
                 {
-                    temp_res = test_trainer(j.trainer, j.x_train, j.y_train, j.x_test, j.y_test);
+                    temp_res = test_binary_decision_function(j.trainer.train(j.x_train, j.y_train), j.x_test, j.y_test);
 
                     res_pipe.enqueue(temp_res);
                 }
