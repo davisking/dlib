@@ -482,22 +482,22 @@ namespace dlib
                                 XFree(hints);
                             }
 
-                            XResizeWindow(gui_core_kernel_2_globals::disp,win->x11_stuff.hwnd,win->width,win->height);
-            
-                            XMoveWindow(gui_core_kernel_2_globals::disp,win->x11_stuff.hwnd,win->x,win->y);
-                            XFlush(gui_core_kernel_2_globals::disp);
+
 
                             if (win->has_been_resized)
                             {
+                                XResizeWindow(gui_core_kernel_2_globals::disp,win->x11_stuff.hwnd,win->width,win->height);
                                 win->has_been_resized = false;
                                 win->on_window_resized();
                             }
 
                             if (win->has_been_moved)
                             {
+                                XMoveWindow(gui_core_kernel_2_globals::disp,win->x11_stuff.hwnd,win->x,win->y);
                                 win->has_been_moved = false;
                                 win->on_window_moved();
                             }
+                            XFlush(gui_core_kernel_2_globals::disp);
 
 
                         } break;
