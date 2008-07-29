@@ -338,6 +338,39 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename trainer_type,
+        typename in_sample_vector_type,
+        typename in_scalar_vector_type
+        >
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    test_trainer (
+        const trainer_type& trainer,
+        const in_sample_vector_type& x_train,
+        const in_scalar_vector_type& y_train,
+        const in_sample_vector_type& x_test,
+        const in_scalar_vector_type& y_test
+    );
+    /*!
+        requires
+            - is_binary_classification_problem(x_test,y_test) == true
+            - is_binary_classification_problem(x_train,y_train) == true
+            - trainer_type == some kind of trainer object (e.g. svm_nu_trainer)
+        ensures
+            - trains a single decision function by calling trainer.train(x_train,y_train)
+              and tests the decision function on the x_test and y_test samples.
+            - The accuracy is returned in a column vector, let us call it R.  Both 
+              quantities in R are numbers between 0 and 1 which represent the fraction 
+              of examples correctly classified.  R(0) is the fraction of +1 examples 
+              correctly classified and R(1) is the fraction of -1 examples correctly 
+              classified.
+        throws
+            - any exceptions thrown by trainer.train()
+            - std::bad_alloc
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T,
         typename U
         >

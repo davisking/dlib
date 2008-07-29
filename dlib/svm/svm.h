@@ -251,6 +251,103 @@ namespace dlib
         typename in_scalar_vector_type
         >
     const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    test_trainer_impl (
+        const trainer_type& trainer,
+        const in_sample_vector_type& x_train,
+        const in_scalar_vector_type& y_train,
+        const in_sample_vector_type& x_test,
+        const in_scalar_vector_type& y_test
+    )
+    {
+        typedef typename trainer_type::scalar_type scalar_type;
+        typedef typename trainer_type::sample_type sample_type;
+        typedef typename trainer_type::mem_manager_type mem_manager_type;
+        typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
+        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
+
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_binary_classification_problem(x_train,y_train) == true && 
+                    is_binary_classification_problem(x_test,y_test) == true,
+                    "\tmatrix test_trainer()"
+                    << "\n\t invalid inputs were given to this function"
+                    << "\n\t is_binary_classification_problem(x_train,y_train): " 
+                    << ((is_binary_classification_problem(x_train,y_train))? "true":"false")
+                    << "\n\t is_binary_classification_problem(x_test,y_test): " 
+                    << ((is_binary_classification_problem(x_test,y_test))? "true":"false"));
+
+
+        // count the number of positive and negative examples
+        long num_pos = 0;
+        long num_neg = 0;
+
+
+        long num_pos_correct = 0;
+        long num_neg_correct = 0;
+
+        typename trainer_type::trained_function_type d;
+
+
+        // do the training
+        d = trainer.train(x_train,y_train);
+
+        // now test this trained object 
+        for (long i = 0; i < x_test.nr(); ++i)
+        {
+            // if this is a positive example
+            if (y_test(i) == +1.0)
+            {
+                ++num_pos;
+                if (d(x_test(i)) >= 0)
+                    ++num_pos_correct;
+            }
+            else if (y_test(i) == -1.0)
+            {
+                ++num_neg;
+                if (d(x_test(i)) < 0)
+                    ++num_neg_correct;
+            }
+            else
+            {
+                throw dlib::error("invalid input labels to the test_trainer() function");
+            }
+        }
+
+
+        matrix<scalar_type, 1, 2, mem_manager_type> res;
+        res(0) = (scalar_type)num_pos_correct/(scalar_type)(num_pos); 
+        res(1) = (scalar_type)num_neg_correct/(scalar_type)(num_neg); 
+        return res;
+    }
+
+    template <
+        typename trainer_type,
+        typename in_sample_vector_type,
+        typename in_scalar_vector_type
+        >
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    test_trainer (
+        const trainer_type& trainer,
+        const in_sample_vector_type& x_train,
+        const in_scalar_vector_type& y_train,
+        const in_sample_vector_type& x_test,
+        const in_scalar_vector_type& y_test
+    )
+    {
+        return test_trainer_impl(trainer,
+                                 vector_to_matrix(x_train),
+                                 vector_to_matrix(y_train),
+                                 vector_to_matrix(x_test),
+                                 vector_to_matrix(y_test));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename trainer_type,
+        typename in_sample_vector_type,
+        typename in_scalar_vector_type
+        >
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
     cross_validate_trainer_impl (
         const trainer_type& trainer,
         const in_sample_vector_type& x,
@@ -270,9 +367,6 @@ namespace dlib
             "\tmatrix cross_validate_trainer()"
             << "\n\t invalid inputs were given to this function"
             << "\n\t x.nr(): " << x.nr() 
-            << "\n\t y.nr(): " << y.nr() 
-            << "\n\t x.nc(): " << x.nc() 
-            << "\n\t y.nc(): " << y.nc() 
             << "\n\t folds:  " << folds 
             << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
             );
@@ -295,8 +389,6 @@ namespace dlib
         const long num_neg_test_samples = num_neg/folds; 
         const long num_neg_train_samples = num_neg - num_neg_test_samples; 
 
-        long num_pos_correct = 0;
-        long num_neg_correct = 0;
 
         typename trainer_type::trained_function_type d;
         sample_vector_type x_test, x_train;
@@ -308,6 +400,9 @@ namespace dlib
 
         long pos_idx = 0;
         long neg_idx = 0;
+
+        matrix<scalar_type, 1, 2, mem_manager_type> res;
+        set_all_elements(res,0);
 
         for (long i = 0; i < folds; ++i)
         {
@@ -367,35 +462,11 @@ namespace dlib
                 train_neg_idx = (train_neg_idx+1)%x.nr();
             }
 
-            // do the training
-            d = trainer.train(x_train,y_train);
-
-            // now test this fold 
-            for (long i = 0; i < x_test.nr(); ++i)
-            {
-                // if this is a positive example
-                if (y_test(i) == +1.0)
-                {
-                    if (d(x_test(i)) >= 0)
-                        ++num_pos_correct;
-                }
-                else if (y_test(i) == -1.0)
-                {
-                    if (d(x_test(i)) < 0)
-                        ++num_neg_correct;
-                }
-                else
-                {
-                    throw dlib::error("invalid input labels to the cross_validate_trainer() function");
-                }
-            }
+            res += test_trainer(trainer,x_train,y_train,x_test,y_test);
 
         } // for (long i = 0; i < folds; ++i)
 
-        matrix<scalar_type, 1, 2, mem_manager_type> res;
-        res(0) = (scalar_type)num_pos_correct/(scalar_type)(num_pos_test_samples*folds); 
-        res(1) = (scalar_type)num_neg_correct/(scalar_type)(num_neg_test_samples*folds); 
-        return res;
+        return res/(scalar_type)folds;
     }
 
     template <
