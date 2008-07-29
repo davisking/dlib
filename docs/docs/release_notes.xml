@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.7" date="Jul 25, 2008">
+New Stuff:
    - Machine Learning
       - Added the ability to compare kcentroid objects to each other
       - Added the rank_features() function
@@ -46,7 +59,7 @@ Other:
    - Added an option to the cmake file to toggle the dlib stack trace macros
    - Made the library compile in Cygwin
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 

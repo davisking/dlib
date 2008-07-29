@@ -132,6 +132,8 @@
                <item>rbf_network_trainer</item> 
                <item>train_probabilistic_decision_function</item> 
                <item>cross_validate_trainer</item> 
+               <item>test_trainer</item> 
+               <item>cross_validate_trainer_threaded</item> 
                <item>rank_features</item> 
                <item>reduced_decision_function_trainer</item> 
                <item>reduced</item> 
@@ -1213,6 +1215,37 @@
             <example>svm_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>test_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+            Trains and tests the output <a href="#decision_function">decision_function</a> of a trainer object such
+               as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.  
+
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
+         <name>cross_validate_trainer_threaded</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/svm_threaded_abstract.h</spec_file>
+         <description>
+               Performs k-fold cross validation on a user supplied trainer object such
+               as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.  This function does the same thing as <a href="#cross_validate_trainer">cross_validate_trainer</a>
+               except this function also allows you to specify how many threads of execution to use.
+               So you can use this function to take advantage of a multi-core system to perform
+               cross validation faster.
+         </description>
       </component>
       
    <!-- ************************************************************************* -->
