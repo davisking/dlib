@@ -106,7 +106,7 @@
                      <a href="dlib/matrix/matrix_utilities_abstract.h.html#svd">singular value decomposition</a>, 
                      <a href="dlib/matrix/matrix_utilities_abstract.h.html#trans">transpose</a>, 
                      <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc...</li>
-                  <li>Unconstrained optimization algorithms such as 
+                  <li>Unconstrained non-linear optimization algorithms such as 
                      <a href="algorithms.html#find_min_conjugate_gradient">conjugate gradient</a> and <a href="algorithms.html#find_min_quasi_newton">quasi newton</a> techniques</li>
                   <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
                   <li>A <a href="algorithms.html#rand">random number</a> object</li>

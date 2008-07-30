@@ -328,7 +328,7 @@
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the function f() using the 
+             Performs an unconstrained minimization of the potentially nonlinear function f() using the 
              BFGS quasi newton method.  
          </description>
                                  
@@ -341,7 +341,7 @@
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the function f() using a 
+             Performs an unconstrained minimization of the potentially nonlinear function f() using a 
               conjugate gradient method. 
          </description>
                                  
@@ -354,7 +354,7 @@
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the function f() using the
+             Performs an unconstrained minimization of the potentially nonlinear function f() using the
              BFGS quasi newton method.  This version doesn't take a gradient function of f()
               but instead numerically approximates the gradient.
          </description>
@@ -368,7 +368,7 @@
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the function f() using a 
+             Performs an unconstrained minimization of the potentially nonlinear function f() using a 
               conjugate gradient method. This version doesn't take a gradient function of f()
               but instead numerically approximates the gradient.
          </description>
