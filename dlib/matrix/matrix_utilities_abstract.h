@@ -298,7 +298,7 @@ namespace dlib
             - statements of the following form:
                 - set_subm(m,row,col,nr,nc) = scalar_value;
               result in it being the case that:
-                - subm(m,row,col,nr,nc) == uniform_matrix<matrix_exp::type>(m.nr(),m.nc(),scalar_value).
+                - subm(m,row,col,nr,nc) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -320,7 +320,7 @@ namespace dlib
             - statements of the following form:
                 - set_subm(m,rect) = scalar_value;
               result in it being the case that:
-                - subm(m,rect) == uniform_matrix<matrix_exp::type>(m.nr(),m.nc(),scalar_value).
+                - subm(m,rect) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -341,7 +341,7 @@ namespace dlib
             - statements of the following form:
                 - set_rowm(m,row) = scalar_value;
               result in it being the case that:
-                - rowm(m,row) == uniform_matrix<matrix_exp::type>(1,m.nc(),scalar_value).
+                - rowm(m,row) == uniform_matrix<matrix::type>(1,nc,scalar_value).
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -362,7 +362,7 @@ namespace dlib
             - statements of the following form:
                 - set_colm(m,col) = scalar_value;
               result in it being the case that:
-                - colm(m,col) == uniform_matrix<matrix_exp::type>(m.nr(),1,scalar_value).
+                - colm(m,col) == uniform_matrix<matrix::type>(nr,1,scalar_value).
     !*/
 
 // ----------------------------------------------------------------------------------------
