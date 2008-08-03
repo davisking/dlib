@@ -596,6 +596,34 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    const matrix_exp::type length_squared (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.nr() == 1 || m.nc() == 1
+              (i.e. m must be a vector)
+        ensures
+            - returns sum(squared(m))
+              (i.e. returns the square of the length of the vector m)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp::type length (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.nr() == 1 || m.nc() == 1
+              (i.e. m must be a vector)
+        ensures
+            - returns sqrt(sum(squared(m)))
+              (i.e. returns the length of the vector m)
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 //                             Linear algebra functions 
 // ----------------------------------------------------------------------------------------

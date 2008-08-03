@@ -129,7 +129,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == 1/(1 + pow(e,-m(r,c))) 
+                  R(r,c) == 1/(1 + exp(-m(r,c))) 
     !*/
 
 // ----------------------------------------------------------------------------------------

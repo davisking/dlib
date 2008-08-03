@@ -221,6 +221,42 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    const typename matrix_exp<EXP>::type length (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.nr() == 1 || m.nc() == 1, 
+            "\ttype length(const matrix_exp& m)"
+            << "\n\tm must be a row or column vector"
+            << "\n\tm.nr():     " << m.nr() 
+            << "\n\tm.nc():     " << m.nc() 
+            );
+        return std::sqrt(sum(squared(m)));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    const typename matrix_exp<EXP>::type length_squared (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.nr() == 1 || m.nc() == 1, 
+            "\ttype length_squared(const matrix_exp& m)"
+            << "\n\tm must be a row or column vector"
+            << "\n\tm.nr():     " << m.nr() 
+            << "\n\tm.nc():     " << m.nc() 
+            );
+        return sum(squared(m));
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
