@@ -24,7 +24,6 @@
 #include "../logger.h"
 #include <vector>
 #include <set>
-#include "../gui_widgets/fonts.h"
 
 namespace dlib
 {
@@ -1570,7 +1569,8 @@ namespace dlib
             int mcount;
             char *def_str;
             char fontset[256];
-            sprintf(fontset, "-*-*-medium-r-normal--%lu-*-*-*-", get_native_font()->height());
+            const long native_font_height = 12;
+            sprintf(fontset, "-*-*-medium-r-normal--%lu-*-*-*-", native_font_height);
             XFontSet fs = XCreateFontSet(gui_core_kernel_2_globals::disp, fontset, &mlist, &mcount, &def_str);
             xpoint.x = 0;
             xpoint.y = 0;

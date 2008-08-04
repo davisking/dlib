@@ -372,6 +372,8 @@ namespace nativefont
                             XFreeFontSet(d, fs);
                         }
                         fs = XCreateFontSet(d, fontset, &mlist, &mcount, &def_str);
+                        if (fs == NULL)
+                           throw dlib::gui_error("gui_error: XCreateFontSet() failure");
 
                         XFontSetExtents *extent;
                         extent = XExtentsOfFontSet(fs);
