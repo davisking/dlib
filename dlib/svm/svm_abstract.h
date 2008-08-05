@@ -119,7 +119,6 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used
                   to train a support vector machine.
-                - #get_kernel() == kernel_type() 
                 - #get_nu() == 0.1 
                 - #get_cache_size() == 200
                 - #get_epsilon() == 0.001
@@ -229,9 +228,9 @@ namespace dlib
         /*!
             requires
                 - is_binary_classification_problem(x,y) == true
-                - x == a matrix or something convertable to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via vector_to_matrix().
                   Also, x should contain sample_type objects.
-                - y == a matrix or something convertable to a matrix via vector_to_matrix().
+                - y == a matrix or something convertible to a matrix via vector_to_matrix().
                   Also, y should contain scalar_type objects.
             ensures
                 - trains a nu support vector classifier given the training samples in x and 

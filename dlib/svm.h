@@ -11,6 +11,7 @@
 #include "svm/rbf_network.h"
 #include "svm/linearly_independent_subset_finder.h"
 #include "svm/reduced.h"
+#include "svm/rvm.h"
 
 #endif // DLIB_SVm_HEADER
 
