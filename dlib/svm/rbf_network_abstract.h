@@ -89,9 +89,9 @@ namespace dlib
         ) const
         /*!
             requires
-                - x == a matrix or something convertable to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via vector_to_matrix().
                   Also, x should contain sample_type objects.
-                - y == a matrix or something convertable to a matrix via vector_to_matrix().
+                - y == a matrix or something convertible to a matrix via vector_to_matrix().
                   Also, y should contain scalar_type objects.
                 - x.nr() > 1
                 - x.nr() == y.nr() && x.nc() == 1 && y.nc() == 1 
