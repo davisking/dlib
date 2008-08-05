@@ -968,6 +968,54 @@
       
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>rvm_regression_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/rvm_abstract.h</spec_file>
+         <description>
+            <p>
+               Trains a relevance vector machine for solving regression problems.  
+               Outputs a <a href="#decision_function">decision_function</a> that represents the learned 
+               regression function. 
+            </p>
+               The implementation of the RVM training algorithm used by this library is based
+               on the following paper:
+               <blockquote>
+                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
+                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
+                of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                Key West, FL, Jan 3-6.
+               </blockquote>
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      
+      <component>
+         <name>rvm_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/rvm_abstract.h</spec_file>
+         <description>
+            <p>
+               Trains a relevance vector machine for solving binary classification problems.  
+               Outputs a <a href="#decision_function">decision_function</a> that represents the learned classifier. 
+            </p>
+               The implementation of the RVM training algorithm used by this library is based
+               on the following paper:
+               <blockquote>
+                Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
+                for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
+                of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                Key West, FL, Jan 3-6.
+               </blockquote>
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
       
       <component>
          <name>svm_nu_trainer</name>

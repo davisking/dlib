@@ -115,15 +115,17 @@
 
             <li><b>Machine Learning Algorithms</b>
                <ul>
-                  <li><a href="algorithms.html#mlp">multi layer perceptrons</a> </li>  
-                  <li><a href="algorithms.html#svm_nu_trainer">support vector machines</a> for classification</li>
+                  <li><a href="algorithms.html#mlp">Multi layer perceptrons</a> </li>  
+                  <li><a href="algorithms.html#svm_nu_trainer">Support vector machines</a> for classification</li>
+                  <li>Relevance vector machines for <a href="algorithms.html#rvm_trainer">classification</a> 
+                      and <a href="algorithms.html#rvm_regression_trainer">regression</a> </li>
                   <li>An online <a href="algorithms.html#krls">kernel RLS regression</a> algorithm</li>
                   <li>An online kernelized <a href="algorithms.html#kcentroid">centroid estimator</a>/novelty detector</li>
                   <li>A kernelized <a href="algorithms.html#kkmeans">k-means</a> clustering algorithm</li>
                   <li><a href="algorithms.html#rbf_network_trainer">Radial Basis Function Networks</a></li>
-                  <li>Bayesian Network inference algorithms such as the 
+                  <li>Bayesian network inference algorithms such as the 
                      <a href="algorithms.html#bayesian_network_join_tree">join tree</a> algorithm and 
-                     <a href="algorithms.html#bayesian_network_gibbs_sampler">Gibbs sampler</a> Markov Chain Monte Carlo algorithm</li>
+                     <a href="algorithms.html#bayesian_network_gibbs_sampler">gibbs sampler</a> markov chain monte carlo algorithm</li>
                </ul>
             </li>
 
