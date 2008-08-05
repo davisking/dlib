@@ -148,7 +148,10 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
-            { return m(r,c)*m(r,c)*m(r,c); }
+            { 
+                const type temp = m(r,c);
+                return temp*temp*temp; 
+            }
         };
     };
 
@@ -173,7 +176,10 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
-            { return m(r,c)*m(r,c); }
+            { 
+                const type temp = m(r,c);
+                return temp*temp; 
+            }
         };
     };
 
