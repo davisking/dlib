@@ -149,8 +149,8 @@ namespace dlib
             !*/
             matrix<long,0,1,mem_manager_type> active_bases(x.nr());
             scalar_matrix_type phi(x.nr(),1);
-            scalar_vector_type alpha(1);
-            scalar_vector_type weights(1);
+            scalar_vector_type alpha(1), prev_alpha;
+            scalar_vector_type weights(1), prev_weights;
 
             scalar_vector_type tempv, K_col; 
 
@@ -244,6 +244,14 @@ namespace dlib
                 // check if we should do a full search for the best alpha to optimize
                 if (ticker == rounds_of_narrow_search)
                 {
+                    // if the current alpha and weights are equal to what they were
+                    // at the last time we were about to start a wide search then
+                    // we are done.
+                    if (equal(prev_alpha, alpha, eps) && equal(prev_weights, weights, eps))
+                        break;
+
+                    prev_alpha = alpha;
+                    prev_weights = weights;
                     search_all_alphas = true;
                     ticker = 0;
                 }
@@ -278,6 +286,13 @@ namespace dlib
                 }
 
                 const long selected_idx = find_next_best_alpha_to_update(S,Q,alpha,active_bases, search_all_alphas);
+
+                // if we just did a search of all the alphas and it still put is back
+                // into the current active set then we are done.
+                if (search_all_alphas == true && active_bases(selected_idx) != -1)
+                {
+                    break;
+                }
 
 
                 // if find_next_best_alpha_to_update didn't find any good alpha to update
@@ -693,8 +708,8 @@ namespace dlib
             !*/
             matrix<long,0,1,mem_manager_type> active_bases(x.nr());
             scalar_matrix_type phi(x.nr(),1);
-            scalar_vector_type alpha(1);
-            scalar_vector_type weights(1);
+            scalar_vector_type alpha(1), prev_alpha;
+            scalar_vector_type weights(1), prev_weights;
 
             scalar_vector_type tempv, K_col; 
             scalar_type var = variance(t)*0.1;
@@ -739,6 +754,14 @@ namespace dlib
                 // check if we should do a full search for the best alpha to optimize
                 if (ticker == rounds_of_narrow_search)
                 {
+                    // if the current alpha and weights are equal to what they were
+                    // at the last time we were about to start a wide search then
+                    // we are done.
+                    if (equal(prev_alpha, alpha, eps) && equal(prev_weights, weights, eps))
+                        break;
+
+                    prev_alpha = alpha;
+                    prev_weights = weights;
                     search_all_alphas = true;
                     ticker = 0;
                 }
@@ -774,6 +797,12 @@ namespace dlib
 
                 const long selected_idx = find_next_best_alpha_to_update(S,Q,alpha,active_bases, search_all_alphas);
 
+                // if we just did a search of all the alphas and it still put is back
+                // into the current active set then we are done.
+                if (search_all_alphas == true && active_bases(selected_idx) != -1)
+                {
+                    break;
+                }
 
                 // if find_next_best_alpha_to_update didn't find any good alpha to update
                 if (selected_idx == -1)
