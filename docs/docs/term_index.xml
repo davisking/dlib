@@ -496,6 +496,8 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd" name="svd"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#det" name="det"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#scale_columns" name="scale_columns"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#length" name="length"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#length_squared" name="length_squared"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#min" name="min"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#max" name="max"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#sum" name="sum"/>

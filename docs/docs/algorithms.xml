@@ -129,6 +129,8 @@
                <item>linearly_independent_subset_finder</item>
                <item>kkmeans</item>
                <item>svm_nu_trainer</item> 
+               <item>rvm_trainer</item> 
+               <item>rvm_regression_trainer</item> 
                <item>rbf_network_trainer</item> 
                <item>train_probabilistic_decision_function</item> 
                <item>cross_validate_trainer</item> 
