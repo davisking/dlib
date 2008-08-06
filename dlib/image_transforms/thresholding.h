@@ -206,7 +206,7 @@ namespace dlib
         {
             for (long c = 0; c < in_img.nc(); ++c)
             {
-                typename out_image_type::type p;
+                unsigned long p;
                 assign_pixel(p,in_img[r][c]);
                 if (p >= upper_thresh)
                 {
