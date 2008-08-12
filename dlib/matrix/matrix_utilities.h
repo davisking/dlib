@@ -1671,17 +1671,7 @@ namespace dlib
 
             if (exp.destructively_aliases(m) == false)
             {
-                long r_exp = 0;
-                for (long r = rect.top(); r <= rect.bottom(); ++r)
-                {
-                    long c_exp = 0;
-                    for (long c = rect.left(); c <= rect.right(); ++c)
-                    {
-                        m(r,c) = exp(r_exp,c_exp);
-                        ++c_exp;
-                    }
-                    ++r_exp;
-                }
+                matrix_assign(m, exp, rect.top(), rect.left()); 
             }
             else
             {
@@ -1787,10 +1777,7 @@ namespace dlib
 
             if (exp.destructively_aliases(m) == false)
             {
-                for (long i = 0; i < m.nr(); ++i)
-                {
-                    m(i,col) = exp(i);
-                }
+                matrix_assign(m, exp, 0, col); 
             }
             else
             {
@@ -1866,10 +1853,7 @@ namespace dlib
 
             if (exp.destructively_aliases(m) == false)
             {
-                for (long i = 0; i < m.nc(); ++i)
-                {
-                    m(row,i) = exp(i);
-                }
+                matrix_assign(m, exp, row, 0); 
             }
             else
             {

@@ -39,46 +39,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    template <typename M1, typename M2>
-    inline typename enable_if_c<M1::NR == 0,long>::type matrix_nr ( 
-        const M1& m1,
-        const M2& m2
-    ) { return m2.nr(); }
-    template <typename M1, typename M2>
-    inline typename enable_if_c<M1::NR != 0,long>::type matrix_nr ( 
-        const M1& m1,
-        const M2& m2
-    ) { return m1.nr(); }
-    /*!
-        ensures
-            - if (M1::NR != 0) then
-                - returns m1.nr()
-            - else
-                - returns m2.nr()
-    !*/
-
-    template <typename M1, typename M2>
-    inline typename enable_if_c<M1::NC == 0,long>::type matrix_nc ( 
-        const M1& m1,
-        const M2& m2
-    ) { return m2.nc(); }
-    template <typename M1, typename M2>
-    inline typename enable_if_c<M1::NC != 0,long>::type matrix_nc ( 
-        const M1& m1,
-        const M2& m2
-    ) { return m1.nc(); }
-    /*!
-        ensures
-            - if (M1::NC != 0) then
-                - returns m1.nc()
-            - else
-                - returns m2.nc()
-    !*/
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
     template <
         typename T,
         long num_rows,
@@ -1421,6 +1381,37 @@ namespace dlib
     ) { return !(m1 == m2); }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_dest_type,
+        typename src_exp 
+        >
+    void matrix_assign (
+        matrix_dest_type& dest,
+        const matrix_exp<src_exp>& src,
+        const long row_offset = 0,
+        const long col_offset = 0
+    )
+    /*!
+        requires
+            - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()-row_offset
+            - dest.nc() == src.nc()-col_offset
+        ensures
+            - #subm(dest, row_offset, col_offset, src.nr(), src.nc()) == src
+            - the part of dest outside the above sub matrix remains unchanged
+    !*/
+    {
+        for (long r = 0; r < src.nr(); ++r)
+        {
+            for (long c = 0; c < src.nc(); ++c)
+            {
+                dest(r+row_offset,c+col_offset) = src(r,c);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -1533,13 +1524,7 @@ namespace dlib
 
             data.set_size(m.nr(),m.nc());
 
-            for (long r = 0; r < matrix_nr(*this,m); ++r)
-            {
-                for (long c = 0; c < matrix_nc(*this,m); ++c)
-                {
-                    data(r,c) = m(r,c);
-                }
-            }
+            matrix_assign(data, m);
         }
 
         matrix (
@@ -1547,13 +1532,7 @@ namespace dlib
         ): matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> >(ref_type(*this)) 
         {
             data.set_size(m.nr(),m.nc());
-            for (long r = 0; r < matrix_nr(*this,m); ++r)
-            {
-                for (long c = 0; c < matrix_nc(*this,m); ++c)
-                {
-                    data(r,c) = m(r,c);
-                }
-            }
+            matrix_assign(data, m);
         }
 
         template <typename U, size_t len>
@@ -1795,13 +1774,7 @@ namespace dlib
             if (m.destructively_aliases(*this) == false)
             {
                 set_size(m.nr(),m.nc());
-                for (long r = 0; r < matrix_nr(*this,m); ++r)
-                {
-                    for (long c = 0; c < matrix_nc(*this,m); ++c)
-                    {
-                        data(r,c) = m(r,c);
-                    }
-                }
+                matrix_assign(data, m);
             }
             else
             {
@@ -1809,13 +1782,7 @@ namespace dlib
                 // this->data is aliased inside the matrix_exp m somewhere.
                 matrix_data<T,NR,NC, mem_manager> temp;
                 temp.set_size(m.nr(),m.nc());
-                for (long r = 0; r < matrix_nr(temp,m); ++r)
-                {
-                    for (long c = 0; c < matrix_nc(temp,m); ++c)
-                    {
-                        temp(r,c) = m(r,c);
-                    }
-                }
+                matrix_assign(temp, m);
                 data.consume(temp);
             }
             return *this;
@@ -1842,13 +1809,7 @@ namespace dlib
             COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true));
             if (m.destructively_aliases(*this) == false)
             {
-                for (long r = 0; r < matrix_nr(*this,m); ++r)
-                {
-                    for (long c = 0; c < matrix_nc(*this,m); ++c)
-                    {
-                        data(r,c) += m(r,c);
-                    }
-                }
+                matrix_assign(data, m + *this);
             }
             else
             {
@@ -1856,13 +1817,7 @@ namespace dlib
                 // this->data is aliased inside the matrix_exp m somewhere.
                 matrix_data<T,NR,NC, mem_manager> temp;
                 temp.set_size(m.nr(),m.nc());
-                for (long r = 0; r < matrix_nr(temp,m); ++r)
-                {
-                    for (long c = 0; c < matrix_nc(temp,m); ++c)
-                    {
-                        temp(r,c) = m(r,c) + data(r,c);
-                    }
-                }
+                matrix_assign(temp, m + *this);
                 data.consume(temp);
             }
             return *this;
@@ -1890,13 +1845,7 @@ namespace dlib
             COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true));
             if (m.destructively_aliases(*this) == false)
             {
-                for (long r = 0; r < matrix_nr(*this,m); ++r)
-                {
-                    for (long c = 0; c < matrix_nc(*this,m); ++c)
-                    {
-                        data(r,c) -= m(r,c);
-                    }
-                }
+                matrix_assign(data, *this - m);
             }
             else
             {
@@ -1904,13 +1853,7 @@ namespace dlib
                 // this->data is aliased inside the matrix_exp m somewhere.
                 matrix_data<T,NR,NC, mem_manager> temp;
                 temp.set_size(m.nr(),m.nc());
-                for (long r = 0; r < matrix_nr(temp,m); ++r)
-                {
-                    for (long c = 0; c < matrix_nc(temp,m); ++c)
-                    {
-                        temp(r,c) = data(r,c) - m(r,c);
-                    }
-                }
+                matrix_assign(temp, *this - m);
                 data.consume(temp);
             }
             return *this;
