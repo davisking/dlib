@@ -2480,6 +2480,8 @@ namespace dlib
 
         struct menu_data
         {
+            menu_data():underline_pos(dlib::ustring::npos){}
+
             dlib::ustring name;
             dlib::ustring::size_type underline_pos;
             popup_menu menu;
