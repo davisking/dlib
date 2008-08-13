@@ -57,6 +57,18 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        sockstreambuf (
+            const scoped_ptr<connection>& con
+        );
+        /*!
+            requires
+                - con == a valid connection object
+            ensures
+                - *this will read from and write to con
+            throws
+                - std::bad_alloc
+        !*/
+
         ~sockstreambuf (
         );
         /*!

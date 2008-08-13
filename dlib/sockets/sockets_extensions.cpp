@@ -201,10 +201,21 @@ namespace dlib
         unsigned long timeout 
     )
     {
+        scoped_ptr<connection> ptr(con);
+        close_gracefully(ptr,timeout);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void close_gracefully (
+        scoped_ptr<connection>& con,
+        unsigned long timeout 
+    )
+    {
         if(con->shutdown_outgoing())
         {
             // there was an error so just close it now and return
-            delete con;
+            con.reset();
             return;
         }
 
@@ -218,11 +229,11 @@ namespace dlib
         }
         catch (...)
         {
-            delete con;
+            con.reset();
             throw;
         }
 
-        delete con;
+        con.reset();
     }
 
 // ----------------------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 #include <string>
 #include "../sockets.h"
 #include "sockets_extensions_abstract.h"
+#include "../smart_pointers.h"
 
 namespace dlib
 {
@@ -35,6 +36,13 @@ namespace dlib
 
     void close_gracefully (
         connection* con,
+        unsigned long timeout = 500
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    void close_gracefully (
+        scoped_ptr<connection>& con,
         unsigned long timeout = 500
     );
 

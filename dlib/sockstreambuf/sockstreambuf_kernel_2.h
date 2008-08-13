@@ -35,20 +35,17 @@ namespace dlib
             out_buffer(0),
             in_buffer(0)
         {
-            try
-            {
-                out_buffer = new char[out_buffer_size];
-                in_buffer = new char[in_buffer_size];
-            }
-            catch (...)
-            {
-                if (out_buffer) delete [] out_buffer;
-                throw;
-            }
-            setp(out_buffer, out_buffer + (out_buffer_size-1));
-            setg(in_buffer+max_putback, 
-                 in_buffer+max_putback, 
-                 in_buffer+max_putback);
+            init();
+        }
+
+        sockstreambuf_kernel_2 (
+            const scoped_ptr<connection>& con_
+        ) :
+            con(*con_),
+            out_buffer(0),
+            in_buffer(0)
+        {
+            init();
         }
 
         virtual ~sockstreambuf_kernel_2 (
@@ -64,6 +61,25 @@ namespace dlib
 
 
     protected:
+
+        void init (
+        )
+        {
+            try
+            {
+                out_buffer = new char[out_buffer_size];
+                in_buffer = new char[in_buffer_size];
+            }
+            catch (...)
+            {
+                if (out_buffer) delete [] out_buffer;
+                throw;
+            }
+            setp(out_buffer, out_buffer + (out_buffer_size-1));
+            setg(in_buffer+max_putback, 
+                 in_buffer+max_putback, 
+                 in_buffer+max_putback);
+        }
 
         int flush_out_buffer (
         )

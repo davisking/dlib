@@ -44,6 +44,14 @@ namespace dlib
             lastread_next(false)
         {}
 
+        sockstreambuf_kernel_1 (
+            const scoped_ptr<connection>& con_
+        ) :
+            con(*con_),
+            peek(EOF),
+            lastread_next(false)
+        {}
+
         connection* get_connection (
         ) { return &con; }
 
