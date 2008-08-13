@@ -24,22 +24,24 @@ int main()
     try
     {
         // Connect to Google's web server which listens on port 80.  If this
-        // fails it will throw a dlib::socket_error exception.
-        connection* con = connect("www.google.com",80);
+        // fails it will throw a dlib::socket_error exception.  Note that we
+        // are using a smart pointer here to contain the connection pointer
+        // returned from connect.  Doing this ensures that the connection
+        // is deleted even if someone throws an exception somewhere in your code.
+        scoped_ptr<connection> con(connect("www.google.com",80));
 
 
         {
-            // create a stream buffer for our connection
+            // Create a stream buffer for our connection
             sockstreambuf::kernel_2a buf(con);
-            // now stick that stream buffer into an iostream object
+            // Now stick that stream buffer into an iostream object
             iostream stream(&buf);
-            // this command causes the iostream to flush its output buffers
+            // This command causes the iostream to flush its output buffers
             // whenever someone makes a read request. 
             stream.tie(&stream);
 
-            // now we make the HTTP GET request for the main Google page.
-            stream << "GET / HTTP/1.0\r\n"
-                << "\r\n";
+            // Now we make the HTTP GET request for the main Google page.
+            stream << "GET / HTTP/1.0\r\n\r\n";
 
             // Here we print each character we get back one at a time. 
             int ch = stream.get();
@@ -49,17 +51,31 @@ int main()
                 ch = stream.get();
             }
 
-            // at the end of this scope buf will be destructed and flush 
+            // At the end of this scope buf will be destructed and flush 
             // anything it still contains to the connection.  Thus putting
-            // this scope here makes it safe to call close_gracefully() next.
-            // If we just called close_gracefully() before buf was destructed
-            // then buf would try to flush its data to a closed connection
+            // this } here makes it safe to destroy the connection later on.
+            // If we just destroyed the connection before buf was destructed
+            // then buf might try to flush its data to a closed connection
             // which would be an error.
         }
 
-        // Don't forget to close the connection.  Not doing so will
-        // cause a resource leak.  And once it is closed the con pointer
-        // is invalid so don't touch it.
+        // Here we call close_gracefully().  It takes a connection and performs
+        // a proper TCP shutdown by sending a FIN packet to the other end of the 
+        // connection and waiting half a second for the other end to close the 
+        // connection as well.  If half a second goes by without the other end 
+        // responding then the connection is forcefully shutdown and deleted.  
+        // 
+        // You usually want to perform a graceful shutdown of your TCP connections 
+        // because there might be some data you tried to send that is still buffered 
+        // in the operating system's output buffers.  If you just killed the 
+        // connection it might not be sent to the other side (although maybe 
+        // you don't care, and in the case of this example it doesn't really matter.  
+        // But I'm only putting this here for the purpose of illustration :-).  
+        // In any case, this function is provided to allow you to perform a graceful 
+        // close if you so choose.  
+        // 
+        // Also note that the timeout can be changed by suppling an optional second 
+        // argument to this function.
         close_gracefully(con);
     }
     catch (exception& e)
