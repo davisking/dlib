@@ -283,6 +283,12 @@ namespace dlib
         sliding_buffer buffer;
         buffer.set_size(15);
 
+        // Initialize the buffer to all zeros.  There is no algorithmic reason to
+        // do this.  But doing so avoids a warning from valgrind so that is why
+        // I'm doing this.
+        for (unsigned long i = 0; i < buffer.size(); ++i)
+              buffer[i] = 0;
+
         crc32 crc;
         
         unsigned long lz77_count = 1;  // number of times we used lz77 to encode
