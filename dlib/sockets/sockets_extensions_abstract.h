@@ -5,6 +5,7 @@
 
 #include <string>
 #include "sockets_kernel_abstract.h"
+#include "../smart_pointers.h"
 #include "../error.h"
 
 namespace dlib
@@ -84,6 +85,31 @@ namespace dlib
             - std::bad_alloc or dlib::thread_error
               If either of these exceptions are thrown con will still be closed via
               "delete con;" 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void close_gracefully (
+        scoped_ptr<connection>& con,
+        unsigned long timeout = 500
+    );
+    /*!
+        requires
+            - con == a valid pointer to a connection object
+        ensures
+            - performs a graceful close of the given connection and if it takes longer than
+              timeout milliseconds to complete then forces the connection closed. 
+                - Specifically, a graceful close means that the outgoing part of con is
+                  closed (a FIN is sent) and then we wait for the other end to to close their 
+                  end of the connection.  This way any data still on its way to the other
+                  end of the connection will be received properly.
+            - this function will block until the graceful close is completed or we timeout.
+            - #con.get() == 0.  Thus con is no longer a valid pointer after this function
+              has finished.
+        throws
+            - std::bad_alloc or dlib::thread_error
+              If either of these exceptions are thrown con will still be closed and
+              deleted (i.e. #con.get() == 0).
     !*/
 
 // ----------------------------------------------------------------------------------------
