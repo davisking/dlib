@@ -172,6 +172,8 @@ namespace
         matrix<double,4,1> x, opt;
         opt(0) = 0;
         opt(1) = 0;
+        opt(2) = 0;
+        opt(3) = 0;
 
         dlog << LINFO << "testing with powell and the start point: " << trans(p);
 
