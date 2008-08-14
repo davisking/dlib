@@ -12,12 +12,19 @@
 
 <current>
 New Stuff:
+   - Added relevance vector machine regression and classification support.
+   - Added the cross_validate_trainer_threaded() function
+   - Added the length and length_squared matrix functions.
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Changed gui code a little so that windows don't popup in funny 
+     places when used with the cygwin X windows system.
 
 Other:
+   - Made it easier to use the scoped_ptr with the TCP connection object
+   - Optimized the matrix object a little
 
 </current>
 
