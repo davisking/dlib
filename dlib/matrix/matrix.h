@@ -202,25 +202,6 @@ namespace dlib
         {
         }
 
-        void consume(
-            matrix_data& item
-        )
-        /*!
-            ensures
-                - #*this == item
-                - #item is in an untouchable state.  no one should do anything
-                  to it other than let it destruct.
-        !*/
-        {
-            for (long r = 0; r < num_rows; ++r)
-            {
-                for (long c = 0; c < num_cols; ++c)
-                {
-                    (*this)(r,c) = item(r,c);
-                }
-            }
-        }
-
     private:
         T data[num_rows][num_cols];
     };
@@ -282,22 +263,6 @@ namespace dlib
             long nc
         )
         {
-        }
-
-        void consume(
-            matrix_data& item
-        )
-        /*!
-            ensures
-                - #*this == item
-                - #item is in an untouchable state.  no one should do anything
-                  to it other than let it destruct.
-        !*/
-        {
-            pool.deallocate_array(data);
-            data = item.data;
-            item.data = 0;
-            pool.swap(item.pool);
         }
 
     private:
@@ -373,23 +338,6 @@ namespace dlib
             }
             data = pool.allocate_array(nr*nc);
             nr_ = nr;
-        }
-
-        void consume(
-            matrix_data& item
-        )
-        /*!
-            ensures
-                - #*this == item
-                - #item is in an untouchable state.  no one should do anything
-                  to it other than let it destruct.
-        !*/
-        {
-            pool.deallocate_array(data);
-            data = item.data;
-            nr_ = item.nr_;
-            item.data = 0;
-            pool.swap(item.pool);
         }
 
     private:
@@ -470,23 +418,6 @@ namespace dlib
             nc_ = nc;
         }
 
-        void consume(
-            matrix_data& item
-        )
-        /*!
-            ensures
-                - #*this == item
-                - #item is in an untouchable state.  no one should do anything
-                  to it other than let it destruct.
-        !*/
-        {
-            pool.deallocate_array(data);
-            data = item.data;
-            nc_ = item.nc_;
-            item.data = 0;
-            pool.swap(item.pool);
-        }
-
     private:
 
         T* data;
@@ -565,24 +496,6 @@ namespace dlib
             data = pool.allocate_array(nr*nc);
             nr_ = nr;
             nc_ = nc;
-        }
-
-        void consume(
-            matrix_data& item
-        )
-        /*!
-            ensures
-                - #*this == item
-                - #item is in an untouchable state.  no one should do anything
-                  to it other than let it destruct.
-        !*/
-        {
-            pool.deallocate_array(data);
-            data = item.data;
-            nc_ = item.nc_;
-            nr_ = item.nr_;
-            item.data = 0;
-            pool.swap(item.pool);
         }
 
     private:
@@ -1382,34 +1295,34 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename matrix_dest_type,
-        typename src_exp 
-        >
-    void matrix_assign (
-        matrix_dest_type& dest,
-        const matrix_exp<src_exp>& src,
-        const long row_offset = 0,
-        const long col_offset = 0
-    )
-    /*!
-        requires
-            - src.destructively_aliases(dest) == false
-            - dest.nr() == src.nr()-row_offset
-            - dest.nc() == src.nc()-col_offset
-        ensures
-            - #subm(dest, row_offset, col_offset, src.nr(), src.nc()) == src
-            - the part of dest outside the above sub matrix remains unchanged
-    !*/
-    {
-        for (long r = 0; r < src.nr(); ++r)
+        template <
+            typename matrix_dest_type,
+            typename src_exp 
+            >
+        void matrix_assign (
+            matrix_dest_type& dest,
+            const matrix_exp<src_exp>& src,
+            const long row_offset = 0,
+            const long col_offset = 0
+        )
+        /*!
+            requires
+                - src.destructively_aliases(dest) == false
+                - dest.nr() == src.nr()-row_offset
+                - dest.nc() == src.nc()-col_offset
+            ensures
+                - #subm(dest, row_offset, col_offset, src.nr(), src.nc()) == src
+                - the part of dest outside the above sub matrix remains unchanged
+        !*/
         {
-            for (long c = 0; c < src.nc(); ++c)
+            for (long r = 0; r < src.nr(); ++r)
             {
-                dest(r+row_offset,c+col_offset) = src(r,c);
+                for (long c = 0; c < src.nc(); ++c)
+                {
+                    dest(r+row_offset,c+col_offset) = src(r,c);
+                }
             }
         }
-    }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -1524,7 +1437,7 @@ namespace dlib
 
             data.set_size(m.nr(),m.nc());
 
-            matrix_assign(data, m);
+            matrix_assign(*this, m);
         }
 
         matrix (
@@ -1532,7 +1445,7 @@ namespace dlib
         ): matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> >(ref_type(*this)) 
         {
             data.set_size(m.nr(),m.nc());
-            matrix_assign(data, m);
+            matrix_assign(*this, m);
         }
 
         template <typename U, size_t len>
@@ -1774,16 +1687,16 @@ namespace dlib
             if (m.destructively_aliases(*this) == false)
             {
                 set_size(m.nr(),m.nc());
-                matrix_assign(data, m);
+                matrix_assign(*this, m);
             }
             else
             {
-                // we have to use a temporary matrix_data object here because
-                // this->data is aliased inside the matrix_exp m somewhere.
-                matrix_data<T,NR,NC, mem_manager> temp;
+                // we have to use a temporary matrix object here because
+                // *this is aliased inside the matrix_exp m somewhere.
+                matrix temp;
                 temp.set_size(m.nr(),m.nc());
                 matrix_assign(temp, m);
-                data.consume(temp);
+                temp.swap(*this);
             }
             return *this;
         }
@@ -1809,16 +1722,16 @@ namespace dlib
             COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true));
             if (m.destructively_aliases(*this) == false)
             {
-                matrix_assign(data, m + *this);
+                matrix_assign(*this, m + *this);
             }
             else
             {
                 // we have to use a temporary matrix_data object here because
                 // this->data is aliased inside the matrix_exp m somewhere.
-                matrix_data<T,NR,NC, mem_manager> temp;
+                matrix temp;
                 temp.set_size(m.nr(),m.nc());
                 matrix_assign(temp, m + *this);
-                data.consume(temp);
+                temp.swap(*this);
             }
             return *this;
         }
@@ -1845,16 +1758,16 @@ namespace dlib
             COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true));
             if (m.destructively_aliases(*this) == false)
             {
-                matrix_assign(data, *this - m);
+                matrix_assign(*this, *this - m);
             }
             else
             {
                 // we have to use a temporary matrix_data object here because
                 // this->data is aliased inside the matrix_exp m somewhere.
-                matrix_data<T,NR,NC, mem_manager> temp;
+                matrix temp;
                 temp.set_size(m.nr(),m.nc());
                 matrix_assign(temp, *this - m);
-                data.consume(temp);
+                temp.swap(*this);
             }
             return *this;
         }
