@@ -10,6 +10,7 @@
 #include <vector>
 #include "../stl_checked.h"
 #include "../array.h"
+#include "../rand.h"
 
 #include "tester.h"
 #include <dlib/memory_manager_stateless.h>
@@ -172,6 +173,7 @@ namespace
         DLIB_CASSERT(vector_to_matrix(stdv).nc() == 1,"");
         DLIB_CASSERT(vector_to_matrix(stdv).size() == 4,"");
         DLIB_CASSERT(equal(trans(vector_to_matrix(stdv))*vector_to_matrix(stdv), trans(v)*v), "");
+        DLIB_CASSERT(equal(trans(vector_to_matrix(stdv))*vector_to_matrix(stdv), tmp(trans(v)*v)), "");
 
         DLIB_CASSERT(vector_to_matrix(stdv_c)(0) == 1,"");
         DLIB_CASSERT(vector_to_matrix(stdv_c)(1) == 2,"");
@@ -233,6 +235,10 @@ namespace
         DLIB_CASSERT((round(10000*dm3*inv(m3))/10000 == identity_matrix<double,3>()),"");
         DLIB_CASSERT((round(10000*dm3*inv(dm3))/10000 == identity_matrix<double,3>()),"");
         DLIB_CASSERT((round(10000*m3*inv(dm3))/10000 == identity_matrix<double,3>()),"");
+        DLIB_CASSERT((round(10000*tmp(m3*inv(m3)))/10000 == identity_matrix<double,3>()),"");
+        DLIB_CASSERT((round(10000*tmp(dm3*inv(m3)))/10000 == identity_matrix<double,3>()),"");
+        DLIB_CASSERT((round(10000*tmp(dm3*inv(dm3)))/10000 == identity_matrix<double,3>()),"");
+        DLIB_CASSERT((round(10000*tmp(m3*inv(dm3)))/10000 == identity_matrix<double,3>()),"");
         DLIB_CASSERT(-1*m3 == -m3,"");
         DLIB_CASSERT(-1*dm3 == -m3,"");
         DLIB_CASSERT(-1*m3 == -dm3,"");
@@ -288,6 +294,7 @@ namespace
 
         m2 = m1inv;
         DLIB_CASSERT((round(m2*m1) == identity_matrix<double,4>()),"");
+        DLIB_CASSERT((round(tmp(m2*m1)) == identity_matrix<double,4>()),"");
 
         DLIB_CASSERT(round(m2*10000) == round(inv(m1)*10000),"");
         DLIB_CASSERT(m1 == abs(-1*m1),"");
@@ -535,7 +542,7 @@ namespace
             {
                 for (long c = 0; c < a.nc(); ++c)
                 {
-                    a(r,c) = 10*((double)rand())/RAND_MAX;
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
                 }
             }
 
@@ -564,7 +571,7 @@ namespace
             {
                 for (long c = 0; c < a.nc(); ++c)
                 {
-                    a(r,c) = 10*((double)rand())/RAND_MAX;
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
                 }
             }
 
@@ -594,7 +601,7 @@ namespace
             {
                 for (long c = 0; c < a.nc(); ++c)
                 {
-                    a(r,c) = 10*((double)rand())/RAND_MAX;
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
                 }
             }
 
@@ -620,7 +627,7 @@ namespace
             {
                 for (long c = 0; c < a.nc(); ++c)
                 {
-                    a(r,c) = 10*((double)rand())/RAND_MAX;
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
                 }
             }
 
@@ -647,7 +654,7 @@ namespace
             {
                 for (long c = 0; c < a.nc(); ++c)
                 {
-                    a(r,c) = 10*((double)rand())/RAND_MAX;
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
                 }
             }
 
@@ -671,7 +678,7 @@ namespace
             {
                 for (long c = 0; c < a.nc(); ++c)
                 {
-                    a(r,c) = 10*((double)rand())/RAND_MAX;
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
                 }
             }
 
@@ -1384,6 +1391,30 @@ namespace
             DLIB_CASSERT(dlib::equal(inv_upper_triangular(m), inv(m),1e-10), inv_upper_triangular(m)-inv(m));
             DLIB_CASSERT(dlib::equal(inv_lower_triangular(trans(m)), inv(trans(m)),1e-10), inv_lower_triangular(trans(m))-inv(trans(m)));
 
+        }
+
+        {
+            matrix<double> a;
+            matrix<float> b;
+            matrix<int> i;
+            a.set_size(1000,10);
+            b.set_size(1000,10);
+            i.set_size(1000,10);
+            dlib::rand::float_1a rnd;
+            for (long r = 0; r < a.nr(); ++r)
+            {
+                for (long c = 0; c < a.nc(); ++c)
+                {
+                    a(r,c) = rnd.get_random_double();
+                    b(r,c) = rnd.get_random_float();
+                    i(r,c) = r+c*r;
+                }
+            }
+
+            // make sure the multiply optimizations aren't messing things up
+            DLIB_CASSERT(trans(i)*i == tmp(trans(i)*i),"");
+            DLIB_CASSERT(equal(trans(a)*a , tmp(trans(a)*a), 1e-11),max(abs(trans(a)*a - tmp(trans(a)*a))));
+            DLIB_CASSERT(equal(trans(b)*b , tmp(trans(b)*b), 1e-3),max(abs(trans(b)*b - tmp(trans(b)*b))));
         }
 
     }
