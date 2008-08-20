@@ -50,7 +50,6 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used
                   to train a relevance vector machine.
-                - #get_epsilon() == 0.001
         !*/
 
         void set_kernel (
@@ -66,25 +65,6 @@ namespace dlib
         /*!
             ensures
                 - returns a copy of the kernel function in use by this object
-        !*/
-
-        void set_epsilon (
-            scalar_type eps_
-        );
-        /*!
-            requires
-                - eps > 0
-            ensures
-                - #get_epsilon() == eps 
-        !*/
-
-        const scalar_type get_epsilon (
-        ) const;
-        /*!
-            ensures
-                - returns the error epsilon that determines when training should stop.
-                  Generally a good value for this is 0.001.  Smaller values may result
-                  in a more accurate solution but take longer to execute.
         !*/
 
         template <
@@ -104,7 +84,7 @@ namespace dlib
                   Also, y should contain scalar_type objects.
             ensures
                 - trains a relevance vector classifier given the training samples in x and 
-                  labels in y.  Training is done when the error is less than get_epsilon().
+                  labels in y.  
                 - returns a decision function F with the following properties:
                     - if (new_x is a sample predicted have +1 label) then
                         - F(new_x) >= 0
@@ -173,7 +153,6 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used
                   to train a relevance vector machine.
-                - #get_epsilon() == 0.001
         !*/
 
         void set_kernel (
@@ -189,25 +168,6 @@ namespace dlib
         /*!
             ensures
                 - returns a copy of the kernel function in use by this object
-        !*/
-
-        void set_epsilon (
-            scalar_type eps_
-        );
-        /*!
-            requires
-                - eps > 0
-            ensures
-                - #get_epsilon() == eps 
-        !*/
-
-        const scalar_type get_epsilon (
-        ) const;
-        /*!
-            ensures
-                - returns the error epsilon that determines when training should stop.
-                  Generally a good value for this is 0.001.  Smaller values may result
-                  in a more accurate solution but take longer to execute.
         !*/
 
         template <

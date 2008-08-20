@@ -59,25 +59,6 @@ namespace dlib
             return kernel;
         }
 
-        void set_epsilon (
-            scalar_type eps_
-        )
-        {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(eps_ > 0,
-                "\tvoid rvm_trainer::set_epsilon(eps_)"
-                << "\n\t invalid inputs were given to this function"
-                << "\n\t eps: " << eps_ 
-                );
-            eps = eps_;
-        }
-
-        const scalar_type get_epsilon (
-        ) const
-        { 
-            return eps;
-        }
-
         template <
             typename in_sample_vector_type,
             typename in_scalar_vector_type
@@ -289,7 +270,7 @@ namespace dlib
 
                 // if we just did a search of all the alphas and it still put is back
                 // into the current active set then we are done.
-                if (search_all_alphas == true && active_bases(selected_idx) != -1)
+                if (search_all_alphas == true && selected_idx != -1 && active_bases(selected_idx) != -1)
                 {
                     break;
                 }
@@ -327,7 +308,7 @@ namespace dlib
                         alpha(idx) = s*s/(q*q-s);
 
                     }
-                    else
+                    else if (phi.nc() > 1) // don't ever remove the last basis vector 
                     {
                         // the new alpha value is infinite so remove the selected alpha from our model
                         active_bases(selected_idx) = -1; 
@@ -347,6 +328,21 @@ namespace dlib
                         // we changed the number of weights so we need to remember to 
                         // recompute the beta vector next time around the main loop.
                         recompute_beta = true;
+                    }
+                    else
+                    {
+                        if (search_all_alphas == true)
+                        {
+                            // In this case we are saying we are done because the wide search
+                            // told us to remove the only basis function we have.  So just stop
+                            break;
+                        }
+                        else
+                        {
+                            // we tried to remove the last basis vector in phi 
+                            // so lets make sure we do a round of wide search next time.
+                            ticker = rounds_of_narrow_search;
+                        }
                     }
                 }
                 else
@@ -629,25 +625,6 @@ namespace dlib
             return kernel;
         }
 
-        void set_epsilon (
-            scalar_type eps_
-        )
-        {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(eps_ > 0,
-                "\tvoid rvm_regression_trainer::set_epsilon(eps_)"
-                << "\n\t invalid inputs were given to this function"
-                << "\n\t eps: " << eps_ 
-                );
-            eps = eps_;
-        }
-
-        const scalar_type get_epsilon (
-        ) const
-        { 
-            return eps;
-        }
-
         template <
             typename in_sample_vector_type,
             typename in_scalar_vector_type
@@ -799,7 +776,7 @@ namespace dlib
 
                 // if we just did a search of all the alphas and it still put is back
                 // into the current active set then we are done.
-                if (search_all_alphas == true && active_bases(selected_idx) != -1)
+                if (search_all_alphas == true && selected_idx != -1 && active_bases(selected_idx) != -1)
                 {
                     break;
                 }
@@ -838,7 +815,7 @@ namespace dlib
                         alpha(idx) = s*s/(q*q-s);
 
                     }
-                    else
+                    else if (phi.nc() > 1) // don't ever remove the last basis vector from phi
                     {
                         // the new alpha value is infinite so remove the selected alpha from our model
                         active_bases(selected_idx) = -1; 
@@ -853,6 +830,21 @@ namespace dlib
                             {
                                 active_bases(i) -= 1;
                             }
+                        }
+                    }
+                    else
+                    {
+                        if (search_all_alphas == true)
+                        {
+                            // In this case we are saying we are done because the wide search
+                            // told us to remove the only basis function we have.  So just stop
+                            break;
+                        }
+                        else
+                        {
+                            // we tried to remove the last basis vector in phi 
+                            // so lets make sure we do a round of wide search next time.
+                            ticker = rounds_of_narrow_search;
                         }
                     }
                 }
