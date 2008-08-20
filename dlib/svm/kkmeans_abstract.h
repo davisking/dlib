@@ -25,6 +25,7 @@ namespace dlib
 
             INITIAL VALUE
                 - number_of_centers() == 1
+                - get_min_change() == 0.01
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of a kernelized k-means clustering algorithm.  
@@ -42,6 +43,7 @@ namespace dlib
         /*!
             ensures
                 - #number_of_centers() == 1
+                - #get_min_change() == 0.01
                 - #get_kcentroid(0) == a copy of kc_
         !*/
 
@@ -105,7 +107,7 @@ namespace dlib
         void train (
             const matrix_type& samples,
             const matrix_type2& initial_centers,
-            long max_iter = 1000000
+            long max_iter = 1000
         );
         /*!
             requires
@@ -119,8 +121,9 @@ namespace dlib
             ensures
                 - performs k-means clustering of the given set of samples.  The initial center points
                   are taken from the initial_centers argument.
-                - loops over the data and continues to refine the clustering until either the cluster centers
-                  don't move or we have done max_iter iterations over the data.
+                - loops over the data and continues to refine the clustering until either less than 
+                  get_min_change() fraction of the cluster centers move or we have done max_iter iterations 
+                  over the data.
                 - After this function finishes you can call the operator() function below
                   to determine which centroid a given sample is closest to.
         !*/
@@ -134,6 +137,24 @@ namespace dlib
                     - idx < number_of_centers()
                     - get_kcentroid(idx) == the centroid that is closest to the given
                       sample.
+        !*/
+
+        void set_min_change (
+            scalar_type min_change
+        );
+        /*!
+            requires
+                - 0 <= min_change < 1
+            ensures
+                - #get_min_change() == min_change
+        !*/
+
+        const scalar_type get_min_change (
+        ) const;
+        /*!
+            ensures
+                - returns the minimum fraction of centers that need to change
+                  in an iteration of kmeans for the algorithm to keep going.
         !*/
 
         void swap (

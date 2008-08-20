@@ -31,7 +31,8 @@ namespace dlib
         kkmeans (
             const kcentroid<kernel_type>& kc_ 
         ):
-            kc(kc_)
+            kc(kc_),
+            min_change(0.01)
         {
             set_number_of_centers(1);
         }
@@ -127,6 +128,19 @@ namespace dlib
             return label;
         }
 
+        void set_min_change (
+            scalar_type min_change_
+        )
+        {
+            min_change = min_change_;
+        }
+
+        const scalar_type get_min_change (
+        ) const
+        {
+            return min_change;
+        }
+
         void swap (
             kkmeans& item
         )
@@ -134,6 +148,7 @@ namespace dlib
             centers.swap(item.centers);
             kc.swap(item.kc);
             assignments.swap(item.assignments);
+            exchange(min_change, item.min_change);
         }
 
         friend void serialize(const kkmeans& item, std::ostream& out)
@@ -144,7 +159,7 @@ namespace dlib
                 serialize(*item.centers[i], out);
             }
             serialize(item.kc, out);
-            serialize(item.assignments, out);
+            serialize(item.min_change, out);
         }
 
         friend void deserialize(kkmeans& item, std::istream& in)
@@ -160,7 +175,7 @@ namespace dlib
             }
 
             deserialize(item.kc, in);
-            deserialize(item.assignments, in);
+            deserialize(item.min_change, in);
         }
 
     private:
@@ -246,6 +261,7 @@ namespace dlib
 
         typename array<scoped_ptr<kcentroid<kernel_type> > >::expand_1b_c centers;
         kcentroid<kernel_type> kc;
+        scalar_type min_change;
 
         // temp variables
         array<unsigned long>::expand_1b_c assignments;
