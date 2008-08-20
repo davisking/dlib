@@ -138,14 +138,27 @@ namespace dlib
 
         friend void serialize(const kkmeans& item, std::ostream& out)
         {
-            serialize(item.centers, out);
+            serialize(item.centers.size(),out);
+            for (unsigned long i = 0; i < item.centers.size(); ++i)
+            {
+                serialize(*item.centers[i], out);
+            }
             serialize(item.kc, out);
             serialize(item.assignments, out);
         }
 
         friend void deserialize(kkmeans& item, std::istream& in)
         {
-            deserialize(item.centers, in);
+            unsigned long num;
+            deserialize(num, in);
+            item.centers.expand(num);
+            for (unsigned long i = 0; i < item.centers.size(); ++i)
+            {
+                scoped_ptr<kcentroid<kernel_type> > temp(new kcentroid<kernel_type>(kernel_type()));
+                deserialize(*temp, in);
+                item.centers[i].swap(temp);
+            }
+
             deserialize(item.kc, in);
             deserialize(item.assignments, in);
         }
