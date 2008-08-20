@@ -165,8 +165,8 @@ endif()
 
 
 if (DLIB_ENABLE_ASSERTS)
-   add_global_define(DLIB_ENABLE_ASSERTS)
+   add_global_define(ENABLE_ASSERTS)
 else()
-   remove_global_define(DLIB_ENABLE_ASSERTS)
+   remove_global_define(ENABLE_ASSERTS)
 endif()
 
