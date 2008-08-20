@@ -1034,6 +1034,7 @@ namespace dlib
         void hide (
         )
         {
+            auto_mutex M(m);
             mouse_over_event::hide();
             if (stuff)
             {
@@ -1045,6 +1046,7 @@ namespace dlib
         void disable (
         )
         {
+            auto_mutex M(m);
             mouse_over_event::disable();
             if (stuff)
             {
