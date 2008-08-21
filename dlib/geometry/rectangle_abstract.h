@@ -451,6 +451,21 @@ namespace dlib
 
     const rectangle translate_rect (
         const rectangle& rect,
+        const point& p
+    );
+    /*!
+        ensures
+            - returns a rectangle R such that:
+                - R.left()   == rect.left()   + p.x()
+                - R.right()  == rect.right()  + p.x()
+                - R.top()    == rect.top()    + p.y()
+                - R.bottom() == rect.bottom() + p.y()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const rectangle translate_rect (
+        const rectangle& rect,
         long x,
         long y
     );
@@ -511,6 +526,21 @@ namespace dlib
                 - R.left() == rect.left() 
                 - R.top() == rect.top() 
                 - R.right() == rect.right() 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const rectangle move_rect (
+        const rectangle& rect,
+        const point& p
+    );
+    /*!
+        ensures
+            - returns a rectangle R such that:
+                - R.width() == rect.width() 
+                - R.height() == rect.height() 
+                - R.left() == p.x()
+                - R.top() == p.y() 
     !*/
 
 // ----------------------------------------------------------------------------------------

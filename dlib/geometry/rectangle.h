@@ -399,6 +399,21 @@ namespace dlib
 
     inline const rectangle translate_rect (
         const rectangle& rect,
+        const point& p
+    )
+    {
+        rectangle result;
+        result.set_top ( rect.top() + p.y() );
+        result.set_bottom ( rect.bottom() + p.y() );
+        result.set_left ( rect.left() + p.x() );
+        result.set_right ( rect.right() + p.x() );
+        return result;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline const rectangle translate_rect (
+        const rectangle& rect,
         long x,
         long y
     )
@@ -446,6 +461,16 @@ namespace dlib
         return rectangle(rect.left(),rect.top(), 
                          rect.right(),
                          rect.top()+height-1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline const rectangle move_rect (
+        const rectangle& rect,
+        const point& p
+    )
+    {
+        return rectangle(p.x(), p.y(), p.x()+rect.width()-1, p.y()+rect.height()-1);
     }
 
 // ----------------------------------------------------------------------------------------
