@@ -594,6 +594,10 @@
                   <link>dlib/threads/threads_kernel_abstract.h.html#mutex</link>
                </item>
                <item>   
+                  <name>unregister_thread_end_handler</name>
+                  <link>dlib/threads/threads_kernel_abstract.h.html#unregister_thread_end_handler</link>
+               </item>
+               <item>   
                   <name>register_thread_end_handler</name>
                   <link>dlib/threads/threads_kernel_abstract.h.html#register_thread_end_handler</link>
                </item>
