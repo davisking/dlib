@@ -16,6 +16,111 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace rvm_helpers
+    {
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename scalar_vector_type, typename mem_manager_type>
+        long find_next_best_alpha_to_update (
+            const scalar_vector_type& S,
+            const scalar_vector_type& Q,
+            const scalar_vector_type& alpha,
+            const matrix<long,0,1,mem_manager_type>& active_bases,
+            const bool search_all_alphas,
+            typename scalar_vector_type::type eps
+        ) 
+        /*!
+            ensures
+                - if (we can find another alpha to update) then
+                    - returns the index of said alpha 
+                - else
+                    - returns -1
+        !*/
+        {
+            typedef typename scalar_vector_type::type scalar_type;
+            // now use S and Q to find next alpha to update.  What
+            // we want to do here is select the alpha to update that gives us
+            // the greatest improvement in marginal likelihood.
+            long selected_idx = -1;
+            scalar_type greatest_improvement = -1;
+            for (long i = 0; i < S.nr(); ++i)
+            {
+                scalar_type value = -1;
+
+                // if i is currently in the active set
+                if (active_bases(i) >= 0)
+                {
+                    const long idx = active_bases(i);
+                    const scalar_type s = alpha(idx)*S(i)/(alpha(idx) - S(i));
+                    const scalar_type q = alpha(idx)*Q(i)/(alpha(idx) - S(i));
+
+                    if (q*q-s > 0)
+                    {
+                        // only update an existing alpha if this is a narrow search
+                        if (search_all_alphas == false)
+                        {
+                            // choosing this sample would mean doing an update of an 
+                            // existing alpha value.
+                            scalar_type new_alpha = s*s/(q*q-s);
+                            scalar_type cur_alpha = alpha(idx);
+                            new_alpha = 1/new_alpha;
+                            cur_alpha = 1/cur_alpha;
+
+                            // from equation 32 in the Tipping paper 
+                            value = Q(i)*Q(i)/(S(i) +  1/(new_alpha - cur_alpha) ) - 
+                                std::log(1 + S(i)*(new_alpha - cur_alpha));
+                        }
+
+                    }
+                    // we only pick an alpha to remove if this is a wide search and it wasn't one of the recently added ones 
+                    else if (search_all_alphas && idx+2 < alpha.size() )  
+                    {
+                        // choosing this sample would mean the alpha value is infinite 
+                        // so we would remove the selected sample from our model.
+
+                        // from equation 37 in the Tipping paper 
+                        value = Q(i)*Q(i)/(S(i) - alpha(idx)) - 
+                            std::log(1-S(i)/alpha(idx));
+
+                    }
+                }
+                else if (search_all_alphas)
+                {
+                    const scalar_type s = S(i);
+                    const scalar_type q = Q(i);
+
+                    if (q*q-s > 0)
+                    {
+                        // choosing this sample would mean we would add the selected 
+                        // sample to our model.
+
+                        // from equation 27 in the Tipping paper 
+                        value = (Q(i)*Q(i)-S(i))/S(i) + std::log(S(i)/(Q(i)*Q(i)));
+                    }
+                }
+
+                if (value > greatest_improvement)
+                {
+                    greatest_improvement = value;
+                    selected_idx = i;
+                }
+            }
+
+            // If the greatest_improvement in marginal likelihood we would get is less
+            // than our epsilon then report that there isn't anything else to do.  But
+            // if it is big enough then return the selected_idx.
+            if (greatest_improvement > eps)
+                return selected_idx;
+            else
+                return -1;
+        }
+
+    } // end namespace rvm_helpers
+
+    // ------------------------------------------------------------------------------------
+
+
     template <
         typename kern_type 
         >
@@ -269,7 +374,7 @@ namespace dlib
                     Q(i) = tempv2*t_hat - tempv2*tempv; 
                 }
 
-                const long selected_idx = find_next_best_alpha_to_update(S,Q,alpha,active_bases, search_all_alphas);
+                const long selected_idx = rvm_helpers::find_next_best_alpha_to_update(S,Q,alpha,active_bases, search_all_alphas, eps);
 
 
                 // if find_next_best_alpha_to_update didn't find any good alpha to update
@@ -387,6 +492,34 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        template <typename M1, typename M2>
+        long pick_initial_vector (
+            const M1& x,
+            const M2& t
+        ) const
+        {
+            scalar_vector_type K_col;
+            double max_projection = -std::numeric_limits<scalar_type>::infinity();
+            long max_idx = 0;
+            // find the row in the kernel matrix that has the biggest normalized projection onto the t vector
+            for (long r = 0; r < x.nr(); ++r)
+            {
+                get_kernel_colum(r,x,K_col);
+                double temp = trans(K_col)*t;
+                temp = temp*temp/length_squared(K_col);
+
+                if (temp > max_projection)
+                {
+                    max_projection = temp;
+                    max_idx = r;
+                }
+            }
+
+            return max_idx;
+        }
+
+    // ------------------------------------------------------------------------------------
+
         template <typename T>
         void get_kernel_colum (
             long idx,
@@ -413,128 +546,6 @@ namespace dlib
             const double temp2 = trans(phi)*t;
 
             return temp/( temp2*temp2/temp + variance(t)*0.1);
-        }
-
-    // ------------------------------------------------------------------------------------
-
-        long find_next_best_alpha_to_update (
-            const scalar_vector_type& S,
-            const scalar_vector_type& Q,
-            const scalar_vector_type& alpha,
-            const matrix<long,0,1,mem_manager_type>& active_bases,
-            const bool search_all_alphas
-        ) const
-        /*!
-            ensures
-                - if (we can find another alpha to update) then
-                    - returns the index of said alpha 
-                - else
-                    - returns -1
-        !*/
-        {
-            // now use S and Q to find next alpha to update.  What
-            // we want to do here is select the alpha to update that gives us
-            // the greatest improvement in marginal likelihood.
-            long selected_idx = -1;
-            scalar_type greatest_improvement = -1;
-            for (long i = 0; i < S.nr(); ++i)
-            {
-                scalar_type value = -1;
-
-                // if i is currently in the active set
-                if (active_bases(i) >= 0)
-                {
-                    const long idx = active_bases(i);
-                    const scalar_type s = alpha(idx)*S(i)/(alpha(idx) - S(i));
-                    const scalar_type q = alpha(idx)*Q(i)/(alpha(idx) - S(i));
-
-                    if (q*q-s > 0)
-                    {
-                        // only update an existing alpha if this is a narrow search
-                        if (search_all_alphas == false)
-                        {
-                            // choosing this sample would mean doing an update of an 
-                            // existing alpha value.
-                            scalar_type new_alpha = s*s/(q*q-s);
-                            scalar_type cur_alpha = alpha(idx);
-                            new_alpha = 1/new_alpha;
-                            cur_alpha = 1/cur_alpha;
-
-                            // from equation 32 in the Tipping paper 
-                            value = Q(i)*Q(i)/(S(i) +  1/(new_alpha - cur_alpha) ) - 
-                                std::log(1 + S(i)*(new_alpha - cur_alpha));
-                        }
-
-                    }
-                    // we only pick an alpha to remove if this is a wide search and it wasn't one of the recently added ones 
-                    else if (search_all_alphas && idx+2 < alpha.size() )  
-                    {
-                        // choosing this sample would mean the alpha value is infinite 
-                        // so we would remove the selected sample from our model.
-
-                        // from equation 37 in the Tipping paper 
-                        value = Q(i)*Q(i)/(S(i) - alpha(idx)) - 
-                            std::log(1-S(i)/alpha(idx));
-
-                    }
-                }
-                else if (search_all_alphas)
-                {
-                    const scalar_type s = S(i);
-                    const scalar_type q = Q(i);
-
-                    if (q*q-s > 0)
-                    {
-                        // choosing this sample would mean we would add the selected 
-                        // sample to our model.
-
-                        // from equation 27 in the Tipping paper 
-                        value = (Q(i)*Q(i)-S(i))/S(i) + std::log(S(i)/(Q(i)*Q(i)));
-                    }
-                }
-
-                if (value > greatest_improvement)
-                {
-                    greatest_improvement = value;
-                    selected_idx = i;
-                }
-            }
-
-            // If the greatest_improvement in marginal likelihood we would get is less
-            // than our epsilon then report that there isn't anything else to do.  But
-            // if it is big enough then return the selected_idx.
-            if (greatest_improvement > eps)
-                return selected_idx;
-            else
-                return -1;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-        template <typename M1, typename M2>
-        long pick_initial_vector (
-            const M1& x,
-            const M2& t
-        ) const
-        {
-            scalar_vector_type K_col;
-            double max_projection = -std::numeric_limits<scalar_type>::infinity();
-            long max_idx = 0;
-            // find the row in the kernel matrix that has the biggest normalized projection onto the t vector
-            for (long r = 0; r < x.nr(); ++r)
-            {
-                get_kernel_colum(r,x,K_col);
-                double temp = trans(K_col)*t;
-                temp = temp*temp/length_squared(K_col);
-
-                if (temp > max_projection)
-                {
-                    max_projection = temp;
-                    max_idx = r;
-                }
-            }
-
-            return max_idx;
         }
 
     // ------------------------------------------------------------------------------------
@@ -589,7 +600,7 @@ namespace dlib
         typedef decision_function<kernel_type> trained_function_type;
 
         rvm_regression_trainer (
-        ) : eps(0.001)
+        ) : eps(0.0005)
         {
         }
 
@@ -704,7 +715,7 @@ namespace dlib
                 sigma = trans(phi)*phi/var;
                 for (long r = 0; r < alpha.nr(); ++r)
                     sigma(r,r) += alpha(r);
-                sigma = pinv(sigma);
+                sigma = inv(sigma);
                 weights = sigma*trans(phi)*t/var;  
 
 
@@ -753,14 +764,7 @@ namespace dlib
                     Q(i) = tempv2*t - tempv2*tempv; 
                 }
 
-                const long selected_idx = find_next_best_alpha_to_update(S,Q,alpha,active_bases, search_all_alphas);
-
-                // if we just did a search of all the alphas and it still put is back
-                // into the current active set then we are done.
-                if (search_all_alphas == true && selected_idx != -1 && active_bases(selected_idx) != -1)
-                {
-                    break;
-                }
+                const long selected_idx = rvm_helpers::find_next_best_alpha_to_update(S,Q,alpha,active_bases, search_all_alphas, eps);
 
                 // if find_next_best_alpha_to_update didn't find any good alpha to update
                 if (selected_idx == -1)
@@ -796,7 +800,7 @@ namespace dlib
                         alpha(idx) = s*s/(q*q-s);
 
                     }
-                    else if (phi.nc() > 1) // don't ever remove the last basis vector from phi
+                    else 
                     {
                         // the new alpha value is infinite so remove the selected alpha from our model
                         active_bases(selected_idx) = -1; 
@@ -811,21 +815,6 @@ namespace dlib
                             {
                                 active_bases(i) -= 1;
                             }
-                        }
-                    }
-                    else
-                    {
-                        if (search_all_alphas == true)
-                        {
-                            // In this case we are saying we are done because the wide search
-                            // told us to remove the only basis function we have.  So just stop
-                            break;
-                        }
-                        else
-                        {
-                            // we tried to remove the last basis vector in phi 
-                            // so lets make sure we do a round of wide search next time.
-                            ticker = rounds_of_narrow_search;
                         }
                     }
                 }
@@ -915,100 +904,6 @@ namespace dlib
             const double temp2 = trans(phi)*t;
 
             return temp/( temp2*temp2/temp + var);
-        }
-
-    // ------------------------------------------------------------------------------------
-
-        long find_next_best_alpha_to_update (
-            const scalar_vector_type& S,
-            const scalar_vector_type& Q,
-            const scalar_vector_type& alpha,
-            const matrix<long,0,1,mem_manager_type>& active_bases,
-            const bool search_all_alphas
-        ) const
-        /*!
-            ensures
-                - if (we can find another alpha to update) then
-                    - returns the index of said alpha 
-                - else
-                    - returns -1
-        !*/
-        {
-            // now use S and Q to find next alpha to update.  What
-            // we want to do here is select the alpha to update that gives us
-            // the greatest improvement in marginal likelihood.
-            long selected_idx = -1;
-            scalar_type greatest_improvement = -1;
-            for (long i = 0; i < S.nr(); ++i)
-            {
-                // if we are currently limiting the search for the next alpha to update
-                // to the set in the active set then skip all non-active alphas.
-                if (search_all_alphas == false && active_bases(i) == -1)
-                    continue;
-
-
-                scalar_type value = -1;
-                // if i is currently in the active set
-                if (active_bases(i) >= 0)
-                {
-                    const long idx = active_bases(i);
-                    const scalar_type s = alpha(idx)*S(i)/(alpha(idx) - S(i));
-                    const scalar_type q = alpha(idx)*Q(i)/(alpha(idx) - S(i));
-
-                    if (q*q-s > 0)
-                    {
-                        // choosing this sample would mean doing an update of an 
-                        // existing alpha value.
-                        scalar_type new_alpha = s*s/(q*q-s);
-                        scalar_type cur_alpha = alpha(idx);
-                        new_alpha = 1/new_alpha;
-                        cur_alpha = 1/cur_alpha;
-
-                        // from equation 32 in the Tipping paper 
-                        value = Q(i)*Q(i)/(S(i) +  1/(new_alpha - cur_alpha) ) - 
-                            std::log(1 + S(i)*(new_alpha - cur_alpha));
-
-                    }
-                    else
-                    {
-                        // choosing this sample would mean the alpha value is infinite 
-                        // so we would remove the selected sample from our model.
-
-                        // from equation 37 in the Tipping paper 
-                        value = Q(i)*Q(i)/(S(i) - alpha(idx)) - 
-                            std::log(1-S(i)/alpha(idx));
-
-                    }
-                }
-                else
-                {
-                    const scalar_type s = S(i);
-                    const scalar_type q = Q(i);
-
-                    if (q*q-s > 0)
-                    {
-                        // choosing this sample would mean we would add the selected 
-                        // sample to our model.
-
-                        // from equation 27 in the Tipping paper 
-                        value = (Q(i)*Q(i)-S(i))/S(i) + std::log(S(i)/(Q(i)*Q(i)));
-                    }
-                }
-
-                if (value > greatest_improvement)
-                {
-                    greatest_improvement = value;
-                    selected_idx = i;
-                }
-            }
-
-            // If the greatest_improvement in marginal likelihood we would get is less
-            // than our epsilon then report that there isn't anything else to do.  But
-            // if it is big enough then return the selected_idx.
-            if (greatest_improvement > eps)
-                return selected_idx;
-            else
-                return -1;
         }
 
     // ------------------------------------------------------------------------------------
