@@ -897,6 +897,8 @@ namespace dlib
                   same but its width and height are modified
         !*/
 
+        void set_text (const std::wstring& str);
+        void set_text (const dlib::ustring& str);
         void set_text (
             const std::string& str
         );
@@ -907,32 +909,9 @@ namespace dlib
                   will display on the screen when the user hovers the mouse over it
         !*/
 
-        // overloads for wide character strings
-        void set_text (
-            const std::wstring& str
-        );
-
-        void set_text (
-            const dlib::ustring& str
-        );
-
-        const std::string text (
-        ) const;
-        /*!
-            ensures
-                - returns the text that is displayed inside this
-                  tooltip
-        !*/
-
-        const std::wstring wtext (
-        ) const;
-        /*!
-            ensures
-                - returns the text that is displayed inside this
-                  tooltip
-        !*/
-
-        const dlib::ustring utext (
+        const std::wstring  wtext () const;
+        const dlib::ustring utext () const;
+        const std::string   text (
         ) const;
         /*!
             ensures
