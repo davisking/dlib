@@ -31,6 +31,9 @@ namespace dlib
         ~thread_specific_data (
         )
         {
+            unregister_thread_end_handler(const_cast<thread_specific_data&>(*this),&thread_specific_data::thread_end_handler);
+
+            auto_mutex M(m);
             items.reset();
             while (items.move_next())
             {
@@ -94,8 +97,11 @@ namespace dlib
             thread_id_type junk;
             T* item;
             auto_mutex M(m);
-            items.remove(id,junk,item);
-            delete item;
+            if (items[id])
+            {
+                items.remove(id,junk,item);
+                delete item;
+            }
         }
 
         mutable typename binary_search_tree<thread_id_type,T*>::kernel_2a items;

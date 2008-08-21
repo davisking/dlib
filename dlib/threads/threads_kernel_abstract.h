@@ -118,6 +118,26 @@ namespace dlib
     template <
         typename T
         >
+    void unregister_thread_end_handler (
+        T& obj,
+        void (T::*handler)()
+    );
+    /*!
+        requires
+            - handler == a valid member function pointer for class T
+        ensures
+            - Undoes all previous calls to register_thread_end_handler(obj,handler).  
+              So the given handler won't be called when any threads end.
+        throws
+            - std::bad_alloc
+              If this exception is thrown then the call to this function had no effect.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
     void register_program_ending_handler (
         T& obj,
         void (T::*handler)()

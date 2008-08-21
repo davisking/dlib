@@ -84,6 +84,32 @@ namespace dlib
             template <
                 typename T
                 >
+            void unregister_thread_end_handler (
+                T& obj,
+                void (T::*handler)()
+            )
+            {
+                member_function_pointer<>::kernel_1a mfp, junk_mfp;
+                mfp.set(obj,handler);
+
+                thread_id_type junk_id;
+
+                // find any member function pointers in the registry that point to the same
+                // thing as mfp and remove them
+                auto_mutex M(reg.m);
+                reg.reg.reset();
+                while (reg.reg.move_next())
+                {
+                    while (reg.reg.current_element_valid() && reg.reg.element().value() == mfp)
+                    {
+                        reg.reg.remove_current_element(junk_id, junk_mfp);
+                    }
+                }
+            }
+
+            template <
+                typename T
+                >
             void register_thread_end_handler (
                 T& obj,
                 void (T::*handler)()
@@ -200,6 +226,19 @@ namespace dlib
             );
 
         threads_kernel_shared::thread_pool().register_thread_end_handler(obj,handler);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    inline void unregister_thread_end_handler (
+        T& obj,
+        void (T::*handler)()
+    )
+    {
+        threads_kernel_shared::thread_pool().unregister_thread_end_handler(obj,handler);
     }
 
 // ----------------------------------------------------------------------------------------
