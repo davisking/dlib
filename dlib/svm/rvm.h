@@ -42,7 +42,7 @@ namespace dlib
         typedef decision_function<kernel_type> trained_function_type;
 
         rvm_trainer (
-        ) : eps(0.001)
+        ) : eps(0.0005)
         {
         }
 
@@ -190,6 +190,8 @@ namespace dlib
                     ++count;
                     if (count > 100)
                     {
+                        // jump us to where search_all_alphas will be set to true 
+                        ticker = rounds_of_narrow_search;
                         break;
                     }
 
@@ -197,7 +199,7 @@ namespace dlib
                     sigma = scale_columns(trans(phi),beta)*phi;
                     for (long r = 0; r < alpha.nr(); ++r)
                         sigma(r,r) += alpha(r);
-                    sigma = pinv(sigma);
+                    sigma = inv(sigma);
 
 
                     // compute the updated weights vector (t_hat = phi*mu_mp + inv(B)*(t-y))
@@ -223,13 +225,14 @@ namespace dlib
                 }
 
                 // check if we should do a full search for the best alpha to optimize
-                if (ticker == rounds_of_narrow_search)
+                if (ticker >= rounds_of_narrow_search)
                 {
                     // if the current alpha and weights are equal to what they were
                     // at the last time we were about to start a wide search then
                     // we are done.
                     if (equal(prev_alpha, alpha, eps) && equal(prev_weights, weights, eps))
                         break;
+
 
                     prev_alpha = alpha;
                     prev_weights = weights;
@@ -268,13 +271,6 @@ namespace dlib
 
                 const long selected_idx = find_next_best_alpha_to_update(S,Q,alpha,active_bases, search_all_alphas);
 
-                // if we just did a search of all the alphas and it still put is back
-                // into the current active set then we are done.
-                if (search_all_alphas == true && selected_idx != -1 && active_bases(selected_idx) != -1)
-                {
-                    break;
-                }
-
 
                 // if find_next_best_alpha_to_update didn't find any good alpha to update
                 if (selected_idx == -1)
@@ -308,7 +304,7 @@ namespace dlib
                         alpha(idx) = s*s/(q*q-s);
 
                     }
-                    else if (phi.nc() > 1) // don't ever remove the last basis vector 
+                    else 
                     {
                         // the new alpha value is infinite so remove the selected alpha from our model
                         active_bases(selected_idx) = -1; 
@@ -328,21 +324,6 @@ namespace dlib
                         // we changed the number of weights so we need to remember to 
                         // recompute the beta vector next time around the main loop.
                         recompute_beta = true;
-                    }
-                    else
-                    {
-                        if (search_all_alphas == true)
-                        {
-                            // In this case we are saying we are done because the wide search
-                            // told us to remove the only basis function we have.  So just stop
-                            break;
-                        }
-                        else
-                        {
-                            // we tried to remove the last basis vector in phi 
-                            // so lets make sure we do a round of wide search next time.
-                            ticker = rounds_of_narrow_search;
-                        }
                     }
                 }
                 else
@@ -458,13 +439,8 @@ namespace dlib
             scalar_type greatest_improvement = -1;
             for (long i = 0; i < S.nr(); ++i)
             {
-                // if we are currently limiting the search for the next alpha to update
-                // to the set in the active set then skip all non-active alphas.
-                if (search_all_alphas == false && active_bases(i) == -1)
-                    continue;
-
-
                 scalar_type value = -1;
+
                 // if i is currently in the active set
                 if (active_bases(i) >= 0)
                 {
@@ -474,19 +450,24 @@ namespace dlib
 
                     if (q*q-s > 0)
                     {
-                        // choosing this sample would mean doing an update of an 
-                        // existing alpha value.
-                        scalar_type new_alpha = s*s/(q*q-s);
-                        scalar_type cur_alpha = alpha(idx);
-                        new_alpha = 1/new_alpha;
-                        cur_alpha = 1/cur_alpha;
+                        // only update an existing alpha if this is a narrow search
+                        if (search_all_alphas == false)
+                        {
+                            // choosing this sample would mean doing an update of an 
+                            // existing alpha value.
+                            scalar_type new_alpha = s*s/(q*q-s);
+                            scalar_type cur_alpha = alpha(idx);
+                            new_alpha = 1/new_alpha;
+                            cur_alpha = 1/cur_alpha;
 
-                        // from equation 32 in the Tipping paper 
-                        value = Q(i)*Q(i)/(S(i) +  1/(new_alpha - cur_alpha) ) - 
-                            std::log(1 + S(i)*(new_alpha - cur_alpha));
+                            // from equation 32 in the Tipping paper 
+                            value = Q(i)*Q(i)/(S(i) +  1/(new_alpha - cur_alpha) ) - 
+                                std::log(1 + S(i)*(new_alpha - cur_alpha));
+                        }
 
                     }
-                    else
+                    // we only pick an alpha to remove if this is a wide search and it wasn't one of the recently added ones 
+                    else if (search_all_alphas && idx+2 < alpha.size() )  
                     {
                         // choosing this sample would mean the alpha value is infinite 
                         // so we would remove the selected sample from our model.
@@ -497,7 +478,7 @@ namespace dlib
 
                     }
                 }
-                else
+                else if (search_all_alphas)
                 {
                     const scalar_type s = S(i);
                     const scalar_type q = Q(i);
