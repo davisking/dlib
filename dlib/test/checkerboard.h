@@ -8,9 +8,10 @@
 namespace dlib
 {
 
+    template <typename scalar_type>
     void get_checkerboard_problem (
-        std::vector<matrix<double,2,1> >& x,
-        std::vector<double>& y,
+        std::vector<matrix<scalar_type,2,1> >& x,
+        std::vector<scalar_type>& y,
         const long num_samples,
         const long board_dimension = 8
     )
@@ -31,7 +32,7 @@ namespace dlib
         x.clear();
         y.clear();
 
-        matrix<double,2,1> sample;
+        matrix<scalar_type,2,1> sample;
         for (long i = 0; i < num_samples; ++i)
         {
             sample(0) = rnd.get_random_double();
