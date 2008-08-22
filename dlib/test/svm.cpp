@@ -177,7 +177,7 @@ namespace
         rvm_test.set_kernel(test.get_kernel());
         rbf_network_trainer<kernel_type> rbf_test;
         rbf_test.set_kernel(test.get_kernel());
-        rbf_test.set_num_centers(10);
+        rbf_test.set_num_centers(13);
 
         print_spinner();
         std::vector<sample_type> samples;
@@ -371,20 +371,20 @@ namespace
         DLIB_CASSERT(num_rv <= 14, "");
         DLIB_CASSERT(num_sv <= 35, "");
 
-        decision_function<kernel_type> df = reduced2(trainer, 15).train(x,y);
+        decision_function<kernel_type> df = reduced2(trainer, 19).train(x,y);
         print_spinner();
 
         matrix<scalar_type> svm_reduced_error = test_binary_decision_function(df, x, y);
         print_spinner();
-        DLIB_CASSERT(mean(svm_reduced_error) > 0.9, "");
         dlog << LDEBUG << "svm reduced test error: " << svm_reduced_error;
         dlog << LDEBUG << "svm reduced num sv: " << df.support_vectors.size();
+        DLIB_CASSERT(mean(svm_reduced_error) > 0.9, "");
 
         svm_cv = cross_validate_trainer(reduced(trainer,30), x,y, 4);
         dlog << LDEBUG << "svm reduced cv: " << svm_cv;
         DLIB_CASSERT(mean(svm_cv) > 0.9, svm_cv);
 
-        DLIB_CASSERT(df.support_vectors.size() == 15,"");
+        DLIB_CASSERT(df.support_vectors.size() == 19,"");
         dlog << LINFO << "   end test_binary_classification()";
     }
 
