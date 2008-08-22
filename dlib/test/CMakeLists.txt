@@ -60,6 +60,7 @@ set (tests
    static_map.cpp
    static_set.cpp
    string.cpp
+   svm.cpp
    threads.cpp
    timer.cpp
    tokenizer.cpp
