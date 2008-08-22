@@ -1414,7 +1414,7 @@ namespace
             // make sure the multiply optimizations aren't messing things up
             DLIB_CASSERT(trans(i)*i == tmp(trans(i)*i),"");
             DLIB_CASSERT(equal(trans(a)*a , tmp(trans(a)*a), 1e-11),max(abs(trans(a)*a - tmp(trans(a)*a))));
-            DLIB_CASSERT(equal(trans(b)*b , tmp(trans(b)*b), 1e-3),max(abs(trans(b)*b - tmp(trans(b)*b))));
+            DLIB_CASSERT(equal(trans(b)*b , tmp(trans(b)*b), 1e-3f),max(abs(trans(b)*b - tmp(trans(b)*b))));
         }
 
     }
