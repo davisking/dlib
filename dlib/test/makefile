@@ -73,6 +73,7 @@ SRC += stack.cpp
 SRC += static_map.cpp
 SRC += static_set.cpp
 SRC += string.cpp
+SRC += svm.cpp
 SRC += threads.cpp
 SRC += timer.cpp
 SRC += tokenizer.cpp
