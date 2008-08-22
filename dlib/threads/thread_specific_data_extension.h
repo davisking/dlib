@@ -26,12 +26,26 @@ namespace dlib
     public:
 
         thread_specific_data (
-        ){}
+        )
+        {
+            thread_end_handler_calls_left = 0;
+        }
 
         ~thread_specific_data (
         )
         {
-            unregister_thread_end_handler(const_cast<thread_specific_data&>(*this),&thread_specific_data::thread_end_handler);
+            // We should only call the unregister_thread_end_handler function if there are
+            // some outstanding callbacks we expect to get.  Otherwise lets avoid calling it
+            // since the dlib state that maintains the registered thread end handlers may have
+            // been destructed already (since the program might be in the process of terminating).
+            bool call_unregister = false;
+            m.lock();
+            if (thread_end_handler_calls_left > 0)
+                call_unregister = true;
+            m.unlock();
+
+            if (call_unregister)
+                unregister_thread_end_handler(const_cast<thread_specific_data&>(*this),&thread_specific_data::thread_end_handler);
 
             auto_mutex M(m);
             items.reset();
@@ -74,7 +88,10 @@ namespace dlib
                     in_tree = true;
 
                     if (is_dlib_thread(id))
+                    {
                         register_thread_end_handler(const_cast<thread_specific_data&>(*this),&thread_specific_data::thread_end_handler);
+                        ++thread_end_handler_calls_left;
+                    }
                 }
                 catch (...)
                 {
@@ -97,6 +114,7 @@ namespace dlib
             thread_id_type junk;
             T* item;
             auto_mutex M(m);
+            --thread_end_handler_calls_left;
             if (items[id])
             {
                 items.remove(id,junk,item);
@@ -106,6 +124,7 @@ namespace dlib
 
         mutable typename binary_search_tree<thread_id_type,T*>::kernel_2a items;
         mutex m;
+        mutable long thread_end_handler_calls_left;
 
         // restricted functions
         thread_specific_data(thread_specific_data&);        // copy constructor
