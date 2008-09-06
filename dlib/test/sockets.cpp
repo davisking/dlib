@@ -18,8 +18,8 @@ namespace  {
     using namespace dlib;
     using namespace std;
 
-    dlib::mutex m;
-    dlib::signaler s(m);
+    dlib::mutex gm;
+    dlib::signaler gs(gm);
     const char magic_num = 42;
     const int min_bytes_sent = 10000;
     int assigned_port;
@@ -40,9 +40,9 @@ namespace  {
         void on_listening_port_assigned (
         )
         {
-            auto_mutex M(m);
+            auto_mutex M(gm);
             assigned_port = get_listening_port();
-            s.broadcast();
+            gs.broadcast();
         }
 
 
@@ -112,9 +112,9 @@ namespace  {
             {
                 dlog << LTRACE << "enter thread";
                 {
-                    auto_mutex M(::m);
+                    auto_mutex M(gm);
                     while (assigned_port == 0)
-                        ::s.wait();
+                        gs.wait();
                 }
 
                 int status;

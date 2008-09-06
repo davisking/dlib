@@ -66,10 +66,15 @@ namespace dlib
             unsigned long count;
         };
 
+
+    public:
+
+        struct private_constructor{};
         inline file (
             const std::string& name,
             const std::string& full_name,
-            const uint64 file_size
+            const uint64 file_size,
+            private_constructor
         )
         {
             state = new data;
@@ -79,7 +84,7 @@ namespace dlib
             state->full_name = full_name;
         }
 
-    public:
+
         class file_not_found : public error { 
             public: file_not_found(const std::string& s): error(s){}
         };
@@ -181,16 +186,13 @@ namespace dlib
                 is_root()          == state->name.size() == 0
 
         !*/
-        struct data
-        {
-            std::string name;
-            std::string full_name;
-            unsigned long count;
-        };
 
+    public:
+        struct private_constructor{};
         inline directory (
             const std::string& name,
-            const std::string& full_name
+            const std::string& full_name,
+            private_constructor
         )
         {
             state = new data;
@@ -199,7 +201,12 @@ namespace dlib
             state->full_name = full_name;
         }
 
-    public:
+        struct data
+        {
+            std::string name;
+            std::string full_name;
+            unsigned long count;
+        };
 
         class dir_not_found : public error {
             public: dir_not_found(const std::string& s):error(s){}
@@ -242,28 +249,14 @@ namespace dlib
         template <
             typename queue_of_files
             >
-        typename enable_if<is_std_vector<queue_of_files>,void>::type get_files (
-            queue_of_files& files
-        ) const;
-
-        template <
-            typename queue_of_files
-            >
-        typename disable_if<is_std_vector<queue_of_files>,void>::type get_files (
+        void get_files (
             queue_of_files& files
         ) const;
 
         template <
             typename queue_of_dirs
             >
-        typename enable_if<is_std_vector<queue_of_dirs>,void>::type get_dirs (
-            queue_of_dirs& dirs
-        ) const;
-
-        template <
-            typename queue_of_dirs
-            >
-        typename disable_if<is_std_vector<queue_of_dirs>,void>::type get_dirs (
+        void get_dirs (
             queue_of_dirs& dirs
         ) const;
 
@@ -351,39 +344,17 @@ namespace dlib
     template <
         typename queue_of_files
         >
-    typename enable_if<is_std_vector<queue_of_files>,void>::type directory::
-    get_files (
+    typename disable_if<is_std_vector<queue_of_files>,void>::type
+    directory_helper_get_files (
+        const directory::data* state,
         queue_of_files& files
-    ) const
-    {
-        queue<file>::kernel_2a temp_files;
-        get_files(temp_files);
-
-        files.clear();
-
-        // copy the queue of files into the vector
-        temp_files.reset();
-        while (temp_files.move_next())
-        {
-            files.push_back(temp_files.element());
-        }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename queue_of_files
-        >
-    typename disable_if<is_std_vector<queue_of_files>,void>::type directory::
-    get_files (
-        queue_of_files& files
-    ) const
+    ) 
     {
         using namespace std;
 
         files.clear();
         if (state->full_name.size() == 0)
-            throw listing_error("This directory object currently doesn't represent any directory.");
+            throw directory::listing_error("This directory object currently doesn't represent any directory.");
 
         DIR* ffind = 0;
         struct dirent* data;
@@ -393,14 +364,14 @@ namespace dlib
         {
             string path = state->full_name;
             // ensure that the path ends with a separator
-            if (path[path.size()-1] != get_separator())
-                path += get_separator();
+            if (path[path.size()-1] != directory::get_separator())
+                path += directory::get_separator();
 
             // get a handle to something we can search with
             ffind = opendir(state->full_name.c_str());
             if (ffind == 0)
             {
-                throw listing_error("Unable to list the contents of " + state->full_name);
+                throw directory::listing_error("Unable to list the contents of " + state->full_name);
             }
 
             while(true)
@@ -417,7 +388,7 @@ namespace dlib
                     else
                     {
                         // there was an error
-                        throw listing_error("Unable to list the contents of " + state->full_name);
+                        throw directory::listing_error("Unable to list the contents of " + state->full_name);
                     }                
                 }
 
@@ -430,7 +401,7 @@ namespace dlib
                     char buf[PATH_MAX];
                     ssize_t temp = readlink((path+data->d_name).c_str(),buf,sizeof(buf));
                     if (temp == -1)                    
-                        throw listing_error("Unable to list the contents of " + state->full_name);
+                        throw directory::listing_error("Unable to list the contents of " + state->full_name);
                     else
                         file_size = static_cast<uint64>(temp);
                 }
@@ -445,7 +416,8 @@ namespace dlib
                     file temp(
                         data->d_name,
                         path+data->d_name,
-                        file_size
+                        file_size,
+                        file::private_constructor()
                         );
                     files.enqueue(temp);
                 }
@@ -481,41 +453,60 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename queue_of_dirs
+        typename queue_of_files
         >
-    typename enable_if<is_std_vector<queue_of_dirs>,void>::type directory::
-    get_dirs (
-        queue_of_dirs& dirs
-    ) const
+    typename enable_if<is_std_vector<queue_of_files>,void>::type 
+    directory_helper_get_files (
+        const directory::data* state,
+        queue_of_files& files
+    ) 
     {
-        queue<directory>::kernel_2a temp_dirs;
-        get_dirs(temp_dirs);
+        queue<file>::kernel_2a temp_files;
+        directory_helper_get_files(state,temp_files);
 
-        dirs.clear();
+        files.clear();
 
-        // copy the queue of dirs into the vector
-        temp_dirs.reset();
-        while (temp_dirs.move_next())
+        // copy the queue of files into the vector
+        temp_files.reset();
+        while (temp_files.move_next())
         {
-            dirs.push_back(temp_dirs.element());
+            files.push_back(temp_files.element());
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename queue_of_files
+        >
+    void directory::
+    get_files (
+        queue_of_files& files
+    ) const
+    {
+        // the reason for this indirection here is because it avoids a bug in
+        // the cygwin version of gcc
+        directory_helper_get_files(state,files);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename queue_of_dirs
         >
-    typename disable_if<is_std_vector<queue_of_dirs>,void>::type directory::
-    get_dirs (
+    typename disable_if<is_std_vector<queue_of_dirs>,void>::type 
+    directory_helper_get_dirs (
+        const directory::data* state,
         queue_of_dirs& dirs
-    ) const
+    ) 
     {
         using namespace std;
 
         dirs.clear();
         if (state->full_name.size() == 0)
-            throw listing_error("This directory object currently doesn't represent any directory.");
+            throw directory::listing_error("This directory object currently doesn't represent any directory.");
 
         DIR* ffind = 0;
         struct dirent* data;
@@ -525,14 +516,14 @@ namespace dlib
         {
             string path = state->full_name;
             // ensure that the path ends with a separator
-            if (path[path.size()-1] != get_separator())
-                path += get_separator();
+            if (path[path.size()-1] != directory::get_separator())
+                path += directory::get_separator();
 
             // get a handle to something we can search with
             ffind = opendir(state->full_name.c_str());
             if (ffind == 0)
             {
-                throw listing_error("Unable to list the contents of " + state->full_name);
+                throw directory::listing_error("Unable to list the contents of " + state->full_name);
             }
 
             while(true)
@@ -549,7 +540,7 @@ namespace dlib
                     else
                     {
                         // there was an error
-                        throw listing_error("Unable to list the contents of " + state->full_name);
+                        throw directory::listing_error("Unable to list the contents of " + state->full_name);
                     }                
                 }
 
@@ -567,7 +558,7 @@ namespace dlib
                     dtemp != ".." )
                 {
                     // this is a directory so add it to dirs
-                    directory temp(dtemp,path+dtemp);
+                    directory temp(dtemp,path+dtemp, directory::private_constructor());
                     dirs.enqueue(temp);
                 }
             } // while (true)
@@ -598,7 +589,49 @@ namespace dlib
             throw;
         }
     }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename queue_of_dirs
+        >
+    typename enable_if<is_std_vector<queue_of_dirs>,void>::type 
+    directory_helper_get_dirs (
+        const directory::data* state,
+        queue_of_dirs& dirs
+    ) 
+    {
+        queue<directory>::kernel_2a temp_dirs;
+        directory_helper_get_dirs(state,temp_dirs);
+
+        dirs.clear();
+
+        // copy the queue of dirs into the vector
+        temp_dirs.reset();
+        while (temp_dirs.move_next())
+        {
+            dirs.push_back(temp_dirs.element());
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+
+    template <
+        typename queue_of_dirs
+        >
+    void directory::
+    get_dirs (
+        queue_of_dirs& dirs
+    ) const
+    {
+        // the reason for this indirection here is because it avoids a bug in
+        // the cygwin version of gcc
+        directory_helper_get_dirs(state,dirs);
+    }
  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
