@@ -3,6 +3,8 @@
 #ifndef DLIB_IS_KINd_H_
 #define DLIB_IS_KINd_H_
 
+#include <vector>
+
 namespace dlib
 {
     /*!
@@ -53,6 +55,31 @@ namespace dlib
                 - is_matrix<T>::value == false
         !*/
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    struct is_std_vector : public default_is_kind_value  
+    {
+        /*!
+            - if (T is an implementation of the standard C++ std::vector object) then
+                - is_std_vector<T>::value == true
+            - else
+                - is_std_vector<T>::value == false
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//                              Implementation details
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename alloc> 
+    struct is_std_vector<std::vector<T,alloc> >         { const static bool value = true; };
+    template <typename T> struct is_std_vector<T&>      { const static bool value = is_std_vector<T>::value; };
+    template <typename T> struct is_std_vector<const T&>{ const static bool value = is_std_vector<T>::value; };
+    template <typename T> struct is_std_vector<const T> { const static bool value = is_std_vector<T>::value; };
 
 // ----------------------------------------------------------------------------------------
 

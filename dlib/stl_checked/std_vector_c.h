@@ -8,6 +8,7 @@
 #include "../assert.h"
 #include "std_vector_c_abstract.h"
 #include "../serialize.h"
+#include "../is_kind.h"
 
 namespace dlib
 {
@@ -337,6 +338,11 @@ namespace dlib
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std_vector_c"); }
     }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename alloc> 
+    struct is_std_vector<std_vector_c<T,alloc> >        { const static bool value = true; };
 
 // ----------------------------------------------------------------------------------------
 
