@@ -26,6 +26,10 @@
 #define stat64 stat
 #endif
 
+#include <vector>
+#include "../stl_checked.h"
+#include "../enable_if.h"
+#include "../queue.h"
 
 namespace dlib
 {
@@ -237,17 +241,29 @@ namespace dlib
 
         template <
             typename queue_of_files
-            // Is an implementation of queue/queue_kernel_abstract.h with T set to file.
             >
-        void get_files (
+        typename enable_if<is_std_vector<queue_of_files>,void>::type get_files (
+            queue_of_files& files
+        ) const;
+
+        template <
+            typename queue_of_files
+            >
+        typename disable_if<is_std_vector<queue_of_files>,void>::type get_files (
             queue_of_files& files
         ) const;
 
         template <
             typename queue_of_dirs
-            // Is an implementation of queue/queue_kernel_abstract.h with T set to directory.
             >
-        void get_dirs (
+        typename enable_if<is_std_vector<queue_of_dirs>,void>::type get_dirs (
+            queue_of_dirs& dirs
+        ) const;
+
+        template <
+            typename queue_of_dirs
+            >
+        typename disable_if<is_std_vector<queue_of_dirs>,void>::type get_dirs (
             queue_of_dirs& dirs
         ) const;
 
@@ -335,7 +351,30 @@ namespace dlib
     template <
         typename queue_of_files
         >
-    void directory::
+    typename enable_if<is_std_vector<queue_of_files>,void>::type directory::
+    get_files (
+        queue_of_files& files
+    ) const
+    {
+        queue<file>::kernel_2a temp_files;
+        get_files(temp_files);
+
+        files.clear();
+
+        // copy the queue of files into the vector
+        temp_files.reset();
+        while (temp_files.move_next())
+        {
+            files.push_back(temp_files.element());
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename queue_of_files
+        >
+    typename disable_if<is_std_vector<queue_of_files>,void>::type directory::
     get_files (
         queue_of_files& files
     ) const
@@ -444,7 +483,30 @@ namespace dlib
     template <
         typename queue_of_dirs
         >
-    void directory::
+    typename enable_if<is_std_vector<queue_of_dirs>,void>::type directory::
+    get_dirs (
+        queue_of_dirs& dirs
+    ) const
+    {
+        queue<directory>::kernel_2a temp_dirs;
+        get_dirs(temp_dirs);
+
+        dirs.clear();
+
+        // copy the queue of dirs into the vector
+        temp_dirs.reset();
+        while (temp_dirs.move_next())
+        {
+            dirs.push_back(temp_dirs.element());
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename queue_of_dirs
+        >
+    typename disable_if<is_std_vector<queue_of_dirs>,void>::type directory::
     get_dirs (
         queue_of_dirs& dirs
     ) const
@@ -542,13 +604,25 @@ namespace dlib
     template <
         typename queue_of_dir
         >
-    void get_filesystem_roots (
+    typename disable_if<is_std_vector<queue_of_dir>,void>::type get_filesystem_roots (
         queue_of_dir& roots
     )
     {
         roots.clear();
         directory dir("/");
         roots.enqueue(dir);
+    }
+
+    template <
+        typename queue_of_dir
+        >
+    typename enable_if<is_std_vector<queue_of_dir>,void>::type get_filesystem_roots (
+        const std::vector<directory>& roots
+    )
+    {
+        roots.clear();
+        directory dir("/");
+        roots.push_back(dir);
     }
 
 // ----------------------------------------------------------------------------------------

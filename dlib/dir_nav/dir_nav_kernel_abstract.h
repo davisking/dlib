@@ -4,6 +4,7 @@
 #ifdef DLIB_DIR_NAV_KERNEl_ABSTRACT_
 
 #include <string>
+#include <vector>
 #include "../uintn.h"
 #include "../algs.h"
 
@@ -23,12 +24,14 @@ namespace dlib
 
     template <
         typename queue_of_dir
-        // Is an implementation of queue/queue_kernel_abstract.h with T set to directory.
         >
     void get_filesystem_roots (
         queue_of_dir& roots
     );
     /*!
+        requires
+            - queue_of_dirs == an implementation of queue/queue_kernel_abstract.h with T 
+              set to directory or a std::vector<directory> or dlib::std_vector_c<directory>.
         ensures
             - #roots == a queue containing directories that represent all the roots 
               of the filesystem on this machine.   (e.g. in windows you have c:\, d:\ 
@@ -254,12 +257,14 @@ namespace dlib
 
         template <
             typename queue_of_files
-            // Is an implementation of queue/queue_kernel_abstract.h with T set to file.
             >
         void get_files (
             queue_of_files& files
         ) const;
         /*!
+            requires
+                - queue_of_files == an implementation of queue/queue_kernel_abstract.h with T 
+                  set to file or a std::vector<file> or dlib::std_vector_c<file>.
             ensures
                 - #files == A queue containing all the files present in this directory.
                   (Note that symbolic links will not have been resolved in the names 
@@ -280,12 +285,14 @@ namespace dlib
 
         template <
             typename queue_of_dirs
-            // Is an implementation of queue/queue_kernel_abstract.h with T set to directory.
             >
         void get_dirs (
             queue_of_dirs& dirs
         ) const;
         /*!
+            requires
+                - queue_of_dirs == an implementation of queue/queue_kernel_abstract.h with T 
+                  set to directory or a std::vector<directory> or dlib::std_vector_c<directory>.
             ensures
                 - #dirs == a queue containing all the directories present in this directory.
                   (note that symbolic links will not have been resolved in the names 
