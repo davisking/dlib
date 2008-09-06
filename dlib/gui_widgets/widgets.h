@@ -1819,8 +1819,11 @@ namespace dlib
                     path = old_path;
                     cur_dir = old_cur_dir;
                 }
+                else
+                {
 
                 sob[cur_dir]->set_checked();
+                }
             }
 
             void on_dirs_click (
