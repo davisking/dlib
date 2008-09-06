@@ -676,8 +676,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------    
 
-    int 
-    create_listener (
+    int create_listener (
+        scoped_ptr<listener>& new_listener,
+        unsigned short port,
+        const std::string& ip
+    )
+    {
+        new_listener.reset();
+        listener* temp;
+        int status = create_listener(temp,port,ip);
+
+        if (status == 0)
+            new_listener.reset(temp);
+
+        return status;
+    }
+
+    int create_listener (
         listener*& new_listener,
         unsigned short port,
         const std::string& ip
@@ -779,6 +794,24 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    int create_connection (
+        scoped_ptr<connection>& new_connection,
+        unsigned short foreign_port, 
+        const std::string& foreign_ip, 
+        unsigned short local_port,
+        const std::string& local_ip
+    )
+    {
+        new_connection.reset();
+        connection* temp;
+        int status = create_connection(temp,foreign_port, foreign_ip, local_port, local_ip);
+
+        if (status == 0)
+            new_connection.reset(temp);
+
+        return status;
+    }
 
     int 
     create_connection ( 

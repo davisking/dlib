@@ -110,6 +110,16 @@ namespace dlib
             - returns OTHER_ERROR if some other error occurred
     !*/
 
+    int create_listener (
+        scoped_ptr<listener>& new_listener,
+        unsigned short port,
+        const std::string& ip = ""
+    );
+    /*!
+        This function is just an overload of the above function but it gives you a
+        scoped_ptr smart pointer instead of a C pointer.
+    !*/
+
     int create_connection ( 
         connection*& new_connection,
         unsigned short foreign_port, 
@@ -136,6 +146,18 @@ namespace dlib
             - returns PORTINUSE if the specified local port was already in use 
             - returns OTHER_ERROR if some other error occurred
         !*/
+
+    int create_connection ( 
+        scoped_ptr<connection>& new_connection,
+        unsigned short foreign_port, 
+        const std::string& foreign_ip, 
+        unsigned short local_port = 0,
+        const std::string& local_ip = ""
+    );
+    /*!
+        This function is just an overload of the above function but it gives you a
+        scoped_ptr smart pointer instead of a C pointer.
+    !*/
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -200,7 +222,7 @@ namespace dlib
 
         void* user_data;
         /*!
-            This pointer is provided so that the client programmer may easily assocaite
+            This pointer is provided so that the client programmer may easily associate
             some data with a connection object.  You can really do whatever you want
             with it.  Initially user_data is 0.
         !*/
@@ -372,7 +394,7 @@ namespace dlib
 
                 - returns 0 if accept() was successful                
                 - returns TIMEOUT if timeout milliseconds have elapsed 
-                - returns OTHER_ERROR if an error has occured 
+                - returns OTHER_ERROR if an error has occurred 
         !*/
 
         unsigned short get_listening_port (
