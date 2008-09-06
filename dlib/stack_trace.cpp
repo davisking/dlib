@@ -21,6 +21,11 @@ namespace dlib
     {
         struct stack_tracer_data
         {
+            stack_tracer_data(
+            ) :  funct_name(0),
+                 file_name(0),
+                 line_number(0)
+            {}
             const char* funct_name;
             const char* file_name;
             int line_number;

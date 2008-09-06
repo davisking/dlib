@@ -111,8 +111,8 @@ namespace dlib
         )
         {
             const thread_id_type id = get_thread_id();
-            thread_id_type junk;
-            T* item;
+            thread_id_type junk = 0;
+            T* item = 0;
             auto_mutex M(m);
             --thread_end_handler_calls_left;
             if (items[id])
