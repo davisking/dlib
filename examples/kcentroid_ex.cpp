@@ -46,7 +46,22 @@ int main()
     // smaller values give better results but cause the algorithm to run slower.  You just have
     // to play with it to decide what balance of speed and accuracy is right for your problem.
     // Here we have set it to 0.01.
+    //
+    // Also, since we are using the radial basis kernel we have to pick the RBF width parameter.
+    // Here we have it set to 0.1.  But in general, a reasonable way of picking this value is
+    // to start with some initial guess and to just run the algorithm.  Then print out 
+    // test.dictionary_size() to see how many support vectors the kcentroid object is using.
+    // And a good rule of thumb is that you should have somewhere in the range of 10-100 
+    // support vectors.  So if you aren't in that range then you can change the RBF parameter.
+    // Making it smaller will decrease the dictionary size and making it bigger will increase
+    // the dictionary size.   
+    //
+    // So what I often do is I set the kcentroid's second parameter to 0.01 or 0.001.  Then
+    // I find an RBF kernel parameter that gives me the number of support vectors that I 
+    // feel is appropriate for the problem I'm trying to solve.  Again, this just comes down
+    // to playing with it and getting a feel for how things work.  
     kcentroid<kernel_type> test(kernel_type(0.1),0.01);
+
 
     // now we train our object on a few samples of the sinc function.
     sample_type m;
