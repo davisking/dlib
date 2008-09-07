@@ -41,6 +41,7 @@ namespace dlib
             Window hwnd;
             Time last_click_time;
             XIC xic;
+            XFontSet fs;
         };
 
         typedef sync_extension<binary_search_tree<Window,base_window*>::kernel_1a>::kernel_1a 
@@ -48,7 +49,7 @@ namespace dlib
 
         int depth;
         Display* disp;
-        static XIM xim;
+        static XIM xim = NULL;
         static XIMStyle xim_style;
         static Screen* screen;
 
@@ -379,6 +380,7 @@ namespace dlib
                     auto_mutex window_table_locker(window_table.get_mutex());
 
                     XEvent ev;                
+                    memset(&ev, 0, sizeof(ev));
                     while (XPending(disp) == 0){
                         window_table.get_mutex().unlock();
                         // wait until receiving X11 next event
@@ -1032,7 +1034,15 @@ namespace dlib
                         XFlush(disp);
 
                         wait();
+
+                        if (xim != NULL)
+                        {
+                            XCloseIM(xim);
+                        }
+
                         XCloseDisplay(disp);
+
+
                     }
                     else
                     {
@@ -1134,6 +1144,7 @@ namespace dlib
                             }
                             if (xim_style) break;
                         }
+                        XFree(xim_styles);
                     }
 
                     // make this window just so we can send messages to it and trigger
@@ -1571,10 +1582,10 @@ namespace dlib
             char fontset[256];
             const long native_font_height = 12;
             sprintf(fontset, "-*-*-medium-r-normal--%lu-*-*-*-", native_font_height);
-            XFontSet fs = XCreateFontSet(gui_core_kernel_2_globals::disp, fontset, &mlist, &mcount, &def_str);
+            x11_stuff.fs = XCreateFontSet(gui_core_kernel_2_globals::disp, fontset, &mlist, &mcount, &def_str);
             xpoint.x = 0;
             xpoint.y = 0;
-            xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, XNFontSet, fs, NULL);
+            xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, XNFontSet, x11_stuff.fs, NULL);
             x11_stuff.xic = XCreateIC(
                 gui_core_kernel_2_globals::xim,
                 XNInputStyle, gui_core_kernel_2_globals::xim_style,
@@ -1583,6 +1594,7 @@ namespace dlib
                 NULL
                 );
             XFree(xva_nlist);
+            XFreeStringList(mlist);
         }
 
         Window temp = x11_stuff.hwnd;
@@ -1651,10 +1663,11 @@ namespace dlib
             has_been_destroyed = true;
 
             gui_core_kernel_2_globals::window_table.destroy(x11_stuff.hwnd);           
-            if (x11_stuff.xic)
+            if (gui_core_kernel_2_globals::xim != NULL)
             {
                 XDestroyIC(x11_stuff.xic);
                 x11_stuff.xic = 0;
+                XFreeFontSet(gui_core_kernel_2_globals::disp,x11_stuff.fs);
             }
 
             XDestroyWindow(gui_core_kernel_2_globals::disp,x11_stuff.hwnd);
