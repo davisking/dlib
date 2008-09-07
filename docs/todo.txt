@@ -4,9 +4,6 @@ maybe add a function to find the distance between two column vectors
 
 
 
-reader and directory capable of using std::vector
-
-
 
 
 move all the function bodies in widgets.h to cpp.

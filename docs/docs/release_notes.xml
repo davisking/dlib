@@ -16,8 +16,21 @@ New Stuff:
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a bug in the tooltip widget
+   - Fixed the cmake option to toggle the ENABLE_ASSERTS macro
+   - Fixed some bugs in the rvm
+   - Fixed the serialization code for the kkmeans object so that it actually 
+     works
+   - Fixed a bug that can trigger when the thread_specific_data object is 
+     destructed
+   - Fixed a bug in the directory navigation gui.  If you tried to go
+     into a drive on windows that wasn't mounted you got an error.
+     This is now fixed.
 
 Other:
+   - Made the dir_nav stuff work with std::vector and dlib::std_vector_c 
+     as well as dlib::queue objects.
+   - Generally cleaned up a bunch of things
 
 </current>
 

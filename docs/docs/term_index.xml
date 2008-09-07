@@ -597,6 +597,7 @@
          <term link="metaprogramming.html#static_switch" name="static_switch"/>
          <term link="metaprogramming.html#is_graph" name="is_graph"/>
          <term link="metaprogramming.html#is_matrix" name="is_matrix"/>
+         <term link="metaprogramming.html#is_std_vector" name="is_std_vector"/>
          <term link="metaprogramming.html#is_directed_graph" name="is_directed_graph"/>
          <term link="metaprogramming.html#is_built_in_scalar_type" name="is_built_in_scalar_type"/>
          <term link="metaprogramming.html#assign_zero_if_built_in_scalar_type" name="assign_zero_if_built_in_scalar_type"/>
