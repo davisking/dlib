@@ -111,7 +111,7 @@ namespace dlib
         );
         /*!
             requires
-                - matrix_type and matrix_type2 must either be dlib::matrix objects or convertable to dlib::matrix
+                - matrix_type and matrix_type2 must either be dlib::matrix objects or convertible to dlib::matrix
                   via vector_to_matrix()
                 - matrix_type::type == sample_type  (i.e. matrix_type should contain sample_type objects)
                 - matrix_type2::type == sample_type (i.e. matrix_type2 should contain sample_type objects)
@@ -122,8 +122,8 @@ namespace dlib
                 - performs k-means clustering of the given set of samples.  The initial center points
                   are taken from the initial_centers argument.
                 - loops over the data and continues to refine the clustering until either less than 
-                  get_min_change() fraction of the cluster centers move or we have done max_iter iterations 
-                  over the data.
+                  get_min_change() fraction of the data points change clusters or we have done max_iter 
+                  iterations over the data.
                 - After this function finishes you can call the operator() function below
                   to determine which centroid a given sample is closest to.
         !*/
@@ -153,8 +153,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the minimum fraction of centers that need to change
-                  in an iteration of kmeans for the algorithm to keep going.
+                - returns the minimum fraction of data points that need to change
+                  centers in an iteration of kmeans for the algorithm to keep going.
         !*/
 
         void swap (

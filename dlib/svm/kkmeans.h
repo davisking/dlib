@@ -101,7 +101,7 @@ namespace dlib
         void train (
             const T& samples,
             const U& initial_centers,
-            long max_iter = 1000000
+            long max_iter = 1000
         )
         {
             do_train(vector_to_matrix(samples),vector_to_matrix(initial_centers),max_iter);
@@ -132,6 +132,13 @@ namespace dlib
             scalar_type min_change_
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( 0 <= min_change_ < 1,
+                "\tvoid kkmeans::set_min_change()"
+                << "\n\tInvalid arguments to this function"
+                << "\n\tthis: " << this
+                << "\n\tmin_change_: " << min_change_ 
+                );
             min_change = min_change_;
         }
 
@@ -184,7 +191,7 @@ namespace dlib
         void do_train (
             const matrix_type& samples,
             const matrix_type2& initial_centers,
-            long max_iter = 1000000
+            long max_iter = 1000
         )
         {
             COMPILE_TIME_ASSERT((is_same_type<typename matrix_type::type, sample_type>::value));
@@ -214,10 +221,13 @@ namespace dlib
 
             // loop until the centers stabilize 
             long count = 0;
-            while (assignment_changed && count < max_iter)
+            const unsigned long min_num_change = static_cast<unsigned long>(min_change*samples.size());
+            unsigned long num_changed = min_num_change;
+            while (assignment_changed && count < max_iter && num_changed >= min_num_change)
             {
                 ++count;
                 assignment_changed = false;
+                num_changed = 0;
 
                 // loop over all the samples and assign them to their closest centers
                 for (long i = 0; i < samples.size(); ++i)
@@ -240,6 +250,7 @@ namespace dlib
                     {
                         assignments[i] = best_center;
                         assignment_changed = true;
+                        ++num_changed;
                     }
                 }
 
