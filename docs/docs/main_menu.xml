@@ -112,6 +112,10 @@
                   <link>rank_features_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Relevance_Vector_Machine</name>
+                  <link>rvm_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Support_Vector_Machine</name>
                   <link>svm_ex.cpp.html</link>
                </item>
