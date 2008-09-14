@@ -112,7 +112,11 @@
                   <link>rank_features_ex.cpp.html</link>
                </item>
                <item>
-                  <name>Relevance_Vector_Machine</name>
+                  <name>Relevance_Vector_Regression</name>
+                  <link>rvm_regression_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Relevance_Vector_Classification</name>
                   <link>rvm_ex.cpp.html</link>
                </item>
                <item>
