@@ -31,6 +31,7 @@ namespace dlib
             CONVENTION
                 - max_dictionary_size() == my_max_dictionary_size
                 - get_kernel() == kernel
+                - minimum_tolerance() == min_tolerance
                 - dictionary_size() == dictionary.size()
                 - get_dictionary() == vector_to_matrix(dictionary)
                 - K.nr() == dictionary.size()
@@ -56,11 +57,20 @@ namespace dlib
 
         linearly_independent_subset_finder (
             const kernel_type& kernel_, 
-            unsigned long max_dictionary_size_ 
+            unsigned long max_dictionary_size_,
+            scalar_type min_tolerance_ = 0.001
         ) : 
             kernel(kernel_), 
-            my_max_dictionary_size(max_dictionary_size_)
+            my_max_dictionary_size(max_dictionary_size_),
+            min_tolerance(min_tolerance_)
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(min_tolerance_ > 0,
+                "\tlinearly_independent_subset_finder()"
+                << "\n\tinvalid argument to constructor"
+                << "\n\tmin_tolerance_: " << min_tolerance_
+                << "\n\tthis:           " << this
+                );
             clear_dictionary();
         }
 
@@ -73,6 +83,12 @@ namespace dlib
         ) const
         {
             return kernel;
+        }
+
+        scalar_type minimum_tolerance(
+        ) const
+        {
+            return min_tolerance;
         }
 
         void clear_dictionary ()
@@ -115,15 +131,17 @@ namespace dlib
 
                 // if this new vector is approximately linearly independent of the vectors
                 // in our dictionary.  Or if our dictionary just isn't full yet.
-                if (delta > min_strength || dictionary.size() < my_max_dictionary_size)
+                if (delta > min_strength && delta > min_tolerance)
                 {
                     if (dictionary.size() == my_max_dictionary_size)
                     {
 
                         const long i = min_vect_idx;
 
-                        // replace the min strength vector with x
-                        dictionary[i] = x;
+                        // replace the min strength vector with x.  Put the new vector onto the end of
+                        // dictionary and remove the vector at position i.
+                        dictionary.erase(dictionary.begin()+i);
+                        dictionary.push_back(x);
 
                         // compute reduced K_inv.
                         // Remove the i'th vector from the inverse kernel matrix.  This formula is basically
@@ -147,23 +165,14 @@ namespace dlib
                         K_inv(temp.nr(), temp.nc()) = 1/delta;
 
                         // now update the kernel matrix K
-                        for (long r = 0; r < K.nr(); ++r)
-                        {
-                            if (r < i)
-                            {
-                                K(r,i) = k2(r);
-                                K(i,r) = k2(r);
-                            }
-                            else if (r == i)
-                            {
-                                K(i,i) = kx;
-                            }
-                            else
-                            {
-                                K(r,i) = k2(r-1);
-                                K(i,r) = k2(r-1);
-                            }
-                        }
+                        set_subm(K,get_rect(temp)) = removerc(K, i,i);
+                        set_subm(K, 0, K.nr()-1,K.nr()-1,1) = k2;
+                        // update the bottom row of the matrix
+                        set_subm(K, K.nr()-1, 0, 1, K.nr()-1) = trans(k2);
+                        K(K.nr()-1, K.nc()-1) = kx;
+
+                        // now we have to recompute the min_strength in this case
+                        recompute_min_strength();
                     }
                     else
                     {
@@ -197,13 +206,6 @@ namespace dlib
                         dictionary.push_back(x);
 
                     }
-
-                    // now we have to recompute the min_strength in this case
-                    if (dictionary.size() == my_max_dictionary_size)
-                    {
-                        recompute_min_strength();
-                    }
-
                 }
             }
         }
@@ -219,6 +221,7 @@ namespace dlib
             K_inv.swap(item.K_inv);
             K.swap(item.K);
             exchange(my_max_dictionary_size, item.my_max_dictionary_size);
+            exchange(min_tolerance, item.min_tolerance);
 
             // non-state temp members
             a.swap(item.a);
@@ -246,6 +249,7 @@ namespace dlib
             serialize(item.K_inv, out);
             serialize(item.K, out);
             serialize(item.my_max_dictionary_size, out);
+            serialize(item.min_tolerance, out);
         }
 
         friend void deserialize(linearly_independent_subset_finder& item, std::istream& in)
@@ -257,6 +261,7 @@ namespace dlib
             deserialize(item.K_inv, in);
             deserialize(item.K, in);
             deserialize(item.my_max_dictionary_size, in);
+            deserialize(item.min_tolerance, in);
         }
 
         const sample_type& operator[] (
@@ -310,6 +315,7 @@ namespace dlib
         matrix<scalar_type,0,0,mem_manager_type> K;
 
         unsigned long my_max_dictionary_size;
+        scalar_type min_tolerance;
 
         // temp variables here just so we don't have to reconstruct them over and over.  Thus, 
         // they aren't really part of the state of this object.

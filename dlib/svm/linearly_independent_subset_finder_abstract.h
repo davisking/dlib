@@ -47,10 +47,14 @@ namespace dlib
 
         linearly_independent_subset_finder (
             const kernel_type& kernel_, 
-            unsigned long max_dictionary_size  
+            unsigned long max_dictionary_size,
+            scalar_type min_tolerance = 0.001
         );
         /*!
+            requires
+                - min_tolerance > 0
             ensures
+                - #minimum_tolerance() == min_tolerance
                 - this object is properly initialized
                 - #get_kernel() == kernel_
                 - #max_dictionary_size() == max_dictionary_size_
@@ -70,6 +74,18 @@ namespace dlib
                 - returns the maximum number of dictionary vectors this object
                   will accumulate.  That is, dictionary_size() will never be
                   greater than max_dictionary_size().
+        !*/
+
+        scalar_type minimum_tolerance(
+        ) const;
+        /*!
+            ensures
+                - returns the minimum tolerance to use for the approximately linearly dependent 
+                  test used for dictionary vector selection (see KRLS paper for ALD details).  
+                  In other words, this is the minimum threshold for how linearly independent 
+                  a sample must be for it to even be considered for addition to the dictionary.  
+                  Moreover, bigger values of this field will make the algorithm run faster but 
+                  might give less accurate results.
         !*/
 
         void clear_dictionary (
