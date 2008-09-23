@@ -14,7 +14,7 @@ namespace dlib
     multithreaded_object::
     multithreaded_object (
     ):
-        s(m),
+        s(m_),
         is_running_(false),
         should_stop_(false),
         threads_started(0)
@@ -40,7 +40,7 @@ namespace dlib
     clear (
     )
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
         stop();
         wait();
         dead_threads.clear();
@@ -54,7 +54,7 @@ namespace dlib
     is_running (
     ) const 
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
         return is_running_;
     }
 
@@ -64,7 +64,7 @@ namespace dlib
     number_of_threads_registered (
     ) const
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
         return thread_ids.size() + dead_threads.size();
     }
 
@@ -74,7 +74,7 @@ namespace dlib
     number_of_threads_alive (
     ) const
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
         return threads_started;
     }
 
@@ -84,7 +84,7 @@ namespace dlib
     wait (
     ) const
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
 
         DLIB_ASSERT(thread_ids.is_in_domain(get_thread_id()) == false,
                "\tvoid multithreaded_object::wait()"
@@ -102,7 +102,7 @@ namespace dlib
     start (
     )
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
         const unsigned long num_threads_registered = dead_threads.size() + thread_ids.size();
         // start any dead threads
         for (unsigned long i = threads_started; i < num_threads_registered; ++i)
@@ -126,7 +126,7 @@ namespace dlib
     pause (
     )
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
         is_running_ = false;
     }
 
@@ -136,7 +136,7 @@ namespace dlib
     stop (
     )
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
         should_stop_ = true;
         is_running_ = false;
         s.broadcast();
@@ -148,7 +148,7 @@ namespace dlib
     should_stop (
     ) const
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
         DLIB_ASSERT(thread_ids.is_in_domain(get_thread_id()),
                "\tbool multithreaded_object::should_stop()"
                << "\n\tYou can only call this function from one of the registered threads in this object"
@@ -173,7 +173,7 @@ namespace dlib
             // if there is a dead_thread sitting around then pull it
             // out and put it into mf
             {
-                auto_mutex M(m);
+                auto_mutex M(m_);
                 if (dead_threads.size() > 0)
                 {
                     dead_threads.dequeue(mf);
@@ -189,7 +189,7 @@ namespace dlib
                 // call the registered thread function
                 mf();
 
-                auto_mutex M(m);
+                auto_mutex M(m_);
                 if (thread_ids.is_in_domain(id))
                 {
                     mfp temp;
@@ -202,7 +202,7 @@ namespace dlib
                 dead_threads.enqueue(mf);
             }
 
-            auto_mutex M(m);
+            auto_mutex M(m_);
             --threads_started;
             // If this is the last thread to terminate then
             // signal that that is the case.
@@ -215,7 +215,7 @@ namespace dlib
         }
         catch (...)
         {
-            auto_mutex M(m);
+            auto_mutex M(m_);
             if (thread_ids.is_in_domain(id))
             {
                 mfp temp;

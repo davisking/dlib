@@ -44,8 +44,8 @@ namespace dlib
                 - dead_threads == a queue that contains all the member function pointers
                   for threads that are currently registered but not running
 
-                - m == the mutex used to protect all our variables
-                - s == the signaler for m
+                - m_ == the mutex used to protect all our variables
+                - s == the signaler for m_
         !*/
 
     public:
@@ -93,7 +93,7 @@ namespace dlib
             void (T::*thread)()
         )
         {
-            auto_mutex M(m);
+            auto_mutex M(m_);
             try
             {
                 mfp mf;
@@ -118,7 +118,7 @@ namespace dlib
 
         typedef member_function_pointer<>::kernel_1a_c mfp;
 
-        rmutex m;
+        rmutex m_;
         rsignaler s;
         map<thread_id_type,mfp,memory_manager<char>::kernel_2a>::kernel_1a thread_ids;
         queue<mfp,memory_manager<char>::kernel_2a>::kernel_1a dead_threads;

@@ -14,7 +14,7 @@ namespace dlib
     threaded_object::
     threaded_object (
     ):
-        s(m),
+        s(m_),
         id1(0),
         is_running_(false),
         is_alive_(false),
@@ -42,7 +42,7 @@ namespace dlib
     is_running (
     ) const 
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
 
         DLIB_ASSERT(id1 != get_thread_id() || id_valid == false,
                "\tbool threaded_object::is_running()"
@@ -59,7 +59,7 @@ namespace dlib
     is_alive (
     ) const
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
 
         DLIB_ASSERT(id1 != get_thread_id() || id_valid == false,
                "\tbool threaded_object::is_alive()"
@@ -76,7 +76,7 @@ namespace dlib
     wait (
     ) const
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
 
         DLIB_ASSERT(id1 != get_thread_id() || id_valid == false,
                "\tvoid threaded_object::wait()"
@@ -94,7 +94,7 @@ namespace dlib
     start (
     )
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
 
         DLIB_ASSERT(id1 != get_thread_id() || id_valid == false,
                "\tvoid threaded_object::start()"
@@ -122,7 +122,7 @@ namespace dlib
     pause (
     )
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
 
         DLIB_ASSERT(id1 != get_thread_id() || id_valid == false,
                "\tvoid threaded_object::pause()"
@@ -139,7 +139,7 @@ namespace dlib
     stop (
     )
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
 
         DLIB_ASSERT(id1 != get_thread_id() || id_valid == false,
                "\tvoid threaded_object::stop()"
@@ -158,7 +158,7 @@ namespace dlib
     should_stop (
     ) const
     {
-        auto_mutex M(m);
+        auto_mutex M(m_);
         DLIB_ASSERT(is_alive_ && id1 == get_thread_id() && id_valid == true,
                "\tbool threaded_object::should_stop()"
                << "\n\tYou can only call this function from the thread that executes threaded_object::thread"
@@ -181,7 +181,7 @@ namespace dlib
 #endif
 
         thread();
-        auto_mutex M(m);
+        auto_mutex M(m_);
 
 #ifdef ENABLE_ASSERTS
         id_valid = false;

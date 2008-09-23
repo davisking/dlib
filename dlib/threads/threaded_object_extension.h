@@ -42,8 +42,8 @@ namespace dlib
                     - id_valid == false
 #endif
 
-                - m == the mutex used to protect all our variables
-                - s == the signaler for m
+                - m_ == the mutex used to protect all our variables
+                - s == the signaler for m_
         !*/
 
     public:
@@ -85,7 +85,7 @@ namespace dlib
         virtual void thread (
         ) = 0;
 
-        mutex m;
+        mutex m_;
         signaler s;
         thread_id_type id1;
         bool is_running_;
