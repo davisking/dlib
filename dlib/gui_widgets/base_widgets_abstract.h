@@ -1580,7 +1580,9 @@ namespace dlib
                 protected member functions.  It provides a function, total_rect(), that
                 tells you where the 2D region is on the screen.  You draw your stuff 
                 inside total_rect() as you would normally except that you only modify 
-                pixels that are also inside display_rect(). 
+                pixels that are also inside display_rect().  When the user moves the
+                scroll bars the position of total_rect() is updated accordingly, causing
+                the widget's content to scroll across the screen. 
         !*/
 
     public:
@@ -1715,9 +1717,13 @@ namespace dlib
         /*!
             requires
                 - mutex drawable::m is locked
+                - (width > 0 && height > 0) || (width == 0 && height == 0)
             ensures
-                - #total_rect().width() == width
+                - #total_rect().width()  == width
                 - #total_rect().height() == height 
+                - The scroll bars as well as the position of #total_rect() 
+                  is updated so that the total rect is still in the correct
+                  position with respect to the scroll bars.
         !*/
 
         const rectangle& total_rect (
@@ -1728,7 +1734,7 @@ namespace dlib
             ensures
                 - returns a rectangle that represents the entire scrollable
                   region inside this widget, even the parts that are outside
-                  this->rect.  
+                  display_rect().  
         !*/
 
         void scroll_to_rect (
@@ -1738,9 +1744,9 @@ namespace dlib
             requires
                 - mutex drawable::m is locked
             ensures
-                - adjusts the scroll bars of this object so that the rectangle
-                  r is displayed in the display_rect() (or as close to being 
-                  displayed as possible if r is outside of total_rect())
+                - Adjusts the scroll bars of this object so that the part of 
+                  the total_rect() rectangle that overlaps with r is displayed in 
+                  the display_rect() rectangle on the screen.
         !*/
 
     // ---------------------------- event handlers ----------------------------

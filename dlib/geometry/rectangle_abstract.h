@@ -70,6 +70,8 @@ namespace dlib
             unsigned long height_
         );
         /*!
+            requires
+                - (width_ > 0 && height_ > 0) || (width_ == 0 && height_ == 0)
             ensures
                 - #left() == 0  
                 - #top() == 0

@@ -2950,6 +2950,14 @@ namespace dlib
             unsigned long height
         )
         {
+            DLIB_ASSERT(width > 0 && height > 0 || width == 0 && height == 0,
+                "\tvoid scrollable_region::set_total_rect_size(width,height)"
+                << "\n\twidth and height must be > 0 or both == 0"
+                << "\n\twidth:  " << width 
+                << "\n\theight: " << height 
+                << "\n\tthis: " << this
+                );
+
             total_rect_ = move_rect(rectangle(width,height), 
                                     display_rect_.left()-static_cast<long>(hsb.slider_pos()),
                                     display_rect_.top()-static_cast<long>(vsb.slider_pos()));
@@ -2965,9 +2973,10 @@ namespace dlib
         }
 
         void scroll_to_rect (
-            const rectangle& r
+            const rectangle& r_
         )
         {
+            const rectangle r(total_rect_.intersect(r_));
             const rectangle old(total_rect_);
             // adjust the horizontal scroll bar so that r fits as best as possible
             if (r.left() < display_rect_.left())
@@ -2984,12 +2993,12 @@ namespace dlib
             // adjust the vertical scroll bar so that r fits as best as possible
             if (r.top() < display_rect_.top())
             {
-                long distance = (r.top()-total_rect_.top())/hscroll_bar_inc;
+                long distance = (r.top()-total_rect_.top())/vscroll_bar_inc;
                 vsb.set_slider_pos(distance);
             }
             else if (r.bottom() > display_rect_.bottom())
             {
-                long distance = (r.bottom()-total_rect_.top()-display_rect_.height()+hscroll_bar_inc)/hscroll_bar_inc;
+                long distance = (r.bottom()-total_rect_.top()-display_rect_.height()+vscroll_bar_inc)/vscroll_bar_inc;
                 vsb.set_slider_pos(distance);
             }
       
