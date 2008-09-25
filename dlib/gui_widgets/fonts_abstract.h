@@ -276,14 +276,14 @@ namespace dlib
         !*/
 
         template <typename T, typename traits, typename alloc, typename pixel_type>
-        const void draw_string (
+        void draw_string (
             const canvas& c,
             const rectangle& rect,
             const std::basic_string<T,traits,alloc>& str,
             const pixel_type& color = rgb_pixel(0,0,0),
             typename std::basic_string<T,traits,alloc>::size_type first = 0,
             typename std::basic_string<T,traits,alloc>::size_type last = std::basic_string<T,traits,alloc>::npos,
-            const rectangle& area = rectangle(-infinity,-infinity,infinity,infinity)
+            const rectangle area = rectangle(-infinity,-infinity,infinity,infinity)
         ) const;
         /*!
             requires
