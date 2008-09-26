@@ -14,6 +14,21 @@
 New Stuff:
 
 Non-Backwards Compatible Changes:
+   - The on_wheel_up() and on_wheel_down() gui events now take an unsigned long
+     argument.  
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.9" date="Sep 06, 2008">
+New Stuff:
+
+Non-Backwards Compatible Changes:
 
 Bug fixes:
    - Fixed a bug in the tooltip widget
@@ -32,7 +47,7 @@ Other:
      as well as dlib::queue objects.
    - Generally cleaned up a bunch of things
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
