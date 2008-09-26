@@ -598,22 +598,22 @@ namespace dlib
                             else if (e->button == Button2)
                                 btn = base_window::MIDDLE;
 
+                            unsigned long state = 0;
+                            if (e->state & ControlMask)
+                                state |= base_window::CONTROL;
+                            if (e->state & Button1Mask)
+                                state |= base_window::LEFT;
+                            if (e->state & Button2Mask)
+                                state |= base_window::MIDDLE;
+                            if (e->state & Button3Mask)
+                                state |= base_window::RIGHT;
+                            if (e->state & ShiftMask)
+                                state |= base_window::SHIFT;
 
                             // only send the event if this is a button we support
                             if (btn != (unsigned long)base_window::NONE)
                             {
 
-                                unsigned long state = 0;
-                                if (e->state & ControlMask)
-                                    state |= base_window::CONTROL;
-                                if (e->state & Button1Mask)
-                                    state |= base_window::LEFT;
-                                if (e->state & Button2Mask)
-                                    state |= base_window::MIDDLE;
-                                if (e->state & Button3Mask)
-                                    state |= base_window::RIGHT;
-                                if (e->state & ShiftMask)
-                                    state |= base_window::SHIFT;
 
                                 if (ev.type == ButtonPress)
                                 {
@@ -651,11 +651,11 @@ namespace dlib
                             }
                             else if (e->button == Button4 && ev.type == ButtonPress)
                             {
-                                win->on_wheel_up();
+                                win->on_wheel_up(state);
                             }
                             else if (e->button == Button5 && ev.type == ButtonPress)
                             {
-                                win->on_wheel_down();
+                                win->on_wheel_down(state);
                             }
                             
                         } break;

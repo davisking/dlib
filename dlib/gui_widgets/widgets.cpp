@@ -2804,6 +2804,7 @@ namespace dlib
     template <typename S>
     void list_box<S>::
     on_wheel_up (
+        unsigned long state
     )
     {
         if (rect.contains(lastx,lasty) && enabled && !hidden)
@@ -2823,6 +2824,7 @@ namespace dlib
     template <typename S>
     void list_box<S>::
     on_wheel_down (
+        unsigned long state
     )
     {
         if (rect.contains(lastx,lasty) && enabled && !hidden)

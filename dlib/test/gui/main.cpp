@@ -40,7 +40,7 @@ public:
         unsigned char green_,
         unsigned char blue_
     ) :
-        dragable(w),
+        dragable(w, MOUSE_WHEEL),
         red(red_),
         green(green_),
         blue(blue_),
@@ -78,6 +78,45 @@ private:
         {
             fill_rect(c,rect,rgb_pixel(red,green,blue));
         }
+    }
+
+    void on_wheel_up(
+        unsigned long state
+    )
+    {
+        if (state == base_window::NONE)
+            cout << "up scroll, NONE" << endl;
+        else if (state&base_window::LEFT)
+            cout << "up scroll, LEFT" << endl;
+        else if (state&base_window::RIGHT)
+            cout << "up scroll, RIGHT" << endl;
+        else if (state&base_window::MIDDLE)
+            cout << "up scroll, MIDDLE" << endl;
+        else if (state&base_window::SHIFT)
+            cout << "up scroll, SHIFT" << endl;
+        else if (state&base_window::CONTROL)
+            cout << "up scroll, CONTROL" << endl;
+
+    }
+
+    void on_wheel_down(
+        unsigned long state
+    )
+    {
+        
+        if (state == base_window::NONE)
+            cout << "down scroll, NONE" << endl;
+        else if (state&base_window::LEFT)
+            cout << "down scroll, LEFT" << endl;
+        else if (state&base_window::RIGHT)
+            cout << "down scroll, RIGHT" << endl;
+        else if (state&base_window::MIDDLE)
+            cout << "down scroll, MIDDLE" << endl;
+        else if (state&base_window::SHIFT)
+            cout << "down scroll, SHIFT" << endl;
+        else if (state&base_window::CONTROL)
+            cout << "down scroll, CONTROL" << endl;
+
     }
 
 
@@ -643,6 +682,8 @@ private:
     {
         message_box("file opened",file);
     }
+
+
 
 
     void on_click (

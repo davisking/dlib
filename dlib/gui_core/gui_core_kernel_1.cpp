@@ -746,15 +746,26 @@ namespace dlib
                             else
                                 break;
 
+                            unsigned long state = 0;
+                            if (wParam & MK_CONTROL)
+                                state |= base_window::CONTROL;
+                            if (wParam & MK_LBUTTON)
+                                state |= base_window::LEFT;
+                            if (wParam & MK_MBUTTON)
+                                state |= base_window::MIDDLE;
+                            if (wParam & MK_RBUTTON)
+                                state |= base_window::RIGHT;
+                            if (wParam & MK_SHIFT)
+                                state |= base_window::SHIFT;
 
                             // signal the mouse wheel event
                             if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
                             {
-                                win->on_wheel_up();                                
+                                win->on_wheel_up(state);                                
                             }
                             else
                             {
-                                win->on_wheel_down();
+                                win->on_wheel_down(state);
                             }
                            
                         }

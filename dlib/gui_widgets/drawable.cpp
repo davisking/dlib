@@ -298,6 +298,7 @@ namespace dlib
 
     void drawable_window::
     on_wheel_up (
+        unsigned long state
     )
     {
         ++event_id;
@@ -307,7 +308,7 @@ namespace dlib
             if (mouse_wheel.element()->event_id != event_id)
             {
                 mouse_wheel.element()->event_id = event_id;
-                mouse_wheel.element()->on_wheel_up();
+                mouse_wheel.element()->on_wheel_up(state);
             }
         }
     }
@@ -316,6 +317,7 @@ namespace dlib
 
     void drawable_window::
     on_wheel_down (
+        unsigned long state
     )
     {
         ++event_id;
@@ -325,7 +327,7 @@ namespace dlib
             if (mouse_wheel.element()->event_id != event_id)
             {
                 mouse_wheel.element()->event_id = event_id;
-                mouse_wheel.element()->on_wheel_down();
+                mouse_wheel.element()->on_wheel_down(state);
             }
         }
     }

@@ -1575,9 +1575,11 @@ namespace dlib
         !*/
 
         void on_wheel_up (
+            unsigned long state
         );
 
         void on_wheel_down (
+            unsigned long state
         );
 
         void on_mouse_down (

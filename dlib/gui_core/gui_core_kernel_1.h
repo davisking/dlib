@@ -367,9 +367,11 @@ namespace dlib
         ){}
 
         virtual void on_wheel_up (
+            unsigned long state
         ){}
 
         virtual void on_wheel_down (
+            unsigned long state
         ){}
 
         virtual void on_focus_gained (

@@ -1542,8 +1542,8 @@ namespace dlib
     // event for your own reasons (e.g. to override the mouse drag this object
     // performs)
 
-        void on_wheel_down ();
-        void on_wheel_up ();
+        void on_wheel_down (unsigned long state);
+        void on_wheel_up (unsigned long state);
         void on_mouse_move ( unsigned long state, long x, long y);
         void on_mouse_up ( unsigned long btn, unsigned long state, long x, long y);
         void on_mouse_down ( unsigned long btn, unsigned long state, long x, long y, bool is_double_click);
@@ -1756,8 +1756,8 @@ namespace dlib
     // event for your own reasons (e.g. to override the mouse wheel action 
     // this object performs)
 
-        void on_wheel_down ();
-        void on_wheel_up ();
+        void on_wheel_down (unsigned long state);
+        void on_wheel_up (unsigned long state);
         void draw (const canvas& c) const;
 
     private:

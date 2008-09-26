@@ -692,24 +692,30 @@ namespace dlib
 
         // do nothing by default
         virtual void on_wheel_up (
+            unsigned long state
         ){}
         /*!
             requires
                 - is_closed() == false
                 - mutex wm is locked
                 - is called every time the mouse wheel is scrolled up one notch
+                - state == the bitwise OR of the buttons that are currently depressed 
+                  (from the mouse_state_masks enum) 
             ensures
                 - does not change the state of mutex wm
         !*/
 
         // do nothing by default
         virtual void on_wheel_down (
+            unsigned long state
         ){}
         /*!
             requires
                 - is_closed() == false
                 - mutex wm is locked
                 - is called every time the mouse wheel is scrolled down one notch
+                - state == the bitwise OR of the buttons that are currently depressed 
+                  (from the mouse_state_masks enum) 
             ensures
                 - does not change the state of mutex wm
         !*/

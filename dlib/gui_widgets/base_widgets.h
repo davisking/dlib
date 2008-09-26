@@ -2477,6 +2477,7 @@ namespace dlib
     // ----------- event handlers ---------------
 
         void on_wheel_down (
+            unsigned long state
         )
         {
             // zoom out
@@ -2493,6 +2494,7 @@ namespace dlib
         }
 
         void on_wheel_up (
+            unsigned long state
         )
         {
             // zoom in 
@@ -3016,6 +3018,7 @@ namespace dlib
         }
 
         void on_wheel_down (
+            unsigned long state
         )
         {
             if (rect.contains(lastx,lasty) && enabled && !hidden)
@@ -3036,6 +3039,7 @@ namespace dlib
         }
 
         void on_wheel_up (
+            unsigned long state
         )
         {
             if (rect.contains(lastx,lasty) && enabled && !hidden)
