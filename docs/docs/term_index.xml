@@ -516,6 +516,7 @@
          <term link="containers.html#sequence" name="sequence"/>
          <term link="containers.html#set" name="set"/>
          <term link="containers.html#shared_ptr" name="shared_ptr"/>
+         <term link="containers.html#shared_ptr_thread_safe" name="shared_ptr_thread_safe"/>
          <term link="containers.html#sliding_buffer" name="sliding_buffer"/>
          <term link="containers.html#stack" name="stack"/>
          <term link="containers.html#static_map" name="static_map"/>
