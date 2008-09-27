@@ -1,9 +1,8 @@
 // Copyright (C) 2007  Davis E. King (davisking@users.sourceforge.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_SHARED_PTr_ABSTRACT_
-#ifdef DLIB_SHARED_PTr_ABSTRACT_ 
+#undef DLIB_SHARED_PTr_THREAD_SAFE_ABSTRACT_
+#ifdef DLIB_SHARED_PTr_THREAD_SAFE_ABSTRACT_ 
 
-#include "weak_ptr_abstract.h"
 #include <exception>     
 
 namespace dlib 
@@ -11,44 +10,40 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class bad_weak_ptr: public std::exception {}
-
-// ----------------------------------------------------------------------------------------
-
     template <
         typename T
         > 
-    class shared_ptr 
+    class shared_ptr_thread_safe 
     {
         /*!
             INITIAL VALUE
                 defined by constructors
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a reference counted smart pointer.  Each shared_ptr
-                contains a pointer to some object and when the last shared_ptr that points
+                This object represents a reference counted smart pointer.  Each shared_ptr_thread_safe
+                contains a pointer to some object and when the last shared_ptr_thread_safe that points
                 to the object is destructed or reset() then the object is guaranteed to be 
                 deleted.
 
                 This is an implementation of the std::tr1::shared_ptr template from the 
                 document ISO/IEC PDTR 19768, Proposed Draft Technical Report on C++
                 Library Extensions.  The only deviation from that document is that this 
-                shared_ptr is declared inside the dlib namespace rather than std::tr1.
+                shared_ptr_thread_safe is declared inside the dlib namespace rather than std::tr1,
+                this one is explicitly thread safe, and there isn't a corresponding weak_ptr.
 
             THREAD SAFETY
-                This object is not thread safe.  Especially so since it is
-                reference counted.  So you should take care to not have two shared_ptr
-                objects in different threads that point to the same object.
-
-                If you want a thread safe version of this object you should use the
-                dlib::shared_ptr_thread_safe object instead.
+                This is a version of the shared_ptr object that can be used to share pointers
+                across more than one thread.  Note however, that individual instances of this object
+                must still have access to them serialized by a mutex lock if they are to be modified
+                by more than one thread.  But if you have two different shared_ptr_thread_safe objects
+                that both point to the same thing from different threads then you are safe.
         !*/
 
     public:
 
         typedef T element_type;
 
-        shared_ptr(
+        shared_ptr_thread_safe(
         );
         /*!
             ensures
@@ -57,7 +52,7 @@ namespace dlib
         !*/
 
         template<typename Y> 
-        explicit shared_ptr(
+        explicit shared_ptr_thread_safe(
             Y* p
         );
         /*!
@@ -75,7 +70,7 @@ namespace dlib
         !*/
 
         template<typename Y, typename D> 
-        shared_ptr(
+        shared_ptr_thread_safe(
             Y* p, 
             const D& d
         );
@@ -94,20 +89,20 @@ namespace dlib
                   if this exception is thrown then "d(p);" is called
         !*/
 
-        shared_ptr( 
-            const shared_ptr& r
+        shared_ptr_thread_safe( 
+            const shared_ptr_thread_safe& r
         );
         /*!
             ensures
                 - #get() == #r.get()
                 - #use_count() == #r.use_count()
-                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs 
-                  a shared_ptr object that shares ownership with r.
+                - If r is empty, constructs an empty shared_ptr_thread_safe object; otherwise, constructs 
+                  a shared_ptr_thread_safe object that shares ownership with r.
         !*/
 
         template<typename Y> 
-        shared_ptr(
-            const shared_ptr<Y>& r
+        shared_ptr_thread_safe(
+            const shared_ptr_thread_safe<Y>& r
         );
         /*!
             requires
@@ -115,29 +110,12 @@ namespace dlib
             ensures
                 - #get() == #r.get()
                 - #use_count() == #r.use_count()
-                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs 
-                  a shared_ptr object that shares ownership with r.
-        !*/
-
-        template<typename Y> 
-        explicit shared_ptr(
-            const weak_ptr<Y>& r
-        );
-        /*!
-            requires
-                - Y* is convertible to T* 
-            ensures
-                - #get() == #r.get()
-                - #use_count() == #r.use_count()
-                - If r is empty, constructs an empty shared_ptr object; otherwise, constructs 
-                  a shared_ptr object that shares ownership with r.
-            throws
-                - bad_weak_ptr
-                  this exception is thrown if r.expired() == true
+                - If r is empty, constructs an empty shared_ptr_thread_safe object; otherwise, constructs 
+                  a shared_ptr_thread_safe object that shares ownership with r.
         !*/
 
         template<typename Y>
-        explicit shared_ptr(
+        explicit shared_ptr_thread_safe(
             std::auto_ptr<Y>& r
         );
         /*!
@@ -154,14 +132,14 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
-        ~shared_ptr(
+        ~shared_ptr_thread_safe(
         );
         /*!
             ensures
                 - if (use_count() > 1)
                     - this object destroys itself but otherwise has no effect (i.e. 
                       the pointer get() is still valid and shared between the remaining
-                      shared_ptr objects)
+                      shared_ptr_thread_safe objects)
                 - else if (use_count() == 1)
                     - deletes the pointer get() by calling delete (or using the deleter passed
                       to the constructor if one was passed in)
@@ -169,29 +147,29 @@ namespace dlib
                     - in this case get() == 0 so there is nothing to do so nothing occurs
         !*/
 
-        shared_ptr& operator= (
-            const shared_ptr& r
+        shared_ptr_thread_safe& operator= (
+            const shared_ptr_thread_safe& r
         );
         /*!
             ensures
-                - equivalent to shared_ptr(r).swap(*this).
+                - equivalent to shared_ptr_thread_safe(r).swap(*this).
                 - returns #*this
         !*/
 
         template<typename Y> 
-        shared_ptr& operator= (
-            const shared_ptr<Y>& r
+        shared_ptr_thread_safe& operator= (
+            const shared_ptr_thread_safe<Y>& r
         );
         /*!
             requires
                 - Y* is convertible to T* 
             ensures
-                - equivalent to shared_ptr(r).swap(*this).
+                - equivalent to shared_ptr_thread_safe(r).swap(*this).
                 - returns #*this
         !*/
 
         template<typename Y> 
-        shared_ptr& operator= (
+        shared_ptr_thread_safe& operator= (
             std::auto_ptr<Y>& r
         );
         /*!
@@ -200,7 +178,7 @@ namespace dlib
                 - p.release() is convertible to a T* type pointer
                 - p.release() can be deleted by calling "delete p.release();" and doing so will not throw exceptions
             ensures
-                - equivalent to shared_ptr(r).swap(*this).
+                - equivalent to shared_ptr_thread_safe(r).swap(*this).
                 - returns #*this
         !*/
 
@@ -208,7 +186,7 @@ namespace dlib
         );
         /*!
             ensures
-                - equivalent to shared_ptr().swap(*this)
+                - equivalent to shared_ptr_thread_safe().swap(*this)
         !*/
 
         template<typename Y> 
@@ -221,7 +199,7 @@ namespace dlib
                 - p can be deleted by calling "delete p;" and doing so will not throw exceptions
                 - p != 0
             ensures
-                - equivalent to shared_ptr(p).swap(*this)
+                - equivalent to shared_ptr_thread_safe(p).swap(*this)
         !*/
 
         template<typename Y, typename D> 
@@ -236,7 +214,7 @@ namespace dlib
                 - p can be deleted by calling "d(p);" and doing so will not throw exceptions
                 - p != 0
             ensures
-                - equivalent to shared_ptr(p,d).swap(*this)
+                - equivalent to shared_ptr_thread_safe(p,d).swap(*this)
         !*/
 
         T* get(
@@ -275,7 +253,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - The number of shared_ptr objects, *this included, that share ownership with *this, or 0 when *this
+                - The number of shared_ptr_thread_safe objects, *this included, that share ownership with *this, or 0 when *this
                   is empty.
         !*/
 
@@ -287,7 +265,7 @@ namespace dlib
         !*/
 
         void swap(
-            shared_ptr& b
+            shared_ptr_thread_safe& b
         );
         /*!
             ensures
@@ -300,8 +278,8 @@ namespace dlib
 
     template<typename T, typename U>
     bool operator== (
-        const shared_ptr<T>& a, 
-        const shared_ptr<U>& b
+        const shared_ptr_thread_safe<T>& a, 
+        const shared_ptr_thread_safe<U>& b
     );
     /*!
         ensures
@@ -310,8 +288,8 @@ namespace dlib
 
     template<typename T, typename U>
     bool operator!= (
-        const shared_ptr<T>& a, 
-        const shared_ptr<U>& b
+        const shared_ptr_thread_safe<T>& a, 
+        const shared_ptr_thread_safe<U>& b
     ) { return a.get() != b.get(); }
     /*!
         ensures
@@ -320,65 +298,65 @@ namespace dlib
 
     template<typename T, typename U>
     bool operator< (
-        const shared_ptr<T>& a, 
-        const shared_ptr<U>& b
+        const shared_ptr_thread_safe<T>& a, 
+        const shared_ptr_thread_safe<U>& b
     );
     /*!
         ensures
-            - Defines an operator< on shared_ptr types appropriate for use in the associative 
+            - Defines an operator< on shared_ptr_thread_safe types appropriate for use in the associative 
               containers.  
     !*/
 
     template<typename T> 
     void swap(
-        shared_ptr<T>& a, 
-        shared_ptr<T>& b
+        shared_ptr_thread_safe<T>& a, 
+        shared_ptr_thread_safe<T>& b
     ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
 
     template<typename T, typename U>
-    shared_ptr<T> static_pointer_cast(
-        const shared_ptr<U>& r
+    shared_ptr_thread_safe<T> static_pointer_cast(
+        const shared_ptr_thread_safe<U>& r
     );
     /*!
         - if (r.get() == 0) then
-            - returns shared_ptr<T>()
+            - returns shared_ptr_thread_safe<T>()
         - else
-            - returns a shared_ptr<T> object that stores static_cast<T*>(r.get()) and shares 
+            - returns a shared_ptr_thread_safe<T> object that stores static_cast<T*>(r.get()) and shares 
               ownership with r.
     !*/
 
     template<typename T, typename U>
-    shared_ptr<T> const_pointer_cast(
-        const shared_ptr<U>& r
+    shared_ptr_thread_safe<T> const_pointer_cast(
+        const shared_ptr_thread_safe<U>& r
     );
     /*!
         - if (r.get() == 0) then
-            - returns shared_ptr<T>()
+            - returns shared_ptr_thread_safe<T>()
         - else
-            - returns a shared_ptr<T> object that stores const_cast<T*>(r.get()) and shares 
+            - returns a shared_ptr_thread_safe<T> object that stores const_cast<T*>(r.get()) and shares 
               ownership with r.
     !*/
 
     template<typename T, typename U>
-    shared_ptr<T> dynamic_pointer_cast(
-        const shared_ptr<U>& r
+    shared_ptr_thread_safe<T> dynamic_pointer_cast(
+        const shared_ptr_thread_safe<U>& r
     );
     /*!
         ensures
             - if (dynamic_cast<T*>(r.get()) returns a nonzero value) then
-                - returns a shared_ptr<T> object that stores a copy of 
+                - returns a shared_ptr_thread_safe<T> object that stores a copy of 
                   dynamic_cast<T*>(r.get()) and shares ownership with r
             - else
-                - returns an empty shared_ptr<T> object.
+                - returns an empty shared_ptr_thread_safe<T> object.
     !*/
 
     template<typename E, typename T, typename Y>
     std::basic_ostream<E, T> & operator<< (
         std::basic_ostream<E, T> & os, 
-        const shared_ptr<Y>& p
+        const shared_ptr_thread_safe<Y>& p
     );
     /*!
         ensures
@@ -388,7 +366,7 @@ namespace dlib
 
     template<typename D, typename T>
     D* get_deleter(
-        const shared_ptr<T>& p
+        const shared_ptr_thread_safe<T>& p
     );
     /*!
         ensures
@@ -402,5 +380,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SHARED_PTr_ABSTRACT_
+#endif // DLIB_SHARED_PTr_THREAD_SAFE_ABSTRACT_
 
