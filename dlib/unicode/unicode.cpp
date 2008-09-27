@@ -15,7 +15,7 @@ namespace dlib
     static const unichar SURROGATE_FIRST_TOP = 0xD800;
     static const unichar SURROGATE_SECOND_TOP = 0xDC00;
     static const unichar SURROGATE_CLEARING_MASK = 0x03FF;
-    static const unichar &SURROGATE_TOP = SURROGATE_FIRST_TOP;
+    static const unichar SURROGATE_TOP = SURROGATE_FIRST_TOP;
     static const unichar SURROGATE_END = 0xE000;
     static const unichar SMP_TOP = 0x10000;
     static const int VALID_BITS = 10;

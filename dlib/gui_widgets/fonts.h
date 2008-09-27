@@ -491,13 +491,14 @@ namespace dlib
         default_font(default_font&);        // copy constructor
         default_font& operator=(default_font&);    // assignment operator   
 
-        static scoped_ptr<default_font> f;
-        static mutex m;
+
 
     public:
         static const font* get_font (
         )
-        {
+        {        
+            static mutex m;
+            static scoped_ptr<default_font> f;
             auto_mutex M(m);
             if (f.get() == 0)
                 f.reset(new default_font);

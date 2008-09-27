@@ -16,9 +16,6 @@
 namespace dlib
 {
 
-    scoped_ptr<default_font> default_font::f;
-    mutex default_font::m;
-
 // ----------------------------------------------------------------------------------------
 
     const std::string get_decoded_string_with_default_font_data()

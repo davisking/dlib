@@ -771,13 +771,13 @@ private:
 };
 
 
+        win w;
 
 int main()
 {
 
     try
     {
-        win w;
         w.set_pos (100,200);
         w.set_title("test window");
         w.show();
