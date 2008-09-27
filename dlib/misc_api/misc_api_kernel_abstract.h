@@ -15,9 +15,6 @@ namespace dlib
     /*!
         GENERAL COMMENTS
             This file just contains miscellaneous api functions
-
-        GENERAL WARNING
-            Don't call any of these functions before main() has been entered.  
     !*/
 
 // ----------------------------------------------------------------------------------------

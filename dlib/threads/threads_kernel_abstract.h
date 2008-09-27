@@ -9,11 +9,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     /*!
-        GENERAL COMMENTS
-            Unlike the other API wrappers you may make instances of these objects at the
-            global scope and call these functions before main() has been entered.
-
-        THREAD POOL
+        THREAD POOLING
             When threads end they go into a global thread pool and each waits there 
             for 30 seconds before timing out and having its resources returned to the 
             operating system.  When create_new_thread() is called it first looks in the
