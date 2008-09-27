@@ -16,6 +16,10 @@ New Stuff:
 Non-Backwards Compatible Changes:
    - The on_wheel_up() and on_wheel_down() gui events now take an unsigned long
      argument.  
+   - Removed the register_program_ending_handler() function from the threading
+     API and also changed the dlib thread pool so that it no longer causes
+     a terminating program to wait for any outstanding threads to finish
+     before allowing the application to end.
 
 Bug fixes:
 

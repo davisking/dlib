@@ -36,7 +36,6 @@
          <term link="dlib/threads/threads_kernel_abstract.h.html#is_dlib_thread" name="is_dlib_thread"/>
          <term link="dlib/threads/threads_kernel_abstract.h.html#register_thread_end_handler" name="register_thread_end_handler"/>
          <term link="dlib/threads/threads_kernel_abstract.h.html#unregister_thread_end_handler" name="unregister_thread_end_handler"/>
-         <term link="dlib/threads/threads_kernel_abstract.h.html#register_program_ending_handler" name="register_program_ending_handler"/>
          <term link="dlib/threads/threads_kernel_abstract.h.html#create_new_thread" name="create_new_thread"/>
          <term link="dlib/threads/threads_kernel_abstract.h.html#mutex" name="mutex"/>
          <term link="dlib/threads/threads_kernel_abstract.h.html#signaler" name="signaler"/>

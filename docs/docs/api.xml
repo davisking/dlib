@@ -602,10 +602,6 @@
                   <link>dlib/threads/threads_kernel_abstract.h.html#register_thread_end_handler</link>
                </item>
                <item>   
-                  <name>register_program_ending_handler</name>
-                  <link>dlib/threads/threads_kernel_abstract.h.html#register_program_ending_handler</link>
-               </item>
-               <item>   
                   <name>signaler</name>
                   <link>dlib/threads/threads_kernel_abstract.h.html#signaler</link>
                </item>
