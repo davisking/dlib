@@ -31,7 +31,7 @@ namespace dlib
 
     namespace gui_core_kernel_2_globals
     {
-        void event_handler ();
+        class event_handler_thread;
         void trigger_user_event_threadproc (void*);
 
         // This is a forward declaration for a struct that contains any 
@@ -109,7 +109,8 @@ namespace dlib
 
     private:
 
-        friend void gui_core_kernel_2_globals::event_handler ();
+        friend class gui_core_kernel_2_globals::event_handler_thread;
+
 
         canvas (
             unsigned char* bits__,
@@ -152,7 +153,7 @@ namespace dlib
 
     class base_window
     {
-        friend void gui_core_kernel_2_globals::event_handler ();
+        friend class gui_core_kernel_2_globals::event_handler_thread;
         friend void gui_core_kernel_2_globals::trigger_user_event_threadproc (void*);
 
     public:

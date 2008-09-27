@@ -41,11 +41,6 @@ namespace dlib
             base_window
                 All methods for this class are thread safe.  You may call them 
                 from any thread and do not need to serialize access.
-
-        GENERAL WARNING
-            You can't make base_window objects before main() has been entered or
-            call get_from_clipboard() or put_on_clipboard() before 
-            main() has been entered.
     !*/
 
 // ----------------------------------------------------------------------------------------

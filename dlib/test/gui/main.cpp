@@ -771,7 +771,7 @@ private:
 };
 
 
-        win w;
+win w;
 
 int main()
 {

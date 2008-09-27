@@ -32,10 +32,7 @@ namespace dlib
 
     namespace gui_core_kernel_2_globals
     {
-        static logger dlog("dlib.gui_core");
-        void event_handler ();
-        void trigger_user_event_threadproc (void*);
-
+        void init_keyboard_mod_masks();
         struct x11_base_windowstuff
         {
             Window hwnd;
@@ -43,29 +40,6 @@ namespace dlib
             XIC xic;
             XFontSet fs;
         };
-
-        typedef sync_extension<binary_search_tree<Window,base_window*>::kernel_1a>::kernel_1a 
-            window_table_type;
-
-        int depth;
-        Display* disp;
-        static XIM xim = NULL;
-        static XIMStyle xim_style;
-        static Screen* screen;
-
-        Atom delete_window; 
-        static Window exit_window;
-        static std::wstring clipboard;
-        static bool core_has_been_initialized = false;
-
-        static int alt_mask = 0;
-        static int meta_mask = 0;
-        static int num_lock_mask = 0;
-        static int scroll_lock_mask = 0;
-
-        static window_table_type window_table;
-        static rsignaler window_close_signaler(window_table.get_mutex());
-        static rsignaler et_signaler(window_table.get_mutex());
 
         struct user_event_type
         {
@@ -75,8 +49,282 @@ namespace dlib
         };
 
         typedef sync_extension<queue<user_event_type,memory_manager<char>::kernel_1b>::kernel_2a_c>::kernel_1a queue_of_user_events;
-        queue_of_user_events user_events;
-        queue_of_user_events user_events_temp;
+
+        typedef sync_extension<binary_search_tree<Window,base_window*>::kernel_1a>::kernel_1a 
+            window_table_type;
+
+    // ----------------------------------------------------------------------------------------
+
+        class event_handler_thread : public threaded_object
+        {
+        public:
+
+            enum et_state
+            {
+                uninitialized,
+                initialized,
+                failure_to_init 
+            };
+
+            et_state status;
+            logger dlog;
+
+            // this is true if the application is trying to end
+            bool should_destruct;
+
+            int depth;
+            Display* disp;
+            XIM xim;
+            XIMStyle xim_style;
+            Screen* screen;
+
+            Atom delete_window; 
+            Window exit_window;
+            std::wstring clipboard;
+
+            int alt_mask;
+            int meta_mask;
+            int num_lock_mask;
+            int scroll_lock_mask;
+
+            // the mutex in this object is the global mutex used to protect everything
+            // in the gui_core and gui_widgets components.
+            window_table_type window_table;
+
+            rsignaler window_close_signaler;
+            rsignaler et_signaler;
+
+            queue_of_user_events user_events;
+            queue_of_user_events user_events_temp;
+
+            event_handler_thread(
+            ) :
+                dlog("dlib.gui_core"),
+                should_destruct(false),
+                depth(0),
+                disp(0),
+                xim(0),
+                screen(0),
+                alt_mask(0),
+                meta_mask(0),
+                num_lock_mask(0),
+                scroll_lock_mask(0),
+                window_close_signaler(window_table.get_mutex()),
+                et_signaler(window_table.get_mutex())
+            {
+                auto_mutex M(window_table.get_mutex());
+
+                status = uninitialized;
+
+                // start up the event handler thread
+                start();
+
+                // wait for the event thread to get up and running
+                while (status == uninitialized)
+                    et_signaler.wait();
+
+                if (status == failure_to_init)
+                    throw gui_error("Failed to initialize X11 resources");
+
+                init_keyboard_mod_masks();
+            }
+
+            ~event_handler_thread ()
+            {
+                
+                if (is_alive())
+                {
+                    
+                    if (status != failure_to_init)
+                    {
+                        XConfigureEvent event;
+                        event.type = ConfigureNotify;
+                        event.send_event = True;
+                        event.display = disp;
+                        event.window = exit_window;
+                        event.x = 1;
+                        XFlush(disp);
+                        XPutBackEvent(disp,reinterpret_cast<XEvent*>(&event));
+                        XFlush(disp);
+
+                        // This should cause XNextEvent() to unblock so that it will see 
+                        // this ConfigureNotify event we are putting onto the event queue.
+                        XSendEvent(disp,exit_window,False,0,reinterpret_cast<XEvent*>(&event));
+                        XFlush(disp);
+
+                        wait();
+
+                        if (xim != NULL)
+                        {
+                            XCloseIM(xim);
+                        }
+
+                        XCloseDisplay(disp);
+
+
+                    }
+                    else
+                    {
+
+                        wait();
+                    }
+                }
+            }
+
+        private:
+
+            void thread (
+            )
+            {
+                using namespace std;
+                using namespace dlib;
+                try
+                {
+
+/*
+                    // causes dead-lock when using with XIM
+                    if (XInitThreads() == 0)
+                    {
+                        dlog << LFATAL << "Unable to initialize threading support.";
+                        // signal that an error has occurred
+                        window_table.get_mutex().lock();
+                        status = failure_to_init;
+                        et_signaler.broadcast();
+                        window_table.get_mutex().unlock();
+                        return;
+                    }
+*/
+
+                    window_table.get_mutex().lock();
+                    disp = XOpenDisplay(NULL);
+                    window_table.get_mutex().unlock();
+                    if (disp == 0)
+                    {
+                        window_table.get_mutex().lock();
+                        disp = XOpenDisplay(":0.0");
+                        window_table.get_mutex().unlock();
+                        if (disp == 0)
+                        {
+                            dlog << LFATAL << "Unable to connect to the X display.";
+                            // signal that an error has occurred
+                            window_table.get_mutex().lock();
+                            status = failure_to_init;
+                            et_signaler.broadcast();
+                            window_table.get_mutex().unlock();
+                            return;
+                        }
+                    }
+
+                    window_table.get_mutex().lock();
+                    screen = DefaultScreenOfDisplay(disp);
+                    depth = DefaultDepthOfScreen(screen);
+                    delete_window = XInternAtom(disp,"WM_DELETE_WINDOW",1); 
+                    window_table.get_mutex().unlock();
+
+                    xim = NULL;
+                    window_table.get_mutex().lock();
+                    if (setlocale( LC_CTYPE, "" ) && XSupportsLocale() && XSetLocaleModifiers("")){
+                        xim = XOpenIM(disp, NULL, NULL, NULL);
+                    }
+                    window_table.get_mutex().unlock();
+
+                    if (xim)
+                    {
+                        const static XIMStyle preedit_styles[] =
+                            {XIMPreeditPosition, XIMPreeditNothing, XIMPreeditNone, 0};
+                        const static XIMStyle status_styles[] =
+                            {XIMStatusNothing, XIMStatusNone, 0};
+                        xim_style = 0;
+
+                        XIMStyles *xim_styles;
+                        window_table.get_mutex().lock();
+
+                        XGetIMValues (xim, XNQueryInputStyle, &xim_styles, NULL);
+                        window_table.get_mutex().unlock();
+                        std::set<XIMStyle> xims;
+                        for (int i = 0; i < xim_styles->count_styles; ++i){
+                            xims.insert(xim_styles->supported_styles[i]);
+                        }
+                        for (int j = 0; status_styles[j]; ++j){
+                            for (int i = 0; preedit_styles[i]; ++i){
+                                xim_style = (status_styles[j] | preedit_styles[i]);
+                                if (xims.count(xim_style)) break;
+                            }
+                            if (xim_style) break;
+                        }
+                        XFree(xim_styles);
+                    }
+
+                    // make this window just so we can send messages to it and trigger
+                    // events in the event thread
+                    XSetWindowAttributes attr;
+                    window_table.get_mutex().lock();
+                    exit_window = XCreateWindow(
+                        disp,
+                        DefaultRootWindow(disp),
+                        0,
+                        0,
+                        10,  // this is the default width of a window
+                        10,  // this is the default width of a window
+                        0,
+                        depth,
+                        InputOutput,
+                        CopyFromParent,
+                        0,
+                        &attr
+                    );
+                    window_table.get_mutex().unlock();
+
+                    // signal that the event thread is now up and running
+                    window_table.get_mutex().lock();
+                    status = initialized;
+                    et_signaler.broadcast();
+                    window_table.get_mutex().unlock();
+
+                    // start the event handler
+                    event_handler();
+                }
+                catch (std::exception& e)
+                {
+                    cout << "\nEXCEPTION THROWN: \n" << e.what() << endl;
+                    abort();
+                }
+                catch (...)
+                {
+                    cout << "UNKNOWN EXCEPTION THROWN.\n" << endl;
+                    abort();
+                }
+            }
+
+            void event_handler();
+            void init_keyboard_mod_masks();
+        };
+
+        event_handler_thread& globals()
+        {
+            static event_handler_thread* p = new event_handler_thread;
+            return *p;
+        }
+
+        struct event_handler_thread_destruct_helper
+        {
+            ~event_handler_thread_destruct_helper()
+            {
+                globals().window_table.get_mutex().lock();
+                // if there aren't any more gui windows then we can destroy the event handler thread
+                if (globals().window_table.size() == 0)
+                {
+                    globals().window_table.get_mutex().unlock();
+                    delete &globals();
+                }
+                else
+                {
+                    globals().should_destruct = true;
+                    globals().window_table.get_mutex().unlock();
+                }
+            }
+        };
+        static event_handler_thread_destruct_helper just_a_name;
 
     // ----------------------------------------------------------------------------------------
 
@@ -361,7 +609,8 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        void event_handler (
+        void event_handler_thread::
+        event_handler (
         )
         /*!
             ensures
@@ -477,7 +726,7 @@ namespace dlib
                                 hints->max_width = win->width;
                                 hints->max_height = win->height; 
                                 hints->min_height = win->height; 
-                                XSetNormalHints(gui_core_kernel_2_globals::disp,win->x11_stuff.hwnd,hints);
+                                XSetNormalHints(disp,win->x11_stuff.hwnd,hints);
                                 XFree(hints);
                             }
 
@@ -485,18 +734,18 @@ namespace dlib
 
                             if (win->has_been_resized)
                             {
-                                XResizeWindow(gui_core_kernel_2_globals::disp,win->x11_stuff.hwnd,win->width,win->height);
+                                XResizeWindow(disp,win->x11_stuff.hwnd,win->width,win->height);
                                 win->has_been_resized = false;
                                 win->on_window_resized();
                             }
 
                             if (win->has_been_moved)
                             {
-                                XMoveWindow(gui_core_kernel_2_globals::disp,win->x11_stuff.hwnd,win->x,win->y);
+                                XMoveWindow(disp,win->x11_stuff.hwnd,win->x,win->y);
                                 win->has_been_moved = false;
                                 win->on_window_moved();
                             }
-                            XFlush(gui_core_kernel_2_globals::disp);
+                            XFlush(disp);
 
 
                         } break;
@@ -760,7 +1009,7 @@ namespace dlib
                                         window_table.destroy(e->window);
                                         XDestroyWindow(disp,e->window);
                                         win->has_been_destroyed = true;
-                                        gui_core_kernel_2_globals::window_close_signaler.broadcast();
+                                        window_close_signaler.broadcast();
                                     }
                                     else
                                     {
@@ -986,197 +1235,6 @@ namespace dlib
  
     // ----------------------------------------------------------------------------------------
 
-        class event_handler_thread : public threaded_object
-        {
-        public:
-
-            enum et_state
-            {
-                uninitialized,
-                initialized,
-                failure_to_init 
-            };
-
-            et_state status;
-
-            event_handler_thread(
-            )
-            {
-                status = uninitialized;
-            }
-
-            ~event_handler_thread ()
-            {
-                using namespace gui_core_kernel_2_globals;
-                
-                if (is_alive())
-                {
-                    
-                    if (status != failure_to_init)
-                    {
-                        using namespace gui_core_kernel_2_globals;
-                        XConfigureEvent event;
-                        event.type = ConfigureNotify;
-                        event.send_event = True;
-                        event.display = disp;
-                        event.window = exit_window;
-                        event.x = 1;
-                        XFlush(disp);
-                        XPutBackEvent(disp,reinterpret_cast<XEvent*>(&event));
-                        XFlush(disp);
-
-                        // This should cause XNextEvent() to unblock so that it will see 
-                        // this ConfigureNotify event we are putting onto the event queue.
-                        XSendEvent(disp,exit_window,False,0,reinterpret_cast<XEvent*>(&event));
-                        XFlush(disp);
-
-                        wait();
-
-                        if (xim != NULL)
-                        {
-                            XCloseIM(xim);
-                        }
-
-                        XCloseDisplay(disp);
-
-
-                    }
-                    else
-                    {
-
-                        wait();
-                    }
-                }
-            }
-
-        private:
-
-            void thread (
-            )
-            {
-                using namespace std;
-                using namespace dlib;
-                using namespace gui_core_kernel_2_globals;
-                try
-                {
-
-/*
-                    // causes dead-lock when using with XIM
-                    if (XInitThreads() == 0)
-                    {
-                        dlog << LFATAL << "Unable to initialize threading support.";
-                        // signal that an error has occurred
-                        window_table.get_mutex().lock();
-                        status = failure_to_init;
-                        et_signaler.broadcast();
-                        window_table.get_mutex().unlock();
-                        return;
-                    }
-*/
-
-                    window_table.get_mutex().lock();
-                    disp = XOpenDisplay(NULL);
-                    window_table.get_mutex().unlock();
-                    if (disp == 0)
-                    {
-                        window_table.get_mutex().lock();
-                        disp = XOpenDisplay(":0.0");
-                        window_table.get_mutex().unlock();
-                        if (disp == 0)
-                        {
-                            dlog << LFATAL << "Unable to connect to the X display.";
-                            // signal that an error has occurred
-                            window_table.get_mutex().lock();
-                            status = failure_to_init;
-                            et_signaler.broadcast();
-                            window_table.get_mutex().unlock();
-                            return;
-                        }
-                    }
-
-                    window_table.get_mutex().lock();
-                    screen = DefaultScreenOfDisplay(disp);
-                    depth = DefaultDepthOfScreen(screen);
-                    delete_window = XInternAtom(disp,"WM_DELETE_WINDOW",1); 
-                    window_table.get_mutex().unlock();
-
-                    xim = NULL;
-                    window_table.get_mutex().lock();
-                    if (setlocale( LC_CTYPE, "" ) && XSupportsLocale() && XSetLocaleModifiers("")){
-                        xim = XOpenIM(disp, NULL, NULL, NULL);
-                    }
-                    window_table.get_mutex().unlock();
-
-                    if (xim)
-                    {
-                        const static XIMStyle preedit_styles[] =
-                            {XIMPreeditPosition, XIMPreeditNothing, XIMPreeditNone, 0};
-                        const static XIMStyle status_styles[] =
-                            {XIMStatusNothing, XIMStatusNone, 0};
-                        xim_style = 0;
-
-                        XIMStyles *xim_styles;
-                        window_table.get_mutex().lock();
-
-                        XGetIMValues (xim, XNQueryInputStyle, &xim_styles, NULL);
-                        window_table.get_mutex().unlock();
-                        std::set<XIMStyle> xims;
-                        for (int i = 0; i < xim_styles->count_styles; ++i){
-                            xims.insert(xim_styles->supported_styles[i]);
-                        }
-                        for (int j = 0; status_styles[j]; ++j){
-                            for (int i = 0; preedit_styles[i]; ++i){
-                                xim_style = (status_styles[j] | preedit_styles[i]);
-                                if (xims.count(xim_style)) break;
-                            }
-                            if (xim_style) break;
-                        }
-                        XFree(xim_styles);
-                    }
-
-                    // make this window just so we can send messages to it and trigger
-                    // events in the event thread
-                    XSetWindowAttributes attr;
-                    window_table.get_mutex().lock();
-                    exit_window = XCreateWindow(
-                        disp,
-                        DefaultRootWindow(disp),
-                        0,
-                        0,
-                        10,  // this is the default width of a window
-                        10,  // this is the default width of a window
-                        0,
-                        depth,
-                        InputOutput,
-                        CopyFromParent,
-                        0,
-                        &attr
-                    );
-                    window_table.get_mutex().unlock();
-
-                    // signal that the event thread is now up and running
-                    window_table.get_mutex().lock();
-                    status = initialized;
-                    et_signaler.broadcast();
-                    window_table.get_mutex().unlock();
-
-                    // start the event handler
-                    event_handler();
-                }
-                catch (std::exception& e)
-                {
-                    cout << "\nEXCEPTION THROWN: \n" << e.what() << endl;
-                    abort();
-                }
-                catch (...)
-                {
-                    cout << "UNKNOWN EXCEPTION THROWN.\n" << endl;
-                    abort();
-                }
-            }
-        };
-
-    // ----------------------------------------------------------------------------------------
 
         int index_to_modmask(unsigned long n)
         {
@@ -1194,7 +1252,8 @@ namespace dlib
             return Mod5Mask;
         }
 
-        void init_keyboard_mod_masks()
+        void event_handler_thread::
+        init_keyboard_mod_masks()
         {
             XModifierKeymap* map = XGetModifierMapping( disp );
             KeyCode* codes = map->modifiermap + map->max_keypermod * Mod1MapIndex;
@@ -1237,31 +1296,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        static event_handler_thread event_handler_thread_object;
 
-        void init_gui_core ()
-        {
-            using namespace dlib::gui_core_kernel_2_globals;
-            auto_mutex M(window_table.get_mutex());
-
-            if (core_has_been_initialized == false)
-            {
-                core_has_been_initialized = true;
-
-
-                // start up the event handler thread
-                event_handler_thread_object.start();
-
-                // wait for the event thread to get up and running
-                while (event_handler_thread_object.status == event_handler_thread::uninitialized)
-                    et_signaler.wait();
-
-                if (event_handler_thread_object.status == event_handler_thread::failure_to_init)
-                    throw gui_error("Failed to initialize X11 resources");
-
-                init_keyboard_mod_masks();
-            }
-        }
 
 
 
@@ -1313,12 +1348,10 @@ namespace dlib
     )
     {
         using namespace gui_core_kernel_2_globals;
-        init_gui_core();
-        auto_mutex M(window_table.get_mutex());
-        clipboard = str;
-        clipboard[0] = clipboard[0];
+        auto_mutex M(globals().window_table.get_mutex());
+        globals().clipboard = str.c_str();
 
-        XSetSelectionOwner(disp,XA_PRIMARY,exit_window,CurrentTime);
+        XSetSelectionOwner(globals().disp,XA_PRIMARY,globals().exit_window,CurrentTime);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1362,8 +1395,7 @@ namespace dlib
     )
     {
         using namespace gui_core_kernel_2_globals;
-        init_gui_core();
-        auto_mutex M(window_table.get_mutex());
+        auto_mutex M(globals().window_table.get_mutex());
         str.clear();
         unsigned char *data = 0;
         wchar_t **plist = 0;
@@ -1375,13 +1407,12 @@ namespace dlib
 
         try
         {
-            Atom atom_ct = XInternAtom(disp, "COMPOUND_TEXT", False);
-            sown = XGetSelectionOwner (disp, XA_PRIMARY);
-            if (sown == exit_window)
+            Atom atom_ct = XInternAtom(globals().disp, "COMPOUND_TEXT", False);
+            sown = XGetSelectionOwner (globals().disp, XA_PRIMARY);
+            if (sown == globals().exit_window)
             {
                 // if we are copying from ourselfs then don't fool with the Xwindows junk.
-                str = clipboard;
-                str[0] = str[0];
+                str = globals().clipboard.c_str();
             }
             else if (sown != None)
             {
@@ -1389,15 +1420,15 @@ namespace dlib
                 // of the exit_window.  It doesn't matter what window we put it in 
                 // so long as it is one under the control of this process and exit_window
                 // is easy to use here so that is what I'm using.
-                XConvertSelection (disp, XA_PRIMARY, atom_ct, XA_PRIMARY,
-                                   exit_window, CurrentTime);
+                XConvertSelection (globals().disp, XA_PRIMARY, atom_ct, XA_PRIMARY,
+                                   globals().exit_window, CurrentTime);
 
                 // This will wait until we get a SelectionNotify event which should happen
                 // really soon.
-                XPeekIfEvent(disp,&e,clip_peek_helper,0);
+                XPeekIfEvent(globals().disp,&e,clip_peek_helper,0);
 
                 // See how much data we got
-                XGetWindowProperty (disp, exit_window, 
+                XGetWindowProperty (globals().disp, globals().exit_window, 
                                     XA_PRIMARY,    // Tricky..
                                     0, 0,         // offset - len
                                     0,        // Delete 0==FALSE
@@ -1414,14 +1445,14 @@ namespace dlib
                 if (bytes_left > 0 && type == atom_ct)
                 {
                     XTextProperty p;
-                    result = XGetWindowProperty (disp, exit_window, 
+                    result = XGetWindowProperty (globals().disp, globals().exit_window, 
                                                  XA_PRIMARY, 0,bytes_left,0,
                                                  AnyPropertyType, &p.encoding,&p.format,
                                                  &p.nitems, &dummy, &p.value);
                     if (result == Success && p.encoding == atom_ct)
                     {
                         int n;
-                        XwcTextPropertyToTextList(disp, &p, &plist, &n);
+                        XwcTextPropertyToTextList(globals().disp, &p, &plist, &n);
                         str = plist[0];
                     }
                     if (plist)
@@ -1452,18 +1483,18 @@ namespace dlib
             void*
         )
         {
-            auto_mutex M(window_table.get_mutex());
+            auto_mutex M(globals().window_table.get_mutex());
 
-            user_events.lock();
-            user_events.swap(user_events_temp);
-            user_events.unlock();
+            globals().user_events.lock();
+            globals().user_events.swap(globals().user_events_temp);
+            globals().user_events.unlock();
 
 
-            user_events_temp.reset();
+            globals().user_events_temp.reset();
             // now dispatch all these user events
-            while (user_events_temp.move_next())
+            while (globals().user_events_temp.move_next())
             {
-                base_window** win_ = window_table[user_events_temp.element().w];
+                base_window** win_ = globals().window_table[globals().user_events_temp.element().w];
                 base_window* win;
                 // if this window exists in the window table then dispatch
                 // its event.
@@ -1471,12 +1502,12 @@ namespace dlib
                 {
                     win = *win_;
                     win->on_user_event(
-                        user_events_temp.element().p,
-                        user_events_temp.element().i
+                        globals().user_events_temp.element().p,
+                        globals().user_events_temp.element().i
                     );
                 }
             }
-            user_events_temp.clear();
+            globals().user_events_temp.clear();
         }
     }
 
@@ -1492,12 +1523,12 @@ namespace dlib
         e.p = p;
         e.i = i;
         {
-            auto_mutex M(user_events.get_mutex());
-            user_events.enqueue(e);
+            auto_mutex M(globals().user_events.get_mutex());
+            globals().user_events.enqueue(e);
 
             // we only need to start a thread to deal with this if there isn't already
             // one out working on the queue
-            if (user_events.size() == 1)
+            if (globals().user_events.size() == 1)
                 create_new_thread (trigger_user_event_threadproc,0);
         }
     }
@@ -1515,15 +1546,14 @@ namespace dlib
         has_been_destroyed(false),
         has_been_resized(false),
         has_been_moved(false),
-        wm(gui_core_kernel_2_globals::window_table.get_mutex())
+        wm(gui_core_kernel_2_globals::globals().window_table.get_mutex())
     {
         DLIB_ASSERT(!(undecorated == true && resizable_ == true),
             "\tbase_window::base_window()"
             << "\n\tThere is no such thing as an undecorated window that is resizable by the user."
             << "\n\tthis:     " << this
             );
-
-        gui_core_kernel_2_globals::init_gui_core();
+        using namespace gui_core_kernel_2_globals;
 
         auto_mutex M(wm);
         
@@ -1542,15 +1572,16 @@ namespace dlib
             valuemask = CWOverrideRedirect;
         }
 
+
         x11_stuff.hwnd = XCreateWindow(
-                        gui_core_kernel_2_globals::disp,
-                        DefaultRootWindow(gui_core_kernel_2_globals::disp),
+                        globals().disp,
+                        DefaultRootWindow(globals().disp),
                         0,
                         0,
                         10,  // this is the default width of a window
                         10,  // this is the default width of a window
                         0,
-                        gui_core_kernel_2_globals::depth,
+                        globals().depth,
                         InputOutput,
                         CopyFromParent,
                         valuemask,
@@ -1558,7 +1589,7 @@ namespace dlib
                         );
 
         x11_stuff.xic = NULL;
-        if (gui_core_kernel_2_globals::xim)
+        if (globals().xim)
         {
             XVaNestedList   xva_nlist;
             XPoint          xpoint;
@@ -1569,13 +1600,13 @@ namespace dlib
             char fontset[256];
             const long native_font_height = 12;
             sprintf(fontset, "-*-*-medium-r-normal--%lu-*-*-*-", native_font_height);
-            x11_stuff.fs = XCreateFontSet(gui_core_kernel_2_globals::disp, fontset, &mlist, &mcount, &def_str);
+            x11_stuff.fs = XCreateFontSet(globals().disp, fontset, &mlist, &mcount, &def_str);
             xpoint.x = 0;
             xpoint.y = 0;
             xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, XNFontSet, x11_stuff.fs, NULL);
             x11_stuff.xic = XCreateIC(
-                gui_core_kernel_2_globals::xim,
-                XNInputStyle, gui_core_kernel_2_globals::xim_style,
+                globals().xim,
+                XNInputStyle, globals().xim_style,
                 XNClientWindow, x11_stuff.hwnd,
                 XNPreeditAttributes, xva_nlist,
                 NULL
@@ -1586,7 +1617,7 @@ namespace dlib
 
         Window temp = x11_stuff.hwnd;
         base_window* ttemp = this;
-        gui_core_kernel_2_globals::window_table.add(temp,ttemp);
+        globals().window_table.add(temp,ttemp);
         
         // query event mask required by input method
         unsigned long event_xim = 0;
@@ -1594,7 +1625,7 @@ namespace dlib
              XGetICValues( x11_stuff.xic, XNFilterEvents, &event_xim, NULL );
         
         XSelectInput(
-            gui_core_kernel_2_globals::disp,
+            globals().disp,
             x11_stuff.hwnd,
             StructureNotifyMask|ExposureMask|ButtonPressMask|ButtonReleaseMask|
             PointerMotionMask|LeaveWindowMask|EnterWindowMask|KeyPressMask|
@@ -1602,9 +1633,9 @@ namespace dlib
             );
 
         XSetWMProtocols(
-            gui_core_kernel_2_globals::disp,
+            globals().disp,
             x11_stuff.hwnd,
-            &gui_core_kernel_2_globals::delete_window,
+            &globals().delete_window,
             1
             );
 
@@ -1623,7 +1654,7 @@ namespace dlib
             hints->max_width = width;
             hints->max_height = height; 
             hints->min_height = height; 
-            XSetNormalHints(gui_core_kernel_2_globals::disp,x11_stuff.hwnd,hints);
+            XSetNormalHints(globals().disp,x11_stuff.hwnd,hints);
             XFree(hints);
         }
     }
@@ -1634,8 +1665,23 @@ namespace dlib
     ~base_window (
     )
     {
+        using namespace gui_core_kernel_2_globals;
         close_window();
         delete &x11_stuff;
+
+        // check if we were the last window to be destroyed and the program is
+        // ending.  If so then destroy the event handler thread's global object
+        wm.lock();
+        if (globals().window_table.size() == 0 && globals().should_destruct == true)
+        {
+            wm.unlock();
+            delete &globals();
+        }
+        else
+        {
+            // don't do anything except remember to unlock the wm mutex
+            wm.unlock();
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1644,22 +1690,23 @@ namespace dlib
     close_window (
     )
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
         if (has_been_destroyed == false)
         {
             has_been_destroyed = true;
 
-            gui_core_kernel_2_globals::window_table.destroy(x11_stuff.hwnd);           
-            if (gui_core_kernel_2_globals::xim != NULL)
+            globals().window_table.destroy(x11_stuff.hwnd);           
+            if (globals().xim != NULL)
             {
                 XDestroyIC(x11_stuff.xic);
                 x11_stuff.xic = 0;
-                XFreeFontSet(gui_core_kernel_2_globals::disp,x11_stuff.fs);
+                XFreeFontSet(globals().disp,x11_stuff.fs);
             }
 
-            XDestroyWindow(gui_core_kernel_2_globals::disp,x11_stuff.hwnd);
+            XDestroyWindow(globals().disp,x11_stuff.hwnd);
             x11_stuff.hwnd = 0;
-            gui_core_kernel_2_globals::window_close_signaler.broadcast();
+            globals().window_close_signaler.broadcast();
         }   
     }
 
@@ -1696,6 +1743,7 @@ namespace dlib
         const std::wstring& title_
     )
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::set_title"
@@ -1706,10 +1754,10 @@ namespace dlib
         // it isn't const anymore.
         wchar_t *title = const_cast<wchar_t *>(title_.c_str());
         XTextProperty property;
-        XwcTextListToTextProperty(gui_core_kernel_2_globals::disp,&title,1,XStdICCTextStyle, &property);
-        XSetWMName(gui_core_kernel_2_globals::disp,x11_stuff.hwnd,&property);
+        XwcTextListToTextProperty(globals().disp,&title,1,XStdICCTextStyle, &property);
+        XSetWMName(globals().disp,x11_stuff.hwnd,&property);
         XFree(property.value);
-        XFlush(gui_core_kernel_2_globals::disp);
+        XFlush(globals().disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1718,14 +1766,15 @@ namespace dlib
     show (
     )    
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::show"
             << "\n\tYou can't do this to a window that has been closed."
             << "\n\tthis:     " << this
             );
-        XMapRaised(gui_core_kernel_2_globals::disp,x11_stuff.hwnd);
-        XFlush(gui_core_kernel_2_globals::disp);
+        XMapRaised(globals().disp,x11_stuff.hwnd);
+        XFlush(globals().disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1734,9 +1783,10 @@ namespace dlib
     wait_until_closed (
     ) const
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
         while (has_been_destroyed == false)
-            gui_core_kernel_2_globals::window_close_signaler.wait();
+            globals().window_close_signaler.wait();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1745,14 +1795,15 @@ namespace dlib
     hide (
     )    
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::hide"
             << "\n\tYou can't do this to a window that has been closed."
             << "\n\tthis:     " << this
             );
-        XUnmapWindow(gui_core_kernel_2_globals::disp,x11_stuff.hwnd);
-        XFlush(gui_core_kernel_2_globals::disp);
+        XUnmapWindow(globals().disp,x11_stuff.hwnd);
+        XFlush(globals().disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1763,6 +1814,7 @@ namespace dlib
         int height_
     )
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::set_size"
@@ -1790,13 +1842,13 @@ namespace dlib
             hints->max_width = width;
             hints->max_height = height; 
             hints->min_height = height; 
-            XSetNormalHints(gui_core_kernel_2_globals::disp,x11_stuff.hwnd,hints);
+            XSetNormalHints(globals().disp,x11_stuff.hwnd,hints);
             XFree(hints);
         }
 
-        XResizeWindow(gui_core_kernel_2_globals::disp,x11_stuff.hwnd,width,height);
+        XResizeWindow(globals().disp,x11_stuff.hwnd,width,height);
         
-        XFlush(gui_core_kernel_2_globals::disp);
+        XFlush(globals().disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1807,6 +1859,7 @@ namespace dlib
         long y_
     )
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::set_pos"
@@ -1821,8 +1874,8 @@ namespace dlib
 
         has_been_moved = true;
 
-        XMoveWindow(gui_core_kernel_2_globals::disp,x11_stuff.hwnd,x,y);
-        XFlush(gui_core_kernel_2_globals::disp);
+        XMoveWindow(globals().disp,x11_stuff.hwnd,x,y);
+        XFlush(globals().disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1833,6 +1886,7 @@ namespace dlib
         long& y_
     )
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::get_pos"
@@ -1844,9 +1898,9 @@ namespace dlib
         // will have reported bogus values back in the ConfigureNotify event.  So just to be
         // on the safe side we will use XTranslateCoordinates() 
         int rx, ry;
-        Window desktop_window = DefaultRootWindow(gui_core_kernel_2_globals::disp);
+        Window desktop_window = DefaultRootWindow(globals().disp);
         Window junk;
-        XTranslateCoordinates(gui_core_kernel_2_globals::disp,x11_stuff.hwnd,desktop_window,0,0,&rx, &ry, &junk);
+        XTranslateCoordinates(globals().disp,x11_stuff.hwnd,desktop_window,0,0,&rx, &ry, &junk);
         x_ = rx;
         y_ = ry;
         x = rx;
@@ -1880,6 +1934,7 @@ namespace dlib
         unsigned long& height_
     ) const
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
         DLIB_ASSERT(is_closed() == false,
             "\tvoid base_window::get_display_size"
@@ -1887,10 +1942,9 @@ namespace dlib
             << "\n\tthis:     " << this
             );
 
-        using namespace gui_core_kernel_2_globals;
-        int screen_number = XScreenNumberOfScreen(screen);
-        width_ = DisplayWidth(disp, screen_number);
-        height_ = DisplayHeight(disp, screen_number);
+        int screen_number = XScreenNumberOfScreen(globals().screen);
+        width_ = DisplayWidth(globals().disp, screen_number);
+        height_ = DisplayHeight(globals().disp, screen_number);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1900,6 +1954,7 @@ namespace dlib
         const rectangle& rect
     )
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
         if (is_mapped == false)
             return;
@@ -1911,8 +1966,8 @@ namespace dlib
             const unsigned long width = rect.width();
             const unsigned long height = rect.height();
             
-            XClearArea(gui_core_kernel_2_globals::disp,x11_stuff.hwnd,x,y,width,height,1);
-            XFlush(gui_core_kernel_2_globals::disp);
+            XClearArea(globals().disp,x11_stuff.hwnd,x,y,width,height,1);
+            XFlush(globals().disp);
         }
     }
 
@@ -1924,8 +1979,9 @@ namespace dlib
         long y
     )
     {
+        using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
-        if (!x11_stuff.xic || !(gui_core_kernel_2_globals::xim_style & XIMPreeditPosition)) return;
+        if (!x11_stuff.xic || !(globals().xim_style & XIMPreeditPosition)) return;
 
         XVaNestedList   xva_nlist;
         XPoint          xpoint;
