@@ -16,16 +16,6 @@
       Programs written using them can be compiled under POSIX or MS Windows platforms without changing the code.
       </p>
 
-   
-
-        <p>One important thing to note about the API wrappers (except the threading wrappers)
-         is that some platforms
-        need to be initialized in some way or another before the API will work right.
-        Because of this it is never safe to call API wrapper functions before
-        main() has been entered.  This means no global objects with
-        constructors that call them or any weird stuff like that.</p>
-
-
 
    
    </body>
