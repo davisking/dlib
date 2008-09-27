@@ -1092,7 +1092,7 @@ namespace dlib
         class tooltip_window : public base_window 
         {
         public:
-            tooltip_window (const font* f) : base_window(false,true), pad(3), mfont(f)
+            tooltip_window (const shared_ptr_thread_safe<font>& f) : base_window(false,true), pad(3), mfont(f)
             {
             }
 
@@ -1100,7 +1100,7 @@ namespace dlib
             rectangle rect_all;
             rectangle rect_text;
             const unsigned long pad;
-            const font* mfont;
+            const shared_ptr_thread_safe<font> mfont;
             
             void set_text (
                 const std::string& str
@@ -1410,7 +1410,7 @@ namespace dlib
 
     private:
         dlib::ustring text;
-        const font* f;
+        const shared_ptr_thread_safe<font> f;
         member_function_pointer<>::kernel_1a action;
         unichar hotkey;
         point underline_p1;
@@ -1556,7 +1556,7 @@ namespace dlib
 
     private:
         dlib::ustring text;
-        const font* f;
+        const shared_ptr_thread_safe<font> f;
         member_function_pointer<>::kernel_1a action;
         unichar hotkey;
         point underline_p1;

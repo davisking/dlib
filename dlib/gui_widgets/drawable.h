@@ -344,7 +344,7 @@ namespace dlib
         }
 
         virtual void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         )
         {
             auto_mutex M(m);
@@ -352,9 +352,10 @@ namespace dlib
             parent.invalidate_rectangle(rect);
         }
 
-        const font* main_font (
+        const shared_ptr_thread_safe<font> main_font (
         ) const
         {
+            auto_mutex M(m);
             return mfont;
         }
 
@@ -419,7 +420,7 @@ namespace dlib
         bool enabled;
         const long& lastx;
         const long& lasty;
-        const font* mfont;
+        shared_ptr_thread_safe<font> mfont;
 
         
         void enable_events (

@@ -432,13 +432,15 @@ public:
     {
         bool use_bdf_fonts = false;
 
+        shared_ptr_thread_safe<bdf_font> f(new bdf_font);
         
         if (use_bdf_fonts)
         {
-            ifstream fin("/home/davis/source/10x20.bdf");
-            f.read_bdf_file(fin,0xFFFF);
 
-            mt.set_main_font(&f);
+            ifstream fin("/home/davis/source/10x20.bdf");
+            f->read_bdf_file(fin,0xFFFF);
+
+            mt.set_main_font(f);
         }
         //mt.hide();
         mt.set_pos(5,200);
@@ -465,7 +467,7 @@ public:
         lb.set_pos(580,200);
         lb.set_size(200,300);
         if (use_bdf_fonts)
-            lb.set_main_font(&f);
+            lb.set_main_font(f);
 
         dlib::queue<string>::kernel_2a_c qos;
         string a;
@@ -597,7 +599,7 @@ public:
 
 
         if (use_bdf_fonts)
-            rb.set_main_font(&f);
+            rb.set_main_font(f);
         rb.set_name("radio button");
         rb.set_pos(sb_shown.get_rect().left(),sb_shown.get_rect().bottom()+2);
 
@@ -641,7 +643,7 @@ public:
         b.set_click_handler(*this,&win::on_click);
         b.set_tooltip_text("hurray i'm a button!");
         if (use_bdf_fonts)
-            b.set_main_font(&f);
+            b.set_main_font(f);
 
 
         set_size(800,500);
@@ -658,9 +660,9 @@ public:
         save_file_box(*this,&win::on_open_file);
 
         if (use_bdf_fonts)
-            tf.set_main_font(&f);
+            tf.set_main_font(f);
         if (use_bdf_fonts)
-            tabs.set_main_font(&f);
+            tabs.set_main_font(f);
 
     }
 
@@ -728,7 +730,6 @@ private:
     label cbl;
     check_box cbox;
     int count;
-    bdf_font f;
     int flip;
     widget_group group1;
     widget_group group2;

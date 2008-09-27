@@ -13,7 +13,7 @@
 #include "../array.h"
 #include "../array2d.h"
 #include "../threads.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers_thread_safe.h"
 
 namespace dlib
 {
@@ -494,16 +494,16 @@ namespace dlib
 
 
     public:
-        static const font* get_font (
+        static const shared_ptr_thread_safe<font>& get_font (
         )
         {        
             static mutex m;
-            static scoped_ptr<default_font> f;
+            static shared_ptr_thread_safe<font> f;
             auto_mutex M(m);
             if (f.get() == 0)
                 f.reset(new default_font);
 
-            return f.get();
+            return f;
         }
 
         ~default_font(

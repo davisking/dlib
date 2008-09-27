@@ -387,13 +387,11 @@ namespace dlib
         !*/
 
     public:
-        static const font* get_font(
+        static const shared_ptr_thread_safe<font> get_font(
         );
         /*!
             ensures
                 - returns an instance of this font.
-                  (Note that you do not need to and should NOT call delete on the 
-                  returned pointer)
             throws
                 - std::bad_alloc
                     This exception is thrown if there is a problem gathering the needed

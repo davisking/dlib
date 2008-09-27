@@ -359,7 +359,7 @@ namespace dlib
         !*/
 
         virtual void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         );
         /*!
             ensures
@@ -368,7 +368,7 @@ namespace dlib
                     - parent_window() is updated to reflect the new state of #*this 
         !*/
 
-        const font* main_font (
+        const shared_ptr_thread_safe<font> main_font (
         ) const;
         /*!
             ensures
@@ -458,7 +458,7 @@ namespace dlib
         bool enabled;
 
         // This is the font pointer returned by main_font()
-        const font* mfont;
+        shared_ptr_thread_safe<font> mfont;
 
         // This is the x coordinate that we last saw the mouse at or -1 if the mouse
         // is outside the parent window.

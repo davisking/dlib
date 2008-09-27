@@ -88,7 +88,7 @@ namespace dlib
         ) const;
 
         void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         );
 
     private:
@@ -182,7 +182,7 @@ namespace dlib
         ) const;
 
         void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         );
 
         void show (
@@ -367,7 +367,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         );
 
         void set_pos (
@@ -576,7 +576,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         );
 
         int next_free_user_event_number (
@@ -903,7 +903,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         );
 
         void fit_to_contents (
@@ -1022,7 +1022,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         );
 
     protected:
@@ -1081,7 +1081,7 @@ namespace dlib
         );
 
         void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         );
 
     protected:
@@ -1554,7 +1554,7 @@ namespace dlib
         ) const;
 
         void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         );
 
     private:
@@ -2140,7 +2140,7 @@ namespace dlib
         void set_pos(long,long){}
 
         void set_main_font (
-            const font* f
+            const shared_ptr_thread_safe<font>& f
         )
         {
             auto_mutex M(m);

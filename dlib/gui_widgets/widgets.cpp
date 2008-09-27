@@ -131,7 +131,7 @@ namespace dlib
 
     void button::
     set_main_font (
-        const font* f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -395,7 +395,7 @@ namespace dlib
 
     void toggle_button::
     set_main_font (
-        const font* f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -544,7 +544,7 @@ namespace dlib
 
     void label::
     set_main_font (
-        const font* f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -697,7 +697,7 @@ namespace dlib
 
     void text_field::
     set_main_font (
-        const font* f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -1847,7 +1847,7 @@ namespace dlib
 
     void tabbed_display::
     set_main_font (
-        const font* f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -1989,7 +1989,7 @@ namespace dlib
 
     void named_rectangle::
     set_main_font (
-        const font* f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -2167,7 +2167,7 @@ namespace dlib
 
     void mouse_tracker::
     set_main_font (
-        const font* f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
@@ -2375,7 +2375,7 @@ namespace dlib
     template <typename S>
     void list_box<S>::
     set_main_font (
-        const font* f
+        const shared_ptr_thread_safe<font>& f
     )
     {
         auto_mutex M(m);
