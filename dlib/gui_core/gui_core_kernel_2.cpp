@@ -63,11 +63,9 @@ namespace dlib
         static int num_lock_mask = 0;
         static int scroll_lock_mask = 0;
 
-        // put these objects on the heap because we want to ensure that they
-        // aren't destroyed until the event_handler_thread_object is destroyed
-        static window_table_type& window_table = *(new window_table_type);
-        static rsignaler& window_close_signaler = *(new rsignaler(window_table.get_mutex()));
-        static rsignaler& et_signaler = *(new rsignaler(window_table.get_mutex()));
+        static window_table_type window_table;
+        static rsignaler window_close_signaler(window_table.get_mutex());
+        static rsignaler et_signaler(window_table.get_mutex());
 
         struct user_event_type
         {
@@ -1004,7 +1002,6 @@ namespace dlib
             event_handler_thread(
             )
             {
-                register_program_ending_handler(*this, &event_handler_thread::self_destruct);
                 status = uninitialized;
             }
 
@@ -1050,16 +1047,6 @@ namespace dlib
                         wait();
                     }
                 }
-
-                delete &et_signaler;
-                delete &window_close_signaler;
-                delete &window_table;
-            }
-
-            void self_destruct (
-            )
-            {
-                delete this;
             }
 
         private:
@@ -1250,7 +1237,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        static event_handler_thread* event_handler_thread_object = new event_handler_thread;
+        static event_handler_thread event_handler_thread_object;
 
         void init_gui_core ()
         {
@@ -1263,13 +1250,13 @@ namespace dlib
 
 
                 // start up the event handler thread
-                event_handler_thread_object->start();
+                event_handler_thread_object.start();
 
                 // wait for the event thread to get up and running
-                while (event_handler_thread_object->status == event_handler_thread::uninitialized)
+                while (event_handler_thread_object.status == event_handler_thread::uninitialized)
                     et_signaler.wait();
 
-                if (event_handler_thread_object->status == event_handler_thread::failure_to_init)
+                if (event_handler_thread_object.status == event_handler_thread::failure_to_init)
                     throw gui_error("Failed to initialize X11 resources");
 
                 init_keyboard_mod_masks();

@@ -34,6 +34,8 @@ namespace dlib
                     - destructed is associated with the mutex data_mutex
                     - destruct == false
                     - total_count == 0
+                    - should_destruct == false
+                    - function_pointer == 0
 
                 CONVENTION
                     - data_ready is associated with the mutex data_mutex 
@@ -55,13 +57,14 @@ namespace dlib
                     - else
                         - destruct == false
 
-                    - queue_of_enders is locked by the data_mutex
-                    - queue_of_enders == a set of member_function_pointers that should be called
-                      when we want to end all the threads.  these come from calls made to
-                      register_program_ending_handler().
                     - thread_ids is locked by the data_mutex
                     - thread_ids == a set that contains the thread id for each thread spawned by this
                       object.
+
+                    - if (destruct_when_ready() has been called) then
+                        - should_destruct == true
+                    - else
+                        - should_destruct == false
             !*/
 
 
@@ -72,9 +75,16 @@ namespace dlib
             ~threader (
             );
 
-            void add_ender (
-                member_function_pointer<>::kernel_1a mfp
+            void destruct_when_ready (
             );
+            /*!
+                ensures
+                    - if (there are no threads currently running) then
+                        - calls delete this
+                    - else
+                        - sets a flag that will cause the last thread to 
+                          call delete this when it finishes
+            !*/
 
             bool create_new_thread (
                 void (*funct)(void*),
@@ -144,7 +154,6 @@ namespace dlib
 
             // private data
             set<thread_id_type,memory_manager<char>::kernel_2b>::kernel_1b_c thread_ids;
-            queue<member_function_pointer<>::kernel_1a>::kernel_1a queue_of_enders;
             unsigned long total_count;
             void* parameter;
             void (*function_pointer)(void*);
@@ -154,6 +163,7 @@ namespace dlib
             signaler data_empty;        // signaler to signal when the data is empty
             bool destruct;
             signaler destructed;        // signaler to signal when a thread has ended 
+            bool should_destruct;
 
             struct registry_type
             {
@@ -239,21 +249,6 @@ namespace dlib
     )
     {
         threads_kernel_shared::thread_pool().unregister_thread_end_handler(obj,handler);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T
-        >
-    inline void register_program_ending_handler (
-        T& obj,
-        void (T::*handler)()
-    )
-    {
-        member_function_pointer<>::kernel_1a mfp;
-        mfp.set(obj,handler);
-        threads_kernel_shared::thread_pool().add_ender(mfp);
     }
 
 // ----------------------------------------------------------------------------------------

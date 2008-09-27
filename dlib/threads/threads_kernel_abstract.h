@@ -13,33 +13,6 @@ namespace dlib
             Unlike the other API wrappers you may make instances of these objects at the
             global scope and call these functions before main() has been entered.
 
-        PROGRAM TERMINATION
-            When the main() function ends the program will wait until all outstanding 
-            threads have terminated before allowing the program itself to terminate.  
-            This means that if you want your program to actually be able to terminate 
-            you have to ensure that all your threads will eventually end.  To help you 
-            make sure all your threads end you can use the register_program_ending_handler() 
-            function.  It allows you to register a member function that will be called after 
-            main() has ended.  Thus, you can register a function that can tell your 
-            threads to end.
-            
-            Note that you can't safely use the destructor of a global static object
-            to tell a thread to end.  This is because the order in which global objects
-            in different translation units is undefined.  So what may happen if you 
-            attempt this is that dlib may begin to wait for threads to terminate (
-            in the main program thread, i.e. the one that executes global object's
-            destructors) before your object is destructed.  Thus your program would
-            hang forever.  So just use the register_thread_end_handler() function
-            instead of a global object's destructor if you have threads that will 
-            survive beyond the end of main().
-
-            Finally, note that once main() ends C++ will start destructing global and 
-            static objects so any threads making use of those resources may get into 
-            trouble.  So you probably just want to ensure that all your threads are 
-            done *before* you try to terminate the program.  But if that isn't possible 
-            for whatever reason then you can use the register_program_ending_handler() 
-            function to notify those threads that it is time to end.
-
         THREAD POOL
             When threads end they go into a global thread pool and each waits there 
             for 30 seconds before timing out and having its resources returned to the 
@@ -128,33 +101,6 @@ namespace dlib
         ensures
             - Undoes all previous calls to register_thread_end_handler(obj,handler).  
               So the given handler won't be called when any threads end.
-        throws
-            - std::bad_alloc
-              If this exception is thrown then the call to this function had no effect.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T
-        >
-    void register_program_ending_handler (
-        T& obj,
-        void (T::*handler)()
-    );
-    /*!
-        requires
-            - handler == a valid member function pointer for class T
-            - handler does not throw
-            - handler does not call register_thread_end_handler()
-            - handler does not call register_program_ending_handler()
-            - handler does not block
-        ensures
-            - (obj.*handler)() will be called after main() has terminated. 
-            - each call to this function adds another handler that will be called at  
-              program termination.  This means that if you call it a bunch of 
-              times then you will end up registering multiple handlers (or single 
-              handlers multiple times).  
         throws
             - std::bad_alloc
               If this exception is thrown then the call to this function had no effect.

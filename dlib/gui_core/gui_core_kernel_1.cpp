@@ -65,11 +65,9 @@ namespace dlib
         // this variable holds a mapping from window handles to the base_window
         // objects which represent them.  Note that this objects mutex is always locked
         // when inside the event loop.
-        // Also, put these objects on the heap because we want to ensure that they
-        // aren't destroyed until the event_handler is destroyed
-        static window_table_type& window_table = *(new window_table_type);
-        static rsignaler& window_close_signaler = *(new rsignaler(window_table.get_mutex()));
-        static rsignaler& et_signaler = *(new rsignaler(window_table.get_mutex()));
+        static window_table_type window_table;
+        static rsignaler window_close_signaler(window_table.get_mutex());
+        static rsignaler et_signaler(window_table.get_mutex());
 
         // note that this is the thread that will perform all the event
         // processing.
@@ -1335,7 +1333,6 @@ namespace dlib
             )
             {
                 status = uninitialized;
-                register_program_ending_handler(*this, &event_handler_thread::self_destruct);
             }
 
             ~event_handler_thread ()
@@ -1351,15 +1348,6 @@ namespace dlib
 
                     wait();
                 }
-
-                delete &et_signaler;
-                delete &window_close_signaler;
-                delete &window_table;
-            }
-
-            void self_destruct()
-            {
-                delete this;
             }
 
         private:
@@ -1450,7 +1438,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        static event_handler_thread* event_handler = new event_handler_thread;
+        static event_handler_thread event_handler;
 
         void init_gui_core ()
         {
@@ -1463,13 +1451,13 @@ namespace dlib
 
 
                 // start up the event handler thread
-                event_handler->start();
+                event_handler.start();
 
                 // wait for the event thread to get up and running
-                while (event_handler->status == event_handler_thread::uninitialized)
+                while (event_handler.status == event_handler_thread::uninitialized)
                     et_signaler.wait();
 
-                if (event_handler->status == event_handler_thread::failure_to_init)
+                if (event_handler.status == event_handler_thread::failure_to_init)
                     throw gui_error("Failed to start event thread");
             }
         }

@@ -17,18 +17,8 @@ namespace dlib
         shutdown(false),
         running(false)
     {
-        register_program_ending_handler(*this,&timer_kernel_2_global_clock::destruct);
     }
 
-// ----------------------------------------------------------------------------------------
-
-    void timer_kernel_2_global_clock::
-    destruct (
-    )
-    {
-        delete this;
-    }
-    
 // ----------------------------------------------------------------------------------------
 
     timer_kernel_2_global_clock::
@@ -193,8 +183,8 @@ namespace dlib
 
     timer_kernel_2_global_clock& get_global_clock()
     {
-        static timer_kernel_2_global_clock* d = new timer_kernel_2_global_clock;
-        return *d;
+        static timer_kernel_2_global_clock d;
+        return d;
     }
 
 // ----------------------------------------------------------------------------------------

@@ -28,9 +28,22 @@ namespace dlib
         threader& thread_pool (
         ) 
         {
-            static threader thread_pool;
-            return thread_pool;
+            static threader* thread_pool = new threader;
+            return *thread_pool;
         }
+
+// ----------------------------------------------------------------------------------------
+
+        struct threader_destruct_helper
+        {
+            // cause the thread pool to begin its destruction process when 
+            // global objects start to be destroyed
+            ~threader_destruct_helper()
+            {
+                thread_pool().destruct_when_ready();
+            }
+        };
+        static threader_destruct_helper a;
 
 // ----------------------------------------------------------------------------------------
 
@@ -49,11 +62,13 @@ namespace dlib
         threader (
         ) :
             total_count(0),
+            function_pointer(0),
             pool_count(0),
             data_ready(data_mutex),
             data_empty(data_mutex),
             destruct(false),
-            destructed(data_mutex)
+            destructed(data_mutex),
+            should_destruct(false)
         {}
 
 // ----------------------------------------------------------------------------------------
@@ -66,17 +81,6 @@ namespace dlib
             destruct = true;
             data_ready.broadcast();
 
-            member_function_pointer<>::kernel_1a mfp;
-            // call all the handlers for anything that has registered for this event
-            while(queue_of_enders.size())
-            {
-                queue_of_enders.dequeue(mfp);
-
-                data_mutex.unlock();
-                mfp();
-                data_mutex.lock();
-            }
-
             // wait for all the threads to end
             while (total_count > 0)
                 destructed.wait();
@@ -86,12 +90,25 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
         void threader::
-        add_ender (
-            member_function_pointer<>::kernel_1a mfp
+        destruct_when_ready (
         )
         {
-            auto_mutex M(data_mutex);
-            queue_of_enders.enqueue(mfp);
+            data_mutex.lock();
+
+            // if there aren't any active threads, just maybe some sitting around
+            // in the pool then just destroy the threader
+            if (total_count == pool_count)
+            {
+                data_mutex.unlock();
+                delete this;
+            }
+            else
+            {
+                // in this case we just let the thread pool know that it
+                // should self destruct whenever it gets a chance
+                should_destruct = true;
+                data_mutex.unlock();
+            }
         }
 
 // ----------------------------------------------------------------------------------------
@@ -180,7 +197,9 @@ namespace dlib
             // get a reference to the calling threader object
             threader& self = *reinterpret_cast<threader*>(object);
 
+            bool should_destroy_threader = false;
 
+            {
             auto_mutex M(self.data_mutex);
 
             // add this thread id
@@ -244,7 +263,7 @@ namespace dlib
                     ++self.pool_count;
                 }
 
-                if (self.destruct == true)
+                if (self.destruct == true || self.should_destruct == true)
                     break;
 
                 // if we timed out and there isn't any work to do then
@@ -264,6 +283,14 @@ namespace dlib
             --self.total_count;
 
             self.destructed.signal();
+
+            if (self.should_destruct && self.total_count == 0)
+                should_destroy_threader = true;
+
+            } // end of auto_mutex M(self.data_mutex) block
+
+            if (should_destroy_threader)
+                delete &self;
         }
 
     // ------------------------------------------------------------------------------------
