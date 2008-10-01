@@ -55,6 +55,12 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        dlib::mutex* global_mutex()
+        {
+            static dlib::mutex* m = new dlib::mutex;
+            return m;
+        }
+
         class event_handler_thread : public threaded_object
         {
         public:
@@ -169,6 +175,8 @@ namespace dlib
                         wait();
                     }
                 }
+
+                delete global_mutex();
             }
 
         private:
@@ -300,9 +308,16 @@ namespace dlib
             void init_keyboard_mod_masks();
         };
 
+        // Do all this just to make sure global_mutex() is initialized at program start
+        // and thus hopefully before any threads have the chance to startup and call
+        // globals() concurrently.
+        struct call_global_mutex { call_global_mutex() { global_mutex(); } };
+        static call_global_mutex call_global_mutex_instance;
+
         event_handler_thread& globals()
         {
-            static event_handler_thread* p = new event_handler_thread;
+            auto_mutex M(*global_mutex());
+            static event_handler_thread* p = new event_handler_thread();
             return *p;
         }
 

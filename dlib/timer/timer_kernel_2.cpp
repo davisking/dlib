@@ -181,9 +181,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    timer_kernel_2_global_clock& get_global_clock()
+    shared_ptr_thread_safe<timer_kernel_2_global_clock> get_global_clock()
     {
-        static timer_kernel_2_global_clock d;
+        static shared_ptr_thread_safe<timer_kernel_2_global_clock> d(new timer_kernel_2_global_clock);
         return d;
     }
 

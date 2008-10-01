@@ -63,6 +63,12 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        dlib::mutex* global_mutex()
+        {
+            static dlib::mutex* m = new dlib::mutex;
+            return m;
+        }
+
         class event_handler_thread : public threaded_object
         {
         public:
@@ -180,6 +186,8 @@ namespace dlib
 
                     wait();
                 }
+
+                delete global_mutex();
             }
 
         private:
@@ -268,11 +276,27 @@ namespace dlib
             }
         };
 
+        // Do all this just to make sure global_mutex() is initialized at program start
+        // and thus hopefully before any threads have the chance to startup and call
+        // globals() concurrently.
+        struct call_global_mutex { call_global_mutex() { global_mutex(); } };
+        static call_global_mutex call_global_mutex_instance;
+
         event_handler_thread& globals()
         {
-            static event_handler_thread* p = new event_handler_thread;
-            p->start_event_thread();
-            return *p;
+            global_mutex()->lock();
+            try
+            {
+                static event_handler_thread* p = new event_handler_thread;
+                global_mutex()->unlock();
+                p->start_event_thread();
+                return *p;
+            }
+            catch (...)
+            {
+                global_mutex()->unlock();
+                throw;
+            }
         }
 
         struct event_handler_thread_destruct_helper

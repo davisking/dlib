@@ -9,6 +9,7 @@
 #include "timer_kernel_abstract.h"
 #include "../uintn.h"
 #include "../binary_search_tree.h"
+#include "../smart_pointers_thread_safe.h"
 
 namespace dlib
 {
@@ -94,16 +95,10 @@ namespace dlib
 
         mutex m;
 
-        friend timer_kernel_2_global_clock& get_global_clock();
+        friend shared_ptr_thread_safe<timer_kernel_2_global_clock> get_global_clock();
 
     private:
         timer_kernel_2_global_clock();
-
-        void destruct();
-        /*!
-            ensures
-                - calls delete this;
-        !*/
 
         time_map tm;  
         signaler s;
@@ -117,7 +112,7 @@ namespace dlib
                 - spawns timer tasks as is appropriate
         !*/
     };
-    timer_kernel_2_global_clock& get_global_clock();
+    shared_ptr_thread_safe<timer_kernel_2_global_clock> get_global_clock();
     /*!
         ensures
             - returns the global instance of the timer_kernel_2_global_clock object
@@ -138,9 +133,10 @@ namespace dlib
                 - af        == a pointer to the action_function()
                 - in_global_clock == false
                 - next_time_to_run == 0
+                - gc == get_global_clock()
 
             CONVENTION
-                - the mutex used to lock everything is get_global_clock().m
+                - the mutex used to lock everything is gc->m
                 - running == is_running()
                 - delay == delay_time()
                 - *ao == action_object()
@@ -207,6 +203,7 @@ namespace dlib
         // data members
         T& ao;
         const af_type af;
+        shared_ptr_thread_safe<timer_kernel_2_global_clock> gc;
 
         // restricted functions
         timer_kernel_2(const timer_kernel_2&);        // copy constructor
@@ -229,7 +226,8 @@ namespace dlib
         af_type af_
     ) : 
         ao(ao_),
-        af(af_)
+        af(af_),
+        gc(get_global_clock())
     {
         delay = 1000;
         next_time_to_run = 0;
@@ -259,9 +257,9 @@ namespace dlib
     clear(
     )
     {
-        auto_mutex M(get_global_clock().m);
+        auto_mutex M(gc->m);
         running = false;
-        get_global_clock().remove(this);
+        gc->remove(this);
         delay = 1000;        
         next_time_to_run = 0;
     }
@@ -311,7 +309,7 @@ namespace dlib
     is_running (
     ) const
     {
-        auto_mutex M(get_global_clock().m);
+        auto_mutex M(gc->m);
         return running;
     }
 
@@ -324,7 +322,7 @@ namespace dlib
     delay_time (
     ) const
     {
-        auto_mutex M(get_global_clock().m);
+        auto_mutex M(gc->m);
         return delay;        
     }
 
@@ -338,8 +336,8 @@ namespace dlib
         unsigned long milliseconds
     )
     {
-        auto_mutex M(get_global_clock().m);
-        get_global_clock().adjust_delay(this,milliseconds);
+        auto_mutex M(gc->m);
+        gc->adjust_delay(this,milliseconds);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -351,10 +349,10 @@ namespace dlib
     start (            
     )
     {
-        auto_mutex M(get_global_clock().m);
+        auto_mutex M(gc->m);
         if (!running)
         {
-            get_global_clock().add(this);
+            gc->add(this);
             running = true;
         }
     }
@@ -368,10 +366,10 @@ namespace dlib
     stop (
     )
     {
-        get_global_clock().m.lock();
+        gc->m.lock();
         running = false;
-        get_global_clock().remove(this);
-        get_global_clock().m.unlock();
+        gc->remove(this);
+        gc->m.unlock();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -385,11 +383,11 @@ namespace dlib
     {
         // call the action function
         (ao.*af)(); 
-        auto_mutex M(get_global_clock().m);
+        auto_mutex M(gc->m);
         if (running)
         {
-            get_global_clock().remove(this);
-            get_global_clock().add(this);
+            gc->remove(this);
+            gc->add(this);
         }
     }
 
@@ -402,10 +400,10 @@ namespace dlib
     stop_and_wait (
     )
     {
-        get_global_clock().m.lock();
+        gc->m.lock();
         running = false;
-        get_global_clock().remove(this);
-        get_global_clock().m.unlock();
+        gc->remove(this);
+        gc->m.unlock();
         wait();
     }
 
