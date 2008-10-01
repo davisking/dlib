@@ -99,6 +99,7 @@ namespace dlib
 
             rsignaler window_close_signaler;
             rsignaler et_signaler;
+            unsigned long existing_base_windows;
 
             queue_of_user_events user_events;
             queue_of_user_events user_events_temp;
@@ -116,7 +117,8 @@ namespace dlib
                 num_lock_mask(0),
                 scroll_lock_mask(0),
                 window_close_signaler(window_table.get_mutex()),
-                et_signaler(window_table.get_mutex())
+                et_signaler(window_table.get_mutex()),
+                existing_base_windows(0)
             {
                 auto_mutex M(window_table.get_mutex());
 
@@ -327,7 +329,7 @@ namespace dlib
             {
                 globals().window_table.get_mutex().lock();
                 // if there aren't any more gui windows then we can destroy the event handler thread
-                if (globals().window_table.size() == 0)
+                if (globals().existing_base_windows == 0)
                 {
                     globals().window_table.get_mutex().unlock();
                     delete &globals();
@@ -1633,6 +1635,7 @@ namespace dlib
         Window temp = x11_stuff.hwnd;
         base_window* ttemp = this;
         globals().window_table.add(temp,ttemp);
+        globals().existing_base_windows += 1;
         
         // query event mask required by input method
         unsigned long event_xim = 0;
@@ -1687,7 +1690,8 @@ namespace dlib
         // check if we were the last window to be destroyed and the program is
         // ending.  If so then destroy the event handler thread's global object
         wm.lock();
-        if (globals().window_table.size() == 0 && globals().should_destruct == true)
+        globals().existing_base_windows -= 1;
+        if (globals().existing_base_windows == 0 && globals().should_destruct == true)
         {
             wm.unlock();
             delete &globals();
