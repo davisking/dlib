@@ -12,6 +12,7 @@ return_error()
 
 echo Testing environment for needed utilities
 
+bc -h 		> /dev/null || return_error "bc";
 flip -h 		> /dev/null || return_error "flip";
 echo nothing | awk '{}' > /dev/null || return_error "awk";
 echo | sed -e "s/s/r/"  > /dev/null || return_error "sed";
