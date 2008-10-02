@@ -1565,9 +1565,12 @@ namespace dlib
             INITIAL VALUE
                 - horizontal_scroll_pos() == 0
                 - horizontal_scroll_increment() == 1
+                - horizontal_mouse_wheel_scroll_increment() == 1
                 - vertical_scroll_pos() == 0
                 - vertical_scroll_increment() == 1
+                - vertical_mouse_wheel_scroll_increment() == 1
                 - total_rect().empty() == true
+                - mouse_drag_enabled() == false
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a 2D region of arbitrary size that is displayed
@@ -1665,6 +1668,39 @@ namespace dlib
                     - #vertical_scroll_pos() == the valid scroll position closest to pos
         !*/
 
+        unsigned long horizontal_mouse_wheel_scroll_increment (
+        ) const;
+        /*!
+            ensures
+                - returns the number of positions the horizontal scroll bar
+                  moves when the user scrolls the mouse wheel.  
+        !*/
+
+        unsigned long vertical_mouse_wheel_scroll_increment (
+        ) const;
+        /*!
+            ensures
+                - returns the number of positions the vertical scroll bar
+                  moves when the user scrolls the mouse wheel.  
+        !*/
+
+        void set_horizontal_mouse_wheel_scroll_increment (
+            unsigned long inc
+        );
+        /*!
+            ensures
+                - #horizontal_mouse_wheel_scroll_increment() == inc
+        !*/
+
+        void set_vertical_mouse_wheel_scroll_increment (
+            unsigned long inc
+        );
+        /*!
+            ensures
+                - #vertical_mouse_wheel_scroll_increment() == inc
+        !*/
+
+
         unsigned long horizontal_scroll_increment (
         ) const;
         /*!
@@ -1695,6 +1731,31 @@ namespace dlib
         /*!
             ensures
                 - #vertical_scroll_increment() == inc
+        !*/
+
+        bool mouse_drag_enabled (
+        ) const;
+        /*!
+            ensures
+                - if (the user can drag this contents of this widget around by
+                  holding down the left mouse button and dragging) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
+        void enable_mouse_drag (
+        );
+        /*!
+            ensures
+                - #mouse_drag_enabled() == true
+        !*/
+
+        void disable_mouse_drag (
+        );
+        /*!
+            ensures
+                - #mouse_drag_enabled() == false
         !*/
 
     protected:
@@ -1757,7 +1818,10 @@ namespace dlib
     // this object performs)
 
         void on_wheel_down (unsigned long state);
-        void on_wheel_up (unsigned long state);
+        void on_wheel_up   (unsigned long state);
+        void on_mouse_move (unsigned long state, long x, long y);
+        void on_mouse_down (unsigned long btn, unsigned long state, long x, long y, bool is_double_click);
+        void on_mouse_up   (unsigned long btn, unsigned long state, long x, long y);
         void draw (const canvas& c) const;
 
     private:

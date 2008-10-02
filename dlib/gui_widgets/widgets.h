@@ -3864,6 +3864,7 @@ namespace dlib
             bool is_double_click
         )
         {
+            scrollable_region::on_mouse_down(btn, state, x, y, is_double_click);
             if (display_rect().contains(x,y) && enabled && !hidden)
             {
                 // figure out which box this click landed in
@@ -3931,6 +3932,7 @@ namespace dlib
             long y
         ) 
         {
+            scrollable_region::on_mouse_up(btn, state, x, y);
         }
 
         void on_focus_lost (

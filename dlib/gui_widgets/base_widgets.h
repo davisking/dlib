@@ -2667,15 +2667,29 @@ namespace dlib
                 - border_size == 2
                 - hscroll_bar_inc == 1
                 - vscroll_bar_inc == 1
+                - h_wheel_scroll_bar_inc == 1
+                - v_wheel_scroll_bar_inc == 1
+                - mouse_drag_enabled_ == false
+                - user_is_dragging_mouse == false
 
             CONVENTION
+                - mouse_drag_enabled() == mouse_drag_enabled_
                 - border_size == 2
                 - horizontal_scroll_increment() == hscroll_bar_inc
                 - vertical_scroll_increment() == vscroll_bar_inc
+                - horizontal_mouse_wheel_scroll_increment() == h_wheel_scroll_bar_inc
+                - vertical_mouse_wheel_scroll_increment() == v_wheel_scroll_bar_inc
                 - vertical_scroll_pos() == vsb.slider_pos()
                 - horizontal_scroll_pos() == hsb.slider_pos()
                 - total_rect() == total_rect_
                 - display_rect() == display_rect_
+
+                - if (the user is currently dragging the total_rect around with a mouse drag) then
+                    - user_is_dragging_mouse == true
+                    - drag_origin == the point the mouse was at, with respect to total_rect, 
+                      when the dragging started
+                - else
+                    - user_is_dragging_mouse == false 
         !*/
 
     public:
@@ -2684,12 +2698,16 @@ namespace dlib
             drawable_window& w,
             unsigned long events = 0
         ) :
-            drawable(w, MOUSE_WHEEL|events),
+            drawable(w, MOUSE_WHEEL|events|MOUSE_CLICK|MOUSE_MOVE),
             hsb(w,scroll_bar::HORIZONTAL),
             vsb(w,scroll_bar::VERTICAL),
             border_size(2),
             hscroll_bar_inc(1),
-            vscroll_bar_inc(1)
+            vscroll_bar_inc(1),
+            h_wheel_scroll_bar_inc(1),
+            v_wheel_scroll_bar_inc(1),
+            mouse_drag_enabled_(false),
+            user_is_dragging_mouse(false)
         {
             hsb.set_scroll_handler(*this,&scrollable_region::on_h_scroll);
             vsb.set_scroll_handler(*this,&scrollable_region::on_v_scroll);
@@ -2853,6 +2871,37 @@ namespace dlib
             parent.invalidate_rectangle(rect+old);
         }
 
+        unsigned long horizontal_mouse_wheel_scroll_increment (
+        ) const
+        {
+            auto_mutex M(m);
+            return h_wheel_scroll_bar_inc;
+        }
+
+        unsigned long vertical_mouse_wheel_scroll_increment (
+        ) const
+        {
+            auto_mutex M(m);
+            return v_wheel_scroll_bar_inc;
+        }
+
+        void set_horizontal_mouse_wheel_scroll_increment (
+            unsigned long inc
+        )
+        {
+            auto_mutex M(m);
+            h_wheel_scroll_bar_inc = inc;
+        }
+
+        void set_vertical_mouse_wheel_scroll_increment (
+            unsigned long inc
+        )
+        {
+            auto_mutex M(m);
+            v_wheel_scroll_bar_inc = inc;
+        }
+
+
         unsigned long horizontal_scroll_increment (
         ) const
         {
@@ -2937,6 +2986,27 @@ namespace dlib
             display_rect_ = move_rect(display_rect_, rect.left()+border_size, rect.top()+border_size);
 
             total_rect_ = move_rect(total_rect_, display_rect_.left()+delta_x, display_rect_.top()+delta_y);
+        }
+
+        bool mouse_drag_enabled (
+        ) const
+        {
+            auto_mutex M(m);
+            return mouse_drag_enabled_;
+        }
+
+        void enable_mouse_drag (
+        )
+        {
+            auto_mutex M(m);
+            mouse_drag_enabled_ = true;
+        }
+
+        void disable_mouse_drag (
+        )
+        {
+            auto_mutex M(m);
+            mouse_drag_enabled_ = false;
         }
 
     protected:
@@ -3025,17 +3095,65 @@ namespace dlib
             {
                 if (need_v_scroll())
                 {
-                    unsigned long pos = vsb.slider_pos();
-                    vsb.set_slider_pos(pos+1);
+                    long pos = vsb.slider_pos();
+                    vsb.set_slider_pos(pos+(long)v_wheel_scroll_bar_inc);
                     on_v_scroll();
                 }
                 else if (need_h_scroll())
                 {
-                    unsigned long pos = hsb.slider_pos();
-                    hsb.set_slider_pos(pos+1);
+                    long pos = hsb.slider_pos();
+                    hsb.set_slider_pos(pos+(long)h_wheel_scroll_bar_inc);
                     on_h_scroll();
                 }
             }
+        }
+
+        void on_mouse_move (
+            unsigned long state,
+            long x,
+            long y
+        )
+        {
+            if (enabled && !hidden && user_is_dragging_mouse && state==base_window::LEFT)
+            {
+                point current_delta = point(x,y) - point(total_rect().left(), total_rect().top());
+                rectangle new_rect(translate_rect(display_rect(), drag_origin - current_delta));
+                new_rect = centered_rect(new_rect, new_rect.width()-hscroll_bar_inc, new_rect.height()-vscroll_bar_inc);
+                scroll_to_rect(new_rect);
+            }
+            else
+            {
+                user_is_dragging_mouse = false;
+            }
+        }
+
+        void on_mouse_down (
+            unsigned long btn,
+            unsigned long state,
+            long x,
+            long y,
+            bool is_double_click
+        )
+        {
+            if (mouse_drag_enabled_ && enabled && !hidden && display_rect().contains(x,y) && (btn==base_window::LEFT))
+            {
+                drag_origin = point(x,y) - point(total_rect().left(), total_rect().top());
+                user_is_dragging_mouse = true;
+            }
+            else
+            {
+                user_is_dragging_mouse = false;
+            }
+        }
+
+        void on_mouse_up   (
+            unsigned long btn,
+            unsigned long state,
+            long x,
+            long y
+        )
+        {
+            user_is_dragging_mouse = false;
         }
 
         void on_wheel_up (
@@ -3046,14 +3164,14 @@ namespace dlib
             {
                 if (need_v_scroll())
                 {
-                    unsigned long pos = vsb.slider_pos();
-                    vsb.set_slider_pos(pos-1);
+                    long pos = vsb.slider_pos();
+                    vsb.set_slider_pos(pos-(long)v_wheel_scroll_bar_inc);
                     on_v_scroll();
                 }
                 else if (need_h_scroll())
                 {
-                    unsigned long pos = hsb.slider_pos();
-                    hsb.set_slider_pos(pos-1);
+                    long pos = hsb.slider_pos();
+                    hsb.set_slider_pos(pos-(long)h_wheel_scroll_bar_inc);
                     on_h_scroll();
                 }
             }
@@ -3131,6 +3249,11 @@ namespace dlib
         const unsigned long border_size;
         unsigned long hscroll_bar_inc;
         unsigned long vscroll_bar_inc;
+        unsigned long h_wheel_scroll_bar_inc;
+        unsigned long v_wheel_scroll_bar_inc;
+        bool mouse_drag_enabled_;
+        bool user_is_dragging_mouse;
+        point drag_origin;
 
     };
     scrollable_region::~scrollable_region(){}
