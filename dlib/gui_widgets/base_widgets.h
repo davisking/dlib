@@ -3259,6 +3259,149 @@ namespace dlib
     scrollable_region::~scrollable_region(){}
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // class popup_menu_region 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class popup_menu_region : public drawable 
+    {
+
+    public:
+
+        popup_menu_region(  
+            drawable_window& w
+        ) :
+            drawable(w,MOUSE_CLICK | KEYBOARD_EVENTS | FOCUS_EVENTS | WINDOW_MOVED),
+            popup_menu_shown(false)
+        {
+            enable_events();
+        }
+
+        virtual ~popup_menu_region(
+        ){ disable_events();}
+
+        void set_size (
+            long width, 
+            long height
+        )
+        {
+            auto_mutex M(m);
+            rect = resize_rect(rect,width,height);
+        }
+
+        popup_menu& menu (
+        )
+        {
+            return menu_;
+        }
+
+        void hide (
+        )
+        {
+            auto_mutex M(m);
+            drawable::hide();
+            menu_.hide();
+            popup_menu_shown = false;
+        }
+
+        void disable (
+        )
+        {
+            auto_mutex M(m);
+            drawable::disable();
+            menu_.hide();
+            popup_menu_shown = false;
+        }
+
+    protected:
+
+        void on_keydown (
+            unsigned long key,
+            bool is_printable,
+            unsigned long state
+        )
+        {
+            if (enabled && !hidden && popup_menu_shown)
+            {
+                menu_.forwarded_on_keydown(key, is_printable, state);
+            }
+            else if (popup_menu_shown)
+            {
+                menu_.hide();
+                popup_menu_shown = false;
+            }
+        }
+
+        void on_focus_lost (
+        )
+        {
+            if (popup_menu_shown)
+            {
+                menu_.hide();
+                popup_menu_shown = false;
+            }
+        }
+
+        void on_focus_gained (
+        )
+        {
+            if (popup_menu_shown)
+            {
+                menu_.hide();
+                popup_menu_shown = false;
+            }
+        }
+
+        void on_window_moved(
+        )
+        {
+            if (popup_menu_shown)
+            {
+                menu_.hide();
+                popup_menu_shown = false;
+            }
+        }
+
+        void on_mouse_down (
+            unsigned long btn,
+            unsigned long state,
+            long x,
+            long y,
+            bool is_double_click
+        )
+        {
+            if (enabled && !hidden && rect.contains(x,y) && btn == base_window::RIGHT)
+            {
+                long orig_x, orig_y;
+                parent.get_pos(orig_x, orig_y);
+                menu_.set_pos(orig_x+x, orig_y+y);
+                menu_.show();
+                popup_menu_shown = true;
+            }
+            else if (popup_menu_shown)
+            {
+                menu_.hide();
+                popup_menu_shown = false;
+            }
+        }
+
+        void draw (
+            const canvas& 
+        ) const{}
+
+    private:
+
+        popup_menu menu_;
+        bool popup_menu_shown;
+
+        // restricted functions
+        popup_menu_region(popup_menu_region&);        // copy constructor
+        popup_menu_region& operator=(popup_menu_region&);    // assignment operator
+    };
+
+
+// ----------------------------------------------------------------------------------------
 
 }
 

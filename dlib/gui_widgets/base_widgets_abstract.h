@@ -1323,6 +1323,79 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // class popup_menu_region 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class popup_menu_region : public drawable 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a region on a window where if the user
+                right clicks the mouse over this region a popup_menu pops up.
+                
+                Note that this widget doesn't actually draw anything, it just 
+                provides a region the user can click on to get a popup menu.
+        !*/
+
+    public:
+
+        popup_menu_region(  
+            drawable_window& w
+        );
+        /*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/
+
+        virtual ~popup_menu_region(
+        );
+        /*!
+            ensures
+                - all resources associated with *this have been released
+        !*/
+
+        void set_size (
+            long width_, 
+            long height_ 
+        );
+        /*!
+            ensures
+                - #width() == width_
+                - #height() == height_
+                - #top() == top()
+                - #left() == left()
+                - i.e. The location of the upper left corner of this widget stays the
+                  same but its width and height are modified
+        !*/
+
+        popup_menu& menu (
+        );
+        /*!
+            ensures
+                - returns a reference to the popup_menu for this object. It is
+                  the menu that is displayed when the user right clicks on 
+                  this widget
+        !*/
+
+    private:
+
+        // restricted functions
+        popup_menu_region(popup_menu_region&);        // copy constructor
+        popup_menu_region& operator=(popup_menu_region&);    // assignment operator
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // class zoomable_region 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     class zoomable_region : public drawable 
     {
