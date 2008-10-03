@@ -171,6 +171,7 @@
          <term link="dlib/gui_widgets/drawable_abstract.h.html#disable" name="disable"/>
          <term link="dlib/gui_widgets/drawable_abstract.h.html#is_hidden" name="is_hidden"/>
          <term link="dlib/gui_widgets/drawable_abstract.h.html#drawable_window" name="drawable_window"/>
+         <term link="dlib/gui_widgets/drawable_abstract.h.html#drawable" name="drawable"/>
 
          <term name="show">
             <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#show" name="in base_window object"/>
@@ -284,6 +285,7 @@
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#mouse_over_event" name="mouse_over_event"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#arrow_button" name="arrow_button"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#tooltip" name="tooltip"/>
+         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#popup_menu_region" name="popup_menu_region"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#scroll_bar" name="scroll_bar"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#widget_group" name="widget_group"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#image_widget" name="image_widget"/>

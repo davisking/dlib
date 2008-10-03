@@ -48,6 +48,10 @@
                                <link>dlib/gui_widgets/base_widgets_abstract.h.html#tooltip</link>
                            </item>
                            <item>
+                               <name>popup_menu_region</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#popup_menu_region</link>
+                           </item>
+                           <item>
                                <name>button_action</name>
                                <link>dlib/gui_widgets/base_widgets_abstract.h.html#button_action</link>
                            </item>

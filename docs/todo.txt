@@ -51,7 +51,6 @@ make the popup menus from the menu_bar always put themselves on the screen
 add toggle menu item styles
 improve unicode support in on_keydown()
 make widgets take ustring as well as std::string
-add a popup menu region sort of like the tooltip widget
 make other widgets have a user settable style
 
 
