@@ -1148,7 +1148,6 @@ namespace dlib
         /*!
             ensures
                 - The text of this menu item will be str
-                  clicked by the user.
                 - #get_hot_key() == hotkey
         !*/
 
