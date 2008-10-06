@@ -2957,7 +2957,7 @@ namespace dlib
         matrix<typename EXP::type::type, EXP::type::NR, EXP::type::NR, typename EXP::mem_manager_type> cov(m(0).nr(),m(0).nr());
         set_all_elements(cov,0);
 
-        const matrix<double,4,1, typename EXP::mem_manager_type> avg = mean(m);
+        const matrix<double,EXP::type::NR,EXP::type::NC, typename EXP::mem_manager_type> avg = mean(m);
 
         for (long r = 0; r < m.nr(); ++r)
         {
