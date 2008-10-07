@@ -33,35 +33,12 @@ namespace dlib
         typedef typename kernel_type::sample_type sample_type;
         typedef typename kernel_type::mem_manager_type mm;
 
-        COMPILE_TIME_ASSERT(is_matrix<sample_matrix_type>::value);
-        COMPILE_TIME_ASSERT(is_matrix<typename sample_matrix_type::type>::value);
-        COMPILE_TIME_ASSERT(is_matrix<label_matrix_type>::value);
-  
+
         // make sure requires clause is not broken
-        DLIB_ASSERT(samples.nc() == 1 && labels.nc() == 1 && samples.size() == labels.size() &&
-                    samples.size() > 0,
+        DLIB_ASSERT(is_binary_classification_problem(samples, labels) == true,
             "\tmatrix rank_features()"
             << "\n\t you have given invalid arguments to this function"
-            << "\n\t samples.nc():   " << samples.nc() 
-            << "\n\t labels.nc():    " << labels.nc()
-            << "\n\t samples.size(): " << samples.size() 
-            << "\n\t labels.size():  " << labels.size()
             );
-
-#ifdef ENABLE_ASSERTS
-        for (long i = 0; i < samples.size(); ++i)
-        {
-            DLIB_ASSERT(samples(i).nc() == 1 && 
-                        samples(0).nr() == samples(i).nr(),
-                "\tmatrix rank_features()"
-                << "\n\t you have given invalid arguments to this function"
-                << "\n\t samples(i).nc(): " << samples(i).nc() 
-                << "\n\t samples(i).nr(): " << samples(i).nr() 
-                << "\n\t samples(0).nr(): " << samples(0).nr() 
-                );
-        }
-#endif
-
 
         matrix<scalar_type,0,2,mm> results(samples(0).nr(), 2);
         matrix<scalar_type,sample_matrix_type::type::NR,1,mm> mask(samples(0).nr());
