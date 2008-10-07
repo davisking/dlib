@@ -6,6 +6,7 @@
 #include <vector>
 #include <limits>
 
+#include "svm_abstract.h"
 #include "kcentroid_abstract.h"
 #include "../is_kind.h"
 
@@ -23,35 +24,23 @@ namespace dlib
         const kcentroid<kernel_type>& kc,
         const sample_matrix_type& samples,
         const label_matrix_type& labels,
-        const long num_features
+        const long num_features = samples(0).nr()
     );
     /*!
         requires
-            - vector_to_matrix(samples) == a valid matrix object
-            - vector_to_matrix(samples(0)) == a valid matrix object
-            - vector_to_matrix(labels) == a valid matrix object
-              (i.e. the 3 above things must either be dlib::matrix objects or be
-              convertable to them via the vector_to_matrix() function)
-            - samples.nc() == 1 && labels.nc() == 1
-              (i.e. samples and labels must be column vectors)
-            - samples.size() == labels.size()
-            - samples.size() > 0
-            - for all i < samples.size()
-                - 0 < num_features <= samples(i).nr()
-                - samples(i).nc() = 1
-                - i.e. samples must contain column vectors of equal length
-                  and num_features must be less than the size of these column vectors
+            - is_binary_classification_problem(samples, labels) == true
             - kc.train(samples(0)) must be a valid expression.  This means that
               kc must use a kernel type that is capable of operating on the
               contents of the samples matrix
+            - 0 < num_features <= samples(0).nr()
         ensures
             - Let Class1 denote the centroid of all the samples with labels that are < 0
             - Let Class2 denote the centroid of all the samples with labels that are > 0
-            - finds a ranking of the top num_features best features.  This function 
-              does this by computing the distance between the centroid of the Class1 
+            - finds a ranking of the features where the best features come first.  This 
+              function does this by computing the distance between the centroid of the Class1 
               samples and the Class2 samples in kernel defined feature space.
               Good features are then ones that result in the biggest separation between
-              the two centroids of Class1 and Class2
+              the two centroids of Class1 and Class2.
             - Uses the kc object to compute the centroids of the two classes
             - returns a ranking matrix R where:
                 - R.nr() == num_features
@@ -60,10 +49,8 @@ namespace dlib
                   (e.g. samples(n)(R(0,0)) is the best feature from sample(n) and
                    samples(n)(R(1,0)) is the second best, samples(n)(R(2,0)) the
                    third best and so on)
-                - R(i,1) == a number that indicates how much the feature R(i,0) contributes
-                  to the separation of the Class1 and Class2 centroids when it 
-                  is added into the feature set defined by R(0,0), R(1,0), R(2,0), up to 
-                  R(i-1,0).  
+                - R(i,1) == a number that indicates how much separation exists between 
+                  the two centroids when features 0 through i are used.
     !*/
 
 // ----------------------------------------------------------------------------------------
