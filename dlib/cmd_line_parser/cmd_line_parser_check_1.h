@@ -41,7 +41,9 @@ namespace dlib
             ) :
                 dlib::error(t),
                 opt(opt_),
-                arg(arg_)
+                opt2(),
+                arg(arg_),
+                required_opts()
             { set_info_string(); }
 
             cmd_line_check_error(
@@ -52,7 +54,9 @@ namespace dlib
             ) :
                 dlib::error(t),
                 opt(opt_),
-                opt2(opt2_)
+                opt2(opt2_),
+                arg(),
+                required_opts()
             { set_info_string(); }
 
             cmd_line_check_error (
@@ -62,6 +66,8 @@ namespace dlib
             ) :
                 dlib::error(t),
                 opt(opt_),
+                opt2(),
+                arg(),
                 required_opts(vect)
             { set_info_string(); }
 
@@ -70,7 +76,10 @@ namespace dlib
                 const string_type& opt_
             ) :
                 dlib::error(t),
-                opt(opt_)
+                opt(opt_),
+                opt2(),
+                arg(),
+                required_opts()
             { set_info_string(); }
 
             ~cmd_line_check_error() throw() {}

@@ -114,6 +114,7 @@ namespace dlib
             cmd_line_parse_error(
             ) :
                 dlib::error(),
+                item(),
                 num(0)
             { set_info_string();}
 
