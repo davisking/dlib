@@ -41,9 +41,9 @@ int main()
 
     dlib::rand::float_1a rnd;
 
-    for (int x = -20; x <= 20; ++x)
+    for (int x = -30; x <= 30; ++x)
     {
-        for (int y = -20; y <= 20; ++y)
+        for (int y = -30; y <= 30; ++y)
         {
             sample_type samp;
 
@@ -60,14 +60,14 @@ int main()
             // This is a version of the y feature that is corrupted by random noise.  It
             // should be ranked as less useful than features 0, and 1, but more useful
             // than the above feature.
-            samp(3) = y - rnd.get_random_double()*10;
+            samp(3) = y*0.2 + (rnd.get_random_double()-0.5)*10;
 
             // add this sample into our vector of samples.
             samples.push_back(samp);
 
-            // if this point is less than 10 from the origin then label it as a +1 class point.  
+            // if this point is less than 15 from the origin then label it as a +1 class point.  
             // otherwise it is a -1 class point
-            if (sqrt((double)x*x + y*y) <= 10)
+            if (sqrt((double)x*x + y*y) <= 15)
                 labels.push_back(+1);
             else
                 labels.push_back(-1);
@@ -109,10 +109,10 @@ int main()
 
     // The output is:
     /*
-        0   0.452251 
-        1   0.259739 
-        3    0.28801 
-        2 -0.0347664 
+       1 0.514169 
+       0 0.810535 
+       3        1 
+       2 0.966936 
     */
 
     // The first column is a list of the features in order of decreasing goodness.  So the rank_features() function
@@ -122,15 +122,16 @@ int main()
     // intuitively expect.
 
 
-    // The second column of the matrix is a number that indicates how much that feature contributes to the
-    // separation of the two classes.  So a bigger number is better and smaller is worse.  What we see above is that
-    // the first 3 features all help separate the data and the last one actually hurts us in terms of this metric.
+    // The second column of the matrix is a number that indicates how much the features up to that point
+    // contribute to the separation of the two classes.  So bigger numbers are better since they
+    // indicate a larger separation.
 
     // So to break it down a little more.
-    //    0   0.452251   <-- class separation of feature 0 all by itself
-    //    1   0.259739   <-- Additional separation gained from feature 1 if classification is done with features 1 and 0
-    //    3    0.28801   <-- Additional separation gained from feature 3 if classification is done with features 3, 0, and 1
-    //    2 -0.0347664   <-- Additional separation gained from feature 2 if classification is done with features 2, 3, 0, and 1
+    //    1 0.514169   <-- class separation of feature 1 all by itself
+    //    0 0.810535   <-- class separation of feature 1 and 0
+    //    3        1   <-- class separation of feature 1, 0, and 3
+    //    2 0.966936   <-- class separation of feature 1, 0, 3, and 2
+        
 
 }
 
