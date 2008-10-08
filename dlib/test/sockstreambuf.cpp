@@ -30,7 +30,9 @@ namespace
 // ----------------------------------------------------------------------------------------
 
     template <typename ssb>
-    void thread_proc (
+    struct thread_proc_struct
+    {
+    static void thread_proc (
         void* param
     )
     {
@@ -107,6 +109,7 @@ namespace
 
         delete [] bigbuf;
     }
+    };
 
     template <typename ssb>
     void sockstreambuf_test (
@@ -132,7 +135,7 @@ namespace
             DLIB_CASSERT(false, "Unable to create a listener");
         }
 
-        create_new_thread(thread_proc<ssb>,list);
+        create_new_thread(&thread_proc_struct<ssb>::thread_proc,list);
 
         if (create_connection(con,list->get_listening_port(),"127.0.0.1"))
         {

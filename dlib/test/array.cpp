@@ -200,7 +200,6 @@ namespace
             for (unsigned long i = 0; i < a1.size(); ++i)
             {
                 unsigned long a = static_cast<unsigned long>(rnd.get_random_32bit_number());
-                DLIB_CASSERT(a >= 0,"");
                 a1[i] = a;
                 a2[i] = i;
                 DLIB_CASSERT(a1[i] == a,"");
@@ -328,7 +327,6 @@ namespace
             for (unsigned long i = 0; i < a1.size(); ++i)
             {
                 unsigned long a = static_cast<unsigned long>(rnd.get_random_32bit_number());
-                DLIB_CASSERT(a >= 0,"");
                 a1[i] = a;
                 a2[i] = i;
                 DLIB_CASSERT(a1[i] == a,"");

@@ -11,6 +11,13 @@
 #include <dlib/algs.h>
 #include <typeinfo>
 
+#ifdef  __INTEL_COMPILER
+// ignore the bogus warning about not overloading perform_test() all the way
+#pragma warning (disable: 654)
+#endif
+
+
+
 namespace test
 {
     class tester;
