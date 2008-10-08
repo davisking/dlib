@@ -60,7 +60,7 @@ namespace dlib
             num_centers = num;
         }
 
-        const unsigned long get_num_centers (
+        unsigned long get_num_centers (
         ) const
         {
             return num_centers;

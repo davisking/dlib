@@ -72,10 +72,10 @@ namespace dlib
                 delete [] points; 
         }
             
-        const unsigned short width (
+        unsigned short width (
         ) const { return w; }
         
-        const unsigned short num_of_points (
+        unsigned short num_of_points (
         ) const { return count;}
 
         point& operator[] (
@@ -150,16 +150,16 @@ namespace dlib
             unichar ch
         )const=0;
 
-        virtual const unsigned long height (
+        virtual unsigned long height (
         ) const = 0;
 
-        virtual const unsigned long ascender (
+        virtual unsigned long ascender (
         ) const = 0;
 
-        virtual const unsigned long left_overflow (
+        virtual unsigned long left_overflow (
         ) const = 0;
 
-        virtual const unsigned long right_overflow (
+        virtual unsigned long right_overflow (
         ) const = 0;
 
     // ------------------------------------------------------------------------------------
@@ -384,7 +384,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <typename T, typename traits, typename alloc>
-        const unsigned long compute_cursor_pos (
+        unsigned long compute_cursor_pos (
             const rectangle& rect,
             const std::basic_string<T,traits,alloc>& str,
             long x,
@@ -512,16 +512,16 @@ namespace dlib
             delete [] l;
         }
 
-        const unsigned long height (
+        unsigned long height (
         ) const { return 16; }
 
-        const unsigned long ascender (
+        unsigned long ascender (
         ) const { return 12; }
 
-        const unsigned long left_overflow (
+        unsigned long left_overflow (
         ) const { return 1; }
 
-        const unsigned long right_overflow (
+        unsigned long right_overflow (
         ) const { return 2; }
 
         bool has_character (
@@ -554,19 +554,19 @@ namespace dlib
         bdf_font( long default_char_ = -1 );
     
         long read_bdf_file( std::istream& in, unichar max_enc, unichar min_enc = 0 );
-        const unsigned long height() const
+        unsigned long height() const
         {
             return fbb.height();
         }
-        const unsigned long ascender() const
+        unsigned long ascender() const
         {
             return std::max( 0L, 1 - fbb.top() );
         }
-        const unsigned long left_overflow() const
+        unsigned long left_overflow() const
         {
             return std::max( 0L, -fbb.left() );
         }
-        const unsigned long right_overflow() const
+        unsigned long right_overflow() const
         {
             return right_overflow_;
         }

@@ -69,11 +69,11 @@ namespace std
 /*!A _dT !*/
 
 template <typename charT>
-inline const charT _dTcast (const char a, const wchar_t b);
+inline charT _dTcast (const char a, const wchar_t b);
 template <>
-inline const char _dTcast<char> (const char a, const wchar_t ) { return a; }
+inline char _dTcast<char> (const char a, const wchar_t ) { return a; }
 template <>
-inline const wchar_t _dTcast<wchar_t> (const char , const wchar_t b) { return b; }
+inline wchar_t _dTcast<wchar_t> (const char , const wchar_t b) { return b; }
 
 template <typename charT>
 inline const charT* _dTcast ( const char* a, const wchar_t* b);

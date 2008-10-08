@@ -146,7 +146,7 @@ namespace dlib
     struct string_cast_helper<bool>
     {
         template < typename charT, typename traits, typename alloc >
-        static const bool cast (
+        static bool cast (
             const std::basic_string<charT,traits,alloc>& str
         )
         {
@@ -169,7 +169,7 @@ namespace dlib
     struct string_cast_helper<type>                                 \
     {                                                               \
         template < typename charT, typename traits, typename alloc> \
-        static const type cast (                                    \
+        static type cast (                                    \
             const std::basic_string<charT,traits,alloc>& str        \
         )                                                           \
         {                                                           \

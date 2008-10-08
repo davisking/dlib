@@ -583,16 +583,16 @@ namespace nativefont
             return *l;
         }
 
-        virtual const unsigned long height (
+        virtual unsigned long height (
         ) const { return 12; }
 
-        virtual const unsigned long ascender (
+        virtual unsigned long ascender (
         ) const { return ascender_; }
 
-        virtual const unsigned long left_overflow (
+        virtual unsigned long left_overflow (
         ) const { return 1; }
 
-        virtual const unsigned long right_overflow (
+        virtual unsigned long right_overflow (
         ) const { return 2; }
     };
 

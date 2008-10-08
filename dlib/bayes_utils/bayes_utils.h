@@ -341,7 +341,7 @@ namespace dlib
             }
         }
 
-        const double probability (
+        double probability (
             const assignment& a
         ) const
         {
@@ -851,7 +851,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
         template <typename T>
-        const double node_probability (
+        double node_probability (
             const T& bn,
             unsigned long n,
             unsigned long value,
@@ -1166,7 +1166,7 @@ namespace dlib
         template <
             typename T
             >
-        const double node_probability (
+        double node_probability (
             const T& bn,
             unsigned long n 
         ) 

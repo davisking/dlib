@@ -146,7 +146,7 @@ namespace dlib
         typename enable_if<is_directed_graph<typename T::graph_type>,bool>::type search_for_undirected_cycles (
             const T& node,
             std::vector<bool>& visited,
-            unsigned long prev = -1
+            unsigned long prev = std::numeric_limits<unsigned long>::max()
         )
         /*!
             requires
@@ -191,7 +191,7 @@ namespace dlib
         typename enable_if<is_graph<typename T::graph_type>,bool>::type search_for_undirected_cycles (
             const T& node,
             std::vector<bool>& visited,
-            unsigned long prev = -1
+            unsigned long prev = std::numeric_limits<unsigned long>::max()
         )
         /*!
             requires

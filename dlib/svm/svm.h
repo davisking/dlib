@@ -929,7 +929,7 @@ namespace dlib
             cache_size = cache_size_;
         }
 
-        const long get_cache_size (
+        long get_cache_size (
         ) const
         {
             return cache_size;

@@ -249,7 +249,7 @@ namespace dlib
                         XIMStyles *xim_styles;
                         window_table.get_mutex().lock();
 
-                        XGetIMValues (xim, XNQueryInputStyle, &xim_styles, NULL);
+                        XGetIMValues (xim, XNQueryInputStyle, &xim_styles, (const void*)NULL);
                         window_table.get_mutex().unlock();
                         std::set<XIMStyle> xims;
                         for (int i = 0; i < xim_styles->count_styles; ++i){
@@ -1620,13 +1620,13 @@ namespace dlib
             x11_stuff.fs = XCreateFontSet(globals().disp, fontset, &mlist, &mcount, &def_str);
             xpoint.x = 0;
             xpoint.y = 0;
-            xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, XNFontSet, x11_stuff.fs, NULL);
+            xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, XNFontSet, x11_stuff.fs, (const void*)NULL);
             x11_stuff.xic = XCreateIC(
                 globals().xim,
                 XNInputStyle, globals().xim_style,
                 XNClientWindow, x11_stuff.hwnd,
                 XNPreeditAttributes, xva_nlist,
-                NULL
+                (const void*)NULL
                 );
             XFree(xva_nlist);
             XFreeStringList(mlist);
@@ -1640,7 +1640,7 @@ namespace dlib
         // query event mask required by input method
         unsigned long event_xim = 0;
         if (x11_stuff.xic)
-             XGetICValues( x11_stuff.xic, XNFilterEvents, &event_xim, NULL );
+             XGetICValues( x11_stuff.xic, XNFilterEvents, &event_xim, (const void*)NULL );
         
         XSelectInput(
             globals().disp,
@@ -2008,8 +2008,8 @@ namespace dlib
         xpoint.x = x;
         xpoint.y = y;
 
-        xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, NULL);
-        XSetICValues(x11_stuff.xic, XNPreeditAttributes, xva_nlist, NULL);
+        xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, (const void*)NULL);
+        XSetICValues(x11_stuff.xic, XNPreeditAttributes, xva_nlist, (const void*)NULL);
         XFree(xva_nlist);
     }
 

@@ -80,6 +80,12 @@ namespace dlib
         { 
             public: 
                 decompression_error(
+                    const char* i
+                ) :
+                    dlib::error(std::string(i))
+                {}
+
+                decompression_error(
                     const std::string& i
                 ) :
                     dlib::error(i)

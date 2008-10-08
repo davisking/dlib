@@ -11,6 +11,11 @@
 #include <string>
 #include "../logger.h"
 
+#ifdef  __INTEL_COMPILER
+// ignore the bogus warning about hiding on_connect()
+#pragma warning (disable: 1125)
+#endif
+
 namespace dlib
 {
 
