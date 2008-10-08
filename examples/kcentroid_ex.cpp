@@ -33,6 +33,8 @@ double sinc(double x)
 int main()
 {
     // Here we declare that our samples will be 2 dimensional column vectors.  
+    // (Note that if you don't know the dimensionality of your vectors at compile time
+    // you can change the 2 to a 0 and then set the size at runtime)
     typedef matrix<double,2,1> sample_type;
 
     // Now we are making a typedef for the kind of kernel we want to use.  I picked the

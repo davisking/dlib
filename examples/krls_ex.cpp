@@ -29,6 +29,8 @@ int main()
     // Here we declare that our samples will be 1 dimensional column vectors.  The reason for
     // using a matrix here is that in general you can use N dimensional vectors as inputs to the
     // krls object.  But here we only have 1 dimension to make the example simple.
+    // (Note that if you don't know the dimensionality of your vectors at compile time
+    // you can change the first number to a 0 and then set the size at runtime)
     typedef matrix<double,1,1> sample_type;
 
     // Now we are making a typedef for the kind of kernel we want to use.  I picked the
