@@ -199,7 +199,10 @@ namespace dlib
     }
 
     bool is_dlib_thread (
-        thread_id_type id = get_thread_id()
+        thread_id_type id 
+    );
+
+    bool is_dlib_thread (
     );
 
 // ----------------------------------------------------------------------------------------

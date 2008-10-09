@@ -306,6 +306,12 @@ namespace dlib
         return threads_kernel_shared::thread_pool().is_dlib_thread(id);
     }
 
+    bool is_dlib_thread (
+    )
+    {
+        return is_dlib_thread(get_thread_id());
+    }
+
 // ----------------------------------------------------------------------------------------
 
 }
