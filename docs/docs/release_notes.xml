@@ -12,6 +12,8 @@
 
 <current>
 New Stuff:
+   - Added a thread safe shared pointer object
+   - Added the popup_menu_region widget.
 
 Non-Backwards Compatible Changes:
    - The on_wheel_up() and on_wheel_down() gui events now take an unsigned long
@@ -20,10 +22,32 @@ Non-Backwards Compatible Changes:
      API and also changed the dlib thread pool so that it no longer causes
      a terminating program to wait for any outstanding threads to finish
      before allowing the application to end.
+   - Changed the serialization format of the linearly_independent_subset_finder
+     class.
+   - Changed all the font pointers in the gui API's interfaces
+     to shared_ptr_thread_safe objects.
 
 Bug fixes:
+   - Made the kkmeans class actually use the min_change parameter.
+   - Fixed a bug in the linearly_independent_subset_finder object.  Also
+     added a way to set a minimum tolerance.  
+   - Fixed a bug in the scrollable_region widget that caused it to scroll in an
+     unpleasant way when the horizontal and vertical scroll increments weren't 
+     set to the same value.
+   - Made one of the arguments to font::draw_string() not be a reference because
+     some versions of gcc don't end up doing the right thing when -O3 is 
+     supplied.
+   - Fixed a bug in the covariance() function that prevented it from compiling
+     sometimes.
 
 Other:
+   - Changed the gui core code around so that it should be safe to make window 
+     objects at the global scope.
+   - Added more control over how the scrollable_region scrolls its region.
+     You can now adjust how much it scrolls when the mouse wheel is scrolled 
+     as well as enabling scrolling via a mouse drag.
+   - Modified the library so that it compiles with the Intel compiler.
+   - Added some example programs that use the relevance vector machine
 
 </current>
 
@@ -191,7 +215,7 @@ New Stuff:
    - Added an implementation of the kernel recursive least squares algorithm
 
 Non-Backwards Compatible Changes:
-   - Broke backwards compatability in the directed_graph_drawer's serialization
+   - Broke backwards compatibility in the directed_graph_drawer's serialization
      format when I fixed the bug below.  
 
 Bug fixes:
@@ -329,7 +353,7 @@ New Stuff:
     - Added a class that represents 2D points 
     - Added the following matrix functions:
       - squared(), cubed(), get_rect(), a subm() function that takes 
-        rectangles, and normlize() 
+        rectangles, and normalize() 
     - Added the following rectangle functions:
       - area(), centered_rect(), translate_rect(), move_rect(), resize_rect(),
         resize_rect_height(), resize_rect_width(), and nearest_point() 
@@ -606,7 +630,7 @@ Non-Backwards Compatible Changes:
 Bug fixes:
    - Fixed some build issues in gcc 4.2 involving some uses of the std_allocator
    - Fixed some build issues in Visual Studio involving the dir_nav component
-     and buidling with NO_MAKEFILE #defined.
+     and building with NO_MAKEFILE #defined.
    - Moved the #define that disables the old WinSock API into the sockets cpp 
      file.  This should avoid conflicts with people who are using the old WinSock
      API.
@@ -1222,7 +1246,7 @@ New Stuff:
 Non-Backwards Compatible Changes:
    - Changed how the config_reader works.  It now has a more powerful syntax and 
      improved interface.  Converting any old code to use the new version should be 
-     simple since the new file syntax is very nearly backwards compatable with the 
+     simple since the new file syntax is very nearly backwards compatible with the 
      old syntax.  (i.e. You probably won't have to change anything about your 
      config files)
    - Renamed the dlib/image_loader.h file to dlib/image_io.h since it now includes
@@ -1261,7 +1285,7 @@ Non-Backwards Compatible Changes:
    - Changed the specs to say that sockstreambuf may be buffered.  
      sockstreambuf_kernel_1 is still just as it always has been though.  So all old 
      code will still work just as it always has.  But all the same, the specs have 
-     been changed and now allow for an implemenation that is not 100% backwards 
+     been changed and now allow for an implementation that is not 100% backwards 
      compatible.
    - rand_kernel_2 now emits a different string of random numbers.  
  
