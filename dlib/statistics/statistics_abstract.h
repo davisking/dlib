@@ -5,9 +5,12 @@
 
 #include <limits>
 #include <cmath>
+#include "../matrix/matrix_abstract.h"
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
 
     template <
         typename T
@@ -143,6 +146,154 @@ namespace dlib
                 - return (val-mean())/std::sqrt(variance());
         !*/
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_type
+        >
+    class vector_normalizer
+    {
+        /*!
+            REQUIREMENTS ON matrix_type
+                - must be a dlib::matrix object capable of representing column 
+                  vectors
+
+            INITIAL VALUE
+                - in_vector_size() == 0
+                - out_vector_size() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents something that can learn to normalize a set 
+                of vectors.  In particular, normalized vectors should have zero
+                mean and a variance of one.  
+
+                Also, if desired, this object can also use principal component 
+                analysis for the purposes of reducing the number of elements in a 
+                vector.  
+        !*/
+
+    public:
+        typedef typename matrix_type::mem_manager_type mem_manager_type;
+        typedef typename matrix_type::type scalar_type;
+
+        template <typename vector_type>
+        void train (
+            const vector_type& samples
+        );
+        /*!
+            requires
+                - samples.size() > 0
+                - samples == a column matrix or something convertible to a column 
+                  matrix via vector_to_matrix().  Also, x should contain 
+                  matrix_type objects that represent nonempty column vectors.
+            ensures
+                - #in_vector_size() == samples(0).nr()
+                - #out_vector_size() == samples(0).nr()
+                - This object has learned how to normalize vectors that look like
+                  vectors in the given set of samples.  
+        !*/
+
+        template <typename vector_type>
+        void train_pca (
+            const vector_type& samples,
+            const double eps = 0.99
+        );
+        /*!
+            requires
+                - 0 < eps <= 1
+                - samples.size() > 0
+                - samples == a column matrix or something convertible to a column 
+                  matrix via vector_to_matrix().  Also, x should contain 
+                  matrix_type objects that represent nonempty column vectors.
+            ensures
+                - This object has learned how to normalize vectors that look like
+                  vectors in the given set of samples.  
+                - Principal component analysis is performed to find a transform 
+                  that might reduce the number of output features. 
+                - #in_vector_size() == samples(0).nr()
+                - 0 < #out_vector_size() <= samples(0).nr()
+                - eps is a number that controls how "lossy" the pca transform will be.
+                  Large values of eps result in #out_vector_size() being larger and
+                  smaller values of eps result in #out_vector_size() being smaller. 
+        !*/
+
+        long in_vector_size (
+        ) const;
+        /*!
+            ensures
+                - returns the number of rows that input vectors are
+                  required to contain if they are to be normalized by
+                  this object.
+        !*/
+
+        long out_vector_size (
+        ) const;
+        /*!
+            ensures
+                - returns the number of rows in the normalized vectors
+                  that come out of this object.
+        !*/
+
+        const matrix<scalar_type,0,1,mem_manager_type>& operator() (
+            const matrix_type& x
+        ) const;
+        /*!
+            requires
+                - x.nr() == in_vector_size()
+                - x.nc() == 1
+            ensures
+                - returns a normalized version of x, call it Z, that has the 
+                  following properties: 
+                    - Z.nr() == out_vector_size()
+                    - Z.nc() == 1
+                    - the expected value of each element of Z is 0 
+                    - the expected variance of each element of Z is 1
+        !*/
+
+        void swap (
+            vector_normalizer& item
+        );
+        /*!
+            ensures
+                - swaps *this and item
+        !*/
+    };
+
+    template <
+        typename matrix_type
+        >
+    inline void swap (
+        vector_normalizer<matrix_type>& a, 
+        vector_normalizer<matrix_type>& b 
+    ) { a.swap(b); }   
+    /*!
+        provides a global swap function
+    !*/
+
+    template <
+        typename matrix_type,
+        >
+    void deserialize (
+        vector_normalizer<matrix_type>& item, 
+        std::istream& in
+    );   
+    /*!
+        provides deserialization support 
+    !*/
+
+    template <
+        typename matrix_type,
+        >
+    void serialize (
+        const vector_normalizer<matrix_type>& item, 
+        std::ostream& out 
+    );   
+    /*!
+        provides serialization support 
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 
