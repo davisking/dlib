@@ -11,6 +11,7 @@
 #include "../algs.h"
 #include "../serialize.h"
 #include "../rand.h"
+#include "../statistics.h"
 
 namespace dlib
 {
@@ -113,12 +114,6 @@ namespace dlib
         std::istream& in 
     )
     {
-        typedef typename K::scalar_type scalar_type;
-        typedef typename K::sample_type sample_type;
-        typedef typename K::mem_manager_type mem_manager_type;
-
-        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
-        typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
         try
         {
             deserialize(item.alpha, in);
@@ -349,12 +344,6 @@ namespace dlib
         std::istream& in 
     )
     {
-        typedef typename K::scalar_type scalar_type;
-        typedef typename K::sample_type sample_type;
-        typedef typename K::mem_manager_type mem_manager_type;
-
-        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
-        typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
         try
         {
             deserialize(item.alpha, in);
@@ -368,6 +357,77 @@ namespace dlib
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename function_type
+        >
+    struct normalized_function 
+    {
+        typedef typename function_type::scalar_type scalar_type;
+        typedef typename function_type::sample_type sample_type;
+        typedef typename function_type::mem_manager_type mem_manager_type;
+
+        vector_normalizer<sample_type> normalizer;
+        function_type function;
+
+        normalized_function (
+        ){}
+
+        normalized_function (
+            const normalized_function& f
+        ) :
+            normalizer(f.normalizer),
+            function(f.function)
+        {}
+
+        normalized_function (
+            const vector_normalizer<sample_type>& normalizer_,
+            const function_type& funct 
+        ) : normalizer(normalizer_), function(funct) {}
+
+        scalar_type operator() (
+            const sample_type& x
+        ) const { return function(normalizer(x)); }
+    };
+
+    template <
+        typename function_type
+        >
+    void serialize (
+        const normalized_function<function_type>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.normalizer, out);
+            serialize(item.function,     out);
+        }
+        catch (serialization_error e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type normalized_function"); 
+        }
+    }
+
+    template <
+        typename function_type
+        >
+    void deserialize (
+        normalized_function<function_type>& item,
+        std::istream& in 
+    )
+    {
+        try
+        {
+            deserialize(item.normalizer, in);
+            deserialize(item.function, in);
+        }
+        catch (serialization_error e)
+        { 
+            throw serialization_error(e.info + "\n   while deserializing object of type normalized_function"); 
+        }
+    }
 
 // ----------------------------------------------------------------------------------------
 

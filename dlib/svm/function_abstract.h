@@ -9,6 +9,7 @@
 #include "../matrix/matrix_abstract.h"
 #include "../algs.h"
 #include "../serialize.h"
+#include "../statistics/statistics_abstract.h"
 
 namespace dlib
 {
@@ -85,7 +86,7 @@ namespace dlib
         ) const
         /*!
             ensures
-                - evalutes this sample according to the decision
+                - evaluates this sample according to the decision
                   function contained in this object.
         !*/
         {
@@ -359,6 +360,97 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename function_type
+        >
+    struct normalized_function 
+    {
+        /*!
+            REQUIREMENTS ON function_type 
+                - function_type must be a function object with an overloaded
+                  operator() similar to the other function objects defined in
+                  this file.
+                - function_type::sample_type must be a dlib::matrix column
+                  matrix type
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents some sort of function object that 
+                automatically normalizes its inputs using a vector_normalizer 
+                object.
+        !*/
+
+        typedef typename function_type::scalar_type scalar_type;
+        typedef typename function_type::sample_type sample_type;
+        typedef typename function_type::mem_manager_type mem_manager_type;
+
+        vector_normalizer<sample_type> normalizer;
+        function_type function;
+
+        normalized_function (
+        );
+        /*!
+            ensures
+                - the members of this object have their default values
+        !*/
+
+        normalized_function (
+            const normalized_function& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
+        normalized_function (
+            const vector_normalizer<sample_type>& normalizer_,
+            const function_type& funct 
+        ) : normalizer(normalizer_), function(funct) {}
+        /*!
+            ensures
+                - populates this object with the vector_normalizer and function object 
+        !*/
+
+        normalized_function& operator= (
+            const normalized_function& d
+        );
+        /*!
+            ensures
+                - #*this is identical to d
+                - returns *this
+        !*/
+
+        scalar_type operator() (
+            const sample_type& x
+        ) const
+        /*!
+            ensures
+                - returns function(normalizer(x))
+        !*/
+    };
+
+    template <
+        typename K
+        >
+    void serialize (
+        const normalized_function<K>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for normalized_function
+    !*/
+
+    template <
+        typename K
+        >
+    void deserialize (
+        normalized_function<K>& item,
+        std::istream& in 
+    );
+    /*!
+        provides serialization support for normalized_function
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 
