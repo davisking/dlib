@@ -28,6 +28,7 @@
          <item>crc32</item> 
          <item>rand</item> 
          <item>running_stats</item> 
+         <item>vector_normalizer</item> 
          <item>mlp</item> 
          <item nolink="true">
             <name>Optimization</name>
@@ -121,6 +122,7 @@
                      <item>decision_function</item>
                      <item>distance_function</item>
                      <item>probabilistic_decision_function</item>
+                     <item>normalized_function</item>
                   </sub>
                </item>
                <item>pick_initial_centers</item> 
@@ -858,6 +860,28 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>vector_normalizer</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object represents something that can learn to normalize a set 
+                of vectors.  In particular, normalized vectors should have zero
+                mean and a variance of one.  
+
+                Also, if desired, this object can also use principal component 
+                analysis for the purposes of reducing the number of elements in a 
+                vector.  
+         </description>
+
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+      <component>
          <name>running_stats</name>
          <file>dlib/statistics.h</file>
          <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
@@ -1049,6 +1073,24 @@
       </component>
       
    <!-- ************************************************************************* -->
+
+      <component>
+         <name>normalized_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
+         <description>
+                This object represents some sort of function object that 
+                automatically normalizes its inputs using a <a href="#vector_normalizer">vector_normalizer</a> 
+                object.  
+         </description>
+         <examples>
+            <example>svm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
 
       <component>
          <name>probabilistic_decision_function</name>
