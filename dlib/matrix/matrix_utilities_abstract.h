@@ -597,6 +597,50 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    void sort_columns (
+        matrix<T>& m,
+        matrix<T>& v
+    );
+    /*!
+        requires
+            - v.nc() == 1 (i.e. v is a column vector)
+            - v.nr() == m.nc()
+            - m and v both contain the same type of element
+        ensures
+            - the dimensions for m and v are not changed
+            - sorts the columns of m according to the values in v.
+              i.e. 
+                - #v == the contents of v but in sorted order according to
+                  operator<.  So smaller elements come first.
+                - Let #v(new(i)) == v(i) (i.e. new(i) is the index element i moved to)
+                - colm(#m,new(i)) == colm(m,i) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void rsort_columns (
+        matrix<T>& m,
+        matrix<T>& v
+    );
+    /*!
+        requires
+            - v.nc() == 1 (i.e. v is a column vector)
+            - v.nr() == m.nc()
+            - m and v both contain the same type of element
+        ensures
+            - the dimensions for m and v are not changed
+            - sorts the columns of m according to the values in v.
+              i.e. 
+                - #v == the contents of v but in sorted order according to
+                  operator>.  So larger elements come first.
+                - Let #v(new(i)) == v(i) (i.e. new(i) is the index element i moved to)
+                - colm(#m,new(i)) == colm(m,i) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp::type length_squared (
         const matrix_exp& m
     );

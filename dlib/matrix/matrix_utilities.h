@@ -12,6 +12,9 @@
 #include "../geometry/rectangle.h"
 #include "../stl_checked.h"
 #include <vector>
+#include <algorithm>
+#include "dlib/std_allocator.h"
+
 
 
 namespace dlib
@@ -3724,6 +3727,112 @@ namespace dlib
             );
         typedef matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_scale_columns> exp;
         return matrix_exp<exp>(exp(m,v));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct sort_columns_sort_helper
+    {
+        template <typename T>
+        bool operator() (
+            const T& item1,
+            const T& item2
+        ) const
+        {
+            return item1.first < item2.first;
+        }
+    };
+
+    template <
+        typename T, long NR, long NC, typename mm,
+        long NR2, long NC2, typename mm2
+        >
+    void sort_columns (
+        matrix<T,NR,NC,mm>& m,
+        matrix<T,NR2,NC2,mm2>& v
+    )
+    {
+        COMPILE_TIME_ASSERT(NC2 == 1 || NC2 == 0);
+        COMPILE_TIME_ASSERT(NC == NR2 || NC == 0 || NR2 == 0);
+
+        DLIB_ASSERT(v.nc() == 1 && v.nr() == m.nc(), 
+            "\tconst matrix_exp sort_columns(m, v)"
+            << "\n\tv must be a column vector and its length must match the number of columns in m"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tv.nr(): " << v.nr()
+            << "\n\tv.nc(): " << v.nc() 
+            );
+
+
+
+        // Now we have to sort the given vectors in the m matrix according
+        // to how big their corresponding v(column index) values are.
+        typedef std::pair<T, matrix<T,0,1,mm> > col_pair;
+        typedef std_allocator<col_pair, mm> alloc;
+        std::vector<col_pair,alloc> colvalues;
+        col_pair p;
+        for (long r = 0; r < v.nr(); ++r)
+        {
+            p.first = v(r);
+            p.second = colm(m,r);
+            colvalues.push_back(p);
+        }
+        std::sort(colvalues.begin(), colvalues.end(), sort_columns_sort_helper());
+        
+        for (long i = 0; i < v.nr(); ++i)
+        {
+            v(i) = colvalues[i].first;
+            set_colm(m,i) = colvalues[i].second;
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, long NR, long NC, typename mm,
+        long NR2, long NC2, typename mm2
+        >
+    void rsort_columns (
+        matrix<T,NR,NC,mm>& m,
+        matrix<T,NR2,NC2,mm2>& v
+    )
+    {
+        COMPILE_TIME_ASSERT(NC2 == 1 || NC2 == 0);
+        COMPILE_TIME_ASSERT(NC == NR2 || NC == 0 || NR2 == 0);
+
+        DLIB_ASSERT(v.nc() == 1 && v.nr() == m.nc(), 
+            "\tconst matrix_exp rsort_columns(m, v)"
+            << "\n\tv must be a column vector and its length must match the number of columns in m"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tv.nr(): " << v.nr()
+            << "\n\tv.nc(): " << v.nc() 
+            );
+
+
+
+        // Now we have to sort the given vectors in the m matrix according
+        // to how big their corresponding v(column index) values are.
+        typedef std::pair<T, matrix<T,0,1,mm> > col_pair;
+        typedef std_allocator<col_pair, mm> alloc;
+        std::vector<col_pair,alloc> colvalues;
+        col_pair p;
+        for (long r = 0; r < v.nr(); ++r)
+        {
+            p.first = v(r);
+            p.second = colm(m,r);
+            colvalues.push_back(p);
+        }
+        std::sort(colvalues.rbegin(), colvalues.rend(), sort_columns_sort_helper());
+        
+        for (long i = 0; i < v.nr(); ++i)
+        {
+            v(i) = colvalues[i].first;
+            set_colm(m,i) = colvalues[i].second;
+        }
+
     }
 
 // ----------------------------------------------------------------------------------------
