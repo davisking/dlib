@@ -170,6 +170,13 @@ namespace dlib
             const vector_type& samples
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(samples.size() > 0,
+                "\tvoid vector_normalizer::train()"
+                << "\n\tyou have to give a nonempty set of samples to this function"
+                << "\n\tthis: " << this
+                );
+
             m = mean(vector_to_matrix(samples));
             sd = reciprocal(sqrt(variance(vector_to_matrix(samples))));
             pca.set_size(0,0);
@@ -181,6 +188,17 @@ namespace dlib
             const double eps = 0.99
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(samples.size() > 0,
+                "\tvoid vector_normalizer::train_pca()"
+                << "\n\tyou have to give a nonempty set of samples to this function"
+                << "\n\tthis: " << this
+                );
+            DLIB_ASSERT(0 < eps && eps <= 1,
+                "\tvoid vector_normalizer::train_pca()"
+                << "\n\tyou have to give a nonempty set of samples to this function"
+                << "\n\tthis: " << this
+                );
             train_pca_impl(vector_to_matrix(samples),eps);
         }
 
@@ -203,6 +221,16 @@ namespace dlib
             const matrix_type& x
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(x.nr() == in_vector_size() && x.nc() == 1,
+                "\tmatrix vector_normalizer::operator()"
+                << "\n\t you have given invalid arguments to this function"
+                << "\n\t x.nr():           " << x.nr()
+                << "\n\t in_vector_size(): " << in_vector_size()
+                << "\n\t x.nc():           " << x.nc()
+                << "\n\t this:             " << this
+                );
+
             if (pca.size() == 0)
             {
                 temp_out = pointwise_multiply(x-m, sd);
