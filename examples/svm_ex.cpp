@@ -73,12 +73,12 @@ int main()
     // prevents one large feature from smothering others.  Doing this doesn't matter much in this example
     // so I'm just doing this here so you can see an easy way to accomplish this with 
     // the library.  
-    const sample_type m(mean(vector_to_matrix(samples)));  // compute a mean vector
-    const sample_type sd(reciprocal(sqrt(variance(vector_to_matrix(samples))))); // compute a standard deviation vector
+    vector_normalizer<sample_type> normalizer;
+    // let the normalizer learn the mean and standard deviation of the samples
+    normalizer.train(samples);
     // now normalize each sample
     for (unsigned long i = 0; i < samples.size(); ++i)
-        samples[i] = pointwise_multiply(samples[i] - m, sd); 
-
+        samples[i] = normalizer(samples[i]); 
 
 
     // Now that we have some data we want to train on it.  However, there are two parameters to the 
@@ -131,73 +131,71 @@ int main()
     // are in the +1 class and numbers < 0 for samples it predicts to be in the -1 class.
     trainer.set_kernel(kernel_type(0.1));
     trainer.set_nu(0.1);
-    decision_function<kernel_type> learned_decision_function = trainer.train(samples, labels);
+    typedef decision_function<kernel_type> dec_funct_type;
+    typedef normalized_function<dec_funct_type> funct_type;
+
+    // Here we are making an instance of the normalized_function object.  This object provides a convenient 
+    // way to store the vector normalization information along with the decision function we are
+    // going to learn.  
+    funct_type learned_function;
+    learned_function.normalizer = normalizer;  // save normalization information
+    learned_function.function = trainer.train(samples, labels); // perform the actual SVM training and save the results
 
     // print out the number of support vectors in the resulting decision function
-    cout << "\nnumber of support vectors in our learned_decision_function is " 
-         << learned_decision_function.support_vectors.nr() << endl;
+    cout << "\nnumber of support vectors in our learned_function is " 
+         << learned_function.function.support_vectors.nr() << endl;
 
     // now lets try this decision_function on some samples we haven't seen before 
     sample_type sample;
 
     sample(0) = 3.123;
     sample(1) = 2;
-    // don't forget that we have to normalize each new sample the same way we did for the training samples.
-    sample = pointwise_multiply(sample-m, sd);
-
-    cout << "This sample should be >= 0 and it is classified as a " << learned_decision_function(sample) << endl;
+    cout << "This sample should be >= 0 and it is classified as a " << learned_function(sample) << endl;
 
     sample(0) = 3.123;
     sample(1) = 9.3545;
-    sample = pointwise_multiply(sample-m, sd);
-    cout << "This sample should be >= 0 and it is classified as a " << learned_decision_function(sample) << endl;
+    cout << "This sample should be >= 0 and it is classified as a " << learned_function(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 9.3545;
-    sample = pointwise_multiply(sample-m, sd);
-    cout << "This sample should be < 0 and it is classified as a " << learned_decision_function(sample) << endl;
+    cout << "This sample should be < 0 and it is classified as a " << learned_function(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 0;
-    sample = pointwise_multiply(sample-m, sd);
-    cout << "This sample should be < 0 and it is classified as a " << learned_decision_function(sample) << endl;
+    cout << "This sample should be < 0 and it is classified as a " << learned_function(sample) << endl;
 
 
     // We can also train a decision function that reports a well conditioned probability 
     // instead of just a number > 0 for the +1 class and < 0 for the -1 class.  An example 
     // of doing that follows:
-    probabilistic_decision_function<kernel_type> learned_probabilistic_decision_function;  
-    learned_probabilistic_decision_function = train_probabilistic_decision_function(trainer, samples, labels, 3);
+    typedef probabilistic_decision_function<kernel_type> probabilistic_funct_type;  
+    typedef normalized_function<probabilistic_funct_type> pfunct_type;
+
+    pfunct_type learned_pfunct; 
+    learned_pfunct.normalizer = normalizer;
+    learned_pfunct.function = train_probabilistic_decision_function(trainer, samples, labels, 3);
     // Now we have a function that returns the probability that a given sample is of the +1 class.  
 
     // print out the number of support vectors in the resulting decision function.  
     // (it should be the same as in the one above)
-    cout << "\nnumber of support vectors in our learned_probabilistic_decision_function is " 
-         << learned_probabilistic_decision_function.decision_funct.support_vectors.nr() << endl;
+    cout << "\nnumber of support vectors in our learned_pfunct is " 
+         << learned_pfunct.function.decision_funct.support_vectors.nr() << endl;
 
     sample(0) = 3.123;
     sample(1) = 2;
-    sample = pointwise_multiply(sample-m, sd);
-    cout << "This +1 example should have high probability.  It's probability is: " 
-         << learned_probabilistic_decision_function(sample) << endl;
+    cout << "This +1 example should have high probability.  It's probability is: " << learned_pfunct(sample) << endl;
 
     sample(0) = 3.123;
     sample(1) = 9.3545;
-    sample = pointwise_multiply(sample-m, sd);
-    cout << "This +1 example should have high probability.  It's probability is: " 
-         << learned_probabilistic_decision_function(sample) << endl;
+    cout << "This +1 example should have high probability.  It's probability is: " << learned_pfunct(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 9.3545;
-    sample = pointwise_multiply(sample-m, sd);
-    cout << "This -1 example should have low probability.  It's probability is: " 
-         << learned_probabilistic_decision_function(sample) << endl;
+    cout << "This -1 example should have low probability.  It's probability is: " << learned_pfunct(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 0;
-    sample = pointwise_multiply(sample-m, sd);
-    cout << "This -1 example should have low probability.  It's probability is: " 
-         << learned_probabilistic_decision_function(sample) << endl;
+    cout << "This -1 example should have low probability.  It's probability is: " << learned_pfunct(sample) << endl;
 
 
 
@@ -227,8 +225,8 @@ int main()
 
 
     // To get the reduced decision function out we would just do this:
-    learned_decision_function = reduced2(trainer,10).train(samples, labels);
+    learned_function.function = reduced2(trainer,10).train(samples, labels);
     // And similarly for the probabilistic_decision_function: 
-    learned_probabilistic_decision_function = train_probabilistic_decision_function(reduced2(trainer,10), samples, labels, 3);
+    learned_pfunct.function = train_probabilistic_decision_function(reduced2(trainer,10), samples, labels, 3);
 }
 
