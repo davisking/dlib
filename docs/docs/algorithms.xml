@@ -1079,9 +1079,11 @@
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
          <description>
-                This object represents some sort of function object that 
-                automatically normalizes its inputs using a <a href="#vector_normalizer">vector_normalizer</a> 
-                object.  
+                This object represents a container for another function
+                object and an instance of the <a href="#vector_normalizer">vector_normalizer</a> object.  
+
+                It automatically noramlizes all inputs before passing them
+                off to the contained function object.
          </description>
          <examples>
             <example>svm_ex.cpp.html</example>
