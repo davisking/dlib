@@ -374,9 +374,11 @@ namespace dlib
                   matrix type
 
             WHAT THIS OBJECT REPRESENTS 
-                This object represents some sort of function object that 
-                automatically normalizes its inputs using a vector_normalizer 
-                object.
+                This object represents a container for another function
+                object and an instance of the vector_normalizer object.  
+
+                It automatically noramlizes all inputs before passing them
+                off to the contained function object.
         !*/
 
         typedef typename function_type::scalar_type scalar_type;
