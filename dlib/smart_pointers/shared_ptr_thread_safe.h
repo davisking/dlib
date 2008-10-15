@@ -152,13 +152,15 @@ namespace dlib
                     if (shared_node->del)
                     {
                         shared_node->del->del(data);
+                        
+                        shared_node->m.unlock();
                         delete shared_node->del;
                     }
                     else
                     {
+                        shared_node->m.unlock();
                         delete data;
                     }
-                    shared_node->m.unlock();
 
                     // finally delete the shared_node
                     delete shared_node;
