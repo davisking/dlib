@@ -287,7 +287,11 @@ namespace dlib
             auto_mutex M(*global_mutex());
             static shared_ptr_thread_safe<event_handler_thread> p;
             if (p.get() == 0)
+            {
                 p.reset(new event_handler_thread());
+                global_mutex()->unlock();
+                p->start_event_thread();
+            }
             return p;
         }
 

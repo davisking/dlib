@@ -166,7 +166,7 @@ namespace dlib
     class base_window
     {
         friend LRESULT CALLBACK gui_core_kernel_1_globals::WndProc (HWND, UINT, WPARAM, LPARAM);
-        shared_ptr_thread_safe<event_handler_thread> globals;
+        shared_ptr_thread_safe<gui_core_kernel_1_globals::event_handler_thread> globals;
 
         HWND hwnd;
         DWORD style;
