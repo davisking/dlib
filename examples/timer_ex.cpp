@@ -37,7 +37,7 @@ public:
 
 private:
 
-    timer<timer_example>::kernel_1a t;
+    timer<timer_example>::kernel_2a t;
 
     void action_function()
     {
