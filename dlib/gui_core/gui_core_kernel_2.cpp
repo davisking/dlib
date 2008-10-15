@@ -24,6 +24,7 @@
 #include "../logger.h"
 #include <vector>
 #include <set>
+#include "../smart_pointers_thread_safe.h"
 
 namespace dlib
 {
@@ -33,14 +34,6 @@ namespace dlib
     namespace gui_core_kernel_2_globals
     {
         void init_keyboard_mod_masks();
-        struct x11_base_windowstuff
-        {
-            Window hwnd;
-            Time last_click_time;
-            XIC xic;
-            XFontSet fs;
-        };
-
         struct user_event_type
         {
             Window w;
@@ -75,8 +68,6 @@ namespace dlib
             et_state status;
             logger dlog;
 
-            // this is true if the application is trying to end
-            bool should_destruct;
 
             int depth;
             Display* disp;
@@ -99,7 +90,6 @@ namespace dlib
 
             rsignaler window_close_signaler;
             rsignaler et_signaler;
-            unsigned long existing_base_windows;
 
             queue_of_user_events user_events;
             queue_of_user_events user_events_temp;
@@ -107,7 +97,6 @@ namespace dlib
             event_handler_thread(
             ) :
                 dlog("dlib.gui_core"),
-                should_destruct(false),
                 depth(0),
                 disp(0),
                 xim(0),
@@ -117,8 +106,7 @@ namespace dlib
                 num_lock_mask(0),
                 scroll_lock_mask(0),
                 window_close_signaler(window_table.get_mutex()),
-                et_signaler(window_table.get_mutex()),
-                existing_base_windows(0)
+                et_signaler(window_table.get_mutex())
             {
                 auto_mutex M(window_table.get_mutex());
 
@@ -310,38 +298,29 @@ namespace dlib
             void init_keyboard_mod_masks();
         };
 
+        struct x11_base_windowstuff
+        {
+            Window hwnd;
+            Time last_click_time;
+            XIC xic;
+            XFontSet fs;
+            shared_ptr_thread_safe<event_handler_thread> globals;
+        };
+
         // Do all this just to make sure global_mutex() is initialized at program start
         // and thus hopefully before any threads have the chance to startup and call
-        // globals() concurrently.
+        // global_data() concurrently.
         struct call_global_mutex { call_global_mutex() { global_mutex(); } };
         static call_global_mutex call_global_mutex_instance;
 
-        event_handler_thread& globals()
+        const shared_ptr_thread_safe<event_handler_thread>& global_data()
         {
             auto_mutex M(*global_mutex());
-            static event_handler_thread* p = new event_handler_thread();
-            return *p;
+            static shared_ptr_thread_safe<event_handler_thread> p;
+            if (p.get() == 0)
+                p.reset(new event_handler_thread());
+            return p;
         }
-
-        struct event_handler_thread_destruct_helper
-        {
-            ~event_handler_thread_destruct_helper()
-            {
-                globals().window_table.get_mutex().lock();
-                // if there aren't any more gui windows then we can destroy the event handler thread
-                if (globals().existing_base_windows == 0)
-                {
-                    globals().window_table.get_mutex().unlock();
-                    delete &globals();
-                }
-                else
-                {
-                    globals().should_destruct = true;
-                    globals().window_table.get_mutex().unlock();
-                }
-            }
-        };
-        static event_handler_thread_destruct_helper just_a_name;
 
     // ----------------------------------------------------------------------------------------
 
@@ -1365,10 +1344,13 @@ namespace dlib
     )
     {
         using namespace gui_core_kernel_2_globals;
-        auto_mutex M(globals().window_table.get_mutex());
-        globals().clipboard = str.c_str();
 
-        XSetSelectionOwner(globals().disp,XA_PRIMARY,globals().exit_window,CurrentTime);
+        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+
+        auto_mutex M(globals->window_table.get_mutex());
+        globals->clipboard = str.c_str();
+
+        XSetSelectionOwner(globals->disp,XA_PRIMARY,globals->exit_window,CurrentTime);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1412,7 +1394,9 @@ namespace dlib
     )
     {
         using namespace gui_core_kernel_2_globals;
-        auto_mutex M(globals().window_table.get_mutex());
+        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+
+        auto_mutex M(globals->window_table.get_mutex());
         str.clear();
         unsigned char *data = 0;
         wchar_t **plist = 0;
@@ -1424,12 +1408,12 @@ namespace dlib
 
         try
         {
-            Atom atom_ct = XInternAtom(globals().disp, "COMPOUND_TEXT", False);
-            sown = XGetSelectionOwner (globals().disp, XA_PRIMARY);
-            if (sown == globals().exit_window)
+            Atom atom_ct = XInternAtom(globals->disp, "COMPOUND_TEXT", False);
+            sown = XGetSelectionOwner (globals->disp, XA_PRIMARY);
+            if (sown == globals->exit_window)
             {
                 // if we are copying from ourselfs then don't fool with the Xwindows junk.
-                str = globals().clipboard.c_str();
+                str = globals->clipboard.c_str();
             }
             else if (sown != None)
             {
@@ -1437,15 +1421,15 @@ namespace dlib
                 // of the exit_window.  It doesn't matter what window we put it in 
                 // so long as it is one under the control of this process and exit_window
                 // is easy to use here so that is what I'm using.
-                XConvertSelection (globals().disp, XA_PRIMARY, atom_ct, XA_PRIMARY,
-                                   globals().exit_window, CurrentTime);
+                XConvertSelection (globals->disp, XA_PRIMARY, atom_ct, XA_PRIMARY,
+                                   globals->exit_window, CurrentTime);
 
                 // This will wait until we get a SelectionNotify event which should happen
                 // really soon.
-                XPeekIfEvent(globals().disp,&e,clip_peek_helper,0);
+                XPeekIfEvent(globals->disp,&e,clip_peek_helper,0);
 
                 // See how much data we got
-                XGetWindowProperty (globals().disp, globals().exit_window, 
+                XGetWindowProperty (globals->disp, globals->exit_window, 
                                     XA_PRIMARY,    // Tricky..
                                     0, 0,         // offset - len
                                     0,        // Delete 0==FALSE
@@ -1462,14 +1446,14 @@ namespace dlib
                 if (bytes_left > 0 && type == atom_ct)
                 {
                     XTextProperty p;
-                    result = XGetWindowProperty (globals().disp, globals().exit_window, 
+                    result = XGetWindowProperty (globals->disp, globals->exit_window, 
                                                  XA_PRIMARY, 0,bytes_left,0,
                                                  AnyPropertyType, &p.encoding,&p.format,
                                                  &p.nitems, &dummy, &p.value);
                     if (result == Success && p.encoding == atom_ct)
                     {
                         int n;
-                        XwcTextPropertyToTextList(globals().disp, &p, &plist, &n);
+                        XwcTextPropertyToTextList(globals->disp, &p, &plist, &n);
                         str = plist[0];
                     }
                     if (plist)
@@ -1500,18 +1484,19 @@ namespace dlib
             void*
         )
         {
-            auto_mutex M(globals().window_table.get_mutex());
+            shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+            auto_mutex M(globals->window_table.get_mutex());
 
-            globals().user_events.lock();
-            globals().user_events.swap(globals().user_events_temp);
-            globals().user_events.unlock();
+            globals->user_events.lock();
+            globals->user_events.swap(globals->user_events_temp);
+            globals->user_events.unlock();
 
 
-            globals().user_events_temp.reset();
+            globals->user_events_temp.reset();
             // now dispatch all these user events
-            while (globals().user_events_temp.move_next())
+            while (globals->user_events_temp.move_next())
             {
-                base_window** win_ = globals().window_table[globals().user_events_temp.element().w];
+                base_window** win_ = globals->window_table[globals->user_events_temp.element().w];
                 base_window* win;
                 // if this window exists in the window table then dispatch
                 // its event.
@@ -1519,12 +1504,12 @@ namespace dlib
                 {
                     win = *win_;
                     win->on_user_event(
-                        globals().user_events_temp.element().p,
-                        globals().user_events_temp.element().i
+                        globals->user_events_temp.element().p,
+                        globals->user_events_temp.element().i
                     );
                 }
             }
-            globals().user_events_temp.clear();
+            globals->user_events_temp.clear();
         }
     }
 
@@ -1540,12 +1525,13 @@ namespace dlib
         e.p = p;
         e.i = i;
         {
-            auto_mutex M(globals().user_events.get_mutex());
-            globals().user_events.enqueue(e);
+            shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+            auto_mutex M(globals->user_events.get_mutex());
+            globals->user_events.enqueue(e);
 
             // we only need to start a thread to deal with this if there isn't already
             // one out working on the queue
-            if (globals().user_events.size() == 1)
+            if (globals->user_events.size() == 1)
                 create_new_thread (trigger_user_event_threadproc,0);
         }
     }
@@ -1563,7 +1549,7 @@ namespace dlib
         has_been_destroyed(false),
         has_been_resized(false),
         has_been_moved(false),
-        wm(gui_core_kernel_2_globals::globals().window_table.get_mutex())
+        wm(gui_core_kernel_2_globals::global_data()->window_table.get_mutex())
     {
         DLIB_ASSERT(!(undecorated == true && resizable_ == true),
             "\tbase_window::base_window()"
@@ -1573,6 +1559,8 @@ namespace dlib
         using namespace gui_core_kernel_2_globals;
 
         auto_mutex M(wm);
+
+        x11_stuff.globals = global_data();
         
         x11_stuff.last_click_time = 0;
         last_click_x = 0;
@@ -1591,14 +1579,14 @@ namespace dlib
 
 
         x11_stuff.hwnd = XCreateWindow(
-                        globals().disp,
-                        DefaultRootWindow(globals().disp),
+                        x11_stuff.globals->disp,
+                        DefaultRootWindow(x11_stuff.globals->disp),
                         0,
                         0,
                         10,  // this is the default width of a window
                         10,  // this is the default width of a window
                         0,
-                        globals().depth,
+                        x11_stuff.globals->depth,
                         InputOutput,
                         CopyFromParent,
                         valuemask,
@@ -1606,7 +1594,7 @@ namespace dlib
                         );
 
         x11_stuff.xic = NULL;
-        if (globals().xim)
+        if (x11_stuff.globals->xim)
         {
             XVaNestedList   xva_nlist;
             XPoint          xpoint;
@@ -1617,13 +1605,13 @@ namespace dlib
             char fontset[256];
             const long native_font_height = 12;
             sprintf(fontset, "-*-*-medium-r-normal--%lu-*-*-*-", native_font_height);
-            x11_stuff.fs = XCreateFontSet(globals().disp, fontset, &mlist, &mcount, &def_str);
+            x11_stuff.fs = XCreateFontSet(x11_stuff.globals->disp, fontset, &mlist, &mcount, &def_str);
             xpoint.x = 0;
             xpoint.y = 0;
             xva_nlist = XVaCreateNestedList(0, XNSpotLocation, &xpoint, XNFontSet, x11_stuff.fs, (const void*)NULL);
             x11_stuff.xic = XCreateIC(
-                globals().xim,
-                XNInputStyle, globals().xim_style,
+                x11_stuff.globals->xim,
+                XNInputStyle, x11_stuff.globals->xim_style,
                 XNClientWindow, x11_stuff.hwnd,
                 XNPreeditAttributes, xva_nlist,
                 (const void*)NULL
@@ -1634,8 +1622,7 @@ namespace dlib
 
         Window temp = x11_stuff.hwnd;
         base_window* ttemp = this;
-        globals().window_table.add(temp,ttemp);
-        globals().existing_base_windows += 1;
+        x11_stuff.globals->window_table.add(temp,ttemp);
         
         // query event mask required by input method
         unsigned long event_xim = 0;
@@ -1643,7 +1630,7 @@ namespace dlib
              XGetICValues( x11_stuff.xic, XNFilterEvents, &event_xim, (const void*)NULL );
         
         XSelectInput(
-            globals().disp,
+            x11_stuff.globals->disp,
             x11_stuff.hwnd,
             StructureNotifyMask|ExposureMask|ButtonPressMask|ButtonReleaseMask|
             PointerMotionMask|LeaveWindowMask|EnterWindowMask|KeyPressMask|
@@ -1651,9 +1638,9 @@ namespace dlib
             );
 
         XSetWMProtocols(
-            globals().disp,
+            x11_stuff.globals->disp,
             x11_stuff.hwnd,
-            &globals().delete_window,
+            &x11_stuff.globals->delete_window,
             1
             );
 
@@ -1672,7 +1659,7 @@ namespace dlib
             hints->max_width = width;
             hints->max_height = height; 
             hints->min_height = height; 
-            XSetNormalHints(globals().disp,x11_stuff.hwnd,hints);
+            XSetNormalHints(x11_stuff.globals->disp,x11_stuff.hwnd,hints);
             XFree(hints);
         }
     }
@@ -1686,21 +1673,6 @@ namespace dlib
         using namespace gui_core_kernel_2_globals;
         close_window();
         delete &x11_stuff;
-
-        // check if we were the last window to be destroyed and the program is
-        // ending.  If so then destroy the event handler thread's global object
-        wm.lock();
-        globals().existing_base_windows -= 1;
-        if (globals().existing_base_windows == 0 && globals().should_destruct == true)
-        {
-            wm.unlock();
-            delete &globals();
-        }
-        else
-        {
-            // don't do anything except remember to unlock the wm mutex
-            wm.unlock();
-        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1715,17 +1687,17 @@ namespace dlib
         {
             has_been_destroyed = true;
 
-            globals().window_table.destroy(x11_stuff.hwnd);           
-            if (globals().xim != NULL)
+            x11_stuff.globals->window_table.destroy(x11_stuff.hwnd);           
+            if (x11_stuff.globals->xim != NULL)
             {
                 XDestroyIC(x11_stuff.xic);
                 x11_stuff.xic = 0;
-                XFreeFontSet(globals().disp,x11_stuff.fs);
+                XFreeFontSet(x11_stuff.globals->disp,x11_stuff.fs);
             }
 
-            XDestroyWindow(globals().disp,x11_stuff.hwnd);
+            XDestroyWindow(x11_stuff.globals->disp,x11_stuff.hwnd);
             x11_stuff.hwnd = 0;
-            globals().window_close_signaler.broadcast();
+            x11_stuff.globals->window_close_signaler.broadcast();
         }   
     }
 
@@ -1773,10 +1745,10 @@ namespace dlib
         // it isn't const anymore.
         wchar_t *title = const_cast<wchar_t *>(title_.c_str());
         XTextProperty property;
-        XwcTextListToTextProperty(globals().disp,&title,1,XStdICCTextStyle, &property);
-        XSetWMName(globals().disp,x11_stuff.hwnd,&property);
+        XwcTextListToTextProperty(x11_stuff.globals->disp,&title,1,XStdICCTextStyle, &property);
+        XSetWMName(x11_stuff.globals->disp,x11_stuff.hwnd,&property);
         XFree(property.value);
-        XFlush(globals().disp);
+        XFlush(x11_stuff.globals->disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1792,8 +1764,8 @@ namespace dlib
             << "\n\tYou can't do this to a window that has been closed."
             << "\n\tthis:     " << this
             );
-        XMapRaised(globals().disp,x11_stuff.hwnd);
-        XFlush(globals().disp);
+        XMapRaised(x11_stuff.globals->disp,x11_stuff.hwnd);
+        XFlush(x11_stuff.globals->disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1805,7 +1777,7 @@ namespace dlib
         using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
         while (has_been_destroyed == false)
-            globals().window_close_signaler.wait();
+            x11_stuff.globals->window_close_signaler.wait();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1821,8 +1793,8 @@ namespace dlib
             << "\n\tYou can't do this to a window that has been closed."
             << "\n\tthis:     " << this
             );
-        XUnmapWindow(globals().disp,x11_stuff.hwnd);
-        XFlush(globals().disp);
+        XUnmapWindow(x11_stuff.globals->disp,x11_stuff.hwnd);
+        XFlush(x11_stuff.globals->disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1861,13 +1833,13 @@ namespace dlib
             hints->max_width = width;
             hints->max_height = height; 
             hints->min_height = height; 
-            XSetNormalHints(globals().disp,x11_stuff.hwnd,hints);
+            XSetNormalHints(x11_stuff.globals->disp,x11_stuff.hwnd,hints);
             XFree(hints);
         }
 
-        XResizeWindow(globals().disp,x11_stuff.hwnd,width,height);
+        XResizeWindow(x11_stuff.globals->disp,x11_stuff.hwnd,width,height);
         
-        XFlush(globals().disp);
+        XFlush(x11_stuff.globals->disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1893,8 +1865,8 @@ namespace dlib
 
         has_been_moved = true;
 
-        XMoveWindow(globals().disp,x11_stuff.hwnd,x,y);
-        XFlush(globals().disp);
+        XMoveWindow(x11_stuff.globals->disp,x11_stuff.hwnd,x,y);
+        XFlush(x11_stuff.globals->disp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1917,9 +1889,9 @@ namespace dlib
         // will have reported bogus values back in the ConfigureNotify event.  So just to be
         // on the safe side we will use XTranslateCoordinates() 
         int rx, ry;
-        Window desktop_window = DefaultRootWindow(globals().disp);
+        Window desktop_window = DefaultRootWindow(x11_stuff.globals->disp);
         Window junk;
-        XTranslateCoordinates(globals().disp,x11_stuff.hwnd,desktop_window,0,0,&rx, &ry, &junk);
+        XTranslateCoordinates(x11_stuff.globals->disp,x11_stuff.hwnd,desktop_window,0,0,&rx, &ry, &junk);
         x_ = rx;
         y_ = ry;
         x = rx;
@@ -1961,9 +1933,9 @@ namespace dlib
             << "\n\tthis:     " << this
             );
 
-        int screen_number = XScreenNumberOfScreen(globals().screen);
-        width_ = DisplayWidth(globals().disp, screen_number);
-        height_ = DisplayHeight(globals().disp, screen_number);
+        int screen_number = XScreenNumberOfScreen(x11_stuff.globals->screen);
+        width_ = DisplayWidth(x11_stuff.globals->disp, screen_number);
+        height_ = DisplayHeight(x11_stuff.globals->disp, screen_number);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1985,8 +1957,8 @@ namespace dlib
             const unsigned long width = rect.width();
             const unsigned long height = rect.height();
             
-            XClearArea(globals().disp,x11_stuff.hwnd,x,y,width,height,1);
-            XFlush(globals().disp);
+            XClearArea(x11_stuff.globals->disp,x11_stuff.hwnd,x,y,width,height,1);
+            XFlush(x11_stuff.globals->disp);
         }
     }
 
@@ -2000,7 +1972,7 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
-        if (!x11_stuff.xic || !(globals().xim_style & XIMPreeditPosition)) return;
+        if (!x11_stuff.xic || !(x11_stuff.globals->xim_style & XIMPreeditPosition)) return;
 
         XVaNestedList   xva_nlist;
         XPoint          xpoint;

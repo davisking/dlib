@@ -90,7 +90,6 @@ namespace dlib
             HWND helper_window;    
             const TCHAR* window_class_name;
 
-            bool should_destruct;
             bool quit_windows_loop;
             bool set_window_title_done;
             std::wstring window_title;
@@ -114,7 +113,6 @@ namespace dlib
             window_table_type window_table;
             rsignaler window_close_signaler;
             rsignaler et_signaler;
-            unsigned long existing_base_windows;
 
             // note that this is the thread that will perform all the event
             // processing.
@@ -126,7 +124,6 @@ namespace dlib
                 hInstance(0),
                 helper_window(0),
                 window_class_name(TEXT ("w3049u6qc2d94thw9m34f4we0gvwa3-tgkser0-b9gm 05")),
-                should_destruct(false),
                 quit_windows_loop(false),
                 set_window_title_done(true),
                 move_window_done(true),
@@ -141,8 +138,7 @@ namespace dlib
                 in_ime_composition(false),
                 event_thread_started(false),
                 window_close_signaler(window_table.get_mutex()),
-                et_signaler(window_table.get_mutex()),
-                existing_base_windows(0)
+                et_signaler(window_table.get_mutex())
             {
                 status = uninitialized;
             }
@@ -280,46 +276,18 @@ namespace dlib
 
         // Do all this just to make sure global_mutex() is initialized at program start
         // and thus hopefully before any threads have the chance to startup and call
-        // globals() concurrently.
+        // global_data() concurrently.
         struct call_global_mutex { call_global_mutex() { global_mutex(); } };
         static call_global_mutex call_global_mutex_instance;
 
-        event_handler_thread& globals()
+        const shared_ptr_thread_safe<event_handler_thread>& global_data()
         {
-            global_mutex()->lock();
-            try
-            {
-                static event_handler_thread* p = new event_handler_thread;
-                global_mutex()->unlock();
-                p->start_event_thread();
-                return *p;
-            }
-            catch (...)
-            {
-                global_mutex()->unlock();
-                throw;
-            }
+            auto_mutex M(*global_mutex());
+            static shared_ptr_thread_safe<event_handler_thread> p;
+            if (p.get() == 0)
+                p.reset(new event_handler_thread());
+            return p;
         }
-
-        struct event_handler_thread_destruct_helper
-        {
-            ~event_handler_thread_destruct_helper()
-            {
-                globals().window_table.get_mutex().lock();
-                // if there aren't any more gui windows then we can destroy the event handler thread
-                if (globals().existing_base_windows == 0)
-                {
-                    globals().window_table.get_mutex().unlock();
-                    delete &globals();
-                }
-                else
-                {
-                    globals().should_destruct = true;
-                    globals().window_table.get_mutex().unlock();
-                }
-            }
-        };
-        static event_handler_thread_destruct_helper just_a_name;
 
     // ----------------------------------------------------------------------------------------
 
@@ -691,8 +659,10 @@ namespace dlib
             SetThreadPriority(hand,THREAD_PRIORITY_ABOVE_NORMAL);
             CloseHandle(hand);
 
-            window_table_type& window_table = globals().window_table;
-            HWND& helper_window = globals().helper_window;
+            shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+
+            window_table_type& window_table = globals->window_table;
+            HWND& helper_window = globals->helper_window;
 
             auto_mutex M(window_table.get_mutex());
 
@@ -708,7 +678,7 @@ namespace dlib
                     case WM_USER+QUIT_EVENT_HANDLER_THREAD:
                         if (hwnd == helper_window)
                         {                            
-                            globals().quit_windows_loop = true;
+                            globals->quit_windows_loop = true;
                             PostQuitMessage(0); 
                         }
                         return 0;
@@ -724,14 +694,14 @@ namespace dlib
                         if (hwnd == helper_window)
                         {
                             MoveWindow(
-                                globals().move_window_hwnd,
-                                globals().move_window_x,
-                                globals().move_window_y,
-                                globals().move_window_width,
-                                globals().move_window_height,
+                                globals->move_window_hwnd,
+                                globals->move_window_x,
+                                globals->move_window_y,
+                                globals->move_window_width,
+                                globals->move_window_height,
                                 TRUE);
-                            globals().move_window_done = true;
-                            globals().et_signaler.broadcast();
+                            globals->move_window_done = true;
+                            globals->et_signaler.broadcast();
                         }
                         return 0;
 
@@ -739,14 +709,14 @@ namespace dlib
                         if (hwnd == helper_window)
                         {
                             // this is the signal to look in the user_events queue 
-                            globals().user_events.lock();
-                            globals().user_events.swap(globals().user_events_temp);
-                            globals().user_events.unlock();
-                            globals().user_events_temp.reset();
+                            globals->user_events.lock();
+                            globals->user_events.swap(globals->user_events_temp);
+                            globals->user_events.unlock();
+                            globals->user_events_temp.reset();
                             // now dispatch all these user events
-                            while (globals().user_events_temp.move_next())
+                            while (globals->user_events_temp.move_next())
                             {
-                                base_window** win_ = window_table[globals().user_events_temp.element().w];
+                                base_window** win_ = window_table[globals->user_events_temp.element().w];
                                 base_window* win;
                                 // if this window exists in the window table then dispatch
                                 // its event.
@@ -754,12 +724,12 @@ namespace dlib
                                 {
                                     win = *win_;
                                     win->on_user_event(
-                                        globals().user_events_temp.element().p,
-                                        globals().user_events_temp.element().i
+                                        globals->user_events_temp.element().p,
+                                        globals->user_events_temp.element().i
                                     );
                                 }
                             }
-                            globals().user_events_temp.clear();
+                            globals->user_events_temp.clear();
                         }
                         return 0;
 
@@ -788,9 +758,9 @@ namespace dlib
                     case WM_USER+CALL_SET_WINDOW_TITLE:
                         if (hwnd == helper_window)
                         {                            
-                            SetWindowTextW((HWND)wParam,globals().window_title.c_str());
-                            globals().set_window_title_done = true;
-                            globals().et_signaler.broadcast();
+                            SetWindowTextW((HWND)wParam,globals->window_title.c_str());
+                            globals->set_window_title_done = true;
+                            globals->et_signaler.broadcast();
                         }
                         return 0;
 
@@ -800,36 +770,36 @@ namespace dlib
                         {                 
 
                             // if this is stupposed to be a popup window then do the popup window thing
-                            if (globals().dwStyle == WS_CHILD)
+                            if (globals->dwStyle == WS_CHILD)
                             {
                                 TCHAR nothing[] = TEXT("");
-                                globals().new_window = CreateWindowEx (WS_EX_TOOLWINDOW,globals().window_class_name, nothing,
-                                    globals().dwStyle,
+                                globals->new_window = CreateWindowEx (WS_EX_TOOLWINDOW,globals->window_class_name, nothing,
+                                    globals->dwStyle,
                                     CW_USEDEFAULT, CW_USEDEFAULT,
                                     CW_USEDEFAULT, CW_USEDEFAULT,
-                                    helper_window, NULL, globals().hInstance, NULL);
-                                SetParent(globals().new_window,NULL);
+                                    helper_window, NULL, globals->hInstance, NULL);
+                                SetParent(globals->new_window,NULL);
                             }
                             else
                             {
                                 TCHAR nothing[] = TEXT("");
-                                globals().new_window = CreateWindow (globals().window_class_name, nothing,
-                                    globals().dwStyle,
+                                globals->new_window = CreateWindow (globals->window_class_name, nothing,
+                                    globals->dwStyle,
                                     CW_USEDEFAULT, CW_USEDEFAULT,
                                     CW_USEDEFAULT, CW_USEDEFAULT,
-                                    NULL, NULL, globals().hInstance, NULL);
+                                    NULL, NULL, globals->hInstance, NULL);
                             }
                             // use the helper_window to indicate that CreateWindow failed
-                            if (globals().new_window == NULL)
-                                globals().new_window = helper_window;
-                            globals().et_signaler.broadcast();
+                            if (globals->new_window == NULL)
+                                globals->new_window = helper_window;
+                            globals->et_signaler.broadcast();
                         }
                         return 0;
 
                     case WM_SYSKEYDOWN:
                     case WM_KEYDOWN:
                         {
-                            if (globals().in_ime_composition) break;
+                            if (globals->in_ime_composition) break;
 
                             base_window** win_ = window_table[hwnd];
                             base_window* win;
@@ -1350,7 +1320,7 @@ namespace dlib
                                     window_table.destroy(hwnd);
                                     win->has_been_destroyed = true;
                                     win->hwnd = 0;
-                                    globals().window_close_signaler.broadcast();
+                                    globals->window_close_signaler.broadcast();
                                 }
                                 else
                                 {
@@ -1364,12 +1334,12 @@ namespace dlib
                         return DefWindowProc (hwnd, message, wParam, lParam);
 
                     case WM_IME_STARTCOMPOSITION:
-                        globals().in_ime_composition = true;
+                        globals->in_ime_composition = true;
                         break;
 
                     case WM_IME_COMPOSITION:
                         {
-                        globals().in_ime_composition = false;
+                        globals->in_ime_composition = false;
                         base_window** win_ = window_table[hwnd];
                         base_window* win;
                         if (win_)
@@ -1407,12 +1377,12 @@ namespace dlib
             catch (std::exception& e)
             {
                 error_box("Exception thrown in event handler",e.what());
-                globals().quit_windows_loop = true; 
+                globals->quit_windows_loop = true; 
             }
             catch (...)
             {
                 error_box("Exception thrown in event handler","Unknown Exception type.");
-                globals().quit_windows_loop = true; 
+                globals->quit_windows_loop = true; 
             }
 
             return DefWindowProc (hwnd, message, wParam, lParam) ;
@@ -1426,7 +1396,7 @@ namespace dlib
         )
         {
             using namespace gui_core_kernel_1_globals;
-            PostMessage(globals().helper_window,WM_USER+SHOW_WINDOW_SHOW,(WPARAM)hwnd,0);
+            PostMessage(global_data()->helper_window,WM_USER+SHOW_WINDOW_SHOW,(WPARAM)hwnd,0);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -1436,7 +1406,7 @@ namespace dlib
         )
         {
             using namespace gui_core_kernel_1_globals;
-            PostMessage(globals().helper_window,WM_USER+SHOW_WINDOW_HIDE,(WPARAM)hwnd,0);
+            PostMessage(global_data()->helper_window,WM_USER+SHOW_WINDOW_HIDE,(WPARAM)hwnd,0);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -1450,7 +1420,7 @@ namespace dlib
         !*/
         {
             using namespace gui_core_kernel_1_globals;
-            PostMessage(globals().helper_window,WM_USER+SET_ACTIVE_WINDOW,(WPARAM)hwnd,0);
+            PostMessage(global_data()->helper_window,WM_USER+SET_ACTIVE_WINDOW,(WPARAM)hwnd,0);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -1464,7 +1434,7 @@ namespace dlib
         !*/
         {
             using namespace gui_core_kernel_1_globals;
-            PostMessage(globals().helper_window,WM_USER+DESTROY_WINDOW,(WPARAM)hwnd,0);
+            PostMessage(global_data()->helper_window,WM_USER+DESTROY_WINDOW,(WPARAM)hwnd,0);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -1483,58 +1453,59 @@ namespace dlib
         !*/
         {   
             using namespace gui_core_kernel_1_globals;
+            shared_ptr_thread_safe<event_handler_thread> globals(global_data());
             // if we are running in the event handling thread then just call
             // CreateWindow directly
-            if (get_thread_id() == globals().event_thread_id)
+            if (get_thread_id() == globals->event_thread_id)
             {
                 // if this is stupposed to be a popup window then do the popup window thing
                 if (dwStyle_ == WS_CHILD)
                 {
                     TCHAR nothing[] = TEXT("");
-                    HWND tmp = CreateWindowEx (WS_EX_TOOLWINDOW|WS_EX_TOPMOST, globals().window_class_name, nothing,
+                    HWND tmp = CreateWindowEx (WS_EX_TOOLWINDOW|WS_EX_TOPMOST, globals->window_class_name, nothing,
                             dwStyle_,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
-                            globals().helper_window, NULL, globals().hInstance, NULL);
+                            globals->helper_window, NULL, globals->hInstance, NULL);
                     SetParent(tmp,NULL);
                     return tmp;
                 }
                 else
                 {
                     TCHAR nothing[] = TEXT("");
-                    return CreateWindow (globals().window_class_name, nothing,
+                    return CreateWindow (globals->window_class_name, nothing,
                             dwStyle_,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
-                            NULL, NULL, globals().hInstance, NULL);
+                            NULL, NULL, globals->hInstance, NULL);
                 }
             }
             else
             {
-                auto_mutex M(globals().window_table.get_mutex());
+                auto_mutex M(globals->window_table.get_mutex());
                 // wait for our chance to make a new window request
-                while (globals().request_new_window)
-                    globals().et_signaler.wait();
+                while (globals->request_new_window)
+                    globals->et_signaler.wait();
 
 
-                globals().dwStyle = dwStyle_;
-                if (PostMessage(globals().helper_window,WM_USER+CREATE_WINDOW,0,0)==0)
+                globals->dwStyle = dwStyle_;
+                if (PostMessage(globals->helper_window,WM_USER+CREATE_WINDOW,0,0)==0)
                 {
                     throw gui_error("Unable to schedule function for execution in event handling thread.");
                 } 
 
                 // wait for our request to be serviced
-                while (globals().new_window == NULL)
-                    globals().et_signaler.wait();
+                while (globals->new_window == NULL)
+                    globals->et_signaler.wait();
 
-                HWND temp = globals().new_window;
-                globals().new_window = NULL;
-                globals().request_new_window = false;
-                globals().et_signaler.broadcast();
+                HWND temp = globals->new_window;
+                globals->new_window = NULL;
+                globals->request_new_window = false;
+                globals->et_signaler.broadcast();
 
                 // if make_window() returns the helper_window then it means it failed
                 // to make a new window
-                if (temp == globals().helper_window)
+                if (temp == globals->helper_window)
                     temp = NULL;
 
                 return temp;
@@ -1602,17 +1573,18 @@ namespace dlib
     )
     {
         using namespace gui_core_kernel_1_globals;
+        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
 
         user_event_type e;
         e.w = hwnd;
         e.p = p;
         e.i = i;
         {
-            auto_mutex M(globals().user_events.get_mutex());
-            globals().user_events.enqueue(e);
+            auto_mutex M(globals->user_events.get_mutex());
+            globals->user_events.enqueue(e);
         }
         
-        if (PostMessage(globals().helper_window,WM_USER+USER_EVENTS_READY,0,0)==0)
+        if (PostMessage(globals->helper_window,WM_USER+USER_EVENTS_READY,0,0)==0)
         {
             throw gui_error("Unable to schedule function for execution in event handling thread.");
         } 
@@ -1625,11 +1597,12 @@ namespace dlib
         bool resizable,
         bool undecorated 
     ) :
+        globals(gui_core_kernel_1_globals::global_data()),
         has_been_destroyed(false),
         prevx(-1),
         prevy(-1),
         prev_state(0),
-        wm(gui_core_kernel_1_globals::globals().window_table.get_mutex())
+        wm(globals->window_table.get_mutex())
     {
         using namespace gui_core_kernel_1_globals;
         DLIB_ASSERT(!(undecorated == true && resizable == true),
@@ -1656,8 +1629,7 @@ namespace dlib
 
         HWND temp = hwnd;
         base_window* ttemp = this;
-        globals().window_table.add(temp,ttemp);
-        globals().existing_base_windows += 1;
+        globals->window_table.add(temp,ttemp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1668,21 +1640,6 @@ namespace dlib
     {
         using namespace gui_core_kernel_1_globals;
         close_window();
-
-        // check if we were the last window to be destroyed and the program is
-        // ending.  If so then destroy the event handler thread's global object
-        wm.lock();
-        globals().existing_base_windows -= 1;
-        if (globals().existing_base_windows == 0 && globals().should_destruct == true)
-        {
-            wm.unlock();
-            delete &globals();
-        }
-        else
-        {
-            // don't do anything except remember to unlock the wm mutex
-            wm.unlock();
-        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1697,11 +1654,11 @@ namespace dlib
         {
             // do this just to make sure no one tries to call this window's
             // calbacks.
-            globals().window_table.destroy(hwnd);
+            globals->window_table.destroy(hwnd);
             gui_core_kernel_1_globals::destroy_window(hwnd);
             hwnd = 0;
             has_been_destroyed = true;
-            globals().window_close_signaler.broadcast();
+            globals->window_close_signaler.broadcast();
         }  
     }
 
@@ -1714,7 +1671,7 @@ namespace dlib
         using namespace gui_core_kernel_1_globals;
         auto_mutex M(wm);
         while (has_been_destroyed == false)
-            globals().window_close_signaler.wait();
+            globals->window_close_signaler.wait();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1763,23 +1720,23 @@ namespace dlib
         // do this to avoid possible deadlocks.
         auto_mutex M(wm);
 
-        if (get_thread_id() == globals().event_thread_id)
+        if (get_thread_id() == globals->event_thread_id)
         {
             SetWindowTextW(hwnd,title.c_str());
         }
         else
         {
-            globals().window_title = title;
-            globals().set_window_title_done = false;
+            globals->window_title = title;
+            globals->set_window_title_done = false;
 
-            if (PostMessage(globals().helper_window,WM_USER+CALL_SET_WINDOW_TITLE,(WPARAM)hwnd,0)==0)
+            if (PostMessage(globals->helper_window,WM_USER+CALL_SET_WINDOW_TITLE,(WPARAM)hwnd,0)==0)
             {
                 throw gui_error("Unable to schedule SetWindowText function for execution in event handling thread.");
             } 
 
             // wait for any SetWindowText() calls to finish
-            while (globals().set_window_title_done == false)
-                globals().et_signaler.wait();
+            while (globals->set_window_title_done == false)
+                globals->et_signaler.wait();
         }
     }
 
@@ -1832,7 +1789,7 @@ namespace dlib
             << "\n\theight:   " << height_ 
             );
         auto_mutex M(wm);
-        if (get_thread_id() == globals().event_thread_id)
+        if (get_thread_id() == globals->event_thread_id)
         {
             RECT info;
             GetWindowRect(hwnd,&info);
@@ -1884,21 +1841,21 @@ namespace dlib
             // have to do this because the MoveWindow() apparently blocks
             // until something happens in the event thread so we have to 
             // do this to avoid possible deadlocks.
-            globals().move_window_hwnd = hwnd;
-            globals().move_window_x = x;
-            globals().move_window_y = y;
-            globals().move_window_width = width;
-            globals().move_window_height = height;
-            globals().move_window_done = false;
+            globals->move_window_hwnd = hwnd;
+            globals->move_window_x = x;
+            globals->move_window_y = y;
+            globals->move_window_width = width;
+            globals->move_window_height = height;
+            globals->move_window_done = false;
 
-            if (PostMessage(globals().helper_window,WM_USER+CALL_MOVE_WINDOW,0,0)==0)
+            if (PostMessage(globals->helper_window,WM_USER+CALL_MOVE_WINDOW,0,0)==0)
             {
                 throw gui_error("Unable to schedule MoveWindow function for execution in event handling thread.");
             } 
 
             // wait for any MoveWindow calls to finish
-            while (globals().move_window_done == false)
-                globals().et_signaler.wait();
+            while (globals->move_window_done == false)
+                globals->et_signaler.wait();
         }
 
     }
@@ -1920,7 +1877,7 @@ namespace dlib
             << "\n\ty:        " << y_ 
             );
         auto_mutex M(wm);
-        if (get_thread_id() == globals().event_thread_id)
+        if (get_thread_id() == globals->event_thread_id)
         {
             RECT info;
             GetWindowRect(hwnd,&info);
@@ -1949,21 +1906,21 @@ namespace dlib
             // have to do this because the MoveWindow() apparently blocks
             // until something happens in the event thread so we have to 
             // do this to avoid possible deadlocks.
-            globals().move_window_hwnd = hwnd;
-            globals().move_window_x = x_;
-            globals().move_window_y = y_;
-            globals().move_window_width = width;
-            globals().move_window_height = height;
-            globals().move_window_done = false;
+            globals->move_window_hwnd = hwnd;
+            globals->move_window_x = x_;
+            globals->move_window_y = y_;
+            globals->move_window_width = width;
+            globals->move_window_height = height;
+            globals->move_window_done = false;
 
-            if (PostMessage(globals().helper_window,WM_USER+CALL_MOVE_WINDOW,0,0)==0)
+            if (PostMessage(globals->helper_window,WM_USER+CALL_MOVE_WINDOW,0,0)==0)
             {
                 throw gui_error("Unable to schedule MoveWindow function for execution in event handling thread.");
             } 
 
             // wait for any MoveWindow calls to finish
-            while (globals().move_window_done == false)
-                globals().et_signaler.wait();
+            while (globals->move_window_done == false)
+                globals->et_signaler.wait();
         }
     }
 
@@ -2107,10 +2064,12 @@ namespace dlib
         using namespace gui_core_kernel_1_globals;
         using namespace std;
 
-        if (OpenClipboard(globals().helper_window))
+        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+
+        if (OpenClipboard(globals->helper_window))
         {
             EmptyClipboard();
-            auto_mutex M(globals().window_table.get_mutex());
+            auto_mutex M(globals->window_table.get_mutex());
 
             const unsigned long newlines = count(str.begin(),str.end(),L'\n');
 
@@ -2172,9 +2131,10 @@ namespace dlib
     {
         using namespace gui_core_kernel_1_globals;
         using namespace std;
+        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
 
-        auto_mutex M(globals().window_table.get_mutex());
-        if (OpenClipboard(globals().helper_window))
+        auto_mutex M(globals->window_table.get_mutex());
+        if (OpenClipboard(globals->helper_window))
         {
 
             HANDLE data = GetClipboardData(CF_UNICODETEXT);
