@@ -48,9 +48,9 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        dlib::mutex* global_mutex()
+        const shared_ptr_thread_safe<dlib::mutex>& global_mutex()
         {
-            static dlib::mutex* m = new dlib::mutex;
+            static shared_ptr_thread_safe<dlib::mutex> m(new dlib::mutex);
             return m;
         }
 
@@ -94,6 +94,8 @@ namespace dlib
             queue_of_user_events user_events;
             queue_of_user_events user_events_temp;
 
+            shared_ptr_thread_safe<dlib::mutex> reference_to_global_mutex;
+
             event_handler_thread(
             ) :
                 dlog("dlib.gui_core"),
@@ -106,7 +108,8 @@ namespace dlib
                 num_lock_mask(0),
                 scroll_lock_mask(0),
                 window_close_signaler(window_table.get_mutex()),
-                et_signaler(window_table.get_mutex())
+                et_signaler(window_table.get_mutex()),
+                reference_to_global_mutex(global_mutex())
             {
                 auto_mutex M(window_table.get_mutex());
 
@@ -166,7 +169,7 @@ namespace dlib
                     }
                 }
 
-                delete global_mutex();
+
             }
 
         private:
