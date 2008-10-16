@@ -144,7 +144,6 @@ INCLUDE(TestForANSIStreamHeaders)
 
 
 if (DLIB_ISO_CPP_ONLY)
-   set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
    add_global_define(DLIB_ISO_CPP_ONLY)
 else()
    remove_global_define(DLIB_ISO_CPP_ONLY)
