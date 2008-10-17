@@ -12,6 +12,30 @@
 
 <current>
 New Stuff:
+   - Added the sort_columns() and rsort_columns() functions
+   - Added the vector_normalizer object
+   - Added the normalized_function object.
+   - Added a tensor_product() function for the matrix object.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Made it so that the gui event handler thread isn't created at all 
+     unless some part of an application calls some of the gui_core code. 
+     In the previous release the event handler thread was executed
+     briefly during program termination and could cause problems if no
+     windowing environment was available.
+   - Fixed an #include statement in the matrix utilities so that it works 
+     even if you don't specify an include path argument to your compiler.
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.10" date="Oct 09, 2008">
+New Stuff:
    - Added a thread safe shared pointer object
    - Added the popup_menu_region widget.
 
@@ -49,7 +73,7 @@ Other:
    - Modified the library so that it compiles with the Intel compiler.
    - Added some example programs that use the relevance vector machine
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 

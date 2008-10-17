@@ -413,6 +413,7 @@
          <term link="algorithms.html#kcentroid" name="kcentroid"/>
          <term link="algorithms.html#linearly_independent_subset_finder" name="linearly_independent_subset_finder"/>
          <term link="algorithms.html#running_stats" name="running_stats"/>
+         <term link="algorithms.html#vector_normalizer" name="vector_normalizer"/>
          <term link="algorithms.html#kkmeans" name="kkmeans"/>
          <term link="algorithms.html#pick_initial_centers" name="pick_initial_centers"/>
          <term link="algorithms.html#rank_features" name="rank_features"/>
@@ -421,6 +422,7 @@
          <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>
 
          <term link="algorithms.html#decision_function" name="decision_function"/>
+         <term link="algorithms.html#normalized_function" name="normalized_function"/>
          <term link="algorithms.html#distance_function" name="distance_function"/>
          <term link="algorithms.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
          <term link="algorithms.html#linear_kernel" name="linear_kernel"/>
