@@ -576,6 +576,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp tensor_product (
+        const matrix_exp& a,
+        const matrix_exp& b 
+    );
+    /*!
+        requires
+            - a and b both contain the same type of element
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in a and b.
+                - R.nr() == a.nr()*b.nr()  
+                - R.nc() == a.nc()*b.nc()  
+                - for all valid r and c:
+                  R(r,c) == a(r/b.nr(), c/b.nc()) * b(r%b.nr(), c%b.nc())
+                - I.e. R is the tensor product of matrix a with matrix b
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp scale_columns (
         const matrix_exp& m,
         const matrix_exp& v

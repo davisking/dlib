@@ -3837,6 +3837,46 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct op_tensor_product
+    {
+        template <typename EXP1, typename EXP2>
+        struct op : public has_destructive_aliasing
+        {
+            const static long NR = EXP1::NR*EXP2::NR;
+            const static long NC = EXP1::NC*EXP2::NC;
+            typedef typename EXP1::type type;
+            typedef typename EXP1::mem_manager_type mem_manager_type;
+
+            template <typename M1, typename M2>
+            static type apply ( const M1& m1, const M2& m2 , long r, long c)
+            { 
+                return m1(r/m2.nr(),c/m2.nc())*m2(r%m2.nr(),c%m2.nc()); 
+            }
+
+
+            template <typename M1, typename M2>
+            static long nr (const M1& m1, const M2& m2 ) { return m1.nr()*m2.nr(); }
+            template <typename M1, typename M2>
+            static long nc (const M1& m1, const M2& m2 ) { return m1.nc()*m2.nc(); }
+        };
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    inline const matrix_exp<matrix_binary_exp<EXP1,EXP2,op_tensor_product> > tensor_product (
+        const matrix_exp<EXP1>& a,
+        const matrix_exp<EXP2>& b 
+    )
+    {
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+        typedef matrix_binary_exp<EXP1,EXP2,op_tensor_product> exp;
+        return matrix_exp<exp>(exp(a.ref(),b.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_UTILITIES_
