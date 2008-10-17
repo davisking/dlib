@@ -13,7 +13,7 @@
 #include "../stl_checked.h"
 #include <vector>
 #include <algorithm>
-#include "dlib/std_allocator.h"
+#include "../std_allocator.h"
 
 
 
