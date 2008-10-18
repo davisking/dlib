@@ -1330,8 +1330,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void widget_group::
-    disable (
-    )
+    disable ()
     {
         auto_mutex M(m);
         widgets.reset();
@@ -1362,6 +1361,1738 @@ namespace dlib
         r.set_left(rect.left());
         r.set_top(rect.top());
         rect = r;
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//                class popup_menu
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    popup_menu::
+    popup_menu (
+    ) :
+        base_window(false,true),
+        pad(2),
+        item_pad(3),
+        cur_rect(pad,pad,pad-1,pad-1),
+        left_width(0),
+        middle_width(0),
+        selected_item(0),
+        submenu_open(false)
+    {
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    enable_menu_item (
+        unsigned long idx
+    )
+    {
+        DLIB_ASSERT ( idx < size() ,
+                      "\tvoid popup_menu::enable_menu_item()"
+                      << "\n\tidx:    " << idx
+                      << "\n\tsize(): " << size() 
+        );
+        auto_mutex M(wm);
+        item_enabled[idx] = true;
+        invalidate_rectangle(cur_rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    disable_menu_item (
+        unsigned long idx
+    )
+    {
+        DLIB_ASSERT ( idx < size() ,
+                      "\tvoid popup_menu::enable_menu_item()"
+                      << "\n\tidx:    " << idx
+                      << "\n\tsize(): " << size() 
+        );
+        auto_mutex M(wm);
+        item_enabled[idx] = false;
+        invalidate_rectangle(cur_rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    unsigned long popup_menu::
+    size (
+    ) const
+    { 
+        auto_mutex M(wm);
+        return items.size();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    clear (
+    )
+    {
+        auto_mutex M(wm);
+        hide();
+        cur_rect = rectangle(pad,pad,pad-1,pad-1);
+        win_rect = rectangle();
+        left_width = 0;
+        middle_width = 0;
+        items.clear();
+        item_enabled.clear();
+        left_rects.clear();
+        middle_rects.clear();
+        right_rects.clear();
+        line_rects.clear();
+        submenus.clear();
+        selected_item = 0;
+        submenu_open = false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    show (
+    )
+    {
+        auto_mutex M(wm);
+        selected_item = submenus.size();
+        base_window::show();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    hide (
+    )
+    {
+        auto_mutex M(wm);
+        // hide ourselves
+        close_submenu();
+        selected_item = submenus.size();
+        base_window::hide();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    select_first_item (
+    )
+    {
+        auto_mutex M(wm);
+        close_submenu();
+        selected_item = items.size();
+        for (unsigned long i = 0; i < items.size(); ++i)
+        {
+            if ((items[i]->has_click_event() || submenus[i]) && item_enabled[i])
+            {
+                selected_item = i;
+                break;
+            }
+        }
+        invalidate_rectangle(cur_rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool popup_menu::
+    forwarded_on_keydown (
+        unsigned long key,
+        bool is_printable,
+        unsigned long state
+    )
+    {
+        auto_mutex M(wm);
+        // do nothing if this popup menu is empty
+        if (items.size() == 0)
+            return false;
+
+
+        // check if the selected item is a submenu
+        if (selected_item != submenus.size() && submenus[selected_item] != 0 && submenu_open)
+        {
+            // send the key to the submenu and return if that menu used the key
+            if (submenus[selected_item]->forwarded_on_keydown(key,is_printable,state) == true)
+                return true;
+        }
+
+        if (key == KEY_UP)
+        {
+            for (unsigned long i = 0; i < items.size(); ++i)
+            {
+                selected_item = (selected_item + items.size() - 1)%items.size();
+                // only stop looking if this one is enabled and has a click event or is a submenu
+                if (item_enabled[selected_item] && (items[selected_item]->has_click_event() || submenus[selected_item]) )
+                    break;
+            }
+            invalidate_rectangle(cur_rect);
+            return true;
+        }
+        else if (key == KEY_DOWN)
+        {
+            for (unsigned long i = 0; i < items.size(); ++i)
+            {
+                selected_item = (selected_item + 1)%items.size();
+                // only stop looking if this one is enabled and has a click event or is a submenu
+                if (item_enabled[selected_item] && (items[selected_item]->has_click_event() || submenus[selected_item]))
+                    break;
+            }
+            invalidate_rectangle(cur_rect);
+            return true;
+        }
+        else if (key == KEY_RIGHT && submenu_open == false && display_selected_submenu())
+        {
+            submenus[selected_item]->select_first_item();
+            return true;
+        }
+        else if (key == KEY_LEFT && selected_item != submenus.size() && 
+                 submenus[selected_item] != 0 && submenu_open)
+        {
+            close_submenu();
+            return true;
+        }
+        else if (key == '\n')
+        {
+            if (selected_item != submenus.size() && (items[selected_item]->has_click_event() || submenus[selected_item]))
+            {
+                const long idx = selected_item;
+                // only hide this popup window if this isn't a submenu
+                if (submenus[idx] == 0)
+                {
+                    hide();
+                    hide_handlers.reset();
+                    while (hide_handlers.move_next())
+                        hide_handlers.element()();
+                }
+                else
+                {
+                    display_selected_submenu();
+                    submenus[idx]->select_first_item();
+                }
+                items[idx]->on_click();
+                return true;
+            }
+        }
+        else if (is_printable)
+        {
+            // check if there is a hotkey for this key
+            for (unsigned long i = 0; i < items.size(); ++i)
+            {
+                if (std::tolower(key) == std::tolower(items[i]->get_hot_key()) && 
+                    (items[i]->has_click_event() || submenus[i]) )
+                {
+                    // only hide this popup window if this isn't a submenu
+                    if (submenus[i] == 0)
+                    {
+                        hide();
+                        hide_handlers.reset();
+                        while (hide_handlers.move_next())
+                            hide_handlers.element()();
+                    }
+                    else
+                    {
+                        if (selected_item != items.size())
+                            invalidate_rectangle(line_rects[selected_item]);
+
+                        selected_item = i;
+                        display_selected_submenu();
+                        invalidate_rectangle(line_rects[i]);
+                        submenus[i]->select_first_item();
+                    }
+                    items[i]->on_click();
+                }
+            }
+
+            // always say we use a printable key for hotkeys
+            return true;
+        }
+
+        return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    on_submenu_hide (
+    )
+    {
+        hide();
+        hide_handlers.reset();
+        while (hide_handlers.move_next())
+            hide_handlers.element()();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    on_window_resized(
+    )
+    {
+        invalidate_rectangle(win_rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    on_mouse_up (
+        unsigned long btn,
+        unsigned long,
+        long x,
+        long y
+    )
+    {
+        if (cur_rect.contains(x,y) && btn == LEFT)
+        {
+            // figure out which item this was on 
+            for (unsigned long i = 0; i < items.size(); ++i)
+            {
+                if (line_rects[i].contains(x,y) && item_enabled[i] && items[i]->has_click_event())
+                {
+                    // only hide this popup window if this isn't a submenu
+                    if (submenus[i] == 0)
+                    {
+                        hide();
+                        hide_handlers.reset();
+                        while (hide_handlers.move_next())
+                            hide_handlers.element()();
+                    }
+                    items[i]->on_click();
+                    break;
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    on_mouse_move (
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        if (cur_rect.contains(x,y))
+        {
+            // check if the mouse is still in the same rect it was in last time
+            rectangle last_rect;
+            if (selected_item != submenus.size())
+            {
+                last_rect = line_rects[selected_item];
+            }
+
+            // if the mouse isn't in the same rectangle any more
+            if (last_rect.contains(x,y) == false)
+            {
+                if (selected_item != submenus.size())
+                {
+                    invalidate_rectangle(last_rect);
+                    close_submenu();
+                    selected_item = submenus.size();
+                }
+
+
+                // figure out if we should redraw any menu items 
+                for (unsigned long i = 0; i < items.size(); ++i)
+                {
+                    if (items[i]->has_click_event() || submenus[i])
+                    {
+                        if (line_rects[i].contains(x,y))
+                        {
+                            selected_item = i;
+                            break;
+                        }
+                    }
+                }
+
+                // if we found a rectangle that contains the mouse then
+                // tell it to redraw itself
+                if (selected_item != submenus.size())
+                {
+                    display_selected_submenu();
+                    invalidate_rectangle(line_rects[selected_item]);
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    close_submenu (
+    )
+    {
+        if (selected_item != submenus.size() && submenus[selected_item] && submenu_open)
+        {
+            submenus[selected_item]->hide();
+            submenu_open = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool popup_menu::
+    display_selected_submenu (
+    )
+    {
+        // show the submenu if one exists
+        if (selected_item != submenus.size() && submenus[selected_item])
+        {
+            long wx, wy;
+            get_pos(wx,wy);
+            wx += line_rects[selected_item].right();
+            wy += line_rects[selected_item].top();
+            submenus[selected_item]->set_pos(wx+1,wy-2);
+            submenus[selected_item]->show();
+            submenu_open = true;
+            return true;
+        }
+        return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    on_mouse_leave (
+    )
+    {
+        if (selected_item != submenus.size())
+        {
+            // only unhighlight a menu item if it isn't a submenu item
+            if (submenus[selected_item] == 0)
+            {
+                invalidate_rectangle(line_rects[selected_item]);
+                selected_item = submenus.size();
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu::
+    paint (
+        const canvas& c
+    )
+    {
+        c.fill(200,200,200);
+        draw_rectangle(c, win_rect);
+        for (unsigned long i = 0; i < items.size(); ++i)
+        {
+            bool is_selected = false;
+            if (selected_item != submenus.size() && i == selected_item && 
+                item_enabled[i])
+                is_selected = true;
+
+            items[i]->draw_background(c,line_rects[i], item_enabled[i], is_selected);
+            items[i]->draw_left(c,left_rects[i], item_enabled[i], is_selected);
+            items[i]->draw_middle(c,middle_rects[i], item_enabled[i], is_selected);
+            items[i]->draw_right(c,right_rects[i], item_enabled[i], is_selected);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//              class zoomable_region
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    zoomable_region::
+    zoomable_region (
+        drawable_window& w,
+        unsigned long events 
+    ) :
+        drawable(w,MOUSE_CLICK | MOUSE_WHEEL | MOUSE_MOVE | events),
+        min_scale(0.15),
+        max_scale(1.0),
+        zoom_increment_(0.02),
+        vsb(w, scroll_bar::VERTICAL),
+        hsb(w, scroll_bar::HORIZONTAL)
+    {
+        scale = 1;
+        mouse_drag_screen = false;
+
+        hsb.set_scroll_handler(*this,&zoomable_region::on_h_scroll);
+        vsb.set_scroll_handler(*this,&zoomable_region::on_v_scroll);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    zoomable_region::
+    ~zoomable_region() 
+    {
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    set_pos (
+        long x,
+        long y
+    )
+    {
+        auto_mutex M(m);
+        drawable::set_pos(x,y);
+        vsb.set_pos(rect.right()-2-vsb.width(),rect.top()+2);
+        hsb.set_pos(rect.left()+2,rect.bottom()-2-hsb.height());
+
+        display_rect_ = rectangle(rect.left()+2,rect.top()+2,rect.right()-2-vsb.width(),rect.bottom()-2-hsb.height());
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    set_zoom_increment (
+        double zi
+    )
+    {
+        auto_mutex M(m);
+        zoom_increment_ = zi;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    double zoomable_region::
+    zoom_increment (
+    ) const
+    {
+        auto_mutex M(m);
+        return zoom_increment_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    set_max_zoom_scale (
+        double ms 
+    )
+    {
+        auto_mutex M(m);
+        max_scale = ms;
+        if (scale > ms)
+        {
+            scale = max_scale;
+            lr_point = gui_to_graph_space(point(display_rect_.right(),display_rect_.bottom()));
+            redraw_graph();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    set_min_zoom_scale (
+        double ms 
+    )
+    {
+        auto_mutex M(m);
+        min_scale = ms;
+        if (scale < ms)
+        {
+            scale = min_scale;
+            lr_point = gui_to_graph_space(point(display_rect_.right(),display_rect_.bottom()));
+            redraw_graph();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    double zoomable_region::
+    min_zoom_scale (
+    ) const
+    {
+        auto_mutex M(m);
+        return min_scale;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    double zoomable_region::
+    max_zoom_scale (
+    ) const
+    {
+        auto_mutex M(m);
+        return max_scale;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    set_size (
+        long width,
+        long height
+    )
+    {
+        auto_mutex M(m);
+        rectangle old(rect);
+        rect = resize_rect(rect,width,height);
+        vsb.set_pos(rect.right()-1-vsb.width(),  rect.top()+2);
+        hsb.set_pos(rect.left()+2,  rect.bottom()-1-hsb.height());
+
+        display_rect_ = rectangle(rect.left()+2,rect.top()+2,rect.right()-2-vsb.width(),rect.bottom()-2-hsb.height());
+        vsb.set_length(display_rect_.height());
+        hsb.set_length(display_rect_.width());
+        parent.invalidate_rectangle(rect+old);
+
+        const double old_scale = scale;
+        scale = min_scale;
+        lr_point = gui_to_graph_space(point(display_rect_.right(),display_rect_.bottom()));
+        scale = old_scale;
+
+        // call adjust_origin() so that the scroll bars get their max slider positions
+        // setup right
+        const point rect_corner(display_rect_.left(), display_rect_.top());
+        const vector<double> rect_corner_graph(gui_to_graph_space(rect_corner));
+        adjust_origin(rect_corner, rect_corner_graph);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    show (
+    )
+    {
+        auto_mutex M(m);
+        drawable::show();
+        hsb.show();
+        vsb.show();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    hide (
+    )
+    {
+        auto_mutex M(m);
+        drawable::hide();
+        hsb.hide();
+        vsb.hide();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    enable (
+    )
+    {
+        auto_mutex M(m);
+        drawable::enable();
+        hsb.enable();
+        vsb.enable();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    disable (
+    )
+    {
+        auto_mutex M(m);
+        drawable::disable();
+        hsb.disable();
+        vsb.disable();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    set_z_order (
+        long order
+    )
+    {
+        auto_mutex M(m);
+        drawable::set_z_order(order);
+        hsb.set_z_order(order);
+        vsb.set_z_order(order);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    point zoomable_region::
+    graph_to_gui_space (
+        const vector<double>& p
+    ) const
+    {
+        const point rect_corner(display_rect_.left(), display_rect_.top());
+        const dlib::vector<double> v(p);
+        return (v - gr_orig)*scale + rect_corner;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    vector<double> zoomable_region::
+    gui_to_graph_space (
+        const point& p
+    ) const
+    {
+        const point rect_corner(display_rect_.left(), display_rect_.top());
+        const dlib::vector<double> v(p - rect_corner);
+        return v/scale + gr_orig;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    point zoomable_region::
+    max_graph_point (
+    ) const
+    {
+        return lr_point;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    rectangle zoomable_region::
+    display_rect (
+    ) const 
+    {
+        return display_rect_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    double zoomable_region::
+    zoom_scale (
+    ) const
+    {
+        return scale;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    set_zoom_scale (
+        double new_scale
+    )
+    {
+        if (min_scale <= new_scale && new_scale <= max_scale)
+        {
+            // find the point in the center of the graph area
+            point center((display_rect_.left()+display_rect_.right())/2,  (display_rect_.top()+display_rect_.bottom())/2);
+            point graph_p(gui_to_graph_space(center));
+            scale = new_scale;
+            adjust_origin(center, graph_p);
+            redraw_graph();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    center_display_at_graph_point (
+        const vector<double>& p
+    )
+    {
+        // find the point in the center of the graph area
+        point center((display_rect_.left()+display_rect_.right())/2,  (display_rect_.top()+display_rect_.bottom())/2);
+        adjust_origin(center, p);
+        redraw_graph();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    on_wheel_down (
+        unsigned long state
+    )
+    {
+        // zoom out
+        if (enabled && !hidden && scale > min_scale && display_rect_.contains(lastx,lasty))
+        {
+            point gui_p(lastx,lasty);
+            point graph_p(gui_to_graph_space(gui_p));
+            scale -= zoom_increment_;
+            if (scale < min_scale)
+                scale = min_scale;
+            redraw_graph(); 
+            adjust_origin(gui_p, graph_p);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    on_wheel_up (
+        unsigned long state
+    )
+    {
+        // zoom in 
+        if (enabled && !hidden && scale < max_scale  && display_rect_.contains(lastx,lasty))
+        {
+            point gui_p(lastx,lasty);
+            point graph_p(gui_to_graph_space(gui_p));
+            scale += zoom_increment_;
+            if (scale > max_scale)
+                scale = max_scale;
+            redraw_graph(); 
+            adjust_origin(gui_p, graph_p);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    on_mouse_move (
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        if (enabled && !hidden && mouse_drag_screen)
+        {
+            adjust_origin(point(x,y), drag_screen_point);
+            redraw_graph();
+        }
+
+        // check if the mouse isn't being dragged anymore
+        if ((state & base_window::LEFT) == 0)
+        {
+            mouse_drag_screen = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    on_mouse_up (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        mouse_drag_screen = false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    on_mouse_down (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y,
+        bool is_double_click
+    )
+    {
+        if (enabled && !hidden && display_rect_.contains(x,y) && btn == base_window::LEFT)
+        {
+            mouse_drag_screen = true;
+            drag_screen_point = gui_to_graph_space(point(x,y));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    draw (
+        const canvas& c
+    ) const
+    {
+        draw_sunken_rectangle(c,rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    on_h_scroll (
+    )
+    {
+        gr_orig.x() = hsb.slider_pos();
+        redraw_graph();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    on_v_scroll (
+    )
+    {
+        gr_orig.y() = vsb.slider_pos();
+        redraw_graph();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    redraw_graph (
+    )
+    {
+        parent.invalidate_rectangle(display_rect_);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void zoomable_region::
+    adjust_origin (
+        const point& gui_p,
+        const vector<double>& graph_p
+    )
+    {
+        const point rect_corner(display_rect_.left(), display_rect_.top());
+        const dlib::vector<double> v(gui_p - rect_corner);
+        gr_orig = graph_p - v/scale;
+
+
+        // make sure the origin isn't outside the point (0,0)
+        if (gr_orig.x() < 0)
+            gr_orig.x() = 0;
+        if (gr_orig.y() < 0)
+            gr_orig.y() = 0;
+
+        // make sure the lower right corner of the display_rect_ doesn't map to a point beyond lr_point
+        point lr_rect_corner(display_rect_.right(), display_rect_.bottom());
+        point p = graph_to_gui_space(lr_point);
+        vector<double> lr_rect_corner_graph_space(gui_to_graph_space(lr_rect_corner));
+        vector<double> delta(lr_point - lr_rect_corner_graph_space);
+        if (lr_rect_corner.x() > p.x())
+        {
+            gr_orig.x() += delta.x();
+        }
+
+        if (lr_rect_corner.y() > p.y())
+        {
+            gr_orig.y() += delta.y();
+        }
+
+
+        const vector<double> ul_rect_corner_graph_space(gui_to_graph_space(rect_corner));
+        lr_rect_corner_graph_space = gui_to_graph_space(lr_rect_corner);
+        // now adjust the scroll bars
+
+        hsb.set_max_slider_pos((unsigned long)std::max(lr_point.x()-(lr_rect_corner_graph_space.x()-ul_rect_corner_graph_space.x()),0.0));
+        vsb.set_max_slider_pos((unsigned long)std::max(lr_point.y()-(lr_rect_corner_graph_space.y()-ul_rect_corner_graph_space.y()),0.0));
+        // adjust slider position now.  
+        hsb.set_slider_pos(static_cast<long>(ul_rect_corner_graph_space.x()));
+        vsb.set_slider_pos(static_cast<long>(ul_rect_corner_graph_space.y()));
+
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//              class scrollable_region
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    scrollable_region::
+    scrollable_region (
+        drawable_window& w,
+        unsigned long events 
+    ) :
+        drawable(w, MOUSE_WHEEL|events|MOUSE_CLICK|MOUSE_MOVE),
+        hsb(w,scroll_bar::HORIZONTAL),
+        vsb(w,scroll_bar::VERTICAL),
+        border_size(2),
+        hscroll_bar_inc(1),
+        vscroll_bar_inc(1),
+        h_wheel_scroll_bar_inc(1),
+        v_wheel_scroll_bar_inc(1),
+        mouse_drag_enabled_(false),
+        user_is_dragging_mouse(false)
+    {
+        hsb.set_scroll_handler(*this,&scrollable_region::on_h_scroll);
+        vsb.set_scroll_handler(*this,&scrollable_region::on_v_scroll);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    scrollable_region::
+    ~scrollable_region (
+    )
+    {
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    show (
+    )
+    {
+        auto_mutex M(m);
+        drawable::show();
+        if (need_h_scroll())
+            hsb.show();
+        if (need_v_scroll())
+            vsb.show();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    hide (
+    )
+    {
+        auto_mutex M(m);
+        drawable::hide();
+        hsb.hide();
+        vsb.hide();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    enable (
+    )
+    {
+        auto_mutex M(m);
+        drawable::enable();
+        hsb.enable();
+        vsb.enable();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    disable (
+    )
+    {
+        auto_mutex M(m);
+        drawable::disable();
+        hsb.disable();
+        vsb.disable();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_z_order (
+        long order
+    )
+    {
+        auto_mutex M(m);
+        drawable::set_z_order(order);
+        hsb.set_z_order(order);
+        vsb.set_z_order(order);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_size (
+        unsigned long width,
+        unsigned long height
+    )
+    {
+        auto_mutex M(m);
+        rectangle old(rect);
+        rect = resize_rect(rect,width,height);
+        vsb.set_pos(rect.right()-border_size-vsb.width()+1, rect.top()+border_size);
+        hsb.set_pos(rect.left()+border_size, rect.bottom()-border_size-hsb.height()+1);
+
+        // adjust the display_rect_
+        if (need_h_scroll() && need_v_scroll())
+        {
+            // both scroll bars aren't hidden
+            if (!hidden)
+            {
+                vsb.show();
+                hsb.show();
+            }
+            display_rect_ = rectangle( rect.left()+border_size,
+                                       rect.top()+border_size,
+                                       rect.right()-border_size-vsb.width(),
+                                       rect.bottom()-border_size-hsb.height());
+
+            // figure out how many scroll bar positions there should be
+            unsigned long hdelta = total_rect_.width()-display_rect_.width();
+            unsigned long vdelta = total_rect_.height()-display_rect_.height();
+            hdelta = (hdelta+hscroll_bar_inc-1)/hscroll_bar_inc;
+            vdelta = (vdelta+vscroll_bar_inc-1)/vscroll_bar_inc;
+
+            hsb.set_max_slider_pos(hdelta);
+            vsb.set_max_slider_pos(vdelta);
+
+            vsb.set_jump_size((display_rect_.height()+vscroll_bar_inc-1)/vscroll_bar_inc/2+1);
+            hsb.set_jump_size((display_rect_.width()+hscroll_bar_inc-1)/hscroll_bar_inc/2+1);
+        }
+        else if (need_h_scroll())
+        {
+            // only hsb is hidden 
+            if (!hidden)
+            {
+                hsb.show();
+                vsb.hide();
+            }
+            display_rect_ = rectangle( rect.left()+border_size,
+                                       rect.top()+border_size,
+                                       rect.right()-border_size,
+                                       rect.bottom()-border_size-hsb.height());
+
+            // figure out how many scroll bar positions there should be
+            unsigned long hdelta = total_rect_.width()-display_rect_.width();
+            hdelta = (hdelta+hscroll_bar_inc-1)/hscroll_bar_inc;
+
+            hsb.set_max_slider_pos(hdelta);
+            vsb.set_max_slider_pos(0);
+
+            hsb.set_jump_size((display_rect_.width()+hscroll_bar_inc-1)/hscroll_bar_inc/2+1);
+        }
+        else if (need_v_scroll())
+        {
+            // only vsb is hidden 
+            if (!hidden)
+            {
+                hsb.hide();
+                vsb.show();
+            }
+            display_rect_ = rectangle( rect.left()+border_size,
+                                       rect.top()+border_size,
+                                       rect.right()-border_size-vsb.width(),
+                                       rect.bottom()-border_size);
+
+            unsigned long vdelta = total_rect_.height()-display_rect_.height();
+            vdelta = (vdelta+vscroll_bar_inc-1)/vscroll_bar_inc;
+
+            hsb.set_max_slider_pos(0);
+            vsb.set_max_slider_pos(vdelta);
+
+            vsb.set_jump_size((display_rect_.height()+vscroll_bar_inc-1)/vscroll_bar_inc/2+1);
+        }
+        else
+        {
+            // both are hidden 
+            if (!hidden)
+            {
+                hsb.hide();
+                vsb.hide();
+            }
+            display_rect_ = rectangle( rect.left()+border_size,
+                                       rect.top()+border_size,
+                                       rect.right()-border_size,
+                                       rect.bottom()-border_size);
+
+            hsb.set_max_slider_pos(0);
+            vsb.set_max_slider_pos(0);
+        }
+
+        vsb.set_length(display_rect_.height());
+        hsb.set_length(display_rect_.width());
+
+        // adjust the total_rect_ position by trigging the scroll events
+        on_h_scroll();
+        on_v_scroll();
+
+        parent.invalidate_rectangle(rect+old);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    unsigned long scrollable_region::
+    horizontal_mouse_wheel_scroll_increment (
+    ) const
+    {
+        auto_mutex M(m);
+        return h_wheel_scroll_bar_inc;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    unsigned long scrollable_region::
+    vertical_mouse_wheel_scroll_increment (
+    ) const
+    {
+        auto_mutex M(m);
+        return v_wheel_scroll_bar_inc;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_horizontal_mouse_wheel_scroll_increment (
+        unsigned long inc
+    )
+    {
+        auto_mutex M(m);
+        h_wheel_scroll_bar_inc = inc;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_vertical_mouse_wheel_scroll_increment (
+        unsigned long inc
+    )
+    {
+        auto_mutex M(m);
+        v_wheel_scroll_bar_inc = inc;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    unsigned long scrollable_region::
+    horizontal_scroll_increment (
+    ) const
+    {
+        auto_mutex M(m);
+        return hscroll_bar_inc;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    unsigned long scrollable_region::
+    vertical_scroll_increment (
+    ) const
+    {
+        auto_mutex M(m);
+        return vscroll_bar_inc;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_horizontal_scroll_increment (
+        unsigned long inc
+    )
+    {
+        auto_mutex M(m);
+        hscroll_bar_inc = inc;
+        // call set_size to reset the scroll bars
+        set_size(rect.width(),rect.height());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_vertical_scroll_increment (
+        unsigned long inc
+    )
+    {
+        auto_mutex M(m);
+        vscroll_bar_inc = inc;
+        // call set_size to reset the scroll bars
+        set_size(rect.width(),rect.height());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    long scrollable_region::
+    horizontal_scroll_pos (
+    ) const
+    {
+        auto_mutex M(m);
+        return hsb.slider_pos();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    long scrollable_region::
+    vertical_scroll_pos (
+    ) const
+    {
+        auto_mutex M(m);
+        return vsb.slider_pos();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_horizontal_scroll_pos (
+        long pos
+    )
+    {
+        auto_mutex M(m);
+
+        hsb.set_slider_pos(pos);
+        on_h_scroll();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_vertical_scroll_pos (
+        long pos
+    )
+    {
+        auto_mutex M(m);
+
+        vsb.set_slider_pos(pos);
+        on_v_scroll();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_pos (
+        long x,
+        long y
+    )
+    {
+        auto_mutex M(m);
+        drawable::set_pos(x,y);
+        vsb.set_pos(rect.right()-border_size-vsb.width()+1, rect.top()+border_size);
+        hsb.set_pos(rect.left()+border_size, rect.bottom()-border_size-hsb.height()+1);
+
+        const long delta_x = total_rect_.left() - display_rect_.left();
+        const long delta_y = total_rect_.top() - display_rect_.top();
+
+        display_rect_ = move_rect(display_rect_, rect.left()+border_size, rect.top()+border_size);
+
+        total_rect_ = move_rect(total_rect_, display_rect_.left()+delta_x, display_rect_.top()+delta_y);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool scrollable_region::
+    mouse_drag_enabled (
+    ) const
+    {
+        auto_mutex M(m);
+        return mouse_drag_enabled_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    enable_mouse_drag (
+    )
+    {
+        auto_mutex M(m);
+        mouse_drag_enabled_ = true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    disable_mouse_drag (
+    )
+    {
+        auto_mutex M(m);
+        mouse_drag_enabled_ = false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const rectangle& scrollable_region::
+    display_rect (
+    ) const
+    {
+        return display_rect_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    set_total_rect_size (
+        unsigned long width,
+        unsigned long height
+    )
+    {
+        DLIB_ASSERT(width > 0 && height > 0 || width == 0 && height == 0,
+                    "\tvoid scrollable_region::set_total_rect_size(width,height)"
+                    << "\n\twidth and height must be > 0 or both == 0"
+                    << "\n\twidth:  " << width 
+                    << "\n\theight: " << height 
+                    << "\n\tthis: " << this
+        );
+
+        total_rect_ = move_rect(rectangle(width,height), 
+                                display_rect_.left()-static_cast<long>(hsb.slider_pos()),
+                                display_rect_.top()-static_cast<long>(vsb.slider_pos()));
+
+        // call this just to reconfigure the scroll bars
+        set_size(rect.width(),rect.height());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const rectangle& scrollable_region::
+    total_rect (
+    ) const
+    {
+        return total_rect_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    scroll_to_rect (
+        const rectangle& r_
+    )
+    {
+        const rectangle r(total_rect_.intersect(r_));
+        const rectangle old(total_rect_);
+        // adjust the horizontal scroll bar so that r fits as best as possible
+        if (r.left() < display_rect_.left())
+        {
+            long distance = (r.left()-total_rect_.left())/hscroll_bar_inc;
+            hsb.set_slider_pos(distance);
+        }
+        else if (r.right() > display_rect_.right())
+        {
+            long distance = (r.right()-total_rect_.left()-display_rect_.width()+hscroll_bar_inc)/hscroll_bar_inc;
+            hsb.set_slider_pos(distance);
+        }
+
+        // adjust the vertical scroll bar so that r fits as best as possible
+        if (r.top() < display_rect_.top())
+        {
+            long distance = (r.top()-total_rect_.top())/vscroll_bar_inc;
+            vsb.set_slider_pos(distance);
+        }
+        else if (r.bottom() > display_rect_.bottom())
+        {
+            long distance = (r.bottom()-total_rect_.top()-display_rect_.height()+vscroll_bar_inc)/vscroll_bar_inc;
+            vsb.set_slider_pos(distance);
+        }
+
+
+        // adjust total_rect_ so that it matches where the scroll bars are now
+        total_rect_ = move_rect(total_rect_, 
+                                display_rect_.left()-hscroll_bar_inc*hsb.slider_pos(), 
+                                display_rect_.top()-vscroll_bar_inc*vsb.slider_pos());
+
+        // only redraw if we actually changed something
+        if (total_rect_ != old)
+        {
+            parent.invalidate_rectangle(display_rect_);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    on_wheel_down (
+        unsigned long state
+    )
+    {
+        if (rect.contains(lastx,lasty) && enabled && !hidden)
+        {
+            if (need_v_scroll())
+            {
+                long pos = vsb.slider_pos();
+                vsb.set_slider_pos(pos+(long)v_wheel_scroll_bar_inc);
+                on_v_scroll();
+            }
+            else if (need_h_scroll())
+            {
+                long pos = hsb.slider_pos();
+                hsb.set_slider_pos(pos+(long)h_wheel_scroll_bar_inc);
+                on_h_scroll();
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    on_mouse_move (
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        if (enabled && !hidden && user_is_dragging_mouse && state==base_window::LEFT)
+        {
+            point current_delta = point(x,y) - point(total_rect().left(), total_rect().top());
+            rectangle new_rect(translate_rect(display_rect(), drag_origin - current_delta));
+            new_rect = centered_rect(new_rect, new_rect.width()-hscroll_bar_inc, new_rect.height()-vscroll_bar_inc);
+            scroll_to_rect(new_rect);
+        }
+        else
+        {
+            user_is_dragging_mouse = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    on_mouse_down (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y,
+        bool is_double_click
+    )
+    {
+        if (mouse_drag_enabled_ && enabled && !hidden && display_rect().contains(x,y) && (btn==base_window::LEFT))
+        {
+            drag_origin = point(x,y) - point(total_rect().left(), total_rect().top());
+            user_is_dragging_mouse = true;
+        }
+        else
+        {
+            user_is_dragging_mouse = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    on_mouse_up   (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        user_is_dragging_mouse = false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    on_wheel_up (
+        unsigned long state
+    )
+    {
+        if (rect.contains(lastx,lasty) && enabled && !hidden)
+        {
+            if (need_v_scroll())
+            {
+                long pos = vsb.slider_pos();
+                vsb.set_slider_pos(pos-(long)v_wheel_scroll_bar_inc);
+                on_v_scroll();
+            }
+            else if (need_h_scroll())
+            {
+                long pos = hsb.slider_pos();
+                hsb.set_slider_pos(pos-(long)h_wheel_scroll_bar_inc);
+                on_h_scroll();
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    draw (
+        const canvas& c
+    ) const
+    {
+        rectangle area = c.intersect(rect);
+        if (area.is_empty() == true)
+            return;
+
+        draw_sunken_rectangle(c,rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool scrollable_region::
+    need_h_scroll (
+    ) const
+    {
+        if (total_rect_.width() > rect.width()-border_size*2)
+        {
+            return true;
+        }
+        else
+        {
+            // check if we would need a vertical scroll bar and if adding one would make us need
+            // a horizontal one
+            if (total_rect_.height() > rect.height()-border_size*2 && 
+                total_rect_.width() > rect.width()-border_size*2-vsb.width())
+                return true;
+            else
+                return false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool scrollable_region::
+    need_v_scroll (
+    ) const
+    {
+        if (total_rect_.height() > rect.height()-border_size*2)
+        {
+            return true;
+        }
+        else
+        {
+            // check if we would need a horizontal scroll bar and if adding one would make us need
+            // a vertical_scroll_pos one
+            if (total_rect_.width() > rect.width()-border_size*2 && 
+                total_rect_.height() > rect.height()-border_size*2-hsb.height())
+                return true;
+            else
+                return false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    on_h_scroll (
+    )
+    {
+        total_rect_ = move_rect(total_rect_, display_rect_.left()-hscroll_bar_inc*hsb.slider_pos(), total_rect_.top());
+        parent.invalidate_rectangle(display_rect_);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scrollable_region::
+    on_v_scroll (
+    )
+    {
+        total_rect_ = move_rect(total_rect_, total_rect_.left(), display_rect_.top()-vscroll_bar_inc*vsb.slider_pos());
+        parent.invalidate_rectangle(display_rect_);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// class popup_menu_region 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    popup_menu_region::
+    popup_menu_region(  
+        drawable_window& w
+    ) :
+        drawable(w,MOUSE_CLICK | KEYBOARD_EVENTS | FOCUS_EVENTS | WINDOW_MOVED),
+        popup_menu_shown(false)
+    {
+        enable_events();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    popup_menu_region::
+    ~popup_menu_region(
+    )
+    { 
+        disable_events();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    set_size (
+        long width, 
+        long height
+    )
+    {
+        auto_mutex M(m);
+        rect = resize_rect(rect,width,height);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    popup_menu& popup_menu_region::
+    menu (
+    )
+    {
+        return menu_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    hide (
+    )
+    {
+        auto_mutex M(m);
+        drawable::hide();
+        menu_.hide();
+        popup_menu_shown = false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    disable (
+    )
+    {
+        auto_mutex M(m);
+        drawable::disable();
+        menu_.hide();
+        popup_menu_shown = false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    on_keydown (
+        unsigned long key,
+        bool is_printable,
+        unsigned long state
+    )
+    {
+        if (enabled && !hidden && popup_menu_shown)
+        {
+            menu_.forwarded_on_keydown(key, is_printable, state);
+        }
+        else if (popup_menu_shown)
+        {
+            menu_.hide();
+            popup_menu_shown = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    on_focus_lost (
+    )
+    {
+        if (popup_menu_shown)
+        {
+            menu_.hide();
+            popup_menu_shown = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    on_focus_gained (
+    )
+    {
+        if (popup_menu_shown)
+        {
+            menu_.hide();
+            popup_menu_shown = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    on_window_moved(
+    )
+    {
+        if (popup_menu_shown)
+        {
+            menu_.hide();
+            popup_menu_shown = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    on_mouse_down (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y,
+        bool is_double_click
+    )
+    {
+        if (enabled && !hidden && rect.contains(x,y) && btn == base_window::RIGHT)
+        {
+            long orig_x, orig_y;
+            parent.get_pos(orig_x, orig_y);
+            menu_.set_pos(orig_x+x, orig_y+y);
+            menu_.show();
+            popup_menu_shown = true;
+        }
+        else if (popup_menu_shown)
+        {
+            menu_.hide();
+            popup_menu_shown = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    draw (
+        const canvas& 
+    ) const
+    {
     }
 
 // ----------------------------------------------------------------------------------------
