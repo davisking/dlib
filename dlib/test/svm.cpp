@@ -368,8 +368,8 @@ namespace
         dlog << LDEBUG << "num sv: " << num_sv;
         dlog << LDEBUG << "num rv: " << num_rv;
 
-        DLIB_CASSERT(num_rv <= 14, "");
-        DLIB_CASSERT(num_sv <= 35, "");
+        DLIB_CASSERT(num_rv <= 17, "");
+        DLIB_CASSERT(num_sv <= 45, "");
 
         decision_function<kernel_type> df = reduced2(trainer, 19).train(x,y);
         print_spinner();
