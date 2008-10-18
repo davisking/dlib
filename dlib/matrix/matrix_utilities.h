@@ -2407,7 +2407,6 @@ namespace dlib
         COMPILE_TIME_ASSERT(NC == 0 || uNC == 0 || NC == uNC);
         COMPILE_TIME_ASSERT(NC == 0 || wN == 0 || NC == wN);
         COMPILE_TIME_ASSERT(NC == 0 || vN == 0 || NC == vN);
-        COMPILE_TIME_ASSERT(NR >= NC || NR == 0);
 
         w.set_size(m.nc(),m.nc());
         v.set_size(m.nc(),m.nc());
