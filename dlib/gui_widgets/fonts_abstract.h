@@ -140,9 +140,9 @@ namespace dlib
     
         private:
 
-            // restricted functions
-            letter(letter&);        // copy constructor
-            letter& operator=(letter&);    // assignment operator
+        // restricted functions
+        letter(letter&);        // copy constructor
+        letter& operator=(letter&);    // assignment operator
     };
 
     inline void swap (

@@ -657,7 +657,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const font* get_native_font (
+    const shared_ptr_thread_safe<font> get_native_font (
     )
     {
         return nativefont::native_font::get_font();

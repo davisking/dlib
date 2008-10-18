@@ -7,6 +7,7 @@
 
 #include "../gui_widgets.h"
 #include "../unicode.h"
+#include "../smart_pointers_thread_safe.h"
 
 #include <map>
 
@@ -528,21 +529,32 @@ namespace nativefont
             ascender_ = 0;
             get_letter((int)('x'));
         }
-        virtual ~native_font() {}
-        std::map<int,dlib::letter *> letters;
+        typedef std::map<int,dlib::letter *> letters_map_type;
+        letters_map_type letters;
         font_renderer::font_renderer fl;
     public:
+
+        virtual ~native_font() 
+        {
+            // delete all the letter objects we have in our letters map
+            letters_map_type::iterator i;
+            for (i = letters.begin(); i != letters.end(); ++i)
+            {
+                delete i->second;
+            }
+        }
+
         virtual bool has_character (
             dlib::unichar ch
         )const{
             return (*this)[ch].width() > 0;
         }
 
-        static const font* get_font (
+        static const dlib::shared_ptr_thread_safe<font>& get_font (
         )
         {
-            static native_font f;
-            return &f;
+            static dlib::shared_ptr_thread_safe<font> f(new native_font);
+            return f;
         }
 
         virtual const dlib::letter& operator[] (dlib::unichar ch) const{

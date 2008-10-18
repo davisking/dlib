@@ -120,6 +120,10 @@ namespace dlib
         }
 
     private:
+        // restricted functions
+        letter(letter&);        // copy constructor
+        letter& operator=(letter&);    // assignment operator
+
         point* points;
         unsigned short w;
         unsigned short count;
@@ -477,7 +481,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const font* get_native_font ();
+    const shared_ptr_thread_safe<font> get_native_font ();
 
 // ----------------------------------------------------------------------------------------
 

@@ -2953,6 +2953,236 @@ namespace dlib
    template class list_box<std::wstring>;
    template class list_box<dlib::ustring>;
    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // function message_box()  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace message_box_helper
+    {
+        void box_win::
+        initialize (
+        )
+        {
+            msg.set_pos(20,20);
+            msg.set_text(message);
+            rectangle msg_rect = msg.get_rect();
+            btn_ok.set_name("OK");
+            btn_ok.set_size(60,btn_ok.height());
+            if (msg_rect.width() >= 60)
+                btn_ok.set_pos(msg_rect.width()/2+msg_rect.left()-btn_ok.width()/2,msg_rect.bottom()+15);
+            else
+                btn_ok.set_pos(20,msg_rect.bottom()+15);
+            btn_ok.set_click_handler(*this,&box_win::on_click);
+
+            rectangle size = btn_ok.get_rect() + msg_rect;
+            set_size(size.right()+20,size.bottom()+20);
+
+
+            show();
+            set_title(title);
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        box_win::
+        box_win (
+            const std::string& title_,
+            const std::string& message_
+        ) : 
+            drawable_window(false),
+            title(convert_mbstring_to_wstring(title_)),
+            message(convert_mbstring_to_wstring(message_)),
+            msg(*this),
+            btn_ok(*this)
+        {
+            initialize();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        box_win::
+        box_win (
+            const std::wstring& title_,
+            const std::wstring& message_
+        ) : 
+            drawable_window(false),
+            title(title_),
+            message(message_),
+            msg(*this),
+            btn_ok(*this)
+        {
+            initialize();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        box_win::
+        box_win (
+            const dlib::ustring& title_,
+            const dlib::ustring& message_
+        ) : 
+            drawable_window(false),
+            title(convert_utf32_to_wstring(title_)),
+            message(convert_utf32_to_wstring(message_)),
+            msg(*this),
+            btn_ok(*this)
+        {
+            initialize();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        box_win::
+        ~box_win (
+        )
+        {
+            close_window();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        deleter_thread (
+            void* param
+        )
+        {
+            // The point of this extra member function pointer stuff is to allow the user
+            // to end the program from within the callback.  So we want to destroy the 
+            // window *before* we call their callback.
+            box_win& w = *reinterpret_cast<box_win*>(param);
+            w.close_window();
+            member_function_pointer<>::kernel_1a event_handler(w.event_handler);
+            delete &w;
+            if (event_handler.is_set())
+                event_handler(); 
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        on_click (
+        )
+        {
+            hide();
+            create_new_thread(&deleter_thread,this);
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        base_window::on_close_return_code box_win::
+        on_window_close (
+        )
+        {
+            // The point of this extra member function pointer stuff is to allow the user
+            // to end the program within the callback.  So we want to destroy the 
+            // window *before* we call their callback. 
+            member_function_pointer<>::kernel_1a event_handler_copy(event_handler);
+            delete this;
+            if (event_handler_copy.is_set())
+                event_handler_copy();
+            return CLOSE_WINDOW;
+        }
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+        void blocking_box_win::
+        initialize (
+        )
+        {
+            msg.set_pos(20,20);
+            msg.set_text(message);
+            rectangle msg_rect = msg.get_rect();
+            btn_ok.set_name("OK");
+            btn_ok.set_size(60,btn_ok.height());
+            if (msg_rect.width() >= 60)
+                btn_ok.set_pos(msg_rect.width()/2+msg_rect.left()-btn_ok.width()/2,msg_rect.bottom()+15);
+            else
+                btn_ok.set_pos(20,msg_rect.bottom()+15);
+            btn_ok.set_click_handler(*this,&blocking_box_win::on_click);
+
+            rectangle size = btn_ok.get_rect() + msg_rect;
+            set_size(size.right()+20,size.bottom()+20);
+
+
+            set_title(title);
+            show();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        blocking_box_win::
+        blocking_box_win (
+            const std::string& title_,
+            const std::string& message_
+        ) : 
+            drawable_window(false),
+            title(convert_mbstring_to_wstring(title_)),
+            message(convert_mbstring_to_wstring(message_)),
+            msg(*this),
+            btn_ok(*this)
+        {
+            initialize();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        blocking_box_win::
+        blocking_box_win (
+            const std::wstring& title_,
+            const std::wstring& message_
+        ) : 
+            drawable_window(false),
+            title(title_),
+            message(message_),
+            msg(*this),
+            btn_ok(*this)
+        {
+            initialize();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        blocking_box_win::
+        blocking_box_win (
+            const dlib::ustring& title_,
+            const dlib::ustring& message_
+        ) : 
+            drawable_window(false),
+            title(convert_utf32_to_wstring(title_)),
+            message(convert_utf32_to_wstring(message_)),
+            msg(*this),
+            btn_ok(*this)
+        {
+            initialize();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        blocking_box_win::
+        ~blocking_box_win (
+        )
+        { 
+            close_window(); 
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void blocking_box_win::
+        on_click (
+        )
+        {
+            close_window();
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_WIDGETs_CPP_
