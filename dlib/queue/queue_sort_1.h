@@ -90,6 +90,8 @@ namespace dlib
                     queue_base left, right;
                     T partition_element;
                     T temp;
+                    // do this just to avoid a compiler warning
+                    assign_zero_if_built_in_scalar_type(temp);
 
                     queue.dequeue(partition_element);
 
