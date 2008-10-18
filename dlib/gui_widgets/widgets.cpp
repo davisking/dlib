@@ -3182,6 +3182,1882 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // function open_file_box() 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace open_file_box_helper
+    {
+        box_win::
+        box_win (
+            const std::string& title,
+            bool has_text_field 
+        ) : 
+            lbl_dirs(*this),
+            lbl_files(*this),
+            lbl_file_name(*this),
+            lb_dirs(*this),
+            lb_files(*this),
+            btn_ok(*this),
+            btn_cancel(*this),
+            btn_root(*this),
+            tf_file_name(*this)
+        {
+            if (has_text_field == false)
+            {
+                tf_file_name.hide();
+                lbl_file_name.hide();
+            }
+            else
+            {
+                lbl_file_name.set_text("File: ");
+            }
+
+            cur_dir = -1;
+            set_size(500,300);
+
+            lbl_dirs.set_text("Directories:");
+            lbl_files.set_text("Files:");
+            btn_ok.set_name("Ok");
+            btn_cancel.set_name("Cancel");
+            btn_root.set_name("/");
+
+            btn_root.set_click_handler(*this,&box_win::on_root_click);
+            btn_cancel.set_click_handler(*this,&box_win::on_cancel_click);
+            btn_ok.set_click_handler(*this,&box_win::on_open_click);
+            lb_dirs.set_double_click_handler(*this,&box_win::on_dirs_click);
+            lb_files.set_click_handler(*this,&box_win::on_files_click);
+            lb_files.set_double_click_handler(*this,&box_win::on_files_double_click);
+
+
+            btn_root.set_pos(5,5);
+
+            set_sizes();
+            set_title(title);
+
+            on_root_click();
+
+            // make it so that the file box starts out in our current working
+            // directory
+            std::string full_name(get_current_dir());
+
+            while (full_name.size() > 0)
+            {
+                std::string::size_type pos = full_name.find_first_of("\\/");
+                std::string left(full_name.substr(0,pos));
+                if (pos != std::string::npos)
+                    full_name = full_name.substr(pos+1);
+                else
+                    full_name.clear();
+
+                if (left.size() > 0)
+                    enter_folder(left); 
+            }
+
+
+            show();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        box_win::
+        ~box_win (
+        )
+        {
+            close_window();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        set_sizes(
+        )
+        {
+            unsigned long width, height;
+            get_size(width,height);
+
+
+            if (lbl_file_name.is_hidden())
+            {
+                lbl_dirs.set_pos(0,btn_root.bottom()+5);
+                lb_dirs.set_pos(0,lbl_dirs.bottom());
+                lb_dirs.set_size(width/2,height-lb_dirs.top()-btn_cancel.height()-10);
+
+                lbl_files.set_pos(lb_dirs.right(),btn_root.bottom()+5);
+                lb_files.set_pos(lb_dirs.right(),lbl_files.bottom());
+                lb_files.set_size(width-lb_files.left(),height-lb_files.top()-btn_cancel.height()-10);
+
+                btn_ok.set_pos(width - btn_ok.width()-25,lb_files.bottom()+5);
+                btn_cancel.set_pos(btn_ok.left() - btn_cancel.width()-5,lb_files.bottom()+5);
+            }
+            else
+            {
+
+                lbl_dirs.set_pos(0,btn_root.bottom()+5);
+                lb_dirs.set_pos(0,lbl_dirs.bottom());
+                lb_dirs.set_size(width/2,height-lb_dirs.top()-btn_cancel.height()-10-tf_file_name.height());
+
+                lbl_files.set_pos(lb_dirs.right(),btn_root.bottom()+5);
+                lb_files.set_pos(lb_dirs.right(),lbl_files.bottom());
+                lb_files.set_size(width-lb_files.left(),height-lb_files.top()-btn_cancel.height()-10-tf_file_name.height());
+
+                lbl_file_name.set_pos(lb_files.left(), lb_files.bottom()+8);
+                tf_file_name.set_pos(lbl_file_name.right(), lb_files.bottom()+5);
+                tf_file_name.set_width(width-tf_file_name.left()-5);
+
+                btn_ok.set_pos(width - btn_ok.width()-25,tf_file_name.bottom()+5);
+                btn_cancel.set_pos(btn_ok.left() - btn_cancel.width()-5,tf_file_name.bottom()+5);
+            }
+
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        on_window_resized (
+        )
+        {
+            set_sizes();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        deleter_thread (
+        ) 
+        {  
+            close_window();
+            delete this; 
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        enter_folder (
+            const std::string& folder_name
+        )
+        {
+            if (btn_root.is_checked())
+                btn_root.set_unchecked();
+            if (cur_dir != -1)
+                sob[cur_dir]->set_unchecked();
+
+
+            const std::string old_path = path;
+            const long old_cur_dir = cur_dir;
+
+            scoped_ptr<toggle_button> new_btn(new toggle_button(*this));
+            new_btn->set_name(folder_name);
+            new_btn->set_click_handler(*this,&box_win::on_path_button_click);
+
+            // remove any path buttons that won't be part of the path anymore
+            if (sob.size())
+            {
+                while (sob.size() > (unsigned long)(cur_dir+1))
+                {
+                    scoped_ptr<toggle_button> junk;
+                    sob.remove(cur_dir+1,junk);
+                }
+            }
+
+            if (sob.size())
+                new_btn->set_pos(sob[sob.size()-1]->right()+5,sob[sob.size()-1]->top());
+            else
+                new_btn->set_pos(btn_root.right()+5,btn_root.top());
+
+            cur_dir = sob.size();
+            sob.add(sob.size(),new_btn);
+
+            path += folder_name + directory::get_separator();
+            if (set_dir(prefix + path) == false)
+            {
+                sob.remove(sob.size()-1,new_btn);
+                path = old_path;
+                cur_dir = old_cur_dir;
+            }
+            else
+            {
+
+                sob[cur_dir]->set_checked();
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        on_dirs_click (
+            unsigned long idx
+        )
+        {
+            enter_folder(lb_dirs[idx]);
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        on_files_click (
+            unsigned long idx
+        )
+        {
+            if (tf_file_name.is_hidden() == false)
+            {
+                tf_file_name.set_text(lb_files[idx]);
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        on_files_double_click (
+            unsigned long 
+        )
+        {
+            on_open_click();
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        on_cancel_click (
+        )
+        {
+            hide();
+            create_new_thread<box_win,&box_win::deleter_thread>(*this);
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        on_open_click (
+        )
+        {
+            if (lb_files.get_selected() != lb_files.size() || tf_file_name.text().size() > 0)
+            {
+                if (event_handler.is_set())
+                {
+                    if (tf_file_name.is_hidden())
+                        event_handler(prefix + path + lb_files[lb_files.get_selected()]);
+                    else if (tf_file_name.text().size() > 0)
+                        event_handler(prefix + path + tf_file_name.text());
+                }
+                hide();
+                create_new_thread<box_win,&box_win::deleter_thread>(*this);
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        on_path_button_click (
+            toggle_button& btn
+        )
+        {
+            if (btn_root.is_checked())
+                btn_root.set_unchecked();
+            if (cur_dir != -1)
+                sob[cur_dir]->set_unchecked();
+            std::string new_path;
+
+            for (unsigned long i = 0; i < sob.size(); ++i)
+            {
+                new_path += sob[i]->name() + directory::get_separator();
+                if (sob[i].get() == &btn)
+                {
+                    cur_dir = i;
+                    sob[i]->set_checked();
+                    break;
+                }
+            }
+            if (path != new_path)
+            {
+                path = new_path;
+                set_dir(prefix+path);
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        struct case_insensitive_compare
+        {
+            bool operator() (
+                const std::string& a,
+                const std::string& b
+            ) const
+            {
+                std::string::size_type i, size;
+                size = std::min(a.size(),b.size());
+                for (i = 0; i < size; ++i)
+                {
+                    if (std::tolower(a[i]) < std::tolower(b[i]))
+                        return true;
+                    else if (std::tolower(a[i]) > std::tolower(b[i]))
+                        return false;
+                }
+                if (a.size() < b.size())
+                    return true;
+                else
+                    return false;
+            }
+        };
+
+    // ------------------------------------------------------------------------------------
+
+        bool box_win::
+        set_dir (
+            const std::string& dir
+        )
+        {
+            try
+            {
+                directory d(dir);
+                queue<directory>::kernel_1a_c qod;
+                queue<file>::kernel_1a_c qof;
+                queue<std::string>::sort_1a_c qos;
+                d.get_dirs(qod);
+                d.get_files(qof);
+
+                qod.reset();
+                while (qod.move_next())
+                {
+                    std::string temp = qod.element().name();
+                    qos.enqueue(temp);
+                }
+                qos.sort(case_insensitive_compare());
+                lb_dirs.load(qos);
+                qos.clear();
+
+                qof.reset();
+                while (qof.move_next())
+                {
+                    std::string temp = qof.element().name();
+                    qos.enqueue(temp);
+                }
+                qos.sort(case_insensitive_compare());
+                lb_files.load(qos);
+                return true;
+            }
+            catch (directory::listing_error& )
+            {
+                return false;
+            }
+            catch (directory::dir_not_found&)
+            {
+                return false;
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void box_win::
+        on_root_click (
+        )
+        {
+            btn_root.set_checked();
+            if (cur_dir != -1)
+                sob[cur_dir]->set_unchecked();
+
+            queue<directory>::kernel_1a_c qod, qod2;
+            queue<file>::kernel_1a_c qof;
+            queue<std::string>::sort_1a_c qos;
+            get_filesystem_roots(qod);
+            path.clear();
+            cur_dir = -1;
+            if (qod.size() == 1)
+            {
+                qod.current().get_files(qof);
+                qod.current().get_dirs(qod2);
+                prefix = qod.current().full_name();
+
+                qod2.reset();
+                while (qod2.move_next())
+                {
+                    std::string temp = qod2.element().name();
+                    qos.enqueue(temp);
+                }
+                qos.sort(case_insensitive_compare());
+                lb_dirs.load(qos);
+                qos.clear();
+
+                qof.reset();
+                while (qof.move_next())
+                {
+                    std::string temp = qof.element().name();
+                    qos.enqueue(temp);
+                }
+                qos.sort(case_insensitive_compare());
+                lb_files.load(qos);
+            }
+            else
+            {
+                prefix.clear();
+                qod.reset();
+                while (qod.move_next())
+                {
+                    std::string temp = qod.element().full_name();
+                    temp = temp.substr(0,temp.size()-1);
+                    qos.enqueue(temp);
+                }
+                qos.sort(case_insensitive_compare());
+                lb_dirs.load(qos);
+                qos.clear();
+                lb_files.load(qos);
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        base_window::on_close_return_code box_win::
+        on_window_close (
+        )
+        {
+            delete this;
+            return CLOSE_WINDOW;
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // class menu_bar
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    menu_bar::
+    menu_bar(
+        drawable_window& w
+    ) : 
+        drawable(w, 0xFFFF), // listen for all events
+        open_menu(0)
+    {
+        adjust_position();
+        enable_events();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    menu_bar::
+    ~menu_bar()
+    { 
+        disable_events(); 
+        parent.invalidate_rectangle(rect); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    set_main_font (
+        const shared_ptr_thread_safe<font>& f
+    )
+    {
+        auto_mutex M(m);
+        mfont = f;
+        adjust_position();
+        compute_menu_geometry();
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    set_number_of_menus (
+        unsigned long num
+    )
+    {
+        auto_mutex M(m);
+        menus.set_max_size(num);
+        menus.set_size(num);
+        open_menu = menus.size();
+        compute_menu_geometry();
+
+        for (unsigned long i = 0; i < menus.size(); ++i)
+        {
+            menus[i].menu.set_on_hide_handler(*this,&menu_bar::on_popup_hide);
+        }
+
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    unsigned long menu_bar::
+    number_of_menus (
+    ) const
+    {
+        auto_mutex M(m);
+        return menus.size();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    set_menu_name (
+        unsigned long idx,
+        const std::string name,
+        char underline_ch 
+    )
+    {
+        set_menu_name(idx, convert_mbstring_to_wstring(name), underline_ch);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    set_menu_name (
+        unsigned long idx,
+        const std::wstring name,
+        char underline_ch 
+    )
+    {
+        set_menu_name(idx, convert_wstring_to_utf32(name), underline_ch);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    set_menu_name (
+        unsigned long idx,
+        const dlib::ustring name,
+        char underline_ch 
+    )
+    {
+        DLIB_ASSERT ( idx < number_of_menus() ,
+                      "\tvoid menu_bar::set_menu_name()"
+                      << "\n\tidx:               " << idx
+                      << "\n\tnumber_of_menus(): " << number_of_menus() 
+        );
+        auto_mutex M(m);
+        menus[idx].name = name.c_str();
+        menus[idx].underline_pos = name.find_first_of(underline_ch);
+        compute_menu_geometry();
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const std::string menu_bar::
+    menu_name (
+        unsigned long idx
+    ) const
+    {
+        return convert_wstring_to_mbstring(menu_wname(idx));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const std::wstring menu_bar::
+    menu_wname (
+        unsigned long idx
+    ) const
+    {
+        return convert_utf32_to_wstring(menu_uname(idx));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const dlib::ustring menu_bar::
+    menu_uname (
+        unsigned long idx
+    ) const
+    {
+        DLIB_ASSERT ( idx < number_of_menus() ,
+                      "\tstd::string menu_bar::menu_name()"
+                      << "\n\tidx:               " << idx
+                      << "\n\tnumber_of_menus(): " << number_of_menus() 
+        );
+        auto_mutex M(m);
+        return menus[idx].name.c_str();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    popup_menu& menu_bar::
+    menu (
+        unsigned long idx
+    )
+    {
+        DLIB_ASSERT ( idx < number_of_menus() ,
+                      "\tpopup_menu& menu_bar::menu()"
+                      << "\n\tidx:               " << idx
+                      << "\n\tnumber_of_menus(): " << number_of_menus() 
+        );
+        auto_mutex M(m);
+        return menus[idx].menu;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const popup_menu& menu_bar::
+    menu (
+        unsigned long idx
+    ) const
+    {
+        DLIB_ASSERT ( idx < number_of_menus() ,
+                      "\tconst popup_menu& menu_bar::menu()"
+                      << "\n\tidx:               " << idx
+                      << "\n\tnumber_of_menus(): " << number_of_menus() 
+        );
+        auto_mutex M(m);
+        return menus[idx].menu;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    on_window_resized (
+    )
+    {
+        adjust_position();
+        hide_menu();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    draw (
+        const canvas& c
+    ) const
+    {
+        rectangle area(rect.intersect(c));
+        if (area.is_empty())
+            return;
+
+        const unsigned char opacity = 40;
+        fill_rect_with_vertical_gradient(c, rect,rgb_alpha_pixel(255,255,255,opacity),
+                                         rgb_alpha_pixel(0,0,0,opacity));
+
+        // first draw the border between the menu and the rest of the window
+        draw_line(c, point(rect.left(),rect.bottom()-1), 
+                  point(rect.right(),rect.bottom()-1), 100);
+        draw_line(c, point(rect.left(),rect.bottom()), 
+                  point(rect.right(),rect.bottom()), 255);
+
+        // now draw all the menu buttons
+        for (unsigned long i = 0; i < menus.size(); ++i)
+        {
+            mfont->draw_string(c,menus[i].rect, menus[i].name );
+            if (menus[i].underline_p1 != menus[i].underline_p2)
+                draw_line(c, menus[i].underline_p1, menus[i].underline_p2);
+
+            if (open_menu == i)
+            {
+                fill_rect_with_vertical_gradient(c, menus[i].bgrect,rgb_alpha_pixel(255,255,0,40),  rgb_alpha_pixel(0,0,0,40));
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    on_window_moved (
+    )
+    {
+        hide_menu();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    on_focus_lost (
+    )
+    {
+        hide_menu();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    on_mouse_down (
+        unsigned long btn,
+        unsigned long ,
+        long x,
+        long y,
+        bool 
+    )
+    {
+
+        if (rect.contains(x,y) == false || btn != (unsigned long)base_window::LEFT)
+        {
+            hide_menu();
+            return;
+        }
+
+        unsigned long old_menu = menus.size();
+
+        // if a menu is currently open then save its index
+        if (open_menu != menus.size())
+        {
+            old_menu = open_menu;
+            hide_menu();
+        }
+
+        // figure out which menu should be open if any
+        for (unsigned long i = 0; i < menus.size(); ++i)
+        {
+            if (menus[i].bgrect.contains(x,y))
+            {
+                if (old_menu != i)
+                    show_menu(i);
+
+                break;
+            }
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    on_mouse_move (
+        unsigned long ,
+        long x,
+        long y
+    )
+    {
+        // if the mouse is over the menu_bar and some menu is currently open
+        if (rect.contains(x,y) && open_menu != menus.size())
+        {
+            // if the mouse is still in the same rectangle then don't do anything
+            if (menus[open_menu].bgrect.contains(x,y) == false)
+            {
+                // figure out which menu should be instead   
+                for (unsigned long i = 0; i < menus.size(); ++i)
+                {
+                    if (menus[i].bgrect.contains(x,y))
+                    {
+                        show_menu(i);
+                        break;
+                    }
+                }
+
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    on_keydown (
+        unsigned long key,
+        bool is_printable,
+        unsigned long state
+    )
+    {
+        if (state&base_window::KBD_MOD_ALT)
+        {
+            // check if the key matches any of our underlined keys
+            for (unsigned long i = 0; i < menus.size(); ++i)
+            {
+                // if we have found a matching key
+                if (is_printable && 
+                    menus[i].underline_pos != std::string::npos &&
+                    std::tolower(menus[i].name[menus[i].underline_pos]) == std::tolower(key))
+                {
+                    show_menu(i);
+                    menus[open_menu].menu.select_first_item();
+                    return;
+                }
+            }
+        }
+
+        if (open_menu != menus.size())
+        {
+            unsigned long i = open_menu;
+            // if the submenu doesn't use this key for something then we will
+            if (menus[open_menu].menu.forwarded_on_keydown(key,is_printable,state) == false)
+            {
+                if (key == base_window::KEY_LEFT)
+                {
+                    i = (i+menus.size()-1)%menus.size();
+                    show_menu(i);
+                    menus[open_menu].menu.select_first_item();
+                }
+                else if (key == base_window::KEY_RIGHT)
+                {
+                    i = (i+1)%menus.size();
+                    show_menu(i);
+                    menus[open_menu].menu.select_first_item();
+                }
+                else if (key == base_window::KEY_ESC)
+                {
+                    hide_menu();
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    show_menu (
+        unsigned long i
+    )
+    {
+        rectangle temp;
+
+        // menu already open so do nothing
+        if (i == open_menu)
+            return;
+
+        // if a menu is currently open
+        if (open_menu != menus.size())
+        {
+            menus[open_menu].menu.hide();
+            temp = menus[open_menu].bgrect;
+        }
+
+        // display the new menu
+        open_menu = i;
+        long wx, wy;
+        parent.get_pos(wx,wy);
+        wx += menus[i].bgrect.left();
+        wy += menus[i].bgrect.bottom()+1;
+        menus[i].menu.set_pos(wx,wy);
+        menus[i].menu.show();
+        parent.invalidate_rectangle(menus[i].bgrect+temp);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    hide_menu (
+    )
+    {
+        // if a menu is currently open
+        if (open_menu != menus.size())
+        {
+            menus[open_menu].menu.hide();
+            parent.invalidate_rectangle(menus[open_menu].bgrect);
+            open_menu = menus.size();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    on_popup_hide (
+    )
+    {
+        // if a menu is currently open
+        if (open_menu != menus.size())
+        {
+            parent.invalidate_rectangle(menus[open_menu].bgrect);
+            open_menu = menus.size();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    compute_menu_geometry (
+    )
+    {
+        long x = 7;
+        long bg_x = 0;
+        for (unsigned long i = 0; i < menus.size(); ++i)
+        {
+            // compute the locations of the text rectangles
+            menus[i].rect.set_top(5);
+            menus[i].rect.set_left(x);
+            menus[i].rect.set_bottom(rect.bottom()-2);
+
+            unsigned long width, height;
+            mfont->compute_size(menus[i].name,width,height);
+            menus[i].rect = resize_rect_width(menus[i].rect, width);
+            x = menus[i].rect.right()+10;
+
+            menus[i].bgrect.set_top(0);
+            menus[i].bgrect.set_left(bg_x);
+            menus[i].bgrect.set_bottom(rect.bottom()-2);
+            menus[i].bgrect.set_right(x-5);
+            bg_x = menus[i].bgrect.right()+1;
+
+            if (menus[i].underline_pos != std::string::npos)
+            {
+                // now compute the location of the underline bar
+                rectangle r1 = mfont->compute_cursor_rect(
+                    menus[i].rect, 
+                    menus[i].name,
+                    menus[i].underline_pos);
+
+                rectangle r2 = mfont->compute_cursor_rect(
+                    menus[i].rect, 
+                    menus[i].name,
+                    menus[i].underline_pos+1);
+
+                menus[i].underline_p1.x() = r1.left()+1;
+                menus[i].underline_p2.x() = r2.left()-1;
+                menus[i].underline_p1.y() = r1.bottom()-mfont->height()+mfont->ascender()+2;
+                menus[i].underline_p2.y() = r2.bottom()-mfont->height()+mfont->ascender()+2;
+            }
+            else
+            {
+                // there is no underline in this case
+                menus[i].underline_p1 = menus[i].underline_p2;
+            }
+
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void menu_bar::
+    adjust_position (
+    )
+    {
+        unsigned long width, height;
+        rectangle old(rect);
+        parent.get_size(width,height);
+        rect.set_left(0);
+        rect.set_top(0);
+        rect = resize_rect(rect,width,mfont->height()+10);
+        parent.invalidate_rectangle(old+rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// class text_grid
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    text_grid::
+    text_grid (
+        drawable_window& w
+    ) :
+        scrollable_region(w, KEYBOARD_EVENTS | MOUSE_CLICK | FOCUS_EVENTS ),
+        has_focus(false),
+        cursor_timer(*this,&text_grid::timer_action),
+        border_color_(128,128,128)
+    {
+
+        cursor_timer.set_delay_time(500);
+        set_vertical_scroll_increment(10);
+        set_horizontal_scroll_increment(10);
+        enable_events();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    text_grid::
+    ~text_grid (
+    )
+    {
+        // Disable all further events for this drawable object.  We have to do this 
+        // because we don't want draw() events coming to this object while or after 
+        // it has been destructed.
+        disable_events();
+
+        // wait for the timer to stop doing its thing
+        cursor_timer.stop_and_wait();
+        // Tell the parent window to redraw its area that previously contained this
+        // drawable object.
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_grid_size (
+        unsigned long rows,
+        unsigned long cols
+    )
+    {
+        auto_mutex M(m);
+        row_height.set_max_size(rows);
+        row_height.set_size(rows);
+
+        col_width.set_max_size(cols);
+        col_width.set_size(cols);
+
+        grid.set_size(rows,cols);
+
+        for (unsigned long i = 0; i < row_height.size(); ++i)
+            row_height[i] = (mfont->height()*3)/2;
+        for (unsigned long i = 0; i < col_width.size(); ++i)
+            col_width[i] = mfont->height()*5;
+
+        compute_total_rect();
+        compute_bg_rects();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    unsigned long text_grid::
+    number_of_columns (
+    ) const
+    {
+        auto_mutex M(m);
+        return grid.nc();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    unsigned long text_grid::
+    number_of_rows (
+    ) const
+    {
+        auto_mutex M(m);
+        return grid.nr();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    int text_grid::
+    next_free_user_event_number (
+    ) const
+    {
+        return scrollable_region::next_free_user_event_number()+1;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    rgb_pixel text_grid::
+    border_color (
+    ) const
+    {
+        auto_mutex M(m);
+        return border_color_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_border_color (
+        rgb_pixel color
+    )
+    {
+        auto_mutex M(m);
+        border_color_ = color;
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const std::string text_grid::
+    text (
+        unsigned long row,
+        unsigned long col
+    ) const
+    {
+        return convert_wstring_to_mbstring(wtext(row, col));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const std::wstring text_grid::
+    wtext (
+        unsigned long row,
+        unsigned long col
+    ) const
+    {
+        return convert_utf32_to_wstring(utext(row, col));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const dlib::ustring text_grid::
+    utext (
+        unsigned long row,
+        unsigned long col
+    ) const
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                      "\tconst std::string text_grid::text(row,col)"
+                      << "\n\trow:              " << row 
+                      << "\n\tcol:              " << col 
+                      << "\n\tnumber_of_rows(): " << number_of_rows() 
+                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\tthis:             " << this
+        );
+        return grid[row][col].text.c_str();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_text (
+        unsigned long row,
+        unsigned long col,
+        const std::string& str
+    ) 
+    {
+        set_text(row, col, convert_mbstring_to_wstring(str));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_text (
+        unsigned long row,
+        unsigned long col,
+        const std::wstring& str
+    ) 
+    {
+        set_text(row, col, convert_wstring_to_utf32(str));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_text (
+        unsigned long row,
+        unsigned long col,
+        const dlib::ustring& str
+    ) 
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                      "\tvoid text_grid::set_text(row,col)"
+                      << "\n\trow:              " << row 
+                      << "\n\tcol:              " << col 
+                      << "\n\tnumber_of_rows(): " << number_of_rows() 
+                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\tthis:             " << this
+        );
+        grid[row][col].text = str.c_str();
+        parent.invalidate_rectangle(get_text_rect(row,col));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const rgb_pixel text_grid::
+    text_color (
+        unsigned long row,
+        unsigned long col
+    ) const
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                      "\tconst rgb_pixel text_grid::text_color(row,col)"
+                      << "\n\trow:              " << row 
+                      << "\n\tcol:              " << col 
+                      << "\n\tnumber_of_rows(): " << number_of_rows() 
+                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\tthis:             " << this
+        );
+        return grid[row][col].text_color;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_text_color (
+        unsigned long row,
+        unsigned long col,
+        const rgb_pixel color
+    ) 
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                      "\tvoid text_grid::set_text_color(row,col,color)"
+                      << "\n\trow:              " << row 
+                      << "\n\tcol:              " << col 
+                      << "\n\tnumber_of_rows(): " << number_of_rows() 
+                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\tthis:             " << this
+        );
+        grid[row][col].text_color = color;
+        parent.invalidate_rectangle(get_text_rect(row,col));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const rgb_pixel text_grid::
+    background_color (
+        unsigned long row,
+        unsigned long col
+    ) const
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                      "\tconst rgb_pixel text_grid::background_color(row,col,color)"
+                      << "\n\trow:              " << row 
+                      << "\n\tcol:              " << col 
+                      << "\n\tnumber_of_rows(): " << number_of_rows() 
+                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\tthis:             " << this
+        );
+        return grid[row][col].bg_color;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_background_color (
+        unsigned long row,
+        unsigned long col,
+        const rgb_pixel color
+    ) 
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                      "\tvoid text_grid::set_background_color(row,col,color)"
+                      << "\n\trow:              " << row 
+                      << "\n\tcol:              " << col 
+                      << "\n\tnumber_of_rows(): " << number_of_rows() 
+                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\tthis:             " << this
+        );
+        grid[row][col].bg_color = color;
+        parent.invalidate_rectangle(get_bg_rect(row,col));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool text_grid::
+    is_editable (
+        unsigned long row,
+        unsigned long col
+    ) const
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                      "\tbool text_grid::is_editable(row,col)"
+                      << "\n\trow:              " << row 
+                      << "\n\tcol:              " << col 
+                      << "\n\tnumber_of_rows(): " << number_of_rows() 
+                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\tthis:             " << this
+        );
+        return grid[row][col].is_editable;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_editable (
+        unsigned long row,
+        unsigned long col,
+        bool editable
+    ) 
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
+                      "\tvoid text_grid::set_editable(row,col,editable)"
+                      << "\n\trow:              " << row 
+                      << "\n\tcol:              " << col 
+                      << "\n\tnumber_of_rows(): " << number_of_rows() 
+                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\teditable:         " << editable 
+                      << "\n\tthis:             " << this
+        );
+        grid[row][col].is_editable = editable;
+        if (has_focus && active_row == static_cast<long>(row) && active_col == static_cast<long>(col))
+        {
+            drop_input_focus();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_column_width (
+        unsigned long col,
+        unsigned long width
+    )
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( col < number_of_columns(),
+                      "\tvoid text_grid::set_column_width(col,width)"
+                      << "\n\tcol:              " << col 
+                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\twidth:            " << width 
+                      << "\n\tthis:             " << this
+        );
+        col_width[col] = width;
+        compute_total_rect();
+        compute_bg_rects();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    set_row_height (
+        unsigned long row,
+        unsigned long height 
+    )
+    {
+        auto_mutex M(m);
+        DLIB_ASSERT ( row < number_of_rows() ,
+                      "\tvoid text_grid::set_row_height(row,height)"
+                      << "\n\trow:              " << row 
+                      << "\n\tnumber_of_rows(): " << number_of_rows() 
+                      << "\n\theight:           " << height 
+                      << "\n\tthis:             " << this
+        );
+        row_height[row] = height;
+        compute_total_rect();
+        compute_bg_rects();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    disable (
+    ) 
+    {
+        auto_mutex M(m);
+        scrollable_region::disable();
+        drop_input_focus();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    hide (
+    ) 
+    {
+        auto_mutex M(m);
+        scrollable_region::hide();
+        drop_input_focus();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    on_user_event (
+        int num
+    )
+    {
+        // ignore this user event if it isn't for us
+        if (num != scrollable_region::next_free_user_event_number())
+            return;
+
+        if (has_focus && !recent_cursor_move && enabled && !hidden)
+        {
+            show_cursor = !show_cursor;
+            parent.invalidate_rectangle(get_text_rect(active_row,active_col));
+        }
+        recent_cursor_move = false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    timer_action (
+    ) 
+    { 
+        parent.trigger_user_event(this,scrollable_region::next_free_user_event_number()); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    compute_bg_rects (
+    )
+    {
+        // loop over each element in the grid and figure out what its rectangle should be
+        // with respect to the total_rect()
+        point p1, p2;
+        p1.y() = total_rect().top();
+        for (long row = 0; row < grid.nr(); ++row)
+        {
+            p1.x() = total_rect().left();
+            p2.y() = p1.y() + row_height[row]-1;
+            for (long col = 0; col < grid.nc(); ++col)
+            {
+                // if this is the last box in this row make it super wide so that it always
+                // goes to the end of the widget
+                if (col+1 == grid.nc())
+                    p2.x() = 1000000;
+                else
+                    p2.x() = p1.x() + col_width[col]-1;
+
+                // at this point p1 is the upper left corner of this box and p2 is the 
+                // lower right corner of the box;
+                rectangle bg_rect(p1);
+                bg_rect += p2;
+
+                grid[row][col].bg_rect = translate_rect(bg_rect, -total_rect().left(), -total_rect().top());
+
+
+                p1.x() += 1 + col_width[col];
+            }
+            p1.y() += 1 + row_height[row];
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    compute_total_rect (
+    )
+    {
+        if (grid.size() == 0)
+        {
+            set_total_rect_size(0,0);
+        }
+        else
+        {
+            unsigned long width = col_width.size()-1;
+            unsigned long height = row_height.size()-1;
+
+            for (unsigned long i = 0; i < col_width.size(); ++i)
+                width += col_width[i];
+            for (unsigned long i = 0; i < row_height.size(); ++i)
+                height += row_height[i];
+
+            set_total_rect_size(width,height);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    on_keydown (
+        unsigned long key,          
+        bool is_printable,
+        unsigned long state
+    )
+    {
+        // ignore this event if we are disabled or hidden
+        if (!enabled || hidden)
+            return;
+
+        if (has_focus)
+        {
+            if (is_printable)
+            {
+                // if the user hit the tab key then jump to the next box
+                if (key == '\t')
+                {
+                    if (active_col+1 == grid.nc())
+                    {
+                        if (active_row+1 == grid.nr())
+                            move_cursor(0,0,0);
+                        else
+                            move_cursor(active_row+1,0,0);
+                    }
+                    else
+                    {
+                        move_cursor(active_row,active_col+1,0);
+                    }
+                }
+                if (key == '\n')
+                {
+                    // ignore the enter key
+                }
+                else if (grid[active_row][active_col].is_editable)
+                {
+                    // insert the key the user pressed into the string
+                    grid[active_row][active_col].text.insert(cursor_pos,1,static_cast<char>(key));
+                    move_cursor(active_row,active_col,cursor_pos+1);
+
+                    if (text_modified_handler.is_set())
+                        text_modified_handler(active_row,active_col);
+                }
+            }
+            else if ((state & base_window::KBD_MOD_CONTROL))
+            {
+                if (key == base_window::KEY_LEFT)
+                    move_cursor(active_row,active_col-1,0);
+                else if (key == base_window::KEY_RIGHT)
+                    move_cursor(active_row,active_col+1,0);
+                else if (key == base_window::KEY_UP)
+                    move_cursor(active_row-1,active_col,0);
+                else if (key == base_window::KEY_DOWN)
+                    move_cursor(active_row+1,active_col,0);
+                else if (key == base_window::KEY_END)
+                    move_cursor(active_row,active_col,grid[active_row][active_col].text.size());
+                else if (key == base_window::KEY_HOME)
+                    move_cursor(active_row,active_col,0);
+            }
+            else
+            {
+                if (key == base_window::KEY_LEFT)
+                    move_cursor(active_row,active_col,cursor_pos-1);
+                else if (key == base_window::KEY_RIGHT)
+                    move_cursor(active_row,active_col,cursor_pos+1);
+                else if (key == base_window::KEY_UP)
+                    move_cursor(active_row-1,active_col,0);
+                else if (key == base_window::KEY_DOWN)
+                    move_cursor(active_row+1,active_col,0);
+                else if (key == base_window::KEY_END)
+                    move_cursor(active_row,active_col,grid[active_row][active_col].text.size());
+                else if (key == base_window::KEY_HOME)
+                    move_cursor(active_row,active_col,0);
+                else if (key == base_window::KEY_BACKSPACE)
+                {
+                    if (cursor_pos > 0 && grid[active_row][active_col].is_editable)
+                    {
+                        grid[active_row][active_col].text.erase(
+                            grid[active_row][active_col].text.begin()+cursor_pos-1,
+                            grid[active_row][active_col].text.begin()+cursor_pos);
+                        move_cursor(active_row,active_col,cursor_pos-1);
+
+                        if (text_modified_handler.is_set())
+                            text_modified_handler(active_row,active_col);
+                    }
+                }
+                else if (key == base_window::KEY_DELETE)
+                {
+                    if (cursor_pos < static_cast<long>(grid[active_row][active_col].text.size()) &&
+                        grid[active_row][active_col].is_editable)
+                    {
+                        grid[active_row][active_col].text.erase(
+                            grid[active_row][active_col].text.begin()+cursor_pos);
+                        move_cursor(active_row,active_col,cursor_pos);
+
+                        if (text_modified_handler.is_set())
+                            text_modified_handler(active_row,active_col);
+                    }
+                }
+            }
+        } // if (has_focus)
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    on_mouse_down (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y,
+        bool is_double_click
+    )
+    {
+        scrollable_region::on_mouse_down(btn, state, x, y, is_double_click);
+        if (display_rect().contains(x,y) && enabled && !hidden)
+        {
+            // figure out which box this click landed in
+            rectangle hit;
+
+            // find which column we hit
+            unsigned long col = 0;
+            long box_x = total_rect().left();
+            for (unsigned long i = 0; i < col_width.size(); ++i)
+            {
+                if (box_x <= x && (x < box_x+static_cast<long>(col_width[i]) || (i+1 == col_width.size())))
+                {
+                    col = i;
+                    hit.set_left(box_x);
+                    hit.set_right(box_x+col_width[i]-1);
+                    break;
+                }
+                else
+                {
+                    box_x += col_width[i]+1;
+                }
+            }
+
+            // find which row we hit
+            unsigned long row = 0;
+            long box_y = total_rect().top();
+            for (unsigned long i = 0; i < row_height.size(); ++i)
+            {
+                if (box_y <= y && y < box_y+static_cast<long>(row_height[i]))
+                {
+                    row = i;
+                    hit.set_top(box_y);
+                    hit.set_bottom(box_y+row_height[i]-1);
+                    break;
+                }
+                else
+                {
+                    box_y += row_height[i]+1;
+                }
+            }
+
+            // if we hit a box
+            if (hit.is_empty() == false)
+            {
+                move_cursor(row, 
+                            col,
+                            mfont->compute_cursor_pos(get_text_rect(row,col), grid[row][col].text, x, y, grid[row][col].first)
+                );
+            }
+            else
+            {
+                drop_input_focus();
+            }
+        }
+        else
+        {
+            drop_input_focus();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    on_mouse_up (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y
+    ) 
+    {
+        scrollable_region::on_mouse_up(btn, state, x, y);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    on_focus_lost (
+    )
+    {
+        drop_input_focus();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    draw (
+        const canvas& c
+    ) const
+    {
+        scrollable_region::draw(c);
+        rectangle area = c.intersect(display_rect());
+        if (area.is_empty() == true)
+            return;
+
+        if (enabled)
+            fill_rect(c, area, 255); 
+
+        // don't do anything if the grid is empty
+        if (grid.size() == 0)
+            return;
+
+        // draw all the vertical lines
+        point p1, p2;
+        p1.x() = p2.x() = total_rect().left();
+        p1.y() = total_rect().top();
+        p2.y() = total_rect().bottom();
+        for (unsigned long i = 0; i < col_width.size()-1; ++i)
+        {
+            p1.x() += col_width[i];
+            p2.x() += col_width[i];
+            if (enabled)
+                draw_line(c,p1,p2,border_color_,area);
+            else
+                draw_line(c,p1,p2,128,area);
+            p1.x() += 1;
+            p2.x() += 1;
+        }
+
+        // draw all the horizontal lines
+        p1.y() = p2.y() = total_rect().top();
+        p1.x() = display_rect().left();
+        p2.x() = display_rect().right();
+        for (unsigned long i = 0; i < row_height.size(); ++i)
+        {
+            p1.y() += row_height[i];
+            p2.y() += row_height[i];
+            if (enabled)
+                draw_line(c,p1,p2,border_color_,area);
+            else
+                draw_line(c,p1,p2,128,area);
+            p1.y() += 1;
+            p2.y() += 1;
+        }
+
+        // draw the backgrounds and text for each box
+        for (long row = 0; row < grid.nr(); ++row)
+        {
+            for (long col = 0; col < grid.nc(); ++col)
+            {
+                rectangle bg_rect(get_bg_rect(row,col));
+
+                rectangle text_rect(get_text_rect(row,col));
+
+                if (enabled)
+                {
+                    fill_rect(c,bg_rect.intersect(area),grid[row][col].bg_color);
+
+                    mfont->draw_string(c,
+                                       text_rect, 
+                                       grid[row][col].text, 
+                                       grid[row][col].text_color, 
+                                       grid[row][col].first, 
+                                       std::string::npos, 
+                                       area);
+                }
+                else
+                {
+                    mfont->draw_string(c,
+                                       text_rect, 
+                                       grid[row][col].text, 
+                                       128, 
+                                       grid[row][col].first, 
+                                       std::string::npos, 
+                                       area);
+                }
+
+                // if this box has input focus then draw it with a cursor
+                if (has_focus && active_col == col && active_row == row && show_cursor)
+                {
+                    rectangle cursor_rect = mfont->compute_cursor_rect(text_rect,
+                                                                       grid[row][col].text,
+                                                                       cursor_pos,
+                                                                       grid[row][col].first);
+                    draw_rectangle(c,cursor_rect,0,area);
+                }
+
+            }
+        }
+
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    rectangle text_grid::
+    get_text_rect (
+        unsigned long row,
+        unsigned long col
+    ) const
+    {
+        rectangle bg_rect(get_bg_rect(row,col));
+        long padding = (bg_rect.height() - mfont->height())/2 + (bg_rect.height() - mfont->height())%2;
+        if (padding < 0)
+            padding = 0;
+        bg_rect.set_left(bg_rect.left()+padding);
+        bg_rect.set_top(bg_rect.top()+padding);
+        bg_rect.set_right(bg_rect.right()-padding);
+        bg_rect.set_bottom(bg_rect.bottom()-padding);
+        return bg_rect;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    rectangle text_grid::
+    get_bg_rect (
+        unsigned long row,
+        unsigned long col
+    ) const
+    {
+        return translate_rect(grid[row][col].bg_rect, total_rect().left(), total_rect().top());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    drop_input_focus (
+    )
+    {
+        if (has_focus)
+        {
+            parent.invalidate_rectangle(get_text_rect(active_row,active_col));
+            has_focus = false;
+            show_cursor = false;
+            cursor_timer.stop();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_grid::
+    move_cursor (
+        long row,
+        long col,
+        long new_cursor_pos
+    )
+    {
+        // don't do anything if the grid is empty
+        if (grid.size() == 0)
+        {
+            return;
+        }
+
+        if (row < 0)
+            row = 0;
+        if (row >= grid.nr())
+            row = grid.nr()-1;
+        if (col < 0)
+            col = 0;
+        if (col >= grid.nc())
+            col = grid.nc()-1;
+
+        if (new_cursor_pos < 0)
+        {
+            if (col == 0)
+            {
+                new_cursor_pos = 0;
+            }
+            else 
+            {
+                --col;
+                new_cursor_pos = grid[row][col].text.size();
+            }
+        }
+
+        if (new_cursor_pos > static_cast<long>(grid[row][col].text.size()))
+        {
+            if (col+1 == grid.nc())
+            {
+                new_cursor_pos = grid[row][col].text.size();
+            }
+            else 
+            {
+                ++col;
+                new_cursor_pos = 0;
+            }
+        }
+
+        // if some other box had the input focus then redraw it
+        if (has_focus && (active_row != row || active_col != col ))
+        {
+            parent.invalidate_rectangle(get_text_rect(active_row,active_col));
+        }
+
+        if (has_focus == false)
+        {
+            cursor_timer.start();
+        }
+
+        has_focus = true;
+        recent_cursor_move = true;
+        show_cursor = true;
+        active_row = row;
+        active_col = col;
+        cursor_pos = new_cursor_pos;
+
+        // adjust the first character to draw so that the string is displayed well
+        rectangle text_rect(get_text_rect(active_row,active_col));
+        rectangle cursor_rect = mfont->compute_cursor_rect(text_rect,
+                                                           grid[row][col].text,
+                                                           cursor_pos,
+                                                           grid[row][col].first);
+
+        // if the cursor rect is too far to the left of the string
+        if (cursor_pos < static_cast<long>(grid[row][col].first))
+        {
+            if (cursor_pos > 5)
+            {
+                grid[row][col].first = cursor_pos - 5;
+            }
+            else
+            {
+                grid[row][col].first = 0;
+            }
+        }
+        // if the cursor rect is too far to the right of the string
+        else if (cursor_rect.left() > text_rect.right())
+        {
+            long distance = (cursor_rect.left() - text_rect.right()) + text_rect.width()/3;
+            // find the letter that is distance pixels from the start of the string
+            long sum = 0;
+            for (unsigned long i = grid[row][col].first; i < grid[row][col].text.size(); ++i)
+            {
+                sum += (*mfont)[grid[row][col].text[i]].width();
+                if (sum >= distance)
+                {
+                    grid[row][col].first = i;
+                    break;
+                }
+            }
+        }
+
+        scroll_to_rect(get_bg_rect(row,col));
+
+        // redraw our box
+        parent.invalidate_rectangle(text_rect);
+
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 
