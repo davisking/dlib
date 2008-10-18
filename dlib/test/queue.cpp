@@ -52,7 +52,7 @@ namespace
         // report as an error/failed test.
         DLIB_CASSERT(e.at_start() == true,"");
 
-        int a;
+        int a = 0;
 
         DLIB_CASSERT(q.size() == 0,"");
         DLIB_CASSERT(q.at_start() == true,"");
