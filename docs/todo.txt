@@ -26,10 +26,6 @@ add row_cat and col_cat matrix functions
 
 
 
-add a quadratic classifier
-
-
-
 
 
 make a multiline text field
