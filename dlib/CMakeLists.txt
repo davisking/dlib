@@ -6,6 +6,8 @@
 # setting this makes CMake allow normal looking IF ELSE statements
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 cmake_minimum_required(VERSION 2.4)
+cmake_policy(SET CMP0003 NEW)
+
 
 # make macros that can add #define directives to the entire project.  Not just 
 # to the dlib library itself.  I.e. to dlib and to any projects that depend
