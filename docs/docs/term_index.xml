@@ -207,6 +207,11 @@
          <term link="dlib/gui_widgets/style_abstract.h.html#button_style_default" name="button_style_default"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#button_style_toolbar1" name="button_style_toolbar1"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#button_style_toolbar_icon1" name="button_style_toolbar_icon1"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_up_arrow" name="button_style_up_arrow"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_down_arrow" name="button_style_down_arrow"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_left_arrow" name="button_style_left_arrow"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_right_arrow" name="button_style_right_arrow"/>
+
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style" name="toggle_button_style"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_default" name="toggle_button_style_default"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_check_box" name="toggle_button_style_check_box"/>
@@ -258,7 +263,6 @@
          <term link="dlib/gui_widgets/widgets_abstract.h.html#message_box" name="message_box"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#message_box_blocking" name="message_box_blocking"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#label" name="label"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#button" name="button"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#toggle_button" name="toggle_button"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#text_grid" name="text_grid"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#directed_graph_drawer" name="directed_graph_drawer"/>
@@ -278,12 +282,12 @@
          <term link="dlib/gui_widgets/fonts_abstract.h.html#bdf_font" name="bdf_font"/>
 
 
+         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#button" name="button"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#dragable" name="dragable"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#button_action" name="button_action"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#zoomable_region" name="zoomable_region"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#scrollable_region" name="scrollable_region"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#mouse_over_event" name="mouse_over_event"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#arrow_button" name="arrow_button"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#tooltip" name="tooltip"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#popup_menu_region" name="popup_menu_region"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#scroll_bar" name="scroll_bar"/>

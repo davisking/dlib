@@ -40,10 +40,6 @@
                                <link>dlib/gui_widgets/base_widgets_abstract.h.html#dragable</link>
                            </item>
                            <item>
-                               <name>arrow_button</name>
-                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#arrow_button</link>
-                           </item>
-                           <item>
                                <name>tooltip</name>
                                <link>dlib/gui_widgets/base_widgets_abstract.h.html#tooltip</link>
                            </item>
@@ -133,7 +129,7 @@
                            </item>
                            <item>
                                <name>button</name>
-                               <link>dlib/gui_widgets/widgets_abstract.h.html#button</link>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#button</link>
                            </item>
                            <item>
                                <name>toggle_button</name>
@@ -183,6 +179,22 @@
                         <item>
                            <name>button_style_default</name>
                            <link>dlib/gui_widgets/style_abstract.h.html#button_style_default</link>
+                        </item>
+                        <item>
+                           <name>button_style_up_arrow</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_up_arrow</link>
+                        </item>
+                        <item>
+                           <name>button_style_down_arrow</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_down_arrow</link>
+                        </item>
+                        <item>
+                           <name>button_style_left_arrow</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_left_arrow</link>
+                        </item>
+                        <item>
+                           <name>button_style_right_arrow</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_right_arrow</link>
                         </item>
                         <item>
                            <name>button_style_toolbar1</name>
