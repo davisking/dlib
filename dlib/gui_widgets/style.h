@@ -216,6 +216,98 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+
+    class button_style_left_arrow : public button_style
+    {
+    public:
+        virtual void draw_button (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const font& mfont,
+            const long lastx,
+            const long lasty,
+            const ustring& name,
+            const bool is_depressed
+        ) const;
+
+        virtual rectangle get_min_size (
+            const ustring& name,
+            const font& mfont 
+        ) const { return rectangle(); }
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class button_style_right_arrow : public button_style
+    {
+    public:
+        virtual void draw_button (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const font& mfont,
+            const long lastx,
+            const long lasty,
+            const ustring& name,
+            const bool is_depressed
+        ) const;
+
+        virtual rectangle get_min_size (
+            const ustring& name,
+            const font& mfont 
+        ) const { return rectangle(); }
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class button_style_up_arrow : public button_style
+    {
+    public:
+        virtual void draw_button (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const font& mfont,
+            const long lastx,
+            const long lasty,
+            const ustring& name,
+            const bool is_depressed
+        ) const;
+
+        virtual rectangle get_min_size (
+            const ustring& name,
+            const font& mfont 
+        ) const { return rectangle(); }
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class button_style_down_arrow : public button_style
+    {
+    public:
+        virtual void draw_button (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const font& mfont,
+            const long lastx,
+            const long lasty,
+            const ustring& name,
+            const bool is_depressed
+        ) const;
+
+        virtual rectangle get_min_size (
+            const ustring& name,
+            const font& mfont 
+        ) const { return rectangle(); }
+    };
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     // toggle button styles  
 // ----------------------------------------------------------------------------------------

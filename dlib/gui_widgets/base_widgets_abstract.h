@@ -329,66 +329,43 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class arrow_button 
+    // class button
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class arrow_button : public button_action 
+    class button : public button_action 
     {
         /*!
             INITIAL VALUE
-                direction() == a value given to the constructor.
+                name() == ""
+                tooltip_text() == "" (i.e. there is no tooltip by default)
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a push button with an arrow in the middle. 
+                This object represents a simple button.  
 
                 When this object is disabled it means it will not respond to user clicks.
         !*/
 
     public:
-        enum arrow_direction 
-        {
-            UP,
-            DOWN,
-            LEFT,
-            RIGHT
-        };
 
-        arrow_button(  
-            drawable_window& w,
-            arrow_direction dir 
+        button(  
+            drawable_window& w
         );
         /*!
             ensures 
                 - #*this is properly initialized 
                 - #*this has been added to window w
-                - #direction() == dir
                 - #parent_window() == w
             throws
                 - std::bad_alloc
                 - dlib::thread_error
         !*/
 
-        virtual ~arrow_button(
+        virtual ~button(
         );
         /*!
             ensures
                 - all resources associated with *this have been released
-        !*/
-
-        arrow_direction direction (
-        ) const;
-        /*!
-            ensures
-                - returns the direction that this arrow_button's arrow points
-        !*/
-
-        void set_direction (
-            arrow_direction new_direction
-        );
-        /*!
-            ensures
-                - #direction() == new_direction
         !*/
 
         void set_size (
@@ -397,12 +374,58 @@ namespace dlib
         );
         /*! 
             ensures
-                - #width() == width_
-                - #height() == height_
-                - #top() == top()
-                - #left() == left()
-                - i.e. The location of the upper left corner of this button stays the
-                  same but its width and height are modified
+                - if (width and height are big enough to contain the name of this button) then
+                    - #width() == width_
+                    - #height() == height_
+                    - #top() == top()
+                    - #left() == left()
+                    - i.e. The location of the upper left corner of this button stays the
+                      same but its width and height are modified
+        !*/
+
+        void set_name (const std::wstring& name);
+        void set_name (const dlib::ustring& name);
+        void set_name (
+            const std::string& name
+        );
+        /*!
+            ensures
+                - #name() == name
+                - this button has been resized such that it is big enough to contain
+                  the new name.
+            throws
+                - std::bad_alloc
+        !*/
+
+        const std::wstring wname () const;
+        const dlib::string uname () const;
+        const std::string  name (
+        ) const;
+        /*!
+            ensures
+                - returns the name of this button
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_tooltip_text (const std::wstring& text);
+        void set_tooltip_text (const dlib::ustring& text);
+        void set_tooltip_text (
+            const std::string& text
+        );
+        /*!
+            ensures
+                - #tooltip_text() == text
+                - enables the tooltip for this button
+        !*/
+
+        const dlib::ustring tooltip_utext () const;
+        const std::wstring  tooltip_wtext () const;
+        const std::string   tooltip_text (
+        ) const;
+        /*!
+            ensures
+                - returns the text that is displayed in the tooltip for this button
         !*/
 
         bool is_depressed (
@@ -410,11 +433,66 @@ namespace dlib
         /*!
             ensures
                 - if (this button is currently in a depressed state) then
-                    - the user has left clicked on this drawable and is still
+                    - the user has left clicked on this widget and is still
                       holding the left mouse button down over it.
                     - returns true
                 - else
                     - returns false
+        !*/
+
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style
+        );
+        /*!
+            requires
+                - style_type == a type that inherits from button_style
+            ensures
+                - this button object will draw itself using the given
+                  button style
+        !*/
+
+        template <
+            typename T
+            >
+        void set_click_handler (
+            T& object,
+            void (T::*event_handler)()
+        );
+        /*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - the event_handler function is called on object when the button is 
+                  clicked by the user.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        template <
+            typename T
+            >
+        void set_click_handler (
+            T& object,
+            void (T::*event_handler)(button& self)
+        );
+        /*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - &self == this
+                - the event_handler function is called on object when the button is 
+                  clicked by the user.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
         !*/
 
         template <
@@ -426,10 +504,10 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T
+                - event_handler is a valid pointer to a member function in T 
             ensures
-                - The event_handler function is called whenever this object transitions
-                  from the state where is_depressed() == false to is_depressed() == true
+                - the event_handler function is called on object when the user causes 
+                  the button to go into its depressed state.
                 - any previous calls to this function are overridden by this new call.  
                   (i.e. you can only have one event handler associated with this 
                   event at a time)
@@ -446,15 +524,60 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T
+                - event_handler is a valid pointer to a member function in T 
             ensures
-                - The event_handler function is called whenever this object transitions
-                  from the state where is_depressed() == true to is_depressed() == false.
-                  furthermore:
-                    - if (the mouse was over this button when this event occurred) then
-                        - mouse_over == true
-                    - else
-                        - mouse_over == false
+                - the event_handler function is called on object when the user causes 
+                  the button to go into its non-depressed state.
+                - if (the mouse is over this button when this event occurs) then
+                    - mouse_over == true
+                - else
+                    - mouse_over == false
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        template <
+            typename T
+            >
+        void set_button_down_handler (
+            T& object,
+            void (T::*event_handler)(button& self)
+        );
+        /*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - &self == this
+                - the event_handler function is called on object when the user causes 
+                  the button to go into its depressed state.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        template <
+            typename T
+            >
+        void set_button_up_handler (
+            T& object,
+            void (T::*event_handler)(bool mouse_over, button& self)
+        );
+        /*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - &self == this
+                - the event_handler function is called on object when the user causes 
+                  the button to go into its non-depressed state.
+                - if (the mouse is over this button when this event occurs) then
+                    - mouse_over == true
+                - else
+                    - mouse_over == false
                 - any previous calls to this function are overridden by this new call.  
                   (i.e. you can only have one event handler associated with this 
                   event at a time)
@@ -465,8 +588,8 @@ namespace dlib
     private:
 
         // restricted functions
-        arrow_button(arrow_button&);        // copy constructor
-        arrow_button& operator=(arrow_button&);    // assignment operator
+        button(button&);        // copy constructor
+        button& operator=(button&);    // assignment operator
     };
 
 // ----------------------------------------------------------------------------------------

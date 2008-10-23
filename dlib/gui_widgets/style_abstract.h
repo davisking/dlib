@@ -123,6 +123,42 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+
+    class button_style_left_arrow : public button_style
+    {
+        /*!
+            This draws a simple button with a left pointing arrow in it 
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class button_style_right_arrow : public button_style
+    {
+        /*!
+            This draws a simple button with a right pointing arrow in it 
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class button_style_up_arrow : public button_style
+    {
+        /*!
+            This draws a simple button with an up pointing arrow in it 
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class button_style_down_arrow : public button_style
+    {
+        /*!
+            This draws a simple button with a down pointing arrow in it 
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     // toggle button styles  
 // ----------------------------------------------------------------------------------------

@@ -13,6 +13,258 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+    // button object methods  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    set_size (
+        unsigned long width,
+        unsigned long height
+    )
+    {
+        auto_mutex M(m);
+        rectangle min_rect = style->get_min_size(name_,*mfont);
+        // only change the size if it isn't going to be too small to fit the name
+        if (height >= min_rect.height() &&
+            width >= min_rect.width())
+        {
+            rectangle old(rect);
+            rect = resize_rect(rect,width,height);
+            parent.invalidate_rectangle(rect+old);
+            btn_tooltip.set_size(width,height);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    show (
+    )
+    {
+        button_action::show();
+        btn_tooltip.show();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    hide (
+    )
+    {
+        button_action::hide();
+        btn_tooltip.hide();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    enable (
+    )
+    {
+        button_action::enable();
+        btn_tooltip.enable();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    disable (
+    )
+    {
+        button_action::disable();
+        btn_tooltip.disable();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    set_tooltip_text (
+        const std::string& text
+    )
+    {
+        btn_tooltip.set_text(text);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    set_tooltip_text (
+        const std::wstring& text
+    )
+    {
+        btn_tooltip.set_text(text);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    set_tooltip_text (
+        const ustring& text
+    )
+    {
+        btn_tooltip.set_text(text);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const std::string button::
+    tooltip_text (
+    ) const
+    {
+        return btn_tooltip.text();
+    }
+
+    const std::wstring button::
+    tooltip_wtext (
+    ) const
+    {
+        return btn_tooltip.wtext();
+    }
+
+    const dlib::ustring button::
+    tooltip_utext (
+    ) const
+    {
+        return btn_tooltip.utext();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    set_main_font (
+        const shared_ptr_thread_safe<font>& f
+    )
+    {
+        auto_mutex M(m);
+        mfont = f;
+        set_name(name_);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    set_pos (
+        long x,
+        long y
+    )
+    {
+        auto_mutex M(m);
+        button_action::set_pos(x,y);
+        btn_tooltip.set_pos(x,y);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    set_name (
+        const std::string& name
+    )
+    {
+        set_name(convert_mbstring_to_wstring(name));
+    }
+
+    void button::
+    set_name (
+        const std::wstring& name
+    )
+    {
+        set_name(convert_wstring_to_utf32(name));
+    }
+
+    void button::
+    set_name (
+        const ustring& name
+    )
+    {
+        auto_mutex M(m);
+        name_ = name;
+        // do this to get rid of any reference counting that may be present in 
+        // the std::string implementation.
+        name_[0] = name_[0];
+
+        rectangle old(rect);
+        rect = move_rect(style->get_min_size(name,*mfont),rect.left(),rect.top());
+        btn_tooltip.set_size(rect.width(),rect.height());
+        
+        parent.invalidate_rectangle(rect+old);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const std::string button::
+    name (
+    ) const
+    {
+        auto_mutex M(m);
+        std::string temp = convert_wstring_to_mbstring(wname());
+        // do this to get rid of any reference counting that may be present in 
+        // the std::string implementation.
+        char c = temp[0];
+        temp[0] = c;
+        return temp;
+    }
+
+    const std::wstring button::
+    wname (
+    ) const
+    {
+        auto_mutex M(m);
+        std::wstring temp = convert_utf32_to_wstring(uname());
+        // do this to get rid of any reference counting that may be present in 
+        // the std::wstring implementation.
+        wchar_t w = temp[0];
+        temp[0] = w;
+        return temp;
+    }
+
+    const dlib::ustring button::
+    uname (
+    ) const
+    {
+        auto_mutex M(m);
+        dlib::ustring temp = name_;
+        // do this to get rid of any reference counting that may be present in 
+        // the dlib::ustring implementation.
+        temp[0] = name_[0];
+        return temp;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    on_button_up (
+        bool mouse_over
+    )
+    {
+        if (mouse_over)                
+        {
+            // this is a valid button click
+            if (event_handler.is_set())
+                event_handler();
+            if (event_handler_self.is_set())
+                event_handler_self(*this);
+        }
+        if (button_up_handler.is_set())
+            button_up_handler(mouse_over);
+        if (button_up_handler_self.is_set())
+            button_up_handler_self(mouse_over,*this);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void button::
+    on_button_down (
+    )
+    {
+        if (button_down_handler.is_set())
+            button_down_handler();
+        if (button_down_handler_self.is_set())
+            button_down_handler_self(*this);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
     // dragable object methods  
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -350,139 +602,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // arrow_button object methods  
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-    void arrow_button::
-    set_size (
-        unsigned long width,
-        unsigned long height
-    )
-    {
-        auto_mutex M(m);
-
-        rectangle old(rect);
-        const unsigned long x = rect.left();
-        const unsigned long y = rect.top();
-        rect.set_right(x+width-1);
-        rect.set_bottom(y+height-1);
-
-        parent.invalidate_rectangle(rect+old);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    void arrow_button::
-    draw (
-        const canvas& c
-    ) const
-    {
-        rectangle area = rect.intersect(c);
-        if (area.is_empty())
-            return;
-
-        fill_rect(c,rect,rgb_pixel(212,208,200));
-
-        const long height = rect.height();
-        const long width = rect.width();
-
-        const long smallest = (width < height) ? width : height; 
-
-        const long rows = (smallest+3)/4;
-        const long start = rows + rows/2-1;
-        long dep;
-
-        long tip_x = 0;
-        long tip_y = 0;
-        long wy = 0;
-        long hy = 0;
-        long wx = 0; 
-        long hx = 0;
-
-        if (button_action::is_depressed())
-        {
-            dep = 0;
-
-            // draw the button's border
-            draw_button_down(c,rect); 
-        }
-        else
-        {
-            dep = -1;
-
-            // draw the button's border
-            draw_button_up(c,rect);
-        }
-
-
-        switch (dir)
-        {
-            case UP:
-                tip_x = width/2 + rect.left() + dep;
-                tip_y = (height - start)/2 + rect.top() + dep + 1;
-                wy = 0;
-                hy = 1;
-                wx = 1;
-                hx = 0;
-                break;
-
-            case DOWN:
-                tip_x = width/2 + rect.left() + dep;
-                tip_y = rect.bottom() - (height - start)/2 + dep;
-                wy = 0;
-                hy = -1;
-                wx = 1;
-                hx = 0;
-                break;
-
-            case LEFT:
-                tip_x = rect.left() + (width - start)/2 + dep + 1;
-                tip_y = height/2 + rect.top() + dep;
-                wy = 1;
-                hy = 0;
-                wx = 0;
-                hx = 1;
-                break;
-
-            case RIGHT:
-                tip_x = rect.right() - (width - start)/2 + dep;
-                tip_y = height/2 + rect.top() + dep;
-                wy = 1;
-                hy = 0;
-                wx = 0;
-                hx = -1;
-                break;
-        }
-
-
-        rgb_pixel color;
-        if (enabled)
-        {
-            color.red = 0;
-            color.green = 0;
-            color.blue = 0;
-        }
-        else
-        {
-            color.red = 128;
-            color.green = 128;
-            color.blue = 128;
-        }
-
-
-
-        for (long i = 0; i < rows; ++i)
-        {
-            draw_line(c,point(tip_x + wx*i + hx*i, tip_y + wy*i + hy*i), 
-                      point(tip_x + wx*i*-1 + hx*i, tip_y + wy*i*-1 + hy*i), 
-                       color);
-        }
-
-    }
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
     // scroll_bar object methods  
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -494,8 +613,8 @@ namespace dlib
     ) :
         drawable(w),
         width_(16),
-        b1(w,arrow_button::UP),
-        b2(w,arrow_button::DOWN),
+        b1(w),
+        b2(w),
         slider(w,*this,&scroll_bar::on_slider_drag),
         ori(orientation),
         top_filler(w,*this,&scroll_bar::top_filler_down,&scroll_bar::top_filler_up),
@@ -510,8 +629,13 @@ namespace dlib
     {
         if (ori == HORIZONTAL)
         {
-            b1.set_direction(arrow_button::LEFT);
-            b2.set_direction(arrow_button::RIGHT);
+            b1.set_style(button_style_left_arrow());
+            b2.set_style(button_style_right_arrow());
+        }
+        else
+        {
+            b1.set_style(button_style_up_arrow());
+            b2.set_style(button_style_down_arrow());
         }
 
         // don't show the slider when there is no place it can move.
@@ -575,16 +699,15 @@ namespace dlib
         {
             rect.set_right(rect.left() + length - 1 );
             rect.set_bottom(rect.top() + width_ - 1 );
-            b1.set_direction(arrow_button::LEFT);
-            b2.set_direction(arrow_button::RIGHT);
-
+            b1.set_style(button_style_left_arrow());
+            b2.set_style(button_style_right_arrow());
         }
         else
         {
             rect.set_right(rect.left() + width_ - 1);
             rect.set_bottom(rect.top() + length - 1);
-            b1.set_direction(arrow_button::UP);
-            b2.set_direction(arrow_button::DOWN);
+            b1.set_style(button_style_up_arrow());
+            b2.set_style(button_style_down_arrow());
         }
         ori = new_orientation;
 
