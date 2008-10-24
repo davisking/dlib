@@ -1940,6 +1940,7 @@ namespace dlib
     {
         scale = 1;
         mouse_drag_screen = false;
+        style.reset(new scrollable_region_style_default());
 
         hsb.set_scroll_handler(*this,&zoomable_region::on_h_scroll);
         vsb.set_scroll_handler(*this,&zoomable_region::on_v_scroll);
@@ -1962,10 +1963,14 @@ namespace dlib
     {
         auto_mutex M(m);
         drawable::set_pos(x,y);
-        vsb.set_pos(rect.right()-2-vsb.width(),rect.top()+2);
-        hsb.set_pos(rect.left()+2,rect.bottom()-2-hsb.height());
+        const long border_size = style->get_border_size();
+        vsb.set_pos(rect.right()-border_size+1-vsb.width(),rect.top()+border_size);
+        hsb.set_pos(rect.left()+border_size,rect.bottom()-border_size+1-hsb.height());
 
-        display_rect_ = rectangle(rect.left()+2,rect.top()+2,rect.right()-2-vsb.width(),rect.bottom()-2-hsb.height());
+        display_rect_ = rectangle(rect.left()+border_size,
+                                  rect.top()+border_size,
+                                  rect.right()-border_size-vsb.width(),
+                                  rect.bottom()-border_size-hsb.height());
 
     }
 
@@ -2054,11 +2059,15 @@ namespace dlib
     {
         auto_mutex M(m);
         rectangle old(rect);
+        const long border_size = style->get_border_size();
         rect = resize_rect(rect,width,height);
-        vsb.set_pos(rect.right()-1-vsb.width(),  rect.top()+2);
-        hsb.set_pos(rect.left()+2,  rect.bottom()-1-hsb.height());
+        vsb.set_pos(rect.right()-border_size+1-vsb.width(),  rect.top()+border_size);
+        hsb.set_pos(rect.left()+border_size,  rect.bottom()-border_size+1-hsb.height());
 
-        display_rect_ = rectangle(rect.left()+2,rect.top()+2,rect.right()-2-vsb.width(),rect.bottom()-2-hsb.height());
+        display_rect_ = rectangle(rect.left()+border_size,
+                                  rect.top()+border_size,
+                                  rect.right()-border_size-vsb.width(),
+                                  rect.bottom()-border_size-hsb.height());
         vsb.set_length(display_rect_.height());
         hsb.set_length(display_rect_.width());
         parent.invalidate_rectangle(rect+old);
@@ -2318,7 +2327,7 @@ namespace dlib
         const canvas& c
     ) const
     {
-        draw_sunken_rectangle(c,rect);
+        style->draw_scrollable_region_border(c, rect, enabled);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2411,7 +2420,6 @@ namespace dlib
         drawable(w, MOUSE_WHEEL|events|MOUSE_CLICK|MOUSE_MOVE),
         hsb(w,scroll_bar::HORIZONTAL),
         vsb(w,scroll_bar::VERTICAL),
-        border_size(2),
         hscroll_bar_inc(1),
         vscroll_bar_inc(1),
         h_wheel_scroll_bar_inc(1),
@@ -2419,6 +2427,8 @@ namespace dlib
         mouse_drag_enabled_(false),
         user_is_dragging_mouse(false)
     {
+        style.reset(new scrollable_region_style_default());
+
         hsb.set_scroll_handler(*this,&scrollable_region::on_h_scroll);
         vsb.set_scroll_handler(*this,&scrollable_region::on_v_scroll);
     }
@@ -2505,8 +2515,8 @@ namespace dlib
         auto_mutex M(m);
         rectangle old(rect);
         rect = resize_rect(rect,width,height);
-        vsb.set_pos(rect.right()-border_size-vsb.width()+1, rect.top()+border_size);
-        hsb.set_pos(rect.left()+border_size, rect.bottom()-border_size-hsb.height()+1);
+        vsb.set_pos(rect.right()-style->get_border_size()-vsb.width()+1, rect.top()+style->get_border_size());
+        hsb.set_pos(rect.left()+style->get_border_size(), rect.bottom()-style->get_border_size()-hsb.height()+1);
 
         // adjust the display_rect_
         if (need_h_scroll() && need_v_scroll())
@@ -2517,10 +2527,10 @@ namespace dlib
                 vsb.show();
                 hsb.show();
             }
-            display_rect_ = rectangle( rect.left()+border_size,
-                                       rect.top()+border_size,
-                                       rect.right()-border_size-vsb.width(),
-                                       rect.bottom()-border_size-hsb.height());
+            display_rect_ = rectangle( rect.left()+style->get_border_size(),
+                                       rect.top()+style->get_border_size(),
+                                       rect.right()-style->get_border_size()-vsb.width(),
+                                       rect.bottom()-style->get_border_size()-hsb.height());
 
             // figure out how many scroll bar positions there should be
             unsigned long hdelta = total_rect_.width()-display_rect_.width();
@@ -2542,10 +2552,10 @@ namespace dlib
                 hsb.show();
                 vsb.hide();
             }
-            display_rect_ = rectangle( rect.left()+border_size,
-                                       rect.top()+border_size,
-                                       rect.right()-border_size,
-                                       rect.bottom()-border_size-hsb.height());
+            display_rect_ = rectangle( rect.left()+style->get_border_size(),
+                                       rect.top()+style->get_border_size(),
+                                       rect.right()-style->get_border_size(),
+                                       rect.bottom()-style->get_border_size()-hsb.height());
 
             // figure out how many scroll bar positions there should be
             unsigned long hdelta = total_rect_.width()-display_rect_.width();
@@ -2564,10 +2574,10 @@ namespace dlib
                 hsb.hide();
                 vsb.show();
             }
-            display_rect_ = rectangle( rect.left()+border_size,
-                                       rect.top()+border_size,
-                                       rect.right()-border_size-vsb.width(),
-                                       rect.bottom()-border_size);
+            display_rect_ = rectangle( rect.left()+style->get_border_size(),
+                                       rect.top()+style->get_border_size(),
+                                       rect.right()-style->get_border_size()-vsb.width(),
+                                       rect.bottom()-style->get_border_size());
 
             unsigned long vdelta = total_rect_.height()-display_rect_.height();
             vdelta = (vdelta+vscroll_bar_inc-1)/vscroll_bar_inc;
@@ -2585,10 +2595,10 @@ namespace dlib
                 hsb.hide();
                 vsb.hide();
             }
-            display_rect_ = rectangle( rect.left()+border_size,
-                                       rect.top()+border_size,
-                                       rect.right()-border_size,
-                                       rect.bottom()-border_size);
+            display_rect_ = rectangle( rect.left()+style->get_border_size(),
+                                       rect.top()+style->get_border_size(),
+                                       rect.right()-style->get_border_size(),
+                                       rect.bottom()-style->get_border_size());
 
             hsb.set_max_slider_pos(0);
             vsb.set_max_slider_pos(0);
@@ -2748,13 +2758,13 @@ namespace dlib
     {
         auto_mutex M(m);
         drawable::set_pos(x,y);
-        vsb.set_pos(rect.right()-border_size-vsb.width()+1, rect.top()+border_size);
-        hsb.set_pos(rect.left()+border_size, rect.bottom()-border_size-hsb.height()+1);
+        vsb.set_pos(rect.right()-style->get_border_size()-vsb.width()+1, rect.top()+style->get_border_size());
+        hsb.set_pos(rect.left()+style->get_border_size(), rect.bottom()-style->get_border_size()-hsb.height()+1);
 
         const long delta_x = total_rect_.left() - display_rect_.left();
         const long delta_y = total_rect_.top() - display_rect_.top();
 
-        display_rect_ = move_rect(display_rect_, rect.left()+border_size, rect.top()+border_size);
+        display_rect_ = move_rect(display_rect_, rect.left()+style->get_border_size(), rect.top()+style->get_border_size());
 
         total_rect_ = move_rect(total_rect_, display_rect_.left()+delta_x, display_rect_.top()+delta_y);
     }
@@ -2989,11 +2999,7 @@ namespace dlib
         const canvas& c
     ) const
     {
-        rectangle area = c.intersect(rect);
-        if (area.is_empty() == true)
-            return;
-
-        draw_sunken_rectangle(c,rect);
+        style->draw_scrollable_region_border(c, rect, enabled);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3002,7 +3008,7 @@ namespace dlib
     need_h_scroll (
     ) const
     {
-        if (total_rect_.width() > rect.width()-border_size*2)
+        if (total_rect_.width() > rect.width()-style->get_border_size()*2)
         {
             return true;
         }
@@ -3010,8 +3016,8 @@ namespace dlib
         {
             // check if we would need a vertical scroll bar and if adding one would make us need
             // a horizontal one
-            if (total_rect_.height() > rect.height()-border_size*2 && 
-                total_rect_.width() > rect.width()-border_size*2-vsb.width())
+            if (total_rect_.height() > rect.height()-style->get_border_size()*2 && 
+                total_rect_.width() > rect.width()-style->get_border_size()*2-vsb.width())
                 return true;
             else
                 return false;
@@ -3024,7 +3030,7 @@ namespace dlib
     need_v_scroll (
     ) const
     {
-        if (total_rect_.height() > rect.height()-border_size*2)
+        if (total_rect_.height() > rect.height()-style->get_border_size()*2)
         {
             return true;
         }
@@ -3032,8 +3038,8 @@ namespace dlib
         {
             // check if we would need a horizontal scroll bar and if adding one would make us need
             // a vertical_scroll_pos one
-            if (total_rect_.width() > rect.width()-border_size*2 && 
-                total_rect_.height() > rect.height()-border_size*2-hsb.height())
+            if (total_rect_.width() > rect.width()-style->get_border_size()*2 && 
+                total_rect_.height() > rect.height()-style->get_border_size()*2-hsb.height())
                 return true;
             else
                 return false;

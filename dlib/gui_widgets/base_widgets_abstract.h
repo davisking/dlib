@@ -1614,6 +1614,20 @@ namespace dlib
                 - all resources associated with *this have been released
         !*/
 
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style_
+        );
+        /*!
+            requires
+                - style_type == a type that inherits from scrollable_region_style 
+            ensures
+                - this zoomable_region object will draw itself using the given
+                  style
+        !*/
+
         void set_zoom_increment (
             double zi
         );
@@ -1839,6 +1853,20 @@ namespace dlib
         /*!
             ensures
                 - all resources associated with *this have been released
+        !*/
+
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style_
+        );
+        /*!
+            requires
+                - style_type == a type that inherits from scrollable_region_style 
+            ensures
+                - this scrollable_region object will draw itself using the given
+                  style
         !*/
 
         void set_size (

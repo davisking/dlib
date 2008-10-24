@@ -534,6 +534,50 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+    // scrollable_region styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class scrollable_region_style
+    {
+    public:
+
+        virtual ~scrollable_region_style() {}
+
+        virtual long get_border_size (
+        ) const = 0;
+
+        virtual void draw_scrollable_region_border (
+            const canvas& c,
+            const rectangle& rect,
+            const bool enabled
+        ) const = 0;
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class scrollable_region_style_default : public scrollable_region_style
+    {
+    public:
+        scroll_bar_style_default get_horizontal_scroll_bar_style (
+        ) const { return scroll_bar_style_default(); }
+
+        scroll_bar_style_default get_vertical_scroll_bar_style (
+        ) const { return scroll_bar_style_default(); }
+
+        virtual long get_border_size (
+        ) const { return 2; }
+
+        virtual void draw_scrollable_region_border (
+            const canvas& c,
+            const rectangle& rect,
+            const bool enabled
+        ) const  { draw_sunken_rectangle(c,rect); }
+
+    };
+
+// ----------------------------------------------------------------------------------------
 
 }
 

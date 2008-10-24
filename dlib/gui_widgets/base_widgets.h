@@ -2096,6 +2096,22 @@ namespace dlib
             long y
         );
 
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style_
+        )
+        {
+            auto_mutex M(m);
+            style.reset(new style_type(style_));
+            hsb.set_style(style_.get_horizontal_scroll_bar_style());
+            vsb.set_style(style_.get_vertical_scroll_bar_style());
+
+            // do this just so that everything gets redrawn right
+            set_size(rect.width(), rect.height());
+        }
+
         void set_zoom_increment (
             double zi
         );
@@ -2240,6 +2256,8 @@ namespace dlib
         scroll_bar vsb;
         scroll_bar hsb;
 
+        scoped_ptr<scrollable_region_style> style;
+
         // restricted functions
         zoomable_region(zoomable_region&);        // copy constructor
         zoomable_region& operator=(zoomable_region&);    // assignment operator
@@ -2252,7 +2270,6 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                - border_size == 2
                 - hscroll_bar_inc == 1
                 - vscroll_bar_inc == 1
                 - h_wheel_scroll_bar_inc == 1
@@ -2262,7 +2279,6 @@ namespace dlib
 
             CONVENTION
                 - mouse_drag_enabled() == mouse_drag_enabled_
-                - border_size == 2
                 - horizontal_scroll_increment() == hscroll_bar_inc
                 - vertical_scroll_increment() == vscroll_bar_inc
                 - horizontal_mouse_wheel_scroll_increment() == h_wheel_scroll_bar_inc
@@ -2289,6 +2305,22 @@ namespace dlib
 
         virtual ~scrollable_region (
         ) = 0;
+
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style_
+        )
+        {
+            auto_mutex M(m);
+            style.reset(new style_type(style_));
+            hsb.set_style(style_.get_horizontal_scroll_bar_style());
+            vsb.set_style(style_.get_vertical_scroll_bar_style());
+
+            // do this just so that everything gets redrawn right
+            set_size(rect.width(), rect.height());
+        }
 
         void show (
         );
@@ -2435,7 +2467,6 @@ namespace dlib
         rectangle display_rect_;
         scroll_bar hsb;
         scroll_bar vsb;
-        const unsigned long border_size;
         unsigned long hscroll_bar_inc;
         unsigned long vscroll_bar_inc;
         unsigned long h_wheel_scroll_bar_inc;
@@ -2443,6 +2474,7 @@ namespace dlib
         bool mouse_drag_enabled_;
         bool user_is_dragging_mouse;
         point drag_origin;
+        scoped_ptr<scrollable_region_style> style;
 
     };
 

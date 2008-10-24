@@ -419,6 +419,78 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // scrollable_region (and zoomable_region) styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class scrollable_region_style
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                scrollable_region and zoomable_region style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/
+    public:
+
+        virtual ~scrollable_region_style() {}
+
+        virtual long get_border_size (
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns the size of the border region in pixels 
+        !*/
+
+        virtual void draw_scrollable_region_border (
+            const canvas& c,
+            const rectangle& rect,
+            const bool enabled
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect and enabled are the variables defined in the protected section 
+                  of the drawable class.
+            ensures
+                - draws the border part of a scrollable_region on the canvas c at the 
+                  location given by rect.  
+        !*/
+
+        scroll_bar_style_type get_horizontal_scroll_bar_style (
+        ) const;
+        /*!
+            ensures
+                - returns the style of scroll_bar to use for the 
+                  horizontal scroll_bar in this widget.
+        !*/
+
+        scroll_bar_style_type get_vertical_scroll_bar_style (
+        ) const;
+        /*!
+            ensures
+                - returns the style of scroll_bar to use for the 
+                  vertical scroll_bar in this widget.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class scrollable_region_style_default : public scrollable_region_style
+    {
+    public:
+        /*!
+            This is the default style for scrollable_region and zoomable_region objects.  
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
 
 }
 
