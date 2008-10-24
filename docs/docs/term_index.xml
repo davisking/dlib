@@ -217,6 +217,10 @@
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_check_box" name="toggle_button_style_check_box"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_radio_button" name="toggle_button_style_radio_button"/>
 
+
+         <term link="dlib/gui_widgets/style_abstract.h.html#scrollable_region_style" name="scrollable_region_style"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#scrollable_region_style_default" name="scrollable_region_style_default"/>
+
          <term link="dlib/gui_widgets/style_abstract.h.html#scroll_bar_style" name="scroll_bar_style"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#scroll_bar_style_default" name="scroll_bar_style_default"/>
 

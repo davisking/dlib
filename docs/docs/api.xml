@@ -232,6 +232,15 @@
                            <name>scroll_bar_style_default</name>
                            <link>dlib/gui_widgets/style_abstract.h.html#scroll_bar_style_default</link>
                         </item>
+
+                        <item>
+                           <name>scrollable_region_style</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#scrollable_region_style</link>
+                        </item>
+                        <item>
+                           <name>scrollable_region_style_default</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#scrollable_region_style_default</link>
+                        </item>
                      </sub>
                   </item>
                   <item nolink="true">
