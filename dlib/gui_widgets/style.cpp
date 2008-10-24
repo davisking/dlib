@@ -17,7 +17,6 @@ namespace dlib
     void button_style_default::draw_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -107,7 +106,6 @@ namespace dlib
     void button_style_toolbar1::draw_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -206,7 +204,6 @@ namespace dlib
     void button_style_toolbar_icon1::draw_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -405,7 +402,6 @@ namespace dlib
     draw_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -426,7 +422,6 @@ namespace dlib
     draw_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -447,7 +442,6 @@ namespace dlib
     draw_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -468,7 +462,6 @@ namespace dlib
     draw_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -490,7 +483,6 @@ namespace dlib
     void toggle_button_style_default::draw_toggle_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -581,7 +573,6 @@ namespace dlib
     void toggle_button_style_check_box::draw_toggle_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -674,7 +665,6 @@ namespace dlib
     void toggle_button_style_radio_button::draw_toggle_button (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const font& mfont,
         const long lastx,
@@ -850,7 +840,6 @@ namespace dlib
     draw_scroll_bar_background (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const long lastx,
         const long lasty,
@@ -869,7 +858,6 @@ namespace dlib
     draw_scroll_bar_slider (
         const canvas& c,
         const rectangle& rect,
-        const bool hidden,
         const bool enabled,
         const long lastx,
         const long lasty,

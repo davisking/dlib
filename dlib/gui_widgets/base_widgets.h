@@ -896,7 +896,7 @@ namespace dlib
 
         void draw (
             const canvas& c
-        ) const { style->draw_button(c,rect,hidden,enabled,*mfont,lastx,lasty,name_,is_depressed()); }
+        ) const { style->draw_button(c,rect,enabled,*mfont,lastx,lasty,name_,is_depressed()); }
 
         void on_button_up (
             bool mouse_over
@@ -1204,7 +1204,7 @@ namespace dlib
                 const canvas& c
             ) const
             {
-                my_scroll_bar.style->draw_scroll_bar_background(c,rect,hidden,enabled,lastx,lasty,is_depressed());
+                my_scroll_bar.style->draw_scroll_bar_background(c,rect,enabled,lastx,lasty,is_depressed());
             }
 
             void on_button_down (
@@ -1307,7 +1307,7 @@ namespace dlib
                 const canvas& c
             ) const
             {
-                my_scroll_bar.style->draw_scroll_bar_slider(c,rect,hidden,enabled,lastx,lasty, is_being_dragged());
+                my_scroll_bar.style->draw_scroll_bar_slider(c,rect,enabled,lastx,lasty, is_being_dragged());
             }
 
             bool mouse_in_widget;

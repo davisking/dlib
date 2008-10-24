@@ -46,7 +46,6 @@ namespace dlib
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -66,7 +65,6 @@ namespace dlib
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -100,7 +98,6 @@ namespace dlib
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -149,7 +146,6 @@ namespace dlib
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -223,7 +219,6 @@ namespace dlib
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -246,7 +241,6 @@ namespace dlib
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -269,7 +263,6 @@ namespace dlib
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -292,7 +285,6 @@ namespace dlib
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -335,7 +327,6 @@ namespace dlib
         virtual void draw_toggle_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -356,7 +347,6 @@ namespace dlib
         virtual void draw_toggle_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -389,7 +379,6 @@ namespace dlib
         virtual void draw_toggle_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -414,7 +403,6 @@ namespace dlib
         virtual void draw_toggle_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -462,7 +450,6 @@ namespace dlib
         virtual void draw_scroll_bar_background (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const long lastx,
             const long lasty,
@@ -472,7 +459,6 @@ namespace dlib
         virtual void draw_scroll_bar_slider (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const long lastx,
             const long lasty,
@@ -514,7 +500,6 @@ namespace dlib
         virtual void draw_scroll_bar_background (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const long lastx,
             const long lasty,
@@ -524,7 +509,6 @@ namespace dlib
         virtual void draw_scroll_bar_slider (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const long lastx,
             const long lasty,

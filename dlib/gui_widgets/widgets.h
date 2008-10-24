@@ -274,7 +274,7 @@ namespace dlib
 
         void draw (
             const canvas& c
-        ) const { style->draw_toggle_button(c,rect,hidden,enabled,*mfont,lastx,lasty,name_,is_depressed(),checked); }
+        ) const { style->draw_toggle_button(c,rect,enabled,*mfont,lastx,lasty,name_,is_depressed(),checked); }
 
         void on_button_up (
             bool mouse_over

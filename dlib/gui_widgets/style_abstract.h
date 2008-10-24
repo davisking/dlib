@@ -57,7 +57,6 @@ namespace dlib
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -69,7 +68,7 @@ namespace dlib
             requires
                 - the mutex drawable::m is locked
                 - c == the canvas to draw on
-                - rect, hidden, enabled, mfont, lastx, and lasty are the variables
+                - rect, enabled, mfont, lastx, and lasty are the variables
                   defined in the protected section of the drawable class.
                 - name == the name of the button to be drawn
                 - is_depressed == true if the button is to be drawn in a depressed state
@@ -204,7 +203,6 @@ namespace dlib
         virtual void draw_toggle_button (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const font& mfont,
             const long lastx,
@@ -217,7 +215,7 @@ namespace dlib
             requires
                 - the mutex drawable::m is locked
                 - c == the canvas to draw on
-                - rect, hidden, enabled, mfont, lastx, and lasty are the variables
+                - rect, enabled, mfont, lastx, and lasty are the variables
                   defined in the protected section of the drawable class.
                 - name == the name of the button to be drawn
                 - is_depressed == true if the button is to be drawn in a depressed state
@@ -335,7 +333,6 @@ namespace dlib
         virtual void draw_scroll_bar_background (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const long lastx,
             const long lasty,
@@ -345,7 +342,7 @@ namespace dlib
             requires
                 - the mutex drawable::m is locked
                 - c == the canvas to draw on
-                - rect, hidden, enabled, lastx, and lasty are the variables
+                - rect, enabled, lastx, and lasty are the variables
                   defined in the protected section of the drawable class.
                 - is_depressed == true if the background area of the scroll_bar is to 
                   be drawn in a depressed state (because the user is clicking on it)
@@ -357,7 +354,6 @@ namespace dlib
         virtual void draw_scroll_bar_slider (
             const canvas& c,
             const rectangle& rect,
-            const bool hidden,
             const bool enabled,
             const long lastx,
             const long lasty,
@@ -367,7 +363,7 @@ namespace dlib
             requires
                 - the mutex drawable::m is locked
                 - c == the canvas to draw on
-                - rect, hidden, enabled, lastx, and lasty are the variables
+                - rect, enabled, lastx, and lasty are the variables
                   defined in the protected section of the drawable class
                 - is_being_dragged == true if the user is dragging the slider
             ensures
