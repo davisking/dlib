@@ -677,6 +677,20 @@ namespace dlib
                 - returns the orientation of this scroll_bar 
         !*/
 
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style
+        );
+        /*!
+            requires
+                - style_type == a type that inherits from scroll_bar_style 
+            ensures
+                - this scroll_bar object will draw itself using the given
+                  scroll bar style
+        !*/
+
         void set_length (
             unsigned long length,
         );
