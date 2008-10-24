@@ -70,7 +70,13 @@ namespace dlib
 
     protected:
 
+        bool is_being_dragged (
+        ) const { return drag; }
+
         virtual void on_drag (
+        ){}
+
+        virtual void on_drag_stop (
         ){}
 
         void on_mouse_move (
@@ -85,6 +91,13 @@ namespace dlib
             long x,
             long y,
             bool 
+        );
+
+        void on_mouse_up (
+            unsigned long btn,
+            unsigned long state,
+            long x,
+            long y
         );
 
     private:
@@ -910,7 +923,7 @@ namespace dlib
         /*!
             INITIAL VALUE
                 - ori == a value given by the constructor
-                - width_ == 16
+                - style == a scroll_bar_style_default object
                 - pos == 0
                 - max_pos == 0
                 - js == 10
@@ -943,10 +956,6 @@ namespace dlib
         bar_orientation orientation (
         ) const;
 
-        void set_orientation (
-            bar_orientation new_orientation   
-        );
-
         void set_length (
             unsigned long length
         );
@@ -971,7 +980,7 @@ namespace dlib
         void set_scroll_handler (
             T& object,
             void (T::*eh)()
-        ) { scroll_handler.set(object,eh); }
+        ) { auto_mutex M(m); scroll_handler.set(object,eh); }
 
         void set_pos (
             long x,
@@ -981,6 +990,7 @@ namespace dlib
         void enable (
         )
         {
+            auto_mutex M(m);
             if (!hidden)
                 show_slider();
             if (max_pos != 0)
@@ -994,6 +1004,7 @@ namespace dlib
         void disable (
         )
         {
+            auto_mutex M(m);
             hide_slider();
             b1.disable();
             b2.disable();
@@ -1003,6 +1014,7 @@ namespace dlib
         void hide (
         )
         {
+            auto_mutex M(m);
             hide_slider();
             top_filler.hide();
             bottom_filler.hide();
@@ -1014,6 +1026,7 @@ namespace dlib
         void show (
         )
         {
+            auto_mutex M(m);
             b1.show();
             b2.show();
             drawable::show();
@@ -1026,6 +1039,7 @@ namespace dlib
             long order
         )
         {
+            auto_mutex M(m);
             slider.set_z_order(order);
             top_filler.set_z_order(order);
             bottom_filler.set_z_order(order);
@@ -1041,6 +1055,30 @@ namespace dlib
         long jump_size (
         ) const;
 
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style_
+        )
+        {
+            auto_mutex M(m);
+            style.reset(new style_type(style_));
+
+            if (ori == HORIZONTAL)
+            {
+                b1.set_style(style_.get_left_button_style());
+                b2.set_style(style_.get_right_button_style());
+                set_length(rect.width());
+            }
+            else
+            {
+                b1.set_style(style_.get_up_button_style());
+                b2.set_style(style_.get_down_button_style());
+                set_length(rect.height());
+            }
+
+        }
 
     private:
 
@@ -1102,58 +1140,25 @@ namespace dlib
 
         void on_user_event (
             int i
-        )
-        {
-            switch (i)
-            {
-                case 0:
-                    b1_down();
-                    break;
-                case 1:
-                    b2_down();
-                    break;
-                case 2:
-                    top_filler_down();
-                    break;
-                case 3:
-                    bottom_filler_down();
-                    break;
-                case 4:
-                    // if the position we are supposed to switch the slider too isn't 
-                    // already set
-                    if (delayed_pos != pos)
-                    {
-                        set_slider_pos(delayed_pos);
-                        if (scroll_handler.is_set())
-                            scroll_handler();
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
+        );
 
         void delayed_set_slider_pos (
             unsigned long dpos
-        ) 
-        {
-            delayed_pos = dpos;
-            parent.trigger_user_event(this,4); 
-        }
+        );
 
         void b1_down_t (
-        ) { parent.trigger_user_event(this,0); }
+        );
 
         void b2_down_t (
-        ) { parent.trigger_user_event(this,1); }
+        );
 
         void top_filler_down_t (
-        ) { parent.trigger_user_event(this,2); }
+        );
 
         void bottom_filler_down_t (
-        ) { parent.trigger_user_event(this,3); }
+        );
 
-
+        friend class filler;
         class filler : public button_action
         {
             friend class scroll_bar;
@@ -1164,7 +1169,8 @@ namespace dlib
                 void (scroll_bar::*down)(),
                 void (scroll_bar::*up)(bool)
             ):
-                button_action(w)
+                button_action(w),
+                my_scroll_bar(object)
             {
                 bup.set(object,up);
                 bdown.set(object,down);
@@ -1198,10 +1204,7 @@ namespace dlib
                 const canvas& c
             ) const
             {
-                if (is_depressed())
-                    draw_checkered(c, rect,rgb_pixel(0,0,0),rgb_pixel(43,47,55));
-                else
-                    draw_checkered(c, rect,rgb_pixel(255,255,255),rgb_pixel(212,208,200));
+                my_scroll_bar.style->draw_scroll_bar_background(c,rect,hidden,enabled,lastx,lasty,is_depressed());
             }
 
             void on_button_down (
@@ -1211,10 +1214,12 @@ namespace dlib
                 bool mouse_over
             ) { bup(mouse_over); } 
 
+            scroll_bar& my_scroll_bar;
             member_function_pointer<>::kernel_1a bdown;
             member_function_pointer<bool>::kernel_1a bup;
         };
 
+        friend class slider_class;
         class slider_class : public dragable
         {
             friend class scroll_bar;
@@ -1224,7 +1229,9 @@ namespace dlib
                 scroll_bar& object,
                 void (scroll_bar::*handler)()
             ) :
-                dragable(w)
+                dragable(w, MOUSE_MOVE),
+                mouse_in_widget(false),
+                my_scroll_bar(object)
             {
                 mfp.set(object,handler);
                 enable_events();
@@ -1251,6 +1258,45 @@ namespace dlib
             }
 
         private:
+            virtual void on_mouse_move (
+                unsigned long state,
+                long x,
+                long y
+            )
+            {
+                dragable::on_mouse_move(state,x,y);
+                if (!hidden && my_scroll_bar.style->redraw_on_mouse_over_slider())
+                {
+                    if (rect.contains(x,y) && !mouse_in_widget)
+                    {
+                        mouse_in_widget = true;
+                        parent.invalidate_rectangle(rect);
+                    }
+                    else if (rect.contains(x,y) == false && mouse_in_widget)
+                    {
+                        mouse_in_widget = false;
+                        parent.invalidate_rectangle(rect);
+                    }
+                }
+            }
+
+            void on_mouse_leave (
+            )
+            {
+                if (mouse_in_widget && my_scroll_bar.style->redraw_on_mouse_over_slider())
+                {
+                    mouse_in_widget = false;
+                    parent.invalidate_rectangle(rect);
+                }
+            }
+
+            void on_drag_stop (
+            ) 
+            {
+                if (my_scroll_bar.style->redraw_on_mouse_over_slider())
+                    parent.invalidate_rectangle(rect);
+            }
+
             void on_drag (
             )
             {
@@ -1261,10 +1307,11 @@ namespace dlib
                 const canvas& c
             ) const
             {
-                fill_rect(c, rect, rgb_pixel(212,208,200));
-                draw_button_up(c, rect);
+                my_scroll_bar.style->draw_scroll_bar_slider(c,rect,hidden,enabled,lastx,lasty, is_being_dragged());
             }
 
+            bool mouse_in_widget;
+            scroll_bar& my_scroll_bar;
             member_function_pointer<>::kernel_1a mfp;
         };
 
@@ -1287,7 +1334,6 @@ namespace dlib
         !*/
 
 
-        const unsigned long width_;
         button b1, b2;
         slider_class slider;
         bar_orientation ori; 
@@ -1303,6 +1349,7 @@ namespace dlib
         timer<scroll_bar>::kernel_2a top_filler_timer;
         timer<scroll_bar>::kernel_2a bottom_filler_timer;
         long delayed_pos;
+        scoped_ptr<scroll_bar_style> style;
 
         // restricted functions
         scroll_bar(scroll_bar&);        // copy constructor

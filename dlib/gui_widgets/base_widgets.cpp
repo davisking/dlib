@@ -320,6 +320,24 @@ namespace dlib
         else
         {
             drag = false;
+            on_drag_stop();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void dragable::
+    on_mouse_up (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        if (drag && (state & base_window::LEFT) == 0)
+        {
+            drag = false;
+            on_drag_stop();
         }
     }
 
@@ -612,7 +630,6 @@ namespace dlib
         bar_orientation orientation 
     ) :
         drawable(w),
-        width_(16),
         b1(w),
         b2(w),
         slider(w,*this,&scroll_bar::on_slider_drag),
@@ -627,16 +644,7 @@ namespace dlib
         top_filler_timer(*this,&scroll_bar::top_filler_down_t),
         bottom_filler_timer(*this,&scroll_bar::bottom_filler_down_t)
     {
-        if (ori == HORIZONTAL)
-        {
-            b1.set_style(button_style_left_arrow());
-            b2.set_style(button_style_right_arrow());
-        }
-        else
-        {
-            b1.set_style(button_style_up_arrow());
-            b2.set_style(button_style_down_arrow());
-        }
+        set_style(scroll_bar_style_default());
 
         // don't show the slider when there is no place it can move.
         slider.hide();
@@ -681,111 +689,43 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
     
     void scroll_bar::
-    set_orientation (
-        bar_orientation new_orientation   
-    )
-    {
-        auto_mutex M(m);
-        unsigned long length;
-
-        if (ori == HORIZONTAL)
-            length = rect.width();
-        else
-            length = rect.height();
-
-        rectangle old_rect = rect;
-
-        if (new_orientation == HORIZONTAL)
-        {
-            rect.set_right(rect.left() + length - 1 );
-            rect.set_bottom(rect.top() + width_ - 1 );
-            b1.set_style(button_style_left_arrow());
-            b2.set_style(button_style_right_arrow());
-        }
-        else
-        {
-            rect.set_right(rect.left() + width_ - 1);
-            rect.set_bottom(rect.top() + length - 1);
-            b1.set_style(button_style_up_arrow());
-            b2.set_style(button_style_down_arrow());
-        }
-        ori = new_orientation;
-
-        parent.invalidate_rectangle(old_rect);
-        parent.invalidate_rectangle(rect);
-
-        // call this to put everything is in the right spot.
-        set_pos (rect.left(),rect.top());
-    }
-
-// ----------------------------------------------------------------------------------------
-    
-    void scroll_bar::
     set_length (
         unsigned long length
     )
     {
+        auto_mutex M(m);
         // make the min length be at least 1
         if (length == 0)
         {
             length = 1;
         }
 
-        auto_mutex M(m);
 
         parent.invalidate_rectangle(rect);
 
         if (ori == HORIZONTAL)
         {
             rect.set_right(rect.left() + length - 1);
-            rect.set_bottom(rect.top() + width_ - 1);
+            rect.set_bottom(rect.top() + style->get_width() - 1);
 
-            // if the length is too small then we have to smash up the arrow buttons
-            // and hide the slider.
-            if (length <= width_*2)
-            {
-                b1.set_size(length/2,width_);
-                b2.set_size(length/2,width_);
-            }
-            else
-            {
-                b1.set_size(width_,width_);
-                b2.set_size(width_,width_);
+            const long btn_size = style->get_button_length(rect.width(), max_pos);
 
-                // now adjust the slider
-                if (max_pos != 0)
-                {
-                    slider.set_size(get_slider_size(),width_);
-                }
-            }
+            b1.set_size(btn_size,style->get_width());
+            b2.set_size(btn_size,style->get_width());
 
+            slider.set_size(get_slider_size(),style->get_width());
         }
         else
         {
-            rect.set_right(rect.left() + width_ - 1);
+            rect.set_right(rect.left() + style->get_width() - 1);
             rect.set_bottom(rect.top() + length - 1);
 
-            // if the length is too small then we have to smush up the arrow buttons
-            // and hide the slider.
-            if (length <= width_*2)
-            {
-                b1.set_size(width_,length/2);
-                b2.set_size(width_,length/2);
-            }
-            else
-            {
+            const long btn_size = style->get_button_length(rect.height(), max_pos);
 
-                b1.set_size(width_,width_);
-                b2.set_size(width_,width_);
+            b1.set_size(style->get_width(),btn_size);
+            b2.set_size(style->get_width(),btn_size);
 
-                // now adjust the slider
-                if (max_pos != 0)
-                {
-                    slider.set_size(width_,get_slider_size());
-                }
-            }
-
-
+            slider.set_size(style->get_width(),get_slider_size());
         }
 
         // call this to put everything is in the right spot.
@@ -833,8 +773,8 @@ namespace dlib
 
                 // move the dragable area for the slider to the new location
                 rectangle area = rect;
-                area.set_left(area.left() + width_);
-                area.set_right(area.right() - width_);
+                area.set_left(area.left() + style->get_width());
+                area.set_right(area.right() - style->get_width());
                 slider.set_dragable_area(area);
 
             }
@@ -859,8 +799,8 @@ namespace dlib
 
                 // move the dragable area for the slider to the new location
                 rectangle area = rect;
-                area.set_top(area.top() + width_);
-                area.set_bottom(area.bottom() - width_);
+                area.set_top(area.top() + style->get_width());
+                area.set_bottom(area.bottom() - style->get_width());
                 slider.set_dragable_area(area);
             }
         }
@@ -874,28 +814,10 @@ namespace dlib
     get_slider_size (
     ) const
     {
-        double range;
         if (ori == HORIZONTAL)
-        {
-            range = rect.width() - b2.get_rect().width() - b1.get_rect().width();
-        }
+            return style->get_slider_length(rect.width(),max_pos);
         else
-        {
-            range = rect.height() - b2.get_rect().height() - b1.get_rect().height(); 
-        }
-
-        double scale_factor = 30.0/(max_pos + 30.0);
-
-        if (scale_factor < 0.1)
-            scale_factor = 0.1;
-
-
-        double fraction = range/(max_pos + range)*scale_factor;
-        double result = fraction * range;
-        unsigned long res = static_cast<unsigned long>(result);
-        if (res < 8)
-            res = 8;
-        return res;
+            return style->get_slider_length(rect.height(),max_pos);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1005,6 +927,7 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
     long scroll_bar::
     max_slider_pos (
     ) const
@@ -1286,6 +1209,89 @@ namespace dlib
     {
         auto_mutex M(m);
         return js;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scroll_bar::
+    on_user_event (
+        int i
+    )
+    {
+        switch (i)
+        {
+            case 0:
+                b1_down();
+                break;
+            case 1:
+                b2_down();
+                break;
+            case 2:
+                top_filler_down();
+                break;
+            case 3:
+                bottom_filler_down();
+                break;
+            case 4:
+                // if the position we are supposed to switch the slider too isn't 
+                // already set
+                if (delayed_pos != pos)
+                {
+                    set_slider_pos(delayed_pos);
+                    if (scroll_handler.is_set())
+                        scroll_handler();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scroll_bar::
+    delayed_set_slider_pos (
+        unsigned long dpos
+    ) 
+    {
+        delayed_pos = dpos;
+        parent.trigger_user_event(this,4); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scroll_bar::
+    b1_down_t (
+    ) 
+    { 
+        parent.trigger_user_event(this,0); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scroll_bar::
+    b2_down_t (
+    ) 
+    { 
+        parent.trigger_user_event(this,1); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scroll_bar::
+    top_filler_down_t (
+    ) 
+    { 
+        parent.trigger_user_event(this,2); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scroll_bar::
+    bottom_filler_down_t (
+    ) 
+    { 
+        parent.trigger_user_event(this,3); 
     }
 
 // ----------------------------------------------------------------------------------------

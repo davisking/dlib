@@ -788,6 +788,99 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // scroll bar style stuff 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    long scroll_bar_style_default::
+    get_slider_length (
+        long total_length,
+        long max_pos
+    ) const
+    {
+        // if the length is too small then we have to smash up the arrow buttons
+        // and hide the slider.
+        if (total_length <= get_width()*2)
+        {
+            return 0;
+        }
+        else
+        {
+            double range = total_length - get_button_length(total_length, max_pos)*2;
+
+            double scale_factor = 30.0/(max_pos + 30.0);
+
+            if (scale_factor < 0.1)
+                scale_factor = 0.1;
+
+
+            double fraction = range/(max_pos + range)*scale_factor;
+            double result = fraction * range;
+            long res = static_cast<long>(result);
+            if (res < 8)
+                res = 8;
+            return res;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    long scroll_bar_style_default::
+    get_button_length (
+        long total_length,
+        long max_pos
+    ) const
+    {
+        // if the length is too small then we have to smash up the arrow buttons
+        // and hide the slider.
+        if (total_length <= get_width()*2)
+        {
+            return total_length/2;
+        }
+        else
+        {
+            return get_width();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scroll_bar_style_default::
+    draw_scroll_bar_background (
+        const canvas& c,
+        const rectangle& rect,
+        const bool hidden,
+        const bool enabled,
+        const long lastx,
+        const long lasty,
+        const bool is_depressed
+    ) const
+    {
+        if (is_depressed)
+            draw_checkered(c, rect,rgb_pixel(0,0,0),rgb_pixel(43,47,55));
+        else
+            draw_checkered(c, rect,rgb_pixel(255,255,255),rgb_pixel(212,208,200));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void scroll_bar_style_default::
+    draw_scroll_bar_slider (
+        const canvas& c,
+        const rectangle& rect,
+        const bool hidden,
+        const bool enabled,
+        const long lastx,
+        const long lasty,
+        const bool is_being_dragged
+    ) const
+    {
+        fill_rect(c, rect, rgb_pixel(212,208,200));
+        draw_button_up(c, rect);
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 

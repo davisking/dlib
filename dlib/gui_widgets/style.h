@@ -432,6 +432,108 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // scroll_bar styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class scroll_bar_style
+    {
+    public:
+
+        virtual ~scroll_bar_style() {}
+
+        virtual bool redraw_on_mouse_over_slider (
+        ) const { return false; }
+
+        virtual long get_width (
+        ) const = 0;
+
+        virtual long get_slider_length (
+            long total_length,
+            long max_pos
+        ) const = 0;
+
+        virtual long get_button_length (
+            long total_length,
+            long max_pos
+        ) const = 0;
+
+        virtual void draw_scroll_bar_background (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const long lastx,
+            const long lasty,
+            const bool is_depressed
+        ) const = 0;
+
+        virtual void draw_scroll_bar_slider (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const long lastx,
+            const long lasty,
+            const bool is_being_dragged
+        ) const = 0;
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class scroll_bar_style_default : public scroll_bar_style
+    {
+    public:
+        button_style_up_arrow get_up_button_style (
+        ) const { return button_style_up_arrow(); }
+
+        button_style_down_arrow get_down_button_style (
+        ) const { return button_style_down_arrow(); }
+
+        button_style_left_arrow get_left_button_style (
+        ) const { return button_style_left_arrow(); }
+
+        button_style_right_arrow get_right_button_style (
+        ) const { return button_style_right_arrow(); }
+
+        virtual long get_width (
+        ) const  { return 16; }
+
+        virtual long get_slider_length (
+            long total_length,
+            long max_pos
+        ) const;
+
+        virtual long get_button_length (
+            long total_length,
+            long max_pos
+        ) const;
+
+        virtual void draw_scroll_bar_background (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const long lastx,
+            const long lasty,
+            const bool is_depressed
+        ) const;
+
+        virtual void draw_scroll_bar_slider (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const long lastx,
+            const long lasty,
+            const bool is_being_dragged
+        ) const;
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
 }
 

@@ -96,6 +96,18 @@ namespace dlib
 
     protected:
 
+        bool is_being_dragged (
+        ) const;
+        /*!
+            requires
+                - mutex drawable::m is locked
+            ensures
+                - if (this widget is currently being dragged by the user) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
         // does nothing by default
         virtual void on_drag (
         ){}
@@ -108,6 +120,20 @@ namespace dlib
                 - is called when the user drags this object
                 - get_rect() == the rectangle that defines the new position
                   of this object.
+                - is_being_dragged() == true
+            ensures
+                - does not change the state of mutex drawable::m. 
+        !*/
+
+        // does nothing by default
+        virtual void on_drag_stop (
+        ){}
+        /*!
+            requires
+                - enable_events() has been called
+                - mutex drawable::m is locked
+                - is called when the user stops dragging this object
+                - is_being_dragged() == false 
             ensures
                 - does not change the state of mutex drawable::m. 
         !*/
@@ -649,14 +675,6 @@ namespace dlib
         /*!
             ensures
                 - returns the orientation of this scroll_bar 
-        !*/
-
-        void set_orientation (
-            bar_orientation new_orientation   
-        );
-        /*!
-            ensures
-                - #orientation() == new_orientation
         !*/
 
         void set_length (

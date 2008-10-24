@@ -258,6 +258,167 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // scroll_bar styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class scroll_bar_style
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                scroll_bar style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+
+                There are three parts of a scroll bar, the slider, the background,
+                and the two buttons on its ends.  The "slider" is the thing that you
+                drag around on the scroll bar and the "background" is the part
+                in between the slider and the buttons on the ends.
+        !*/
+
+    public:
+
+        virtual ~scroll_bar_style() {}
+
+        virtual bool redraw_on_mouse_over_slider (
+        ) const { return false; }
+        /*!
+            ensures
+                - if (this style draws a scroll_bar's slider differently when a mouse is over it
+                  or it is being dragged) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
+        virtual long get_width (
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns the width in pixels of the scroll bar
+        !*/
+
+        virtual long get_slider_length (
+            long total_length,
+            long max_pos
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - total_length == the total length in pixels of the scroll bar
+                - max_pos == the value of scroll_bar::max_slider_pos() for this
+                  scroll bar
+            ensures
+                - returns the length in pixels of the scroll bar's slider
+        !*/
+
+        virtual long get_button_length (
+            long total_length,
+            long max_pos
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - total_length == the total length in pixels of the scroll bar
+                - max_pos == the value of scroll_bar::max_slider_pos() for this
+                  scroll bar
+            ensures
+                - returns the length in pixels of each of the scroll bar's
+                  buttons
+        !*/
+
+        virtual void draw_scroll_bar_background (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const long lastx,
+            const long lasty,
+            const bool is_depressed
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect, hidden, enabled, lastx, and lasty are the variables
+                  defined in the protected section of the drawable class.
+                - is_depressed == true if the background area of the scroll_bar is to 
+                  be drawn in a depressed state (because the user is clicking on it)
+            ensures
+                - draws the background part of the scroll_bar on the canvas c at the 
+                  location given by rect.  
+        !*/
+
+        virtual void draw_scroll_bar_slider (
+            const canvas& c,
+            const rectangle& rect,
+            const bool hidden,
+            const bool enabled,
+            const long lastx,
+            const long lasty,
+            const bool is_being_dragged
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect, hidden, enabled, lastx, and lasty are the variables
+                  defined in the protected section of the drawable class
+                - is_being_dragged == true if the user is dragging the slider
+            ensures
+                - draws the slider part of the scroll_bar on the canvas c at the 
+                  location given by rect.  
+        !*/
+
+        button_style_type get_up_button_style (
+        ) const;
+        /*!
+            ensures
+                - returns the type of button_style to use for a button on the
+                  top side of a vertical scroll bar.
+        !*/
+
+        button_style_type get_down_button_style (
+        ) const;
+        /*!
+            ensures
+                - returns the type of button_style to use for a button on the
+                  bottom side of a vertical scroll bar.
+        !*/
+
+        button_style_type get_left_button_style (
+        ) const;
+        /*!
+            ensures
+                - returns the type of button_style to use for a button on the
+                  left side of a horizontal scroll bar.
+        !*/
+
+        button_style_type get_right_button_style (
+        ) const;
+        /*!
+            ensures
+                - returns the type of button_style to use for a button on the
+                  right side of a horizontal scroll bar.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class scroll_bar_style_default : public scroll_bar_style
+    {
+        /*!
+            This is the default style for scroll_bar objects.  It will cause
+            a scroll_bar to appear as the simple MS Windows 2000 scroll_bar style.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
 
 }
 
