@@ -1887,7 +1887,7 @@ namespace dlib
     mouse_tracker(  
         drawable_window& w
     ) :
-        dragable(w),
+        draggable(w),
         offset(18),
         nr(w),
         x_label(w),
@@ -1895,7 +1895,7 @@ namespace dlib
         click_x(-1),
         click_y(-1)
     {
-        set_dragable_area(rectangle(0,0,500,500));
+        set_draggable_area(rectangle(0,0,500,500));
 
 
         x_label.set_text("x: ");
@@ -1951,7 +1951,7 @@ namespace dlib
         long y
     )
     {
-        dragable::set_pos(x,y);
+        draggable::set_pos(x,y);
         nr.set_pos(x,y);
         x_label.set_pos(rect.left()+offset,rect.top()+offset);
         y_label.set_pos(x_label.get_rect().left(), x_label.get_rect().bottom()+3);
@@ -1963,7 +1963,7 @@ namespace dlib
     show (
     )
     {
-        dragable::show();
+        draggable::show();
         nr.show();
         x_label.show();
         y_label.show();
@@ -1975,7 +1975,7 @@ namespace dlib
     hide (
     )
     {
-        dragable::hide();
+        draggable::hide();
         nr.hide();
         x_label.hide();
         y_label.hide();
@@ -1987,7 +1987,7 @@ namespace dlib
     enable (
     )
     {
-        dragable::enable();
+        draggable::enable();
         nr.enable();
         x_label.enable();
         y_label.enable();
@@ -1999,7 +1999,7 @@ namespace dlib
     disable (
     )
     {
-        dragable::disable();
+        draggable::disable();
         nr.disable();
         x_label.disable();
         y_label.disable();
@@ -2016,7 +2016,7 @@ namespace dlib
         bool double_clicked 
     )
     {
-        dragable::on_mouse_down(btn,state,x,y,double_clicked);
+        draggable::on_mouse_down(btn,state,x,y,double_clicked);
         if ((state & base_window::SHIFT) && (btn == base_window::LEFT) && enabled && !hidden)
         {
             parent.invalidate_rectangle(rectangle(x,y,x,y));
@@ -2041,7 +2041,7 @@ namespace dlib
         if (!hidden && enabled)
         {
             parent.invalidate_rectangle(rect);
-            dragable::on_mouse_move(state,x,y);
+            draggable::on_mouse_move(state,x,y);
 
             long dx = 0;
             long dy = 0;

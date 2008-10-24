@@ -265,15 +265,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // dragable object methods  
+    // draggable object methods  
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    dragable::~dragable() {}
+    draggable::~draggable() {}
 
 // ----------------------------------------------------------------------------------------
 
-    void dragable::
+    void draggable::
     on_mouse_move (
         unsigned long state,
         long x,
@@ -288,7 +288,7 @@ namespace dlib
             long new_x = x - this->x;
             long new_y = y - this->y;
 
-            // make sure these points are inside the dragable area.  
+            // make sure these points are inside the draggable area.  
             if (new_x < area.left())
                 new_x = area.left();
             if (new_x + static_cast<long>(rect.width()) - 1 > area.right())
@@ -326,7 +326,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void dragable::
+    void draggable::
     on_mouse_up (
         unsigned long btn,
         unsigned long state,
@@ -343,7 +343,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void dragable::
+    void draggable::
     on_mouse_down (
         unsigned long btn,
         unsigned long ,
@@ -771,11 +771,11 @@ namespace dlib
                     rect.top()
                     );
 
-                // move the dragable area for the slider to the new location
+                // move the draggable area for the slider to the new location
                 rectangle area = rect;
                 area.set_left(area.left() + style->get_width());
                 area.set_right(area.right() - style->get_width());
-                slider.set_dragable_area(area);
+                slider.set_draggable_area(area);
 
             }
 
@@ -797,11 +797,11 @@ namespace dlib
                     static_cast<long>(slider_pos) + rect.top() + b1.get_rect().height()
                     );
 
-                // move the dragable area for the slider to the new location
+                // move the draggable area for the slider to the new location
                 rectangle area = rect;
                 area.set_top(area.top() + style->get_width());
                 area.set_bottom(area.bottom() - style->get_width());
-                slider.set_dragable_area(area);
+                slider.set_draggable_area(area);
             }
         }
 

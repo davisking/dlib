@@ -906,14 +906,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class mouse_tracker : public dragable 
+    class mouse_tracker : public draggable 
     {
         /*!
             INITIAL VALUE
-                dragable_area() == rectangle(0,0,500,500)
+                draggable_area() == rectangle(0,0,500,500)
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a simple dragable box that displays the 
+                This object represents a simple draggable box that displays the 
                 current location of the mouse.  
 
                 Also, if you hold shift and left click on the parent window then the 

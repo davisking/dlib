@@ -892,7 +892,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class mouse_tracker : public dragable 
+    class mouse_tracker : public draggable 
     {
 
     public:
@@ -1722,7 +1722,7 @@ namespace dlib
             mouse_drag = false;
             selected_node = 0;
 
-            // Whenever you make your own drawable (or inherit from dragable or button_action)
+            // Whenever you make your own drawable (or inherit from draggable or button_action)
             // you have to remember to call this function to enable the events.  The idea
             // here is that you can perform whatever setup you need to do to get your 
             // object into a valid state without needing to worry about event handlers 

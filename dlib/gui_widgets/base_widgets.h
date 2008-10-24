@@ -27,11 +27,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class dragable
+    // class draggable
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class dragable : public drawable
+    class draggable : public drawable
     {
         /*!
             INITIAL VALUE
@@ -50,7 +50,7 @@ namespace dlib
 
     public:
 
-        dragable(  
+        draggable(  
             drawable_window& w,
             unsigned long events = 0
         ) : 
@@ -58,13 +58,13 @@ namespace dlib
             drag(false)
         {}
 
-        virtual ~dragable(
+        virtual ~draggable(
         ) = 0;
 
-        rectangle dragable_area (
+        rectangle draggable_area (
         ) const { auto_mutex M(m); return area; }
 
-        void set_dragable_area (
+        void set_draggable_area (
             const rectangle& area_ 
         ) { auto_mutex M(m); area = area_; } 
 
@@ -107,8 +107,8 @@ namespace dlib
         long x, y;
 
         // restricted functions
-        dragable(dragable&);        // copy constructor
-        dragable& operator=(dragable&);    // assignment operator
+        draggable(draggable&);        // copy constructor
+        draggable& operator=(draggable&);    // assignment operator
     };
 
 // ----------------------------------------------------------------------------------------
@@ -364,7 +364,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class image_widget : public dragable
+    class image_widget : public draggable
     {
         /*!
             INITIAL VALUE
@@ -378,7 +378,7 @@ namespace dlib
 
         image_widget(  
             drawable_window& w
-        ): dragable(w)  { enable_events(); }
+        ): draggable(w)  { enable_events(); }
 
         ~image_widget(
         )
@@ -1220,7 +1220,7 @@ namespace dlib
         };
 
         friend class slider_class;
-        class slider_class : public dragable
+        class slider_class : public draggable
         {
             friend class scroll_bar;
         public:
@@ -1229,7 +1229,7 @@ namespace dlib
                 scroll_bar& object,
                 void (scroll_bar::*handler)()
             ) :
-                dragable(w, MOUSE_MOVE),
+                draggable(w, MOUSE_MOVE),
                 mouse_in_widget(false),
                 my_scroll_bar(object)
             {
@@ -1264,7 +1264,7 @@ namespace dlib
                 long y
             )
             {
-                dragable::on_mouse_move(state,x,y);
+                draggable::on_mouse_move(state,x,y);
                 if (!hidden && my_scroll_bar.style->redraw_on_mouse_over_slider())
                 {
                     if (rect.contains(x,y) && !mouse_in_widget)

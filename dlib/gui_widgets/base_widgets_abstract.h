@@ -33,28 +33,28 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class dragable
+    // class draggable
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class dragable : public drawable
+    class draggable : public drawable
     {
         /*!
             INITIAL VALUE
-                dragable_area() == an initial value for its type 
+                draggable_area() == an initial value for its type 
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a drawable object that is dragable by the mouse.  
+                This object represents a drawable object that is draggable by the mouse.  
                 You use it by inheriting from it and defining the draw() method and any
                 of the on_*() event handlers you need.  
 
-                This object is dragable by the user when is_enabled() == true and 
-                not dragable otherwise.
+                This object is draggable by the user when is_enabled() == true and 
+                not draggable otherwise.
         !*/
 
     public:
 
-        dragable(  
+        draggable(  
             drawable_window& w,
             unsigned long events = 0
         );
@@ -72,26 +72,26 @@ namespace dlib
                 - dlib::thread_error
         !*/
 
-        virtual ~dragable(
+        virtual ~draggable(
         ) = 0;
         /*!
             ensures
                 - all resources associated with *this have been released
         !*/
 
-        rectangle dragable_area (
+        rectangle draggable_area (
         ) const;
         /*!
             ensures
-                - returns the area that this dragable can be dragged around in. 
+                - returns the area that this draggable can be dragged around in. 
         !*/
 
-        void set_dragable_area (
+        void set_draggable_area (
             const rectangle& area 
         ); 
         /*!
             ensures
-                - #dragable_area() == area
+                - #draggable_area() == area
         !*/
 
     protected:
@@ -141,8 +141,8 @@ namespace dlib
     private:
 
         // restricted functions
-        dragable(dragable&);        // copy constructor
-        dragable& operator=(dragable&);    // assignment operator
+        draggable(draggable&);        // copy constructor
+        draggable& operator=(draggable&);    // assignment operator
     };
 
 // ----------------------------------------------------------------------------------------
@@ -915,19 +915,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class image_widget : public dragable
+    class image_widget : public draggable
     {
         /*!
             INITIAL VALUE
-                dragable_area() == an initial value for its type.
+                draggable_area() == an initial value for its type.
                 This object isn't displaying anything. 
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a dragable image.  You give it an image to display
+                This object represents a draggable image.  You give it an image to display
                 by calling set_image().
 
-                Also note that initially the dragable area is empty so it won't be 
-                dragable unless you call set_dragable_area() to some non-empty region.
+                Also note that initially the draggable area is empty so it won't be 
+                draggable unless you call set_draggable_area() to some non-empty region.
 
                 The image is drawn such that:
                     - the pixel img[0][0] is the upper left corner of the image.
