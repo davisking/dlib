@@ -530,11 +530,10 @@ namespace dlib
 
         unsigned long m_prev = 0, m = radius, c_div = valid_area.height() - 1;
 
-        long c_top = valid_area.top();
+        const long c_top = valid_area.top();
+        const long c_bottom = valid_area.bottom();
 
-        long c_bottom = valid_area.bottom();
-
-        for ( int y = c_top; y <= c_bottom;y++ )
+        for ( long y = c_top; y <= c_bottom;y++ )
         {
             if ( y < valid_area.top() )
                 continue;
@@ -583,8 +582,8 @@ namespace dlib
 
             m_prev = m;
 
-            draw_line ( c, point(valid_area.left() + m, y), 
-                        point(valid_area.right() - m, y), color );
+            draw_line ( c, point(rect.left() + m, y), 
+                        point(rect.right() - m, y), color, valid_area );
         }
     }
 
