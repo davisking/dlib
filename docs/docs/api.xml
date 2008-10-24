@@ -36,8 +36,8 @@
                        <name>widgets</name>
                        <sub>
                            <item>
-                               <name>dragable</name>
-                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#dragable</link>
+                               <name>draggable</name>
+                               <link>dlib/gui_widgets/base_widgets_abstract.h.html#draggable</link>
                            </item>
                            <item>
                                <name>tooltip</name>
@@ -204,6 +204,8 @@
                            <name>button_style_toolbar_icon1</name>
                            <link>dlib/gui_widgets/style_abstract.h.html#button_style_toolbar_icon1</link>
                         </item>
+
+
                         <item>
                            <name>toggle_button_style</name>
                            <link>dlib/gui_widgets/style_abstract.h.html#toggle_button_style</link>
@@ -219,6 +221,16 @@
                         <item>
                            <name>toggle_button_style_radio_button</name>
                            <link>dlib/gui_widgets/style_abstract.h.html#toggle_button_style_radio_button</link>
+                        </item>
+                        
+
+                        <item>
+                           <name>scroll_bar_style</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#scroll_bar_style</link>
+                        </item>
+                        <item>
+                           <name>scroll_bar_style_default</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#scroll_bar_style_default</link>
                         </item>
                      </sub>
                   </item>

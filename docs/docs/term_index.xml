@@ -217,6 +217,9 @@
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_check_box" name="toggle_button_style_check_box"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_radio_button" name="toggle_button_style_radio_button"/>
 
+         <term link="dlib/gui_widgets/style_abstract.h.html#scroll_bar_style" name="scroll_bar_style"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#scroll_bar_style_default" name="scroll_bar_style_default"/>
+
          <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_rectangle" name="draw_rectangle"/>
          <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_circle" name="draw_circle"/>
          <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_pixel" name="draw_pixel"/>
@@ -283,7 +286,7 @@
 
 
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#button" name="button"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#dragable" name="dragable"/>
+         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#draggable" name="draggable"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#button_action" name="button_action"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#zoomable_region" name="zoomable_region"/>
          <term link="dlib/gui_widgets/base_widgets_abstract.h.html#scrollable_region" name="scrollable_region"/>
