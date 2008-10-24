@@ -710,7 +710,7 @@ namespace dlib
             enable_events();
         }
         
-        ~button() { disable_events(); parent.invalidate_rectangle(rect); }
+        ~button() { disable_events(); parent.invalidate_rectangle(style->get_invalidation_rect(rect)); }
 
         void set_size (
             unsigned long width,
@@ -790,7 +790,7 @@ namespace dlib
             auto_mutex M(m);
             style.reset(new style_type(style_));
             rect = move_rect(style->get_min_size(name_,*mfont), rect.left(), rect.top());
-            parent.invalidate_rectangle(rect);
+            parent.invalidate_rectangle(style->get_invalidation_rect(rect));
         }
 
         template <
@@ -906,10 +906,10 @@ namespace dlib
         );
 
         void on_mouse_over (
-        ){ if (style->redraw_on_mouse_over()) parent.invalidate_rectangle(rect); }
+        ){ if (style->redraw_on_mouse_over()) parent.invalidate_rectangle(style->get_invalidation_rect(rect)); }
 
         void on_mouse_not_over (
-        ){ if (style->redraw_on_mouse_over()) parent.invalidate_rectangle(rect); }
+        ){ if (style->redraw_on_mouse_over()) parent.invalidate_rectangle(style->get_invalidation_rect(rect)); }
     };
 
 // ----------------------------------------------------------------------------------------

@@ -118,7 +118,7 @@ namespace dlib
         if (area.is_empty())
             return;
 
-        const long radius = 7;
+        const long radius = 4;
 
         unsigned char red, green, blue;
         if (enabled)
@@ -129,14 +129,23 @@ namespace dlib
 
             long d = 0;
             if (rect.contains(lastx,lasty))
-                d = -40; 
+                d = -70; 
 
             if (is_depressed)
-                d = 50;
+                d = 20;
 
-            fill_gradient_rounded(c,rect,radius,rgb_alpha_pixel(180-d,180-d,200-d,150), 
-                                  rgb_alpha_pixel(130-d,130-d,150-d,100));
-            draw_rounded_rectangle(c,rect,radius, rgb_alpha_pixel(80,80,100,190));
+            if (d != 0)
+            {
+                rectangle temp(rect);
+                temp.left()--; temp.top()--; temp.right()++; temp.bottom()++;
+                draw_rounded_rectangle(c, temp, radius, rgb_alpha_pixel(255,255,0,120)); 
+                temp.left()--; temp.top()--; temp.right()++; temp.bottom()++;
+                draw_rounded_rectangle(c, temp, radius, rgb_alpha_pixel(255,255,0,40)); 
+            }
+
+            fill_gradient_rounded(c,rect,radius,rgb_alpha_pixel(255, 255, 255,120-d), 
+                                  rgb_alpha_pixel(255, 255, 255,0));
+            draw_rounded_rectangle(c,rect,radius, rgb_alpha_pixel(30,30,30,200));
         }
         else
         {

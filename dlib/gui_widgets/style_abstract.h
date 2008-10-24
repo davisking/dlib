@@ -42,6 +42,19 @@ namespace dlib
                     - returns false
         !*/
 
+        virtual rectangle get_invalidation_rect (
+            const rectangle& rect
+        ) const { return rect; }
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - rect == the get_rect() that defines where the button is
+            ensures
+                - returns a rectangle that should be invalidated whenever a button
+                  needs to redraw itself.  (If you wanted your button style to
+                  draw outside the button then you could return a larger rectangle)
+        !*/
+
         virtual rectangle get_min_size (
             const ustring& name,
             const font& mfont 

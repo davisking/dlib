@@ -535,11 +535,6 @@ namespace dlib
 
         for ( long y = c_top; y <= c_bottom;y++ )
         {
-            if ( y < valid_area.top() )
-                continue;
-
-            if ( y > valid_area.bottom() )
-                break;
 
             unsigned long c_s = y - c_top;
 

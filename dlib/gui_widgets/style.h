@@ -38,6 +38,10 @@ namespace dlib
         virtual bool redraw_on_mouse_over (
         ) const { return false; }
 
+        virtual rectangle get_invalidation_rect (
+            const rectangle& rect
+        ) const { return rect; }
+
         virtual rectangle get_min_size (
             const ustring& name,
             const font& mfont 
@@ -105,6 +109,18 @@ namespace dlib
             const ustring& name,
             const bool is_depressed
         ) const;
+
+        virtual rectangle get_invalidation_rect (
+            const rectangle& rect
+        ) const 
+        { 
+            rectangle temp(rect);
+            temp.left() -= 2;
+            temp.top() -= 2;
+            temp.right() += 2;
+            temp.bottom() += 2;
+            return temp; 
+        }
 
         virtual bool redraw_on_mouse_over (
         ) const { return true; }

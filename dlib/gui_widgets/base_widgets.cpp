@@ -31,7 +31,7 @@ namespace dlib
         {
             rectangle old(rect);
             rect = resize_rect(rect,width,height);
-            parent.invalidate_rectangle(rect+old);
+            parent.invalidate_rectangle(style->get_invalidation_rect(rect+old));
             btn_tooltip.set_size(width,height);
         }
     }
@@ -187,7 +187,7 @@ namespace dlib
         rect = move_rect(style->get_min_size(name,*mfont),rect.left(),rect.top());
         btn_tooltip.set_size(rect.width(),rect.height());
         
-        parent.invalidate_rectangle(rect+old);
+        parent.invalidate_rectangle(style->get_invalidation_rect(rect+old));
     }
 
 // ----------------------------------------------------------------------------------------
