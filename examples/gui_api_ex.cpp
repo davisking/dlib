@@ -4,7 +4,7 @@
 
 
     This is a pretty simple example.  It makes a window with a user
-    defined widget (a dragable colored box) and a button.  You can drag the
+    defined widget (a draggable colored box) and a button.  You can drag the
     box around or click the button which increments a counter. 
 */
 
@@ -21,13 +21,13 @@ using namespace dlib;
 
 //  ----------------------------------------------------------------------------
 
-class color_box : public dragable 
+class color_box : public draggable 
 {
     /*
         Here I am defining a custom drawable widget that is a colored box that
-        you can drag around on the screen.  dragable is a special kind of drawable
-        object that, as the name implies, is dragable by the user via the mouse.
-        To make my color_box dragable all I need to do is inherit from dragable.
+        you can drag around on the screen.  draggable is a special kind of drawable
+        object that, as the name implies, is draggable by the user via the mouse.
+        To make my color_box draggable all I need to do is inherit from draggable.
     */
     unsigned char red, green,blue;
 
@@ -39,15 +39,15 @@ public:
         unsigned char green_,
         unsigned char blue_
     ) :
-        dragable(w),
+        draggable(w),
         red(red_),
         green(green_),
         blue(blue_)
     {
         rect = area;
-        set_dragable_area(rectangle(10,10,400,400));
+        set_draggable_area(rectangle(10,10,400,400));
         
-        // Whenever you make your own drawable (or inherit from dragable or button_action)
+        // Whenever you make your own drawable (or inherit from draggable or button_action)
         // you have to remember to call this function to enable the events.  The idea
         // here is that you can perform whatever setup you need to do to get your 
         // object into a valid state without needing to worry about event handlers 
