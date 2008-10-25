@@ -285,202 +285,119 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    namespace arrow_button_style_helper
+    void button_style_arrow::
+    draw_button (
+        const canvas& c,
+        const rectangle& rect,
+        const bool enabled,
+        const font& mfont,
+        const long lastx,
+        const long lasty,
+        const ustring& name,
+        const bool is_depressed
+    ) const
     {
-        enum arrow_direction 
+        rectangle area = rect.intersect(c);
+        if (area.is_empty())
+            return;
+
+        fill_rect(c,rect,rgb_pixel(212,208,200));
+
+        const long height = rect.height();
+        const long width = rect.width();
+
+        const long smallest = (width < height) ? width : height; 
+
+        const long rows = (smallest+3)/4;
+        const long start = rows + rows/2-1;
+        long dep;
+
+        long tip_x = 0;
+        long tip_y = 0;
+        long wy = 0;
+        long hy = 0;
+        long wx = 0; 
+        long hx = 0;
+
+        if (is_depressed)
         {
-            UP,
-            DOWN,
-            LEFT,
-            RIGHT
-        };
+            dep = 0;
 
-        void draw_arrow_button (
-            const canvas& c,
-            const rectangle& rect,
-            const bool enabled,
-            const bool is_depressed,
-            const arrow_direction dir
-        )
-        {
-            rectangle area = rect.intersect(c);
-            if (area.is_empty())
-                return;
-
-            fill_rect(c,rect,rgb_pixel(212,208,200));
-
-            const long height = rect.height();
-            const long width = rect.width();
-
-            const long smallest = (width < height) ? width : height; 
-
-            const long rows = (smallest+3)/4;
-            const long start = rows + rows/2-1;
-            long dep;
-
-            long tip_x = 0;
-            long tip_y = 0;
-            long wy = 0;
-            long hy = 0;
-            long wx = 0; 
-            long hx = 0;
-
-            if (is_depressed)
-            {
-                dep = 0;
-
-                // draw the button's border
-                draw_button_down(c,rect); 
-            }
-            else
-            {
-                dep = -1;
-
-                // draw the button's border
-                draw_button_up(c,rect);
-            }
-
-
-            switch (dir)
-            {
-                case UP:
-                    tip_x = width/2 + rect.left() + dep;
-                    tip_y = (height - start)/2 + rect.top() + dep + 1;
-                    wy = 0;
-                    hy = 1;
-                    wx = 1;
-                    hx = 0;
-                    break;
-
-                case DOWN:
-                    tip_x = width/2 + rect.left() + dep;
-                    tip_y = rect.bottom() - (height - start)/2 + dep;
-                    wy = 0;
-                    hy = -1;
-                    wx = 1;
-                    hx = 0;
-                    break;
-
-                case LEFT:
-                    tip_x = rect.left() + (width - start)/2 + dep + 1;
-                    tip_y = height/2 + rect.top() + dep;
-                    wy = 1;
-                    hy = 0;
-                    wx = 0;
-                    hx = 1;
-                    break;
-
-                case RIGHT:
-                    tip_x = rect.right() - (width - start)/2 + dep;
-                    tip_y = height/2 + rect.top() + dep;
-                    wy = 1;
-                    hy = 0;
-                    wx = 0;
-                    hx = -1;
-                    break;
-            }
-
-
-            rgb_pixel color;
-            if (enabled)
-            {
-                color.red = 0;
-                color.green = 0;
-                color.blue = 0;
-            }
-            else
-            {
-                color.red = 128;
-                color.green = 128;
-                color.blue = 128;
-            }
-
-
-
-            for (long i = 0; i < rows; ++i)
-            {
-                draw_line(c,point(tip_x + wx*i + hx*i, tip_y + wy*i + hy*i), 
-                          point(tip_x + wx*i*-1 + hx*i, tip_y + wy*i*-1 + hy*i), 
-                          color);
-            }
-
+            // draw the button's border
+            draw_button_down(c,rect); 
         }
-    }
+        else
+        {
+            dep = -1;
 
-    void button_style_left_arrow::
-    draw_button (
-        const canvas& c,
-        const rectangle& rect,
-        const bool enabled,
-        const font& mfont,
-        const long lastx,
-        const long lasty,
-        const ustring& name,
-        const bool is_depressed
-    ) const
-    {
-        using namespace arrow_button_style_helper;
-        draw_arrow_button(c, rect, enabled, is_depressed, LEFT);
-    }
+            // draw the button's border
+            draw_button_up(c,rect);
+        }
 
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
 
-    void button_style_right_arrow::
-    draw_button (
-        const canvas& c,
-        const rectangle& rect,
-        const bool enabled,
-        const font& mfont,
-        const long lastx,
-        const long lasty,
-        const ustring& name,
-        const bool is_depressed
-    ) const
-    {
-        using namespace arrow_button_style_helper;
-        draw_arrow_button(c, rect, enabled, is_depressed, RIGHT);
-    }
+        switch (dir)
+        {
+            case UP:
+                tip_x = width/2 + rect.left() + dep;
+                tip_y = (height - start)/2 + rect.top() + dep + 1;
+                wy = 0;
+                hy = 1;
+                wx = 1;
+                hx = 0;
+                break;
 
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
+            case DOWN:
+                tip_x = width/2 + rect.left() + dep;
+                tip_y = rect.bottom() - (height - start)/2 + dep;
+                wy = 0;
+                hy = -1;
+                wx = 1;
+                hx = 0;
+                break;
 
-    void button_style_up_arrow::
-    draw_button (
-        const canvas& c,
-        const rectangle& rect,
-        const bool enabled,
-        const font& mfont,
-        const long lastx,
-        const long lasty,
-        const ustring& name,
-        const bool is_depressed
-    ) const
-    {
-        using namespace arrow_button_style_helper;
-        draw_arrow_button(c, rect, enabled, is_depressed, UP);
-    }
+            case LEFT:
+                tip_x = rect.left() + (width - start)/2 + dep + 1;
+                tip_y = height/2 + rect.top() + dep;
+                wy = 1;
+                hy = 0;
+                wx = 0;
+                hx = 1;
+                break;
 
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
+            case RIGHT:
+                tip_x = rect.right() - (width - start)/2 + dep;
+                tip_y = height/2 + rect.top() + dep;
+                wy = 1;
+                hy = 0;
+                wx = 0;
+                hx = -1;
+                break;
+        }
 
-    void button_style_down_arrow::
-    draw_button (
-        const canvas& c,
-        const rectangle& rect,
-        const bool enabled,
-        const font& mfont,
-        const long lastx,
-        const long lasty,
-        const ustring& name,
-        const bool is_depressed
-    ) const
-    {
-        using namespace arrow_button_style_helper;
-        draw_arrow_button(c, rect, enabled, is_depressed, DOWN);
+
+        rgb_pixel color;
+        if (enabled)
+        {
+            color.red = 0;
+            color.green = 0;
+            color.blue = 0;
+        }
+        else
+        {
+            color.red = 128;
+            color.green = 128;
+            color.blue = 128;
+        }
+
+
+
+        for (long i = 0; i < rows; ++i)
+        {
+            draw_line(c,point(tip_x + wx*i + hx*i, tip_y + wy*i + hy*i), 
+                      point(tip_x + wx*i*-1 + hx*i, tip_y + wy*i*-1 + hy*i), 
+                      color);
+        }
+
     }
 
 // ----------------------------------------------------------------------------------------

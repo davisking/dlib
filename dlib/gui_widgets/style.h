@@ -229,9 +229,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class button_style_left_arrow : public button_style
+    class button_style_arrow : public button_style
     {
+
     public:
+
+        enum arrow_direction 
+        {
+            UP,
+            DOWN,
+            LEFT,
+            RIGHT
+        };
+
+        button_style_arrow (
+            arrow_direction dir_
+        ) : dir(dir_) {}
+
         virtual void draw_button (
             const canvas& c,
             const rectangle& rect,
@@ -247,72 +261,9 @@ namespace dlib
             const ustring& name,
             const font& mfont 
         ) const { return rectangle(); }
-    };
 
-// ----------------------------------------------------------------------------------------
-
-    class button_style_right_arrow : public button_style
-    {
-    public:
-        virtual void draw_button (
-            const canvas& c,
-            const rectangle& rect,
-            const bool enabled,
-            const font& mfont,
-            const long lastx,
-            const long lasty,
-            const ustring& name,
-            const bool is_depressed
-        ) const;
-
-        virtual rectangle get_min_size (
-            const ustring& name,
-            const font& mfont 
-        ) const { return rectangle(); }
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    class button_style_up_arrow : public button_style
-    {
-    public:
-        virtual void draw_button (
-            const canvas& c,
-            const rectangle& rect,
-            const bool enabled,
-            const font& mfont,
-            const long lastx,
-            const long lasty,
-            const ustring& name,
-            const bool is_depressed
-        ) const;
-
-        virtual rectangle get_min_size (
-            const ustring& name,
-            const font& mfont 
-        ) const { return rectangle(); }
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    class button_style_down_arrow : public button_style
-    {
-    public:
-        virtual void draw_button (
-            const canvas& c,
-            const rectangle& rect,
-            const bool enabled,
-            const font& mfont,
-            const long lastx,
-            const long lasty,
-            const ustring& name,
-            const bool is_depressed
-        ) const;
-
-        virtual rectangle get_min_size (
-            const ustring& name,
-            const font& mfont 
-        ) const { return rectangle(); }
+    private:
+        arrow_direction dir;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -488,17 +439,17 @@ namespace dlib
     class scroll_bar_style_default : public scroll_bar_style
     {
     public:
-        button_style_up_arrow get_up_button_style (
-        ) const { return button_style_up_arrow(); }
+        button_style_arrow get_up_button_style (
+        ) const { return button_style_arrow(button_style_arrow::UP); }
 
-        button_style_down_arrow get_down_button_style (
-        ) const { return button_style_down_arrow(); }
+        button_style_arrow get_down_button_style (
+        ) const { return button_style_arrow(button_style_arrow::DOWN); }
 
-        button_style_left_arrow get_left_button_style (
-        ) const { return button_style_left_arrow(); }
+        button_style_arrow get_left_button_style (
+        ) const { return button_style_arrow(button_style_arrow::LEFT); }
 
-        button_style_right_arrow get_right_button_style (
-        ) const { return button_style_right_arrow(); }
+        button_style_arrow get_right_button_style (
+        ) const { return button_style_arrow(button_style_arrow::RIGHT); }
 
         virtual long get_width (
         ) const  { return 16; }
