@@ -71,6 +71,10 @@ namespace dlib
         }
         else
         {
+            rgb_alpha_pixel alpha_pixel;
+            assign_pixel(alpha_pixel, pixel);
+            const unsigned char max_alpha = alpha_pixel.alpha;
+
             const long rise = (((long)y2) - ((long)y1));
             const long run = (((long)x2) - ((long)x1));
             if (std::abs(rise) < std::abs(run))
@@ -90,19 +94,26 @@ namespace dlib
                     last = std::min(x2,valid_area.right());
                 }                             
 
+
                 long y;
                 long x;
                 const double x1f = x1;
                 const double y1f = y1;
                 for (double i = first; i <= last; ++i)
                 {   
-                    y = static_cast<long>(slope*(i-x1f) + y1f);
-                    x = static_cast<long>(i);
+                    const double dy = slope*(i-x1f) + y1f;
+                    const double dx = i;
 
-                    if (y < valid_area.top() || y > valid_area.bottom() )
+                    y = static_cast<long>(dy);
+                    x = static_cast<long>(dx);
+
+                    if (y < valid_area.top() || y+1 > valid_area.bottom() )
                         continue;
 
-                    assign_pixel(c[y-c.top()][x-c.left()], pixel);
+                    alpha_pixel.alpha = (1.0-(dy-y))*max_alpha;
+                    assign_pixel(c[y-c.top()][x-c.left()], alpha_pixel);
+                    alpha_pixel.alpha = (dy-y)*max_alpha;
+                    assign_pixel(c[y+1-c.top()][x-c.left()], alpha_pixel);
                 }         
             }
             else
@@ -128,13 +139,19 @@ namespace dlib
                 const double y1f = y1;
                 for (double i = first; i <= last; ++i)
                 {   
-                    x = static_cast<long>(slope*(i-y1f) + x1f);
-                    y = static_cast<long>(i);
+                    const double dx = slope*(i-y1f) + x1f;
+                    const double dy = i;
 
-                    if (x < valid_area.left() || x > valid_area.right() )
+                    y = static_cast<long>(dy);
+                    x = static_cast<long>(dx);
+
+                    if (x < valid_area.left() || x+1 > valid_area.right() )
                         continue;
 
-                    assign_pixel(c[y-c.top()][x-c.left()], pixel);
+                    alpha_pixel.alpha = (1.0-(dx-x))*max_alpha;
+                    assign_pixel(c[y-c.top()][x-c.left()], alpha_pixel);
+                    alpha_pixel.alpha = (dx-x)*max_alpha;
+                    assign_pixel(c[y-c.top()][x+1-c.left()], alpha_pixel);
                 } 
             }
         }
