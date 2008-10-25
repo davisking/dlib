@@ -578,6 +578,139 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // list_box styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class list_box_style
+    {
+    public:
+
+        virtual ~list_box_style() {}
+
+        virtual void draw_list_box_background (
+            const canvas& c,
+            const rectangle& display_rect,
+            const bool enabled
+        ) const = 0;
+
+        virtual void draw_list_box_item (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const std::string& text,
+            const bool is_selected
+        ) const = 0;
+
+        virtual void draw_list_box_item (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const std::wstring& text,
+            const bool is_selected
+        ) const = 0;
+
+        virtual void draw_list_box_item (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const ustring& text,
+            const bool is_selected
+        ) const = 0;
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class list_box_style_default : public list_box_style
+    {
+    public:
+        scrollable_region_style_default get_scrollable_region_style (
+        ) const { return scrollable_region_style_default(); }
+
+        virtual void draw_list_box_item (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const std::string& text,
+            const bool is_selected
+        ) const { draw_list_box_item_template(c,rect,display_rect, enabled, mfont, text, is_selected); }
+
+        virtual void draw_list_box_item (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const std::wstring& text,
+            const bool is_selected
+        ) const { draw_list_box_item_template(c,rect,display_rect, enabled, mfont, text, is_selected); }
+
+        virtual void draw_list_box_item (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const ustring& text,
+            const bool is_selected
+        ) const { draw_list_box_item_template(c,rect,display_rect, enabled, mfont, text, is_selected); }
+
+        template <typename string_type>
+        void draw_list_box_item_template (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const string_type& text,
+            const bool is_selected
+        ) const
+        {
+            if (is_selected)
+            {
+                if (enabled)
+                    fill_rect_with_vertical_gradient(c,rect,rgb_pixel(110,160,255),  rgb_pixel(100,130,250),display_rect);
+                else
+                    fill_rect_with_vertical_gradient(c,rect,rgb_pixel(140,190,255),  rgb_pixel(130,160,250),display_rect);
+            }
+
+            if (enabled)
+                mfont.draw_string(c,rect,text,rgb_pixel(0,0,0),0,std::string::npos,display_rect);
+            else
+                mfont.draw_string(c,rect,text,rgb_pixel(128,128,128),0,std::string::npos,display_rect);
+        }
+
+        virtual void draw_list_box_background (
+            const canvas& c,
+            const rectangle& display_rect,
+            const bool enabled
+        ) const
+        {
+            if (enabled)
+            {
+                // first fill our area with white
+                fill_rect(c, display_rect,rgb_pixel(255,255,255));
+            }
+            else
+            {
+                // first fill our area with gray 
+                fill_rect(c, display_rect,rgb_pixel(212,208,200));
+            }
+        }
+
+    };
+
+// ----------------------------------------------------------------------------------------
 
 }
 

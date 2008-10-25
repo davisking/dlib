@@ -500,6 +500,110 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // list_box styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class list_box_style
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                list_box style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/
+    public:
+
+        virtual ~list_box_style() {}
+
+        virtual void draw_list_box_background (
+            const canvas& c,
+            const rectangle& display_rect,
+            const bool enabled
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - display_rect == the display_rect for the list_box.  This is the area
+                  in which list box items are drawn (see display_rect in the scrollable_region
+                  widget for more info)
+                - enabled == true if the list box is enabled
+            ensures
+                - draws the background of a list box on the canvas c at the location given 
+                  by display_rect.  
+        !*/
+
+        scrollable_region_style_type get_scrollable_region_style (
+        ) const;
+        /*!
+            ensures
+                - returns the style of scrollable_region to use for the 
+                  list_box.
+        !*/
+
+        virtual void draw_list_box_item (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const std::string& text,
+            const bool is_selected
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect == the rectangle that defines where on the screen this list box item is.
+                - display_rect == the display_rect for the list_box.  This is the area
+                  in which list box items are drawn (see display_rect in the scrollable_region
+                  widget for more info)
+                - mfont == the font to use to draw the list box item
+                - text == the text of the list box item to be drawn
+                - enabled == true if the list box is enabled
+                - is_selected == true if the item is to be drawn in a selected state
+            ensures
+                - draws the list box item on the canvas c at the location given by rect.  
+        !*/
+
+        // wide character overloads
+        virtual void draw_list_box_item (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const std::wstring& text,
+            const bool is_selected
+        ) const = 0;
+
+        virtual void draw_list_box_item (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& display_rect,
+            const bool enabled,
+            const font& mfont,
+            const ustring& text,
+            const bool is_selected
+        ) const = 0;
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class list_box_style_default : public list_box_style
+    {
+    public:
+        /*!
+            This is the default style for list_box objects.  
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
 
 }
 

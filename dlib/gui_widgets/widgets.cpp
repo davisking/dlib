@@ -2109,17 +2109,13 @@ namespace dlib
     list_box(  
         drawable_window& w
     ) : 
-        drawable(w,MOUSE_WHEEL|MOUSE_CLICK),
+        scrollable_region(w,MOUSE_WHEEL|MOUSE_CLICK),
         ms_enabled(false),
-        pos(0),
-        text_start(0),
-        last_selected(0),
-        sbv(w,scroll_bar::VERTICAL),
-        sbh(w,scroll_bar::HORIZONTAL)
+        last_selected(0)
     {
-        adjust_sliders();
-        sbv.set_scroll_handler(*this,&list_box::sbv_handler);
-        sbh.set_scroll_handler(*this,&list_box::sbh_handler);
+        set_vertical_scroll_increment(mfont->height());
+
+        style.reset(new list_box_style_default());
         enable_events();
     }
 
@@ -2149,28 +2145,8 @@ namespace dlib
         {
             mfont->compute_size(items[i].name,items[i].width, items[i].height);
         }
-        adjust_sliders();
+        set_vertical_scroll_increment(mfont->height());
         parent.invalidate_rectangle(rect);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename S>
-    void list_box<S>::
-    set_size (
-        unsigned long width_,
-        unsigned long height_
-    )
-    {
-        auto_mutex M(m);
-        rectangle old(rect);
-        const long x = rect.left();
-        const long y = rect.top();
-        rect.set_right(x+width_-1);
-        rect.set_bottom(y+height_-1);
-
-        adjust_sliders();
-        parent.invalidate_rectangle(rect+old);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2364,242 +2340,32 @@ namespace dlib
         const canvas& c
     ) const
     {
-        rectangle area = rect.intersect(c);
+        scrollable_region::draw(c);
+
+        rectangle area = display_rect().intersect(c);
         if (area.is_empty())
             return;
 
-        if (enabled)
-        {
-            // first fill our area with white
-            fill_rect(c, area,rgb_pixel(255,255,255));
-        }
-        else
-        {
-            // first fill our area with gray 
-            fill_rect(c, area,rgb_pixel(212,208,200));
-        }
+        style->draw_list_box_background(c, display_rect(), enabled);
 
-        draw_sunken_rectangle(c, rect);
-
-        long y = text_area.top();
-        long x = text_area.left();
-        for (unsigned long i = pos; i < items.size(); ++i)
-        {
-            rectangle r(x-(long)text_start,y,text_area.right(),y+items[i].height);
-            rectangle draw_area(x,y,text_area.right(),y+items[i].height);
-            draw_area = draw_area.intersect(text_area);
-            if (draw_area.is_empty())
-                break;
-
-            if (items[i].is_selected)
-            {
-                if (enabled)
-                    fill_rect_with_vertical_gradient(c,draw_area,rgb_pixel(110,160,255),  rgb_pixel(100,130,250));
-                else
-                    fill_rect_with_vertical_gradient(c,draw_area,rgb_pixel(140,190,255),  rgb_pixel(130,160,250));
-            }
-
-            if (enabled)
-                mfont->draw_string(c,r,items[i].name,rgb_pixel(0,0,0),0,std::string::npos,draw_area);
-            else
-                mfont->draw_string(c,r,items[i].name,rgb_pixel(128,128,128),0,std::string::npos,draw_area);
-            y += items[i].height;
-            if (y > area.bottom())
-                break;
-        }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename S>
-    void list_box<S>::
-    hide (
-    )
-    {
-        auto_mutex M(m);
-        sbv.hide();
-        sbh.hide();
-        drawable::hide();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename S>
-    void list_box<S>::
-    show (
-    )
-    {
-        auto_mutex M(m);
-        hidden = false;
-        adjust_sliders();
-        drawable::show();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename S>
-    void list_box<S>::
-    disable (
-    ) 
-    {
-        sbv.disable();
-        sbh.disable();
-        drawable::disable();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename S>
-    void list_box<S>::
-    enable (
-    ) 
-    {
-        sbv.enable();
-        sbh.enable();
-        drawable::enable();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename S>
-    void list_box<S>::
-    set_pos (
-        long x,
-        long y
-    )
-    {
-        auto_mutex M(m);
-        drawable::set_pos(x,y);
-        adjust_sliders();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename S>
-    void list_box<S>::
-    adjust_sliders (
-    ) 
-    {
-        text_area = rectangle(rect.left()+2,rect.top()+2,rect.right()-1,rect.bottom()-1);
-        
-        int extra_count = 0;
-        // find the max width and height of our text
-        unsigned long maxw = 0, maxh = 0;
+        long y = total_rect().top();
         for (unsigned long i = 0; i < items.size(); ++i)
         {
-            maxh += items[i].height;
-            if (maxh > text_area.height())
-                ++extra_count;
-            if (items[i].width > maxw )
-                maxw = items[i].width;
-        }
-
-        if (maxh > text_area.height() && text_area.is_empty() == false)
-        {
-            if (!hidden)
-                sbv.show();
-            sbv.set_pos(rect.right()-sbv.width()-pad+1,rect.top()+pad);
-            sbv.set_length(rect.height()-pad*2);
-
-            text_area.set_right(text_area.right()-sbv.width()-1);
-
-            if (maxw > text_area.width())
+            if (y+(long)items[i].height <= area.top())
             {
-                if (!hidden)
-                    sbh.show();
-                sbh.set_pos(rect.left()+pad,rect.bottom()-sbh.height()-pad+1);
-                sbh.set_length(rect.width()-pad*2 - sbv.width());
-                text_area.set_bottom(text_area.bottom()-sbh.height()-1);
-                sbh.set_max_slider_pos(maxw - text_area.width());
-
-                ++extra_count;
+                y += items[i].height;
+                continue;
             }
-            else
-            {
-                sbh.hide();
-            }
-            sbv.set_max_slider_pos(extra_count);
-        }
-        else
-        {
-            sbv.hide();
-            pos = 0;
-            sbv.set_max_slider_pos(0);
-            if (maxw > text_area.width() && text_area.is_empty() == false)
-            {
-                if (!hidden)
-                    sbh.show();
-                sbh.set_pos(rect.left()+pad,rect.bottom()-sbh.height()-pad+1);
-                sbh.set_length(rect.width()-pad*2);
-                text_area.set_bottom(text_area.bottom()-sbh.height()-1);
-                sbh.set_max_slider_pos(maxw - text_area.width());
-            }
-            else
-            {
-                sbh.hide();
-            }
-        }
-    }
 
-// ----------------------------------------------------------------------------------------
+            rectangle r(total_rect().left(), y, display_rect().right(), y+items[i].height-1);
 
-    template <typename S>
-    void list_box<S>::
-    sbh_handler (
-    )
-    {
-        text_start = sbh.slider_pos();
-        parent.invalidate_rectangle(rect);
-    }
+            style->draw_list_box_item(c,r, display_rect(), enabled, *mfont, items[i].name, items[i].is_selected);
 
-// ----------------------------------------------------------------------------------------
 
-    template <typename S>
-    void list_box<S>::
-    sbv_handler (
-    )
-    {
-        pos = sbv.slider_pos();
-        parent.invalidate_rectangle(rect);
-    }
+            y += items[i].height;
 
-// ----------------------------------------------------------------------------------------
-    
-    template <typename S>
-    void list_box<S>::
-    on_wheel_up (
-        unsigned long state
-    )
-    {
-        if (rect.contains(lastx,lasty) && enabled && !hidden)
-        {
-            long new_pos = sbv.slider_pos();
-            if (new_pos > 0)
-            {
-                pos = new_pos-1;
-                sbv.set_slider_pos(pos);
-                parent.invalidate_rectangle(rect);
-            }
-        }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename S>
-    void list_box<S>::
-    on_wheel_down (
-        unsigned long state
-    )
-    {
-        if (rect.contains(lastx,lasty) && enabled && !hidden)
-        {
-            long new_pos = sbv.slider_pos();
-            if (new_pos < sbv.max_slider_pos())
-            {
-                pos = new_pos+1;
-                sbv.set_slider_pos(pos);
-                parent.invalidate_rectangle(rect);
-            }
+            if (y > area.bottom())
+                break;
         }
     }
 
@@ -2615,7 +2381,7 @@ namespace dlib
         bool is_double_click
     )
     {
-        if (text_area.contains(x,y) && btn == base_window::LEFT && enabled && !hidden )
+        if (display_rect().contains(x,y) && btn == base_window::LEFT && enabled && !hidden )
         {
             if ( ms_enabled == false || 
                  (!(state&base_window::CONTROL)) && !(state&base_window::SHIFT))
@@ -2627,9 +2393,9 @@ namespace dlib
                 }
             }
 
-            y -= text_area.top();
+            y -= total_rect().top();
             long h = 0;
-            for (unsigned long i = pos; i < items.size(); ++i)
+            for (unsigned long i = 0; i < items.size(); ++i)
             {
                 h += items[i].height;
                 if (h >= y)
@@ -2677,19 +2443,6 @@ namespace dlib
 
             parent.invalidate_rectangle(rect);
         }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename S>
-    void list_box<S>::
-    set_z_order (
-        long order
-    )
-    {
-        sbv.set_z_order(order);
-        sbh.set_z_order(order);
-        drawable::set_z_order(order);
     }
 
 // ----------------------------------------------------------------------------------------

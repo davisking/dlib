@@ -1105,34 +1105,24 @@ namespace dlib
 
     namespace list_box_helper{
     template <typename S = std::string>
-    class list_box : public drawable, 
+    class list_box : public scrollable_region, 
                      public enumerable<const S>
     {
         /*!
             INITIAL VALUE
                 - ms_enabled == false
                 - items.size() == 0
-                - pos == 0
-                - text_start = 0
                 - last_selected = 0
 
             CONVENTION
                 - size() == items.size()
                 - (*this)[i] == items[i].name
                 - is_selected(i) == items[i].is_selected
+                - ms_enabled == multiple_select_enabled()
 
                 - items[i].width == the width of items[i].name as given by font::compute_size() 
                 - items[i].height == the height of items[i].name as given by font::compute_size() 
 
-                - items[pos] == the item currently being displayed at the top of the list box
-                - sbv == our vertical scroll bar
-                - sbh == our horizontal scroll bar
-                - text_area == the area that is free to be used for text display (e.g. not occluded 
-                  by scroll bars or anything)
-                - text_start == the amount of pixels the text should be shifted to the left (but the
-                  part outside this widget should be clipped).  This is used by the horizontal 
-                  scroll bar.
-                - pos == the first line that is shown in the list box
                 - last_selected == the last item the user selected
         !*/
 
@@ -1143,16 +1133,6 @@ namespace dlib
         );
 
         ~list_box(
-        );
-
-        void set_size (
-            unsigned long width_,
-            unsigned long height_
-        );
-
-        void set_pos (
-            long x,
-            long y
         );
 
         bool is_selected (
@@ -1166,6 +1146,19 @@ namespace dlib
         void unselect (
             unsigned long index 
         );
+
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style_
+        )
+        {
+            auto_mutex M(m);
+            style.reset(new style_type(style_));
+            scrollable_region::set_style(style_.get_scrollable_region_style());
+            parent.invalidate_rectangle(rect);
+        }
 
         template <typename T>
         void get_selected (
@@ -1195,15 +1188,22 @@ namespace dlib
             items.set_max_size(list.size());
             items.set_size(list.size());
             list.reset();
+            unsigned long max_width = 0;
+            unsigned long total_height = 0;
             while (list.move_next())
             {
                 items[i].is_selected = false;
                 items[i].name = list.element();
                 mfont->compute_size(items[i].name,items[i].width, items[i].height);
+
+                if (items[i].width > max_width)
+                    max_width = items[i].width;
+                total_height += items[i].height;
+
                 ++i;
             }
-            pos = 0;
-            adjust_sliders();
+            set_total_rect_size(max_width, total_height);
+
             parent.invalidate_rectangle(rect);
             last_selected = 0;
         }
@@ -1258,22 +1258,6 @@ namespace dlib
         unsigned long size (
         ) const;
 
-        void show(
-        );
-
-        void hide (
-        );
-
-        void enable (
-        );
-
-        void disable (
-        );
-
-        void set_z_order (
-            long order
-        );
-
         unsigned long get_selected (
         ) const;
 
@@ -1282,29 +1266,6 @@ namespace dlib
         );
 
     private:
-
-        void sbv_handler (
-        );
-
-        void sbh_handler (
-        );
-
-        void adjust_sliders (
-        );
-        /*!
-            requires
-                - m is locked
-            ensures
-                - adjusts the scroll bars so that they are properly displayed
-        !*/
-
-        void on_wheel_up (
-            unsigned long state
-        );
-
-        void on_wheel_down (
-            unsigned long state
-        );
 
         void on_mouse_down (
             unsigned long btn,
@@ -1327,19 +1288,13 @@ namespace dlib
             unsigned long height;
         };
 
-        const static long pad = 2;
-
         bool ms_enabled;
         typename array<data<S> >::kernel_2a_c items;
         member_function_pointer<unsigned long>::kernel_1a event_handler;
         member_function_pointer<unsigned long>::kernel_1a single_click_event_handler;
-        unsigned long pos;
-        unsigned long text_start;
         unsigned long last_selected;
-        scroll_bar sbv;
-        scroll_bar sbh;
-        rectangle text_area;
 
+        scoped_ptr<list_box_style> style;
 
         // restricted functions
         list_box(list_box&);        // copy constructor

@@ -956,7 +956,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class list_box : public drawable, 
+    class list_box : public scrollable_region, 
                      public enumerable<const std::string>
     {
         /*!
@@ -994,6 +994,19 @@ namespace dlib
         /*!
             ensures
                 - all resources associated with *this have been released
+        !*/
+
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style
+        );
+        /*!
+            requires
+                - style_type == a type that inherits from list_box_style 
+            ensures
+                - this list_box object will draw itself using the given style
         !*/
 
         void set_size (
@@ -1165,13 +1178,13 @@ namespace dlib
         list_box& operator=(list_box&);    // assignment operator
     };
 
-    class wlist_box : public drawable, 
+    class wlist_box : public scrollable_region, 
     public enumerable<const std::wstring>;
     /*!
         same as list_box except for std::wstring instead of std::string
     !*/
 
-    class ulist_box : public drawable, 
+    class ulist_box : public scrollable_region, 
     public enumerable<const dlib::ustring>;
     /*!
         same as list_box except for dlib::ustring instead of std::string
