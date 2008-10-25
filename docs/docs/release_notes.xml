@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.11" date="Oct 20, 2008">
+New Stuff:
    - Added the sort_columns() and rsort_columns() functions
    - Added the vector_normalizer object
    - Added the normalized_function object.
@@ -30,7 +43,7 @@ Bug fixes:
 
 Other:
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 

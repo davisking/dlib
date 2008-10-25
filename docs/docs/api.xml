@@ -181,20 +181,8 @@
                            <link>dlib/gui_widgets/style_abstract.h.html#button_style_default</link>
                         </item>
                         <item>
-                           <name>button_style_up_arrow</name>
-                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_up_arrow</link>
-                        </item>
-                        <item>
-                           <name>button_style_down_arrow</name>
-                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_down_arrow</link>
-                        </item>
-                        <item>
-                           <name>button_style_left_arrow</name>
-                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_left_arrow</link>
-                        </item>
-                        <item>
-                           <name>button_style_right_arrow</name>
-                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_right_arrow</link>
+                           <name>button_style_arrow</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#button_style_arrow</link>
                         </item>
                         <item>
                            <name>button_style_toolbar1</name>
@@ -233,6 +221,7 @@
                            <link>dlib/gui_widgets/style_abstract.h.html#scroll_bar_style_default</link>
                         </item>
 
+
                         <item>
                            <name>scrollable_region_style</name>
                            <link>dlib/gui_widgets/style_abstract.h.html#scrollable_region_style</link>
@@ -240,6 +229,16 @@
                         <item>
                            <name>scrollable_region_style_default</name>
                            <link>dlib/gui_widgets/style_abstract.h.html#scrollable_region_style_default</link>
+                        </item>
+
+
+                        <item>
+                           <name>list_box_style</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#list_box_style</link>
+                        </item>
+                        <item>
+                           <name>list_box_style_default</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#list_box_style_default</link>
                         </item>
                      </sub>
                   </item>

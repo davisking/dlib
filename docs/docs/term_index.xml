@@ -207,10 +207,11 @@
          <term link="dlib/gui_widgets/style_abstract.h.html#button_style_default" name="button_style_default"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#button_style_toolbar1" name="button_style_toolbar1"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#button_style_toolbar_icon1" name="button_style_toolbar_icon1"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_up_arrow" name="button_style_up_arrow"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_down_arrow" name="button_style_down_arrow"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_left_arrow" name="button_style_left_arrow"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_right_arrow" name="button_style_right_arrow"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_arrow" name="button_style_arrow"/>
+
+         <term link="dlib/gui_widgets/style_abstract.h.html#list_box_style" name="list_box_style"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#list_box_style_default" name="list_box_style_default"/>
+
 
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style" name="toggle_button_style"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_default" name="toggle_button_style_default"/>
