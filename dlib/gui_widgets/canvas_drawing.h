@@ -110,9 +110,9 @@ namespace dlib
                     if (y < valid_area.top() || y+1 > valid_area.bottom() )
                         continue;
 
-                    alpha_pixel.alpha = (1.0-(dy-y))*max_alpha;
+                    alpha_pixel.alpha = static_cast<unsigned char>((1.0-(dy-y))*max_alpha);
                     assign_pixel(c[y-c.top()][x-c.left()], alpha_pixel);
-                    alpha_pixel.alpha = (dy-y)*max_alpha;
+                    alpha_pixel.alpha = static_cast<unsigned char>((dy-y)*max_alpha);
                     assign_pixel(c[y+1-c.top()][x-c.left()], alpha_pixel);
                 }         
             }
@@ -148,9 +148,9 @@ namespace dlib
                     if (x < valid_area.left() || x+1 > valid_area.right() )
                         continue;
 
-                    alpha_pixel.alpha = (1.0-(dx-x))*max_alpha;
+                    alpha_pixel.alpha = static_cast<unsigned char>((1.0-(dx-x))*max_alpha);
                     assign_pixel(c[y-c.top()][x-c.left()], alpha_pixel);
-                    alpha_pixel.alpha = (dx-x)*max_alpha;
+                    alpha_pixel.alpha = static_cast<unsigned char>((dx-x)*max_alpha);
                     assign_pixel(c[y-c.top()][x+1-c.left()], alpha_pixel);
                 } 
             }
