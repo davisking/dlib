@@ -28,7 +28,7 @@ typedef dlib::array2d<hsi_pixel>::kernel_1a_c image;
 
 
 
-class color_box : public dragable 
+class color_box : public draggable 
 {
     unsigned char red, green,blue;
 
@@ -40,7 +40,7 @@ public:
         unsigned char green_,
         unsigned char blue_
     ) :
-        dragable(w, MOUSE_WHEEL),
+        draggable(w, MOUSE_WHEEL),
         red(red_),
         green(green_),
         blue(blue_),
@@ -51,7 +51,7 @@ public:
         t.set_delay_time(4);
         // t.start();
 
-        set_dragable_area(rectangle(10,10,500,500));
+        set_draggable_area(rectangle(10,10,500,500));
 
         enable_events();
     }
@@ -122,7 +122,7 @@ private:
 
     void on_window_resized ()
     {
-        dragable::on_window_resized();
+        draggable::on_window_resized();
     }
     timer<color_box>::kernel_1a t;
 };
