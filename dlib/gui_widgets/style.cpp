@@ -795,6 +795,115 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // text_field styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    unsigned long text_field_style_default::
+    get_padding (
+        const font& mfont 
+    ) const  
+    { 
+        return mfont.height()-mfont.ascender();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field_style_default::
+    draw_text_field (
+        const canvas& c,
+        const rectangle& rect,
+        const rectangle& text_rect,
+        const bool enabled,
+        const font& mfont,
+        const ustring& text,
+        const unsigned long cursor_x,
+        const unsigned long text_pos,
+        const rgb_pixel& text_color,
+        const rgb_pixel& bg_color,
+        const bool has_focus,
+        const bool cursor_visible,
+        const long highlight_start,
+        const long highlight_end
+    ) const 
+    {
+        rectangle area = rect.intersect(c);
+
+        if (enabled)
+        {
+            // first fill our area with the bg_color
+            fill_rect(c, area,bg_color);
+        }
+        else
+        {
+            // first fill our area with gray 
+            fill_rect(c, area,rgb_pixel(212,208,200));
+        }
+
+
+        if (enabled)
+            mfont.draw_string(c,text_rect,text,text_color,text_pos);
+        else
+            mfont.draw_string(c,text_rect,text,rgb_pixel(128,128,128),text_pos);
+
+        // now draw the edge of the text_field
+        draw_sunken_rectangle(c, rect);
+
+        if (highlight_start <= highlight_end && enabled)
+        {
+            rectangle highlight_rect = text_rect;
+            unsigned long left_pad = 0, right_pad = mfont.left_overflow();
+
+            long i;
+            for (i = text_pos; i <= highlight_end; ++i)
+            {
+                if (i == highlight_start)
+                    left_pad = right_pad;
+
+                right_pad += mfont[text[i]].width();
+            }
+
+            highlight_rect.set_left(text_rect.left()+left_pad);
+            highlight_rect.set_right(text_rect.left()+right_pad);
+
+            // highlight the highlight_rect area
+            highlight_rect = highlight_rect.intersect(c);
+            for (long row = highlight_rect.top(); row <= highlight_rect.bottom(); ++row)
+            {
+                for (long col = highlight_rect.left(); col <= highlight_rect.right(); ++col)
+                {
+                    canvas::pixel& pixel = c[row-c.top()][col-c.left()];
+                    if (pixel.red == 255 && pixel.green == 255 && pixel.blue == 255)
+                    {
+                        // this is a background (and white) pixel so set it to a dark 
+                        // blueish color.
+                        pixel.red = 10;
+                        pixel.green = 36;
+                        pixel.blue = 106;
+                    }
+                    else
+                    {
+                        // this should be a pixel that is part of a letter so set it to white
+                        pixel.red = 255;
+                        pixel.green = 255;
+                        pixel.blue = 255;
+                    }
+                }
+            }
+        }
+
+        // now draw the cursor if we need to
+        if (cursor_visible && has_focus && enabled)
+        {
+            const unsigned long top = rect.top()+3;
+            const unsigned long bottom = rect.bottom()-3;
+            draw_line(c, point(rect.left()+cursor_x,top),point(rect.left()+cursor_x,bottom));
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 

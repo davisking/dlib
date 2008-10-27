@@ -594,6 +594,89 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // text_field styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class text_field_style
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                list_box style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/
+    public:
+
+        virtual ~text_field_style() {}
+
+        virtual unsigned long get_padding (
+            const font& mfont 
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns the number of pixels that separate the text in the text_field
+                  from the edge of the text_field widget itself.
+        !*/
+
+        virtual void draw_text_field (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& text_rect,
+            const bool enabled,
+            const font& mfont,
+            const ustring& text,
+            const unsigned long cursor_x,
+            const unsigned long text_pos,
+            const rgb_pixel& text_color,
+            const rgb_pixel& bg_color,
+            const bool has_focus,
+            const bool cursor_visible,
+            const long highlight_start,
+            const long highlight_end
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - rect, enabled, and mfont are the variables defined in the protected section 
+                  of the drawable class.
+                - text == the current text in the text_field 
+                - text_rect == the rectanle in which we should draw the given text
+                - cursor_x == the x coordinate of the cursor relative to the left side 
+                  of rect.  i.e. the number of pixels that separate the cursor from the
+                  left side of the text_field.
+                - text_pos == the index of the first letter in text that appears in 
+                  this text field.
+                - text_color == the color of the text to be drawn
+                - bg_color == the background color of the text field
+                - has_focus == true if this text field has keyboard input focus
+                - cursor_visible == true if the cursor should be drawn 
+                - if (highlight_start <= highlight_end) then
+                    - text[highlight_start] though text[highlight_end] should be
+                      highlighted
+            ensures
+                - draws the button on the canvas c at the location given by rect.  
+        !*/
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class text_field_style_default : public text_field_style
+    {
+    public:
+        /*!
+            This is the default style for text_field objects.  
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
 
 }
 

@@ -424,9 +424,9 @@ namespace dlib
         unsigned long vertical_pad = (rect.height() - mfont->height())/2+1;
 
         rectangle text_rect;
-        text_rect.set_left(rect.left()+(mfont->height()-mfont->ascender()));
+        text_rect.set_left(rect.left()+style->get_padding(*mfont));
         text_rect.set_top(rect.top()+vertical_pad);
-        text_rect.set_right(rect.right()-(mfont->height()-mfont->ascender()));
+        text_rect.set_right(rect.right()-style->get_padding(*mfont));
         text_rect.set_bottom(text_rect.top()+mfont->height()-1);
         return text_rect;
     }
@@ -468,7 +468,7 @@ namespace dlib
         mfont = f;
         // adjust the height of this text field so that it is appropriate for the current
         // font size
-        rect.set_bottom(rect.top() + mfont->height()+ (mfont->height()-mfont->ascender())*2);
+        rect.set_bottom(rect.top() + mfont->height()+ (style->get_padding(*mfont))*2);
         set_text(text_);
     }
 
@@ -483,79 +483,9 @@ namespace dlib
         if (area.is_empty())
             return;
        
-        if (enabled)
-        {
-            // first fill our area with the bg_color_ 
-            fill_rect(c, area,bg_color_);
-        }
-        else
-        {
-            // first fill our area with gray 
-            fill_rect(c, area,rgb_pixel(212,208,200));
-        }
-
-        const rectangle text_rect = get_text_rect();
-
-        if (enabled)
-            mfont->draw_string(c,text_rect,text_,text_color_,text_pos);
-        else
-            mfont->draw_string(c,text_rect,text_,rgb_pixel(128,128,128),text_pos);
-
-        // now draw the edge of the text_field
-        draw_sunken_rectangle(c, rect);
-
-        if (highlight_start <= highlight_end && enabled)
-        {
-            rectangle highlight_rect = text_rect;
-            unsigned long left_pad = 0, right_pad = mfont->left_overflow();
-            
-            long i;
-            for (i = text_pos; i <= highlight_end; ++i)
-            {
-                if (i == highlight_start)
-                    left_pad = right_pad;
-
-                right_pad += (*mfont)[text_[i]].width();
-            }
-            
-            highlight_rect.set_left(text_rect.left()+left_pad);
-            highlight_rect.set_right(text_rect.left()+right_pad);
-
-            // highlight the highlight_rect area
-            highlight_rect = highlight_rect.intersect(c);
-            for (long row = highlight_rect.top(); row <= highlight_rect.bottom(); ++row)
-            {
-                for (long col = highlight_rect.left(); col <= highlight_rect.right(); ++col)
-                {
-                    canvas::pixel& pixel = c[row-c.top()][col-c.left()];
-                    if (pixel.red == 255 && pixel.green == 255 && pixel.blue == 255)
-                    {
-                        // this is a background (and white) pixel so set it to a dark 
-                        // blueish color.
-                        pixel.red = 10;
-                        pixel.green = 36;
-                        pixel.blue = 106;
-                    }
-                    else
-                    {
-                        // this should be a pixel that is part of a letter so set it to white
-                        pixel.red = 255;
-                        pixel.green = 255;
-                        pixel.blue = 255;
-                    }
-                }
-            }
-        }
-
-        // now draw the cursor if we need to
-        if (cursor_visible && has_focus && enabled && !hidden)
-        {
-            const unsigned long top = rect.top()+3;
-            const unsigned long bottom = rect.bottom()-3;
-            draw_line(c, point(rect.left()+cursor_x,top),point(rect.left()+cursor_x,bottom));
-        }
-        
-        
+        style->draw_text_field(c,rect,get_text_rect(), enabled, *mfont, text_, cursor_x, text_pos,
+                               text_color_, bg_color_, has_focus, cursor_visible, highlight_start,
+                               highlight_end);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -633,7 +563,7 @@ namespace dlib
         unsigned long width
     )
     {        
-        if (width < 10)
+        if (width < style->get_padding(*mfont)*2)
             return;
 
         m.lock();        
@@ -1140,7 +1070,7 @@ namespace dlib
             mfont->compute_size(text_,text_width,height,text_pos);
 
             unsigned long width;
-            unsigned long new_x = (mfont->height()-mfont->ascender());
+            unsigned long new_x = style->get_padding(*mfont);
             if (static_cast<long>(cursor_pos)-1 >= static_cast<long>(text_pos))
             {
                 mfont->compute_size(text_,width,height,text_pos,cursor_pos-1);
@@ -1156,7 +1086,7 @@ namespace dlib
             unsigned long width;
             mfont->compute_size(text_,width,height,text_pos,pos-1);
 
-            unsigned long new_x = (mfont->height()-mfont->ascender()) + 
+            unsigned long new_x = style->get_padding(*mfont) + 
                 width - mfont->right_overflow();
 
             // move the text to the left if necessary

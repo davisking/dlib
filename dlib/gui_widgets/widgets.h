@@ -361,9 +361,10 @@ namespace dlib
             shift_pos(-1),
             t(*this,&text_field::timer_action)
         {
-            rect.set_bottom(mfont->height()+ (mfont->height()-mfont->ascender())*2);
-            rect.set_right(9);
-            cursor_x = (mfont->height()-mfont->ascender());
+            style.reset(new text_field_style_default());
+            rect.set_bottom(mfont->height()+ (style->get_padding(*mfont))*2);
+            rect.set_right((style->get_padding(*mfont))*2);
+            cursor_x = style->get_padding(*mfont);
             enable_events();
 
             t.set_delay_time(500);
@@ -375,6 +376,19 @@ namespace dlib
             disable_events();
             parent.invalidate_rectangle(rect); 
             t.stop_and_wait();
+        }
+
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style_
+        )
+        {
+            auto_mutex M(m);
+            style.reset(new style_type(style_));
+            // call this just so that this widget redraws itself with the new style
+            set_main_font(mfont);
         }
 
         void set_text (
@@ -543,6 +557,7 @@ namespace dlib
         member_function_pointer<>::kernel_1a_c enter_key_handler;
         member_function_pointer<>::kernel_1a_c focus_lost_handler;
 
+        scoped_ptr<text_field_style> style;
 
         timer<text_field>::kernel_2a t;
 

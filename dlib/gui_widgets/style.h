@@ -662,6 +662,81 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // text_field styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class text_field_style
+    {
+    public:
+
+        text_field_style()
+        {
+        }
+
+        virtual ~text_field_style() 
+        {}
+
+        virtual unsigned long get_padding (
+            const font& mfont 
+        ) const = 0;
+
+        virtual void draw_text_field (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& text_rect,
+            const bool enabled,
+            const font& mfont,
+            const ustring& text,
+            const unsigned long cursor_x,
+            const unsigned long text_pos,
+            const rgb_pixel& text_color,
+            const rgb_pixel& bg_color,
+            const bool has_focus,
+            const bool cursor_visible,
+            const long highlight_start,
+            const long highlight_end
+        ) const = 0;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class text_field_style_default : public text_field_style
+    {
+    public:
+
+        text_field_style_default()
+        {
+        }
+
+        virtual ~text_field_style_default() 
+        {}
+
+        virtual unsigned long get_padding (
+            const font& mfont 
+        ) const;
+
+        virtual void draw_text_field (
+            const canvas& c,
+            const rectangle& rect,
+            const rectangle& text_rect,
+            const bool enabled,
+            const font& mfont,
+            const ustring& text,
+            const unsigned long cursor_x,
+            const unsigned long text_pos,
+            const rgb_pixel& text_color,
+            const rgb_pixel& bg_color,
+            const bool has_focus,
+            const bool cursor_visible,
+            const long highlight_start,
+            const long highlight_end
+        ) const;
+
+    };
+
+// ----------------------------------------------------------------------------------------
 
 }
 
