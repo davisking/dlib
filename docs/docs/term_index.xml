@@ -213,6 +213,10 @@
          <term link="dlib/gui_widgets/style_abstract.h.html#list_box_style_default" name="list_box_style_default"/>
 
 
+         <term link="dlib/gui_widgets/style_abstract.h.html#text_field_style" name="text_field_style"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#text_field_style_default" name="text_field_style_default"/>
+
+
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style" name="toggle_button_style"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_default" name="toggle_button_style_default"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_check_box" name="toggle_button_style_check_box"/>

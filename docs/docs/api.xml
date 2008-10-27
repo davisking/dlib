@@ -240,6 +240,16 @@
                            <name>list_box_style_default</name>
                            <link>dlib/gui_widgets/style_abstract.h.html#list_box_style_default</link>
                         </item>
+
+
+                        <item>
+                           <name>text_field_style</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#text_field_style</link>
+                        </item>
+                        <item>
+                           <name>text_field_style_default</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#text_field_style_default</link>
+                        </item>
                      </sub>
                   </item>
                   <item nolink="true">
