@@ -34,8 +34,8 @@ namespace dlib
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                The only functions that invalidate pointers or references to internal data are
-                clear(), remove_node(), add_node(), set_number_of_nodes(), and the object's destructor.
+                The only time pointers or references to nodes or edges become invalid is when
+                they reference nodes or edges that have been removed from a graph.
 
             INITIAL VALUE
                 number_of_nodes() == 0
@@ -295,6 +295,7 @@ namespace dlib
         );
         /*!
             ensures
+                - does not change the index number of existing nodes
                 - adds a node with index N == number_of_nodes() such that:
                     - #node(N).number_of_parents() == 0 
                     - #node(N).number_of_children() == 0 
