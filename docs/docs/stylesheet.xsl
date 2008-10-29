@@ -290,7 +290,7 @@
       </xsl:apply-templates> 
                      </xsl:when>
                      <xsl:otherwise>
-                        <a href="{$file_name}#{name}"><img src="down.gif" border="0"/></a>
+                        <a href="{$file_name}#{name}"><img src="down.gif" border="0" style="margin-right:0.5em"/></a>
                         <a onclick="Toggle(this)"><img src="plus.gif" border="0"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
       <xsl:apply-templates select="sub">
          <xsl:with-param name="file_name" select="$file_name" />
