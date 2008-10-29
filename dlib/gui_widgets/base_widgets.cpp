@@ -374,7 +374,7 @@ namespace dlib
     on_mouse_leave (
     )
     {
-        if (enabled && !hidden && is_mouse_over_)
+        if (is_mouse_over_)
         {
             is_mouse_over_ = false;
             on_mouse_not_over();
@@ -390,9 +390,6 @@ namespace dlib
         long y
     )
     {
-        if (enabled == false || hidden == true)
-            return;
-
         if (rect.contains(x,y) == false)
         {
             if (is_mouse_over_)
@@ -404,7 +401,8 @@ namespace dlib
         else if (is_mouse_over_ == false)
         {
             is_mouse_over_ = true;
-            on_mouse_over();
+            if (enabled && !hidden)
+                on_mouse_over();
         }
     }
 
@@ -415,7 +413,7 @@ namespace dlib
     ) const
     {
         // check if the mouse is still really over this button
-        if (enabled && !hidden && is_mouse_over_ && rect.contains(lastx,lasty) == false)
+        if (is_mouse_over_ && rect.contains(lastx,lasty) == false)
         {
             // trigger a user event to call on_mouse_not_over() and repaint this object.
             // we must do this in another event because someone might call is_mouse_over()

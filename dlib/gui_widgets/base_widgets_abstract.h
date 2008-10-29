@@ -228,8 +228,6 @@ namespace dlib
             requires
                 - enable_events() has been called
                 - mutex drawable::m is locked
-                - is_enabled() == true
-                - is_hidden() == false
                 - is called whenever this object transitions from the state where
                   is_mouse_over() == true to is_mouse_over() == false 
             ensures
@@ -332,8 +330,6 @@ namespace dlib
             requires
                 - enable_events() has been called
                 - mutex drawable::m is locked
-                - is_enabled() == true
-                - is_hidden() == false
                 - the area in parent_window() defined by get_rect() has been invalidated. 
                   (This means you don't have to call invalidate_rectangle())
                 - is called whenever this object transitions from the state where
