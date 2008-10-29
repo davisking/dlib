@@ -100,9 +100,9 @@
                body {margin:0px;}
                pre {margin:0px;}
 
-               ul.tree  li { list-style: none;  } 
-               ul.tree  { margin:0px; padding:0px; margin-left:13px; cursor: pointer;}
-               ul.tree  li ul { margin-left:16px; padding:0px; }
+               ul.tree  li { list-style: none;  margin-left:10px;} 
+               ul.tree  { margin:0px; padding:0px; margin-left:5px;  }
+               ul.tree  li ul { margin-left:10px; padding:0px; }
 
                div#component {
                   background-color:white; 
@@ -266,7 +266,7 @@
          <xsl:when test="@nolink = 'true'">
             <xsl:choose>
                <xsl:when test="name">
-                  <a onclick="Toggle(this)"><img src="plus.gif"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
+                  <a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px"><img src="plus.gif"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
       <xsl:apply-templates select="sub">
          <xsl:with-param name="file_name" select="$file_name" />
       </xsl:apply-templates> 
@@ -283,15 +283,15 @@
                <xsl:when test="sub">
                   <xsl:choose>
                      <xsl:when test="link">
-                        <a href="{link}"><img src="right.gif" border="0"/></a>
-                        <a onclick="Toggle(this)"><img src="plus.gif" border="0"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
+                        <a href="{link}" style="float:right"><img src="right.gif" border="0"/></a>
+                        <a onclick="Toggle(this)" style="cursor: pointer;margin-left:-9px" ><img src="plus.gif" border="0"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
       <xsl:apply-templates select="sub">
          <xsl:with-param name="file_name" select="$file_name" />
       </xsl:apply-templates> 
                      </xsl:when>
                      <xsl:otherwise>
-                        <a href="{$file_name}#{name}"><img src="down.gif" border="0" style="margin-right:0.5em"/></a>
-                        <a onclick="Toggle(this)"><img src="plus.gif" border="0"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
+                        <a href="{$file_name}#{name}" style="float:right"><img src="down.gif" border="0" /></a>
+                        <a onclick="Toggle(this)" style="cursor: pointer;"><img src="plus.gif" border="0"/><font color="green"><u><xsl:value-of select="name"/></u></font></a>
       <xsl:apply-templates select="sub">
          <xsl:with-param name="file_name" select="$file_name" />
       </xsl:apply-templates>
