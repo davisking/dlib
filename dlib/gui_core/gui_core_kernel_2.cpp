@@ -1739,11 +1739,9 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::set_title"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
+        if (has_been_destroyed == true)
+            return;
+
         // I'm pretty sure the pointer won't be modified even though
         // it isn't const anymore.
         wchar_t *title = const_cast<wchar_t *>(title_.c_str());
@@ -1762,11 +1760,9 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::show"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
+        if (has_been_destroyed == true)
+            return;
+
         XMapRaised(x11_stuff.globals->disp,x11_stuff.hwnd);
         XFlush(x11_stuff.globals->disp);
     }
@@ -1791,11 +1787,9 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::hide"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
+        if (has_been_destroyed == true)
+            return;
+
         XUnmapWindow(x11_stuff.globals->disp,x11_stuff.hwnd);
         XFlush(x11_stuff.globals->disp);
     }
@@ -1810,13 +1804,9 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::set_size"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            << "\n\twidth:    " << width_ 
-            << "\n\theight:   " << height_ 
-            );
+        if (has_been_destroyed == true)
+            return;
+
 
         // do some sanity checking on these values
         if (width_ < 1)
@@ -1855,13 +1845,9 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::set_pos"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            << "\n\tx:        " << x_ 
-            << "\n\ty:        " << y_ 
-            );
+        if (has_been_destroyed == true)
+            return;
+
 
         x = x_;
         y = y_;
@@ -1882,11 +1868,10 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::get_pos"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
+        x_ = 0;
+        y_ = 0;
+        if (has_been_destroyed == true)
+            return;
 
         // we can't really trust the values we have for x and y because some window managers
         // will have reported bogus values back in the ConfigureNotify event.  So just to be
@@ -1910,11 +1895,11 @@ namespace dlib
     ) const
     {
         auto_mutex M(wm);
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::get_size"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
+        width_ = 0;
+        height_ = 0;
+        if (has_been_destroyed == true)
+            return;
+
 
         width_ = width;
         height_ = height;
@@ -1930,11 +1915,10 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex M(wm);
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::get_display_size"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
+        width_ = 0;
+        height_ = 0;
+        if (has_been_destroyed == true)
+            return;
 
         int screen_number = XScreenNumberOfScreen(x11_stuff.globals->screen);
         width_ = DisplayWidth(x11_stuff.globals->disp, screen_number);
@@ -1975,6 +1959,9 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         auto_mutex a(wm);
+        if (has_been_destroyed == true)
+            return;
+
         if (!x11_stuff.xic || !(x11_stuff.globals->xim_style & XIMPreeditPosition)) return;
 
         XVaNestedList   xva_nlist;

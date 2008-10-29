@@ -1579,7 +1579,6 @@ namespace dlib
     )
     {
         using namespace gui_core_kernel_1_globals;
-        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
 
         user_event_type e;
         e.w = hwnd;
@@ -1713,19 +1712,17 @@ namespace dlib
         const std::wstring& title
     )
     {
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::set_title"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
         using namespace gui_core_kernel_1_globals;
         
+        auto_mutex M(wm);
+        if (has_been_destroyed == true)
+            return;
+
+
         // call the SetWindowText function with our arguments but make sure it is from 
         // the event thread.  We have to do this because the SetWindowText() apparently blocks
         // until something happens in the event thread so we have to 
         // do this to avoid possible deadlocks.
-        auto_mutex M(wm);
-
         if (get_thread_id() == globals->event_thread_id)
         {
             SetWindowTextW(hwnd,title.c_str());
@@ -1752,12 +1749,11 @@ namespace dlib
     show (
     )    
     {
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::show"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
         using namespace gui_core_kernel_1_globals;
+        auto_mutex M(wm);
+        if (has_been_destroyed == true)
+            return;
+
         show_window(hwnd);
         if (style != WS_CHILD)
             give_window_focus(hwnd);
@@ -1769,12 +1765,11 @@ namespace dlib
     hide(
     )    
     {
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::hide"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
         using namespace gui_core_kernel_1_globals;
+        auto_mutex M(wm);
+        if (has_been_destroyed == true)
+            return;
+
         hide_window(hwnd);
     }
 
@@ -1787,14 +1782,10 @@ namespace dlib
     )
     {
         using namespace gui_core_kernel_1_globals;
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::set_size"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            << "\n\twidth:    " << width_ 
-            << "\n\theight:   " << height_ 
-            );
         auto_mutex M(wm);
+        if (has_been_destroyed == true)
+            return;
+
         if (get_thread_id() == globals->event_thread_id)
         {
             RECT info;
@@ -1875,14 +1866,10 @@ namespace dlib
     )
     {
         using namespace gui_core_kernel_1_globals;
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::set_pos"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            << "\n\tx:        " << x_ 
-            << "\n\ty:        " << y_ 
-            );
         auto_mutex M(wm);
+        if (has_been_destroyed == true)
+            return;
+
         if (get_thread_id() == globals->event_thread_id)
         {
             RECT info;
@@ -1938,11 +1925,12 @@ namespace dlib
         long& y_
     )
     {
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::get_pos"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
+        auto_mutex M(wm);
+        x_ = 0;
+        y_ = 0;
+        if (has_been_destroyed == true)
+            return;
+
         POINT p;
         p.x = 0;
         p.y = 0;
@@ -1960,11 +1948,12 @@ namespace dlib
         unsigned long& height
     ) const
     {
-        DLIB_ASSERT(is_closed() == false,
-                    "\tvoid base_window::get_display_size"
-                    << "\n\tYou can't do this to a window that has been closed."
-                    << "\n\tthis:     " << this
-        );
+        auto_mutex M(wm);
+        width = 0;
+        height = 0;
+        if (has_been_destroyed == true)
+            return;
+
 
         RECT rc;
         GetWindowRect(hwnd, &rc);
@@ -1997,11 +1986,12 @@ namespace dlib
         unsigned long& height
     ) const
     {
-        DLIB_ASSERT(is_closed() == false,
-            "\tvoid base_window::get_size"
-            << "\n\tYou can't do this to a window that has been closed."
-            << "\n\tthis:     " << this
-            );
+        auto_mutex M(wm);
+        width = 0;
+        height = 0;
+        if (has_been_destroyed == true)
+            return;
+
 
         RECT r;
         GetClientRect(hwnd,&r);
@@ -2017,6 +2007,7 @@ namespace dlib
         const rectangle& rect
     )
     {
+        auto_mutex M(wm);
         if (rect.is_empty() == false && !has_been_destroyed)
         {
             RECT info;
@@ -2037,6 +2028,10 @@ namespace dlib
         long y
     )
     {
+        auto_mutex M(wm);
+        if (has_been_destroyed == true)
+            return;
+
         HIMC hImc = ImmGetContext(hwnd);
 
         COMPOSITIONFORM cf;

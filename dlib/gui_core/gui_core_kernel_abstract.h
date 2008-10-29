@@ -354,48 +354,43 @@ namespace dlib
             const std::string& title
         );
         /*!
-            requires
-                - is_closed() == false
             ensures
-                - sets the title of the window
+                - if (is_closed() == false) then
+                    - sets the title of the window
         !*/
 
         void set_title (
             const std::wstring& title
         );
         /*!
-            requires
-                - is_closed() == false
             ensures
-                - sets the title of the window
+                - if (is_closed() == false) then
+                    - sets the title of the window
         !*/
 
         void set_title (
             const dlib::ustring& title
         );
         /*!
-            requires
-                - is_closed() == false
             ensures
-                - sets the title of the window
+                - if (is_closed() == false) then
+                    - sets the title of the window
         !*/
 
         virtual void show (
         );
         /*!
-            requires
-                - is_closed() == false
             ensures
-                - this window will appear on the screen
+                - if (is_closed() == false) then
+                    - this window will appear on the screen
         !*/
 
         virtual void hide(
         );
         /*!
-            requires
-                - is_closed() == false
             ensures
-                - the window does not appear on the screen
+                - if (is_closed() == false) then
+                    - the window does not appear on the screen
         !*/
 
         void set_size (
@@ -403,15 +398,14 @@ namespace dlib
             int height
         );
         /*!
-            requires
-                - is_closed() == false
             ensures
-                - The width of the client area of this window is at least width
-                  pixels.
-                - The height of the client area of this window is at least height
-                  pixels.
-                - if (the window wasn't already this size) then
-                    - triggers the on_window_resized() callback
+                - if (is_closed() == false) then
+                    - The width of the client area of this window is at least width
+                      pixels.
+                    - The height of the client area of this window is at least height
+                      pixels.
+                    - if (the window wasn't already this size) then
+                        - triggers the on_window_resized() callback
         !*/
 
         void set_pos (
@@ -419,12 +413,11 @@ namespace dlib
             long y
         );
         /*!
-            requires
-                - is_closed() == false
             ensures 
-                - sets the upper left corner of this window to the position (x,y) 
-                  on the desktop.  Note that the origin (0,0) is at the upper left
-                  corner of the desktop.
+                - if (is_closed() == false) then
+                    - sets the upper left corner of this window to the position (x,y) 
+                      on the desktop.  Note that the origin (0,0) is at the upper left
+                      corner of the desktop.
         !*/
 
         void get_pos (
@@ -432,15 +425,17 @@ namespace dlib
             long& y
         ) const;
         /*!
-            requires
-                - is_closed() == false
             ensures
-                - #x == the x coordinate of the upper left corner of the client area of
-                  this window.
-                - #y == the y coordinate of the upper left corner of the client area of
-                  this window.
-                - i.e. the point (#x,#y) on the desktop is coincident with the point
-                  (0,0) in the client area of this window.
+                - if (is_closed() == false) then
+                    - #x == the x coordinate of the upper left corner of the client area of
+                      this window.
+                    - #y == the y coordinate of the upper left corner of the client area of
+                      this window.
+                    - i.e. the point (#x,#y) on the desktop is coincident with the point
+                      (0,0) in the client area of this window.
+                - else
+                    - #x == 0
+                    - #y == 0
         !*/
 
         void get_size (
@@ -448,11 +443,13 @@ namespace dlib
             unsigned long& height
         ) const;
         /*!
-            requires
-                - is_closed() == false
             ensures
-                - #width == the width of the client area of this window in pixels
-                - #height == the height of the client area of this window in pixels
+                - if (is_closed() == false) then
+                    - #width == the width of the client area of this window in pixels
+                    - #height == the height of the client area of this window in pixels
+                - else
+                    - #width == 0
+                    - #height == 0
         !*/
 
         void get_display_size (
@@ -460,11 +457,13 @@ namespace dlib
             unsigned long& height
         ) const;
         /*!
-            requires
-                - is_closed() == false
             ensures
-                - #width == the width in pixels of the display device that contains this window 
-                - #height == the height in pixels of the display device that contains this window 
+                - if (is_closed() == false) then
+                    - #width == the width in pixels of the display device that contains this window 
+                    - #height == the height in pixels of the display device that contains this window 
+                - else
+                    - #width == 0
+                    - #height == 0
         !*/
 
         void invalidate_rectangle (
@@ -499,8 +498,9 @@ namespace dlib
         );
         /*!
             ensures
-                - sets the left-top position of input method rectangle used
-                  for wide character input methods.
+                - if (is_closed() == false) then
+                    - sets the left-top position of input method rectangle used
+                      for wide character input methods.
         !*/
 
     protected:
