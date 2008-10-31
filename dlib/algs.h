@@ -348,6 +348,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A is_const
+
+        This is a template where is_const<T>::value == true when T is a const 
+        type ane false otherwise.
+    !*/
+
+    template <typename T>
+    struct is_const
+    {
+        static const bool value = false;
+    };
+    template <typename T>
+    struct is_const<const T>
+    {
+        static const bool value = true;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     /*!A is_same_type 
 
         This is a template where is_same_type<T,U>::value == true when T and U are the

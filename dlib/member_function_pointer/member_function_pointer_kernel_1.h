@@ -5,6 +5,7 @@
 
 #include "../algs.h"
 #include "member_function_pointer_kernel_abstract.h"
+#include "../enable_if.h"
 #include <new>
 
 namespace dlib
@@ -207,7 +208,10 @@ namespace dlib
         { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
           COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        // the reason for putting disable_if on this function is that it avoids an overload
+        // resolution bug in visual studio.
+        template <typename T> typename disable_if<is_const<T>,void>::type 
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
@@ -263,7 +267,10 @@ namespace dlib
         { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
           COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        // the reason for putting disable_if on this function is that it avoids an overload
+        // resolution bug in visual studio.
+        template <typename T> typename disable_if<is_const<T>,void>::type 
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
@@ -320,7 +327,10 @@ namespace dlib
         { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
           COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        // the reason for putting disable_if on this function is that it avoids an overload
+        // resolution bug in visual studio.
+        template <typename T> typename disable_if<is_const<T>,void>::type 
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
@@ -378,7 +388,10 @@ namespace dlib
         { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
           COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        // the reason for putting disable_if on this function is that it avoids an overload
+        // resolution bug in visual studio.
+        template <typename T> typename disable_if<is_const<T>,void>::type 
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
@@ -438,7 +451,10 @@ namespace dlib
         { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
           COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        // the reason for putting disable_if on this function is that it avoids an overload
+        // resolution bug in visual studio.
+        template <typename T> typename disable_if<is_const<T>,void>::type 
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
