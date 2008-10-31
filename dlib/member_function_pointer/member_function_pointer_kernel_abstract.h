@@ -70,8 +70,6 @@ namespace dlib
         /*!
             ensures
                 - *this == item
-            throws
-                - std::bad_alloc
         !*/
 
         ~member_function_pointer (
@@ -87,9 +85,6 @@ namespace dlib
         /*!
             ensures
                 - *this == item
-            throws
-                - std::bad_alloc
-                  If this exception is thrown then #is_set() == false
         !*/
 
         bool operator == (
@@ -144,9 +139,6 @@ namespace dlib
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call (object.*cb)()
-            throws
-                - std::bad_alloc
-                  If this exception is thrown then #is_set() == false
         !*/
 
         template <
@@ -162,9 +154,6 @@ namespace dlib
             ensures
                 - #is_set() == true
                 - calls to this->operator() will call (object.*cb)()
-            throws
-                - std::bad_alloc
-                  If this exception is thrown then #is_set() == false
         !*/
 
         operator some_undefined_pointer_type (
