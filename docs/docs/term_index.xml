@@ -610,6 +610,7 @@
          <term link="metaprogramming.html#TIME_THIS" name="TIME_THIS_TO"/>
          <term link="metaprogramming.html#_dT" name="_dT"/>
          <term link="metaprogramming.html#is_pointer_type" name="is_pointer_type"/>
+         <term link="metaprogramming.html#is_const_type" name="is_const_type"/>
          <term link="metaprogramming.html#is_same_type" name="is_same_type"/>
          <term link="metaprogramming.html#is_function" name="is_function"/>
          <term link="metaprogramming.html#wrap_function" name="wrap_function"/>

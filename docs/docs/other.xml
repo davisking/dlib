@@ -277,7 +277,9 @@
                <name>member_function_pointer_kernel_1</name>
                <file>dlib/member_function_pointer/member_function_pointer_kernel_1.h</file>
                <description> 
-                  This implementation is done using virtual functions in the obvious way (sorta).
+                  This implementation is done using type erasure and placement new.  This
+                  means that it never allocates memory on the heap and instead stores everything
+                  on the stack.
                </description> 
     
                <typedefs>

@@ -31,6 +31,7 @@
       <section>
          <name>Objects</name>
          <item>is_pointer_type</item>
+         <item>is_const_type</item>
          <item>is_same_type</item>
          <item>is_function</item>
          <item>is_signed_type</item>
@@ -261,6 +262,20 @@
       </component>
       
    <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_const_type</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template where is_const_type&lt;T&gt;::value == true when T is a const 
+            type ane false otherwise.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
       
       <component>
          <name>is_pointer_type</name>
