@@ -210,7 +210,7 @@ namespace dlib
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const<T>,void>::type 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
@@ -269,7 +269,7 @@ namespace dlib
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const<T>,void>::type 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
@@ -329,7 +329,7 @@ namespace dlib
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const<T>,void>::type 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
@@ -390,7 +390,7 @@ namespace dlib
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const<T>,void>::type 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
@@ -453,7 +453,7 @@ namespace dlib
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const<T>,void>::type 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
         { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 

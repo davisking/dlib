@@ -348,19 +348,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /*!A is_const
+    /*!A is_const_type
 
-        This is a template where is_const<T>::value == true when T is a const 
+        This is a template where is_const_type<T>::value == true when T is a const 
         type ane false otherwise.
     !*/
 
     template <typename T>
-    struct is_const
+    struct is_const_type
     {
         static const bool value = false;
     };
     template <typename T>
-    struct is_const<const T>
+    struct is_const_type<const T>
     {
         static const bool value = true;
     };
