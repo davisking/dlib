@@ -2429,7 +2429,7 @@ namespace dlib
     template <
         typename EXP
         >
-    inline const typename matrix_exp<EXP>::matrix_type pinv (
+    inline const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv ( 
         const matrix_exp<EXP>& m
     )
     { 

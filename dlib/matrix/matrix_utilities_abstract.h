@@ -707,13 +707,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const matrix_exp::matrix_type pinv (
+    const matrix pinv (
         const matrix_exp& m
     );
     /*!
         ensures
             - returns the Moore-Penrose pseudoinverse of m.
-            - The returned matrix has m.nr() columns and m.nc() rows.
+            - The returned matrix has m.nc() rows and m.nr() columns.
     !*/
 
 // ----------------------------------------------------------------------------------------

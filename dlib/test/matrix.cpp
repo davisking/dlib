@@ -911,6 +911,26 @@ namespace
 
 
         {
+            matrix<double,5,2> m;
+
+            for (long r = 0; r < m.nr(); ++r)
+            {
+                for (long c = 0; c < m.nc(); ++c)
+                {
+                    m(r,c) = r*c; 
+                }
+            }
+
+            m = cos(exp(m));
+
+
+            matrix<double> mi = pinv(m ); 
+            DLIB_CASSERT(mi.nr() == m.nc(),"");
+            DLIB_CASSERT(mi.nc() == m.nr(),"");
+            DLIB_CASSERT((equal(round_zeros(mi*m,0.000001) , identity_matrix<double,2>())),"");
+        }
+
+        {
             matrix<double> m(5,2);
 
             for (long r = 0; r < m.nr(); ++r)
