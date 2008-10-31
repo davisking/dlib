@@ -117,7 +117,7 @@ namespace dlib
         ) { mfp_kernel_1_base_class(item).swap(*this); return *this;  }
 
         ~mfp_kernel_1_base_class (
-        ) { mp()->~mp_base_base(); }
+        ) { destroy_mp_memory(); }
 
         void clear(
         ) { mfp_kernel_1_base_class().swap(*this); }
@@ -138,8 +138,14 @@ namespace dlib
         {  
             // make a temp copy of item
             mfp_kernel_1_base_class temp(item);
+
+            // destory the stuff in item
+            item.destroy_mp_memory();
             // copy *this into item
             mp()->clone(item.mp_memory.data);
+
+            // destory the stuff in this 
+            destroy_mp_memory();
             // copy temp into *this
             temp.mp()->clone(mp_memory.data);
         }
@@ -161,6 +167,14 @@ namespace dlib
 
             char data[sizeof(mp_null_impl)];
         } mp_memory;
+
+        void destroy_mp_memory (
+        )
+        {
+            // Honestly this probably doesn't even do anything but I'm putting
+            // it here just for good measure.
+            mp()->~mp_base_base();
+        }
 
         mp_base_base*       mp ()       { void* ptr = mp_memory.data;       return static_cast<mp_base_base*>(ptr); }
         const mp_base_base* mp () const { const void* ptr = mp_memory.data; return static_cast<const mp_base_base*>(ptr); }
@@ -217,10 +231,10 @@ namespace dlib
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 
@@ -276,10 +290,10 @@ namespace dlib
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 
@@ -336,10 +350,10 @@ namespace dlib
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 
@@ -397,10 +411,10 @@ namespace dlib
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 
@@ -460,10 +474,10 @@ namespace dlib
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 
