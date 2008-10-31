@@ -5,6 +5,7 @@
 
 #include "../algs.h"
 #include "member_function_pointer_kernel_abstract.h"
+#include <new>
 
 namespace dlib
 {
@@ -19,77 +20,176 @@ namespace dlib
         >
     class member_function_pointer_kernel_1;
 
-    template <
-        typename PARAM1,
-        typename PARAM2,
-        typename PARAM3,
-        typename PARAM4 
-        >
-    void swap (
-        member_function_pointer_kernel_1<PARAM1,PARAM2,PARAM3,PARAM4>& a,
-        member_function_pointer_kernel_1<PARAM1,PARAM2,PARAM3,PARAM4>& b
-    ) { a.swap(b); }
+// ----------------------------------------------------------------------------------------
+
+    class mfp_kernel_1_base_class
+    {
+        /*
+            All member function pointer classes inherit from this class.  This
+            is where most of the things in a member function pointer are defined.
+        */
+    protected:
+        enum mfp_type { mfp_nonconst, mfp_const, mfp_null};
+
+        class mp_base_base
+        {
+        public:
+            mp_base_base(void* ptr, mfp_type type_) : o(ptr),type(type_) {}
+            virtual ~mp_base_base(){}
+            virtual void clone(void* ptr) const = 0;
+            virtual bool is_same (const mp_base_base* item) const = 0;
+            bool is_set () const { return o!=0; }
+
+            void* const o;
+            const mfp_type type;
+        };
+
+        template <typename T>
+        class mp_null : public mp_base_base 
+        {
+        public:
+            typedef void (T::*mfp_pointer_type)() ;
+
+            mp_null (void* , mfp_pointer_type ) : mp_base_base(0,mfp_null), callback(0) {}
+            mp_null () : mp_base_base(0,mfp_null), callback(0) {}
+
+            const mfp_pointer_type callback;
+        };
+
+        template <typename mp_impl>
+        class mp_impl_T : public mp_impl 
+        {
+            /*
+                This class supplies the implementations clone() and is_same() for any
+                classes that inherit from mp_base_base.  It does this in a very
+                roundabout way...
+            */
+               
+        public:
+            typedef typename mp_impl::mfp_pointer_type mfp_pointer_type;
+
+            mp_impl_T() : mp_impl(0,0) {}
+            mp_impl_T(void* ptr, mfp_pointer_type cb) : mp_impl(ptr,cb) {}
+            void clone   (void* ptr) const  { new(ptr) mp_impl_T(this->o,this->callback); }
+            bool is_same (const mp_base_base* item) const 
+            {
+                if (item->o == 0 && this->o == 0)
+                {
+                    return true;
+                }
+                else if (item->o == this->o && this->type == item->type)
+                {
+                    const mp_impl* i = reinterpret_cast<const mp_impl*>(item);
+                    return (i->callback == this->callback);
+                }
+                return false;
+            }
+        };
+
+        struct dummy { void nonnull() {}; };
+
+        typedef mp_impl_T<mp_null<dummy> > mp_null_impl;
+    public:
+
+        mfp_kernel_1_base_class (
+            const mfp_kernel_1_base_class& item
+        ) { item.mp()->clone(mp_memory.data); }
+
+        mfp_kernel_1_base_class (  
+        ) { mp_null_impl().clone(mp_memory.data); }
+
+        bool operator == (
+            const mfp_kernel_1_base_class& item
+        ) const { return mp()->is_same(item.mp()); }
+
+        bool operator != (
+            const mfp_kernel_1_base_class& item
+        ) const { return !(*this == item); }
+
+        mfp_kernel_1_base_class& operator= (
+            const mfp_kernel_1_base_class& item
+        ) { mfp_kernel_1_base_class(item).swap(*this); return *this;  }
+
+        ~mfp_kernel_1_base_class (
+        ) { mp()->~mp_base_base(); }
+
+        void clear(
+        ) { mfp_kernel_1_base_class().swap(*this); }
+
+        bool is_set (
+        ) const { return mp()->is_set(); } 
+
+    private:
+        typedef void (dummy::*safe_bool)();
+
+    public:
+        operator safe_bool () const { return is_set() ? &dummy::nonnull : 0; }
+        bool operator!() const { return !is_set(); }
+
+        void swap (
+            mfp_kernel_1_base_class& item
+        ) 
+        {  
+            // make a temp copy of item
+            mfp_kernel_1_base_class temp(item);
+            // copy *this into item
+            mp()->clone(item.mp_memory.data);
+            // copy temp into *this
+            temp.mp()->clone(mp_memory.data);
+        }
+
+    protected:
+
+        // make a block of memory big enough to hold a mp_null object.
+        union data_block_type
+        {
+            // All of this garbage is to make sure this union is properly aligned 
+            // (a union is always aligned such that everything in it would be properly
+            // aligned.  So the assumption here is that one of these things big good
+            // alignment to satisfy mp_null_impl objects (or other objects like it).
+            void* void_ptr;
+            struct {
+                void (mp_base_base::*callback)();
+                mp_base_base* o; 
+            } stuff;
+
+            char data[sizeof(mp_null_impl)];
+        } mp_memory;
+
+        mp_base_base*       mp ()       { void* ptr = mp_memory.data;       return static_cast<mp_base_base*>(ptr); }
+        const mp_base_base* mp () const { const void* ptr = mp_memory.data; return static_cast<const mp_base_base*>(ptr); }
+        
+    };
 
 // ----------------------------------------------------------------------------------------
 
     template <>
-    class member_function_pointer_kernel_1<void,void,void,void>
+    class member_function_pointer_kernel_1<void,void,void,void> : public mfp_kernel_1_base_class
     {
-        /*!
-            INITIAL VALUE
-                - mp == 0
-
-            CONVENTION
-                - is_set() == (mp != 0)
-
-
-                Note that I'm using reinterpret_cast rather than dynamic_cast here 
-                in the is_same() function.  It would be better if dynamic_cast was used
-                but some compilers don't enable RTTI by default so using it would make the
-                build process more complicated for users so I'm not using it.  I'm 
-                not aware of any platforms/compilers where reinterpret_cast won't end 
-                up doing the right thing for us here so it should be ok.  
-        !*/
-
-        class mp_base
-        {
+        class mp_base : public mp_base_base {
         public:
-            virtual ~mp_base(){}
+            mp_base(void* ptr, mfp_type type_) : mp_base_base(ptr,type_) {}
             virtual void call() const = 0;
-            virtual mp_base* clone() const = 0;
-            virtual bool is_same (const mp_base* item) const = 0;
         };
 
         template <typename T>
-        class mp_impl : public mp_base 
-        {
+        class mp_impl : public mp_base {
         public:
-            mp_impl (
-                T& object,
-                void (T::*cb)()
-            ) :
-                callback(cb),
-                o(&object)
-            {
-            }
+            typedef void (T::*mfp_pointer_type)() ;
+            void call () const { (static_cast<T*>(this->o)->*callback)(); }
 
-            void call (
-            ) const
-            {
-                (o->*callback)();
-            }
+            mp_impl      ( void* object, mfp_pointer_type cb) : mp_base(object, mfp_nonconst), callback(cb) {}
+            const mfp_pointer_type callback;
+        };
 
-            mp_base* clone() const { return new mp_impl(*o,callback); }
+        template <typename T>
+        class mp_impl_const : public mp_base {
+        public:
+            typedef void ((T::*mfp_pointer_type)()const);
+            void call () const  { (static_cast<const T*>(this->o)->*callback)(); }
 
-            bool is_same (const mp_base* item) const 
-            {
-                const mp_impl* i = reinterpret_cast<const mp_impl*>(item);
-                return (i != 0 && i->o == o && i->callback == callback);
-            }
-
-        private:
-            void (T::*callback)();
-            T* o;
+            mp_impl_const ( void* object, mfp_pointer_type cb) : mp_base(object,mfp_const), callback(cb) {}
+            const mfp_pointer_type callback;
         };
 
     public:
@@ -98,92 +198,20 @@ namespace dlib
         typedef void param3_type;
         typedef void param4_type;
 
-        member_function_pointer_kernel_1 (  
-        ) : 
-            mp(0)
-        {}
+        void operator() () const { static_cast<const mp_base*>((const void*)mp_memory.data)->call(); }
 
-        member_function_pointer_kernel_1(
-            const member_function_pointer_kernel_1& item
-        ) :
-            mp(0)
-        {
-            if (item.is_set())
-                mp = item.mp->clone();
-        }
+        // This is here just to validate the assumption that our block of memory we have made
+        // in mp_memory.data is the right size to store the data for this object.  If you
+        // get a compiler error on this line then email me :)
+        member_function_pointer_kernel_1()
+        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
+          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        member_function_pointer_kernel_1& operator=(
-            const member_function_pointer_kernel_1& item
-        )
-        {
-            if (this != &item)
-            {
-                clear();
+        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
-                if (item.is_set())
-                    mp = item.mp->clone();
-            }
-            return *this;
-        }
-
-        bool operator == (
-            const member_function_pointer_kernel_1& item
-        ) const
-        {
-            if (is_set() != item.is_set())
-                return false;
-            if (is_set() == false)
-                return true;
-            return mp->is_same(item.mp);
-        }
-
-        bool operator != (
-            const member_function_pointer_kernel_1& item
-        ) const { return !(*this == item); }
-
-        ~member_function_pointer_kernel_1 (
-        )
-        {
-            if (mp)
-                delete mp;
-        }
-
-        void clear(
-        )
-        {
-            if (mp)
-            {
-                delete mp;
-                mp = 0;
-            }
-        }
-
-        bool is_set (
-        ) const { return mp != 0; } 
-
-        template <
-            typename T
-            >
-        void set (
-            T& object,
-            void (T::*cb)()
-        )
-        {
-            clear();
-            mp = new mp_impl<T>(object,cb);
-        }
-
-        void operator () (
-        ) const { mp->call(); }
-
-        void swap (
-            member_function_pointer_kernel_1& item
-        ) { exchange(mp,item.mp); }
-
-    private:
-
-        mp_base* mp;
-
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 
@@ -192,56 +220,32 @@ namespace dlib
     template <
         typename PARAM1
         >
-    class member_function_pointer_kernel_1<PARAM1,void,void,void>
+    class member_function_pointer_kernel_1<PARAM1,void,void,void> : public mfp_kernel_1_base_class
     {
-        /*!
-            INITIAL VALUE
-                - mp == 0
-
-            CONVENTION
-                - is_set() == (mp != 0)
-        !*/
-
-        class mp_base
-        {
+        class mp_base : public mp_base_base {
         public:
-            virtual ~mp_base(){}
+            mp_base(void* ptr, mfp_type type_) : mp_base_base(ptr,type_) {}
             virtual void call(PARAM1) const = 0;
-            virtual mp_base* clone() const = 0;
-            virtual bool is_same (const mp_base* item) const = 0;
         };
 
         template <typename T>
-        class mp_impl : public mp_base 
-        {
+        class mp_impl : public mp_base {
         public:
-            mp_impl (
-                T& object,
-                void (T::*cb)(PARAM1)
-            ) :
-                callback(cb),
-                o(&object)
-            {
-            }
+            typedef void (T::*mfp_pointer_type)(PARAM1) ;
+            void call (PARAM1 p1) const { (static_cast<T*>(this->o)->*callback)(p1); }
 
-            void call (
-                PARAM1 param1
-            ) const
-            {
-                (o->*callback)(param1);
-            }
+            mp_impl      ( void* object, mfp_pointer_type cb) : mp_base(object, mfp_nonconst), callback(cb) {}
+            const mfp_pointer_type callback;
+        };
 
-            mp_base* clone() const { return new mp_impl(*o,callback); }
+        template <typename T>
+        class mp_impl_const : public mp_base {
+        public:
+            typedef void ((T::*mfp_pointer_type)(PARAM1)const);
+            void call (PARAM1 p1) const  { (static_cast<const T*>(this->o)->*callback)(p1); }
 
-            bool is_same (const mp_base* item) const 
-            {
-                const mp_impl* i = reinterpret_cast<const mp_impl*>(item);
-                return (i != 0 && i->o == o && i->callback == callback);
-            }
-
-        private:
-            void (T::*callback)(PARAM1);
-            T* o;
+            mp_impl_const ( void* object, mfp_pointer_type cb) : mp_base(object,mfp_const), callback(cb) {}
+            const mfp_pointer_type callback;
         };
 
     public:
@@ -250,92 +254,20 @@ namespace dlib
         typedef void param3_type;
         typedef void param4_type;
 
-        member_function_pointer_kernel_1 (  
-        ) : 
-            mp(0)
-        {}
+        void operator() (PARAM1 p1) const { static_cast<const mp_base*>((const void*)mp_memory.data)->call(p1); }
 
-        member_function_pointer_kernel_1(
-            const member_function_pointer_kernel_1& item
-        ) :
-            mp(0)
-        {
-            if (item.is_set())
-                mp = item.mp->clone();
-        }
+        // This is here just to validate the assumption that our block of memory we have made
+        // in mp_memory.data is the right size to store the data for this object.  If you
+        // get a compiler error on this line then email me :)
+        member_function_pointer_kernel_1()
+        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
+          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        member_function_pointer_kernel_1& operator=(
-            const member_function_pointer_kernel_1& item
-        )
-        {
-            if (this != &item)
-            {
-                clear();
+        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
-                if (item.is_set())
-                    mp = item.mp->clone();
-            }
-            return *this;
-        }
-
-        bool operator == (
-            const member_function_pointer_kernel_1& item
-        ) const
-        {
-            if (is_set() != item.is_set())
-                return false;
-            if (is_set() == false)
-                return true;
-            return mp->is_same(item.mp);
-        }
-
-        bool operator != (
-            const member_function_pointer_kernel_1& item
-        ) const { return !(*this == item); }
-
-        ~member_function_pointer_kernel_1 (
-        )
-        {
-            if (mp)
-                delete mp;
-        }
-
-        void clear(
-        )
-        {
-            if (mp)
-            {
-                delete mp;
-                mp = 0;
-            }
-        }
-
-        bool is_set (
-        ) const { return mp != 0; } 
-
-        template <
-            typename T
-            >
-        void set (
-            T& object,
-            void (T::*cb)(PARAM1)
-        )
-        {
-            clear();
-            mp = new mp_impl<T>(object,cb);
-        }
-
-        void operator () (
-            PARAM1 param1
-        ) const { mp->call(param1); }
-
-        void swap (
-            member_function_pointer_kernel_1& item
-        ) { exchange(mp,item.mp); }
-
-    private:
-
-        mp_base* mp;
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 
@@ -345,57 +277,32 @@ namespace dlib
         typename PARAM1,
         typename PARAM2
         >
-    class member_function_pointer_kernel_1<PARAM1,PARAM2,void,void>
+    class member_function_pointer_kernel_1<PARAM1,PARAM2,void,void> : public mfp_kernel_1_base_class
     {
-        /*!
-            INITIAL VALUE
-                - mp == 0
-
-            CONVENTION
-                - is_set() == (mp != 0)
-        !*/
-
-        class mp_base
-        {
+        class mp_base : public mp_base_base {
         public:
-            virtual ~mp_base(){}
+            mp_base(void* ptr, mfp_type type_) : mp_base_base(ptr,type_) {}
             virtual void call(PARAM1,PARAM2) const = 0;
-            virtual mp_base* clone() const = 0;
-            virtual bool is_same (const mp_base* item) const = 0;
         };
 
         template <typename T>
-        class mp_impl : public mp_base 
-        {
+        class mp_impl : public mp_base {
         public:
-            mp_impl (
-                T& object,
-                void (T::*cb)(PARAM1,PARAM2)
-            ) :
-                callback(cb),
-                o(&object)
-            {
-            }
+            typedef void (T::*mfp_pointer_type)(PARAM1,PARAM2) ;
+            void call (PARAM1 p1, PARAM2 p2) const { (static_cast<T*>(this->o)->*callback)(p1,p2); }
 
-            void call (
-                PARAM1 param1,
-                PARAM2 param2
-            ) const
-            {
-                (o->*callback)(param1,param2);
-            }
+            mp_impl      ( void* object, mfp_pointer_type cb) : mp_base(object, mfp_nonconst), callback(cb) {}
+            const mfp_pointer_type callback;
+        };
 
-            mp_base* clone() const { return new mp_impl(*o,callback); }
+        template <typename T>
+        class mp_impl_const : public mp_base {
+        public:
+            typedef void ((T::*mfp_pointer_type)(PARAM1,PARAM2)const);
+            void call (PARAM1 p1, PARAM2 p2) const  { (static_cast<const T*>(this->o)->*callback)(p1,p2); }
 
-            bool is_same (const mp_base* item) const 
-            {
-                const mp_impl* i = reinterpret_cast<const mp_impl*>(item);
-                return (i != 0 && i->o == o && i->callback == callback);
-            }
-
-        private:
-            void (T::*callback)(PARAM1,PARAM2);
-            T* o;
+            mp_impl_const ( void* object, mfp_pointer_type cb) : mp_base(object,mfp_const), callback(cb) {}
+            const mfp_pointer_type callback;
         };
 
     public:
@@ -404,93 +311,20 @@ namespace dlib
         typedef void param3_type;
         typedef void param4_type;
 
-        member_function_pointer_kernel_1 (  
-        ) : 
-            mp(0)
-        {}
+        void operator() (PARAM1 p1, PARAM2 p2) const { static_cast<const mp_base*>((const void*)mp_memory.data)->call(p1,p2); }
 
-        member_function_pointer_kernel_1(
-            const member_function_pointer_kernel_1& item
-        ) :
-            mp(0)
-        {
-            if (item.is_set())
-                mp = item.mp->clone();
-        }
+        // This is here just to validate the assumption that our block of memory we have made
+        // in mp_memory.data is the right size to store the data for this object.  If you
+        // get a compiler error on this line then email me :)
+        member_function_pointer_kernel_1()
+        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
+          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        member_function_pointer_kernel_1& operator=(
-            const member_function_pointer_kernel_1& item
-        )
-        {
-            if (this != &item)
-            {
-                clear();
+        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
-                if (item.is_set())
-                    mp = item.mp->clone();
-            }
-            return *this;
-        }
-
-        bool operator == (
-            const member_function_pointer_kernel_1& item
-        ) const
-        {
-            if (is_set() != item.is_set())
-                return false;
-            if (is_set() == false)
-                return true;
-            return mp->is_same(item.mp);
-        }
-
-        bool operator != (
-            const member_function_pointer_kernel_1& item
-        ) const { return !(*this == item); }
-
-        ~member_function_pointer_kernel_1 (
-        )
-        {
-            if (mp)
-                delete mp;
-        }
-
-        void clear(
-        )
-        {
-            if (mp)
-            {
-                delete mp;
-                mp = 0;
-            }
-        }
-
-        bool is_set (
-        ) const { return mp != 0; } 
-
-        template <
-            typename T
-            >
-        void set (
-            T& object,
-            void (T::*cb)(PARAM1,PARAM2)
-        )
-        {
-            clear();
-            mp = new mp_impl<T>(object,cb);
-        }
-
-        void operator () (
-            PARAM1 param1,
-            PARAM2 param2
-        ) const { mp->call(param1,param2); }
-
-        void swap (
-            member_function_pointer_kernel_1& item
-        ) { exchange(mp,item.mp); }
-
-    private:
-
-        mp_base* mp;
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 
@@ -501,58 +335,32 @@ namespace dlib
         typename PARAM2,
         typename PARAM3
         >
-    class member_function_pointer_kernel_1<PARAM1,PARAM2,PARAM3,void>
+    class member_function_pointer_kernel_1<PARAM1,PARAM2,PARAM3,void> : public mfp_kernel_1_base_class
     {
-        /*!
-            INITIAL VALUE
-                - mp == 0
-
-            CONVENTION
-                - is_set() == (mp != 0)
-        !*/
-
-        class mp_base
-        {
+        class mp_base : public mp_base_base {
         public:
-            virtual ~mp_base(){}
+            mp_base(void* ptr, mfp_type type_) : mp_base_base(ptr,type_) {}
             virtual void call(PARAM1,PARAM2,PARAM3) const = 0;
-            virtual mp_base* clone() const = 0;
-            virtual bool is_same (const mp_base* item) const = 0;
         };
 
         template <typename T>
-        class mp_impl : public mp_base 
-        {
+        class mp_impl : public mp_base {
         public:
-            mp_impl (
-                T& object,
-                void (T::*cb)(PARAM1,PARAM2,PARAM3)
-            ) :
-                callback(cb),
-                o(&object)
-            {
-            }
+            typedef void (T::*mfp_pointer_type)(PARAM1,PARAM2,PARAM3) ;
+            void call (PARAM1 p1, PARAM2 p2, PARAM3 p3) const { (static_cast<T*>(this->o)->*callback)(p1,p2,p3); }
 
-            void call (
-                PARAM1 param1,
-                PARAM2 param2,
-                PARAM3 param3
-            ) const
-            {
-                (o->*callback)(param1,param2,param3);
-            }
+            mp_impl      ( void* object, mfp_pointer_type cb) : mp_base(object, mfp_nonconst), callback(cb) {}
+            const mfp_pointer_type callback;
+        };
 
-            mp_base* clone() const { return new mp_impl(*o,callback); }
+        template <typename T>
+        class mp_impl_const : public mp_base {
+        public:
+            typedef void ((T::*mfp_pointer_type)(PARAM1,PARAM2,PARAM3)const);
+            void call (PARAM1 p1, PARAM2 p2, PARAM3 p3) const  { (static_cast<const T*>(this->o)->*callback)(p1,p2,p3); }
 
-            bool is_same (const mp_base* item) const 
-            {
-                const mp_impl* i = reinterpret_cast<const mp_impl*>(item);
-                return (i != 0 && i->o == o && i->callback == callback);
-            }
-
-        private:
-            void (T::*callback)(PARAM1,PARAM2,PARAM3);
-            T* o;
+            mp_impl_const ( void* object, mfp_pointer_type cb) : mp_base(object,mfp_const), callback(cb) {}
+            const mfp_pointer_type callback;
         };
 
     public:
@@ -561,94 +369,20 @@ namespace dlib
         typedef PARAM3 param3_type;
         typedef void param4_type;
 
-        member_function_pointer_kernel_1 (  
-        ) : 
-            mp(0)
-        {}
+        void operator() (PARAM1 p1, PARAM2 p2, PARAM3 p3) const { static_cast<const mp_base*>((const void*)mp_memory.data)->call(p1,p2,p3); }
 
-        member_function_pointer_kernel_1(
-            const member_function_pointer_kernel_1& item
-        ) :
-            mp(0)
-        {
-            if (item.is_set())
-                mp = item.mp->clone();
-        }
+        // This is here just to validate the assumption that our block of memory we have made
+        // in mp_memory.data is the right size to store the data for this object.  If you
+        // get a compiler error on this line then email me :)
+        member_function_pointer_kernel_1()
+        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
+          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        member_function_pointer_kernel_1& operator=(
-            const member_function_pointer_kernel_1& item
-        )
-        {
-            if (this != &item)
-            {
-                clear();
+        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
-                if (item.is_set())
-                    mp = item.mp->clone();
-            }
-            return *this;
-        }
-
-        bool operator == (
-            const member_function_pointer_kernel_1& item
-        ) const
-        {
-            if (is_set() != item.is_set())
-                return false;
-            if (is_set() == false)
-                return true;
-            return mp->is_same(item.mp);
-        }
-
-        bool operator != (
-            const member_function_pointer_kernel_1& item
-        ) const { return !(*this == item); }
-
-        ~member_function_pointer_kernel_1 (
-        )
-        {
-            if (mp)
-                delete mp;
-        }
-
-        void clear(
-        )
-        {
-            if (mp)
-            {
-                delete mp;
-                mp = 0;
-            }
-        }
-
-        bool is_set (
-        ) const { return mp != 0; } 
-
-        template <
-            typename T
-            >
-        void set (
-            T& object,
-            void (T::*cb)(PARAM1,PARAM2,PARAM3)
-        )
-        {
-            clear();
-            mp = new mp_impl<T>(object,cb);
-        }
-
-        void operator () (
-            PARAM1 param1,
-            PARAM2 param2,
-            PARAM3 param3
-        ) const { mp->call(param1,param2,param3); }
-
-        void swap (
-            member_function_pointer_kernel_1& item
-        ) { exchange(mp,item.mp); }
-
-    private:
-
-        mp_base* mp;
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 
@@ -660,59 +394,32 @@ namespace dlib
         typename PARAM3,
         typename PARAM4
         >
-    class member_function_pointer_kernel_1
+    class member_function_pointer_kernel_1 : public mfp_kernel_1_base_class
     {
-        /*!
-            INITIAL VALUE
-                - mp == 0
-
-            CONVENTION
-                - is_set() == (mp != 0)
-        !*/
-
-        class mp_base
-        {
+        class mp_base : public mp_base_base {
         public:
-            virtual ~mp_base(){}
+            mp_base(void* ptr, mfp_type type_) : mp_base_base(ptr,type_) {}
             virtual void call(PARAM1,PARAM2,PARAM3,PARAM4) const = 0;
-            virtual mp_base* clone() const = 0;
-            virtual bool is_same (const mp_base* item) const = 0;
         };
 
         template <typename T>
-        class mp_impl : public mp_base 
-        {
+        class mp_impl : public mp_base {
         public:
-            mp_impl (
-                T& object,
-                void (T::*cb)(PARAM1,PARAM2,PARAM3,PARAM4)
-            ) :
-                callback(cb),
-                o(&object)
-            {
-            }
+            typedef void (T::*mfp_pointer_type)(PARAM1,PARAM2,PARAM3, PARAM4) ;
+            void call (PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4) const { (static_cast<T*>(this->o)->*callback)(p1,p2,p3,p4); }
 
-            void call (
-                PARAM1 param1,
-                PARAM2 param2,
-                PARAM3 param3,
-                PARAM4 param4
-            ) const
-            {
-                (o->*callback)(param1,param2,param3,param4);
-            }
+            mp_impl      ( void* object, mfp_pointer_type cb) : mp_base(object, mfp_nonconst), callback(cb) {}
+            const mfp_pointer_type callback;
+        };
 
-            mp_base* clone() const { return new mp_impl(*o,callback); }
+        template <typename T>
+        class mp_impl_const : public mp_base {
+        public:
+            typedef void ((T::*mfp_pointer_type)(PARAM1,PARAM2,PARAM3,PARAM4)const);
+            void call (PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4) const  { (static_cast<const T*>(this->o)->*callback)(p1,p2,p3,p4); }
 
-            bool is_same (const mp_base* item) const 
-            {
-                const mp_impl* i = reinterpret_cast<const mp_impl*>(item);
-                return (i != 0 && i->o == o && i->callback == callback);
-            }
-
-        private:
-            void (T::*callback)(PARAM1,PARAM2,PARAM3,PARAM4);
-            T* o;
+            mp_impl_const ( void* object, mfp_pointer_type cb) : mp_base(object,mfp_const), callback(cb) {}
+            const mfp_pointer_type callback;
         };
 
     public:
@@ -721,95 +428,21 @@ namespace dlib
         typedef PARAM3 param3_type;
         typedef PARAM4 param4_type;
 
-        member_function_pointer_kernel_1 (  
-        ) : 
-            mp(0)
-        {}
+        void operator() (PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4) const 
+        { static_cast<const mp_base*>((const void*)mp_memory.data)->call(p1,p2,p3,p4); }
 
-        member_function_pointer_kernel_1(
-            const member_function_pointer_kernel_1& item
-        ) :
-            mp(0)
-        {
-            if (item.is_set())
-                mp = item.mp->clone();
-        }
+        // This is here just to validate the assumption that our block of memory we have made
+        // in mp_memory.data is the right size to store the data for this object.  If you
+        // get a compiler error on this line then email me :)
+        member_function_pointer_kernel_1()
+        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
+          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
 
-        member_function_pointer_kernel_1& operator=(
-            const member_function_pointer_kernel_1& item
-        )
-        {
-            if (this != &item)
-            {
-                clear();
+        template <typename T> void set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
 
-                if (item.is_set())
-                    mp = item.mp->clone();
-            }
-            return *this;
-        }
-
-        bool operator == (
-            const member_function_pointer_kernel_1& item
-        ) const
-        {
-            if (is_set() != item.is_set())
-                return false;
-            if (is_set() == false)
-                return true;
-            return mp->is_same(item.mp);
-        }
-
-        bool operator != (
-            const member_function_pointer_kernel_1& item
-        ) const { return !(*this == item); }
-
-        ~member_function_pointer_kernel_1 (
-        )
-        {
-            if (mp)
-                delete mp;
-        }
-
-        void clear(
-        )
-        {
-            if (mp)
-            {
-                delete mp;
-                mp = 0;
-            }
-        }
-
-        bool is_set (
-        ) const { return mp != 0; } 
-
-        template <
-            typename T
-            >
-        void set (
-            T& object,
-            void (T::*cb)(PARAM1,PARAM2,PARAM3,PARAM4)
-        )
-        {
-            clear();
-            mp = new mp_impl<T>(object,cb);
-        }
-
-        void operator () (
-            PARAM1 param1,
-            PARAM2 param2,
-            PARAM3 param3,
-            PARAM4 param4
-        ) const { mp->call(param1,param2,param3,param4); }
-
-        void swap (
-            member_function_pointer_kernel_1& item
-        ) { exchange(mp,item.mp); }
-
-    private:
-
-        mp_base* mp;
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        { mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
 
     };    
 

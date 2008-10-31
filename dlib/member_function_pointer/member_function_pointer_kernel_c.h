@@ -19,18 +19,6 @@ namespace dlib
         >
     class member_function_pointer_kernel_c;
 
-    template <
-        typename mfpb,
-        typename PARAM1,
-        typename PARAM2,
-        typename PARAM3,
-        typename PARAM4
-        >
-    void swap (
-        member_function_pointer_kernel_c<mfpb,PARAM1,PARAM2,PARAM3,PARAM4>& a,
-        member_function_pointer_kernel_c<mfpb,PARAM1,PARAM2,PARAM3,PARAM4>& b
-    ) { a.swap(b); }
-
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -47,6 +35,25 @@ namespace dlib
         void set (
             T& object,
             void (T::*cb)()
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_CASSERT(cb != 0,
+                   "\tvoid member_function_pointer::set"
+                   << "\n\tthe member function pointer can't be null"
+                   << "\n\tthis: " << this
+            );
+
+            // call the real function
+            mfpb::set(object,cb);
+        }
+
+        template <
+            typename T
+            >
+        void set (
+            const T& object,
+            void (T::*cb)()const
         )
         {
             // make sure requires clause is not broken
@@ -105,6 +112,25 @@ namespace dlib
             mfpb::set(object,cb);
         }
 
+        template <
+            typename T
+            >
+        void set (
+            const T& object,
+            void (T::*cb)(PARAM1)const
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_CASSERT(cb != 0,
+                   "\tvoid member_function_pointer::set"
+                   << "\n\tthe member function pointer can't be null"
+                   << "\n\tthis: " << this
+            );
+
+            // call the real function
+            mfpb::set(object,cb);
+        }
+
         void operator () (
             PARAM1 param1
         ) const
@@ -139,6 +165,25 @@ namespace dlib
         void set (
             T& object,
             void (T::*cb)(PARAM1,PARAM2)
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_CASSERT(cb != 0,
+                   "\tvoid member_function_pointer::set"
+                   << "\n\tthe member function pointer can't be null"
+                   << "\n\tthis: " << this
+            );
+
+            // call the real function
+            mfpb::set(object,cb);
+        }
+
+        template <
+            typename T
+            >
+        void set (
+            const T& object,
+            void (T::*cb)(PARAM1,PARAM2)const
         )
         {
             // make sure requires clause is not broken
@@ -201,6 +246,25 @@ namespace dlib
             mfpb::set(object,cb);
         }
 
+        template <
+            typename T
+            >
+        void set (
+            const T& object,
+            void (T::*cb)(PARAM1,PARAM2,PARAM3)const
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_CASSERT(cb != 0,
+                   "\tvoid member_function_pointer::set"
+                   << "\n\tthe member function pointer can't be null"
+                   << "\n\tthis: " << this
+            );
+
+            // call the real function
+            mfpb::set(object,cb);
+        }
+
         void operator () (
             PARAM1 param1,
             PARAM2 param2,
@@ -239,6 +303,25 @@ namespace dlib
         void set (
             T& object,
             void (T::*cb)(PARAM1,PARAM2,PARAM3,PARAM4)
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_CASSERT(cb != 0,
+                   "\tvoid member_function_pointer::set"
+                   << "\n\tthe member function pointer can't be null"
+                   << "\n\tthis: " << this
+            );
+
+            // call the real function
+            mfpb::set(object,cb);
+        }
+
+        template <
+            typename T
+            >
+        void set (
+            const T& object,
+            void (T::*cb)(PARAM1,PARAM2,PARAM3,PARAM4)const
         )
         {
             // make sure requires clause is not broken

@@ -16,17 +16,6 @@ namespace dlib
         >
     class member_function_pointer;
 
-    template <
-        typename PARAM1,
-        typename PARAM2,
-        typename PARAM3,
-        typename PARAM4
-        >
-    void swap (
-        member_function_pointer<PARAM1,PARAM2,PARAM3,PARAM4>& a,
-        member_function_pointer<PARAM1,PARAM2,PARAM3,PARAM4>& b
-    ) { a.swap(b); }
-
 // ----------------------------------------------------------------------------------------
 
     template <>
@@ -53,9 +42,9 @@ namespace dlib
                         member_function_pointer<> my_pointer;
                     To use a pointer to a function that takes a single int you would say:
                         member_function_pointer<int> my_pointer;
-                    To use a pointer to a function that takes an int and then a string
-                    you would say:
-                        member_function_pointer<int,string> my_pointer;
+                    To use a pointer to a function that takes an int and then a reference
+                    to a string you would say:
+                        member_function_pointer<int,string&> my_pointer;
 
                 Also note that the formal comments are only present for the first 
                 template specialization.  They are all exactly the same except for the 
@@ -160,6 +149,38 @@ namespace dlib
                   If this exception is thrown then #is_set() == false
         !*/
 
+        template <
+            typename T
+            >
+        void set (
+            const T& object,
+            void (T::*cb)()const
+        );
+        /*!
+            requires
+                - cb == a valid member function pointer for class T
+            ensures
+                - #is_set() == true
+                - calls to this->operator() will call (object.*cb)()
+            throws
+                - std::bad_alloc
+                  If this exception is thrown then #is_set() == false
+        !*/
+
+        operator bool (
+        ) const;
+        /*!
+            ensures
+                - returns is_set()
+        !*/
+
+        bool operator! (
+        ) const;
+        /*!
+            ensures
+                - returns !is_set()
+        !*/
+
         void operator () (
         ) const;
         /*!
@@ -229,6 +250,18 @@ namespace dlib
             void (T::*cb)(PARAM1)
         );
 
+        template <typename T>
+        void set (
+            const T& object,
+            void (T::*cb)(PARAM1)const
+        );
+
+        operator bool (
+        ) const;
+
+        bool operator! (
+        ) const;
+
         void operator () (
             PARAM1 param1
         ) const;
@@ -283,6 +316,18 @@ namespace dlib
             T& object,
             void (T::*cb)(PARAM1,PARAM2)
         );
+
+        template <typename T>
+        void set (
+            const T& object,
+            void (T::*cb)(PARAM1,PARAM2)const
+        );
+
+        operator bool (
+        ) const;
+
+        bool operator! (
+        ) const;
 
         void operator () (
             PARAM1 param1,
@@ -340,6 +385,18 @@ namespace dlib
             T& object,
             void (T::*cb)(PARAM1,PARAM2,PARAM3)
         );
+
+        template <typename T>
+        void set (
+            const T& object,
+            void (T::*cb)(PARAM1,PARAM2,PARAM3)const
+        );
+
+        operator bool (
+        ) const;
+
+        bool operator! (
+        ) const;
 
         void operator () (
             PARAM1 param1,
@@ -399,6 +456,18 @@ namespace dlib
             T& object,
             void (T::*cb)(PARAM1,PARAM2,PARAM3,PARAM4)
         );
+
+        template <typename T>
+        void set (
+            const T& object,
+            void (T::*cb)(PARAM1,PARAM2,PARAM3,PARAM4)const
+        );
+
+        operator bool (
+        ) const;
+
+        bool operator! (
+        ) const;
 
         void operator () (
             PARAM1 param1,
