@@ -13,12 +13,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    base64_kernel_1::line_ending_type base64_kernel_1::
+    line_ending (
+    ) const
+    {
+        return eol_style;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void base64_kernel_1::
+    set_line_ending (
+        line_ending_type eol_style_
+    )
+    {
+        eol_style = eol_style_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     base64_kernel_1::
     base64_kernel_1 (
     ) : 
         encode_table(0),
         decode_table(0),
-        bad_value(100)
+        bad_value(100),
+        eol_style(LF)
     {
         try
         {
@@ -156,7 +176,6 @@ namespace dlib
         unsigned char c1, c2, c3, c4, c5, c6;
 
         int counter = 19;
-        const char newline = '\n';
 
         // while we haven't hit the end of the input stream
         while (status != 0)
@@ -165,9 +184,29 @@ namespace dlib
             {
                 counter = 19;
                 // write a newline
-                if (out.sputn(reinterpret_cast<const char*>(&newline),1)!=1)
+                char ch;
+                switch (eol_style)
                 {
-                    throw std::ios_base::failure("error occured in the base64 object");
+                    case CR:
+                        ch = '\r';
+                        if (out.sputn(&ch,1)!=1)
+                            throw std::ios_base::failure("error occured in the base64 object");
+                        break;
+                    case LF:
+                        ch = '\n';
+                        if (out.sputn(&ch,1)!=1)
+                            throw std::ios_base::failure("error occured in the base64 object");
+                        break;
+                    case CRLF:
+                        ch = '\r';
+                        if (out.sputn(&ch,1)!=1)
+                            throw std::ios_base::failure("error occured in the base64 object");
+                        ch = '\n';
+                        if (out.sputn(&ch,1)!=1)
+                            throw std::ios_base::failure("error occured in the base64 object");
+                        break;
+                    default:
+                        DLIB_CASSERT(false,"this should never happen");
                 }
             }
             --counter;

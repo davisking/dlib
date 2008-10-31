@@ -13,7 +13,7 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                This object does not have any state associated with it.
+                - line_ending() == LF
 
             WHAT THIS OBJECT REPRESENTS
                 This object consists of the two functions encode and decode.
@@ -42,6 +42,34 @@ namespace dlib
                 - all memory associated with *this has been released
         !*/
 
+        enum line_ending_type
+        {
+            CR,  // i.e. "\r"
+            LF,  // i.e. "\n"
+            CRLF // i.e. "\r\n"
+        };
+
+        line_ending_type line_ending (
+        ) const;
+        /*!
+            ensures
+                - returns the type of end of line bytes the encoder
+                  will use when encoding data to base64 blocks.  Note that
+                  the ostream object you use might apply some sort of transform
+                  to line endings as well.  For example, C++ ofstream objects
+                  usually convert '\n' into whatever a normal newline is for
+                  your platform unless you open a file in binary mode.  But
+                  aside from file streams the ostream objects usually don't
+                  modify the data you pass to them.
+        !*/
+
+        void set_line_ending (
+            line_ending_type eol_style
+        );
+        /*!
+            ensures
+                - #line_ending() == eol_style
+        !*/
 
         void encode (
             std::istream& in,
@@ -58,7 +86,6 @@ namespace dlib
                 - any other exception
                     this exception may be thrown if there is any other problem                    
         !*/
-
 
         void decode (
             std::istream& in,
@@ -79,7 +106,6 @@ namespace dlib
                 - any other exception
                     this exception may be thrown if there is any other problem                    
         !*/
-
 
     private:
 

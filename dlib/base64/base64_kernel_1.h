@@ -4,6 +4,7 @@
 #define DLIB_BASE64_KERNEl_1_
 
 #include "../algs.h"
+#include "base64_kernel_abstract.h"
 #include <iosfwd>
 
 namespace dlib
@@ -42,6 +43,20 @@ namespace dlib
         virtual ~base64_kernel_1 (
         );
 
+        enum line_ending_type
+        {
+            CR,  // i.e. "\r"
+            LF,  // i.e. "\n"
+            CRLF // i.e. "\r\n"
+        };
+
+        line_ending_type line_ending (
+        ) const;
+
+        void set_line_ending (
+            line_ending_type eol_style_
+        );
+
         void encode (
             std::istream& in,
             std::ostream& out
@@ -57,6 +72,7 @@ namespace dlib
         char* encode_table;
         unsigned char* decode_table;
         const unsigned char bad_value;
+        line_ending_type eol_style;
 
         // restricted functions
         base64_kernel_1(base64_kernel_1&);        // copy constructor
