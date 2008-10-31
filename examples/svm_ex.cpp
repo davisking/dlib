@@ -199,6 +199,24 @@ int main()
 
 
 
+    // Another thing that is worth knowing is that just about everything in dlib is serializable.
+    // So for example, you can save the learned_pfunct object to disk and recall it later like so:
+    ofstream fout("saved_function.dat",ios::binary);
+    serialize(learned_pfunct,fout);
+    fout.close();
+
+    // now lets open that file back up and load the function object it contains
+    ifstream fin("saved_function.dat",ios::binary);
+    deserialize(learned_pfunct, fin);
+
+    // Note that there is also an example program that comes with dlib called the file_to_code_ex.cpp
+    // example.  It is a simple program that takes a file and outputs a piece of C++ code 
+    // that is able to fully reproduce the file's contents in the form of a std::string object.  
+    // So you can use that along with the std::istringstream to save learned decision functions
+    // inside your actual C++ code files if you want.  
+
+
+
 
     // Lastly, note that the decision functions we trained above involved well over 100 
     // support vectors.  Support vector machines in general tend to find decision functions

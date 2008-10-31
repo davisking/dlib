@@ -70,6 +70,19 @@ int main()
     // The first column is the true value of the sinc function and the second
     // column is the output from the rvm estimate.  
 
+
+
+    // Another thing that is worth knowing is that just about everything in dlib is serializable.
+    // So for example, you can save the test object to disk and recall it later like so:
+    ofstream fout("saved_function.dat",ios::binary);
+    serialize(test,fout);
+    fout.close();
+
+    // now lets open that file back up and load the function object it contains
+    ifstream fin("saved_function.dat",ios::binary);
+    deserialize(test, fin);
+
+
 }
 
 
