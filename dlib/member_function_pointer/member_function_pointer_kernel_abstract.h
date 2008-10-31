@@ -167,11 +167,14 @@ namespace dlib
                   If this exception is thrown then #is_set() == false
         !*/
 
-        operator bool (
+        operator some_undefined_pointer_type (
         ) const;
         /*!
             ensures
-                - returns is_set()
+                - if (is_set()) then
+                    - returns a non 0 value
+                - else
+                    - returns a 0 value
         !*/
 
         bool operator! (

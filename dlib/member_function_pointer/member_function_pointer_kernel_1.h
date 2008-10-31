@@ -23,11 +23,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <unsigned long num_args>
     class mfp_kernel_1_base_class
     {
         /*
             All member function pointer classes inherit from this class.  This
             is where most of the things in a member function pointer are defined.
+
+            The reason for the num_args template argument to this class is to prevent
+            any sort of implicit casting between derived member function pointer classes
+            that take different numbers of arguments.
         */
     protected:
         enum mfp_type { mfp_nonconst, mfp_const, mfp_null};
@@ -165,7 +170,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <>
-    class member_function_pointer_kernel_1<void,void,void,void> : public mfp_kernel_1_base_class
+    class member_function_pointer_kernel_1<void,void,void,void> : public mfp_kernel_1_base_class<0>
     {
         class mp_base : public mp_base_base {
         public:
@@ -224,7 +229,7 @@ namespace dlib
     template <
         typename PARAM1
         >
-    class member_function_pointer_kernel_1<PARAM1,void,void,void> : public mfp_kernel_1_base_class
+    class member_function_pointer_kernel_1<PARAM1,void,void,void> : public mfp_kernel_1_base_class<1>
     {
         class mp_base : public mp_base_base {
         public:
@@ -284,7 +289,7 @@ namespace dlib
         typename PARAM1,
         typename PARAM2
         >
-    class member_function_pointer_kernel_1<PARAM1,PARAM2,void,void> : public mfp_kernel_1_base_class
+    class member_function_pointer_kernel_1<PARAM1,PARAM2,void,void> : public mfp_kernel_1_base_class<2>
     {
         class mp_base : public mp_base_base {
         public:
@@ -345,7 +350,7 @@ namespace dlib
         typename PARAM2,
         typename PARAM3
         >
-    class member_function_pointer_kernel_1<PARAM1,PARAM2,PARAM3,void> : public mfp_kernel_1_base_class
+    class member_function_pointer_kernel_1<PARAM1,PARAM2,PARAM3,void> : public mfp_kernel_1_base_class<3>
     {
         class mp_base : public mp_base_base {
         public:
@@ -407,7 +412,7 @@ namespace dlib
         typename PARAM3,
         typename PARAM4
         >
-    class member_function_pointer_kernel_1 : public mfp_kernel_1_base_class
+    class member_function_pointer_kernel_1 : public mfp_kernel_1_base_class<4>
     {
         class mp_base : public mp_base_base {
         public:
