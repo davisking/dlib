@@ -217,6 +217,24 @@ namespace dlib
                 return pca.nr();
         }
 
+        const matrix<scalar_type,0,1,mem_manager_type>& means (
+        ) const
+        {
+            return m;
+        }
+
+        const matrix<scalar_type,0,1,mem_manager_type>& std_devs (
+        ) const
+        {
+            return sd;
+        }
+
+        const matrix<scalar_type,0,0,mem_manager_type>& pca_matrix (
+        ) const
+        {
+            return pca;
+        }
+
         const matrix<scalar_type,0,1,mem_manager_type>& operator() (
             const matrix_type& x
         ) const
@@ -329,14 +347,6 @@ namespace dlib
             // what the pca is doing, it just makes sure the output features are
             // normalized.
             pca = trans(scale_columns(trans(pca), reciprocal(sqrt(variance(x)))));
-
-            // if the pca transform doesn't reduce the dimensionality 
-            // then just forget about doing pca
-            if (pca.nr() == pca.nc())
-            {
-                pca.set_size(0,0);
-            }
-
         }
 
 

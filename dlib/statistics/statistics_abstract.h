@@ -162,6 +162,9 @@ namespace dlib
             INITIAL VALUE
                 - in_vector_size() == 0
                 - out_vector_size() == 0
+                - means().size() == 0
+                - std_devs().size() == 0
+                - pca_matrix().size() == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents something that can learn to normalize a set 
@@ -192,6 +195,9 @@ namespace dlib
                 - #out_vector_size() == samples(0).nr()
                 - This object has learned how to normalize vectors that look like
                   vectors in the given set of samples.  
+                - #means() == mean(samples)
+                - #std_devs() == reciprocal(sqrt(variance(samples)));
+                - #pca_matrix().size() == 0
         !*/
 
         template <typename vector_type>
@@ -216,6 +222,10 @@ namespace dlib
                 - eps is a number that controls how "lossy" the pca transform will be.
                   Large values of eps result in #out_vector_size() being larger and
                   smaller values of eps result in #out_vector_size() being smaller. 
+                - #means() == mean(samples)
+                - #std_devs() == reciprocal(sqrt(variance(samples)));
+                - #pca_matrix() == the PCA transform matrix that is out_vector_size()
+                  rows by in_vector_size() columns.
         !*/
 
         long in_vector_size (
@@ -235,6 +245,42 @@ namespace dlib
                   that come out of this object.
         !*/
 
+        const matrix<scalar_type,0,1,mem_manager_type>& means (
+        ) const;
+        /*!
+            ensures               
+                - returns a matrix M such that:
+                    - M.nc() == 1
+                    - M.nr() == in_vector_size()
+                    - M(i) == the mean of the ith input feature shown to train()
+                      or train_pca()
+        !*/
+
+        const matrix<scalar_type,0,1,mem_manager_type>& std_devs (
+        ) const;
+        /*!
+            ensures               
+                - returns a matrix SD such that:
+                    - SD.nc() == 1
+                    - SD.nr() == in_vector_size()
+                    - SD(i) == the reciprocal of the standard deviation of the ith 
+                      input feature shown to train() or train_pca()
+        !*/
+ 
+        const matrix<scalar_type,0,0,mem_manager_type>& pca_matrix (
+        ) const;
+        /*!
+            ensures
+                - if (PCA is used in normalization) then
+                    - returns a matrix PCA such that:
+                        - PCA.nr() == out_vector_size()
+                        - PCA.nc() == in_vector_size()
+                        - PCA == the principal component analysis transformation 
+                          matrix 
+                - else
+                    - returns an empty matrix object (i.e. it has size() == 0)
+        !*/
+
         const matrix<scalar_type,0,1,mem_manager_type>& operator() (
             const matrix_type& x
         ) const;
@@ -249,6 +295,10 @@ namespace dlib
                     - Z.nc() == 1
                     - the expected value of each element of Z is 0 
                     - the expected variance of each element of Z is 1
+                    - if (pca_matrix().size() > 0) then
+                        - Z == pca_matrix()*pointwise_multiply(x-means(), std_devs());
+                    - else
+                        - Z == pointwise_multiply(x-means(), std_devs());
         !*/
 
         void swap (
