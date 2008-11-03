@@ -83,7 +83,7 @@ namespace dlib
                 // This is here just to validate the assumption that our block of memory we have made
                 // in mp_memory.data is the right size to store the data for this object.  If you
                 // get a compiler error on this line then email me :)
-                COMPILE_TIME_ASSERT(sizeof(*this) <= mem_size);
+                COMPILE_TIME_ASSERT(sizeof(mp_impl_T) <= mem_size);
                 clone(buf);
             }
 
