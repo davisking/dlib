@@ -532,6 +532,120 @@ namespace
 
 
 
+
+        {
+            srand(423452);
+            const long M = 50;
+            const long N = 40;
+
+            matrix<double> a(M,N);  
+            for (long r = 0; r < a.nr(); ++r)
+            {
+                for (long c = 0; c < a.nc(); ++c)
+                {
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
+                }
+            }
+
+            matrix<double> u, u2;  
+            matrix<double> q, q2;
+            matrix<double> v, v2;
+
+            matrix<double> a2;  
+            a2 = tmp(a/2);
+
+
+            svd2(true,true,a2+a2,u,q,v);
+
+            double err = sum(round(1e10*(a - subm(u,get_rect(a2+a2))*diagm(q)*trans(v))));
+            DLIB_CASSERT(  err == 0,"err: " << err);
+            DLIB_CASSERT((round(1e10*trans(u)*u)  == 1e10*identity_matrix<double,M>()),"");
+            DLIB_CASSERT((round(1e10*trans(v)*v)  == 1e10*identity_matrix<double,N>()),"");
+
+            svd2(false,true,a2+a2,u2,q2,v2);
+            DLIB_CASSERT(equal(q2,q),"");
+            DLIB_CASSERT(equal(v2,v),"");
+            svd2(true,false,a2+a2,u2,q2,v2);
+            DLIB_CASSERT(equal(q2,q),"");
+            DLIB_CASSERT(equal(u2,u),"");
+            svd2(false,false,a2+a2,u2,q2,v2);
+            DLIB_CASSERT(equal(q2,q),"");
+
+        }
+
+
+        {
+            srand(423452);
+            const long M = 3;
+            const long N = 3;
+
+            matrix<double> a(M,N);  
+            for (long r = 0; r < a.nr(); ++r)
+            {
+                for (long c = 0; c < a.nc(); ++c)
+                {
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
+                }
+            }
+
+            matrix<double,M,M> u, u2;  
+            matrix<double> q, q2;
+            matrix<double,N,N> v, v2;
+
+            matrix<double,M,N,MM> a2;  
+            a2 = tmp(a/2);
+
+
+            svd2(true,true,a2+a2,u,q,v);
+
+            double err = sum(round(1e10*(a - subm(u,get_rect(a2+a2))*diagm(q)*trans(v))));
+            DLIB_CASSERT(  err == 0,"err: " << err);
+            DLIB_CASSERT((round(1e10*trans(u)*u)  == 1e10*identity_matrix<double,M>()),"");
+            DLIB_CASSERT((round(1e10*trans(v)*v)  == 1e10*identity_matrix<double,N>()),"");
+
+            svd2(false,true,a2+a2,u2,q2,v2);
+            DLIB_CASSERT(equal(q2,q),"");
+            DLIB_CASSERT(equal(v2,v),"");
+            svd2(true,false,a2+a2,u2,q2,v2);
+            DLIB_CASSERT(equal(q2,q),"");
+            DLIB_CASSERT(equal(u2,u),"");
+            svd2(false,false,a2+a2,u2,q2,v2);
+            DLIB_CASSERT(equal(q2,q),"");
+
+        }
+
+
+        {
+            srand(423452);
+            const long M = 10;
+            const long N = 7;
+
+            matrix<double> a(M,N);  
+            for (long r = 0; r < a.nr(); ++r)
+            {
+                for (long c = 0; c < a.nc(); ++c)
+                {
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
+                }
+            }
+
+            matrix<double,M,M> u;  
+            matrix<double> q;
+            matrix<double,N,N> v;
+
+            matrix<double,M,N,MM> a2;  
+            a2 = tmp(a/2);
+
+
+            svd2(true,true,a2+a2,u,q,v);
+
+            double err = sum(round(1e10*(a - subm(u,get_rect(a2+a2))*diagm(q)*trans(v))));
+            DLIB_CASSERT(  err == 0,"err: " << err);
+            DLIB_CASSERT((round(1e10*trans(u)*u)  == 1e10*identity_matrix<double,M>()),"");
+            DLIB_CASSERT((round(1e10*trans(v)*v)  == 1e10*identity_matrix<double,N>()),"");
+        }
+
+
         {
             srand(423452);
             const long M = 10;
@@ -1435,6 +1549,70 @@ namespace
             DLIB_CASSERT(trans(i)*i == tmp(trans(i)*i),"");
             DLIB_CASSERT(equal(trans(a)*a , tmp(trans(a)*a), 1e-11),max(abs(trans(a)*a - tmp(trans(a)*a))));
             DLIB_CASSERT(equal(trans(b)*b , tmp(trans(b)*b), 1e-3f),max(abs(trans(b)*b - tmp(trans(b)*b))));
+        }
+
+        {
+            matrix<int,4> i(4,1);
+            i(0) = 1;
+            i(1) = 2;
+            i(2) = 3;
+            i(3) = 4;
+            matrix<int,4,4> m;
+            set_all_elements(m,0);
+            m(0,0) = 1;
+            m(1,1) = 2;
+            m(2,2) = 3;
+            m(3,3) = 4;
+
+            DLIB_CASSERT(diagm(i) == m,"");
+        }
+
+        {
+            matrix<int,1,4> i;
+            i(0) = 1;
+            i(1) = 2;
+            i(2) = 3;
+            i(3) = 4;
+            matrix<int,4,4> m;
+            set_all_elements(m,0);
+            m(0,0) = 1;
+            m(1,1) = 2;
+            m(2,2) = 3;
+            m(3,3) = 4;
+
+            DLIB_CASSERT(diagm(i) == m,"");
+        }
+
+        {
+            matrix<int> i(4,1);
+            i(0) = 1;
+            i(1) = 2;
+            i(2) = 3;
+            i(3) = 4;
+            matrix<int> m(4,4);
+            set_all_elements(m,0);
+            m(0,0) = 1;
+            m(1,1) = 2;
+            m(2,2) = 3;
+            m(3,3) = 4;
+
+            DLIB_CASSERT(diagm(i) == m,"");
+        }
+
+        {
+            matrix<int> i(1,4);
+            i(0) = 1;
+            i(1) = 2;
+            i(2) = 3;
+            i(3) = 4;
+            matrix<int> m(4,4);
+            set_all_elements(m,0);
+            m(0,0) = 1;
+            m(1,1) = 2;
+            m(2,2) = 3;
+            m(3,3) = 4;
+
+            DLIB_CASSERT(diagm(i) == m,"");
         }
 
     }
