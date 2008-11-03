@@ -19,7 +19,7 @@ namespace dlib
         typename PARAM3 = void,
         typename PARAM4 = void
         >
-    class member_function_pointer_kernel_1;
+    class mfpk1;
 
 // ----------------------------------------------------------------------------------------
 
@@ -76,6 +76,17 @@ namespace dlib
 
             mp_impl_T() : mp_impl(0,0) {}
             mp_impl_T(void* ptr, mfp_pointer_type cb) : mp_impl(ptr,cb) {}
+
+            template <unsigned long mem_size>
+            void safe_clone(char (&buf)[mem_size])
+            {
+                // This is here just to validate the assumption that our block of memory we have made
+                // in mp_memory.data is the right size to store the data for this object.  If you
+                // get a compiler error on this line then email me :)
+                COMPILE_TIME_ASSERT(sizeof(*this) <= mem_size);
+                clone(buf);
+            }
+
             void clone   (void* ptr) const  { new(ptr) mp_impl_T(this->o,this->callback); }
             bool is_same (const mp_base_base* item) const 
             {
@@ -92,7 +103,8 @@ namespace dlib
             }
         };
 
-        struct dummy { void nonnull() {}; };
+        struct dummy_base { virtual void nonnull() {}; int a; };
+        struct dummy : virtual public dummy_base{ void nonnull() {}; };
 
         typedef mp_impl_T<mp_null<dummy> > mp_null_impl;
     public:
@@ -102,7 +114,7 @@ namespace dlib
         ) { item.mp()->clone(mp_memory.data); }
 
         mfp_kernel_1_base_class (  
-        ) { mp_null_impl().clone(mp_memory.data); }
+        ) { mp_null_impl().safe_clone(mp_memory.data); }
 
         bool operator == (
             const mfp_kernel_1_base_class& item
@@ -184,7 +196,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <>
-    class member_function_pointer_kernel_1<void,void,void,void> : public mfp_kernel_1_base_class<0>
+    class mfpk1<void,void,void,void> : public mfp_kernel_1_base_class<0>
     {
         class mp_base : public mp_base_base {
         public:
@@ -220,21 +232,14 @@ namespace dlib
 
         void operator() () const { static_cast<const mp_base*>((const void*)mp_memory.data)->call(); }
 
-        // This is here just to validate the assumption that our block of memory we have made
-        // in mp_memory.data is the right size to store the data for this object.  If you
-        // get a compiler error on this line then email me :)
-        member_function_pointer_kernel_1()
-        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
-          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
-
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory.data); }
 
     };    
 
@@ -243,7 +248,7 @@ namespace dlib
     template <
         typename PARAM1
         >
-    class member_function_pointer_kernel_1<PARAM1,void,void,void> : public mfp_kernel_1_base_class<1>
+    class mfpk1<PARAM1,void,void,void> : public mfp_kernel_1_base_class<1>
     {
         class mp_base : public mp_base_base {
         public:
@@ -279,21 +284,14 @@ namespace dlib
 
         void operator() (PARAM1 p1) const { static_cast<const mp_base*>((const void*)mp_memory.data)->call(p1); }
 
-        // This is here just to validate the assumption that our block of memory we have made
-        // in mp_memory.data is the right size to store the data for this object.  If you
-        // get a compiler error on this line then email me :)
-        member_function_pointer_kernel_1()
-        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
-          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
-
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory.data); }
 
     };    
 
@@ -303,7 +301,7 @@ namespace dlib
         typename PARAM1,
         typename PARAM2
         >
-    class member_function_pointer_kernel_1<PARAM1,PARAM2,void,void> : public mfp_kernel_1_base_class<2>
+    class mfpk1<PARAM1,PARAM2,void,void> : public mfp_kernel_1_base_class<2>
     {
         class mp_base : public mp_base_base {
         public:
@@ -339,21 +337,14 @@ namespace dlib
 
         void operator() (PARAM1 p1, PARAM2 p2) const { static_cast<const mp_base*>((const void*)mp_memory.data)->call(p1,p2); }
 
-        // This is here just to validate the assumption that our block of memory we have made
-        // in mp_memory.data is the right size to store the data for this object.  If you
-        // get a compiler error on this line then email me :)
-        member_function_pointer_kernel_1()
-        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
-          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
-
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory.data); }
 
     };    
 
@@ -364,7 +355,7 @@ namespace dlib
         typename PARAM2,
         typename PARAM3
         >
-    class member_function_pointer_kernel_1<PARAM1,PARAM2,PARAM3,void> : public mfp_kernel_1_base_class<3>
+    class mfpk1<PARAM1,PARAM2,PARAM3,void> : public mfp_kernel_1_base_class<3>
     {
         class mp_base : public mp_base_base {
         public:
@@ -400,21 +391,14 @@ namespace dlib
 
         void operator() (PARAM1 p1, PARAM2 p2, PARAM3 p3) const { static_cast<const mp_base*>((const void*)mp_memory.data)->call(p1,p2,p3); }
 
-        // This is here just to validate the assumption that our block of memory we have made
-        // in mp_memory.data is the right size to store the data for this object.  If you
-        // get a compiler error on this line then email me :)
-        member_function_pointer_kernel_1()
-        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
-          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
-
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory.data); }
 
     };    
 
@@ -426,7 +410,7 @@ namespace dlib
         typename PARAM3,
         typename PARAM4
         >
-    class member_function_pointer_kernel_1 : public mfp_kernel_1_base_class<4>
+    class mfpk1 : public mfp_kernel_1_base_class<4>
     {
         class mp_base : public mp_base_base {
         public:
@@ -463,21 +447,14 @@ namespace dlib
         void operator() (PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4) const 
         { static_cast<const mp_base*>((const void*)mp_memory.data)->call(p1,p2,p3,p4); }
 
-        // This is here just to validate the assumption that our block of memory we have made
-        // in mp_memory.data is the right size to store the data for this object.  If you
-        // get a compiler error on this line then email me :)
-        member_function_pointer_kernel_1()
-        { COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl<dummy> >));
-          COMPILE_TIME_ASSERT(sizeof(mp_memory.data) >= sizeof(mp_impl_T<mp_impl_const<dummy> >)); }
-
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory.data); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).clone(mp_memory.data); }
+        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory.data); }
 
     };    
 

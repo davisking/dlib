@@ -17,14 +17,14 @@ namespace dlib
         typename PARAM3 = typename mfpb::param3_type,
         typename PARAM4 = typename mfpb::param4_type 
         >
-    class member_function_pointer_kernel_c;
+    class mfpkc;
 
 // ----------------------------------------------------------------------------------------
 
     template <
         typename mfpb
         >
-    class member_function_pointer_kernel_c<mfpb,void,void,void,void> : 
+    class mfpkc<mfpb,void,void,void,void> : 
     public mfpb
     {
     public:
@@ -88,7 +88,7 @@ namespace dlib
         typename mfpb,
         typename PARAM1
         >
-    class member_function_pointer_kernel_c<mfpb,PARAM1,void,void,void> : 
+    class mfpkc<mfpb,PARAM1,void,void,void> : 
     public mfpb
     {
     public:
@@ -154,7 +154,7 @@ namespace dlib
         typename PARAM1,
         typename PARAM2
         >
-    class member_function_pointer_kernel_c<mfpb,PARAM1,PARAM2,void,void> : 
+    class mfpkc<mfpb,PARAM1,PARAM2,void,void> : 
     public mfpb
     {
     public:
@@ -222,7 +222,7 @@ namespace dlib
         typename PARAM2,
         typename PARAM3
         >
-    class member_function_pointer_kernel_c<mfpb,PARAM1,PARAM2,PARAM3,void> : 
+    class mfpkc<mfpb,PARAM1,PARAM2,PARAM3,void> : 
     public mfpb
     {
     public:
@@ -292,7 +292,7 @@ namespace dlib
         typename PARAM3,
         typename PARAM4
         >
-    class member_function_pointer_kernel_c : 
+    class mfpkc : 
     public mfpb
     {
     public:

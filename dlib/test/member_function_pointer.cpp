@@ -122,11 +122,11 @@ namespace
         mfp<int,int,int> a3, b3;
         mfp<int,int,int,int> a4, b4;
 
-        member_function_pointer_kernel_c<mfp<> > a0c, b0c;
-        member_function_pointer_kernel_c<mfp<int> > a1c, b1c;
-        member_function_pointer_kernel_c<mfp<int,int> > a2c, b2c;
-        member_function_pointer_kernel_c<mfp<int,int,int> > a3c, b3c;
-        member_function_pointer_kernel_c<mfp<int,int,int,int> > a4c, b4c;
+        mfpkc<mfp<> > a0c, b0c;
+        mfpkc<mfp<int> > a1c, b1c;
+        mfpkc<mfp<int,int> > a2c, b2c;
+        mfpkc<mfp<int,int,int> > a3c, b3c;
+        mfpkc<mfp<int,int,int,int> > a4c, b4c;
 
         DLIB_CASSERT(a0c == b0c, "");
         DLIB_CASSERT(a1c == b1c, "");
@@ -543,8 +543,8 @@ namespace
         void perform_test (
         )
         {
-            member_function_pointer_kernel_test<member_function_pointer_kernel_1,mfp_test_helper>();
-            member_function_pointer_kernel_test<member_function_pointer_kernel_1,mfp_test_helper_const>();
+            member_function_pointer_kernel_test<mfpk1,mfp_test_helper>();
+            member_function_pointer_kernel_test<mfpk1,mfp_test_helper_const>();
         }
     } a;
 

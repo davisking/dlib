@@ -248,7 +248,7 @@ namespace dlib
             void (T::*cb)(PARAM1)const
         );
 
-        operator bool (
+        operator some_undefined_pointer_type (
         ) const;
 
         bool operator! (
@@ -315,7 +315,7 @@ namespace dlib
             void (T::*cb)(PARAM1,PARAM2)const
         );
 
-        operator bool (
+        operator some_undefined_pointer_type (
         ) const;
 
         bool operator! (
@@ -384,7 +384,7 @@ namespace dlib
             void (T::*cb)(PARAM1,PARAM2,PARAM3)const
         );
 
-        operator bool (
+        operator some_undefined_pointer_type (
         ) const;
 
         bool operator! (
@@ -455,7 +455,7 @@ namespace dlib
             void (T::*cb)(PARAM1,PARAM2,PARAM3,PARAM4)const
         );
 
-        operator bool (
+        operator some_undefined_pointer_type (
         ) const;
 
         bool operator! (

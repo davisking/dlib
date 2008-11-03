@@ -25,9 +25,9 @@ namespace dlib
         //----------- kernels ---------------
 
         // kernel_1a        
-        typedef      member_function_pointer_kernel_1<PARAM1,PARAM2,PARAM3,PARAM4>
+        typedef      mfpk1<PARAM1,PARAM2,PARAM3,PARAM4>
                      kernel_1a;
-        typedef      member_function_pointer_kernel_c<kernel_1a>
+        typedef      mfpkc<kernel_1a>
                      kernel_1a_c;
            
 
