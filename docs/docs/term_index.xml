@@ -486,6 +486,7 @@
          <term link="dlib/matrix/matrix_math_functions_abstract.h.html#normalize" name="normalize"/>
 
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#diag" name="diag"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#diagm" name="diagm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#trans" name="trans"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#uniform_matrix" name="uniform_matrix"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#identity_matrix" name="identity_matrix"/>
@@ -513,7 +514,11 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv_lower_triangular" name="inv_lower_triangular"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv_upper_triangular" name="inv_upper_triangular"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#pinv" name="pinv"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#pinv" name="pinv"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd" name="svd"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd" name="singular value decomposition"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd2" name="svd2"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd3" name="svd3"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#det" name="det"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#scale_columns" name="scale_columns"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#sort_columns" name="sort_columns"/>
