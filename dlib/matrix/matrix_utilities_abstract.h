@@ -31,6 +31,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp diagm (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m is a row or column matrix
+        ensures
+            - returns a square matrix M such that:
+                - diag(M) == m
+                - non diagonal elements of M are 0
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp trans (
         const matrix_exp& m
     );
@@ -730,13 +744,74 @@ namespace dlib
             - m == #u*#w*trans(#v)
             - trans(#u)*#u == identity matrix
             - trans(#v)*#v == identity matrix
-            - diag(#w) == the sinular values of the matrix m in no 
+            - diag(#w) == the singular values of the matrix m in no 
               particular order.  All non-diagonal elements of #w are
               set to 0.
             - #u.nr() == m.nr()
             - #u.nc() == m.nc()
             - #w.nr() == m.nc()
             - #w.nc() == m.nc()
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    long svd2 (
+        bool withu, 
+        bool withv, 
+        const matrix_exp& m,
+        matrix<matrix_exp::type>& u,
+        matrix<matrix_exp::type>& w,
+        matrix<matrix_exp::type>& v
+    );
+    /*!
+        requires
+            - a.nr() >= a.nc()
+        ensures
+            - computes the singular value decomposition of matrix a
+            - a == subm(#u,get_rect(a))*diagm(#w)*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the singular values of the matrix m in no 
+              particular order.  
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nr()
+            - #w.nr() == m.nc()
+            - #w.nc() == 1 
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+            - if (widthu == false) then
+                - ignore the above regarding #u, it isn't computed and its
+                  output state is undefined.
+            - if (widthv == false) then
+                - ignore the above regarding #v, it isn't computed and its
+                  output state is undefined.
+            - returns an error code of 0, if no errors and 'k' if we fail to
+              converge at the 'kth' singular value.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void svd3 (
+        const matrix_exp& m,
+        matrix<matrix_exp::type>& u,
+        matrix<matrix_exp::type>& w,
+        matrix<matrix_exp::type>& v
+    );
+    /*!
+        ensures
+            - computes the singular value decomposition of m
+            - m == #u*diagm(#w)*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the singular values of the matrix m in no 
+              particular order.  All non-diagonal elements of #w are
+              set to 0.
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nc()
+            - #w.nr() == m.nc()
+            - #w.nc() == 1 
             - #v.nr() == m.nc()
             - #v.nc() == m.nc()
     !*/
