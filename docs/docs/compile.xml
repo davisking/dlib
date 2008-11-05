@@ -83,7 +83,7 @@
          <anchor>DLIB_THREAD_POOL_TIMEOUT</anchor>
         <h3>#define DLIB_THREAD_POOL_TIMEOUT &lt;time-in-milliseconds&gt;</h3>
         <p>
-           If you use the <a href="dlib/threads/threads_kernel_abstract.h#create_new_thread">create_new_thread</a> function
+           If you use the <a href="dlib/threads/threads_kernel_abstract.h.html#create_new_thread">create_new_thread</a> function
            to create your threads then you receive the benefit of the dlib thread pool.  This pool enables the create_new_thread
            function to spawn new threads very rapidly since it draws threads back out of its thread pool when the pool isn't
            empty. 
