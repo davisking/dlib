@@ -15,7 +15,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a group of threads which you can
+                This object represents a fixed size group of threads which you can
                 submit tasks to and then wait for those tasks to be completed. 
         !*/
 
