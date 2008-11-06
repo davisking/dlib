@@ -24,6 +24,7 @@
          <term link="api.html#thread_function" name="thread_function"/>
          <term link="api.html#thread_specific_data" name="thread_specific_data"/>
          <term link="api.html#threaded_object" name="threaded_object"/>
+         <term link="api.html#thread_pool" name="thread_pool"/>
 
 
 

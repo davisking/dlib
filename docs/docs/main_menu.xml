@@ -212,6 +212,10 @@
                   <link>threaded_object_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Thread_Pool</name>
+                  <link>thread_pool_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Thread_Function</name>
                   <link>thread_function_ex.cpp.html</link>
                </item>

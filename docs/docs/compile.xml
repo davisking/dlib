@@ -83,13 +83,14 @@
          <anchor>DLIB_THREAD_POOL_TIMEOUT</anchor>
         <h3>#define DLIB_THREAD_POOL_TIMEOUT &lt;time-in-milliseconds&gt;</h3>
         <p>
-           If you use the <a href="dlib/threads/threads_kernel_abstract.h.html#create_new_thread">create_new_thread</a> function
-           to create your threads then you receive the benefit of the dlib thread pool.  This pool enables the create_new_thread
-           function to spawn new threads very rapidly since it draws threads back out of its thread pool when the pool isn't
-           empty. 
+           If you use dlib to create your threads then you receive the benefit of the dlib dynamic thread pool (Note that the 
+           dlib::<a href="api.html#thread_pool">thread_pool</a> object is something else unrelated to this so don't confuse
+           the two).  This pool 
+           enables dlib to spawn new threads very rapidly since it draws threads back out of its thread pool when 
+           the pool isn't empty. 
         </p>
         <p>
-           Thus, when a thread that was created by create_new_thread ends it actually goes back into the dlib thread pool
+           Thus, when a thread that was created by dlib ends it actually goes back into the dlib thread pool
            and waits DLIB_THREAD_POOL_TIMEOUT milliseconds before totally terminating and releasing its resources back
            to the operating system.  The default timeout used by this library is 30,000 milliseconds (30 seconds).  You
            may however change this to whatever you like by defining DLIB_THREAD_POOL_TIMEOUT to some new value.  

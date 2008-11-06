@@ -608,6 +608,10 @@
                         <link>dlib/threads/threaded_object_extension_abstract.h.html#threaded_object</link>
                      </item>
                      <item>   
+                        <name>thread_pool</name>
+                        <link>dlib/threads/thread_pool_extension_abstract.h.html#thread_pool</link>
+                     </item>
+                     <item>   
                         <name>thread_function</name>
                         <link>dlib/threads/thread_function_extension_abstract.h.html#thread_function</link>
                      </item>
@@ -896,8 +900,7 @@
             for creating multi-threaded programs. There are currently two implementations, one 
             for UNIX and another for any variant of MS Windows after Windows 95. Both provide 
             the exact same interface so programs written with them can be recompiled on either 
-            platform without a problem. Both implementations also pool their threads so repeated 
-            calls to create_new_thread are nice and speedy :) 
+            platform without a problem.  
             <p>
               You also probably want to take note of the <a href="other.html#pipe">pipe</a> object.
               It provides an easy to use typesafe mechanism to send messages between threads.
@@ -908,9 +911,6 @@
             <example>threads_ex.cpp.html</example>
             <example>logger_ex_2.cpp.html</example>
             <example>pipe_ex.cpp.html</example>
-            <example>threaded_object_ex.cpp.html</example>
-            <example>multithreaded_object_ex.cpp.html</example>
-            <example>thread_function_ex.cpp.html</example>
          </examples>
          
          <implementations>
@@ -1045,6 +1045,25 @@
                </examples>
 
                
+            </extension>
+
+            <extension>
+               <name>thread_pool</name>
+               <spec_file>dlib/threads/thread_pool_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                  This object represents a fixed size group of threads which you can
+                  submit tasks to and then wait for those tasks to be completed. 
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/thread_pool_extension.h.html">here</a>.  It is 
+                  implemented such that no memory allocations occur after the thread pool
+                  has been constructed.
+               </description> 
+
+               <examples>
+                  <example>thread_pool_ex.cpp.html</example>
+               </examples>
             </extension>
 
             <extension>
