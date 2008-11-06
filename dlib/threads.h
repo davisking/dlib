@@ -14,6 +14,7 @@
 #include "threads/threaded_object_extension.h"
 #include "threads/thread_specific_data_extension.h"
 #include "threads/thread_function_extension.h"
+#include "threads/thread_pool_extension.h"
 
 #endif // DLIB_THREADs_
 

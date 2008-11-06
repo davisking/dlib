@@ -41,6 +41,7 @@
 #include "../threads/threads_kernel_1.cpp"
 #include "../threads/threads_kernel_2.cpp"
 #include "../threads/threads_kernel_shared.cpp"
+#include "../threads/thread_pool_extension.cpp"
 #include "../timer/timer_kernel_2.cpp"
 #include "../stack_trace.cpp"
 
