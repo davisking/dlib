@@ -24,6 +24,8 @@ namespace dlib
             unsigned long num_threads
         );
         /*!
+            requires
+                - num_threads > 0
             ensures
                 - num_threads_in_pool() == num_threads
             throws
