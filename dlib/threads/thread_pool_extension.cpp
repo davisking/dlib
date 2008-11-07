@@ -18,6 +18,13 @@ namespace dlib
         task_ready_signaler(m),
         we_are_destructing(false)
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(num_threads > 0,
+            "\tthread_pool::thread_pool()"
+            << "\n\tthe number of threads in a thread_pool can't be zero"
+            << "\n\tthis: " << this
+            );
+
         tasks.expand(num_threads);
         for (unsigned long i = 0; i < num_threads; ++i)
         {
