@@ -136,6 +136,8 @@ namespace dlib
 
         try 
         {
+            // lock this mutex since gethostbyname isn't really thread safe
+            auto_mutex M(sockets_kernel_1_mutex::startup_lock);
 
             // if no hostname was given then return error
             if ( hostname.empty())
@@ -193,6 +195,8 @@ namespace dlib
 
         try 
         {
+            // lock this mutex since gethostbyaddr isn't really thread safe
+            auto_mutex M(sockets_kernel_1_mutex::startup_lock);
 
             // if no ip was given then return error
             if (ip.empty())

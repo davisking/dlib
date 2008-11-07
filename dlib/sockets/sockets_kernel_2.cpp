@@ -197,12 +197,10 @@ namespace dlib
         int n
     )
     {
-        // ensure that WSAStartup has been called and WSACleanup will eventually 
-        // be called when program ends
-        sockets_startup();
-
         try 
         {
+            // lock this mutex since gethostbyname isn't really thread safe
+            auto_mutex M(sockets_kernel_2_mutex::startup_lock);
 
             // if no hostname was given then return error
             if ( hostname.empty())
@@ -254,12 +252,10 @@ namespace dlib
         std::string& hostname
     )
     {
-        // ensure that WSAStartup has been called and WSACleanup will eventually 
-        // be called when program ends
-        sockets_startup();
-
         try 
         {
+            // lock this mutex since gethostbyaddr isn't really thread safe
+            auto_mutex M(sockets_kernel_2_mutex::startup_lock);
 
             // if no ip was given then return error
             if (ip.empty())
