@@ -12,12 +12,30 @@
 
 <current>
 New Stuff:
+   - Added user settable styles to most of the gui widgets
+   - Added the diagm(), svd2() and svd3() matrix functions
+   - Added the thread_pool object
 
 Non-Backwards Compatible Changes:
+   - Removed the arrow_button widget and moved its functionality into the 
+     button widget. 
+   - Renamed the dragable class to draggable 
+   - Removed the confusing and unnecessary hidden bool argument to the 
+     gui widget style drawing functions.
+   - Fixed a bug in the fill_gradient_rounded() function. It didn't always
+     draw the entire rectangle.
+   - Changed some of the events that are about the mouse leaving
+     a widget so that they still trigger even if the widget has been disabled
+     or hidden.  
+   - Fixed a compile time bug in the pinv() function.  It didn't compile 
+     when used on statically sized matrices when they weren't square.
 
 Bug fixes:
+   - Added some missing mutex locks to the scroll_bar widget
 
 Other:
+   - The member_function_pointer object now never calls new or delete. 
+     So it is safe to use in a real time environment.
 
 </current>
 
