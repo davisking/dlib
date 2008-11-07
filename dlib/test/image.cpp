@@ -377,8 +377,8 @@ namespace
             {
                 for (long c = 0; c < img2.nc(); ++c)
                 {
-                    if (r == 5 && c == 5 ||
-                        r == 7 && c == 7)
+                    if ((r == 5 && c == 5) ||
+                        (r == 7 && c == 7))
                     {
                         DLIB_CASSERT(img2[r][c] == 255, "");
                     }

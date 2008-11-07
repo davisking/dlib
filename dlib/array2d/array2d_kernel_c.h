@@ -254,8 +254,8 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(nc_ > 0 && nr_ > 0 ||
-                nc_ == 0 && nr_ == 0,
+        DLIB_CASSERT((nc_ > 0 && nr_ > 0) ||
+                (nc_ == 0 && nr_ == 0),
                "\tvoid array2d::set_size(long nr_, long nc_)"
                << "\n\tYou have to give a non zero nc and nr or just make both zero."
                << "\n\tthis:    " << this

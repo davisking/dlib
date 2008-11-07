@@ -350,8 +350,8 @@ namespace
 
         {
             DLIB_CASSERT(test == test2,"");
-            DLIB_CASSERT(test < test2 == false,"");
-            DLIB_CASSERT(test2 < test == false,"");
+            DLIB_CASSERT((test < test2) == false,"");
+            DLIB_CASSERT((test2 < test) == false,"");
 
             int a = 3, b = 3;
             test.add(a);
@@ -360,10 +360,10 @@ namespace
             DLIB_CASSERT(test == test2,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
             test.move_next();
-            DLIB_CASSERT(test < test2 == false,"");
+            DLIB_CASSERT((test < test2) == false,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
             test.move_next();
-            DLIB_CASSERT(test2 < test == false,"");
+            DLIB_CASSERT((test2 < test) == false,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
 
             a = 2; b = 5;
@@ -374,10 +374,10 @@ namespace
             DLIB_CASSERT((test == test2) == false,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
             test2.move_next();                
-            DLIB_CASSERT(test < test2 == true,"");
+            DLIB_CASSERT((test < test2) == true,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
             test2.move_next();                
-            DLIB_CASSERT(test2 < test == false,"");
+            DLIB_CASSERT((test2 < test) == false,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
 
 
@@ -388,10 +388,10 @@ namespace
             DLIB_CASSERT((test == test2) == false,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
             test2.move_next();                
-            DLIB_CASSERT(test < test2 == false,"");
+            DLIB_CASSERT((test < test2) == false,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
             test2.move_next();                
-            DLIB_CASSERT(test2 < test == true,"");
+            DLIB_CASSERT((test2 < test) == true,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
 
             test.clear();
@@ -401,10 +401,10 @@ namespace
             DLIB_CASSERT((test == test2) == false,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
             test2.move_next();                
-            DLIB_CASSERT(test < test2 == true,"");
+            DLIB_CASSERT((test < test2) == true,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
             test2.move_next();                
-            DLIB_CASSERT(test2 < test == false,"");
+            DLIB_CASSERT((test2 < test) == false,"");
             DLIB_CASSERT(test.at_start() && test2.at_start(),"");
 
 

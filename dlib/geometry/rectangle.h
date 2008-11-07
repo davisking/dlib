@@ -51,7 +51,7 @@ namespace dlib
             r(static_cast<long>(w)-1),
             b(static_cast<long>(h)-1)
         {
-            DLIB_ASSERT(w > 0 && h > 0 || w == 0 && h == 0,
+            DLIB_ASSERT((w > 0 && h > 0) || (w == 0 && h == 0),
                 "\trectangle(width,height)"
                 << "\n\twidth and height must be > 0 or both == 0"
                 << "\n\twidth:  " << w 

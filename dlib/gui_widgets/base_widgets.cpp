@@ -2814,7 +2814,7 @@ namespace dlib
         unsigned long height
     )
     {
-        DLIB_ASSERT(width > 0 && height > 0 || width == 0 && height == 0,
+        DLIB_ASSERT((width > 0 && height > 0) || (width == 0 && height == 0),
                     "\tvoid scrollable_region::set_total_rect_size(width,height)"
                     << "\n\twidth and height must be > 0 or both == 0"
                     << "\n\twidth:  " << width 

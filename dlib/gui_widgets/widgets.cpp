@@ -2314,7 +2314,7 @@ namespace dlib
         if (display_rect().contains(x,y) && btn == base_window::LEFT && enabled && !hidden )
         {
             if ( ms_enabled == false || 
-                 (!(state&base_window::CONTROL)) && !(state&base_window::SHIFT))
+                 ((!(state&base_window::CONTROL)) && !(state&base_window::SHIFT)))
             {
                 items.reset();
                 while (items.move_next())

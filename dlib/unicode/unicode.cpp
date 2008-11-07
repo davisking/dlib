@@ -32,7 +32,7 @@ namespace dlib
 
     template <typename T> unichar surrogate_pair_to_unichar(T first, T second)
     {
-        return ((first & SURROGATE_CLEARING_MASK) << VALID_BITS) | (second & SURROGATE_CLEARING_MASK) + SMP_TOP;
+        return ((first & SURROGATE_CLEARING_MASK) << VALID_BITS) | ((second & SURROGATE_CLEARING_MASK) + SMP_TOP);
     }
     //110110 0000000000
     //110111 0000000000

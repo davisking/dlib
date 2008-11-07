@@ -165,13 +165,13 @@ namespace
         {
             for (unsigned long j = 0; j < a.node(i).number_of_neighbors(); ++j)
             {
-                if (i == 0 && a.node(i).neighbor(j).index() == e2 ||
-                    i == e2 && a.node(i).neighbor(j).index() == 0 )
+                if ((i == 0 && a.node(i).neighbor(j).index() == e2) ||
+                    (i == e2 && a.node(i).neighbor(j).index() == 0) )
                 {
                     DLIB_CASSERT(a.node(i).edge(j) == 'n',"");
                 }
-                else if (i == 1 && a.node(i).neighbor(j).index() == e1 ||
-                         i == e1 && a.node(i).neighbor(j).index() == 1)
+                else if ((i == 1 && a.node(i).neighbor(j).index() == e1) ||
+                         (i == e1 && a.node(i).neighbor(j).index() == 1))
                 {
                     DLIB_CASSERT(a.node(i).edge(j) == 'a',"");
                 }
@@ -227,9 +227,9 @@ namespace
 
             for (unsigned long j = 0; j < a.number_of_nodes(); ++j)
             {
-                if (a.node(i).data == 1 && a.node(j).data == 1 || 
-                    a.node(i).data == 1 && a.node(j).data == 3 ||
-                    a.node(i).data == 3 && a.node(j).data == 1)
+                if ((a.node(i).data == 1 && a.node(j).data == 1) || 
+                    (a.node(i).data == 1 && a.node(j).data == 3) ||
+                    (a.node(i).data == 3 && a.node(j).data == 1))
                 {
                     DLIB_CASSERT(a.has_edge(i,j) == true,"");
                     ++count;

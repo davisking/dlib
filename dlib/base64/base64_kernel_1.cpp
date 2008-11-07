@@ -143,7 +143,7 @@ namespace dlib
         }
         for (unsigned char i = 0; i < 64; ++i)
         {
-            decode_table[encode_table[i]] = i;
+            decode_table[(unsigned char)encode_table[i]] = i;
         }
     }
 

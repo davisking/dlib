@@ -205,7 +205,7 @@ namespace dlib
             for (long j = area.top(); j <= area.bottom(); ++j)
             {
                 canvas::pixel& p = c[j - c.top()][i - c.left()];
-                if (j&0x1 ^ i&0x1)
+                if ((j&0x1) ^ (i&0x1))
                 {
                     assign_pixel(p,pixel1);
                 }

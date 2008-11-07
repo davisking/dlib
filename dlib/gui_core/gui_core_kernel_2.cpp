@@ -380,9 +380,9 @@ namespace dlib
         !*/
         {
             is_printable = true;
-            if (keycode <= 'z' && keycode >= 'a' || 
-                keycode <= 'Z' && keycode >= 'A' || 
-                keycode <= '9' && keycode >= '0')
+            if ((keycode <= 'z' && keycode >= 'a') || 
+                (keycode <= 'Z' && keycode >= 'A') || 
+                (keycode <= '9' && keycode >= '0'))
             {
                 result = keycode;
             }
