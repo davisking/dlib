@@ -814,7 +814,7 @@ namespace dlib
             Returns an error code = 0, if no errors and 'k' if a failure to
             converge at the 'kth' singular value.
 
-            USAGE: given the singular value decomposition a = u * diagm(q) * v' for an m*n 
+            USAGE: given the singular value decomposition a = u * diagm(q) * trans(v) for an m*n 
                     matrix a with m >= n ...  
                     After the svd call u is an m x m matrix which is columnwise 
                     orthogonal. q will be an n element vector consisting of singular values 
