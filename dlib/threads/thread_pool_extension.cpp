@@ -216,7 +216,7 @@ namespace dlib
         uint64 id
     ) const
     {
-        return id%tasks.size();
+        return static_cast<unsigned long>(id%tasks.size());
     }
 
 // ----------------------------------------------------------------------------------------
