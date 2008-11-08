@@ -605,16 +605,16 @@ namespace dlib
         node_type& c = *nodes[child_node_index];
 
         // remove the record of the link from the parent node
-        unsigned long pos = find( p.children.begin(),
+        unsigned long pos = static_cast<unsigned long>(find( p.children.begin(),
                                   p.children.end(),
-                                  &c) - p.children.begin();
+                                  &c) - p.children.begin());
         p.children.erase(p.children.begin()+pos);
         p.edge_children.erase(p.edge_children.begin()+pos);
 
         // remove the record of the link from the child node
-        pos = find( c.parents.begin(),
+        pos = static_cast<unsigned long>(find( c.parents.begin(),
                   c.parents.end(),
-                  &p) - c.parents.begin();
+                  &p) - c.parents.begin());
         c.parents.erase(c.parents.begin() + pos);
         c.edge_parents.erase(c.edge_parents.begin() + pos);
     }
@@ -666,9 +666,9 @@ namespace dlib
         for (unsigned long i = 0; i < n.parents.size(); ++i)
         {
             // remove the edge from this specific parent
-            unsigned long pos = find(n.parents[i]->children.begin(), 
+            unsigned long pos = static_cast<unsigned long>(find(n.parents[i]->children.begin(), 
                      n.parents[i]->children.end(), 
-                     &n) - n.parents[i]->children.begin();
+                     &n) - n.parents[i]->children.begin());
 
             n.parents[i]->children.erase(n.parents[i]->children.begin() + pos);
             n.parents[i]->edge_children.erase(n.parents[i]->edge_children.begin() + pos);
@@ -678,9 +678,9 @@ namespace dlib
         for (unsigned long i = 0; i < n.children.size(); ++i)
         {
             // remove the edge from this specific child 
-            unsigned long pos = find(n.children[i]->parents.begin(),
+            unsigned long pos = static_cast<unsigned long>(find(n.children[i]->parents.begin(),
                      n.children[i]->parents.end(),
-                     &n) - n.children[i]->parents.begin();
+                     &n) - n.children[i]->parents.begin());
 
             n.children[i]->parents.erase(n.children[i]->parents.begin() + pos);
             n.children[i]->edge_parents.erase(n.children[i]->edge_parents.begin() + pos);

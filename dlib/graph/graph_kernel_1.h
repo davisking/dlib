@@ -544,7 +544,7 @@ namespace dlib
         node_type& n2 = *nodes[node_index2];
 
         // remove the record of the link from n1 
-        unsigned long pos = find(n1.neighbors.begin(), n1.neighbors.end(), &n2) - n1.neighbors.begin();
+        unsigned long pos = static_cast<unsigned long>(find(n1.neighbors.begin(), n1.neighbors.end(), &n2) - n1.neighbors.begin());
         n1.neighbors.erase(n1.neighbors.begin() + pos); 
         n1.edges.erase(n1.edges.begin() + pos); 
 
@@ -552,7 +552,7 @@ namespace dlib
         if (node_index1 != node_index2)
         {
             // remove the record of the link from n2 
-            unsigned long pos = find(n2.neighbors.begin(), n2.neighbors.end(), &n1) - n2.neighbors.begin();
+            unsigned long pos = static_cast<unsigned long>(find(n2.neighbors.begin(), n2.neighbors.end(), &n1) - n2.neighbors.begin());
             n2.neighbors.erase(n2.neighbors.begin() + pos); 
             n2.edges.erase(n2.edges.begin() + pos); 
         }
@@ -605,8 +605,8 @@ namespace dlib
         for (unsigned long i = 0; i < n.neighbors.size(); ++i)
         {
             // remove the edge from this specific parent
-            unsigned long pos = find(n.neighbors[i]->neighbors.begin(), n.neighbors[i]->neighbors.end(), &n) - 
-                                n.neighbors[i]->neighbors.begin();
+            unsigned long pos = static_cast<unsigned long>(find(n.neighbors[i]->neighbors.begin(), n.neighbors[i]->neighbors.end(), &n) - 
+                                n.neighbors[i]->neighbors.begin());
             n.neighbors[i]->neighbors.erase(n.neighbors[i]->neighbors.begin() + pos); 
             n.neighbors[i]->edges.erase(n.neighbors[i]->edges.begin() + pos); 
         }

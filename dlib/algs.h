@@ -30,6 +30,11 @@
 //    of the form () will be default-initialized.
 // I love it when this compiler gives warnings about bugs in previous versions of itself. 
 #pragma warning(disable : 4345)
+
+
+// Disable warnings about conversion from size_t to unsigned long and long.
+#pragma warning(disable : 4267)
+
 #endif
 
 #ifdef __BORLANDC__
