@@ -360,7 +360,7 @@ namespace dlib
         );
         /*!
             requires
-                - begin() <= position && position < end()
+                - begin() <= position && position <= end()
                   (i.e. position references an element in this vector object)
             ensures
                 - #size() == size() + 1
@@ -376,7 +376,7 @@ namespace dlib
         );
         /*!
             requires
-                - begin() <= position && position < end()
+                - begin() <= position && position <= end()
                   (i.e. position references an element in this vector object)
             ensures
                 - #size() == size() + n
@@ -391,7 +391,7 @@ namespace dlib
         );
         /*!
             requires
-                - begin() <= position && position < end()
+                - begin() <= position && position <= end()
                   (i.e. position references an element in this vector object)
                 - first and last are not iterators into *this
             ensures
