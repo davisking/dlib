@@ -22,16 +22,15 @@ Non-Backwards Compatible Changes:
    - Renamed the dragable class to draggable 
    - Removed the confusing and unnecessary hidden bool argument to the 
      gui widget style drawing functions.
-   - Fixed a bug in the fill_gradient_rounded() function. It didn't always
-     draw the entire rectangle.
-   - Changed some of the events that are about the mouse leaving
-     a widget so that they still trigger even if the widget has been disabled
-     or hidden.  
-   - Fixed a compile time bug in the pinv() function.  It didn't compile 
-     when used on statically sized matrices when they weren't square.
+   - Changed some of the events that are about the mouse leaving a widget so 
+     that they still trigger even if the widget has been disabled or hidden.  
 
 Bug fixes:
    - Added some missing mutex locks to the scroll_bar widget
+   - Fixed a bug in the fill_gradient_rounded() function. It didn't always
+     draw the entire rectangle.
+   - Fixed a compile time bug in the pinv() function.  It didn't compile 
+     when used on statically sized matrices when they weren't square.
 
 Other:
    - The member_function_pointer object now never calls new or delete. 
