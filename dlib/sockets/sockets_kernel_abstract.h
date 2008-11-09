@@ -397,6 +397,15 @@ namespace dlib
                 - returns OTHER_ERROR if an error has occurred 
         !*/
 
+        int accept (
+            scoped_ptr<connection>& new_connection,
+            unsigned long timeout = 0
+        );
+        /*!
+            This function is just an overload of the above function but it gives you a
+            scoped_ptr smart pointer instead of a C pointer.
+        !*/
+
         unsigned short get_listening_port (
         ) const;
         /*!

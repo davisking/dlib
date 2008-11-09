@@ -238,6 +238,11 @@ namespace dlib
             unsigned long timeout = 0
         );
 
+        int accept (
+            scoped_ptr<connection>& new_connection,
+            unsigned long timeout = 0
+        );
+
         unsigned short get_listening_port (
         ) { return listening_port; }
 

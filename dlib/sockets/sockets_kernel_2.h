@@ -283,7 +283,12 @@ namespace dlib
 
         int accept (
             connection*& new_connection,
-            int timeout = 0
+            unsigned long timeout = 0
+        );
+
+        int accept (
+            scoped_ptr<connection>& new_connection,
+            unsigned long timeout = 0
         );
 
         int get_listening_port (

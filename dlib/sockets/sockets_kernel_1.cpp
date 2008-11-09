@@ -401,6 +401,24 @@ namespace dlib
 
     int listener::
     accept (
+        scoped_ptr<connection>& new_connection,
+        unsigned long timeout
+    )
+    {
+        new_connection.reset(0);
+        connection* con;
+        int status = this->accept(con, timeout);
+
+        if (status == 0)
+            new_connection.reset(con);
+
+        return status;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    int listener::
+    accept (
         connection*& new_connection,
         unsigned long timeout
     )
