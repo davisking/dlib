@@ -472,6 +472,20 @@ namespace dlib
                 - all resources associated with *this have been released
         !*/
 
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style
+        );
+        /*!
+            requires
+                - style_type == a type that inherits from text_field_style 
+            ensures
+                - this text_field object will draw itself using the given
+                  text field style
+        !*/
+
         void set_text (const std::wstring& text);
         void set_text (const dlib::ustring& text);
         void set_text (
