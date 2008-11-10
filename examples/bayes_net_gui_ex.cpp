@@ -171,7 +171,7 @@ int WINAPI WinMain (HINSTANCE, HINSTANCE, PSTR cmds, int)
 
 main_window::
 main_window(
-) try : 
+) : 
     color_non_evidence(0,0,0),
     color_default_bg(255,255,255),
     color_evidence(100,200,100),
@@ -261,7 +261,7 @@ main_window(
     // to all arrange themselves correctly in our window.
     no_node_selected();
     on_window_resized();
-} catch (...) { close_window(); } // make sure close_window() is called if something throws 
+} 
 
 // ----------------------------------------------------------------------------------------
 

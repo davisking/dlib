@@ -100,7 +100,7 @@ class win : public drawable_window
     */
 public:
     win(
-    ) try :
+    ) :
         c(*this),
         b(*this),
         cb(*this,rectangle(100,100,200,200),0,0,255), // the color_box will be blue and 101 pixels wide and tall
@@ -144,7 +144,7 @@ public:
 
         set_title("dlib gui example");
         show();
-    } catch (...) { close_window(); } // make sure close window is called if something throws 
+    } 
 
     ~win(
     )

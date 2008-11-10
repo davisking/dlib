@@ -33,7 +33,7 @@ public:
     template <typename image_type>
     win(
         const image_type& img
-    ) try :
+    ) :
         gui_img(*this)
     {
         // set the size of this window to match the size of the input image
@@ -46,7 +46,7 @@ public:
 
         // show this window on the screen
         show();
-    } catch (...) { close_window(); } // make sure close_window() is called if something throws
+    } 
 
     ~win(
     )
