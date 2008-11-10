@@ -767,10 +767,10 @@ namespace dlib
     );
     /*!
         requires
-            - a.nr() >= a.nc()
+            - m.nr() >= m.nc()
         ensures
-            - computes the singular value decomposition of matrix a
-            - a == subm(#u,get_rect(a))*diagm(#w)*trans(#v)
+            - computes the singular value decomposition of matrix m
+            - m == subm(#u,get_rect(m))*diagm(#w)*trans(#v)
             - trans(#u)*#u == identity matrix
             - trans(#v)*#v == identity matrix
             - #w == the singular values of the matrix m in no 
@@ -806,8 +806,7 @@ namespace dlib
             - trans(#u)*#u == identity matrix
             - trans(#v)*#v == identity matrix
             - #w == the singular values of the matrix m in no 
-              particular order.  All non-diagonal elements of #w are
-              set to 0.
+              particular order.  
             - #u.nr() == m.nr()
             - #u.nc() == m.nc()
             - #w.nr() == m.nc()
