@@ -121,21 +121,20 @@ IF (NOT DLIB_ISO_CPP_ONLY)
       endif()
 
       MARK_AS_ADVANCED(nsllib pthreadlib socketlib)
-   ENDIF () #################################################################################
+   ENDIF () ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
 
+
+   # try to find libpng 
+   SET(ZLIB_FIND_QUIETLY ON)
+   SET(PNG_FIND_QUIETLY ON)
    INCLUDE(FindPNG)
    if (PNG_FOUND)
       INCLUDE_DIRECTORIES(${PNG_PNG_INCLUDE_DIR})
       set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
       add_global_define(DLIB_PNG_SUPPORT)
-   else()
-      # we could print a message but doing so is sort of irritating when it occurs by default
-      #message(" *************************************************************************")
-      #message(" ****** PNG IMAGE FILE SUPPORT NOT ENABLED BECAUSE libpng NOT FOUND ******")
-      #message(" ****** Make sure libpng is installed if you want PNG support       ******")
-      #message(" *************************************************************************")
    endif()
+
 
    TARGET_LINK_LIBRARIES(dlib ${dlib_needed_libraries} )
 

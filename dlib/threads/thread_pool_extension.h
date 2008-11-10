@@ -4,12 +4,12 @@
 #define DLIB_THREAD_POOl_H__ 
 
 #include "thread_pool_extension_abstract.h"
-#include "dlib/member_function_pointer.h"
+#include "../member_function_pointer.h"
 #include "threads_kernel.h"
 #include "auto_mutex_extension.h"
 #include "multithreaded_object_extension.h"
 #include "../uintn.h"
-#include "dlib/array.h"
+#include "../array.h"
 
 namespace dlib
 {
