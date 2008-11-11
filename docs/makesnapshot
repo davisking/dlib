@@ -45,6 +45,16 @@ bzip2 $SOURCE_TAR
 
 rm -rf $RELDIR
 
+
+# make an index.html with links to the snapshot archives and chm file
+echo "<html><body>" > index.html
+echo "<a href='$SOURCE_ZIP'>$SOURCE_ZIP</a><br/>" >> index.html
+echo "<a href='$SOURCE_TAR.bz2'>$SOURCE_TAR.bz2</a><br/>" >> index.html
+echo "<a href='dlib_documentation_snapshot-rev$REVISION.chm'>dlib_documentation_snapshot-rev$REVISION.chm</a><br/>" >> index.html
+echo "</body></html>" >> index.html
+
+
+# finally, generate the chm help file
 wine ../docs/chm/htmlhelp/hhc.exe ../docs/chm/lib.hhp
 mv ../docs/chm/help.chm dlib_documentation_snapshot-rev$REVISION.chm
 
