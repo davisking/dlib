@@ -447,7 +447,8 @@ namespace dlib
 
                 Also note that the elements of this matrix are contiguous in memory and 
                 stored in row major order.  Additionally, all memory allocations are
-                performed using the memory manager object supplied as template argument.
+                performed using the memory manager object supplied as a template argument
+                to this class.
         !*/
 
     public:
