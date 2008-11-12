@@ -655,7 +655,7 @@
 
       <component>
          <name>shared_ptr_thread_safe</name>
-         <file>dlib/smart_pointers.h</file>
+         <file>dlib/smart_pointers_thread_safe.h</file>
          <spec_file>dlib/smart_pointers/shared_ptr_thread_safe_abstract.h</spec_file>
          <description>
             <p>
