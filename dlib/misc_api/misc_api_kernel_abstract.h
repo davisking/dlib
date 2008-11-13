@@ -61,8 +61,8 @@ namespace dlib
         throws
             - dir_create_error
                 This exception is thrown if we were unable to create the requested
-                directory.  The type member of the exception will bet set to
-                EDIR_CREATE and the name member will be set to dir.
+                directory and it didn't already exist.  The type member of the exception 
+                will bet set to EDIR_CREATE and the name member will be set to dir.
     !*/
 
 // ----------------------------------------------------------------------------------------
