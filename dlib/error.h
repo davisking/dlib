@@ -5,6 +5,9 @@
 
 #include <string>
 #include <new>          // for std::bad_alloc
+#include <iostream>
+#include <cassert>
+#include <cstdlib>
 
 // -------------------------------
 // ------ exception classes ------
@@ -179,15 +182,26 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                As the name says, this object represents some kind of fatal error. 
-                It is also the exception thrown by the DLIB_ASSERT and DLIB_CASSERT macros.
+                As the name says, this object represents some kind of fatal error.  
+                That is, it represents an unrecoverable error and any program that
+                throws this exception is, by definition, buggy and needs to be fixed.
+
+                Note that a fatal_error exception can only be thrown once.  The second
+                time an application attempts to construct a fatal_error it will be 
+                immediately aborted and an error message will be printed to std::cerr. 
+                The reason for this is because the first fatal_error was apparently ignored
+                so the second fatal_error is going to make itself impossible to ignore 
+                by calling abort.  The lesson here is that you should not try to ignore 
+                fatal errors.
+
+                This is also the exception thrown by the DLIB_ASSERT and DLIB_CASSERT macros.
         !*/
 
     public:
         fatal_error(
             error_type t,
             const std::string& a
-        ): error(t,a) {}
+        ): error(t,a) {check_for_previous_fatal_errors();}
         /*!
             ensures
                 - #type == t
@@ -196,7 +210,7 @@ namespace dlib
 
         fatal_error(
             error_type t
-        ): error(t) {}
+        ): error(t) {check_for_previous_fatal_errors();}
         /*!
             ensures
                 - #type == t
@@ -205,7 +219,7 @@ namespace dlib
 
         fatal_error(
             const std::string& a
-        ): error(EFATAL,a) {}
+        ): error(EFATAL,a) {check_for_previous_fatal_errors();}
         /*!
             ensures
                 - #type == EFATAL
@@ -213,12 +227,32 @@ namespace dlib
         !*/
 
         fatal_error(
-        ): error(EFATAL) {}
+        ): error(EFATAL) {check_for_previous_fatal_errors();}
         /*!
             ensures
                 - #type == EFATAL
                 - #info == ""
         !*/
+
+    private:
+        void check_for_previous_fatal_errors()
+        {
+            static bool is_first_fatal_error = true;
+            if (is_first_fatal_error == false)
+            {
+                std::cerr << "\n\n ************************** FATAL ERROR DETECTED ************************** " << std::endl;
+                std::cerr << " ************************** FATAL ERROR DETECTED ************************** " << std::endl;
+                std::cerr << " ************************** FATAL ERROR DETECTED ************************** \n" << std::endl;
+                std::cerr << "Two fatal errors have been detected, the first was inappropriately ignored. \n"
+                          << "To prevent further fatal errors from being ignored this application will be \n"
+                          << "terminated immediately and you should go fix this buggy program.\n\n"
+                          << "The error message from this fatal error was:\n" << this->what() << "\n\n" << std::endl;
+                using namespace std;
+                assert(false);
+                abort();
+            }
+            is_first_fatal_error = false;
+        }
     };
 
 // ----------------------------------------------------------------------------------------
