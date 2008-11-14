@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.12" date="Nov 10, 2008">
+New Stuff:
    - Added user settable styles to most of the gui widgets
    - Added the diagm(), svd2() and svd3() matrix functions
    - Added the thread_pool object
@@ -36,7 +49,7 @@ Other:
    - The member_function_pointer object now never calls new or delete. 
      So it is safe to use in a real time environment.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
