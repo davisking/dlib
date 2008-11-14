@@ -103,7 +103,7 @@ namespace dlib
             }
         };
 
-        struct dummy_base { virtual void nonnull() {}; int a; };
+        struct dummy_base { virtual void nonnull() {}; virtual ~dummy_base(){}; int a; };
         struct dummy : virtual public dummy_base{ void nonnull() {}; };
 
         typedef mp_impl_T<mp_null<dummy> > mp_null_impl;
