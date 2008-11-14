@@ -851,7 +851,7 @@ namespace dlib
 
         const long m = a.nr();
         const long n = a.nc();
-        long i, j, k, l, l1, iter, retval;
+        long i, j, k, l = 0, l1, iter, retval;
         T c, f, g, h, s, x, y, z;
 
         matrix<T,qN,1,MM2> e(n,1); 
