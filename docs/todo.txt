@@ -1,5 +1,9 @@
 
 
+add overloads for svd for small fixed size matricies
+
+
+
 maybe add a function to find the distance between two column vectors
 
 
