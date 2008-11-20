@@ -5,7 +5,7 @@
 
 #include "matrix_abstract.h"
 #include <complex>
-#include "pixel.h"
+#include "../pixel.h"
 #include "../geometry.h"
 #inclue <vector>
 
