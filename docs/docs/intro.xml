@@ -117,7 +117,8 @@
                 <br/><u>missing requires</u>:   There are no requirements, you may put anything in the function arguments.
                 <br/><u>missing ensures</u>:    This means that the effects of the function are unspecified.  This is often used
                 for call backs where the client programmer implements the actual function. 
-                <br/><u>missing throws</u>:     This means that the function does not throw anything.
+                <br/><u>missing throws</u>:     This doesn't mean anything.  A function without a throws block
+                might throw excepitons or it might not.
                                     
                 <br/>
                 <br/>
