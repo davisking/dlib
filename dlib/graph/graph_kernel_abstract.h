@@ -43,6 +43,9 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents an undirected graph which is a set of nodes with undirected
                 edges connecting various nodes.  
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
         !*/
 
     public:

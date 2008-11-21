@@ -85,7 +85,7 @@ namespace dlib
         !*/
 
     public:
-        // the maximum number of items this tuple tepmlate can contain
+        // the maximum number of items this tuple template can contain
         const static long max_fields = 32;
 
         template <long index> 

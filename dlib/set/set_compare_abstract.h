@@ -35,6 +35,9 @@ namespace dlib
 
                 Also note that it is the case that for any two sets a and b 
                 if (a<b) == false and (b<a) == false then a == b. 
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
                
 
             NOTATION

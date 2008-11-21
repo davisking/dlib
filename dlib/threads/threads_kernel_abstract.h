@@ -24,6 +24,9 @@ namespace dlib
 
             If you want to change the timeout to a different value you can #define 
             DLIB_THREAD_POOL_TIMEOUT to whatever value (in milliseconds) that you like.
+
+        EXCEPTIONS
+            Unless specified otherwise, nothing in this file throws exceptions.
     !*/
 
 // ----------------------------------------------------------------------------------------

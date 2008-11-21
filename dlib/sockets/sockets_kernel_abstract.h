@@ -23,6 +23,9 @@ namespace dlib
             GENERAL WARNING
                 Don't call any of these functions or make any of these objects 
                 before main() has been entered.  
+
+        EXCEPTIONS
+            Unless specified otherwise, nothing in this file throws exceptions.
     !*/
 
 // ----------------------------------------------------------------------------------------

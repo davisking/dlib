@@ -62,6 +62,9 @@ namespace dlib
                 This object represents an unaddressed collection 
                 of items.  Every element in a hash_set is unique.
 
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+
                 definition of equivalent:
                 a is equivalent to b if
                 a < b == false and

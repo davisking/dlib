@@ -41,6 +41,9 @@ namespace dlib
 
                 This object represents an unaddressed collection of items. 
 
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+
             NOTE
                 definition of equivalent:
                 a is equivalent to b if

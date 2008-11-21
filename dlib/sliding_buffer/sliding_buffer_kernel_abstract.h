@@ -42,6 +42,9 @@ namespace dlib
                 if instead of calling rotate_left we call rotate_right(3) instead we would have
                 "ta!some da"
                  9876543210                              
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
         !*/
 
     public:

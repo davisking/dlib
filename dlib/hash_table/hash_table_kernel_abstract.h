@@ -60,6 +60,9 @@ namespace dlib
                 This object represents a data dictionary that is built on top of some 
                 kind of hash table.  The number of buckets in the hash table is 
                 defined by the constructor argument and is some power of 2.
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
                     
                 NOTE:
                     definition of equivalent:

@@ -47,6 +47,9 @@ namespace dlib
                 associated with an integer value.   
                 The items are numbered from 0 though size() - 1 and
                 the operator[] functions run in constant time    
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
         !*/
         
         public:

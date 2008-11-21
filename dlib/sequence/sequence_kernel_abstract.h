@@ -47,6 +47,9 @@ namespace dlib
                 This object represents an ordered sequence of items, each item is 
                 associated with an integer value.   
                 The items are numbered from 0 to size()-1
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
         !*/
         
         public:

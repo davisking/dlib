@@ -49,6 +49,9 @@ namespace dlib
                 e.g. if the queue is {b,c,d,e} and then 'a' is enqueued
                 the queue becomes {a,b,c,d,e} and then calling dequeue takes e out
                 making the queue {a,b,c,d}
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
         !*/
         
         public:

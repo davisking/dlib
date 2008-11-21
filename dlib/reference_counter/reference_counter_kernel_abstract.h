@@ -40,6 +40,9 @@ namespace dlib
                 This object represents a container for an object of type T and 
                 provides reference counting capabilities for the object it contains   
 
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+
         !*/
 
         public:

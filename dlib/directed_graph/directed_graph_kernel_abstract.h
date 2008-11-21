@@ -46,6 +46,9 @@ namespace dlib
 
                 In this object if there is a directed edge from a node A to a node B then I say 
                 that A is the parent of B and B is the child of A.
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
         !*/
 
     public:

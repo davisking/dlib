@@ -63,6 +63,9 @@ namespace dlib
                 this object represents a data dictionary that is built on top of some 
                 kind of binary search tree.  It maps objects of type domain to objects
                 of type range.  
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
                     
                 NOTE:
                     definition of equivalent:

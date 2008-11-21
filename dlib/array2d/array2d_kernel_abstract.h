@@ -46,6 +46,9 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents a 2-Dimensional array of objects of 
                 type T. 
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
         !*/
 
 

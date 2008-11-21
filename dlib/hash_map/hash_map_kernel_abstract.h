@@ -68,6 +68,9 @@ namespace dlib
                 This object is similar an array.  It maps items of type domain on to 
                 items of type range.  
 
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
+
                 definition of equivalent:
                 a is equivalent to b if
                 a < b == false and

@@ -49,6 +49,9 @@ namespace dlib
                 e.g. if the stack is {b,c,d,e} then a is put in
                 the stack becomes {a,b,c,d,e} and then pop takes a back out
                 returning the stack to {b,c,d,e}
+
+                Also note that unless specified otherwise, no member functions
+                of this object throw exceptions.
         !*/
         
         public:
