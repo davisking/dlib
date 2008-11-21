@@ -2071,15 +2071,16 @@ namespace dlib
         parent.invalidate_rectangle(rect+old);
 
         const double old_scale = scale;
+        const vector<double> old_gr_orig(gr_orig);
         scale = min_scale;
+        gr_orig = vector<double>(0,0,0);
         lr_point = gui_to_graph_space(point(display_rect_.right(),display_rect_.bottom()));
         scale = old_scale;
 
         // call adjust_origin() so that the scroll bars get their max slider positions
         // setup right
         const point rect_corner(display_rect_.left(), display_rect_.top());
-        const vector<double> rect_corner_graph(gui_to_graph_space(rect_corner));
-        adjust_origin(rect_corner, rect_corner_graph);
+        adjust_origin(rect_corner, old_gr_orig);
     }
 
 // ----------------------------------------------------------------------------------------

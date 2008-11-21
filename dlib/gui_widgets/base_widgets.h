@@ -2251,7 +2251,7 @@ namespace dlib
         rectangle display_rect_;
 
         bool mouse_drag_screen;  // true if the user is dragging the white background area
-        point drag_screen_point; // the starting point the mouse was at in graph space for the background area drag
+        vector<double> drag_screen_point; // the starting point the mouse was at in graph space for the background area drag
 
         scroll_bar vsb;
         scroll_bar hsb;
