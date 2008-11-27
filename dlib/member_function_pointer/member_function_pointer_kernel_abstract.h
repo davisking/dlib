@@ -120,7 +120,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - if (this->set() has been called and succeeded) then
+                - if (this->set() has been called) then
                     - returns true
                 - else
                     - returns false
