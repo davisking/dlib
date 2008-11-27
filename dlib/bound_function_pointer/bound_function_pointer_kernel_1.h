@@ -1,10 +1,11 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_BOUND_FUNCTION_POINTER_KERNEl_1_
 #define DLIB_BOUND_FUNCTION_POINTER_KERNEl_1_
 
 #include "../algs.h"
 #include "../member_function_pointer.h"
+#include "bound_function_pointer_kernel_abstract.h"
 
 namespace dlib
 {

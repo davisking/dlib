@@ -335,6 +335,9 @@ namespace dlib
         bound_function_pointer& a,
         bound_function_pointer& b
     ) { a.swap(b); }
+    /*!
+        provides a global swap function
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
