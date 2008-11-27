@@ -665,6 +665,7 @@
          <term link="other.html#error" name="error"/>
          <term link="other.html#logger" name="logger"/>
          <term link="other.html#member_function_pointer" name="member_function_pointer"/>
+         <term link="other.html#bound_function_pointer" name="bound_function_pointer"/>
          <term link="other.html#memory_manager" name="memory_manager"/>
          <term link="other.html#memory_manager_global" name="memory_manager_global"/>
          <term link="other.html#memory_manager_stateless" name="memory_manager_stateless"/>
