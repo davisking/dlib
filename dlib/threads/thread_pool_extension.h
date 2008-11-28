@@ -288,6 +288,25 @@ namespace dlib
 
         // --------------------
 
+        template <typename F, typename A1>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object,arg1.get());
+            uint64 id = add_task(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            return id;
+        }
+        
         template <typename T, typename T1, typename A1>
         uint64 add_task (
             T& obj,
@@ -340,6 +359,28 @@ namespace dlib
 
         // --------------------
 
+        template <typename F, typename A1, typename A2>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object, arg1.get(), arg2.get());
+            uint64 id = add_task(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            return id;
+        }
+        
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2>
         uint64 add_task (
@@ -404,6 +445,31 @@ namespace dlib
 
         // --------------------
 
+        template <typename F, typename A1, typename A2, typename A3>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object, arg1.get(), arg2.get(), arg3.get());
+            uint64 id = add_task(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            arg3.task_id = id;
+            arg3.tp = this;
+            return id;
+        }
+        
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
                               typename T3, typename A3>
@@ -480,6 +546,34 @@ namespace dlib
 
         // --------------------
 
+        template <typename F, typename A1, typename A2, typename A3, typename A4>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object, arg1.get(), arg2.get(), arg3.get(), arg4.get());
+            uint64 id = add_task(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            arg3.task_id = id;
+            arg3.tp = this;
+            arg4.task_id = id;
+            arg4.tp = this;
+            return id;
+        }
+        
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
                               typename T3, typename A3,
@@ -586,7 +680,7 @@ namespace dlib
             requires
                 - m is locked
             ensures
-                - if (thread with given id is one of the thread pool's worker threads) then
+                - if (thread with given id is one of the thread pool's worker threads or num_threads_in_pool() == 0) then
                     - returns true
                 - else
                     - returns false
@@ -641,6 +735,7 @@ namespace dlib
         /*!
             requires
                 - m is locked
+                - num_threads_in_pool() != 0
             ensures
                 - returns the index in tasks corresponding to the given id
         !*/

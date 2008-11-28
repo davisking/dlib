@@ -201,6 +201,13 @@ namespace dlib
                 This object represents a fixed size group of threads which you can
                 submit tasks to and then wait for those tasks to be completed. 
 
+                Note that setting the number of threads to 0 is a valid way to
+                use this object.  It causes it to not contain any threads
+                at all.  When tasks are submitted to the object in this mode
+                the tasks are processed within the calling thread.  So in this
+                mode any thread that calls add_task() is considered to be
+                a thread_pool thread capable of executing tasks.
+
             EXCEPTIONS
                 Note that if an exception is thrown inside a task thread and 
                 is not caught then the normal rule for uncaught exceptions in
@@ -213,8 +220,6 @@ namespace dlib
             unsigned long num_threads
         );
         /*!
-            requires
-                - num_threads > 0
             ensures
                 - #num_threads_in_pool() == num_threads
             throws
@@ -327,6 +332,29 @@ namespace dlib
 
         // --------------------
 
+        template <typename F, typename A1>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1
+        );
+        /*!
+            requires
+                - function_object(arg1.get()) is a valid expression 
+                  (i.e. The A1 type stored in the future must be a type that can be passed into the given function object)
+            ensures
+                - if (the thread calling this function is actually one of the threads in the
+                  thread pool and there aren't any free threads available) then
+                    - calls function_object(arg1.get()) within the calling thread and returns
+                      when it finishes
+                - else
+                    - the call to this function blocks until there is a free thread in the pool
+                      to process this new task.  Once a free thread is available the task
+                      is handed off to that thread which then calls function_object(arg1.get()).
+                - #arg1.is_ready() == false 
+                - returns a task id that can be used by this->wait_for_task() to wait
+                  for the submitted task to finish.
+        !*/
+
         template <typename T, typename T1, typename A1>
         uint64 add_task (
             T& obj,
@@ -406,6 +434,13 @@ namespace dlib
         // to 4 futures.  Their behavior is identical to the above add_task() functions.
         // --------------------------------------------------------------------------------
 
+        template <typename F, typename A1, typename A2>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2
+        );
+
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2>
         uint64 add_task (
@@ -433,6 +468,14 @@ namespace dlib
         ); 
 
         // --------------------
+
+        template <typename F, typename A1, typename A2, typename A3>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        );
 
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
@@ -467,6 +510,15 @@ namespace dlib
         ); 
 
         // --------------------
+
+        template <typename F, typename A1, typename A2, typename A3, typename A4>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        );
 
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,

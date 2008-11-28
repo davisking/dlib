@@ -18,13 +18,6 @@ namespace dlib
         task_ready_signaler(m),
         we_are_destructing(false)
     {
-        // make sure requires clause is not broken
-        DLIB_ASSERT(num_threads > 0,
-            "\tthread_pool::thread_pool()"
-            << "\n\tthe number of threads in a thread_pool can't be zero"
-            << "\n\tthis: " << this
-            );
-
         tasks.expand(num_threads);
         for (unsigned long i = 0; i < num_threads; ++i)
         {
@@ -64,9 +57,12 @@ namespace dlib
     ) const
     {
         auto_mutex M(m);
-        const unsigned long idx = task_id_to_index(task_id);
-        while (tasks[idx].task_id == task_id)
-            task_done_signaler.wait();
+        if (num_threads_in_pool() != 0)
+        {
+            const unsigned long idx = task_id_to_index(task_id);
+            while (tasks[idx].task_id == task_id)
+                task_done_signaler.wait();
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -110,7 +106,13 @@ namespace dlib
             if (worker_thread_ids[i] == id)
                 return true;
         }
-        return false;
+
+        // if there aren't any threads in the pool then we consider all threads
+        // to be worker threads
+        if (num_threads_in_pool() == 0)
+            return true;
+        else
+            return false;
     }
 
 // ----------------------------------------------------------------------------------------
