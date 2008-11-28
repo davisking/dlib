@@ -107,7 +107,7 @@ int main()
 {
     setup_loggers();
 
-    // print our first message.  It will go to cout because that is the defaul.
+    // print our first message.  It will go to cout because that is the default.
     logp << LINFO << "This is an informational message.";
 
     int variable = 8;
@@ -134,6 +134,14 @@ int main()
 
 
     logp << LINFO << "program ending";
+
+
+    // It is also worth pointing out that the logger messages are atomic.  This means, for example, that
+    // in the above log statements that involve a string literal and a variable, no other thread can
+    // come in and print a log message in-between the literal string and the variable.  This is good
+    // because it means your messages don't get corrupted.  However, this also means that you shouldn't 
+    // make any function calls inside a logging statement if those calls might try to log a message 
+    // themselves since the atomic nature of the logger would cause your application to deadlock.
 }
 
 
