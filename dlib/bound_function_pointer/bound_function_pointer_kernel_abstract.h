@@ -121,6 +121,19 @@ namespace dlib
 
         // ----------------------
 
+        template <typename F, typename A1 >
+        void set (
+            F& function_object,
+            A1& arg1
+        );
+        /*!
+            requires
+                - function_object(arg1) is a valid expression 
+            ensures
+                - #is_set() == true
+                - calls to this->operator() will call function_object(arg1)
+        !*/
+
         template < typename T, typename T1, typename A1 >
         void set (
             T& object,
@@ -163,6 +176,19 @@ namespace dlib
         !*/
 
         // ----------------------
+        template <typename F, typename A1, typename A2 >
+        void set (
+            F& function_object,
+            A1& arg1,
+            A2& arg2
+        );
+        /*!
+            requires
+                - function_object(arg1,arg2) is a valid expression 
+            ensures
+                - #is_set() == true
+                - calls to this->operator() will call function_object(arg1,arg2)
+        !*/
 
         template < typename T, typename T1, typename A1
                                typename T2, typename A2>
@@ -212,6 +238,21 @@ namespace dlib
         !*/
 
         // ----------------------
+
+        template <typename F, typename A1, typename A2, typename A3 >
+        void set (
+            F& function_object,
+            A1& arg1,
+            A2& arg2,
+            A3& arg3
+        );
+        /*!
+            requires
+                - function_object(arg1,arg2,arg3) is a valid expression 
+            ensures
+                - #is_set() == true
+                - calls to this->operator() will call function_object(arg1,arg2,arg3)
+        !*/
 
         template < typename T, typename T1, typename A1
                                typename T2, typename A2,
@@ -267,6 +308,22 @@ namespace dlib
         !*/
 
         // ----------------------
+
+        template <typename F, typename A1, typename A2, typename A3, typename A4>
+        void set (
+            F& function_object,
+            A1& arg1,
+            A2& arg2,
+            A3& arg3,
+            A4& arg4
+        );
+        /*!
+            requires
+                - function_object(arg1,arg2,arg3,arg4) is a valid expression 
+            ensures
+                - #is_set() == true
+                - calls to this->operator() will call function_object(arg1,arg2,arg3,arg4)
+        !*/
 
         template < typename T, typename T1, typename A1
                                typename T2, typename A2,

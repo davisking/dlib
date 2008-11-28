@@ -14,6 +14,10 @@ namespace dlib
 
     namespace bfp1_helpers
     {
+        template <typename T> struct strip { typedef T type; };
+        template <typename T> struct strip<T&> { typedef T type; };
+
+    // ------------------------------------------------------------------------------------
 
         class bound_function_helper_base_base
         {
@@ -30,9 +34,6 @@ namespace dlib
         class bound_function_helper_base : public bound_function_helper_base_base
         {
         public:
-            template <typename T> struct strip { typedef T type; };
-            template <typename T> struct strip<T&> { typedef T type; };
-
             bound_function_helper_base():arg1(0), arg2(0), arg3(0), arg4(0) {}
 
             typename strip<T1>::type* arg1;
@@ -44,8 +45,22 @@ namespace dlib
             typename member_function_pointer<T1,T2,T3,T4>::kernel_1a_c mfp;
         };
 
-        template <typename T1, typename T2 = void, typename T3 = void, typename T4 = void>
+    // ----------------
+
+        template <typename F, typename T1, typename T2 = void, typename T3 = void, typename T4 = void>
         class bound_function_helper : public bound_function_helper_base<T1,T2,T3,T4>
+        {
+        public:
+            void call() const
+            {
+                (*fp)(*this->arg1, *this->arg2, *this->arg3, *this->arg4);
+            }
+
+            typename strip<F>::type* fp;
+        };
+
+        template <typename T1, typename T2, typename T3, typename T4>
+        class bound_function_helper<void,T1,T2,T3,T4> : public bound_function_helper_base<T1,T2,T3,T4>
         {
         public:
             void call() const
@@ -57,8 +72,22 @@ namespace dlib
             void (*fp)(T1, T2, T3, T4);
         };
 
+    // ----------------
+
+        template <typename F, typename T1>
+        class bound_function_helper<F,T1,void,void,void> : public bound_function_helper_base<T1,void,void,void>
+        {
+        public:
+            void call() const
+            {
+                (*fp)(*this->arg1);
+            }
+
+            typename strip<F>::type* fp;
+        };
+
         template <typename T1>
-        class bound_function_helper<T1,void,void,void> : public bound_function_helper_base<T1,void,void,void>
+        class bound_function_helper<void,T1,void,void,void> : public bound_function_helper_base<T1,void,void,void>
         {
         public:
             void call() const
@@ -70,8 +99,22 @@ namespace dlib
             void (*fp)(T1);
         };
 
+    // ----------------
+
+        template <typename F, typename T1, typename T2>
+        class bound_function_helper<F,T1,T2,void,void> : public bound_function_helper_base<T1,T2,void,void>
+        {
+        public:
+            void call() const
+            {
+                (*fp)(*this->arg1, *this->arg2);
+            }
+
+            typename strip<F>::type* fp;
+        };
+
         template <typename T1, typename T2>
-        class bound_function_helper<T1,T2,void,void> : public bound_function_helper_base<T1,T2,void,void>
+        class bound_function_helper<void,T1,T2,void,void> : public bound_function_helper_base<T1,T2,void,void>
         {
         public:
             void call() const
@@ -83,8 +126,22 @@ namespace dlib
             void (*fp)(T1, T2);
         };
 
+    // ----------------
+
+        template <typename F, typename T1, typename T2, typename T3>
+        class bound_function_helper<F,T1,T2,T3,void> : public bound_function_helper_base<T1,T2,T3,void>
+        {
+        public:
+            void call() const
+            {
+                (*fp)(*this->arg1, *this->arg2, *this->arg3);
+            }
+
+            typename strip<F>::type* fp;
+        };
+
         template <typename T1, typename T2, typename T3>
-        class bound_function_helper<T1,T2,T3,void> : public bound_function_helper_base<T1,T2,T3,void>
+        class bound_function_helper<void,T1,T2,T3,void> : public bound_function_helper_base<T1,T2,T3,void>
         {
         public:
 
@@ -97,6 +154,7 @@ namespace dlib
             void (*fp)(T1, T2, T3);
         };
 
+    // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
         template <typename T>
@@ -138,7 +196,7 @@ namespace dlib
 
     class bound_function_pointer_kernel_1
     {
-        typedef bfp1_helpers::bound_function_helper_T<bfp1_helpers::bound_function_helper<int> > bf_null_type;
+        typedef bfp1_helpers::bound_function_helper_T<bfp1_helpers::bound_function_helper<void,int> > bf_null_type;
 
     public:
         bound_function_pointer_kernel_1 (
@@ -196,6 +254,101 @@ namespace dlib
         operator safe_bool () const { return is_set() ? &dummy::nonnull : 0; }
         bool operator!() const { return !is_set(); }
 
+    // -------------------------------------------
+    //      set function object overloads
+    // -------------------------------------------
+
+        template <typename F, typename A1 >
+        void set (
+            F& function_object,
+            A1& arg1
+        )
+        {
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            using namespace bfp1_helpers;
+            destroy_bf_memory();
+            typedef bound_function_helper_T<bound_function_helper<F,A1> > bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 = &arg1;
+            temp.fp = &function_object;
+
+            temp.safe_clone(bf_memory.data);
+        }
+
+        template <typename F, typename A1, typename A2 >
+        void set (
+            F& function_object,
+            A1& arg1,
+            A2& arg2
+        )
+        {
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            using namespace bfp1_helpers;
+            destroy_bf_memory();
+            typedef bound_function_helper_T<bound_function_helper<F,A1,A2> > bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 = &arg1;
+            temp.arg2 = &arg2;
+            temp.fp = &function_object;
+
+            temp.safe_clone(bf_memory.data);
+        }
+
+        template <typename F, typename A1, typename A2, typename A3 >
+        void set (
+            F& function_object,
+            A1& arg1,
+            A2& arg2,
+            A3& arg3
+        )
+        {
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            using namespace bfp1_helpers;
+            destroy_bf_memory();
+            typedef bound_function_helper_T<bound_function_helper<F,A1,A2,A3> > bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 = &arg1;
+            temp.arg2 = &arg2;
+            temp.arg3 = &arg3;
+            temp.fp = &function_object;
+
+            temp.safe_clone(bf_memory.data);
+        }
+
+        template <typename F, typename A1, typename A2, typename A3, typename A4>
+        void set (
+            F& function_object,
+            A1& arg1,
+            A2& arg2,
+            A3& arg3,
+            A4& arg4
+        )
+        {
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            using namespace bfp1_helpers;
+            destroy_bf_memory();
+            typedef bound_function_helper_T<bound_function_helper<F,A1,A2,A3,A4> > bf_helper_type;
+
+            bf_helper_type temp;
+            temp.arg1 = &arg1;
+            temp.arg2 = &arg2;
+            temp.arg3 = &arg3;
+            temp.arg4 = &arg4;
+            temp.fp = &function_object;
+
+            temp.safe_clone(bf_memory.data);
+        }
 
     // -------------------------------------------
     //      set mfp overloads
@@ -210,7 +363,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -228,7 +381,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -250,7 +403,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1,T2> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1,T2> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -271,7 +424,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1,T2> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1,T2> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -296,7 +449,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1,T2,T3> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1,T2,T3> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -320,7 +473,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1,T2,T3> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1,T2,T3> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -348,7 +501,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1,T2,T3,T4> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1,T2,T3,T4> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -375,7 +528,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1,T2,T3,T4> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1,T2,T3,T4> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -399,7 +552,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -418,7 +571,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1,T2> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1,T2> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -440,7 +593,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1,T2,T3> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1,T2,T3> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
@@ -465,7 +618,7 @@ namespace dlib
         {
             using namespace bfp1_helpers;
             destroy_bf_memory();
-            typedef bound_function_helper_T<bound_function_helper<T1,T2,T3,T4> > bf_helper_type;
+            typedef bound_function_helper_T<bound_function_helper<void,T1,T2,T3,T4> > bf_helper_type;
 
             bf_helper_type temp;
             temp.arg1 = &arg1;
