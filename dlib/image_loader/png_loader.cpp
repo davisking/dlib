@@ -100,7 +100,11 @@ namespace dlib
             throw image_load_error(std::string("png_loader: unable to open file ") + filename);
         }
         png_byte sig[8];
-        fread( sig, 1, 8, fp );
+        if (fread( sig, 1, 8, fp ) != 8)
+        {
+            fclose( fp );
+            throw image_load_error(std::string("png_loader: error reading file ") + filename);
+        }
         if ( png_sig_cmp( sig, 0, 8 ) != 0 )
         {
             fclose( fp );
