@@ -25,12 +25,12 @@ namespace
         float val;
     };
 
-    void set_struct_to_zero (some_struct& a) { a.val = 0; }
+    void gset_struct_to_zero (some_struct& a) { a.val = 0; }
     void gset_to_zero (int& a) { a = 0; }
-    void increment (int& a) { ++a; }
-    void add (int a, const int& b, int& res) { dlib::sleep(20); res = a + b; }
-    void add1(int& a, int& res) { res += a; }
-    void add2 (int c, int a, const int& b, int& res) { dlib::sleep(20); res = a + b + c; }
+    void gincrement (int& a) { ++a; }
+    void gadd (int a, const int& b, int& res) { dlib::sleep(20); res = a + b; }
+    void gadd1(int& a, int& res) { res += a; }
+    void gadd2 (int c, int a, const int& b, int& res) { dlib::sleep(20); res = a + b + c; }
 
     class thread_pool_tester : public tester
     {
@@ -73,24 +73,24 @@ namespace
                 DLIB_CASSERT(res == 0,"");
 
 
-                tp.add_task(::increment, a);
+                tp.add_task(gincrement, a);
                 tp.add_task(*this, &thread_pool_tester::increment, b);
                 tp.add_task(*this, &thread_pool_tester::increment, c);
-                tp.add_task(::increment, res);
+                tp.add_task(gincrement, res);
 
                 DLIB_CASSERT(a == 1,"");
                 DLIB_CASSERT(b == 1,"");
                 DLIB_CASSERT(c == 1,"");
                 DLIB_CASSERT(res == 1,"");
 
-                tp.add_task(&::increment, a);
+                tp.add_task(&gincrement, a);
                 tp.add_task(*this, &thread_pool_tester::increment, b);
                 tp.add_task(*this, &thread_pool_tester::increment, c);
-                tp.add_task(&::increment, res);
-                tp.add_task(::increment, a);
+                tp.add_task(&gincrement, res);
+                tp.add_task(gincrement, a);
                 tp.add_task(*this, &thread_pool_tester::increment, b);
                 tp.add_task(*this, &thread_pool_tester::increment, c);
-                tp.add_task(::increment, res);
+                tp.add_task(gincrement, res);
 
                 DLIB_CASSERT(a == 3,"");
                 DLIB_CASSERT(b == 3,"");
@@ -98,12 +98,12 @@ namespace
                 DLIB_CASSERT(res == 3,"");
 
                 tp.add_task(*this, &thread_pool_tester::increment, c);
-                tp.add_task(::increment, res);
+                tp.add_task(gincrement, res);
                 DLIB_CASSERT(c == 4,"");
                 DLIB_CASSERT(res == 4,"");
 
 
-                tp.add_task(::add, a, b, res);
+                tp.add_task(gadd, a, b, res);
                 DLIB_CASSERT(res == a+b,"");
                 DLIB_CASSERT(res == 6,"");
                 a = 3;
@@ -123,7 +123,7 @@ namespace
                 DLIB_CASSERT(b == 2,"");
                 DLIB_CASSERT(c == 3,"");
 
-                tp.add_task(::add2, a, b, c, res);
+                tp.add_task(gadd2, a, b, c, res);
                 DLIB_CASSERT(res == 6,"");
                 DLIB_CASSERT(a == 1,"");
                 DLIB_CASSERT(b == 2,"");
@@ -147,7 +147,7 @@ namespace
                 b = 2;
                 c = 3;
                 res = 88;
-                tp.add_task(::add1, a, b);
+                tp.add_task(gadd1, a, b);
                 DLIB_CASSERT(a == 1,"");
                 DLIB_CASSERT(b == 3,"");
                 a = 2;
@@ -170,7 +170,7 @@ namespace
 
                 obj.get().val = 8;
                 DLIB_CASSERT(obj.get().val == 8,"");
-                tp.add_task(::set_struct_to_zero, obj);
+                tp.add_task(gset_struct_to_zero, obj);
                 DLIB_CASSERT(obj.get().val == 0,"");
                 obj.get().val = 8;
                 DLIB_CASSERT(obj.get().val == 8,"");
