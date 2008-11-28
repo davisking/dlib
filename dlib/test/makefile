@@ -75,6 +75,7 @@ SRC += static_set.cpp
 SRC += string.cpp
 SRC += svm.cpp
 SRC += threads.cpp
+SRC += thread_pool.cpp
 SRC += timer.cpp
 SRC += tokenizer.cpp
 SRC += tuple.cpp

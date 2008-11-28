@@ -65,6 +65,7 @@ set (tests
    string.cpp
    svm.cpp
    threads.cpp
+   thread_pool.cpp
    timer.cpp
    tokenizer.cpp
    tuple.cpp
