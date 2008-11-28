@@ -34,7 +34,8 @@ class test
     /*
         The thread_pool accepts "tasks" from the user and schedules them
         for execution in one of its threads when one becomes available.  Each
-        task is just a request to call a member function on a particular object.
+        task is just a request to call a member function on a particular object 
+        (or if you use futures you may make tasks that call global functions).
         So here we create a class called test with a few member functions which
         we will have the thread pool call as tasks.
     */
@@ -46,7 +47,7 @@ public:
 
         // Here we ask the thread pool to call this->subtask() three different times
         // with different arguments.  Note that calls to add_task() will return 
-        // immediately if there is an available thread to hand the task off to, however,
+        // immediately if there is an available thread to hand the task off to.  However,
         // if there isn't a thread ready then add_task blocks until there is such a thread.
         // Also note that since task_0() is executed within the thread pool (see main() below)
         // calls to add_task() will execute the requested task within the calling thread
@@ -78,6 +79,18 @@ public:
     }
 
 };
+
+// ----------------------------------------------------------------------------------------
+
+void add (
+    long a,
+    long b,
+    long& result
+)
+{
+    dlib::sleep(400);
+    result = a + b;
+}
 
 // ----------------------------------------------------------------------------------------
 
@@ -115,6 +128,30 @@ int main()
     dlog << LINFO << "all tasks finished";
 
 
+
+    // The thread pool also allows you to use futures to pass arbitrary objects into the tasks.
+    // For example:
+    future<long> n1, n2, result;
+    n1 = 3;
+    n2 = 4;
+    // add a task that is supposed to go call add(n1, n2, result);
+    tp.add_task(add, n1, n2, result);
+
+    // This line will wait for the task in the thread pool to finish and when it does
+    // result will return the integer it contains.  In this case r will be assigned a value of 7.
+    long r = result;
+    // print out the result
+    dlog << LINFO << "result = " << r;
+
+    // We can also use futures with member functions like so:
+    tp.add_task(a, &test::task_1, n1, n2);
+
+    // and we can still wait for tasks like so:
+    tp.wait_for_all_tasks();
+    dlog << LINFO << "all tasks using futures finished";
+
+
+
     /* A possible run of this program might produce the following output (the first column is 
        the time the log message occurred and the value in [] is the thread id for the thread
        that generated the log message):
@@ -135,7 +172,10 @@ int main()
   901 INFO  [3] main: task_1 end: 12, 13
  1101 INFO  [2] main: task_1 end: 14, 15
  1101 INFO  [0] main: all tasks finished
-
+ 1503 INFO  [0] main: result = 7
+ 1503 INFO  [3] main: task_1 start: 3, 4
+ 2203 INFO  [3] main: task_1 end: 3, 4
+ 2203 INFO  [0] main: all tasks using futures finished
     */
 }
 
