@@ -144,7 +144,9 @@ namespace dlib
             }
 
             // now do the task
-            if (task.mfp0)
+            if (task.bfp)
+                task.bfp();
+            else if (task.mfp0)
                 task.mfp0();
             else if (task.mfp1)
                 task.mfp1(task.arg1);
@@ -156,6 +158,7 @@ namespace dlib
             { auto_mutex M(m);
                 tasks[idx].is_being_processed = false;
                 tasks[idx].task_id = 0;
+                tasks[idx].bfp.clear();
                 tasks[idx].mfp0.clear();
                 tasks[idx].mfp1.clear();
                 tasks[idx].mfp2.clear();
@@ -217,6 +220,49 @@ namespace dlib
     ) const
     {
         return static_cast<unsigned long>(id%tasks.size());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    uint64 thread_pool::
+    add_task (
+        const bfp_type& bfp
+    )
+    {
+        auto_mutex M(m);
+        const thread_id_type my_thread_id = get_thread_id();
+
+        // find a thread that isn't doing anything
+        long idx = find_empty_task_slot();
+        if (idx == -1 && is_worker_thread(my_thread_id))
+        {
+            // this function is being called from within a worker thread and there
+            // aren't any other worker threads free so just perform the task right
+            // here
+
+            m.unlock();
+            bfp();
+
+            // return a task id that is both non-zero and also one
+            // that is never normally returned.  This way calls
+            // to wait_for_task() will never block given this id.
+            return 1;
+        }
+
+        // wait until there is a thread that isn't doing anything
+        while (idx == -1)
+        {
+            task_done_signaler.wait();
+            idx = find_empty_task_slot();
+        }
+
+        tasks[idx].thread_id = my_thread_id;
+        tasks[idx].task_id = make_next_task_id(idx);
+        tasks[idx].bfp = bfp;
+
+        task_ready_signaler.signal();
+
+        return tasks[idx].task_id;
     }
 
 // ----------------------------------------------------------------------------------------

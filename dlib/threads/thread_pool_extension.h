@@ -5,6 +5,7 @@
 
 #include "thread_pool_extension_abstract.h"
 #include "../member_function_pointer.h"
+#include "../bound_function_pointer.h"
 #include "threads_kernel.h"
 #include "auto_mutex_extension.h"
 #include "multithreaded_object_extension.h"
@@ -13,6 +14,109 @@
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    class thread_pool;
+
+    template <
+        typename T
+        >
+    class future
+    {
+        /*!
+            INITIAL VALUE
+                - task_id == 0
+                - tp == 0
+
+            CONVENTION
+                - is_ready() == (tp == 0)
+                - get() == var
+
+                - if (tp != 0)
+                    - tp == a pointer to the thread_pool that is using this future object
+                    - task_id == the task id of the task in the thread pool tp that is using
+                      this future object.
+        !*/
+    public:
+
+        future (
+        ) : task_id(0), tp(0) {}
+
+        future (
+            const T& item
+        ) : task_id(0), tp(0), var(item) {}
+
+        future (
+            const future& item
+        ) :task_id(0), tp(0), var(item.get()) {}
+
+        future& operator=(
+            const T& item
+        ) { get() = item; return *this; }
+
+        future& operator=(
+            const future& item
+        ) { get() = item.get(); return *this; }
+
+        operator T& (
+        ) { return get(); }
+
+        operator const T& (
+        ) const { return get(); }
+
+        T& get (
+        ) { wait(); return var; }
+
+        const T& get (
+        ) const { wait(); return var; }
+
+        bool is_ready (
+        ) const { return tp == 0; }
+
+    private:
+
+        friend class thread_pool;
+
+        inline void wait () const;
+
+        mutable uint64 task_id;
+        mutable thread_pool* tp;
+
+        T var;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    inline void swap (
+        future<T>& a,
+        future<T>& b
+    ) { dlib::exchange(a.get(), b.get()); }
+    // Note that dlib::exchange() just calls std::swap.  I'm only using it because
+    // this works around some bugs in certain compilers.
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T> bool operator== (const future<T>& a, const future<T>& b) { return a.get() == b.get(); }
+    template <typename T> bool operator!= (const future<T>& a, const future<T>& b) { return a.get() != b.get(); }
+    template <typename T> bool operator<= (const future<T>& a, const future<T>& b) { return a.get() <= b.get(); }
+    template <typename T> bool operator>= (const future<T>& a, const future<T>& b) { return a.get() >= b.get(); }
+    template <typename T> bool operator<  (const future<T>& a, const future<T>& b) { return a.get() <  b.get(); }
+    template <typename T> bool operator>  (const future<T>& a, const future<T>& b) { return a.get() >  b.get(); }
+
+    template <typename T> bool operator== (const future<T>& a, const T& b) { return a.get() == b; }
+    template <typename T> bool operator== (const T& a, const future<T>& b) { return a.get() == b; }
+    template <typename T> bool operator!= (const future<T>& a, const T& b) { return a.get() != b; }
+    template <typename T> bool operator!= (const T& a, const future<T>& b) { return a.get() != b; }
+    template <typename T> bool operator<= (const future<T>& a, const T& b) { return a.get() <= b; }
+    template <typename T> bool operator<= (const T& a, const future<T>& b) { return a.get() <= b; }
+    template <typename T> bool operator>= (const future<T>& a, const T& b) { return a.get() >= b; }
+    template <typename T> bool operator>= (const T& a, const future<T>& b) { return a.get() >= b; }
+    template <typename T> bool operator<  (const future<T>& a, const T& b) { return a.get() <  b; }
+    template <typename T> bool operator<  (const T& a, const future<T>& b) { return a.get() <  b; }
+    template <typename T> bool operator>  (const future<T>& a, const T& b) { return a.get() >  b; }
+    template <typename T> bool operator>  (const T& a, const future<T>& b) { return a.get() >  b; }
 
 // ----------------------------------------------------------------------------------------
 
@@ -30,6 +134,7 @@ namespace dlib
                 - worker_thread_ids == an array that contains the thread ids for
                   all the threads in the thread pool
         !*/
+        typedef bound_function_pointer::kernel_1a_c bfp_type;
 
     public:
         explicit thread_pool (
@@ -181,7 +286,298 @@ namespace dlib
             return tasks[idx].task_id;
         }
 
+        // --------------------
+
+        template <typename T, typename T1, typename A1>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(T1),
+            future<A1>& arg1
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj,funct,arg1.get());
+            uint64 id = add_task(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1) const,
+            future<A1>& arg1
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj,funct,arg1.get());
+            uint64 id = add_task(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            return id;
+        }
+        
+        template <typename T1, typename A1>
+        uint64 add_task (
+            void (*funct)(T1),
+            future<A1>& arg1
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct,arg1.get());
+            uint64 id = add_task(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            return id;
+        }
+
+        // --------------------
+
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(T1,T2),
+            future<A1>& arg1,
+            future<A2>& arg2
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get());
+            uint64 id = add_task(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1,T2) const,
+            future<A1>& arg1,
+            future<A2>& arg2
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get());
+            uint64 id = add_task(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            return id;
+        }
+        
+        template <typename T1, typename A1,
+                  typename T2, typename A2>
+        uint64 add_task (
+            void (*funct)(T1,T2),
+            future<A1>& arg1,
+            future<A2>& arg2
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct, arg1.get(), arg2.get());
+            uint64 id = add_task(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            return id;
+        }
+
+        // --------------------
+
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(T1,T2,T3),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get());
+            uint64 id = add_task(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            arg3.task_id = id;
+            arg3.tp = this;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1,T2,T3) const,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get());
+            uint64 id = add_task(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            arg3.task_id = id;
+            arg3.tp = this;
+            return id;
+        }
+        
+        template <typename T1, typename A1,
+                  typename T2, typename A2,
+                  typename T3, typename A3>
+        uint64 add_task (
+            void (*funct)(T1,T2,T3),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct, arg1.get(), arg2.get(), arg3.get());
+            uint64 id = add_task(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            arg3.task_id = id;
+            arg3.tp = this;
+            return id;
+        }
+
+        // --------------------
+
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3,
+                              typename T4, typename A4>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(T1,T2,T3,T4),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
+            uint64 id = add_task(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            arg3.task_id = id;
+            arg3.tp = this;
+            arg4.task_id = id;
+            arg4.tp = this;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3,
+                              typename T4, typename A4>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1,T2,T3,T4) const,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
+            uint64 id = add_task(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            arg3.task_id = id;
+            arg3.tp = this;
+            arg4.task_id = id;
+            arg4.tp = this;
+            return id;
+        }
+        
+        template <typename T1, typename A1,
+                  typename T2, typename A2,
+                  typename T3, typename A3,
+                  typename T4, typename A4>
+        uint64 add_task (
+            void (*funct)(T1,T2,T3,T4),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
+            uint64 id = add_task(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = this;
+            arg2.task_id = id;
+            arg2.tp = this;
+            arg3.task_id = id;
+            arg3.tp = this;
+            arg4.task_id = id;
+            arg4.tp = this;
+            return id;
+        }
+
+        // --------------------
+
     private:
+
+        uint64 add_task (
+            const bfp_type& bfp
+        );
+        /*!
+            ensures
+                - adds a task to call the given bfp object.
+                - returns the task id for this new task
+        !*/
 
         bool is_worker_thread (
             const thread_id_type id
@@ -289,6 +685,7 @@ namespace dlib
             member_function_pointer<>::kernel_1a_c mfp0;
             member_function_pointer<long>::kernel_1a_c mfp1;
             member_function_pointer<long,long>::kernel_1a_c mfp2;
+            bfp_type bfp;
 
         };
 
@@ -305,6 +702,22 @@ namespace dlib
         thread_pool& operator=(thread_pool&);    // assignment operator
 
     };
+
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void future<T>::
+    wait (
+    ) const
+    {
+        if (tp)
+        {
+            tp->wait_for_task(task_id);
+            tp = 0;
+            task_id = 0;
+        }
+    }
 
 }
 
