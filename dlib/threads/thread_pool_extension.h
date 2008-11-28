@@ -130,6 +130,8 @@ namespace dlib
                 - else
                     - we_are_destructing == false
 
+                - is_task_thread() == is_worker_thread(get_thread_id())
+
                 - m == the mutex used to protect everything in this object
                 - worker_thread_ids == an array that contains the thread ids for
                   all the threads in the thread pool
@@ -152,6 +154,9 @@ namespace dlib
         ) const;
 
         void wait_for_all_tasks (
+        ) const;
+
+        bool is_task_thread (
         ) const;
 
         template <typename T>

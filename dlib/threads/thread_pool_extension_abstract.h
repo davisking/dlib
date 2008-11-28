@@ -236,6 +236,17 @@ namespace dlib
                 - all resources allocated by *this have been freed.  
         !*/
 
+        bool is_task_thread (
+        ) const;
+        /*!
+            ensures
+                - if (the thread calling this function is one of the threads in this
+                  thread pool or num_threads_in_pool() == 0) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
         unsigned long num_threads_in_pool (
         ) const;
         /*!
@@ -253,8 +264,7 @@ namespace dlib
             requires
                 - funct == a valid member function pointer for class T
             ensures
-                - if (the thread calling this function is actually one of the threads in the
-                  thread pool and there aren't any free threads available) then
+                - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)() within the calling thread and returns
                       when it finishes
                 - else
@@ -275,8 +285,7 @@ namespace dlib
             requires
                 - funct == a valid member function pointer for class T
             ensures
-                - if (the thread calling this function is actually one of the threads in the
-                  thread pool and there aren't any free threads available) then
+                - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)(arg1) within the calling thread and returns
                       when it finishes
                 - else
@@ -298,8 +307,7 @@ namespace dlib
             requires
                 - funct == a valid member function pointer for class T
             ensures
-                - if (the thread calling this function is actually one of the threads in the
-                  thread pool and there aren't any free threads available) then
+                - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)(arg1,arg2) within the calling thread and returns
                       when it finishes
                 - else
@@ -342,8 +350,7 @@ namespace dlib
                 - function_object(arg1.get()) is a valid expression 
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function object)
             ensures
-                - if (the thread calling this function is actually one of the threads in the
-                  thread pool and there aren't any free threads available) then
+                - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls function_object(arg1.get()) within the calling thread and returns
                       when it finishes
                 - else
@@ -367,8 +374,7 @@ namespace dlib
                 - (obj.*funct)(arg1.get()) must be a valid expression.
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
             ensures
-                - if (the thread calling this function is actually one of the threads in the
-                  thread pool and there aren't any free threads available) then
+                - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)(arg1.get()) within the calling thread and returns
                       when it finishes
                 - else
@@ -392,8 +398,7 @@ namespace dlib
                 - (obj.*funct)(arg1.get()) must be a valid expression.
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
             ensures
-                - if (the thread calling this function is actually one of the threads in the
-                  thread pool and there aren't any free threads available) then
+                - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)(arg1.get()) within the calling thread and returns
                       when it finishes
                 - else
@@ -416,8 +421,7 @@ namespace dlib
                 - (funct)(arg1.get()) must be a valid expression.
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
             ensures
-                - if (the thread calling this function is actually one of the threads in the
-                  thread pool and there aren't any free threads available) then
+                - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls funct(arg1.get()) within the calling thread and returns
                       when it finishes
                 - else
