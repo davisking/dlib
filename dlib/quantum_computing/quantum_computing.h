@@ -624,13 +624,13 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <int control_bit1, int control_bit2, int target_bit>
-        class taffoli : public gate_exp<taffoli<control_bit1, control_bit2, target_bit> >
+        class toffoli : public gate_exp<toffoli<control_bit1, control_bit2, target_bit> >
         {
         public:
             COMPILE_TIME_ASSERT(control_bit1 != target_bit && control_bit2 != target_bit && control_bit1 != control_bit2);
             COMPILE_TIME_ASSERT((control_bit1 < target_bit && control_bit2 < target_bit) ||(control_bit1 > target_bit && control_bit2 > target_bit) );
 
-            taffoli() : gate_exp<taffoli>(*this) 
+            toffoli() : gate_exp<toffoli>(*this) 
             {
                 const int min_bit = std::min(std::min(control_bit1, control_bit2), target_bit);
 
