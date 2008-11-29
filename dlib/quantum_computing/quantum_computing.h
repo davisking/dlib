@@ -418,6 +418,8 @@ namespace dlib
         template <typename T, typename U, typename V, typename enabled = void>
         struct combine_gates;
 
+        // This is a base case of this recursive template.  It takes care of converting small composite_gates into
+        // cached gate objects.
         template <typename T, typename U, typename V>
         struct combine_gates<T,U,V,typename enable_if_c<(T::num_bits + U::num_bits <= qc_block_chunking_size)>::type >
         {
@@ -433,9 +435,9 @@ namespace dlib
             }
         };
 
+        // this is the recursive step of this template
         template <typename T, typename U, typename V>
-        struct combine_gates<T,U,V,typename enable_if_c<(T::num_bits + U::num_bits > qc_block_chunking_size && 
-                                                         is_composite_gate<U>::value == true)>::type >
+        struct combine_gates<T,U,V,typename enable_if_c<(is_composite_gate<U>::value == true)>::type >
         {
             typedef typename combine_gates<typename U::lhs_type, typename U::rhs_type, V>::result_type inner_type;
             typedef composite_gate<T,inner_type> result_type;
@@ -450,26 +452,10 @@ namespace dlib
 
         };
 
+        // This is a base case of this recursive template.  It takes care of adding new gates when the left
+        // hand side is too big to just turn it into a cached gate object.
         template <typename T, typename U, typename V>
         struct combine_gates<T,U,V,typename enable_if_c<(T::num_bits + U::num_bits > qc_block_chunking_size && 
-                                                         U::num_bits + V::num_bits <= qc_block_chunking_size &&
-                                                         is_composite_gate<U>::value == false)>::type >
-        {
-            typedef composite_gate<T, gate<U::num_bits + V::num_bits> >  result_type;
-
-            static const result_type eval (
-                const composite_gate<T,U>& lhs,
-                const gate_exp<V>& rhs
-            )
-            {
-                typedef gate<U::num_bits + V::num_bits> gate_type;
-                return composite_gate<T, gate_type>(lhs.lhs,gate_type(composite_gate<U,V>(lhs.rhs, rhs)));
-            }
-        };
-
-        template <typename T, typename U, typename V>
-        struct combine_gates<T,U,V,typename enable_if_c<(T::num_bits + U::num_bits > qc_block_chunking_size && 
-                                                         U::num_bits + V::num_bits > qc_block_chunking_size &&
                                                          is_composite_gate<U>::value == false)>::type >
         {
             typedef composite_gate<T,composite_gate<U, V> > result_type;
@@ -496,8 +482,7 @@ namespace dlib
     }
 
     template <typename T, typename U, typename V>
-    const typename qc_helpers::combine_gates<T,U,V>::result_type 
-    operator, ( 
+    const typename qc_helpers::combine_gates<T,U,V>::result_type operator, ( 
         const composite_gate<T,U>& lhs,
         const gate_exp<V>& rhs
     )
