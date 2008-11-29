@@ -74,7 +74,13 @@ namespace dlib
             int num_bits
         )
         {
-            DLIB_ASSERT(1 <= num_bits && num_bits <= 30, "");
+            // make sure requires clause is not broken
+            DLIB_CASSERT(1 <= num_bits && num_bits <= 30,
+                "\tvoid quantum_register::set_num_bits()"
+                << "\n\tinvalid arguments to this function"
+                << "\n\tnum_bits: " << num_bits 
+                << "\n\tthis:     " << this
+                );
 
             num_bits_in_register = num_bits;
 
@@ -107,6 +113,15 @@ namespace dlib
             rand_type& rnd
         )
         {
+            // make sure requires clause is not broken
+            DLIB_CASSERT(0 <= bit && bit < num_bits(),
+                "\tbool quantum_register::measure_bit()"
+                << "\n\tinvalid arguments to this function"
+                << "\n\tbit:        " << bit 
+                << "\n\tnum_bits(): " << num_bits() 
+                << "\n\tthis:       " << this
+                );
+
             const bool value = (rnd.get_random_double() < probability_of_bit(bit));
 
             // Next we set all the states where this bit doesn't have the given value to 0
@@ -143,7 +158,15 @@ namespace dlib
             rand_type& rnd
         )
         {
-            DLIB_ASSERT(0 <= bit && bit < num_bits() && num_bits() > 0,"");
+            // make sure requires clause is not broken
+            DLIB_CASSERT(0 <= bit && bit < num_bits() && num_bits() > 0,
+                "\tbool quantum_register::measure_and_remove_bit()"
+                << "\n\tinvalid arguments to this function"
+                << "\n\tbit:        " << bit 
+                << "\n\tnum_bits(): " << num_bits() 
+                << "\n\tthis:       " << this
+                );
+
 
             const bool value = (rnd.get_random_double() < probability_of_bit(bit));
             quantum_register temp;
@@ -180,14 +203,16 @@ namespace dlib
         double probability_of_bit (
             int bit
         ) const
-        /*!
-            requires
-                - 0 <= bit < num_bits()
-            ensures
-                - returns the probability of measuring the given bit and it being true
-        !*/
         {
-            DLIB_ASSERT(0 <= bit && bit < num_bits(),"");
+            // make sure requires clause is not broken
+            DLIB_CASSERT(0 <= bit && bit < num_bits(),
+                "\tdouble quantum_register::probability_of_bit()"
+                << "\n\tinvalid arguments to this function"
+                << "\n\tbit:        " << bit 
+                << "\n\tnum_bits(): " << num_bits() 
+                << "\n\tthis:       " << this
+                );
+
 
             // make a mask that selects our bit
             unsigned long mask = 1;
@@ -247,7 +272,16 @@ namespace dlib
 
         void apply_gate_to (quantum_register& reg) const
         {
-            DLIB_CASSERT(reg.num_bits() == num_bits,"reg.num_bits(): " << reg.num_bits() << "   num_bits: " << num_bits);
+            // make sure requires clause is not broken
+            DLIB_CASSERT(reg.num_bits() == num_bits,
+                "\tvoid gate_exp::apply_gate_to()"
+                << "\n\tinvalid arguments to this function"
+                << "\n\treg.num_bits(): " << reg.num_bits() 
+                << "\n\tnum_bits:       " << num_bits 
+                << "\n\tthis:           " << this
+                );
+
+
             quantum_register temp(reg);
 
 
@@ -294,7 +328,19 @@ namespace dlib
             long row_idx
         ) const
         {
-            DLIB_ASSERT(reg.size() == dims,"");
+            // make sure requires clause is not broken
+            DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+                         0 <= row_idx && row_idx < dims,
+                "\tqc_scalar_type gate_exp::compute_state_element(reg,row_idx)"
+                << "\n\tinvalid arguments to this function"
+                << "\n\treg.nr(): " << reg.nr() 
+                << "\n\treg.nc(): " << reg.nc()
+                << "\n\tdims:     " << dims
+                << "\n\trow_idx:  " << row_idx 
+                << "\n\tthis:     " << this
+                );
+
+
             return exp.compute_state_element(reg,row_idx);
         }
 
@@ -334,7 +380,18 @@ namespace dlib
             long row_idx
         ) const
         {
-            DLIB_ASSERT(reg.size() == dims,"");
+            // make sure requires clause is not broken
+            DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+                         0 <= row_idx && row_idx < dims,
+                "\tqc_scalar_type composite_gate::compute_state_element(reg,row_idx)"
+                << "\n\tinvalid arguments to this function"
+                << "\n\treg.nr(): " << reg.nr() 
+                << "\n\treg.nc(): " << reg.nc()
+                << "\n\tdims:     " << dims
+                << "\n\trow_idx:  " << row_idx 
+                << "\n\tthis:     " << this
+                );
+
 
             qc_scalar_type result = 0;
             for (long c = 0; c < T::dims; ++c)
@@ -387,7 +444,18 @@ namespace dlib
             long row_idx
         ) const
         {
-            DLIB_ASSERT(reg.size() == dims,"");
+            // make sure requires clause is not broken
+            DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+                         0 <= row_idx && row_idx < dims,
+                "\tqc_scalar_type gate::compute_state_element(reg,row_idx)"
+                << "\n\tinvalid arguments to this function"
+                << "\n\treg.nr(): " << reg.nr() 
+                << "\n\treg.nc(): " << reg.nc()
+                << "\n\tdims:     " << dims
+                << "\n\trow_idx:  " << row_idx 
+                << "\n\tthis:     " << this
+                );
+
 
             return rowm(data,row_idx)*reg;
         }
@@ -601,7 +669,18 @@ namespace dlib
                 long row_idx
             ) const
             {
-                DLIB_ASSERT(reg.size() == dims,"");
+                // make sure requires clause is not broken
+                DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+                            0 <= row_idx && row_idx < dims,
+                    "\tqc_scalar_type cnot::compute_state_element(reg,row_idx)"
+                    << "\n\tinvalid arguments to this function"
+                    << "\n\treg.nr(): " << reg.nr() 
+                    << "\n\treg.nc(): " << reg.nc()
+                    << "\n\tdims:     " << dims
+                    << "\n\trow_idx:  " << row_idx 
+                    << "\n\tthis:     " << this
+                    );
+
 
                 unsigned long output = row_idx;
                 // if the input control bit is set
@@ -676,7 +755,18 @@ namespace dlib
                 long row_idx
             ) const
             {
-                DLIB_ASSERT(reg.size() == dims,"");
+                // make sure requires clause is not broken
+                DLIB_ASSERT(reg.nr() == dims && reg.nc() == 1 && 
+                            0 <= row_idx && row_idx < dims,
+                    "\tqc_scalar_type toffoli::compute_state_element(reg,row_idx)"
+                    << "\n\tinvalid arguments to this function"
+                    << "\n\treg.nr(): " << reg.nr() 
+                    << "\n\treg.nc(): " << reg.nc()
+                    << "\n\tdims:     " << dims
+                    << "\n\trow_idx:  " << row_idx 
+                    << "\n\tthis:     " << this
+                    );
+
 
                 unsigned long output;
                 // if the input control bits are set

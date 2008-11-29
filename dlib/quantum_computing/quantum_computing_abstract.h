@@ -54,6 +54,8 @@ namespace dlib
             int new_num_bits
         );
         /*!
+            requires
+                - 1 <= new_num_bits <= 30
             ensures
                 - #num_bits() == new_num_bits
                 - #state_vector().nr() == 2^new_num_bits
@@ -204,6 +206,9 @@ namespace dlib
             long c
         ) const;
         /*!
+            requires
+                - 0 <= r < dims
+                - 0 <= c < dims
             ensures
                 - returns ref()(r,c)
         !*/
