@@ -73,11 +73,26 @@ namespace dlib
                 - #get() == item.get()
         !*/
 
+        ~future (
+        );
+        /*!
+            requires
+                - if (item.is_ready() == false) then
+                    - The thread_pool that this future was passed to should still exist
+                      (i.e. You can't pass a future to a thread_pool and then destruct the
+                      thread_pool before you destruct the future).
+            ensures
+                - if (item.is_ready() == false) then
+                    - the call to this function blocks until the thread processing the task related
+                      to the item future has finished.
+        !*/
+
         bool is_ready (
         ) const;
         /*!
             ensures
-                - if (the value of this future may not yet be ready to be accessed because it is in use by a task in a thread_pool) then
+                - if (the value of this future may not yet be ready to be accessed because it 
+                  is in use by a task in a thread_pool) then
                     - returns false 
                 - else
                     - returns true 

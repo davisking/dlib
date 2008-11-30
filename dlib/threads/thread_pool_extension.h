@@ -51,6 +51,9 @@ namespace dlib
             const future& item
         ) :task_id(0), tp(0), var(item.get()) {}
 
+        ~future (
+        ) { wait(); }
+
         future& operator=(
             const T& item
         ) { get() = item; return *this; }
