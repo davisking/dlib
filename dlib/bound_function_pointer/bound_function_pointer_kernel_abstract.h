@@ -92,7 +92,7 @@ namespace dlib
         bool operator! (
         ) const;
         /*!
-            ensuresobject.*
+            ensures
                 - returns !is_set()
         !*/
 
@@ -102,7 +102,7 @@ namespace dlib
             requires
                 - is_set() == true
             ensures
-                - calls the bound function on the object specified by the last 
+                - calls the bound function on the object(s) specified by the last 
                   call to this->set()
             throws
                 - any exception thrown by the function specified by
