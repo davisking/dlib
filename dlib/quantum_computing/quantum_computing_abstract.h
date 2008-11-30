@@ -180,12 +180,17 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T must be some object that implements an interface compatible with
-                a gate_exp or gate object.
+                T must be some object that inherits from gate_exp and implements its own
+                version of operator() and compute_state_element().
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents an expression that evaluates to a quantum gate 
                 that operates on T::num_bits qubits.
+
+                This object makes it easy to create new types of gate objects. All
+                you need to do is inherit from gate_exp in the proper way and 
+                then you can use your new gate objects in conjunction with all the 
+                others.
         !*/
 
     public:
@@ -221,8 +226,8 @@ namespace dlib
                 - reg.num_bits() == num_bits
             ensures
                 - applies this quantum gate to the given quantum register
-                - Let M represent the matrix for this quantum gate
-                - #reg().state_vector() = M*reg().state_vector()
+                - Let M represent the matrix for this quantum gate, then
+                  #reg().state_vector() = M*reg().state_vector()
         !*/
 
         template <typename exp>
@@ -236,8 +241,8 @@ namespace dlib
                 - reg.nc() == 1
                 - 0 <= row_idx < dims
             ensures
-                - Let M represent the matrix for this gate.   
-                - returns rowm(M*reg, row_idx)
+                - Let M represent the matrix for this gate, then   
+                  this function returns rowm(M*reg, row_idx)
                   (i.e. returns the row_idx row of what you get when you apply this
                   gate to the given column vector in reg)
                 - This function works by calling ref().compute_state_element(reg,row_idx)
@@ -263,7 +268,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a quantum gate that is the tensor product of 
-                two quantum gates.
+                two other quantum gates.
 
 
                 As an example, suppose you have 3 registers, reg_high, reg_low, and reg_all.  Also
@@ -306,8 +311,8 @@ namespace dlib
                 - 0 <= r < dims
                 - 0 <= c < dims
             ensures
-                - Let M denote the tensor product of lhs with rhs
-                - returns M(r,c)
+                - Let M denote the tensor product of lhs with rhs, then this function
+                  returns M(r,c)
                   (i.e. returns lhs(r/U::dims,c/U::dims)*rhs(r%U::dims, c%U::dims))
         !*/
 
@@ -322,8 +327,8 @@ namespace dlib
                 - reg.nc() == 1
                 - 0 <= row_idx < dims
             ensures
-                - Let M represent the matrix for this gate.   
-                - returns rowm(M*reg, row_idx)
+                - Let M represent the matrix for this gate, then this function
+                  returns rowm(M*reg, row_idx)
                   (i.e. returns the row_idx row of what you get when you apply this
                   gate to the given column vector in reg)
                 - This function works by calling rhs.compute_state_element() and using elements
@@ -395,8 +400,8 @@ namespace dlib
                 - 0 <= r < dims
                 - 0 <= c < dims
             ensures
-                - Let M denote the matrix for this gate 
-                - returns a const reference to M(r,c)
+                - Let M denote the matrix for this gate, then this function
+                  returns a const reference to M(r,c)
         !*/
 
         qc_scalar_type& operator() (
@@ -408,8 +413,8 @@ namespace dlib
                 - 0 <= r < dims
                 - 0 <= c < dims
             ensures
-                - Let M denote the matrix for this gate 
-                - returns a non-const reference to M(r,c)
+                - Let M denote the matrix for this gate, then this function 
+                  returns a non-const reference to M(r,c)
         !*/
 
         template <typename exp>
@@ -423,8 +428,8 @@ namespace dlib
                 - reg.nc() == 1
                 - 0 <= row_idx < dims
             ensures
-                - Let M represent the matrix for this gate.   
-                - returns rowm(M*reg, row_idx)
+                - Let M represent the matrix for this gate, then this function
+                  returns rowm(M*reg, row_idx)
                   (i.e. returns the row_idx row of what you get when you apply this
                   gate to the given column vector in reg)
         !*/

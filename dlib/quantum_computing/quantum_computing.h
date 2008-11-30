@@ -4,6 +4,7 @@
 #define DLIB_QUANTUM_COMPUTINg_1_
 
 #include <complex>
+#include <cmath>
 #include "../matrix.h"
 #include "../rand.h"
 #include "../enable_if.h"
@@ -131,6 +132,8 @@ namespace dlib
             for (int i = 0; i < bit; ++i)
                 mask <<= 1;
 
+            // loop over all the elements in the state vector and zero out those that
+            // conflict with the measurement we just made.
             for (long r = 0; r < state.nr(); ++r)
             {
                 const unsigned long field = r;
@@ -147,7 +150,7 @@ namespace dlib
             }
 
             // normalize the state
-            state = state/conj(trans(state))*state;
+            state = state/(std::sqrt(sum(norm(state))));
 
             return value;
         }
@@ -193,7 +196,7 @@ namespace dlib
             }
 
             // normalize the state
-            temp.state = temp.state/conj(trans(temp.state))*temp.state;
+            temp.state = temp.state/std::sqrt(sum(norm(temp.state)));
 
             temp.swap(*this);
 
