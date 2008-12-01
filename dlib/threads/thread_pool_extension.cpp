@@ -58,7 +58,7 @@ namespace dlib
     ) const
     {
         auto_mutex M(m);
-        if (num_threads_in_pool() != 0)
+        if (tasks.size() != 0)
         {
             const unsigned long idx = task_id_to_index(task_id);
             while (tasks[idx].task_id == task_id)
@@ -110,7 +110,7 @@ namespace dlib
 
         // if there aren't any threads in the pool then we consider all threads
         // to be worker threads
-        if (num_threads_in_pool() == 0)
+        if (tasks.size() == 0)
             return true;
         else
             return false;
