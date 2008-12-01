@@ -46,6 +46,7 @@ namespace dlib
     num_threads_in_pool (
     ) const
     {
+        auto_mutex M(m);
         return tasks.size();
     }
 
