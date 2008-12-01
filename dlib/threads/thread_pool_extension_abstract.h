@@ -137,7 +137,7 @@ namespace dlib
         !*/
 
         operator const T& (
-        );
+        ) const;
         /*!
             ensures
                 - if (is_ready() == false) then
@@ -159,7 +159,7 @@ namespace dlib
         !*/
 
         const T& get (
-        );
+        ) const;
         /*!
             ensures
                 - if (is_ready() == false) then
