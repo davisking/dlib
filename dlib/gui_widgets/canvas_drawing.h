@@ -107,13 +107,17 @@ namespace dlib
                     y = static_cast<long>(dy);
                     x = static_cast<long>(dx);
 
-                    if (y < valid_area.top() || y+1 > valid_area.bottom() )
-                        continue;
 
-                    alpha_pixel.alpha = static_cast<unsigned char>((1.0-(dy-y))*max_alpha);
-                    assign_pixel(c[y-c.top()][x-c.left()], alpha_pixel);
-                    alpha_pixel.alpha = static_cast<unsigned char>((dy-y)*max_alpha);
-                    assign_pixel(c[y+1-c.top()][x-c.left()], alpha_pixel);
+                    if (y >= valid_area.top() && y <= valid_area.bottom())
+                    {
+                        alpha_pixel.alpha = static_cast<unsigned char>((1.0-(dy-y))*max_alpha);
+                        assign_pixel(c[y-c.top()][x-c.left()], alpha_pixel);
+                    }
+                    if (y+1 >= valid_area.top() && y+1 <= valid_area.bottom())
+                    {
+                        alpha_pixel.alpha = static_cast<unsigned char>((dy-y)*max_alpha);
+                        assign_pixel(c[y+1-c.top()][x-c.left()], alpha_pixel);
+                    }
                 }         
             }
             else
@@ -145,13 +149,16 @@ namespace dlib
                     y = static_cast<long>(dy);
                     x = static_cast<long>(dx);
 
-                    if (x < valid_area.left() || x+1 > valid_area.right() )
-                        continue;
-
-                    alpha_pixel.alpha = static_cast<unsigned char>((1.0-(dx-x))*max_alpha);
-                    assign_pixel(c[y-c.top()][x-c.left()], alpha_pixel);
-                    alpha_pixel.alpha = static_cast<unsigned char>((dx-x)*max_alpha);
-                    assign_pixel(c[y-c.top()][x+1-c.left()], alpha_pixel);
+                    if (x >= valid_area.left() && x <= valid_area.right())
+                    {
+                        alpha_pixel.alpha = static_cast<unsigned char>((1.0-(dx-x))*max_alpha);
+                        assign_pixel(c[y-c.top()][x-c.left()], alpha_pixel);
+                    }
+                    if (x+1 >= valid_area.left() && x+1 <= valid_area.right())
+                    {
+                        alpha_pixel.alpha = static_cast<unsigned char>((dx-x)*max_alpha);
+                        assign_pixel(c[y-c.top()][x+1-c.left()], alpha_pixel);
+                    }
                 } 
             }
         }
