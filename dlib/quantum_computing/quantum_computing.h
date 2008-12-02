@@ -272,6 +272,19 @@ namespace dlib
 
         const qc_scalar_type operator() (long r, long c) const { return exp(r,c); }
 
+        const matrix<qc_scalar_type> mat (
+        ) const
+        {
+            matrix<qc_scalar_type,dims,dims> m;
+            for (long r = 0; r < m.nr(); ++r)
+            {
+                for (long c = 0; c < m.nc(); ++c)
+                {
+                    m(r,c) = exp(r,c);
+                }
+            }
+            return m;
+        }
 
         void apply_gate_to (quantum_register& reg) const
         {

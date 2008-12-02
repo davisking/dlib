@@ -255,6 +255,12 @@ namespace dlib
                 - returns a reference to the subexpression contained in this object
         !*/
 
+        const matrix<qc_scalar_type> mat (
+        ) const;
+        /*!
+            ensures
+                - returns a dense matrix object that contains the matrix for this gate
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
