@@ -215,6 +215,71 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <long start, long inc, long end>
+    const matrix_exp range (
+    );
+    /*!
+        requires
+            - start <= end
+        ensures
+            - returns a matrix R such that:
+                - R::type == long
+                - R.nr() == (end - start)/inc + 1
+                - R.nc() == 1
+                - R(i) == start + i*inc
+    !*/
+
+    template <long start, long end>
+    const matrix_exp range (
+    ) { return range<start,1,end>(); }
+
+    const matrix_exp range (
+        long start,
+        long inc,
+        long end
+    ); 
+    /*!
+        requires
+            - start <= end
+        ensures
+            - returns a matrix R such that:
+                - R::type == long
+                - R.nr() == (end - start)/inc + 1
+                - R.nc() == 1
+                - R(i) == start + i*inc
+    !*/
+
+    const matrix_exp range (
+        long start,
+        long end
+    ) { return range(start,1,end); }
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp subm (
+        const matrix_exp& m,
+        const matrix_exp& rows,
+        const matrix_exp& cols,
+    );
+    /*!
+        requires
+            - rows and cols contain elements of type long
+            - 0 <= min(rows) && max(rows) < m.nr() 
+            - 0 <= min(cols) && max(cols) < m.nc()
+            - rows.nr() == 1 || rows.nc() == 1
+            - cols.nr() == 1 || cols.nc() == 1
+              (i.e. rows and cols must be vectors)
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R.nr() == rows.size()
+                - R.nc() == cols.size()
+                - for all valid r and c:
+                  R(r,c) == m(rows(r),cols(c))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp subm (
         const matrix_exp& m,
         long row,

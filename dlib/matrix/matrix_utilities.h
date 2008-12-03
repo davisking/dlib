@@ -1805,6 +1805,153 @@ convergence:
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    class matrix_range_exp  
+    {
+    public:
+        typedef long type;
+        typedef matrix_range_exp ref_type;
+        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        const static long NR = 0;
+        const static long NC = 1;
+
+        matrix_range_exp (
+            long start_,
+            long end_
+        )
+        {
+            start = start_;
+            inc = 1;
+            nr_ = end_ - start_ + 1;
+        }
+        matrix_range_exp (
+            long start_,
+            long inc_,
+            long end_
+        )
+        {
+            start = start_;
+            inc = inc_;
+            nr_ = (end_ - start_)/inc_ + 1;
+        }
+
+        const long operator() (
+            long r, 
+            long c
+        ) const { return start + r*inc;  }
+
+        template <typename U, long iNR, long iNC , typename MM>
+        bool aliases (
+            const matrix<U,iNR,iNC,MM>& item
+        ) const { return false; }
+
+        template <typename U, long iNR, long iNC, typename MM >
+        bool destructively_aliases (
+            const matrix<U,iNR,iNC,MM>& item
+        ) const { return false; }
+
+        long nr (
+        ) const { return nr_; }
+
+        long nc (
+        ) const { return NC; }
+
+        const ref_type& ref(
+        ) const { return *this; }
+
+
+        long nr_;
+        long start;
+        long inc;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <long start, long inc, long end>
+    class matrix_range_static_exp  
+    {
+    public:
+        typedef long type;
+        typedef matrix_range_static_exp ref_type;
+        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        const static long NR = (end - start)/inc + 1;
+        const static long NC = 1;
+
+        const long operator() (
+            long r, 
+            long c
+        ) const { return start + r*inc;  }
+
+        template <typename U, long iNR, long iNC , typename MM>
+        bool aliases (
+            const matrix<U,iNR,iNC,MM>& item
+        ) const { return false; }
+
+        template <typename U, long iNR, long iNC, typename MM >
+        bool destructively_aliases (
+            const matrix<U,iNR,iNC,MM>& item
+        ) const { return false; }
+
+        long nr (
+        ) const { return NR; }
+
+        long nc (
+        ) const { return NC; }
+
+        const ref_type& ref(
+        ) const { return *this; }
+    };
+
+// ----------------------------------------------------------------------------------------
+    
+    template <long start, long inc, long end>
+    const matrix_exp<matrix_range_static_exp<start,inc,end> > range (
+    ) 
+    { 
+        COMPILE_TIME_ASSERT(start <= end);
+        return matrix_exp<matrix_range_static_exp<start,inc,end> >(matrix_range_static_exp<start,inc,end>()); 
+    }
+
+    template <long start, long end>
+    const matrix_exp<matrix_range_static_exp<start,1,end> > range (
+    ) 
+    { 
+        COMPILE_TIME_ASSERT(start <= end);
+        return matrix_exp<matrix_range_static_exp<start,1,end> >(matrix_range_static_exp<start,1,end>()); 
+    }
+
+    inline const matrix_exp<matrix_range_exp> range (
+        long start,
+        long end
+    ) 
+    { 
+        DLIB_ASSERT(start <= end, 
+            "\tconst matrix_exp range(start, end)"
+            << "\n\tstart can't be bigger than end"
+            << "\n\tstart: " << start 
+            << "\n\tend:   " << end
+            );
+
+        return matrix_exp<matrix_range_exp>(matrix_range_exp(start,end)); 
+    }
+
+    inline const matrix_exp<matrix_range_exp> range (
+        long start,
+        long inc,
+        long end
+    ) 
+    { 
+        DLIB_ASSERT(start <= end, 
+            "\tconst matrix_exp range(start, inc, end)"
+            << "\n\tstart can't be bigger than end"
+            << "\n\tstart: " << start 
+            << "\n\tend:   " << end
+            );
+
+        return matrix_exp<matrix_range_exp>(matrix_range_exp(start,inc,end)); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename array_type
         >
@@ -1947,6 +2094,105 @@ convergence:
 
         typedef matrix_sub_exp<matrix_exp<EXP> > exp;
         return matrix_exp<exp>(exp(m,rect.top(),rect.left(),rect.height(),rect.width()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+
+    template <
+        typename M,
+        typename EXPr,
+        typename EXPc
+        >
+    class matrix_sub_range_exp  
+    {
+        /*!
+            REQUIREMENTS ON M, EXPr and EXPc
+                - must be a matrix_exp or matrix_ref object (or
+                  an object with a compatible interface).
+        !*/
+    public:
+        typedef typename M::type type;
+        typedef matrix_sub_range_exp ref_type;
+        typedef typename M::mem_manager_type mem_manager_type;
+        const static long NR = EXPr::NR*EXPr::NC;
+        const static long NC = EXPc::NR*EXPr::NC;
+
+        matrix_sub_range_exp (
+            const M& m_,
+            const EXPr& rows_,
+            const EXPc& cols_
+        ) :
+            m(m_),
+            rows(rows_),
+            cols(cols_)
+        {
+        }
+
+        const typename M::type operator() (
+            long r, 
+            long c
+        ) const { return m(rows(r),cols(c)); }
+
+        template <typename U, long iNR, long iNC, typename MM >
+        bool aliases (
+            const matrix<U,iNR,iNC,MM>& item
+        ) const { return m.aliases(item) || rows.aliases(item) || cols.aliases(item); }
+
+        template <typename U, long iNR, long iNC , typename MM>
+        bool destructively_aliases (
+            const matrix<U,iNR,iNC,MM>& item
+        ) const { return m.aliases(item) || rows.aliases(item) || cols.aliases(item); }
+
+        const ref_type& ref(
+        ) const { return *this; }
+
+        long nr (
+        ) const { return rows.size(); }
+
+        long nc (
+        ) const { return cols.size(); }
+
+    private:
+
+        const M m;
+        EXPr rows;
+        EXPc cols;
+    };
+
+    template <
+        typename EXP,
+        typename EXPr,
+        typename EXPc
+        >
+    const matrix_exp<matrix_sub_range_exp<matrix_exp<EXP>,matrix_exp<EXPr>,matrix_exp<EXPc> > > subm (
+        const matrix_exp<EXP>& m,
+        const matrix_exp<EXPr>& rows,
+        const matrix_exp<EXPc>& cols
+    )
+    {
+        // the rows and cols matrices must contain elements of type long
+        COMPILE_TIME_ASSERT((is_same_type<typename EXPr::type,long>::value == true));
+        COMPILE_TIME_ASSERT((is_same_type<typename EXPc::type,long>::value == true));
+
+        DLIB_ASSERT(0 <= min(rows) && max(rows) < m.nr() && 0 <= min(cols) && max(cols) < m.nc() &&
+                    (rows.nr() == 1 || rows.nc() == 1) && (cols.nr() == 1 || cols.nc() == 1), 
+            "\tconst matrix_exp subm(const matrix_exp& m, const matrix_exp& rows, const matrix_exp& cols)"
+            << "\n\tYou have given invalid arguments to this function"
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tmin(rows):  " << min(rows) 
+            << "\n\tmax(rows):  " << max(rows) 
+            << "\n\tmin(cols):  " << min(cols) 
+            << "\n\tmax(cols):  " << max(cols) 
+            << "\n\trows.nr():  " << rows.nr()
+            << "\n\trows.nc():  " << rows.nc()
+            << "\n\tcols.nr():  " << cols.nr()
+            << "\n\tcols.nc():  " << cols.nc()
+            );
+
+        typedef matrix_sub_range_exp<matrix_exp<EXP>,matrix_exp<EXPr>,matrix_exp<EXPc> > exp;
+        return matrix_exp<exp>(exp(m,rows,cols));
     }
 
 // ----------------------------------------------------------------------------------------
