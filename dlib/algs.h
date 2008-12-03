@@ -570,7 +570,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /*! tabs 
+    /*!A tabs 
 
         This is a template to compute the absolute value a number at compile time.
 
@@ -586,7 +586,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /*! tmax
+    /*!A tmax
 
         This is a template to compute the max of two values at compile time
 
@@ -601,7 +601,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /*! tmin 
+    /*!A tmin 
 
         This is a template to compute the min of two values at compile time
 
