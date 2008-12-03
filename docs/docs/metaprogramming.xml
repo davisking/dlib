@@ -45,6 +45,9 @@
          <item>is_directed_graph</item>
          <item>is_built_in_scalar_type</item>
          <item>unsigned_type</item> 
+         <item>tabs</item> 
+         <item>tmin</item> 
+         <item>tmax</item> 
       </section>
  
       <section>
@@ -79,6 +82,42 @@
    
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>tmin</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template to compute the min of two values at compile time.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>tmax</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template to compute the max of two values at compile time.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>tabs</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template to compute the absolute value a number at compile time.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
       <component>
          <name>unsigned_type</name>
          <file>dlib/uintn.h</file>

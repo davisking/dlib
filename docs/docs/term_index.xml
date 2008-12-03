@@ -507,6 +507,7 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#rowm" name="rowm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#colm" name="colm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#subm" name="subm"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#range" name="range"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_rowm" name="set_rowm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_colm" name="set_colm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_subm" name="set_subm"/>
@@ -604,6 +605,11 @@
          <term link="metaprogramming.html#DLIB_STACK_TRACE" name="Stack Trace"/>
          <term link="metaprogramming.html#DLIB_STACK_TRACE_NAMED" name="DLIB_STACK_TRACE_NAMED"/>
          <term link="metaprogramming.html#get_stack_trace" name="get_stack_trace"/>
+
+
+         <term link="metaprogramming.html#tmin" name="tmin"/>
+         <term link="metaprogramming.html#tmax" name="tmax"/>
+         <term link="metaprogramming.html#tabs" name="tabs"/>
 
          <term link="metaprogramming.html#unsigned_type" name="unsigned_type"/>
          <term link="metaprogramming.html#DLIB_ASSERT" name="DLIB_ASSERT"/>
