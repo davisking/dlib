@@ -120,6 +120,10 @@ namespace
         mrc.set_size(3,4);
 
         set_all_elements(mrc,1);
+
+        DLIB_CASSERT(diag(mrc) == uniform_matrix<double>(3,1,1),"");
+        DLIB_CASSERT(diag(matrix<double>(mrc)) == uniform_matrix<double>(3,1,1),"");
+
         matrix<double,2,3> mrc2;
         set_all_elements(mrc2,1);
         DLIB_CASSERT((removerc<1,1>(mrc) == mrc2),"");

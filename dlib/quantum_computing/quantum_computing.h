@@ -8,6 +8,7 @@
 #include "../matrix.h"
 #include "../rand.h"
 #include "../enable_if.h"
+#include "../algs.h"
 #include "quantum_computing_abstract.h"
 
 namespace dlib
@@ -31,22 +32,6 @@ namespace dlib
         {
             static const long value = 1;
         };
-
-    // ------------------------------------------------------------------------------------
-
-    // This is a template to compute the absolute value a number at compile time
-        template <long x, typename enabled=void>
-        struct abs { const static long value = x; };
-        template <long x>
-        struct abs<x,typename enable_if_c<(x < 0)>::type> { const static long value = -x; };
-
-    // ------------------------------------------------------------------------------------
-
-    // This is a template to compute the max of two values at compile time
-        template <long x, long y, typename enabled=void>
-        struct max { const static long value = x; };
-        template <long x, long y>
-        struct max<x,y,typename enable_if_c<(y > x)>::type> { const static long value = y; };
 
     // ------------------------------------------------------------------------------------
 
@@ -657,7 +642,7 @@ namespace dlib
                     target_mask <<= 1;
             }
 
-            static const long num_bits = qc_helpers::abs<control_bit-target_bit>::value+1;
+            static const long num_bits = tabs<control_bit-target_bit>::value+1;
             static const long dims = qc_helpers::exp_2_n<num_bits>::value;
 
             const qc_scalar_type operator() (long r, long c) const 
@@ -742,8 +727,8 @@ namespace dlib
                     target_mask <<= 1;
             }
 
-            static const long num_bits = qc_helpers::max<qc_helpers::abs<control_bit1-target_bit>::value, 
-                                                         qc_helpers::abs<control_bit2-target_bit>::value>::value+1;
+            static const long num_bits = tmax<tabs<control_bit1-target_bit>::value, 
+                                              tabs<control_bit2-target_bit>::value>::value+1;
             static const long dims = qc_helpers::exp_2_n<num_bits>::value;
 
             const qc_scalar_type operator() (long r, long c) const 

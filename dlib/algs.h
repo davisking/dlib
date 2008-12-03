@@ -570,6 +570,52 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*! tabs 
+
+        This is a template to compute the absolute value a number at compile time.
+
+        For example,
+            abs<-4>::value == 4
+            abs<4>::value == 4
+    !*/
+
+        template <long x, typename enabled=void>
+        struct tabs { const static long value = x; };
+        template <long x>
+        struct tabs<x,typename enable_if_c<(x < 0)>::type> { const static long value = -x; };
+
+// ----------------------------------------------------------------------------------------
+
+    /*! tmax
+
+        This is a template to compute the max of two values at compile time
+
+        For example,
+            abs<4,7>::value == 7
+    !*/
+
+        template <long x, long y, typename enabled=void>
+        struct tmax { const static long value = x; };
+        template <long x, long y>
+        struct tmax<x,y,typename enable_if_c<(y > x)>::type> { const static long value = y; };
+
+// ----------------------------------------------------------------------------------------
+
+    /*! tmin 
+
+        This is a template to compute the min of two values at compile time
+
+        For example,
+            abs<4,7>::value == 4
+    !*/
+
+        template <long x, long y, typename enabled=void>
+        struct tmin { const static long value = x; };
+        template <long x, long y>
+        struct tmin<x,y,typename enable_if_c<(y < x)>::type> { const static long value = y; };
+
+// ----------------------------------------------------------------------------------------
+
     /*!A is_function 
         
         This is a template that allows you to determine if the given type is a function.

@@ -2948,7 +2948,7 @@ convergence:
         template <typename EXP>
         struct op : has_destructive_aliasing
         {
-            const static long NR = EXP::NC;
+            const static long NR = (EXP::NC&&EXP::NR)? (tmin<EXP::NR,EXP::NC>::value) : (0);
             const static long NC = 1;
             typedef typename EXP::type type;
             typedef typename EXP::mem_manager_type mem_manager_type;
@@ -2957,7 +2957,7 @@ convergence:
             { return m(r,r); }
 
             template <typename M>
-            static long nr (const M& m) { return m.nr(); }
+            static long nr (const M& m) { return std::min(m.nc(),m.nr()); }
             template <typename M>
             static long nc (const M& m) { return 1; }
         };
@@ -2970,14 +2970,6 @@ convergence:
         const matrix_exp<EXP>& m
     )
     {
-        // You can only get the diagonal for square matrices.
-        COMPILE_TIME_ASSERT(EXP::NR == EXP::NC);
-        DLIB_ASSERT(m.nr() == m.nc(), 
-            "\tconst matrix_exp diag(const matrix_exp& m)"
-            << "\n\tYou can only apply diag() to a square matrix"
-            << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
-            );
         typedef matrix_unary_exp<matrix_exp<EXP>,op_diag> exp;
         return matrix_exp<exp>(exp(m));
     }
