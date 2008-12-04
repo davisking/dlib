@@ -1834,7 +1834,7 @@ convergence:
             nr_ = (end_ - start_)/inc_ + 1;
         }
 
-        const long operator() (
+        long operator() (
             long r, 
             long c
         ) const { return start + r*inc;  }
@@ -1876,7 +1876,7 @@ convergence:
         const static long NR = (end - start)/inc + 1;
         const static long NC = 1;
 
-        const long operator() (
+        long operator() (
             long r, 
             long c
         ) const { return start + r*inc;  }
