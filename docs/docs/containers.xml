@@ -702,7 +702,7 @@
 
             <p>
                Note that there is only one implementation of this object so there aren't any
-               different kernels to choose from when you create instances of the matrix object.  
+               different kernels to choose from when you create instances of the tuple object.  
                So for example, you
                could declare a tuple of 3 ints using the following statement: 
                <tt>dlib::tuple&lt;int,int,int&gt; t;</tt>  
@@ -1302,18 +1302,6 @@
             So for example, you
             could declare a matrix of 2 rows and 3 columns using the following statement: 
             <tt>dlib::matrix&lt;float,2,3&gt; m;</tt>  
-         </p>
-         <p>
-            It should also be noted that matrix multiplication is fastest when the two matrices
-            being multiplied are not complex matrix_exp objects returned from other expressions 
-            (such as other matrix multiplies).  This is because the matrix multiply operator will
-            evaluate each element of the matrices it is multiplying many times, and a matrix_exp
-            computes its elements' values each time they are queried.  However, the matrix multiply 
-            operator is the only one that evaluates its argument's elements multiple times so you can
-            stack up all the other operators however you want without any performance penalty.  If
-            you want to multiply two complex matrix_exp expressions together you can easily convert them into
-            fully evaluated temporary matrix objects by using the tmp() function.  For example, to
-            multiply four matrices together you should use an expression such as <tt>result = tmp(a*b)*tmp(c*d);</tt>
          </p>
          </description>
          
