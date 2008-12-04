@@ -1333,6 +1333,52 @@ namespace
             DLIB_CASSERT((equal(round_zeros(cos(exp(array_to_matrix(m)))*mi,0.000001) , identity_matrix<double,5>())),"");
         }
 
+        {
+            matrix<long,5,5> m1, res;
+            matrix<long,2,2> m2;
+
+            set_all_elements(m1,0);
+
+
+            long res_vals[] = {
+                9, 9, 9, 9, 9,
+                0, 1, 1, 0, 0,
+                0, 1, 1, 0, 2,
+                0, 0, 2, 2, 2,
+                0, 0, 2, 2, 0
+            };
+
+            res = res_vals;
+
+            set_all_elements(m2, 1);
+            set_subm(m1, range(1,2), range(1,2)) = subm(m2,0,0,2,2);
+            set_all_elements(m2, 2);
+            set_subm(m1, 3,2,2,2) = m2;
+
+            set_colm(m1,4) = trans(rowm(m1,4));
+            set_rowm(m1,0) = 9;
+
+            DLIB_CASSERT(m1 == res, "m1: \n" << m1 << "\nres: \n" << res);
+
+            set_subm(m1,0,0,5,5) = m1*m1;
+            DLIB_CASSERT(m1 == res*res, "m1: \n" << m1 << "\nres*res: \n" << res*res);
+
+            m1 = res;
+            set_subm(m1,1,1,2,2) = subm(m1,0,0,2,2);
+
+            long res_vals2[] = {
+                9, 9, 9, 9, 9,
+                0, 9, 9, 0, 0,
+                0, 0, 1, 0, 2,
+                0, 0, 2, 2, 2,
+                0, 0, 2, 2, 0
+            };
+
+            res = res_vals2;
+            DLIB_CASSERT(m1 == res, "m1: \n" << m1 << "\nres: \n" << res);
+
+
+        }
 
         {
             matrix<long,5,5> m1, res;
@@ -1749,6 +1795,28 @@ namespace
             DLIB_CASSERT(m2(1,0) == m(2,0),"");
             DLIB_CASSERT(m2(1,1) == m(2,2),"");
 
+
+        }
+
+        {
+            matrix<double,4,5> m;
+            set_subm(m, range(0,3), range(0,4)) = 4;
+            DLIB_CASSERT(min(m) == max(m) && min(m) == 4,"");
+
+            set_subm(m,range(1,1),range(0,4)) = 7;
+            DLIB_CASSERT((rowm(m,0) == uniform_matrix<double>(1,5, 4)),"");
+            DLIB_CASSERT((rowm(m,1) == uniform_matrix<double>(1,5, 7)),"");
+            DLIB_CASSERT((rowm(m,2) == uniform_matrix<double>(1,5, 4)),"");
+            DLIB_CASSERT((rowm(m,3) == uniform_matrix<double>(1,5, 4)),"");
+
+
+            set_subm(m, range(0,2,3), range(0,2,4)) = trans(subm(m,0,0,3,2));
+
+
+            DLIB_CASSERT(m(0,2) == 7,"");
+            DLIB_CASSERT(m(2,2) == 7,"");
+
+            DLIB_CASSERT(sum(m) == 7*5+ 7+7 +  4*(4*5 - 7),"");
 
         }
 

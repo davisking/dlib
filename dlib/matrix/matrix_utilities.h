@@ -2156,8 +2156,8 @@ convergence:
     private:
 
         const M m;
-        EXPr rows;
-        EXPc cols;
+        const EXPr rows;
+        const EXPc cols;
     };
 
     template <
@@ -2388,6 +2388,99 @@ convergence:
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T, long NR, long NC, typename mm, typename EXPr, typename EXPc>
+    class assignable_sub_range_matrix
+    {
+    public:
+        assignable_sub_range_matrix(
+            matrix<T,NR,NC,mm>& m_,
+            const EXPr& rows_,
+            const EXPc& cols_
+        ) : m(m_), rows(rows_), cols(cols_) {}
+
+        template <typename EXP>
+        assignable_sub_range_matrix& operator= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nr() == rows.size() && exp.nc() == cols.size(),
+                "\tassignable_matrix_expression set_subm(matrix& m, const matrix_exp rows, const matrix_exp cols)"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\trows.size() (target matrix):  " << rows.size()
+                << "\n\tcols.size() (target matrix):  " << cols.size()
+                );
+
+            if (exp.destructively_aliases(m) == false)
+            {
+                for (long r = 0; r < rows.size(); ++r)
+                {
+                    for (long c = 0; c < cols.size(); ++c)
+                    {
+                        m(rows(r),cols(c)) = exp(r,c);
+                    }
+                }
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator=(tmp(exp));
+            }
+
+            return *this;
+        }
+
+        assignable_sub_range_matrix& operator= (
+            const T& value
+        )
+        {
+            for (long r = 0; r < rows.size(); ++r)
+            {
+                for (long c = 0; c < cols.size(); ++c)
+                {
+                    m(rows(r),cols(c)) = value;
+                }
+            }
+
+            return *this;
+        }
+
+    private:
+
+        matrix<T,NR,NC,mm>& m;
+        const EXPr rows;
+        const EXPc cols;
+    };
+
+    template <typename T, long NR, long NC, typename mm, typename EXPr, typename EXPc>
+    assignable_sub_range_matrix<T,NR,NC,mm,matrix_exp<EXPr>,matrix_exp<EXPc> > set_subm (
+        matrix<T,NR,NC,mm>& m,
+        const matrix_exp<EXPr>& rows,
+        const matrix_exp<EXPc>& cols
+    )
+    {
+        DLIB_ASSERT(0 <= min(rows) && max(rows) < m.nr() && 0 <= min(cols) && max(cols) < m.nc() &&
+                    (rows.nr() == 1 || rows.nc() == 1) && (cols.nr() == 1 || cols.nc() == 1), 
+            "\tassignable_matrix_expression set_subm(matrix& m, const matrix_exp& rows, const matrix_exp& cols)"
+            << "\n\tYou have specified invalid sub matrix dimensions"
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tmin(rows):  " << min(rows) 
+            << "\n\tmax(rows):  " << max(rows) 
+            << "\n\tmin(cols):  " << min(cols) 
+            << "\n\tmax(cols):  " << max(cols) 
+            << "\n\trows.nr():  " << rows.nr()
+            << "\n\trows.nc():  " << rows.nc()
+            << "\n\tcols.nr():  " << cols.nr()
+            << "\n\tcols.nc():  " << cols.nc()
+            );
+
+        return assignable_sub_range_matrix<T,NR,NC,mm,matrix_exp<EXPr>,matrix_exp<EXPc> >(m,rows,cols);
+    }
+
+// ----------------------------------------------------------------------------------------
 
     template <typename T, long NR, long NC, typename mm>
     class assignable_col_matrix

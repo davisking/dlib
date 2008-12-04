@@ -404,6 +404,33 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    assignable_matrix_expression set_subm (
+        matrix& m,
+        const matrix_exp& rows,
+        const matrix_exp& cols
+    );
+    /*!
+        requires
+            - rows and cols contain elements of type long
+            - 0 <= min(rows) && max(rows) < m.nr() 
+            - 0 <= min(cols) && max(cols) < m.nc()
+            - rows.nr() == 1 || rows.nc() == 1
+            - cols.nr() == 1 || cols.nc() == 1
+              (i.e. rows and cols must be vectors)
+        ensures
+            - statements of the following form:
+                - set_subm(m,rows,cols) = some_matrix;
+              result in it being the case that:
+                - subm(m,rows,cols) == some_matrix.
+
+            - statements of the following form:
+                - set_subm(m,rows,cols) = scalar_value;
+              result in it being the case that:
+                - subm(m,rows,cols) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     assignable_matrix_expression set_rowm (
         matrix& m,
         long row

@@ -78,7 +78,7 @@ namespace dlib
             {
                 for (long c = 0; c < src.nc(); ++c)
                 {
-                    dest(r+row_offset,c+col_offset) = make_exp(lhs*rhs)(r,c);
+                    dest(r+row_offset,c+col_offset) = src(r,c);
                 }
             }
         }
