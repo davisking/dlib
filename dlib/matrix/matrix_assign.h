@@ -93,15 +93,13 @@ namespace dlib
                 for (long c = 0; c < lhs.nc(); c+=bs)
                 {
                     // make a rect for the block from lhs 
-                    rectangle lhs_block(c, r, c+bs-1, r+bs-1);
-                    lhs_block = lhs_block.intersect(get_rect(lhs));
+                    rectangle lhs_block(c, r, std::min(c+bs-1,lhs.nc()-1), std::min(r+bs-1,lhs.nr()-1));
 
                     // now loop over all the rhs blocks we have to multiply with the current lhs block
                     for (long i = 0; i < rhs.nc(); i += bs)
                     {
                         // make a rect for the block from rhs 
-                        rectangle rhs_block(i, c, i+bs-1, c+bs-1);
-                        rhs_block = rhs_block.intersect(get_rect(rhs));
+                        rectangle rhs_block(i, c, std::min(i+bs-1,rhs.nc()-1), std::min(c+bs-1,rhs.nr()-1));
 
                         // make a target rect in res
                         rectangle res_block(rhs_block.left(),lhs_block.top(), rhs_block.right(), lhs_block.bottom());

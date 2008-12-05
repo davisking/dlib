@@ -92,6 +92,7 @@ namespace dlib
                     T temp;
                     // do this just to avoid a compiler warning
                     assign_zero_if_built_in_scalar_type(temp);
+                    assign_zero_if_built_in_scalar_type(partition_element);
 
                     queue.dequeue(partition_element);
 
