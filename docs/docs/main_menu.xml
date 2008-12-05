@@ -277,7 +277,7 @@
       <br/>
       <br/>
       <web>
-<a href="http://www.ohloh.net/projects/3306?ref=WidgetProjectThinBadge"><img width='100' height='16' src='http://www.ohloh.net/projects/3306/widgets/project_thin_badge.gif' alt="Ohloh project report for dlib C++ Library" /></a>
+         <script type="text/javascript" src="http://www.ohloh.net/p/3306/widgets/project_thin_badge"></script>
 
          <br/>
          <a href="http://sourceforge.net/"><img src="http://sourceforge.net/sflogo.php?group_id=130373&amp;type=1"/></a>
