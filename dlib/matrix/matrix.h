@@ -3,6 +3,7 @@
 #ifndef DLIB_MATRIx_
 #define DLIB_MATRIx_
 
+#include "matrix_fwd.h"
 #include "matrix_abstract.h"
 #include "../algs.h"
 #include "../serialize.h"
@@ -11,6 +12,7 @@
 #include <algorithm>
 #include "../memory_manager.h"
 #include "../is_kind.h"
+#include "matrix_data_layout.h"
 
 #ifdef _MSC_VER
 // Disable the following warnings for Visual Studio
@@ -27,23 +29,14 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        long num_rows = 0,
-        long num_cols = 0,
-        typename mem_manager = memory_manager<char>::kernel_1a
-        >
-    class matrix; 
-
-// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
         typename T,
         long num_rows,
         long num_cols,
-        typename mem_manager
+        typename mem_manager,
+        typename layout
         >
     class matrix_ref
     {
@@ -51,11 +44,12 @@ namespace dlib
         typedef T type;
         typedef matrix_ref ref_type;
         typedef mem_manager mem_manager_type;
+        typedef layout layout_type;
         const static long NR = num_rows;
         const static long NC = num_cols;
 
         matrix_ref (
-            const matrix<T,num_rows,num_cols,mem_manager>& m_
+            const matrix<T,num_rows,num_cols,mem_manager,layout>& m_
         ) : m(m_) {}
 
         matrix_ref (
@@ -76,18 +70,18 @@ namespace dlib
         long size (
         ) const { return m.size(); }
 
-        template <typename U, long iNR, long iNC, typename mm >
+        template <typename U, long iNR, long iNC, typename mm, typename l >
         bool aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const  { return false; }
 
-        template <typename U, long iNR, long iNC, typename mm>
+        template <typename U, long iNR, long iNC, typename mm, typename l>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return false; }
 
         bool aliases (
-            const matrix<T,num_rows,num_cols,mem_manager>& item
+            const matrix<T,num_rows,num_cols,mem_manager,layout>& item
         ) const { return (&m == &item); }
 
         const matrix_ref ref(
@@ -97,412 +91,7 @@ namespace dlib
         // no assignment operator
         matrix_ref& operator=(const matrix_ref&);
 
-        const matrix<T,num_rows,num_cols,mem_manager>& m; // This is the item contained by this expression.
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    // this is a hack to avoid a compile time error in visual studio 8.  I would just 
-    // use sizeof(T) and be done with it but that won't compile.  The idea here 
-    // is to avoid using the stack allocation of the matrix_data object if it 
-    // is going to contain another matrix and also avoid asking for the sizeof()
-    // the contained matrix.
-    template <typename T>
-    struct get_sizeof_helper
-    {
-        const static std::size_t val = sizeof(T);
-    };
-
-    template <typename T, long NR, long NC, typename mm>
-    struct get_sizeof_helper<matrix<T,NR,NC,mm> >
-    {
-        const static std::size_t val = 1000000;
-    };
-
-    template <
-        typename T,
-        long num_rows,
-        long num_cols,
-        typename mem_manager,
-        int val = static_switch <
-            // when the sizes are all non zero and small
-            (num_rows*num_cols*get_sizeof_helper<T>::val <= 64) && (num_rows != 0 && num_cols != 0),
-            // when the sizes are all non zero and big 
-            (num_rows*num_cols*get_sizeof_helper<T>::val >=  65) && (num_rows != 0 && num_cols != 0),
-            num_rows == 0 && num_cols != 0,
-            num_rows != 0 && num_cols == 0,
-            num_rows == 0 && num_cols == 0
-            >::value
-        >
-    class matrix_data ;
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This object represents the actual allocation of space for a matrix.
-            Small matrices allocate all their data on the stack and bigger ones
-            use a memory_manager to get their memory.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        long num_rows,
-        long num_cols,
-        typename mem_manager
-        >
-    class matrix_data<T,num_rows,num_cols,mem_manager,1> : noncopyable // when the sizes are all non zero and small
-    {
-    public:
-        const static long NR = num_rows;
-        const static long NC = num_cols;
-
-        matrix_data() {}
-
-        T& operator() (
-            long r, 
-            long c
-        ) { return data[r][c]; }
-
-        const T& operator() (
-            long r, 
-            long c
-        ) const { return data[r][c]; }
-
-        T& operator() (
-            long i 
-        ) { return *(*data + i); }
-
-        const T& operator() (
-            long i
-        ) const { return *(*data + i); }
-
-        void swap(
-            matrix_data& item
-        )
-        {
-            for (long r = 0; r < num_rows; ++r)
-            {
-                for (long c = 0; c < num_cols; ++c)
-                {
-                    exchange((*this)(r,c),item(r,c));
-                }
-            }
-        }
-
-        long nr (
-        ) const { return num_rows; }
-
-        long nc (
-        ) const { return num_cols; }
-
-        void set_size (
-            long nr,
-            long nc
-        )
-        {
-        }
-
-    private:
-        T data[num_rows][num_cols];
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        long num_rows,
-        long num_cols,
-        typename mem_manager
-        >
-    class matrix_data<T,num_rows,num_cols,mem_manager,2> : noncopyable // when the sizes are all non zero and big 
-    {
-    public:
-        const static long NR = num_rows;
-        const static long NC = num_cols;
-
-        matrix_data (
-        ) { data = pool.allocate_array(num_rows*num_cols); }
-
-        ~matrix_data ()
-        { pool.deallocate_array(data); }
-
-        T& operator() (
-            long r, 
-            long c
-        ) { return data[r*num_cols + c]; }
-
-        const T& operator() (
-            long r, 
-            long c
-        ) const { return data[r*num_cols + c]; }
-
-        T& operator() (
-            long i 
-        ) { return data[i]; }
-
-        const T& operator() (
-            long i 
-        ) const { return data[i]; }
-
-        void swap(
-            matrix_data& item
-        )
-        {
-            std::swap(item.data,data);
-            pool.swap(item.pool);
-        }
-
-        long nr (
-        ) const { return num_rows; }
-
-        long nc (
-        ) const { return num_cols; }
-
-        void set_size (
-            long nr,
-            long nc
-        )
-        {
-        }
-
-    private:
-
-        T* data;
-        typename mem_manager::template rebind<T>::other pool;
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        long num_rows,
-        long num_cols,
-        typename mem_manager
-        >
-    class matrix_data<T,num_rows,num_cols,mem_manager,3> : noncopyable // when num_rows == 0 && num_cols != 0,
-    {
-    public:
-        const static long NR = num_rows;
-        const static long NC = num_cols;
-
-        matrix_data (
-        ):data(0), nr_(0) { }
-
-        ~matrix_data ()
-        { 
-            if (data) 
-                pool.deallocate_array(data); 
-        }
-
-        T& operator() (
-            long r, 
-            long c
-        ) { return data[r*num_cols + c]; }
-
-        const T& operator() (
-            long r, 
-            long c
-        ) const { return data[r*num_cols + c]; }
-
-        T& operator() (
-            long i 
-        ) { return data[i]; }
-
-        const T& operator() (
-            long i 
-        ) const { return data[i]; }
-
-        void swap(
-            matrix_data& item
-        )
-        {
-            std::swap(item.data,data);
-            std::swap(item.nr_,nr_);
-            pool.swap(item.pool);
-        }
-
-        long nr (
-        ) const { return nr_; }
-
-        long nc (
-        ) const { return num_cols; }
-
-        void set_size (
-            long nr,
-            long nc
-        )
-        {
-            if (data) 
-            {
-                pool.deallocate_array(data);
-            }
-            data = pool.allocate_array(nr*nc);
-            nr_ = nr;
-        }
-
-    private:
-
-        T* data;
-        long nr_;
-        typename mem_manager::template rebind<T>::other pool;
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        long num_rows,
-        long num_cols,
-        typename mem_manager
-        >
-    class matrix_data<T,num_rows,num_cols,mem_manager,4> : noncopyable // when num_rows != 0 && num_cols == 0
-    {
-    public:
-        const static long NR = num_rows;
-        const static long NC = num_cols;
-
-        matrix_data (
-        ):data(0), nc_(0) { }
-
-        ~matrix_data ()
-        { 
-            if (data) 
-            {
-                pool.deallocate_array(data);
-            }
-        }
-
-        T& operator() (
-            long r, 
-            long c
-        ) { return data[r*nc_ + c]; }
-
-        const T& operator() (
-            long r, 
-            long c
-        ) const { return data[r*nc_ + c]; }
-
-        T& operator() (
-            long i 
-        ) { return data[i]; }
-
-        const T& operator() (
-            long i 
-        ) const { return data[i]; }
-
-        void swap(
-            matrix_data& item
-        )
-        {
-            std::swap(item.data,data);
-            std::swap(item.nc_,nc_);
-            pool.swap(item.pool);
-        }
-
-        long nr (
-        ) const { return num_rows; }
-
-        long nc (
-        ) const { return nc_; }
-
-        void set_size (
-            long nr,
-            long nc
-        )
-        {
-            if (data) 
-            {
-                pool.deallocate_array(data);
-            }
-            data = pool.allocate_array(nr*nc);
-            nc_ = nc;
-        }
-
-    private:
-
-        T* data;
-        long nc_;
-        typename mem_manager::template rebind<T>::other pool;
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        long num_rows,
-        long num_cols,
-        typename mem_manager
-        >
-    class matrix_data<T,num_rows,num_cols,mem_manager,5> : noncopyable // when num_rows == 0 && num_cols == 0
-    {
-    public:
-        const static long NR = num_rows;
-        const static long NC = num_cols;
-
-        matrix_data (
-        ):data(0), nr_(0), nc_(0) { }
-
-        ~matrix_data ()
-        { 
-            if (data) 
-            {
-                pool.deallocate_array(data);
-            }
-        }
-
-        T& operator() (
-            long r, 
-            long c
-        ) { return data[r*nc_ + c]; }
-
-        const T& operator() (
-            long r, 
-            long c
-        ) const { return data[r*nc_ + c]; }
-
-        T& operator() (
-            long i 
-        ) { return data[i]; }
-
-        const T& operator() (
-            long i 
-        ) const { return data[i]; }
-
-        void swap(
-            matrix_data& item
-        )
-        {
-            std::swap(item.data,data);
-            std::swap(item.nc_,nc_);
-            std::swap(item.nr_,nr_);
-            pool.swap(item.pool);
-        }
-
-        long nr (
-        ) const { return nr_; }
-
-        long nc (
-        ) const { return nc_; }
-
-        void set_size (
-            long nr,
-            long nc
-        )
-        {
-            if (data) 
-            {
-                pool.deallocate_array(data);
-            }
-            data = pool.allocate_array(nr*nc);
-            nr_ = nr;
-            nc_ = nc;
-        }
-
-    private:
-        T* data;
-        long nr_;
-        long nc_;
-        typename mem_manager::template rebind<T>::other pool;
+        const matrix<T,num_rows,num_cols,mem_manager,layout>& m; // This is the item contained by this expression.
     };
 
 // ----------------------------------------------------------------------------------------
@@ -608,14 +197,14 @@ namespace dlib
         long nc (
         ) const { return get_nc_helper<ref_type,NC>::get(ref_); }
 
-        template <typename U, long iNR, long iNC, typename mm >
+        template <typename U, long iNR, long iNC, typename mm, typename l >
         bool aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return ref_.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename mm>
+        template <typename U, long iNR, long iNC , typename mm, typename l>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return ref_.destructively_aliases(item); }
 
         const ref_type& ref (
@@ -647,10 +236,10 @@ namespace dlib
 
     template <typename T>
     struct is_matrix<matrix_exp<T> > { static const bool value = true; }; 
-    template <typename T, long NR, long NC, typename mm>
-    struct is_matrix<matrix_ref<T,NR,NC,mm> > { static const bool value = true; }; 
-    template <typename T, long NR, long NC, typename mm>
-    struct is_matrix<matrix<T,NR,NC,mm> > { static const bool value = true; }; 
+    template <typename T, long NR, long NC, typename mm, typename l>
+    struct is_matrix<matrix_ref<T,NR,NC,mm,l> > { static const bool value = true; }; 
+    template <typename T, long NR, long NC, typename mm, typename l>
+    struct is_matrix<matrix<T,NR,NC,mm,l> > { static const bool value = true; }; 
     template <typename T>
     struct is_matrix<T&> { static const bool value = is_matrix<T>::value; }; 
     template <typename T>
@@ -776,14 +365,14 @@ namespace dlib
         long nc (
         ) const { return rhs.nc(); }
 
-        template <typename U, long iNR, long iNC, typename mm >
+        template <typename U, long iNR, long iNC, typename mm, typename l >
         bool aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return lhs.aliases(item) || rhs.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename mm>
+        template <typename U, long iNR, long iNC , typename mm, typename l>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return aliases(item); }
 
         const ref_type& ref(
@@ -799,16 +388,17 @@ namespace dlib
         long NC,
         typename EXP1,
         typename EXP2,
-        typename MM
+        typename MM,
+        typename L
         >
-    inline const matrix_exp<matrix_multiply_exp<EXP1, matrix_multiply_exp<EXP2,typename matrix<T,NR,NC,MM>::ref_type >,0 > > operator* (
+    inline const matrix_exp<matrix_multiply_exp<EXP1, matrix_multiply_exp<EXP2,typename matrix<T,NR,NC,MM,L>::ref_type >,0 > > operator* (
         const matrix_exp<matrix_multiply_exp<EXP1,EXP2,1> >& m1,
-        const matrix<T,NR,NC,MM>& m2
+        const matrix<T,NR,NC,MM,L>& m2
     )
     {
         // We are going to reorder the order of evaluation of the terms here.  This way the
         // multiplication will go faster.
-        typedef matrix_multiply_exp<EXP2,typename matrix<T,NR,NC,MM>::ref_type > exp_inner;
+        typedef matrix_multiply_exp<EXP2,typename matrix<T,NR,NC,MM,L>::ref_type > exp_inner;
         typedef matrix_multiply_exp<EXP1, exp_inner,0 >  exp_outer;
         return matrix_exp<exp_outer>(exp_outer(m1.ref().lhs,exp_inner(m1.ref().rhs,m2)));
     }
@@ -831,14 +421,15 @@ namespace dlib
         long NR,
         long NC,
         typename EXP,
-        typename MM
+        typename MM,
+        typename L
         >
-    inline const matrix_exp<matrix_multiply_exp<typename matrix<T,NR,NC,MM>::ref_type, matrix_exp<EXP> > >  operator* (
-        const matrix<T,NR,NC,MM>& m1,
+    inline const matrix_exp<matrix_multiply_exp<typename matrix<T,NR,NC,MM,L>::ref_type, matrix_exp<EXP> > >  operator* (
+        const matrix<T,NR,NC,MM,L>& m1,
         const matrix_exp<EXP>& m2
     )
     {
-        typedef matrix_multiply_exp<typename matrix<T,NR,NC,MM>::ref_type, matrix_exp<EXP> >  exp;
+        typedef matrix_multiply_exp<typename matrix<T,NR,NC,MM,L>::ref_type, matrix_exp<EXP> >  exp;
         return matrix_exp<exp>(exp(m1,m2));
     }
 
@@ -847,14 +438,15 @@ namespace dlib
         long NR,
         long NC,
         typename EXP,
-        typename MM
+        typename MM,
+        typename L
         >
-    inline const matrix_exp<matrix_multiply_exp< matrix_exp<EXP>, typename matrix<T,NR,NC,MM>::ref_type, 1> >  operator* (
+    inline const matrix_exp<matrix_multiply_exp< matrix_exp<EXP>, typename matrix<T,NR,NC,MM,L>::ref_type, 1> >  operator* (
         const matrix_exp<EXP>& m1,
-        const matrix<T,NR,NC,MM>& m2
+        const matrix<T,NR,NC,MM,L>& m2
     )
     {
-        typedef matrix_multiply_exp< matrix_exp<EXP>, typename matrix<T,NR,NC,MM>::ref_type, 1 >  exp;
+        typedef matrix_multiply_exp< matrix_exp<EXP>, typename matrix<T,NR,NC,MM,L>::ref_type, 1 >  exp;
         return matrix_exp<exp>(exp(m1,m2));
     }
 
@@ -865,14 +457,16 @@ namespace dlib
         long NR2,
         long NC2,
         typename MM1,
-        typename MM2
+        typename MM2,
+        typename L1,
+        typename L2
         >
-    inline const matrix_exp<matrix_multiply_exp<typename matrix<T,NR1,NC1,MM1>::ref_type,typename matrix<T,NR2,NC2,MM2>::ref_type > >  operator* (
-        const matrix<T,NR1,NC1,MM1>& m1,
-        const matrix<T,NR2,NC2,MM2>& m2
+    inline const matrix_exp<matrix_multiply_exp<typename matrix<T,NR1,NC1,MM1,L1>::ref_type,typename matrix<T,NR2,NC2,MM2,L2>::ref_type > >  operator* (
+        const matrix<T,NR1,NC1,MM1,L1>& m1,
+        const matrix<T,NR2,NC2,MM2,L2>& m2
     )
     {
-        typedef matrix_multiply_exp<typename matrix<T,NR1,NC1,MM1>::ref_type, typename matrix<T,NR2,NC2,MM2>::ref_type >  exp;
+        typedef matrix_multiply_exp<typename matrix<T,NR1,NC1,MM1,L1>::ref_type, typename matrix<T,NR2,NC2,MM2,L2>::ref_type >  exp;
         return matrix_exp<exp>(exp(m1,m2));
     }
 
@@ -931,14 +525,14 @@ namespace dlib
             long c
         ) const { return lhs(r,c) + rhs(r,c); }
 
-        template <typename U, long iNR, long iNC , typename mm>
+        template <typename U, long iNR, long iNC , typename mm, typename l>
         bool aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return lhs.aliases(item) || rhs.aliases(item); }
 
-        template <typename U, long iNR, long iNC, typename mm >
+        template <typename U, long iNR, long iNC, typename mm, typename l >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return lhs.destructively_aliases(item) || rhs.destructively_aliases(item); }
 
         const ref_type& ref(
@@ -1018,14 +612,14 @@ namespace dlib
             long c
         ) const { return lhs(r,c) - rhs(r,c); }
 
-        template <typename U, long iNR, long iNC, typename mm >
+        template <typename U, long iNR, long iNC, typename mm, typename l >
         bool aliases (
-            const matrix<U,iNR,iNC, mm>& item
+            const matrix<U,iNR,iNC, mm,l>& item
         ) const { return lhs.aliases(item) || rhs.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename mm>
+        template <typename U, long iNR, long iNC , typename mm, typename l>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return lhs.destructively_aliases(item) || rhs.destructively_aliases(item); }
 
         const ref_type& ref(
@@ -1090,14 +684,14 @@ namespace dlib
             long c
         ) const { return m(r,c)/s; }
 
-        template <typename U, long iNR, long iNC, typename mm >
+        template <typename U, long iNR, long iNC, typename mm , typename l>
         bool aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC, typename mm >
+        template <typename U, long iNR, long iNC, typename mm, typename l >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return m.destructively_aliases(item); }
 
         const ref_type& ref(
@@ -1162,14 +756,14 @@ namespace dlib
             long c
         ) const { return m(r,c)*s; }
 
-        template <typename U, long iNR, long iNC , typename mm>
+        template <typename U, long iNR, long iNC , typename mm, typename l>
         bool aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC, typename mm >
+        template <typename U, long iNR, long iNC, typename mm, typename l >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const { return m.destructively_aliases(item); }
 
         const ref_type& ref(
@@ -1295,34 +889,34 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-        template <
-            typename matrix_dest_type,
-            typename src_exp 
-            >
-        void matrix_assign (
-            matrix_dest_type& dest,
-            const matrix_exp<src_exp>& src,
-            const long row_offset = 0,
-            const long col_offset = 0
-        )
-        /*!
-            requires
-                - src.destructively_aliases(dest) == false
-                - dest.nr() == src.nr()-row_offset
-                - dest.nc() == src.nc()-col_offset
-            ensures
-                - #subm(dest, row_offset, col_offset, src.nr(), src.nc()) == src
-                - the part of dest outside the above sub matrix remains unchanged
-        !*/
+    template <
+        typename matrix_dest_type,
+        typename src_exp 
+        >
+    void matrix_assign (
+        matrix_dest_type& dest,
+        const matrix_exp<src_exp>& src,
+        const long row_offset = 0,
+        const long col_offset = 0
+    )
+    /*!
+        requires
+            - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()-row_offset
+            - dest.nc() == src.nc()-col_offset
+        ensures
+            - #subm(dest, row_offset, col_offset, src.nr(), src.nc()) == src
+            - the part of dest outside the above sub matrix remains unchanged
+    !*/
+    {
+        for (long r = 0; r < src.nr(); ++r)
         {
-            for (long r = 0; r < src.nr(); ++r)
+            for (long c = 0; c < src.nc(); ++c)
             {
-                for (long c = 0; c < src.nc(); ++c)
-                {
-                    dest(r+row_offset,c+col_offset) = src(r,c);
-                }
+                dest(r+row_offset,c+col_offset) = src(r,c);
             }
         }
+    }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -1332,27 +926,29 @@ namespace dlib
         typename T,
         long num_rows,
         long num_cols,
-        typename mem_manager 
+        typename mem_manager,
+        typename layout
         >
-    class matrix : public matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> > 
+    class matrix : public matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager,layout> > 
     {
 
         COMPILE_TIME_ASSERT(num_rows >= 0 && num_cols >= 0); 
 
     public:
         typedef T type;
-        typedef matrix_ref<T,num_rows,num_cols,mem_manager> ref_type;
+        typedef matrix_ref<T,num_rows,num_cols,mem_manager,layout> ref_type;
         typedef mem_manager mem_manager_type;
+        typedef layout layout_type;
         const static long NR = num_rows;
         const static long NC = num_cols;
 
-        matrix () : matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> >(ref_type(*this)) 
+        matrix () : matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager, layout> >(ref_type(*this)) 
         {
         }
 
         explicit matrix (
             long length 
-        ) : matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> >(ref_type(*this)) 
+        ) : matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager, layout> >(ref_type(*this)) 
         {
             // This object you are trying to call matrix(length) on is not a column or 
             // row vector.
@@ -1397,7 +993,7 @@ namespace dlib
         matrix (
             long rows,
             long cols 
-        ) : matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> >(ref_type(*this)) 
+        ) : matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager, layout> >(ref_type(*this)) 
         {
             DLIB_ASSERT( (NR == 0 || NR == rows) && ( NC == 0 || NC == cols) && 
                     rows >= 0 && cols >= 0, 
@@ -1414,7 +1010,7 @@ namespace dlib
         template <typename EXP>
         matrix (
             const matrix_exp<EXP>& m
-        ): matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> >(ref_type(*this)) 
+        ): matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager, layout> >(ref_type(*this)) 
         {
             // You get an error on this line if the matrix m contains a type that isn't
             // the same as the type contained in the target matrix.
@@ -1442,7 +1038,7 @@ namespace dlib
 
         matrix (
             const matrix& m
-        ): matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> >(ref_type(*this)) 
+        ): matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager, layout> >(ref_type(*this)) 
         {
             data.set_size(m.nr(),m.nc());
             matrix_assign(*this, m);
@@ -1451,7 +1047,7 @@ namespace dlib
         template <typename U, size_t len>
         matrix (
             U (&array)[len]
-        ): matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager> >(ref_type(*this)) 
+        ): matrix_exp<matrix_ref<T,num_rows,num_cols, mem_manager, layout> >(ref_type(*this)) 
         {
             COMPILE_TIME_ASSERT(NR*NC == len && len > 0);
             size_t idx = 0;
@@ -1726,7 +1322,7 @@ namespace dlib
             }
             else
             {
-                // we have to use a temporary matrix_data object here because
+                // we have to use a temporary matrix object here because
                 // this->data is aliased inside the matrix_exp m somewhere.
                 matrix temp;
                 temp.set_size(m.nr(),m.nc());
@@ -1762,7 +1358,7 @@ namespace dlib
             }
             else
             {
-                // we have to use a temporary matrix_data object here because
+                // we have to use a temporary matrix object here because
                 // this->data is aliased inside the matrix_exp m somewhere.
                 matrix temp;
                 temp.set_size(m.nr(),m.nc());
@@ -1834,33 +1430,34 @@ namespace dlib
         }
 
     private:
-        matrix_data<T,NR,NC, mem_manager> data;
+        typename layout::template layout<T,NR,NC,mem_manager> data;
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-
     template <
         typename T,
         long NR,
         long NC,
-        typename mm
+        typename mm,
+        typename l
         >
     void swap(
-        matrix<T,NR,NC,mm>& a,
-        matrix<T,NR,NC,mm>& b
+        matrix<T,NR,NC,mm,l>& a,
+        matrix<T,NR,NC,mm,l>& b
     ) { a.swap(b); }
 
     template <
         typename T,
         long NR,
         long NC,
-        typename mm
+        typename mm,
+        typename l
         >
     void serialize (
-        const matrix<T,NR,NC,mm>& item, 
+        const matrix<T,NR,NC,mm,l>& item, 
         std::ostream& out
     )
     {
@@ -1886,10 +1483,11 @@ namespace dlib
         typename T,
         long NR,
         long NC,
-        typename mm
+        typename mm,
+        typename l
         >
     void deserialize (
-        matrix<T,NR,NC,mm>& item, 
+        matrix<T,NR,NC,mm,l>& item, 
         std::istream& in
     )
     {

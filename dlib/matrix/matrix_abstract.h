@@ -5,6 +5,7 @@
 
 #include "../serialize.h"
 #include "../memory_manager.h"
+#include "matrix_data_layout_abstract.h"
 
 namespace dlib
 {
@@ -15,7 +16,8 @@ namespace dlib
         typename T,
         long num_rows,
         long num_cols,
-        typename mem_manager
+        typename mem_manager,
+        typename layout
         >
     class matrix; 
 
@@ -25,7 +27,8 @@ namespace dlib
         typename T,
         long num_rows,
         long num_cols,
-        typename mem_manager
+        typename mem_manager,
+        typename layout
         >
     class matrix_ref
     {
@@ -38,11 +41,12 @@ namespace dlib
         typedef T type;
         typedef matrix_ref ref_type;
         typedef mem_manager mem_manager_type;
+        typedef layout layout_type;
         const static long NR = num_rows;
         const static long NC = num_cols;
 
         matrix_ref (
-            const matrix<T,num_rows,num_cols,mem_manager>& m
+            const matrix<T,num_rows,num_cols,mem_manager,layout>& m
         );
         /*!
             ensures
@@ -92,18 +96,18 @@ namespace dlib
                 - returns nr()*nc()
         !*/
 
-        template <typename U, long iNR, long iNC, typename mm>
+        template <typename U, long iNR, long iNC, typename mm, typename l>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const;
         /*!
             ensures
                 - returns false
         !*/
 
-        template <typename U, long iNR, long iNC, typename mm>
+        template <typename U, long iNR, long iNC, typename mm, typename l>
         bool aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const;
         /*!
             ensures
@@ -234,9 +238,9 @@ namespace dlib
                 - returns nr()*nc()
         !*/
 
-        template <typename U, long iNR, long iNC , typename mm>
+        template <typename U, long iNR, long iNC , typename mm, typename l>
         bool aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const;
         /*!
             ensures
@@ -247,9 +251,9 @@ namespace dlib
                     - returns false
         !*/
 
-        template <typename U, long iNR, long iNC, typename mm >
+        template <typename U, long iNR, long iNC, typename mm, typename l>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm>& item
+            const matrix<U,iNR,iNC,mm,l>& item
         ) const; 
         /*!
             ensures
@@ -404,9 +408,10 @@ namespace dlib
         typename T,
         long num_rows = 0,
         long num_cols = 0,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename layout = default_matrix_layout
         >
-    class matrix : public matrix_exp<matrix_ref<T,num_rows,num_cols,mem_manager> > 
+    class matrix : public matrix_exp<matrix_ref<T,num_rows,num_cols,mem_manager,layout> > 
     {
         /*!
             REQUIREMENTS ON num_rows and num_cols
@@ -417,6 +422,10 @@ namespace dlib
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
                 must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
                 mem_manager::type can be set to anything.
+
+            REQUIREMENTS ON layout
+                must be one of the layout objects defined in matrix/matrix_data_layout_abstract.h or an
+                object with a compatible interface.
 
             INITIAL VALUE
                 - if (num_rows > 0) then
@@ -445,16 +454,18 @@ namespace dlib
                 be detected at compile time.  It also allows the compiler to perform loop 
                 unrolling which can result in substantially faster code.
 
-                Also note that the elements of this matrix are contiguous in memory and 
-                stored in row major order.  Additionally, all memory allocations are
-                performed using the memory manager object supplied as a template argument
-                to this class.
+                Also note that the elements of this matrix are laid out in memory by the layout 
+                object supplied as a template argument to this class.  The default_matrix_layout 
+                sets elements down contiguously in memory and in row major order.  Additionally, 
+                all memory allocations are performed using the memory manager object supplied as 
+                a template argument to this class.
         !*/
 
     public:
         typedef T type;
-        typedef matrix_ref<T,num_rows,num_cols,mem_manager> ref_type;
+        typedef matrix_ref<T,num_rows,num_cols,mem_manager,layout> ref_type;
         typedef mem_manager mem_manager_type;
+        typedef layout layout_type;
         const static long NR = num_rows;
         const static long NC = num_cols;
 
@@ -754,11 +765,12 @@ namespace dlib
         typename T,
         long NR,
         long NC,
-        typename mm
+        typename mm,
+        typename l
         >
     void swap(
-        matrix<T,NR,NC,mm>& a,
-        matrix<T,NR,NC,mm>& b
+        matrix<T,NR,NC,mm,l>& a,
+        matrix<T,NR,NC,mm,l>& b
     ) { a.swap(b); }
     /*!
         Provides a global swap function
@@ -768,10 +780,11 @@ namespace dlib
         typename T,
         long NR,
         long NC,
-        typename mm
+        typename mm,
+        typename l
         >
     void serialize (
-        const matrix<T,NR,NC,mm>& item, 
+        const matrix<T,NR,NC,mm,l>& item, 
         std::ostream& out
     );   
     /*!
@@ -782,10 +795,11 @@ namespace dlib
         typename T,
         long NR,
         long NC,
-        typename mm
+        typename mm,
+        typename l
         >
     void deserialize (
-        matrix<T,NR,NC,mm>& item, 
+        matrix<T,NR,NC,mm,l>& item, 
         std::istream& in
     );   
     /*!

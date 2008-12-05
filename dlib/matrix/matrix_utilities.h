@@ -117,33 +117,33 @@ namespace dlib
 
     struct has_destructive_aliasing
     {
-        template <typename M, typename U, long iNR, long iNC, typename MM >
+        template <typename M, typename U, long iNR, long iNC, typename MM, typename L >
         static bool destructively_aliases (
             const M& m,
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) { return m.aliases(item); }
 
-        template <typename M1, typename M2, typename U, long iNR, long iNC, typename MM >
+        template <typename M1, typename M2, typename U, long iNR, long iNC, typename MM, typename L >
         static bool destructively_aliases (
             const M1& m1,
             const M2& m2,
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) { return m1.aliases(item) || m2.aliases(item) ; }
     };
 
     struct has_nondestructive_aliasing
     {
-        template <typename M, typename U, long iNR, long iNC, typename MM >
+        template <typename M, typename U, long iNR, long iNC, typename MM, typename L >
         static bool destructively_aliases (
             const M& m,
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) { return m.destructively_aliases(item); }
 
-        template <typename M1, typename M2, typename U, long iNR, long iNC, typename MM >
+        template <typename M1, typename M2, typename U, long iNR, long iNC, typename MM, typename L >
         static bool destructively_aliases (
             const M1& m1,
             const M2& m2,
-            const matrix<U,iNR,iNC, MM>& item
+            const matrix<U,iNR,iNC, MM, L>& item
         ) { return m1.destructively_aliases(item) || m2.destructively_aliases(item) ; }
     };
 
@@ -317,13 +317,17 @@ namespace dlib
             typename MM1,
             typename MM2,
             typename MM3,
-            typename MM4
+            typename MM4,
+            typename L1,
+            typename L2,
+            typename L3,
+            typename L4
             >
         bool svdcmp(
-            matrix<T,M,N,MM1>& a,  
-            matrix<T,wN,wX,MM2>& w,
-            matrix<T,vN,vN,MM3>& v,
-            matrix<T,rN,rX,MM4>& rv1
+            matrix<T,M,N,MM1,L1>& a,  
+            matrix<T,wN,wX,MM2,L2>& w,
+            matrix<T,vN,vN,MM3,L3>& v,
+            matrix<T,rN,rX,MM4,L4>& rv1
         )
         /*!  ( this function is derived from the one in numerical recipes in C chapter 2.6)
             requires
@@ -632,13 +636,16 @@ namespace dlib
             long NX,
             typename MM1,
             typename MM2,
-            typename MM3
+            typename MM3,
+            typename L1,
+            typename L2,
+            typename L3
             >
         bool ludcmp (
-            matrix<T,N,N,MM1>& a,
-            matrix<long,N,NX,MM2>& indx,
+            matrix<T,N,N,MM1,L1>& a,
+            matrix<long,N,NX,MM2,L2>& indx,
             T& d,
-            matrix<T,N,NX,MM3> vv
+            matrix<T,N,NX,MM3,L3> vv
         )
         /*!
             ( this function is derived from the one in numerical recipes in C chapter 2.3)
@@ -728,12 +735,15 @@ namespace dlib
             long NX,
             typename MM1,
             typename MM2,
-            typename MM3
+            typename MM3,
+            typename L1,
+            typename L2,
+            typename L3
             >
         void lubksb (
-            const matrix<T,N,N,MM1>& a,
-            const matrix<long,N,NX,MM2>& indx,
-            matrix<T,N,NX,MM3>& b
+            const matrix<T,N,N,MM1,L1>& a,
+            const matrix<long,N,NX,MM2,L2>& indx,
+            matrix<T,N,NX,MM3,L3>& b
         )
         /*!
             ( this function is derived from the one in numerical recipes in C chapter 2.3)
@@ -788,15 +798,18 @@ namespace dlib
         long vN, 
         typename MM1,
         typename MM2,
-        typename MM3
+        typename MM3,
+        typename L1,
+        typename L2,
+        typename L3
         >
     long svd2 (
         bool withu, 
         bool withv, 
         const matrix_exp<EXP>& a,
-        matrix<typename EXP::type,uM,uM,MM1>& u, 
-        matrix<typename EXP::type,qN,qX,MM2>& q, 
-        matrix<typename EXP::type,vN,vN,MM3>& v
+        matrix<typename EXP::type,uM,uM,MM1,L1>& u, 
+        matrix<typename EXP::type,qN,qX,MM2,L2>& q, 
+        matrix<typename EXP::type,vN,vN,MM3,L3>& v
     )
     {
         /*  
@@ -1186,14 +1199,14 @@ convergence:
             long c
         ) const { return OP::apply(r,c); }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
         long nr (
@@ -1244,14 +1257,14 @@ convergence:
             long c
         ) const { return OP::apply(s,r,c); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
         const ref_type& ref(
@@ -1303,14 +1316,14 @@ convergence:
             long c
         ) const { return OP::apply(s,r,c); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
         const ref_type& ref(
@@ -1360,14 +1373,14 @@ convergence:
             long c
         ) const { return OP::apply(m,r,c); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return OP::destructively_aliases(m,item); }
 
         const ref_type& ref(
@@ -1415,14 +1428,14 @@ convergence:
             long 
         ) const { return m[r]; }
 
-        template <typename U, long iNR, long iNC, typename MM>
+        template <typename U, long iNR, long iNC, typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
         const ref_type& ref(
@@ -1470,14 +1483,14 @@ convergence:
             long 
         ) const { return m[r]; }
 
-        template <typename U, long iNR, long iNC, typename MM>
+        template <typename U, long iNR, long iNC, typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
         const ref_type& ref(
@@ -1524,14 +1537,14 @@ convergence:
             long c
         ) const { return m[r][c]; }
 
-        template <typename U, long iNR, long iNC, typename MM>
+        template <typename U, long iNR, long iNC, typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
         const ref_type& ref(
@@ -1586,14 +1599,14 @@ convergence:
             long c
         ) const { return m(r+r_,c+c_); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return m.aliases(item); }
 
         const ref_type& ref(
@@ -1649,14 +1662,14 @@ convergence:
             long c
         ) const { return OP::apply(m,s,r,c); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return OP::destructively_aliases(m,item); }
 
         const ref_type& ref(
@@ -1714,14 +1727,14 @@ convergence:
             long c
         ) const { return OP::apply(m,s1,s2,r,c); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return OP::destructively_aliases(m,item); }
 
         const ref_type& ref(
@@ -1776,14 +1789,14 @@ convergence:
             long c
         ) const { return OP::apply(m1,m2,r,c); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return m1.aliases(item) || m2.aliases(item); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return OP::destructively_aliases(m1,m2,item); }
 
         const ref_type& ref(
@@ -1839,14 +1852,14 @@ convergence:
             long c
         ) const { return start + r*inc;  }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
         long nr (
@@ -1881,14 +1894,14 @@ convergence:
             long c
         ) const { return start + r*inc;  }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return false; }
 
         long nr (
@@ -2134,14 +2147,14 @@ convergence:
             long c
         ) const { return m(rows(r),cols(c)); }
 
-        template <typename U, long iNR, long iNC, typename MM >
+        template <typename U, long iNR, long iNC, typename MM, typename L >
         bool aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return m.aliases(item) || rows.aliases(item) || cols.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename MM>
+        template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM>& item
+            const matrix<U,iNR,iNC,MM,L>& item
         ) const { return m.aliases(item) || rows.aliases(item) || cols.aliases(item); }
 
         const ref_type& ref(
@@ -2282,12 +2295,12 @@ convergence:
 // ----------------------------------------------------------------------------------------
 
 
-    template <typename T, long NR, long NC, typename mm>
+    template <typename T, long NR, long NC, typename mm, typename l>
     class assignable_sub_matrix
     {
     public:
         assignable_sub_matrix(
-            matrix<T,NR,NC,mm>& m_,
+            matrix<T,NR,NC,mm,l>& m_,
             const rectangle& rect_
         ) : m(m_), rect(rect_) {}
 
@@ -2336,14 +2349,14 @@ convergence:
 
     private:
 
-        matrix<T,NR,NC,mm>& m;
+        matrix<T,NR,NC,mm,l>& m;
         const rectangle rect;
     };
 
 
-    template <typename T, long NR, long NC, typename mm>
-    assignable_sub_matrix<T,NR,NC,mm> set_subm (
-        matrix<T,NR,NC,mm>& m,
+    template <typename T, long NR, long NC, typename mm, typename l>
+    assignable_sub_matrix<T,NR,NC,mm,l> set_subm (
+        matrix<T,NR,NC,mm,l>& m,
         const rectangle& rect
     )
     {
@@ -2359,13 +2372,13 @@ convergence:
             );
 
 
-        return assignable_sub_matrix<T,NR,NC,mm>(m,rect);
+        return assignable_sub_matrix<T,NR,NC,mm,l>(m,rect);
     }
 
 
-    template <typename T, long NR, long NC, typename mm>
-    assignable_sub_matrix<T,NR,NC,mm> set_subm (
-        matrix<T,NR,NC,mm>& m,
+    template <typename T, long NR, long NC, typename mm, typename l>
+    assignable_sub_matrix<T,NR,NC,mm,l> set_subm (
+        matrix<T,NR,NC,mm,l>& m,
         long r, 
         long c,
         long nr,
@@ -2383,17 +2396,17 @@ convergence:
                     << "\n\tnc:     " << nc 
         );
 
-        return assignable_sub_matrix<T,NR,NC,mm>(m,rectangle(c,r, c+nc-1, r+nr-1));
+        return assignable_sub_matrix<T,NR,NC,mm,l>(m,rectangle(c,r, c+nc-1, r+nr-1));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, long NR, long NC, typename mm, typename EXPr, typename EXPc>
+    template <typename T, long NR, long NC, typename mm, typename l, typename EXPr, typename EXPc>
     class assignable_sub_range_matrix
     {
     public:
         assignable_sub_range_matrix(
-            matrix<T,NR,NC,mm>& m_,
+            matrix<T,NR,NC,mm,l>& m_,
             const EXPr& rows_,
             const EXPc& cols_
         ) : m(m_), rows(rows_), cols(cols_) {}
@@ -2449,14 +2462,14 @@ convergence:
 
     private:
 
-        matrix<T,NR,NC,mm>& m;
+        matrix<T,NR,NC,mm,l>& m;
         const EXPr rows;
         const EXPc cols;
     };
 
-    template <typename T, long NR, long NC, typename mm, typename EXPr, typename EXPc>
-    assignable_sub_range_matrix<T,NR,NC,mm,matrix_exp<EXPr>,matrix_exp<EXPc> > set_subm (
-        matrix<T,NR,NC,mm>& m,
+    template <typename T, long NR, long NC, typename mm, typename l, typename EXPr, typename EXPc>
+    assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_exp<EXPr>,matrix_exp<EXPc> > set_subm (
+        matrix<T,NR,NC,mm,l>& m,
         const matrix_exp<EXPr>& rows,
         const matrix_exp<EXPc>& cols
     )
@@ -2477,17 +2490,17 @@ convergence:
             << "\n\tcols.nc():  " << cols.nc()
             );
 
-        return assignable_sub_range_matrix<T,NR,NC,mm,matrix_exp<EXPr>,matrix_exp<EXPc> >(m,rows,cols);
+        return assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_exp<EXPr>,matrix_exp<EXPc> >(m,rows,cols);
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, long NR, long NC, typename mm>
+    template <typename T, long NR, long NC, typename mm, typename l>
     class assignable_col_matrix
     {
     public:
         assignable_col_matrix(
-            matrix<T,NR,NC,mm>& m_,
+            matrix<T,NR,NC,mm,l>& m_,
             const long col_ 
         ) : m(m_), col(col_) {}
 
@@ -2532,14 +2545,14 @@ convergence:
 
     private:
 
-        matrix<T,NR,NC,mm>& m;
+        matrix<T,NR,NC,mm,l>& m;
         const long col;
     };
 
 
-    template <typename T, long NR, long NC, typename mm>
-    assignable_col_matrix<T,NR,NC,mm> set_colm (
-        matrix<T,NR,NC,mm>& m,
+    template <typename T, long NR, long NC, typename mm, typename l>
+    assignable_col_matrix<T,NR,NC,mm,l> set_colm (
+        matrix<T,NR,NC,mm,l>& m,
         const long col 
     )
     {
@@ -2552,18 +2565,18 @@ convergence:
             );
 
 
-        return assignable_col_matrix<T,NR,NC,mm>(m,col);
+        return assignable_col_matrix<T,NR,NC,mm,l>(m,col);
     }
 
 // ----------------------------------------------------------------------------------------
 
 
-    template <typename T, long NR, long NC, typename mm>
+    template <typename T, long NR, long NC, typename mm, typename l>
     class assignable_row_matrix
     {
     public:
         assignable_row_matrix(
-            matrix<T,NR,NC,mm>& m_,
+            matrix<T,NR,NC,mm,l>& m_,
             const long row_ 
         ) : m(m_), row(row_) {}
 
@@ -2608,14 +2621,14 @@ convergence:
 
     private:
 
-        matrix<T,NR,NC,mm>& m;
+        matrix<T,NR,NC,mm,l>& m;
         const long row;
     };
 
 
-    template <typename T, long NR, long NC, typename mm>
-    assignable_row_matrix<T,NR,NC,mm> set_rowm (
-        matrix<T,NR,NC,mm>& m,
+    template <typename T, long NR, long NC, typename mm, typename l>
+    assignable_row_matrix<T,NR,NC,mm,l> set_rowm (
+        matrix<T,NR,NC,mm,l>& m,
         const long row 
     )
     {
@@ -2628,7 +2641,7 @@ convergence:
             );
 
 
-        return assignable_row_matrix<T,NR,NC,mm>(m,row);
+        return assignable_row_matrix<T,NR,NC,mm,l>(m,row);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3101,10 +3114,11 @@ convergence:
         long NR,
         long NC,
         typename MM,
-        typename U
+        typename U,
+        typename L
         >
     typename disable_if<is_matrix<U>,void>::type set_all_elements (
-        matrix<T,NR,NC,MM>& m,
+        matrix<T,NR,NC,MM,L>& m,
         const U& value
     )
     {
@@ -3128,10 +3142,11 @@ convergence:
         long NR,
         long NC,
         typename MM,
-        typename U
+        typename U,
+        typename L
         >
     typename enable_if<is_matrix<U>,void>::type set_all_elements (
-        matrix<T,NR,NC,MM>& m,
+        matrix<T,NR,NC,MM,L>& m,
         const U& value
     )
     {
@@ -3155,13 +3170,16 @@ convergence:
         long wX,
         typename MM1,
         typename MM2,
-        typename MM3
+        typename MM3,
+        typename L1,
+        typename L2,
+        typename L3
         >
     inline void svd3 (
         const matrix_exp<EXP>& m,
-        matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1>& u,
-        matrix<typename matrix_exp<EXP>::type, wN, wX,MM2>& w,
-        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3>& v
+        matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1>& u,
+        matrix<typename matrix_exp<EXP>::type, wN, wX,MM2,L2>& w,
+        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3,L3>& v
     )
     {
         typedef typename matrix_exp<EXP>::type T;
@@ -3195,13 +3213,16 @@ convergence:
         long vN,
         typename MM1,
         typename MM2,
-        typename MM3
+        typename MM3,
+        typename L1,
+        typename L2,
+        typename L3
         >
     inline void svd (
         const matrix_exp<EXP>& m,
-        matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1>& u,
-        matrix<typename matrix_exp<EXP>::type, wN, wN,MM2>& w,
-        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3>& v
+        matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1>& u,
+        matrix<typename matrix_exp<EXP>::type, wN, wN,MM2,L2>& w,
+        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3,L3>& v
     )
     {
         typedef typename matrix_exp<EXP>::type T;
@@ -4538,12 +4559,12 @@ convergence:
     };
 
     template <
-        typename T, long NR, long NC, typename mm,
-        long NR2, long NC2, typename mm2
+        typename T, long NR, long NC, typename mm, typename l1,
+        long NR2, long NC2, typename mm2, typename l2
         >
     void sort_columns (
-        matrix<T,NR,NC,mm>& m,
-        matrix<T,NR2,NC2,mm2>& v
+        matrix<T,NR,NC,mm,l1>& m,
+        matrix<T,NR2,NC2,mm2,l2>& v
     )
     {
         COMPILE_TIME_ASSERT(NC2 == 1 || NC2 == 0);
@@ -4585,12 +4606,12 @@ convergence:
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, long NR, long NC, typename mm,
-        long NR2, long NC2, typename mm2
+        typename T, long NR, long NC, typename mm, typename l1,
+        long NR2, long NC2, typename mm2, typename l2
         >
     void rsort_columns (
-        matrix<T,NR,NC,mm>& m,
-        matrix<T,NR2,NC2,mm2>& v
+        matrix<T,NR,NC,mm,l1>& m,
+        matrix<T,NR2,NC2,mm2,l2>& v
     )
     {
         COMPILE_TIME_ASSERT(NC2 == 1 || NC2 == 0);
