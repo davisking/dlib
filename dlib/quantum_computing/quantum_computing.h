@@ -559,6 +559,11 @@ namespace dlib
         return qc_helpers::combine_gates<T,U,V>::eval(lhs,rhs);
     }
 
+    // If you are getting an error here then it means that you are trying to combine a gate expression
+    // with an integer somewhere (and that is an error).  
+    template <typename T> void operator, ( const gate_exp<T>&, int) { COMPILE_TIME_ASSERT(sizeof(T) > 100000000); }
+    template <typename T> void operator, ( int, const gate_exp<T>&) { COMPILE_TIME_ASSERT(sizeof(T) > 100000000); }
+
 // ----------------------------------------------------------------------------------------
 
     namespace quantum_gates
