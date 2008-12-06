@@ -314,9 +314,9 @@ namespace dlib
                 {
                     if (temp.state_vector()(r) != qc_scalar_type(0))
                     {
-                        for (long c = 0; c < dims; ++c)
+                        for (long i = 0; i < dims; ++i)
                         {
-                            reg.state_vector()(c) += temp.state_vector()(r)*exp(r,c);
+                            reg.state_vector()(i) += temp.state_vector()(r)*exp(i,r);
                         }
                     }
                 }
@@ -458,7 +458,7 @@ namespace dlib
                 );
 
 
-            return rowm(data,row_idx)*reg;
+            return (data*reg)(row_idx);
         }
 
     private:

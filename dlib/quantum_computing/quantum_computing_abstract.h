@@ -283,7 +283,8 @@ namespace dlib
                 
                 Then applying a composite gate to reg_all would give you the same thing as
                 applying the lhs gate to reg_high and the rhs gate to reg_low and then appending 
-                the two resulting registers.
+                the two resulting registers.  So the lhs gate of a composite_gate applies to
+                the high order bits of a regitser and the rhs gate applies to the lower order bits.
         !*/
     public:
 
