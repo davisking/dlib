@@ -44,7 +44,7 @@ namespace dlib
     std::string get_current_dir (
     )
     {
-        char buf[PATH_MAX];
+        char buf[1024];
         if (getcwd(buf,sizeof(buf)) == 0)
         {
             return std::string();
