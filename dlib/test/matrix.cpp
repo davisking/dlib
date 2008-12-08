@@ -1820,6 +1820,11 @@ namespace
 
         }
 
+        {
+            DLIB_CASSERT(( uniform_matrix<double>(303,303, 3)*identity_matrix<double>(303) == uniform_matrix<double,303,303>(3) ) , "");
+            DLIB_CASSERT(( uniform_matrix<double,303,303>(3)*identity_matrix<double,303>() == uniform_matrix<double,303,303>(3) ), "");
+        }
+
     }
 
 
