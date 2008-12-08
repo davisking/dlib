@@ -73,9 +73,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T,
         long NR, 
-        long NC,
-        typename T
+        long NC
         >
     const matrix_exp uniform_matrix (
         const T& val
