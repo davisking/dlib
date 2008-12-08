@@ -56,9 +56,7 @@ namespace dlib
     inline typename disable_if_c<ma::matrix_is_vector<EXP1>::value || ma::matrix_is_vector<EXP2>::value ||
                                  ma::is_small_matrix<EXP1>::value || ma::is_small_matrix<EXP2>::value >::type matrix_assign (
         matrix_dest_type& dest,
-        const matrix_exp<matrix_multiply_exp<EXP1,EXP2,count> >& src,
-        const long row_offset = 0,
-        const long col_offset = 0
+        const matrix_exp<matrix_multiply_exp<EXP1,EXP2,count> >& src
     )
     /*!
         This overload catches assignments like:
@@ -78,7 +76,7 @@ namespace dlib
             {
                 for (long c = 0; c < src.nc(); ++c)
                 {
-                    dest(r+row_offset,c+col_offset) = src(r,c);
+                    dest(r,c) = src(r,c);
                 }
             }
         }
@@ -103,7 +101,6 @@ namespace dlib
 
                         // make a target rect in res
                         rectangle res_block(rhs_block.left(),lhs_block.top(), rhs_block.right(), lhs_block.bottom());
-                        res_block = translate_rect(res_block,col_offset, row_offset);
                         if (c != 0)
                             set_subm(dest, res_block) = subm(dest,res_block) + subm(lhs,lhs_block)*subm(rhs, rhs_block);
                         else

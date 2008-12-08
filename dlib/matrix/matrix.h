@@ -895,17 +895,13 @@ namespace dlib
         >
     void matrix_assign (
         matrix_dest_type& dest,
-        const matrix_exp<src_exp>& src,
-        const long row_offset = 0,
-        const long col_offset = 0
+        const matrix_exp<src_exp>& src
     )
     /*!
         requires
             - src.destructively_aliases(dest) == false
-            - dest.nr() == src.nr()-row_offset
-            - dest.nc() == src.nc()-col_offset
         ensures
-            - #subm(dest, row_offset, col_offset, src.nr(), src.nc()) == src
+            - #dest == src
             - the part of dest outside the above sub matrix remains unchanged
     !*/
     {
@@ -913,7 +909,7 @@ namespace dlib
         {
             for (long c = 0; c < src.nc(); ++c)
             {
-                dest(r+row_offset,c+col_offset) = src(r,c);
+                dest(r,c) = src(r,c);
             }
         }
     }

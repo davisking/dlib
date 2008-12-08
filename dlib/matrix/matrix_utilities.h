@@ -2304,6 +2304,17 @@ convergence:
             const rectangle& rect_
         ) : m(m_), rect(rect_) {}
 
+        T& operator() (
+            long r,
+            long c
+        )
+        {
+            return m(r+rect.top(),c+rect.left());
+        }
+
+        long nr() const { return rect.height(); }
+        long nc() const { return rect.width(); }
+
         template <typename EXP>
         assignable_sub_matrix& operator= (
             const matrix_exp<EXP>& exp
@@ -2320,7 +2331,7 @@ convergence:
 
             if (exp.destructively_aliases(m) == false)
             {
-                matrix_assign(m, exp, rect.top(), rect.left()); 
+                matrix_assign(*this, exp); 
             }
             else
             {
@@ -2411,6 +2422,18 @@ convergence:
             const EXPc& cols_
         ) : m(m_), rows(rows_), cols(cols_) {}
 
+        T& operator() (
+            long r,
+            long c
+        )
+        {
+            return m(rows(r),cols(c));
+        }
+
+        long nr() const { return rows.size(); }
+        long nc() const { return cols.size(); }
+
+
         template <typename EXP>
         assignable_sub_range_matrix& operator= (
             const matrix_exp<EXP>& exp
@@ -2427,13 +2450,7 @@ convergence:
 
             if (exp.destructively_aliases(m) == false)
             {
-                for (long r = 0; r < rows.size(); ++r)
-                {
-                    for (long c = 0; c < cols.size(); ++c)
-                    {
-                        m(rows(r),cols(c)) = exp(r,c);
-                    }
-                }
+                matrix_assign(*this, exp);
             }
             else
             {
@@ -2504,6 +2521,17 @@ convergence:
             const long col_ 
         ) : m(m_), col(col_) {}
 
+        T& operator() (
+            long r,
+            long c
+        )
+        {
+            return m(r,col);
+        }
+
+        long nr() const { return m.nr(); }
+        long nc() const { return 1; }
+
         template <typename EXP>
         assignable_col_matrix& operator= (
             const matrix_exp<EXP>& exp
@@ -2519,7 +2547,7 @@ convergence:
 
             if (exp.destructively_aliases(m) == false)
             {
-                matrix_assign(m, exp, 0, col); 
+                matrix_assign(*this, exp); 
             }
             else
             {
@@ -2580,6 +2608,19 @@ convergence:
             const long row_ 
         ) : m(m_), row(row_) {}
 
+
+        T& operator() (
+            long r,
+            long c
+        )
+        {
+            return m(row,c);
+        }
+
+        long nr() const { return 1; }
+        long nc() const { return m.nc(); }
+
+
         template <typename EXP>
         assignable_row_matrix& operator= (
             const matrix_exp<EXP>& exp
@@ -2595,7 +2636,7 @@ convergence:
 
             if (exp.destructively_aliases(m) == false)
             {
-                matrix_assign(m, exp, row, 0); 
+                matrix_assign(*this, exp); 
             }
             else
             {
