@@ -42,6 +42,7 @@ set (tests
    lz77_buffer.cpp
    map.cpp
    matrix.cpp
+   matrix2.cpp
    md5.cpp
    member_function_pointer.cpp
    metaprogramming.cpp
