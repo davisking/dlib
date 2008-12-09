@@ -1426,6 +1426,59 @@ namespace dlib
         }
 
     private:
+        struct literal_assign_helper
+        {
+            /*
+                This struct is a helper struct returned by the operator<<() function below.  It is
+                used primarily to enable us to put DLIB_CASSERT statements on the usage of the
+                operator<< form of matrix assignment.
+            */
+
+            literal_assign_helper(const literal_assign_helper& item) : m(item.m), r(item.r), c(item.c), is_copy(true) {}
+            literal_assign_helper(matrix* m_): m(m_), r(0), c(0),is_copy(false) {}
+            ~literal_assign_helper()
+            {
+                DLIB_CASSERT(!is_copy || r == m->nr(),
+                             "You have used the matrix operator<< assignment incorrectly by failing to\n"
+                             "supply a full set of values for every element of a matrix object.\n");
+            }
+
+            template <typename U>
+            const literal_assign_helper& operator, (
+                const U& val
+            ) const
+            {
+                DLIB_CASSERT(r < m->nr() && c < m->nc(),
+                             "You have used the matrix operator<< assignment incorrectly by attempting to\n" <<
+                             "supply more values than there are elements in the matrix object being assigned to.\n\n" <<
+                             "Did you forget to call set_size()?\n");
+                (*m)(r,c) = static_cast<T>(val);
+                ++c;
+                if (c == m->nc())
+                {
+                    c = 0;
+                    ++r;
+                }
+                return *this;
+            }
+
+
+            bool is_copy;
+            matrix* m;
+            mutable long r;
+            mutable long c;
+        };
+
+    public:
+
+        template <typename U>
+        const literal_assign_helper operator << (
+            const U& val
+        ) { return literal_assign_helper(this) , val; }
+
+    private:
+
+
         typename layout::template layout<T,NR,NC,mem_manager> data;
     };
 
