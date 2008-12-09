@@ -58,22 +58,14 @@ int main()
 
 
     // now we need to initialize the y and M matrices and we can do so like this:
-    const double M_data[] = { 
-      54.2,  7.4,  12.1,
-      1,     2,    3,
-      5.9,   0.05, 1};
+    M << 54.2,  7.4,  12.1,
+         1,     2,    3,
+         5.9,   0.05, 1;
 
-    const double y_data[] = { 
-      3.5,  
-      1.2,    
-      7.8};
+    y << 3.5,  
+         1.2,    
+         7.8;
 
-    // Load these matrices up with their data.   Note that you can only load a matrix
-    // with a C style array if the matrix is statically dimensioned as the M and y 
-    // matrices are.  You couldn't do it for x since x = M_data would be ambiguous. 
-    // (e.g. should the data be interpreted as a 3x3 matrix or a 9x1 matrix?)
-    M = M_data;
-    y = y_data;
 
     // the solution can be obtained now by multiplying the inverse of M with y
     x = inv(M)*y;
