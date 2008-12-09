@@ -1463,10 +1463,10 @@ namespace dlib
             }
 
 
-            bool is_copy;
             matrix* m;
             mutable long r;
             mutable long c;
+            bool is_copy;
         };
 
     public:
