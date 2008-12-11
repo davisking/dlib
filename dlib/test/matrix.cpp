@@ -921,25 +921,28 @@ namespace
 
         {
             matrix<double> m(2,3);
-            m << 1,2,3,
-                 5,6,7;
+            m = 1,2,3,
+                5,6,7;
 
             DLIB_CASSERT(m(0,0) == 1 && m(0,1) == 2 && m(0,2) == 3 &&
                          m(1,0) == 5 && m(1,1) == 6 && m(1,2) == 7,"");
 
+            m = 4;
+            DLIB_CASSERT((m == uniform_matrix<double,2,3>(4)),"");
+
             matrix<double,2,3> m2;
-            m2 << 1,2,3,
-                  5,6,7;
+            m2 = 1,2,3,
+                 5,6,7;
             DLIB_CASSERT(m2(0,0) == 1 && m2(0,1) == 2 && m2(0,2) == 3 &&
                          m2(1,0) == 5 && m2(1,1) == 6 && m2(1,2) == 7,"");
 
             matrix<double,2,1> m3;
-            m3 << 1,
-                  5;
+            m3 = 1,
+                 5;
             DLIB_CASSERT(m3(0) == 1 && m3(1) == 5 ,"");
 
             matrix<double,1,2> m4;
-            m4 << 1, 5;
+            m4 = 1, 5;
             DLIB_CASSERT(m3(0) == 1 && m3(1) == 5 ,"");
         }
 

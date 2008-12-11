@@ -10,9 +10,33 @@
 
 namespace dlib
 {
+    /*
+
+        This file is where all the implementations of matrix_assign() live.  The point of the
+        matrix_assign() functions is to contain all the various optimizations that help the 
+        matrix assign a matrix_exp to an actual matrix object quickly.
+
+    */
+
+    template <
+        typename matrix_dest_type,
+        typename src_exp 
+        >
+    void matrix_assign (
+        matrix_dest_type& dest,
+        const matrix_exp<src_exp>& src
+    );
+    /*!
+        requires
+            - src.destructively_aliases(dest) == false
+        ensures
+            - #dest == src
+            - the part of dest outside the above sub matrix remains unchanged
+    !*/
 
     namespace ma
     {
+        // This namespace defines whatever helpers we need in the rest of this file.
 
     // ------------------------------------------------------------------------------------
 
@@ -43,6 +67,26 @@ namespace dlib
         struct is_small_matrix<EXP, typename enable_if_c<EXP::NR>=1 && EXP::NC>=1 &&
         EXP::NR<=100 && EXP::NC<=100>::type > { static const bool value = true; };
 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_dest_type,
+        typename src_exp 
+        >
+    void matrix_assign (
+        matrix_dest_type& dest,
+        const matrix_exp<src_exp>& src
+    )
+    {
+        for (long r = 0; r < src.nr(); ++r)
+        {
+            for (long c = 0; c < src.nc(); ++c)
+            {
+                dest(r,c) = src(r,c);
+            }
+        }
     }
 
 // ----------------------------------------------------------------------------------------

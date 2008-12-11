@@ -896,23 +896,8 @@ namespace dlib
     void matrix_assign (
         matrix_dest_type& dest,
         const matrix_exp<src_exp>& src
-    )
-    /*!
-        requires
-            - src.destructively_aliases(dest) == false
-        ensures
-            - #dest == src
-            - the part of dest outside the above sub matrix remains unchanged
-    !*/
-    {
-        for (long r = 0; r < src.nr(); ++r)
-        {
-            for (long c = 0; c < src.nc(); ++c)
-            {
-                dest(r,c) = src(r,c);
-            }
-        }
-    }
+    );
+    // See matrix_assign.h for the actual implementation of this function.
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
