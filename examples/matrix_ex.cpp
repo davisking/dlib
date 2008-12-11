@@ -58,13 +58,13 @@ int main()
 
 
     // now we need to initialize the y and M matrices and we can do so like this:
-    M << 54.2,  7.4,  12.1,
-         1,     2,    3,
-         5.9,   0.05, 1;
+    M = 54.2,  7.4,  12.1,
+        1,     2,    3,
+        5.9,   0.05, 1;
 
-    y << 3.5,  
-         1.2,    
-         7.8;
+    y = 3.5,  
+        1.2,    
+        7.8;
 
 
     // the solution can be obtained now by multiplying the inverse of M with y
@@ -198,9 +198,11 @@ int main()
     A = subm(B, range(0,2), range(0,2,3));
 
     // MATLAB: B(:,:) = 5
-    set_subm(B,get_rect(B)) = 5;
+    B = 5;
     // or equivalently
     set_all_elements(B,5);
+    // or equivalently
+    set_subm(B,get_rect(B)) = 5;
 
 
     // MATLAB: B([1:2],[1,2]) = 7
