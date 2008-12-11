@@ -1434,47 +1434,68 @@ namespace dlib
                 operator<< form of matrix assignment.
             */
 
-            literal_assign_helper(const literal_assign_helper& item) : m(item.m), r(item.r), c(item.c), is_copy(true) {}
-            literal_assign_helper(matrix* m_): m(m_), r(0), c(0),is_copy(false) {}
+            literal_assign_helper(const literal_assign_helper& item) : m(item.m), r(item.r), c(item.c), has_been_used(false) {}
+            literal_assign_helper(matrix* m_): m(m_), r(0), c(0),has_been_used(false) {next();}
             ~literal_assign_helper()
             {
-                DLIB_CASSERT(!is_copy || r == m->nr(),
-                             "You have used the matrix operator<< assignment incorrectly by failing to\n"
+                DLIB_CASSERT(!has_been_used || r == m->nr(),
+                             "You have used the matrix comma based assignment incorrectly by failing to\n"
                              "supply a full set of values for every element of a matrix object.\n");
             }
 
-            template <typename U>
             const literal_assign_helper& operator, (
-                const U& val
+                const T& val
             ) const
             {
                 DLIB_CASSERT(r < m->nr() && c < m->nc(),
-                             "You have used the matrix operator<< assignment incorrectly by attempting to\n" <<
+                             "You have used the matrix comma based assignment incorrectly by attempting to\n" <<
                              "supply more values than there are elements in the matrix object being assigned to.\n\n" <<
                              "Did you forget to call set_size()?\n");
-                (*m)(r,c) = static_cast<T>(val);
+                (*m)(r,c) = val;
+                next();
+                has_been_used = true;
+                return *this;
+            }
+
+        private:
+
+            void next (
+            ) const
+            {
                 ++c;
                 if (c == m->nc())
                 {
                     c = 0;
                     ++r;
                 }
-                return *this;
             }
-
 
             matrix* m;
             mutable long r;
             mutable long c;
-            bool is_copy;
+            mutable bool has_been_used;
         };
 
     public:
 
-        template <typename U>
-        const literal_assign_helper operator << (
-            const U& val
-        ) { return literal_assign_helper(this) , val; }
+        const literal_assign_helper operator = (
+            const T& val
+        ) 
+        {  
+            // assign the given value to every spot in this matrix
+            for (long r = 0; r < nr(); ++r)
+            {
+                for (long c = 0; c < nc(); ++c)
+                {
+                    data(r,c) = val;
+                }
+            }
+
+            // Now return the literal_assign_helper so that the user
+            // can use the overloaded comma notation to initialize 
+            // the matrix if they want to.
+            return literal_assign_helper(this); 
+        }
 
     private:
 

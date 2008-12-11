@@ -750,25 +750,28 @@ namespace dlib
                 - returns *this
         !*/
 
-        template <typename U>
-        const literal_assign_helper operator << (
-            const U& val
+        const literal_assign_helper operator = (
+            const T& val
         );
         /*!
             This function is somewhat different than all the others defined in this file.
             The purpose of this function is to enable you to easily initialize a matrix object.
             For example:
                 matrix<double> m(2,3);
-                m << 1,2,3,
-                     4,5,6;
+                m = 1,2,3,
+                    4,5,6;
 
             The above code creates a matrix m with 2 rows and 3 columns and sets it so that
             it contains the matrix | 1 2 3 |
                                    | 4 5 6 |
 
-            To use this method of assignment it is required that you supply exactly m.size()
-            values so that the matrix is fully initialized.  Supplying fewer or more than
-            that is an error that will cause a dlib::fatal_error to be thrown.
+            You can also use this function to assign to all elements of a matrix.  So
+            saying m = 3; would assign all elements of m equal to 3.
+
+            Note that to use this method of assignment it is required that you supply 
+            exactly m.size() or 1 values so that the matrix is fully initialized.  Supplying 
+            fewer or more than that is an error that will cause a dlib::fatal_error to be 
+            thrown.
         !*/
 
         void swap (
