@@ -7,6 +7,7 @@
 #include "matrix.h"
 #include "matrix_utilities.h"
 #include "../enable_if.h"
+#include "matrix_assign_fwd.h"
 
 namespace dlib
 {
@@ -17,22 +18,6 @@ namespace dlib
         matrix assign a matrix_exp to an actual matrix object quickly.
 
     */
-
-    template <
-        typename matrix_dest_type,
-        typename src_exp 
-        >
-    void matrix_assign (
-        matrix_dest_type& dest,
-        const matrix_exp<src_exp>& src
-    );
-    /*!
-        requires
-            - src.destructively_aliases(dest) == false
-        ensures
-            - #dest == src
-            - the part of dest outside the above sub matrix remains unchanged
-    !*/
 
     namespace ma
     {
@@ -61,32 +46,6 @@ namespace dlib
         template < typename EXP >
         struct matrix_is_vector<EXP, typename enable_if_c<EXP::NR==1 || EXP::NC==1>::type > { static const bool value = true; };
 
-        template < typename EXP, typename enable = void >
-        struct is_small_matrix { static const bool value = false; };
-        template < typename EXP >
-        struct is_small_matrix<EXP, typename enable_if_c<EXP::NR>=1 && EXP::NC>=1 &&
-        EXP::NR<=100 && EXP::NC<=100>::type > { static const bool value = true; };
-
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename matrix_dest_type,
-        typename src_exp 
-        >
-    void matrix_assign (
-        matrix_dest_type& dest,
-        const matrix_exp<src_exp>& src
-    )
-    {
-        for (long r = 0; r < src.nr(); ++r)
-        {
-            for (long c = 0; c < src.nc(); ++c)
-            {
-                dest(r,c) = src(r,c);
-            }
-        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -97,8 +56,7 @@ namespace dlib
         typename EXP2,
         unsigned long count
         >
-    inline typename disable_if_c<ma::matrix_is_vector<EXP1>::value || ma::matrix_is_vector<EXP2>::value ||
-                                 ma::is_small_matrix<EXP1>::value || ma::is_small_matrix<EXP2>::value >::type matrix_assign (
+    inline typename disable_if_c<ma::matrix_is_vector<EXP1>::value || ma::matrix_is_vector<EXP2>::value>::type matrix_assign_big (
         matrix_dest_type& dest,
         const matrix_exp<matrix_multiply_exp<EXP1,EXP2,count> >& src
     )

@@ -13,6 +13,7 @@
 #include "../memory_manager.h"
 #include "../is_kind.h"
 #include "matrix_data_layout.h"
+#include "matrix_assign_fwd.h"
 
 #ifdef _MSC_VER
 // Disable the following warnings for Visual Studio
@@ -886,18 +887,6 @@ namespace dlib
         const matrix_exp<EXP1>& m1,
         const matrix_exp<EXP2>& m2
     ) { return !(m1 == m2); }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename matrix_dest_type,
-        typename src_exp 
-        >
-    void matrix_assign (
-        matrix_dest_type& dest,
-        const matrix_exp<src_exp>& src
-    );
-    // See matrix_assign.h for the actual implementation of this function.
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
