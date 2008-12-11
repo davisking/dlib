@@ -22,8 +22,6 @@ namespace dlib
         const matrix_exp& m
     );
     /*!
-        requires
-            - m is a square matrix
         ensures
             - returns a column vector R that contains the elements from the diagonal 
               of m in the order R(0)==m(0,0), R(1)==m(1,1), R(2)==m(2,2) and so on.
