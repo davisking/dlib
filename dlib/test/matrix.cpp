@@ -830,6 +830,76 @@ namespace
         }
 
         {
+            DLIB_CASSERT(range(5,0).nr() == 6,"");
+            DLIB_CASSERT(range(5,1).nr() == 5,"");
+            DLIB_CASSERT(range(5,0).nc() == 1,"");
+            DLIB_CASSERT(range(5,1).nc() == 1,"");
+            DLIB_CASSERT(trans(range(5,0)).nc() == 6,"");
+            DLIB_CASSERT(trans(range(5,1)).nc() == 5,"");
+            DLIB_CASSERT(trans(range(5,0)).nr() == 1,"");
+            DLIB_CASSERT(trans(range(5,1)).nr() == 1,"");
+
+            DLIB_CASSERT(range(5,2,0).nr() == 3,"");
+            DLIB_CASSERT(range(5,2,1).nr() == 3,"");
+            DLIB_CASSERT(range(5,2,0).nc() == 1,"");
+            DLIB_CASSERT(range(5,2,1).nc() == 1,"");
+            DLIB_CASSERT(trans(range(5,2,0)).nc() == 3,"");
+            DLIB_CASSERT(trans(range(5,2,1)).nc() == 3,"");
+            DLIB_CASSERT(trans(range(5,2,0)).nr() == 1,"");
+            DLIB_CASSERT(trans(range(5,2,1)).nr() == 1,"");
+
+            DLIB_CASSERT(range(6,3,0).nr() == 3,"");
+            DLIB_CASSERT(range(5,3,1).nr() == 2,"");
+            DLIB_CASSERT(range(5,3,0).nc() == 1,"");
+            DLIB_CASSERT(range(5,3,1).nc() == 1,"");
+            DLIB_CASSERT(trans(range(6,3,0)).nc() == 3,"");
+            DLIB_CASSERT(trans(range(5,3,1)).nc() == 2,"");
+            DLIB_CASSERT(trans(range(5,3,0)).nr() == 1,"");
+            DLIB_CASSERT(trans(range(5,3,1)).nr() == 1,"");
+
+            DLIB_CASSERT(range(5,9,1).nr() == 1,"");
+            DLIB_CASSERT(range(5,9,1).nc() == 1,"");
+
+            DLIB_CASSERT(range(0,0).nr() == 1,"");
+            DLIB_CASSERT(range(0,0).nc() == 1,"");
+
+            DLIB_CASSERT(range(1,1)(0) == 1,"");
+
+            DLIB_CASSERT(range(5,0)(0) == 5 && range(5,0)(1) == 4 && range(5,0)(5) == 0,"");
+            DLIB_CASSERT(range(5,2,1)(0) == 5 && range(5,2,1)(1) == 3 && range(5,2,1)(2) == 1,"");
+            DLIB_CASSERT((range<5,0>()(0) == 5 && range<5,0>()(1) == 4 && range<5,0>()(5) == 0),"");
+            DLIB_CASSERT((range<5,2,1>()(0) == 5 && range<5,2,1>()(1) == 3 && range<5,2,1>()(2) == 1),"");
+
+
+            DLIB_CASSERT((range<5,0>().nr() == 6),"");
+            DLIB_CASSERT((range<5,1>().nr() == 5),"");
+            DLIB_CASSERT((range<5,0>().nc() == 1),"");
+            DLIB_CASSERT((range<5,1>().nc() == 1),"");
+            DLIB_CASSERT((trans(range<5,0>()).nc() == 6),"");
+            DLIB_CASSERT((trans(range<5,1>()).nc() == 5),"");
+            DLIB_CASSERT((trans(range<5,0>()).nr() == 1),"");
+            DLIB_CASSERT((trans(range<5,1>()).nr() == 1),"");
+
+            DLIB_CASSERT((range<5,2,0>().nr() == 3),"");
+            DLIB_CASSERT((range<5,2,1>().nr() == 3),"");
+            DLIB_CASSERT((range<5,2,0>().nc() == 1),"");
+            DLIB_CASSERT((range<5,2,1>().nc() == 1),"");
+            DLIB_CASSERT((trans(range<5,2,0>()).nc() == 3),"");
+            DLIB_CASSERT((trans(range<5,2,1>()).nc() == 3),"");
+            DLIB_CASSERT((trans(range<5,2,0>()).nr() == 1),"");
+            DLIB_CASSERT((trans(range<5,2,1>()).nr() == 1),"");
+
+            DLIB_CASSERT((range<6,3,0>().nr() == 3),"");
+            DLIB_CASSERT((range<5,3,1>().nr() == 2),"");
+            DLIB_CASSERT((range<5,3,0>().nc() == 1),"");
+            DLIB_CASSERT((range<5,3,1>().nc() == 1),"");
+            DLIB_CASSERT((trans(range<6,3,0>()).nc() == 3),"");
+            DLIB_CASSERT((trans(range<5,3,1>()).nc() == 2),"");
+            DLIB_CASSERT((trans(range<5,3,0>()).nr() == 1),"");
+            DLIB_CASSERT((trans(range<5,3,1>()).nr() == 1),"");
+        }
+
+        {
             matrix<double> m(4,3);
             for (long r = 0; r < m.nr(); ++r)
             {

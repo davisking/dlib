@@ -218,13 +218,16 @@ namespace dlib
     );
     /*!
         requires
-            - start <= end
+            - inc > 0
         ensures
             - returns a matrix R such that:
                 - R::type == long
-                - R.nr() == (end - start)/inc + 1
+                - R.nr() == abs(end - start)/inc + 1
                 - R.nc() == 1
-                - R(i) == start + i*inc
+                - if (start <= end) then
+                    - R(i) == start + i*inc
+                - else
+                    - R(i) == start - i*inc
     !*/
 
     template <long start, long end>
@@ -238,13 +241,16 @@ namespace dlib
     ); 
     /*!
         requires
-            - start <= end
+            - inc > 0
         ensures
             - returns a matrix R such that:
                 - R::type == long
-                - R.nr() == (end - start)/inc + 1
+                - R.nr() == abs(end - start)/inc + 1
                 - R.nc() == 1
-                - R(i) == start + i*inc
+                - if (start <= end) then
+                    - R(i) == start + i*inc
+                - else
+                    - R(i) == start - i*inc
     !*/
 
     const matrix_exp range (
@@ -336,6 +342,27 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp rowm (
+        const matrix_exp& m,
+        const matrix_exp& rows
+    );
+    /*!
+        requires
+            - rows contains elements of type long
+            - 0 <= min(rows) && max(rows) < m.nr() 
+            - rows.nr() == 1 || rows.nc() == 1
+              (i.e. rows must be a vector)
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R.nr() == rows.size()
+                - R.nc() == m.nc() 
+                - for all valid r and c:
+                  R(r,c) == m(rows(r),c)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp colm (
         const matrix_exp& m,
         long col 
@@ -349,6 +376,27 @@ namespace dlib
                 - R.nc() == 1
                 - for all valid i:
                   R(i) == m(i,col)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp colm (
+        const matrix_exp& m,
+        const matrix_exp& cols
+    );
+    /*!
+        requires
+            - cols contains elements of type long
+            - 0 <= min(cols) && max(cols) < m.nc() 
+            - cols.nr() == 1 || cols.nc() == 1
+              (i.e. cols must be a vector)
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R.nr() == m.nr()
+                - R.nc() == cols.size()
+                - for all valid r and c:
+                  R(r,c) == m(r,cols(c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -450,6 +498,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    assignable_matrix_expression set_rowm (
+        matrix& m,
+        const matrix_exp& rows
+    );
+    /*!
+        requires
+            - rows contains elements of type long
+            - 0 <= min(rows) && max(rows) < m.nr() 
+            - rows.nr() == 1 || rows.nc() == 1
+              (i.e. rows must be a vector)
+        ensures
+            - statements of the following form:
+                - set_rowm(m,rows) = some_matrix;
+              result in it being the case that:
+                - rowm(m,rows) == some_matrix.
+
+            - statements of the following form:
+                - set_rowm(m,rows) = scalar_value;
+              result in it being the case that:
+                - rowm(m,rows) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     assignable_matrix_expression set_colm (
         matrix& m,
         long col 
@@ -467,6 +539,30 @@ namespace dlib
                 - set_colm(m,col) = scalar_value;
               result in it being the case that:
                 - colm(m,col) == uniform_matrix<matrix::type>(nr,1,scalar_value).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    assignable_matrix_expression set_colm (
+        matrix& m,
+        const matrix_exp& cols
+    );
+    /*!
+        requires
+            - cols contains elements of type long
+            - 0 <= min(cols) && max(cols) < m.nc() 
+            - cols.nr() == 1 || cols.nc() == 1
+              (i.e. cols must be a vector)
+        ensures
+            - statements of the following form:
+                - set_colm(m,cols) = some_matrix;
+              result in it being the case that:
+                - colm(m,cols) == some_matrix.
+
+            - statements of the following form:
+                - set_colm(m,cols) = scalar_value;
+              result in it being the case that:
+                - colm(m,cols) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
     !*/
 
 // ----------------------------------------------------------------------------------------

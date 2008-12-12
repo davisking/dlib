@@ -1833,8 +1833,11 @@ convergence:
         )
         {
             start = start_;
-            inc = 1;
-            nr_ = end_ - start_ + 1;
+            if (start_ <= end_)
+                inc = 1;
+            else 
+                inc = -1;
+            nr_ = std::abs(end_ - start_) + 1;
         }
         matrix_range_exp (
             long start_,
@@ -1843,8 +1846,11 @@ convergence:
         )
         {
             start = start_;
-            inc = inc_;
-            nr_ = (end_ - start_)/inc_ + 1;
+            nr_ = std::abs(end_ - start_)/inc_ + 1;
+            if (start_ <= end_)
+                inc = inc_;
+            else
+                inc = -inc_;
         }
 
         long operator() (
@@ -1879,14 +1885,15 @@ convergence:
 
 // ----------------------------------------------------------------------------------------
 
-    template <long start, long inc, long end>
+    template <long start, long inc_, long end>
     class matrix_range_static_exp  
     {
     public:
         typedef long type;
         typedef matrix_range_static_exp ref_type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
-        const static long NR = (end - start)/inc + 1;
+        const static long inc = (start <= end)?inc_:-inc_;
+        const static long NR = tabs<(end - start)>::value/inc_ + 1;
         const static long NC = 1;
 
         long operator() (
@@ -1920,7 +1927,7 @@ convergence:
     const matrix_exp<matrix_range_static_exp<start,inc,end> > range (
     ) 
     { 
-        COMPILE_TIME_ASSERT(start <= end);
+        COMPILE_TIME_ASSERT(inc > 0);
         return matrix_exp<matrix_range_static_exp<start,inc,end> >(matrix_range_static_exp<start,inc,end>()); 
     }
 
@@ -1928,7 +1935,6 @@ convergence:
     const matrix_exp<matrix_range_static_exp<start,1,end> > range (
     ) 
     { 
-        COMPILE_TIME_ASSERT(start <= end);
         return matrix_exp<matrix_range_static_exp<start,1,end> >(matrix_range_static_exp<start,1,end>()); 
     }
 
@@ -1937,13 +1943,6 @@ convergence:
         long end
     ) 
     { 
-        DLIB_ASSERT(start <= end, 
-            "\tconst matrix_exp range(start, end)"
-            << "\n\tstart can't be bigger than end"
-            << "\n\tstart: " << start 
-            << "\n\tend:   " << end
-            );
-
         return matrix_exp<matrix_range_exp>(matrix_range_exp(start,end)); 
     }
 
@@ -1953,10 +1952,11 @@ convergence:
         long end
     ) 
     { 
-        DLIB_ASSERT(start <= end, 
+        DLIB_ASSERT(inc > 0, 
             "\tconst matrix_exp range(start, inc, end)"
             << "\n\tstart can't be bigger than end"
             << "\n\tstart: " << start 
+            << "\n\tinc:   " << inc
             << "\n\tend:   " << end
             );
 
@@ -2252,6 +2252,56 @@ convergence:
 
 // ----------------------------------------------------------------------------------------
 
+    struct op_rowm_range
+    {
+        template <typename EXP1, typename EXP2>
+        struct op : has_destructive_aliasing
+        {
+            typedef typename EXP1::type type;
+            typedef typename EXP1::mem_manager_type mem_manager_type;
+            const static long NR = EXP2::NC*EXP2::NR;
+            const static long NC = EXP1::NC;
+
+            template <typename M1, typename M2>
+            static type apply ( const M1& m1, const M2& rows , long r, long c)
+            { return m1(rows(r),c); }
+
+            template <typename M1, typename M2>
+            static long nr (const M1& m1, const M2& rows ) { return rows.size(); }
+            template <typename M1, typename M2>
+            static long nc (const M1& m1, const M2& ) { return m1.nc(); }
+        };
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    const matrix_exp<matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_rowm_range> > rowm (
+        const matrix_exp<EXP1>& m,
+        const matrix_exp<EXP2>& rows
+    )
+    {
+        // the rows matrix must contain elements of type long
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP2::type,long>::value == true));
+
+        DLIB_ASSERT(0 <= min(rows) && max(rows) < m.nr() && (rows.nr() == 1 || rows.nc() == 1), 
+            "\tconst matrix_exp rowm(const matrix_exp& m, const matrix_exp& rows)"
+            << "\n\tYou have given invalid arguments to this function"
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tmin(rows):  " << min(rows) 
+            << "\n\tmax(rows):  " << max(rows) 
+            << "\n\trows.nr():  " << rows.nr()
+            << "\n\trows.nc():  " << rows.nc()
+            );
+
+        typedef matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_rowm_range> exp;
+        return matrix_exp<exp>(exp(m,rows));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     struct op_colm
     {
         template <typename EXP>
@@ -2290,6 +2340,56 @@ convergence:
 
         typedef matrix_scalar_binary_exp<matrix_exp<EXP>,long,op_colm> exp;
         return matrix_exp<exp>(exp(m,col));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_colm_range
+    {
+        template <typename EXP1, typename EXP2>
+        struct op : has_destructive_aliasing
+        {
+            typedef typename EXP1::type type;
+            typedef typename EXP1::mem_manager_type mem_manager_type;
+            const static long NR = EXP1::NR;
+            const static long NC = EXP2::NC*EXP2::NR;
+
+            template <typename M1, typename M2>
+            static type apply ( const M1& m1, const M2& cols , long r, long c)
+            { return m1(r,cols(c)); }
+
+            template <typename M1, typename M2>
+            static long nr (const M1& m1, const M2& cols ) { return m1.nr(); }
+            template <typename M1, typename M2>
+            static long nc (const M1& m1, const M2& cols ) { return cols.size(); }
+        };
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    const matrix_exp<matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_colm_range> > colm (
+        const matrix_exp<EXP1>& m,
+        const matrix_exp<EXP2>& cols
+    )
+    {
+        // the cols matrix must contain elements of type long
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP2::type,long>::value == true));
+
+        DLIB_ASSERT(0 <= min(cols) && max(cols) < m.nc() && (cols.nr() == 1 || cols.nc() == 1), 
+            "\tconst matrix_exp colm(const matrix_exp& m, const matrix_exp& cols)"
+            << "\n\tYou have given invalid arguments to this function"
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tmin(cols):  " << min(cols) 
+            << "\n\tmax(cols):  " << max(cols) 
+            << "\n\tcols.nr():  " << cols.nr()
+            << "\n\tcols.nc():  " << cols.nc()
+            );
+
+        typedef matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_colm_range> exp;
+        return matrix_exp<exp>(exp(m,cols));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2508,6 +2608,50 @@ convergence:
             );
 
         return assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_exp<EXPr>,matrix_exp<EXPc> >(m,rows,cols);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, long NR, long NC, typename mm, typename l, typename EXPr>
+    assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_exp<EXPr>,matrix_exp<matrix_range_exp> > set_rowm (
+        matrix<T,NR,NC,mm,l>& m,
+        const matrix_exp<EXPr>& rows
+    )
+    {
+        DLIB_ASSERT(0 <= min(rows) && max(rows) < m.nr() && (rows.nr() == 1 || rows.nc() == 1), 
+            "\tassignable_matrix_expression set_rowm(matrix& m, const matrix_exp& rows)"
+            << "\n\tYou have specified invalid sub matrix dimensions"
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tmin(rows):  " << min(rows) 
+            << "\n\tmax(rows):  " << max(rows) 
+            << "\n\trows.nr():  " << rows.nr()
+            << "\n\trows.nc():  " << rows.nc()
+            );
+
+        return assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_exp<EXPr>,matrix_exp<matrix_range_exp> >(m,rows,range(0,m.nc()-1));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, long NR, long NC, typename mm, typename l, typename EXPc>
+    assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_exp<matrix_range_exp>,matrix_exp<EXPc> > set_colm (
+        matrix<T,NR,NC,mm,l>& m,
+        const matrix_exp<EXPc>& cols
+    )
+    {
+        DLIB_ASSERT(0 <= min(cols) && max(cols) < m.nc() && (cols.nr() == 1 || cols.nc() == 1), 
+            "\tassignable_matrix_expression set_colm(matrix& m, const matrix_exp& cols)"
+            << "\n\tYou have specified invalid sub matrix dimensions"
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tmin(cols):  " << min(cols) 
+            << "\n\tmax(cols):  " << max(cols) 
+            << "\n\tcols.nr():  " << cols.nr()
+            << "\n\tcols.nc():  " << cols.nc()
+            );
+
+        return assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_exp<matrix_range_exp>,matrix_exp<EXPc> >(m,range(0,m.nr()-1),cols);
     }
 
 // ----------------------------------------------------------------------------------------

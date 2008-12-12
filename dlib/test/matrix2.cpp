@@ -943,6 +943,36 @@ namespace
         }
 
 
+        {
+            matrix<double> m(4,4), m2;
+            m = 1,2,3,4,
+                1,2,3,4,
+                4,6,8,10,
+                4,6,8,10;
+            m2 = m;
+
+            DLIB_CASSERT(colm(m,range(0,3)) == m,"");
+            DLIB_CASSERT(rowm(m,range(0,3)) == m,"");
+            DLIB_CASSERT(colm(m,range(0,0)) == colm(m,0),"");
+            DLIB_CASSERT(rowm(m,range(0,0)) == rowm(m,0),"");
+            DLIB_CASSERT(colm(m,range(1,1)) == colm(m,1),"");
+            DLIB_CASSERT(rowm(m,range(1,1)) == rowm(m,1),"");
+
+            DLIB_CASSERT(colm(m,range(2,2)) == colm(m,2),"");
+            DLIB_CASSERT(rowm(m,range(2,2)) == rowm(m,2),"");
+
+            DLIB_CASSERT(colm(m,range(1,2)) == subm(m,0,1,4,2),"");
+            DLIB_CASSERT(rowm(m,range(1,2)) == subm(m,1,0,2,4),"");
+
+            set_colm(m,range(1,2)) = 9;
+            set_subm(m2,0,1,4,2) = 9;
+            DLIB_CASSERT(m == m2,"");
+
+            set_colm(m,range(1,2)) = 11;
+            set_subm(m2,0,1,4,2) = 11;
+            DLIB_CASSERT(m == m2,"");
+        }
+
 
     }
 
