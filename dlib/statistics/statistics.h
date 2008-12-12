@@ -188,6 +188,11 @@ namespace dlib
             const double eps = 0.99
         )
         {
+            // You are getting an error here because you are trying to apply PCA
+            // to a vector of fixed length.  But PCA is going to try and do 
+            // dimensionality reduction so you can't use a vector with a fixed dimension.
+            COMPILE_TIME_ASSERT(matrix_type::NR == 0);
+
             // make sure requires clause is not broken
             DLIB_ASSERT(samples.size() > 0,
                 "\tvoid vector_normalizer::train_pca()"
@@ -327,13 +332,9 @@ namespace dlib
                 total += eigenvalues(r);
             }
 
-            // so now we know we want to use num_vectors of the first eigenvectors.
-            temp.set_size(num_vectors, eigen.nr());
-            for (long i = 0; i < num_vectors; ++i)
-            {
-                set_rowm(temp,i) = trans(colm(pca,i));
-            }
-            temp.swap(pca);
+            // So now we know we want to use num_vectors of the first eigenvectors.  So
+            // pull those out and discard the rest.
+            pca = trans(colm(pca,range(0,num_vectors-1)));
 
             // Apply the pca transform to the data in x.  Then we will normalize the
             // pca matrix below.
