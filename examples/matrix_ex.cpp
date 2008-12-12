@@ -176,6 +176,9 @@ int main()
     // MATLAB: A = B(1,:)
     A = rowm(B,0);
 
+    // MATLAB: A = B([1:2],:)
+    A = rowm(B,range(0,1));
+
     // MATLAB: A = B(:,1)
     A = colm(B,0);
 
@@ -201,8 +204,6 @@ int main()
     B = 5;
     // or equivalently
     set_all_elements(B,5);
-    // or equivalently
-    set_subm(B,get_rect(B)) = 5;
 
 
     // MATLAB: B([1:2],[1,2]) = 7
@@ -213,6 +214,9 @@ int main()
 
     // MATLAB: B(:,1) = 4
     set_colm(B,0) = 4;
+
+    // MATLAB: B(:,[1:2]) = 4
+    set_colm(B,range(0,1)) = 4;
 
     // MATLAB: B(:,1) = B(:,2)
     set_colm(B,0) = colm(B,1);
