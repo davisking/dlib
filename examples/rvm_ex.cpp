@@ -133,7 +133,7 @@ int main()
     // going to learn.  
     funct_type learned_function;
     learned_function.normalizer = normalizer;  // save normalization information
-    learned_function.function = trainer.train(samples, labels); // perform the actual SVM training and save the results
+    learned_function.function = trainer.train(samples, labels); // perform the actual RVM training and save the results
 
     // print out the number of support vectors in the resulting decision function
     cout << "\nnumber of support vectors in our learned_function is " 
