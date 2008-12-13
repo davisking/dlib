@@ -191,13 +191,17 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+              (i.e. m must contain a type like int, float, double, long, etc...)
         ensures
-            - returns a matrix R such that:
-                - R::type == the same type that was in m
-                - R has the same dimensions as m
-                - for all valid r and c:
-                  R(r,c) == m(r,c) rounded to the nearest integral value
+            - if (m contains integers) then
+                - returns m unmodified
+            - else
+                - returns a matrix R such that:
+                    - R::type == the same type that was in m
+                    - R has the same dimensions as m
+                    - for all valid r and c:
+                      R(r,c) == m(r,c) rounded to the nearest integral value
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -206,8 +210,6 @@ namespace dlib
         const matrix_exp& m
     );
     /*!
-        requires
-            - matrix_exp::type == float, double, or long double 
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
@@ -222,8 +224,6 @@ namespace dlib
         const matrix_exp& m
     );
     /*!
-        requires
-            - matrix_exp::type == float, double, or long double 
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
@@ -239,17 +239,21 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+              (i.e. m must contain a type like int, float, double, long, etc...)
         ensures
-            - returns a matrix R such that:
-                - R::type == the same type that was in m
-                - R has the same dimensions as m
-                - let eps == 10*std::numeric_limits<matrix_exp::type>::epsilon()
-                - for all valid r and c:
-                    - if (abs(m(r,c)) >= eps) then
-                        - R(r,c) == m(r,c)
-                    - else
-                        - R(r,c) == 0
+            - if (m contains integers) then
+                - returns m unmodified
+            - else
+                - returns a matrix R such that:
+                    - R::type == the same type that was in m
+                    - R has the same dimensions as m
+                    - let eps == 10*std::numeric_limits<matrix_exp::type>::epsilon()
+                    - for all valid r and c:
+                        - if (abs(m(r,c)) >= eps) then
+                            - R(r,c) == m(r,c)
+                        - else
+                            - R(r,c) == 0
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -260,7 +264,8 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+              (i.e. m must contain a type like int, float, double, long, etc...)
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m

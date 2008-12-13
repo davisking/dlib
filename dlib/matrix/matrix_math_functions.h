@@ -3,6 +3,7 @@
 #ifndef DLIB_MATRIx_MATH_FUNCTIONS
 #define DLIB_MATRIx_MATH_FUNCTIONS 
 
+#include "matrix_math_functions_abstract.h"
 #include "matrix_utilities.h"
 #include "matrix.h"
 #include "../algs.h"
@@ -110,12 +111,8 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         const matrix_exp<EXP>& m
     )
     {
-        // you can only round matrices that contain floats, doubles or long doubles.
-        COMPILE_TIME_ASSERT((
-                is_same_type<typename EXP::type,float>::value == true || 
-                is_same_type<typename EXP::type,double>::value == true || 
-                is_same_type<typename EXP::type,long double>::value == true 
-        ));
+        // you can only round matrices that contain built in scalar types like double, long, float, etc...
+        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
         typedef matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type, op_round_zeros> exp;
         return matrix_exp<exp>(exp(m,10*std::numeric_limits<typename EXP::type>::epsilon()));
     }
@@ -128,12 +125,8 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         typename EXP::type eps 
     )
     {
-        // you can only round matrices that contain floats, doubles or long doubles.
-        COMPILE_TIME_ASSERT((
-                is_same_type<typename EXP::type,float>::value == true || 
-                is_same_type<typename EXP::type,double>::value == true || 
-                is_same_type<typename EXP::type,long double>::value == true 
-        ));
+        // you can only round matrices that contain built in scalar types like double, long, float, etc...
+        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
         typedef matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type, op_round_zeros> exp;
         return matrix_exp<exp>(exp(m,eps));
     }
@@ -306,7 +299,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
 
     struct op_round
     {
-        template <typename EXP>
+        template <typename EXP, typename enabled = void>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
             typedef typename EXP::type type;
@@ -314,6 +307,18 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
             static type apply ( const M& m, long r, long c)
             { 
                 return static_cast<type>(std::floor(m(r,c)+0.5)); 
+            }
+        };
+
+        template <typename EXP>
+        struct op<EXP,typename enable_if_c<std::numeric_limits<typename EXP::type>::is_integer>::type > 
+                : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            typedef typename EXP::type type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                return m(r,c);
             }
         };
     };
@@ -325,12 +330,8 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         const matrix_exp<EXP>& m
     )
     {
-        // you can only round matrices that contain floats, doubles or long doubles.
-        COMPILE_TIME_ASSERT((
-                is_same_type<typename EXP::type,float>::value == true || 
-                is_same_type<typename EXP::type,double>::value == true || 
-                is_same_type<typename EXP::type,long double>::value == true 
-        ));
+        // you can only round matrices that contain built in scalar types like double, long, float, etc...
+        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
         typedef matrix_unary_exp<matrix_exp<EXP>,op_round> exp;
         return matrix_exp<exp>(exp(m));
     }

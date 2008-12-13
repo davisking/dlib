@@ -647,6 +647,23 @@ namespace
         }
 
         {
+            matrix<int> m(3,4), m2;
+            m = 1,2,3,4,
+                4,5,6,6,
+                6,1,8,0;
+            m2 = m;
+            DLIB_CASSERT(round(m) == m2,"");
+            DLIB_CASSERT(round_zeros(m) == m2,"");
+
+            m2 = 0,2,3,4,
+                 4,5,6,6,
+                 6,0,8,0;
+
+            DLIB_CASSERT(round_zeros(m,2) == m2,"");
+        }
+
+
+        {
 
             matrix<double,6,6> m(identity_matrix<double>(6)*4.5);
 
