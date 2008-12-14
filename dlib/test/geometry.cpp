@@ -129,6 +129,65 @@ namespace
         DLIB_CASSERT(v1.y() == 6,"");
         DLIB_CASSERT(v1.z() == 7,"");
 
+
+        {
+            dlib::vector<double,2> vd2;
+            dlib::vector<double,3> vd3;
+            dlib::vector<long,2> vl2;
+            dlib::vector<long,3> vl3;
+
+            vd2.x() = 2.3;
+            vd2.y() = 4.7;
+
+            vd3.z() = 9;
+
+            vd3 = vd2;
+
+
+
+            vl2 = vd3;
+            vl3 = vd3;
+
+
+            DLIB_CASSERT(vd2.z() == 0,"");
+            DLIB_CASSERT(vd3.z() == 0,"");
+            DLIB_CASSERT(vl2.z() == 0,"");
+            DLIB_CASSERT(vl3.z() == 0,"");
+
+            DLIB_CASSERT(vl2.x() == 2,"");
+            DLIB_CASSERT(vl3.x() == 2,"");
+            DLIB_CASSERT(vl2.y() == 5,"");
+            DLIB_CASSERT(vl3.y() == 5,"");
+
+
+            DLIB_CASSERT(abs(vd2.cross(vd3).dot(vd2)) < 1e-7,""); 
+            DLIB_CASSERT(abs(vd3.cross(vd2).dot(vd2)) < 1e-7,""); 
+            DLIB_CASSERT(abs(vd2.cross(vd3).dot(vd3)) < 1e-7,""); 
+            DLIB_CASSERT(abs(vd3.cross(vd2).dot(vd3)) < 1e-7,""); 
+
+            DLIB_CASSERT(abs(vl2.cross(vl3).dot(vl2)) == 0,""); 
+            DLIB_CASSERT(abs(vl3.cross(vl2).dot(vl2)) == 0,""); 
+            DLIB_CASSERT(abs(vl2.cross(vl3).dot(vl3)) == 0,""); 
+            DLIB_CASSERT(abs(vl3.cross(vl2).dot(vl3)) == 0,""); 
+
+
+            DLIB_CASSERT((vd2-vd3).length() < 1e-7,"");
+
+            DLIB_CASSERT(vl2 == vl3,"");
+
+
+            vl2.x() = 0;
+            vl2.y() = 0;
+            vl3 = vl2;
+
+            vl2.x() = 4;
+            vl3.y() = 3;
+
+            DLIB_CASSERT(vl2.cross(vl3).length() == 12,"");
+            DLIB_CASSERT(vl3.cross(vl2).length() == 12,"");
+
+        }
+
     }
 
 

@@ -70,32 +70,12 @@ namespace dlib
         {
         }
 
-        template <typename T>
-        rectangle (
-            const vector<T>& v
-        ) :
-            l(static_cast<long>(v.x()+0.5)),
-            t(static_cast<long>(v.y()+0.5)),
-            r(static_cast<long>(v.x()+0.5)),
-            b(static_cast<long>(v.y()+0.5))
-        {
-        }
-
         rectangle (
             const point& p1,
             const point& p2
         )
         {
             *this = rectangle(p1) + rectangle(p2);
-        }
-
-        template <typename T>
-        rectangle (
-            const vector<T>& v1,
-            const vector<T>& v2
-        )
-        {
-            *this = rectangle(v1) + rectangle(v2);
         }
 
         rectangle (
@@ -226,6 +206,14 @@ namespace dlib
         ) const
         {
             return (rect + *this == *this);
+        }
+
+        rectangle& operator+= (
+            const point& p 
+        )
+        {
+            *this = *this + rectangle(p);
+            return *this;
         }
 
         rectangle& operator+= (

@@ -10,17 +10,19 @@
 
 namespace dlib
 {
-    class point;
-
     template <
-        typename T
+        typename T,
+        long NR = 3
         >
     class vector
     {
         /*!
             REQUIREMENTS ON T
                 T should be some object that provides an interface that is 
-                compatible with double, float and the like.
+                compatible with double, float, int, long and the like.
+
+            REQUIREMENTS ON NR
+                NR == 3 || NR == 2
 
             INITIAL VALUE
                 x() == 0 
@@ -28,11 +30,10 @@ namespace dlib
                 z() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a three dimensional vector.
+                This object represents a three dimensional vector.  If NR == 2 then
+                this object is limited to representing points on the XY plane where
+                Z is set to 0.
 
-            THREAD SAFETY
-                Note that the vector object is not allowed to be reference counted.
-                This is to ensure a minimum amount of thread safety.
         !*/
 
     public:
@@ -52,33 +53,53 @@ namespace dlib
             const T _z
         );
         /*!
+            requires
+                - NR == 3
             ensures
-                - #*this properly initialized 
                 - #x() == _x 
                 - #y() == _y 
                 - #z() == _z 
         !*/
 
         vector (
-            const point& p
+            const T _x,
+            const T _y
         );
         /*!
+            requires
+                - NR == 2
             ensures
-                - #*this properly initialized 
-                - #x() == p.x() 
-                - #y() == p.y()
-                - #z() == 0 
+                - #x() == _x 
+                - #y() == _y 
+                - #z() == 0
         !*/
 
+        template <typename U, long NRv>
         vector (
-            const vector& v
+            const vector<U,NRv>& v
         );
         /*!
             ensures
-                - #*this properly initialized 
-                - #x() == v.x() 
-                - #y() == v.y() 
-                - #z() == v.z() 
+                - Initializes *this with the contents of v and does any rounding if necessary and also 
+                  takes care of converting between 2 and 3 dimensional vectors.
+                - if (U is a real valued type like float or double and T is an integral type like long) then
+                    - if (NR == 3) then
+                        - #x() == floor(v.x() + 0.5)
+                        - #y() == floor(v.y() + 0.5)
+                        - #z() == floor(v.z() + 0.5)
+                    - else // NR == 2
+                        - #x() == floor(v.x() + 0.5)
+                        - #y() == floor(v.y() + 0.5)
+                        - #z() == 0
+                - else
+                    - if (NR == 3) then
+                        - #x() == v.x() 
+                        - #y() == v.y() 
+                        - #z() == v.z() 
+                    - else // NR == 2
+                        - #x() == v.x() 
+                        - #y() == v.y() 
+                        - #z() == 0
         !*/
 
         template <typename EXP>
@@ -87,27 +108,40 @@ namespace dlib
         );
         /*!
             requires
-                - m.size() == 3
+                - m.size() == NR
                 - m.nr() == 1 || m.nc() == 1 (i.e. m must be a row or column matrix)
             ensures
-                - #x() == m(0)
-                - #y() == m(1)
-                - #z() == m(2)
+                - Initializes *this with the contents of m and does any rounding if necessary and also 
+                  takes care of converting between 2 and 3 dimensional vectors.
+                - if (m contains real valued values like float or double and T is an integral type like long) then
+                    - #x() == floor(m(0) + 0.5)
+                    - #y() == floor(m(1) + 0.5)
+                    - if (NR == 3) then
+                        - #z() == floor(m(2) + 0.5)
+                    - else
+                        - #z() == 0
+                - else
+                    - #x() == m(0)
+                    - #y() == m(1)
+                    - if (NR == 3) then
+                        - #z() == m(2)
+                    - else
+                        - #z() == 0
         !*/
 
-        template <long NR, long NC, typename MM>
-        operator matrix<T,NR, NC, MM> (
+        operator matrix<T> (
         ) const;
         /*!
             ensures
                 - provides automatic conversions from a vector object to a column 
                   matrix
                 - returns a matrix object m such that:
-                    - m.nr() == 3
+                    - m.nr() == NR
                     - m.nc() == 1
                     - m(0) == x()
                     - m(1) == y()
-                    - m(2) == z()
+                    - if (NR == 3) then
+                        - m(2) == z()
         !*/
 
         ~vector (
@@ -142,6 +176,8 @@ namespace dlib
         T& z (
         );
         /*!
+            requires
+                - NR == 3 (this function actually doesn't exist when NR != 3)
             ensures
                 - returns a reference to the z component of the vector
         !*/
@@ -164,7 +200,11 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns a const reference to the z component of the vector
+                - if (NR == 3) then
+                    - returns a const reference to the z component of the vector
+                - else
+                    - return 0
+                      (there isn't really a z in this case so we just return 0)
         !*/
 
         T dot (
@@ -175,7 +215,7 @@ namespace dlib
                 - returns the result of the dot product between *this and rhs
         !*/
 
-        vector cross (
+        vector<T,3> cross (
             const vector& rhs
         ) const;
         /*!
@@ -261,8 +301,9 @@ namespace dlib
                 - returns #*this
         !*/
 
+        template <typename U, long NR2>
         bool operator== (
-            const vector& rhs
+            const vector<U,NR2>& rhs
         ) const;
         /*!
             ensures
@@ -272,8 +313,9 @@ namespace dlib
                     - returns false
         !*/
 
+        template <typename U, long NR2>
         bool operator!= (
-            const vector& rhs
+            const vector<U,NR2>& rhs
         ) const;
         /*!
             ensures
@@ -290,47 +332,27 @@ namespace dlib
 
     };
 
-    template<typename T, typename U>
-    vector<T>  operator* (
-        const vector<T> & lhs,
-        const U rhs
-    );
-    /*!
-        ensures
-            - returns the result of multiplying the scalar rhs by lhs
-    !*/
-    
-    template<typename T, typename U>
-    vector<T>  operator* (
-        const U lhs,
-        const vector<T> & rhs   
-    );
-    /*! 
-        ensures
-            - returns the result of multiplying the scalar lhs by rhs
-    !*/
-
-    template<typename T>
+    template<typename T, long NR>
     inline void swap (
-        vector<T> & a, 
-        vector<T> & b 
+        vector<T,NR> & a, 
+        vector<T,NR> & b 
     ) { a.swap(b); }   
     /*!
         provides a global swap function
     !*/
 
-    template<typename T>
+    template<typename T, long NR>
     void serialize (
-        const vector<T> & item, 
+        const vector<T,NR>& item, 
         std::ostream& out
     );   
     /*!
         provides serialization support 
     !*/
 
-    template<typename T>
+    template<typename T, long NR>
     void deserialize (
-        vector<T> & item, 
+        vector<T,NR>& item, 
         std::istream& in
     );   
     /*!
@@ -340,7 +362,7 @@ namespace dlib
     template<typename T>
     std::ostream& operator<< (
         std::ostream& out, 
-        const vector<T>& item 
+        const vector<T,3>& item 
     );   
     /*!
         ensures
@@ -350,7 +372,7 @@ namespace dlib
     template<typename T>
     std::istream& operator>>(
         std::istream& in, 
-        vector<T>& item 
+        vector<T,3>& item 
     );   
     /*!
         ensures
@@ -358,189 +380,34 @@ namespace dlib
               The data in the input stream should be of the form (x, y, z)
     !*/
 
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-    class point
-    {
-        /*!
-            INITIAL VALUE
-                The initial value of this object is defined by its constructor.                
-
-            WHAT THIS OBJECT REPRESENTS
-                This object represents a point inside a Cartesian coordinate system.
-        !*/
-
-    public:
-
-        point (
-        );
-        /*!
-            ensures
-                - #x() == 0
-                - #y() == 0
-        !*/
-
-        point (
-            long x_
-            long y_
-        );
-        /*!
-            ensures
-                - #x() == x_
-                - #y() == y_
-        !*/
-
-        point (
-            const point& p
-        );
-        /*!
-            ensures
-                - #x() == p.x()
-                - #y() == p.y()
-        !*/
-
-        template <typename T>
-        point (
-            const vector<T>& v
-        );
-        /*!
-            ensures
-                - #x() == floor(v.x()+0.5)
-                - #y() == floor(v.y()+0.5)
-        !*/
-
-        long x (
-        ) const;
-        /*!
-            ensures
-                - returns the x coordinate of this point
-        !*/
-
-        long y (
-        ) const;
-        /*!
-            ensures
-                - returns the y coordinate of this point
-        !*/
-
-        long& x (
-        );
-        /*!
-            ensures
-                - returns a non-const reference to the x coordinate of 
-                  this point
-        !*/
-
-        long& y (
-        );
-        /*!
-            ensures
-                - returns a non-const reference to the y coordinate of 
-                  this point
-        !*/
-
-        const point operator+ (
-            const point& rhs
-        ) const;
-        /*!
-            ensures
-                - returns point(x()+rhs.x(), y()+rhs.y())
-        !*/
-
-        const point operator- (
-            const point& rhs
-        ) const;
-        /*!
-            ensures
-                - returns point(x()-rhs.x(), y()-rhs.y())
-        !*/
-
-        point& operator= (
-            const point& p
-        );
-        /*!
-            ensures
-                - #x() == p.x()
-                - #y() == p.y()
-                - returns #*this
-        !*/
-
-        point& operator+= (
-            const point& rhs
-        );
-        /*!
-            ensures
-                - #*this = *this + rhs
-                - returns #*this
-        !*/
-
-        point& operator-= (
-            const point& rhs
-        );
-        /*!
-            ensures
-                - #*this = *this - rhs
-                - returns #*this
-        !*/
-
-        bool operator== (
-            const point& p
-        ) const;
-        /*!
-            ensures
-                - if (x() == p.x() && y() == p.y()) then 
-                    - returns true
-                - else
-                    - returns false
-        !*/
-
-        bool operator!= (
-            const point& p
-        ) const;
-        /*!
-            ensures
-                - returns !(*this == p)
-        !*/
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    void serialize (
-        const point& item, 
-        std::ostream& out
-    );   
-    /*!
-        provides serialization support 
-    !*/
-
-    void deserialize (
-        point& item, 
-        std::istream& in
-    );   
-    /*!
-        provides deserialization support 
-    !*/
-
+    template<typename T>
     std::ostream& operator<< (
         std::ostream& out, 
-        const point& item 
+        const vector<T,2>& item 
     );   
     /*!
         ensures
             - writes item to out in the form "(x, y)"
     !*/
 
+    template<typename T>
     std::istream& operator>>(
         std::istream& in, 
-        point& item 
+        vector<T,2>& item 
     );   
     /*!
         ensures
-            - reads a point from the input stream in and stores it in #item.
+            - reads a vector from the input stream in and stores it in #item.
               The data in the input stream should be of the form (x, y)
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    /*!A point
+        This is just a typedef of the vector object. 
+    !*/
+
+    typedef vector<long,2> point;
 
 // ----------------------------------------------------------------------------------------
 
@@ -549,12 +416,12 @@ namespace dlib
 namespace std
 {
     /*!
-        Define std::less<vector<T> > so that you can use vectors in the associative containers.
+        Define std::less<vector<T,3> > so that you can use vectors in the associative containers.
     !*/
     template<typename T>
-    struct less<dlib::vector<T> > : public binary_function<dlib::vector<T> ,dlib::vector<T> ,bool>
+    struct less<dlib::vector<T,3> > : public binary_function<dlib::vector<T,3> ,dlib::vector<T,3> ,bool>
     {
-        inline bool operator() (const dlib::vector<T> & a, const dlib::vector<T> & b) const
+        inline bool operator() (const dlib::vector<T,3> & a, const dlib::vector<T,3> & b) const
         { 
             if      (a.x() < b.x()) return true;
             else if (a.x() > b.x()) return false;
@@ -567,12 +434,12 @@ namespace std
     };
 
     /*!
-        Define std::less<point> so that you can use points in the associative containers.
+        Define std::less<vector<T,2> > so that you can use vector<T,2>s in the associative containers.
     !*/
-    template<>
-    struct less<dlib::point> : public binary_function<dlib::point,dlib::point,bool>
+    template<typename T>
+    struct less<dlib::vector<T,2> > : public binary_function<dlib::vector<T,2> ,dlib::vector<T,2> ,bool>
     {
-        inline bool operator() (const dlib::point& a, const dlib::point& b) const
+        inline bool operator() (const dlib::vector<T,2> & a, const dlib::vector<T,2> & b) const
         { 
             if      (a.x() < b.x()) return true;
             else if (a.x() > b.x()) return false;

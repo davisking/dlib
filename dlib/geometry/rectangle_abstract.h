@@ -90,18 +90,6 @@ namespace dlib
                 - #bottom() == p.y()
         !*/
 
-        template <typename T>
-        rectangle (
-            const vector<T>& v
-        );
-        /*!
-            ensures
-                - #left()   == static_cast<long>(floor(v.x()+0.5))
-                - #top()    == static_cast<long>(floor(v.y()+0.5))
-                - #right()  == static_cast<long>(floor(v.x()+0.5))
-                - #bottom() == static_cast<long>(floor(v.y()+0.5))
-        !*/
-
         rectangle (
             const point& p1,
             const point& p2
@@ -109,16 +97,6 @@ namespace dlib
         /*!
             ensures
                 - #*this == rectangle(p1) + rectangle(p2)
-        !*/
-
-        template <typename T>
-        rectangle (
-            const vector<T>& v1,
-            const vector<T>& v2
-        );
-        /*!
-            ensures
-                - #*this == rectangle(v1) + rectangle(v2)
         !*/
 
         long left (
