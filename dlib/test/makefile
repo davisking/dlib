@@ -12,7 +12,7 @@ LFLAGS = -lpthread   -lnsl
 
 # The name of the compiler.  If you only have one version of
 # gcc installed then you probably want to change this to just g++ 
-CC = nice g++-3.3
+CC = nice g++-4.1
 
 ####################################################
 ####################################################
@@ -52,6 +52,7 @@ SRC += image.cpp
 SRC += lz77_buffer.cpp
 SRC += map.cpp
 SRC += matrix.cpp
+SRC += matrix2.cpp
 SRC += md5.cpp
 SRC += member_function_pointer.cpp
 SRC += metaprogramming.cpp
