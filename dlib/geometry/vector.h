@@ -22,6 +22,105 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T, typename U, typename enabled = void>
+    struct vector_assign_helper
+    {
+        template <long NR>
+        static void assign (
+            vector<T,2>& dest,
+            const vector<U,NR>& src
+        )
+        {
+            dest.x() = static_cast<T>(src.x());
+            dest.y() = static_cast<T>(src.y());
+        }
+
+        template <long NR>
+        static void assign (
+            vector<T,3>& dest,
+            const vector<U,NR>& src
+        )
+        {
+            dest.x() = static_cast<T>(src.x());
+            dest.y() = static_cast<T>(src.y());
+            dest.z() = static_cast<T>(src.z());
+        }
+
+        template <typename EXP>
+        static void assign (
+            vector<T,2>& dest,
+            const matrix_exp<EXP>& m
+        )
+        {
+            dest.x() = static_cast<T>(m(0));
+            dest.y() = static_cast<T>(m(1));
+        }
+
+        template <typename EXP>
+        static void assign (
+            vector<T,3>& dest,
+            const matrix_exp<EXP>& m
+        )
+        {
+            dest.x() = static_cast<T>(m(0));
+            dest.y() = static_cast<T>(m(1));
+            dest.z() = static_cast<T>(m(2));
+        }
+    };
+
+    // This is an overload for the case where you are converting from a floating point
+    // type to an integral type.  These overloads make sure values are rounded to 
+    // the nearest integral value.
+    template <typename T, typename U>
+    struct vector_assign_helper<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer == true && 
+                                                          std::numeric_limits<U>::is_integer == false>::type>
+    {
+        template <long NR>
+        static void assign (
+            vector<T,2>& dest,
+            const vector<U,NR>& src
+        )
+        {
+            dest.x() = static_cast<T>(std::floor(src.x() + 0.5));
+            dest.y() = static_cast<T>(std::floor(src.y() + 0.5));
+        }
+
+        template <long NR>
+        static void assign (
+            vector<T,3>& dest,
+            const vector<U,NR>& src
+        )
+        {
+            dest.x() = static_cast<T>(std::floor(src.x() + 0.5));
+            dest.y() = static_cast<T>(std::floor(src.y() + 0.5));
+            dest.z() = static_cast<T>(std::floor(src.z() + 0.5));
+        }
+
+        template <typename EXP>
+        static void assign (
+            vector<T,3>& dest,
+            const matrix_exp<EXP>& m
+        )
+        {
+            dest.x() = static_cast<T>(std::floor(m(0) + 0.5));
+            dest.y() = static_cast<T>(std::floor(m(1) + 0.5));
+            dest.z() = static_cast<T>(std::floor(m(2) + 0.5));
+        }
+
+        template <typename EXP>
+        static void assign (
+            vector<T,2>& dest,
+            const matrix_exp<EXP>& m
+        )
+        {
+            dest.x() = static_cast<T>(std::floor(m(0) + 0.5));
+            dest.y() = static_cast<T>(std::floor(m(1) + 0.5));
+        }
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     class vector<T,3> 
     {
@@ -121,9 +220,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename EXP>
-        const typename enable_if_c<std::numeric_limits<T>::is_integer == true && 
-                                   std::numeric_limits<typename EXP::type>::is_integer == false, vector>::type&
-        operator = (
+        vector& operator = (
             const matrix_exp<EXP>& m
         )
         {
@@ -140,61 +237,18 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            x() = std::floor(m(0)+0.5);
-            y() = std::floor(m(1)+0.5);
-            z() = std::floor(m(2)+0.5);
-            return *this;
-        }
-
-        template <typename EXP>
-        const typename disable_if_c<std::numeric_limits<T>::is_integer == true && 
-                                   std::numeric_limits<typename EXP::type>::is_integer == false, vector>::type&
-        operator = (
-            const matrix_exp<EXP>& m
-        )
-        {
-            // you can only assign vectors with 3 elements to a dlib::vector<T,3> object
-            COMPILE_TIME_ASSERT(EXP::NR*EXP::NC == 3 || EXP::NR*EXP::NC == 0);
-
-            // make sure requires clause is not broken
-            DLIB_ASSERT((m.nr() == 1 || m.nc() == 1) && (m.size() == 3),
-                "\t vector(const matrix_exp& m)"
-                << "\n\t the given matrix is of the wrong size"
-                << "\n\t m.nr():   " << m.nr() 
-                << "\n\t m.nc():   " << m.nc() 
-                << "\n\t m.size(): " << m.size() 
-                << "\n\t this: " << this
-                );
-
-            x() = m(0);
-            y() = m(1);
-            z() = m(2);
+            vector_assign_helper<T, typename EXP::type>::assign(*this, m);
             return *this;
         }
 
         // ---------------------------------------
 
         template <typename U>
-        const typename enable_if_c<std::numeric_limits<T>::is_integer == true && std::numeric_limits<U>::is_integer == false, vector>::type&
-        operator = (
+        vector& operator = (
             const vector<U,3>& item
         )
         {
-            x() = static_cast<T>(std::floor(item.x() + 0.5));
-            y() = static_cast<T>(std::floor(item.y() + 0.5));
-            z() = static_cast<T>(std::floor(item.z() + 0.5));
-            return *this;
-        }
-
-        template <typename U>
-        const typename disable_if_c<std::numeric_limits<T>::is_integer == true && std::numeric_limits<U>::is_integer == false, vector>::type&
-        operator = (
-            const vector<U,3>& item
-        )
-        {
-            x() = static_cast<T>(item.x());
-            y() = static_cast<T>(item.y());
-            z() = static_cast<T>(item.z());
+            vector_assign_helper<T,U>::assign(*this, item);
             return *this;
         }
 
@@ -520,9 +574,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename EXP>
-        const typename enable_if_c<std::numeric_limits<T>::is_integer == true && 
-                                   std::numeric_limits<typename EXP::type>::is_integer == false, vector>::type&
-        operator = (
+        vector& operator = (
             const matrix_exp<EXP>& m
         )
         {
@@ -539,57 +591,18 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            x() = std::floor(m(0)+0.5);
-            y() = std::floor(m(1)+0.5);
-            return *this;
-        }
-
-        template <typename EXP>
-        const typename disable_if_c<std::numeric_limits<T>::is_integer == true && 
-                                   std::numeric_limits<typename EXP::type>::is_integer == false, vector>::type&
-        operator = (
-            const matrix_exp<EXP>& m
-        )
-        {
-            // you can only assign vectors with 2 elements to a dlib::vector<T,2> object
-            COMPILE_TIME_ASSERT(EXP::NR*EXP::NC == 2 || EXP::NR*EXP::NC == 0);
-
-            // make sure requires clause is not broken
-            DLIB_ASSERT((m.nr() == 1 || m.nc() == 1) && (m.size() == 2),
-                "\t vector(const matrix_exp& m)"
-                << "\n\t the given matrix is of the wrong size"
-                << "\n\t m.nr():   " << m.nr() 
-                << "\n\t m.nc():   " << m.nc() 
-                << "\n\t m.size(): " << m.size() 
-                << "\n\t this: " << this
-                );
-
-            x() = m(0);
-            y() = m(1);
+            vector_assign_helper<T, typename EXP::type>::assign(*this, m);
             return *this;
         }
 
         // ---------------------------------------
 
         template <typename U>
-        const typename enable_if_c<std::numeric_limits<T>::is_integer == true && std::numeric_limits<U>::is_integer == false, vector>::type&
-        operator = (
+        vector& operator = (
             const vector<U,2>& item
         )
         {
-            x() = static_cast<T>(std::floor(item.x() + 0.5));
-            y() = static_cast<T>(std::floor(item.y() + 0.5));
-            return *this;
-        }
-
-        template <typename U>
-        const typename disable_if_c<std::numeric_limits<T>::is_integer == true && std::numeric_limits<U>::is_integer == false, vector>::type&
-        operator = (
-            const vector<U,2>& item
-        )
-        {
-            x() = static_cast<T>(item.x());
-            y() = static_cast<T>(item.y());
+            vector_assign_helper<T,U>::assign(*this, item);
             return *this;
         }
 
