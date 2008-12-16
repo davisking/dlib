@@ -359,12 +359,22 @@ namespace dlib
             highlight_start(0),
             highlight_end(-1),
             shift_pos(-1),
-            t(*this,&text_field::timer_action)
+            t(*this,&text_field::timer_action),
+            right_click_menu(w)
         {
             style.reset(new text_field_style_default());
             rect.set_bottom(mfont->height()+ (style->get_padding(*mfont))*2);
             rect.set_right((style->get_padding(*mfont))*2);
             cursor_x = style->get_padding(*mfont);
+
+            right_click_menu.menu().add_menu_item(menu_item_text("Cut",*this,&text_field::on_cut,'t'));
+            right_click_menu.menu().add_menu_item(menu_item_text("Copy",*this,&text_field::on_copy,'C'));
+            right_click_menu.menu().add_menu_item(menu_item_text("Paste",*this,&text_field::on_paste,'P'));
+            right_click_menu.menu().add_menu_item(menu_item_text("Delete",*this,&text_field::on_delete_selected,'D'));
+            right_click_menu.menu().add_menu_item(menu_item_separator());
+            right_click_menu.menu().add_menu_item(menu_item_text("Select All",*this,&text_field::on_select_all,'A'));
+
+            right_click_menu.set_rect(get_text_rect());
             enable_events();
 
             t.set_delay_time(500);
@@ -430,6 +440,11 @@ namespace dlib
             unsigned long width
         );
 
+        void set_pos (
+            long x,
+            long y
+        );
+
         void set_main_font (
             const shared_ptr_thread_safe<font>& f
         );
@@ -443,7 +458,13 @@ namespace dlib
         void disable (
         );
 
+        void enable (
+        );
+
         void hide (
+        );
+
+        void show (
         );
 
         template <
@@ -484,6 +505,27 @@ namespace dlib
         }
 
     private:
+
+        void on_cut (
+        );
+        
+        void on_copy (
+        );
+
+        void on_paste (
+        );
+
+        void on_select_all (
+        );
+
+        void on_delete_selected (
+        );
+
+        void on_text_is_selected (
+        );
+
+        void on_no_text_selected (
+        );
 
         void on_user_event (
             int num
@@ -560,6 +602,8 @@ namespace dlib
         scoped_ptr<text_field_style> style;
 
         timer<text_field>::kernel_2a t;
+
+        popup_menu_region right_click_menu;
 
         // restricted functions
         text_field(text_field&);        // copy constructor

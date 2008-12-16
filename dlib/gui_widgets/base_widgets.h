@@ -1676,19 +1676,17 @@ namespace dlib
             if (c.intersect(rect).is_empty())
                 return;
 
-            if (enabled)
-            {
-                f->draw_string(c,rect,text);
-            }
-            else
-            {
-                f->draw_string(c,rect,text,128);
-            }
+            unsigned char color = 0;
+
+            if (enabled == false)
+                color = 128;
+
+            f->draw_string(c,rect,text,color);
 
             if (underline_p1 != underline_p2)
             {
                 point base(rect.left(),rect.top());
-                draw_line(c, base+underline_p1, base+underline_p2);
+                draw_line(c, base+underline_p1, base+underline_p2, color);
             }
         }
 
@@ -2486,6 +2484,10 @@ namespace dlib
 
     class popup_menu_region : public drawable 
     {
+        /*!
+            CONVENTION
+                popup_menu_visible() == popup_menu_shown
+        !*/
 
     public:
 
@@ -2501,6 +2503,10 @@ namespace dlib
             long height
         );
 
+        void set_rect (
+            const rectangle& new_rect
+        );
+
         popup_menu& menu (
         );
 
@@ -2509,6 +2515,9 @@ namespace dlib
 
         void disable (
         );
+
+        bool popup_menu_visible (
+        ) const { auto_mutex M(m); return popup_menu_shown; }
 
     protected:
 
@@ -2533,6 +2542,9 @@ namespace dlib
             long x,
             long y,
             bool is_double_click
+        );
+
+        void on_menu_becomes_hidden (
         );
 
         void draw (

@@ -1707,7 +1707,7 @@ namespace dlib
             for (unsigned long i = 0; i < items.size(); ++i)
             {
                 if (std::tolower(key) == std::tolower(items[i]->get_hot_key()) && 
-                    (items[i]->has_click_event() || submenus[i]) )
+                    (items[i]->has_click_event() || submenus[i]) && item_enabled[i] )
                 {
                     // only hide this popup window if this isn't a submenu
                     if (submenus[i] == 0)
@@ -3078,6 +3078,8 @@ namespace dlib
         drawable(w,MOUSE_CLICK | KEYBOARD_EVENTS | FOCUS_EVENTS | WINDOW_MOVED),
         popup_menu_shown(false)
     {
+
+        menu_.set_on_hide_handler(*this,&popup_menu_region::on_menu_becomes_hidden);
         enable_events();
     }
 
@@ -3100,6 +3102,17 @@ namespace dlib
     {
         auto_mutex M(m);
         rect = resize_rect(rect,width,height);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    set_rect (
+        const rectangle& new_rect
+    )
+    {
+        auto_mutex M(m);
+        rect = new_rect;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3153,6 +3166,21 @@ namespace dlib
             menu_.hide();
             popup_menu_shown = false;
         }
+
+        if (key == (unsigned long)base_window::KEY_ESC)
+        {
+            menu_.hide();
+            popup_menu_shown = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void popup_menu_region::
+    on_menu_becomes_hidden (
+    )
+    {
+        popup_menu_shown = false;
     }
 
 // ----------------------------------------------------------------------------------------

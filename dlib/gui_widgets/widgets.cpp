@@ -434,6 +434,140 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void text_field::
+    enable (
+    )
+    {
+        drawable::enable();
+        right_click_menu.enable();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    on_cut (
+    )
+    {
+        on_copy();
+        on_delete_selected();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    on_copy (
+    )
+    {
+        if (highlight_start <= highlight_end)
+        {
+            put_on_clipboard(text_.substr(highlight_start, highlight_end-highlight_start+1));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    on_paste (
+    )
+    {
+        ustring temp_str;
+        get_from_clipboard(temp_str);
+        if (highlight_start <= highlight_end)
+        {
+            text_ = text_.substr(0,highlight_start) + temp_str +
+                text_.substr(highlight_end+1,text_.size()-highlight_end-1);
+            move_cursor(highlight_start+temp_str.size());
+            highlight_start = 0;
+            highlight_end = -1;
+            parent.invalidate_rectangle(rect);
+            on_no_text_selected();
+
+            // send out the text modified event
+            if (text_modified_handler.is_set())
+                text_modified_handler();
+        }
+        else
+        {
+            text_ = text_.substr(0,cursor_pos) + temp_str +
+                text_.substr(cursor_pos,text_.size()-cursor_pos);
+            move_cursor(cursor_pos+temp_str.size());
+
+            // send out the text modified event
+            if (temp_str.size() != 0 && text_modified_handler.is_set())
+                text_modified_handler();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    on_select_all (
+    )
+    {
+        move_cursor(static_cast<long>(text_.size()));
+        highlight_start = 0;
+        highlight_end = static_cast<long>(text_.size()-1);
+        if (highlight_start <= highlight_end)
+            on_text_is_selected();
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    on_delete_selected (
+    )
+    {
+        if (highlight_start <= highlight_end)
+        {
+            text_ = text_.erase(highlight_start,highlight_end-highlight_start+1);
+            move_cursor(highlight_start);
+            highlight_start = 0;
+            highlight_end = -1;
+
+            on_no_text_selected();
+            // send out the text modified event
+            if (text_modified_handler.is_set())
+                text_modified_handler();
+
+            parent.invalidate_rectangle(rect);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    on_text_is_selected (
+    )
+    {
+        right_click_menu.menu().enable_menu_item(0);
+        right_click_menu.menu().enable_menu_item(1);
+        right_click_menu.menu().enable_menu_item(3);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    on_no_text_selected (
+    )
+    {
+        right_click_menu.menu().disable_menu_item(0);
+        right_click_menu.menu().disable_menu_item(1);
+        right_click_menu.menu().disable_menu_item(3);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    show (
+    )
+    {
+        drawable::show();
+        right_click_menu.show();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
     disable (
     )
     {
@@ -442,6 +576,7 @@ namespace dlib
         t.stop();
         has_focus = false;
         cursor_visible = false;
+        right_click_menu.disable();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -470,6 +605,7 @@ namespace dlib
         // font size
         rect.set_bottom(rect.top() + mfont->height()+ (style->get_padding(*mfont))*2);
         set_text(text_);
+        right_click_menu.set_rect(get_text_rect());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -563,16 +699,28 @@ namespace dlib
         unsigned long width
     )
     {        
+        auto_mutex M(m);
         if (width < style->get_padding(*mfont)*2)
             return;
 
-        m.lock();        
         rectangle old(rect);
 
         rect.set_right(rect.left() + width - 1); 
 
+        right_click_menu.set_rect(get_text_rect());
         parent.invalidate_rectangle(rect+old);
-        m.unlock();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    set_pos (
+        long x,
+        long y
+    )
+    {
+        drawable::set_pos(x,y);
+        right_click_menu.set_rect(get_text_rect());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -716,6 +864,7 @@ namespace dlib
                 move_cursor(l+1);
                 highlight_start = f;
                 highlight_end = l;
+                on_text_is_selected();
             }
             else
             {
@@ -751,6 +900,7 @@ namespace dlib
                 {
                     highlight_start = 0;
                     highlight_end = -1;
+                    on_no_text_selected();
                     parent.invalidate_rectangle(rect);
                 }
             }
@@ -764,6 +914,7 @@ namespace dlib
             shift_pos = -1;
             highlight_start = 0;
             highlight_end = -1;
+            on_no_text_selected();
 
             if (focus_lost_handler.is_set())
                 focus_lost_handler();
@@ -780,6 +931,11 @@ namespace dlib
         unsigned long state
     )
     {
+        // If the right click menu is up then we don't want to do anything with
+        // the keyboard ourselves.  Let the popup menu use the keyboard for now.
+        if (right_click_menu.popup_menu_visible())
+            return;
+
         const ustring space_str = convert_utf8_to_utf32(std::string(" \t\n"));
         const bool shift = (state&base_window::KBD_MOD_SHIFT) != 0;
         const bool ctrl = (state&base_window::KBD_MOD_CONTROL) != 0;
@@ -841,6 +997,7 @@ namespace dlib
                 {
                     highlight_start = 0;
                     highlight_end = -1;
+                    on_no_text_selected();
                     parent.invalidate_rectangle(rect);
                 }
 
@@ -879,6 +1036,7 @@ namespace dlib
                 {
                     highlight_start = 0;
                     highlight_end = -1;
+                    on_no_text_selected();
                     parent.invalidate_rectangle(rect);
                 }
             }
@@ -888,10 +1046,19 @@ namespace dlib
                 {
                     if (key == 'a')
                     {
-                        move_cursor(static_cast<long>(text_.size()));
-                        highlight_start = 0;
-                        highlight_end = static_cast<long>(text_.size()-1);
-                        parent.invalidate_rectangle(rect);
+                        on_select_all();
+                    }
+                    else if (key == 'c')
+                    {
+                        on_copy();
+                    }
+                    else if (key == 'v')
+                    {
+                        on_paste();
+                    }
+                    else if (key == 'x')
+                    {
+                        on_cut();
                     }
                 }
                 else if (key != '\n')
@@ -903,6 +1070,7 @@ namespace dlib
                         move_cursor(highlight_start+1);
                         highlight_start = 0;
                         highlight_end = -1;
+                        on_no_text_selected();
                         parent.invalidate_rectangle(rect);
                     }
                     else
@@ -929,14 +1097,7 @@ namespace dlib
                 // if something is highlighted then delete that
                 if (highlight_start <= highlight_end)
                 {
-                    text_ = text_.erase(highlight_start,highlight_end-highlight_start+1);
-                    move_cursor(highlight_start);
-                    highlight_start = 0;
-                    highlight_end = -1;
-
-                    // send out the text modified event
-                    if (text_modified_handler.is_set())
-                        text_modified_handler();
+                    on_delete_selected();
                 }
                 else if (cursor_pos != 0)
                 {
@@ -961,14 +1122,7 @@ namespace dlib
                 // if something is highlighted then delete that
                 if (highlight_start <= highlight_end)
                 {
-                    text_ = text_.erase(highlight_start,highlight_end-highlight_start+1);
-                    move_cursor(highlight_start);
-                    highlight_start = 0;
-                    highlight_end = -1;
-
-                    // send out the text modified event
-                    if (text_modified_handler.is_set())
-                        text_modified_handler();
+                    on_delete_selected();
                 }
                 else if (cursor_pos != static_cast<long>(text_.size()))
                 {
@@ -995,6 +1149,7 @@ namespace dlib
                 {
                     highlight_start = 0;
                     highlight_end = -1;
+                    on_no_text_selected();
                     parent.invalidate_rectangle(rect);
                 }
             }
@@ -1005,6 +1160,7 @@ namespace dlib
                 {
                     highlight_start = 0;
                     highlight_end = -1;
+                    on_no_text_selected();
                     parent.invalidate_rectangle(rect);
                 }
             }
@@ -1030,6 +1186,7 @@ namespace dlib
                 move_cursor(highlight_start+ustr.size());
                 highlight_start = 0;
                 highlight_end = -1;
+                on_no_text_selected();
                 parent.invalidate_rectangle(rect);
             }
             else
@@ -1118,6 +1275,11 @@ namespace dlib
                 highlight_start = 0;
                 highlight_end = -1;
             }
+
+            if (highlight_start > highlight_end)
+                on_no_text_selected();
+            else
+                on_text_is_selected();
 
             recent_movement = true;
             cursor_visible = true;

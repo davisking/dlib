@@ -1481,6 +1481,9 @@ namespace dlib
     class popup_menu_region : public drawable 
     {
         /*!
+            INITIAL VALUE
+                - popup_menu_visible() == false
+
             WHAT THIS OBJECT REPRESENTS
                 This object represents a region on a window where if the user
                 right clicks the mouse over this region a popup_menu pops up.
@@ -1523,6 +1526,24 @@ namespace dlib
                 - #left() == left()
                 - i.e. The location of the upper left corner of this widget stays the
                   same but its width and height are modified
+        !*/
+
+        void set_rect (
+            const rectangle& new_rect
+        );
+        /*!
+            ensures
+                - #get_rect() == new_rect
+        !*/
+
+        bool popup_menu_visible (
+        ) const;
+        /*!
+            ensures
+                - if (the popup menu is currently visible on the screen) then
+                    - returns true
+                - else
+                    - returns false
         !*/
 
         popup_menu& menu (
