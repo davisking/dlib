@@ -193,15 +193,15 @@ namespace dlib
         !*/
 
         // This insanity here is to work around a bug in visual studio 8.  
-        template <typename T, long N>
+        template <typename V, long N>
         struct vc_rebind
         {
-            typedef vector<T,N> type;
+            typedef vector<V,N> type;
         };
-            template <typename T, typename U, long N>
+            template <typename V, typename U, long N>
         struct vc_rebind_promote
         {
-            typedef vector<typename promote<T,U>::type,N> type;
+            typedef vector<typename promote<V,U>::type,N> type;
         };
 
     public:
@@ -585,15 +585,15 @@ namespace dlib
         !*/
 
         // This insanity here is to work around a bug in visual studio 8.  
-        template <typename T, long N>
+        template <typename V, long N>
         struct vc_rebind
         {
-            typedef vector<T,N> type;
+            typedef vector<V,N> type;
         };
-            template <typename T, typename U, long N>
+            template <typename V, typename U, long N>
         struct vc_rebind_promote
         {
-            typedef vector<typename promote<T,U>::type,N> type;
+            typedef vector<typename promote<V,U>::type,N> type;
         };
 
 
