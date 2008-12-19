@@ -3,7 +3,7 @@
 # information about it at http://www.cmake.org
 #
 
-# setting this makes CMake allow normal looking IF ELSE statements
+# setting this makes CMake allow normal looking if else statements
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 cmake_minimum_required(VERSION 2.4)
 if(COMMAND cmake_policy) 
@@ -14,21 +14,21 @@ endif()
 # make macros that can add #define directives to the entire project.  Not just 
 # to the dlib library itself.  I.e. to dlib and to any projects that depend
 # on dlib.
-MACRO ( add_global_define def_name )
+macro ( add_global_define def_name )
    if (NOT CMAKE_CXX_FLAGS MATCHES "-D${def_name}")
       set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D${def_name}" 
          CACHE STRING "Flags used by the compiler during all C++ builds." 
          FORCE)
    endif ()
-ENDMACRO()
-MACRO ( remove_global_define def_name )
+endmacro()
+macro ( remove_global_define def_name )
    if (CMAKE_CXX_FLAGS MATCHES " -D${def_name}")
       string (REGEX REPLACE " -D${def_name}" "" temp_var ${CMAKE_CXX_FLAGS}) 
       set (CMAKE_CXX_FLAGS "${temp_var}" 
          CACHE STRING "Flags used by the compiler during all C++ builds." 
          FORCE)
    endif ()
-ENDMACRO()
+endmacro()
 
 
 # Make sure ENABLE_ASSERTS is defined for debug builds
@@ -46,39 +46,46 @@ set (DLIB_ENABLE_STACK_TRACE_STR
 "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
 set (DLIB_ENABLE_ASSERTS_STR 
 "Enable this if you want to turn on the DLIB_ASSERT macro" )
+set (DLIB_ENABLE_SHARED_BUILD_STR
+"Enable this if you want to create a shared dlib library (.dll, .so)" )
 
-OPTION(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
-OPTION(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
-OPTION(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
-OPTION(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
+option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
+option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
+option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
+option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
+option(DLIB_ENABLE_SHARED_BUILD ${DLIB_ENABLE_SHARED_BUILD_STR} OFF)
 
 
-add_library(dlib all/source.cpp )
+if (DLIB_ENABLE_SHARED_BUILD)
+  add_library(dlib SHARED all/source.cpp )
+else ()
+  add_library(dlib STATIC all/source.cpp )
+endif ()
 
 
-IF (NOT DLIB_ISO_CPP_ONLY)
+if (NOT DLIB_ISO_CPP_ONLY)
    # we want to link to the right stuff depending on our platform.  
-   IF (WIN32 AND NOT CYGWIN) ###############################################################################
+   if (WIN32 AND NOT CYGWIN) ###############################################################################
       if (DLIB_NO_GUI_SUPPORT)
          set (dlib_needed_libraries ws2_32)
       else()
          set (dlib_needed_libraries ws2_32 comctl32 gdi32 imm32)
       endif()
-   ELSEIF(APPLE) ############################################################################
-      FIND_LIBRARY(pthreadlib pthread)
+   elseif(APPLE) ############################################################################
+      find_library(pthreadlib pthread)
       set (dlib_needed_libraries ${pthreadlib})
 
       if (NOT DLIB_NO_GUI_SUPPORT)
-         FIND_LIBRARY(xlib X11)
+         find_library(xlib X11)
          # make sure X11 is in the include path
-         FIND_PATH(xlib_path Xlib.h
+         find_path(xlib_path Xlib.h
             PATHS 
             /Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include
             PATH_SUFFIXES X11
             )
          if (xlib AND xlib_path)
-            GET_FILENAME_COMPONENT(x11_path ${xlib_path} PATH CACHE)
-            INCLUDE_DIRECTORIES(${x11_path})
+            get_filename_component(x11_path ${xlib_path} PATH CACHE)
+            include_directories(${x11_path})
             set(dlib_needed_libraries ${dlib_needed_libraries} ${xlib} )
          else()
             message(" ***********************************************************************************")
@@ -89,27 +96,27 @@ IF (NOT DLIB_ISO_CPP_ONLY)
          endif()
       endif()
 
-      MARK_AS_ADVANCED(pthreadlib xlib xlib_path x11_path)
-   ELSE () ##################################################################################
-      FIND_LIBRARY(pthreadlib pthread)
+      mark_as_advanced(pthreadlib xlib xlib_path x11_path)
+   else () ##################################################################################
+      find_library(pthreadlib pthread)
       set (dlib_needed_libraries ${pthreadlib})
 
       # link to the nsl library if it exists.  this is something you need sometimes 
-      FIND_LIBRARY(nsllib nsl)
+      find_library(nsllib nsl)
       if (nsllib)
          set (dlib_needed_libraries ${dlib_needed_libraries} ${nsllib})
       endif ()
 
       # link to the socket library if it exists.  this is something you need on solaris
-      FIND_LIBRARY(socketlib socket)
+      find_library(socketlib socket)
       if (socketlib)
          set (dlib_needed_libraries ${dlib_needed_libraries} ${socketlib})
       endif ()
 
       if (NOT DLIB_NO_GUI_SUPPORT)
-         INCLUDE(FindX11)
+         include(FindX11)
          if (X11_FOUND)
-            INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
+            include_directories(${X11_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${X11_LIBRARIES})
          else()
             message(" ***********************************************************************************")
@@ -120,30 +127,30 @@ IF (NOT DLIB_ISO_CPP_ONLY)
          endif()
       endif()
 
-      MARK_AS_ADVANCED(nsllib pthreadlib socketlib)
-   ENDIF () ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
+      mark_as_advanced(nsllib pthreadlib socketlib)
+   endif () ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
 
 
    # try to find libpng 
-   SET(ZLIB_FIND_QUIETLY ON)
-   SET(PNG_FIND_QUIETLY ON)
-   INCLUDE(FindPNG)
+   set(ZLIB_FIND_QUIETLY ON)
+   set(PNG_FIND_QUIETLY ON)
+   include(FindPNG)
    if (PNG_FOUND)
-      INCLUDE_DIRECTORIES(${PNG_PNG_INCLUDE_DIR})
+      include_directories(${PNG_PNG_INCLUDE_DIR})
       set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
       add_global_define(DLIB_PNG_SUPPORT)
    endif()
 
 
-   TARGET_LINK_LIBRARIES(dlib ${dlib_needed_libraries} )
+   target_link_libraries(dlib ${dlib_needed_libraries} )
 
-ENDIF ()
+endif ()
 
 
 #test for some things that really should be true about the compiler
-INCLUDE(TestForSTDNamespace)
-INCLUDE(TestForANSIStreamHeaders)
+include(TestForSTDNamespace)
+include(TestForANSIStreamHeaders)
 
 
 if (DLIB_ISO_CPP_ONLY)
