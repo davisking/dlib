@@ -186,6 +186,22 @@ namespace
             DLIB_CASSERT(vl2.cross(vl3).length() == 12,"");
             DLIB_CASSERT(vl3.cross(vl2).length() == 12,"");
 
+
+            matrix<double> m(3,3);
+            m = 1,2,3,
+                4,5,6,
+                7,8,9;
+
+            vd3.x() = 2;
+            vd3.y() = 3;
+            vd3.z() = 4;
+
+            vd3 = m*vd3;
+
+            DLIB_CASSERT(vd3.x() == 1*2 + 2*3 + 3*4,vd3.x() << " == " << (1*2 + 2*3 + 3*4));
+            DLIB_CASSERT(vd3.y() == 4*2 + 5*3 + 6*4,"");
+            DLIB_CASSERT(vd3.z() == 7*2 + 8*3 + 9*4,"");
+
         }
 
     }

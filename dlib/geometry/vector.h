@@ -10,6 +10,7 @@
 #include <functional>
 #include <iostream>
 #include "../matrix/matrix.h"
+#include <limits>
 
 namespace dlib
 {
@@ -19,6 +20,37 @@ namespace dlib
         long NR = 3
         >
     class vector;
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename U, typename enabled = void> 
+    struct promote;
+
+    template <typename T, typename U, typename enabled = void>
+    struct largest_type
+    {
+        typedef T type;
+    };
+
+    template <typename T, typename U>
+    struct largest_type<T,U, typename enable_if_c<(sizeof(T) < sizeof(U))>::type>
+    {
+        typedef U type;
+    };
+
+    template <typename T, typename U> 
+    struct promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer == std::numeric_limits<U>::is_integer>::type> 
+    { 
+        // If both T and U are both either integeral or non-integral then just
+        // use the biggest one
+        typedef typename largest_type<T,U>::type type;
+    };
+
+    template <typename T, typename U> 
+    struct promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer != std::numeric_limits<U>::is_integer>::type> 
+    { 
+        typedef double type;
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -52,8 +84,10 @@ namespace dlib
             const matrix_exp<EXP>& m
         )
         {
-            dest.x() = static_cast<T>(m(0));
-            dest.y() = static_cast<T>(m(1));
+            T x = static_cast<T>(m(0));
+            T y = static_cast<T>(m(1));
+            dest.x() = x;
+            dest.y() = y;
         }
 
         template <typename EXP>
@@ -62,9 +96,13 @@ namespace dlib
             const matrix_exp<EXP>& m
         )
         {
-            dest.x() = static_cast<T>(m(0));
-            dest.y() = static_cast<T>(m(1));
-            dest.z() = static_cast<T>(m(2));
+            T x = static_cast<T>(m(0));
+            T y = static_cast<T>(m(1));
+            T z = static_cast<T>(m(2));
+
+            dest.x() = x;
+            dest.y() = y;
+            dest.z() = z;
         }
     };
 
@@ -122,18 +160,18 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    class vector<T,3> 
+    class vector<T,3> : public matrix<T,3,1>
     {
         /*!
             INITIAL VALUE
-                - x_value == 0
-                - y_value == 0  
-                - z_value == 0 
+                - x() == 0
+                - y() == 0
+                - z() == 0
 
             CONVENTION
-                - x_value == x() 
-                - y_value == y() 
-                - z_value == z()
+                - (*this)(0) == x() 
+                - (*this)(1) == y() 
+                - (*this)(2) == z() 
 
         !*/
 
@@ -243,9 +281,9 @@ namespace dlib
 
         // ---------------------------------------
 
-        template <typename U>
+        template <typename U, long N>
         vector& operator = (
-            const vector<U,3>& item
+            const vector<U,N>& item
         )
         {
             vector_assign_helper<T,U>::assign(*this, item);
@@ -266,22 +304,22 @@ namespace dlib
 
         // ---------------------------------------
 
-        T length(
+        double length(
         ) const 
         { 
-            return (T)std::sqrt((double)(x()*x() + y()*y() + z()*z())); 
+            return std::sqrt((double)(x()*x() + y()*y() + z()*z())); 
         }
 
         // ---------------------------------------
 
-        vector normalize (
+        vector<double,3> normalize (
         ) const 
         {
-            T tmp = (T)std::sqrt((double)(x()*x() + y()*y() + z()*z()));
-            return vector ( x()/tmp,
-                            y()/tmp,
-                            z()/tmp
-                            );
+            const double tmp = std::sqrt((double)(x()*x() + y()*y() + z()*z()));
+            return vector<double,3> ( x()/tmp,
+                                      y()/tmp,
+                                      z()/tmp
+            );
         }
 
         // ---------------------------------------
@@ -289,7 +327,7 @@ namespace dlib
         T& x (
         ) 
         { 
-            return x_value;
+            return (*this)(0);
         }
 
         // ---------------------------------------
@@ -297,7 +335,7 @@ namespace dlib
         T& y (
         ) 
         { 
-            return y_value;
+            return (*this)(1);
         }
 
         // ---------------------------------------
@@ -305,7 +343,7 @@ namespace dlib
         T& z (
         ) 
         { 
-            return z_value;
+            return (*this)(2);
         }
 
         // ---------------------------------------
@@ -313,7 +351,7 @@ namespace dlib
         const T& x (
         ) const
         { 
-            return x_value;
+            return (*this)(0);
         }
 
         // ---------------------------------------
@@ -321,7 +359,7 @@ namespace dlib
         const T& y (
         ) const 
         { 
-            return y_value;
+            return (*this)(1);
         }
 
         // ---------------------------------------
@@ -329,7 +367,7 @@ namespace dlib
         const T& z (
         ) const
         { 
-            return z_value;
+            return (*this)(2);
         }
 
         // ---------------------------------------
@@ -343,11 +381,24 @@ namespace dlib
 
         // ---------------------------------------
 
-        vector cross (
-            const vector& rhs
+        template <typename U, long N>
+        typename promote<T,U>::type dot (
+            const vector<U,N>& rhs
+        ) const 
+        { 
+            return x()*rhs.x() + y()*rhs.y() + z()*rhs.z();
+        }
+
+        // ---------------------------------------
+
+        template <typename U, long N>
+        vector<typename promote<T,U>::type,3> cross (
+            const vector<U,N>& rhs
         ) const
         {
-            return vector (
+            typedef vector<typename promote<T,U>::type,3> ret_type;
+
+            return ret_type (
                 y()*rhs.z() - z()*rhs.y(),
                 z()*rhs.x() - x()*rhs.z(),
                 x()*rhs.y() - y()*rhs.x()
@@ -404,11 +455,33 @@ namespace dlib
 
         // ---------------------------------------
 
+        template <typename U, long N>
+        vector<typename promote<T,U>::type,3> operator + (
+            const vector<U,N>& rhs
+        ) const
+        {
+            typedef vector<typename promote<T,U>::type,3> ret_type;
+            return ret_type(x()+rhs.x(), y()+rhs.y(), z()+rhs.z());
+        }
+
+        // ---------------------------------------
+
         vector operator + (
             const vector& rhs
         ) const
         {
             return vector(x()+rhs.x(), y()+rhs.y(), z()+rhs.z());
+        }
+
+        // ---------------------------------------
+
+        template <typename U, long N>
+        vector<typename promote<T,U>::type,3> operator - (
+            const vector<U,N>& rhs
+        ) const
+        {
+            typedef vector<typename promote<T,U>::type,3> ret_type;
+            return ret_type(x()-rhs.x(), y()-rhs.y(), z()-rhs.z());
         }
 
         // ---------------------------------------
@@ -422,11 +495,13 @@ namespace dlib
 
         // ---------------------------------------
 
-        vector operator / (
-            const T& val
+        template <typename U>
+        vector<typename promote<T,U>::type,3> operator / (
+            const U& val
         ) const
         {
-            return vector(x()/val, y()/val, z()/val);
+            typedef vector<typename promote<T,U>::type,3> ret_type;
+            return ret_type(x()/val, y()/val, z()/val);
         }
 
         // ---------------------------------------
@@ -451,49 +526,32 @@ namespace dlib
 
         // ---------------------------------------
 
-        template <long NRm, long NC, typename MM, typename l>
-        operator matrix<T,NRm, NC, MM,l> (
-        ) const
-        {
-            matrix<T,NRm, NC, MM,l> m(3,1);
-            m(0) = x();
-            m(1) = y();
-            m(2) = z();
-            return m;
-        }
-
-        // ---------------------------------------
-
         void swap (
             vector& item
         )
         {
-            dlib::exchange(x_value, item.x_value);
-            dlib::exchange(y_value, item.y_value);
-            dlib::exchange(z_value, item.z_value);
+            dlib::exchange(x(), item.x());
+            dlib::exchange(y(), item.y());
+            dlib::exchange(z(), item.z());
         }
 
         // ---------------------------------------
 
-    private:
-        T x_value;
-        T y_value;
-        T z_value;
     };
 
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    class vector<T,2> 
+    class vector<T,2> : public matrix<T,2,1>
     {
         /*!
             INITIAL VALUE
-                - x_value == 0
-                - y_value == 0  
+                - x() == 0
+                - y() == 0
 
             CONVENTION
-                - x_value == x() 
-                - y_value == y() 
+                - (*this)(0) == x() 
+                - (*this)(1) == y() 
                 - z() == 0
         !*/
 
@@ -597,9 +655,9 @@ namespace dlib
 
         // ---------------------------------------
 
-        template <typename U>
+        template <typename U, long N>
         vector& operator = (
-            const vector<U,2>& item
+            const vector<U,N>& item
         )
         {
             vector_assign_helper<T,U>::assign(*this, item);
@@ -619,21 +677,21 @@ namespace dlib
 
         // ---------------------------------------
 
-        T length(
+        double length(
         ) const 
         { 
-            return (T)std::sqrt((double)(x()*x() + y()*y())); 
+            return std::sqrt((double)(x()*x() + y()*y())); 
         }
 
         // ---------------------------------------
 
-        vector normalize (
+        vector<double,2> normalize (
         ) const 
         {
-            T tmp = (T)std::sqrt((double)(x()*x() + y()*y()));
-            return vector ( x()/tmp,
-                            y()/tmp
-                            );
+            const double tmp = std::sqrt((double)(x()*x() + y()*y()));
+            return vector<double,2> ( x()/tmp,
+                                      y()/tmp
+                                        );
         }
 
         // ---------------------------------------
@@ -641,7 +699,7 @@ namespace dlib
         T& x (
         ) 
         { 
-            return x_value;
+            return (*this)(0);
         }
 
         // ---------------------------------------
@@ -649,7 +707,7 @@ namespace dlib
         T& y (
         ) 
         { 
-            return y_value;
+            return (*this)(1);
         }
 
         // ---------------------------------------
@@ -657,7 +715,7 @@ namespace dlib
         const T& x (
         ) const
         { 
-            return x_value;
+            return (*this)(0);
         }
 
         // ---------------------------------------
@@ -665,7 +723,7 @@ namespace dlib
         const T& y (
         ) const 
         { 
-            return y_value;
+            return (*this)(1);
         }
 
         // ---------------------------------------
@@ -683,6 +741,16 @@ namespace dlib
         ) const 
         { 
             return x()*rhs.x() + y()*rhs.y();
+        }
+
+        // ---------------------------------------
+
+        template <typename U, long N>
+        typename promote<T,U>::type dot (
+            const vector<U,N>& rhs
+        ) const 
+        { 
+            return x()*rhs.x() + y()*rhs.y() + z()*rhs.z();
         }
 
         // ---------------------------------------
@@ -740,6 +808,17 @@ namespace dlib
 
         // ---------------------------------------
 
+        template <typename U, long N>
+        vector<typename promote<T,U>::type,N> operator + (
+            const vector<U,N>& rhs
+        ) const
+        {
+            typedef vector<typename promote<T,U>::type,N> ret_type;
+            return ret_type(*this) + ret_type(rhs);
+        }
+
+        // ---------------------------------------
+
         vector operator - (
             const vector& rhs
         ) const
@@ -749,11 +828,24 @@ namespace dlib
 
         // ---------------------------------------
 
-        vector operator / (
-            const T& val
+        template <typename U, long N>
+        vector<typename promote<T,U>::type,N> operator - (
+            const vector<U,N>& rhs
         ) const
         {
-            return vector(x()/val, y()/val);
+            typedef vector<typename promote<T,U>::type,N> ret_type;
+            return ret_type(*this) - ret_type(rhs);
+        }
+
+        // ---------------------------------------
+
+        template <typename U>
+        vector<typename promote<T,U>::type,2> operator / (
+            const U& val
+        ) const
+        {
+            typedef vector<typename promote<T,U>::type,2> ret_type;
+            return ret_type(x()/val, y()/val);
         }
 
         // ---------------------------------------
@@ -796,33 +888,23 @@ namespace dlib
 
         // ---------------------------------------
 
-        template <long NRm, long NC, typename MM, typename l>
-        operator matrix<T,NRm, NC, MM,l> (
-        ) const
-        {
-            matrix<T,NRm, NC, MM,l> m(2,1);
-            m(0) = x();
-            m(1) = y();
-            return m;
-        }
-
-        // ---------------------------------------
-
         void swap (
             vector& item
         )
         {
-            dlib::exchange(x_value, item.x_value);
-            dlib::exchange(y_value, item.y_value);
+            dlib::exchange(x(), item.x());
+            dlib::exchange(y(), item.y());
         }
 
         // ---------------------------------------
 
-        vector<T,3> cross (
-            const vector<T,3>& rhs
+        template <typename U, long N>
+        vector<typename promote<T,U>::type,3> cross (
+            const vector<U,N>& rhs
         ) const
         {
-            return vector<T,3> (
+            typedef vector<typename promote<T,U>::type,3> ret_type;
+            return ret_type (
                 y()*rhs.z(),
                 - x()*rhs.z(),
                 x()*rhs.y() - y()*rhs.x()
@@ -831,17 +913,15 @@ namespace dlib
 
         // ---------------------------------------
 
-    private:
-        T x_value;
-        T y_value;
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+
     template <typename T, typename U>
-    inline const vector<T,2> operator* (
+    inline typename disable_if<is_matrix<U>, const vector<T,2> >::type operator* (
         const vector<T,2>& v,
         const U& s
     )
@@ -852,7 +932,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename U>
-    inline const vector<T,2> operator* (
+    inline typename disable_if<is_matrix<U>, const vector<T,2> >::type operator* (
         const U& s,
         const vector<T,2>& v
     )
@@ -863,7 +943,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename U>
-    inline const vector<T,3> operator* (
+    inline typename disable_if<is_matrix<U>, const vector<T,3> >::type operator* (
         const vector<T,3>& v,
         const U& s
     )
@@ -874,7 +954,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename U>
-    inline const vector<T,3> operator* (
+    inline typename disable_if<is_matrix<U>, const vector<T,3> >::type operator* (
         const U& s,
         const vector<T,3>& v
     )

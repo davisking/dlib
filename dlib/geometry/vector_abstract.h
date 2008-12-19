@@ -14,7 +14,7 @@ namespace dlib
         typename T,
         long NR = 3
         >
-    class vector
+    class vector : public matrix<T,NR,1>
     {
         /*!
             REQUIREMENTS ON T
@@ -127,21 +127,6 @@ namespace dlib
                         - #z() == m(2)
                     - else
                         - #z() == 0
-        !*/
-
-        operator matrix<T> (
-        ) const;
-        /*!
-            ensures
-                - provides automatic conversions from a vector object to a column 
-                  matrix
-                - returns a matrix object m such that:
-                    - m.nr() == NR
-                    - m.nc() == 1
-                    - m(0) == x()
-                    - m(1) == y()
-                    - if (NR == 3) then
-                        - m(2) == z()
         !*/
 
         ~vector (
