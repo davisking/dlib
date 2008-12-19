@@ -182,10 +182,13 @@ namespace dlib
             const EXP& exp
         ) : ref_(exp) {}
 
-        matrix_exp(const matrix_exp& item) : ref_(item.ref_) {}
 
     private:
 
+        // you can't copy a matrix_exp at all.  Things that inherit from it must
+        // define their own copy constructors that call the above protected 
+        // constructor so that the reference below is maintained correctly.
+        matrix_exp(const matrix_exp& item);
         matrix_exp& operator= (const matrix_exp&);
 
         const exp_type& ref_;
@@ -310,6 +313,14 @@ namespace dlib
         typedef typename conditional_matrix_temp<const LHS,lhs_is_costly == false>::type LHS_ref_type;
         typedef typename conditional_matrix_temp<const RHS,rhs_is_costly == false>::type RHS_ref_type;
 
+        matrix_multiply_exp (
+            const matrix_multiply_exp& item
+        ) : matrix_exp<matrix_multiply_exp>(*this), lhs(item.lhs), rhs(item.rhs) {}
+
+        // This constructor exists simply for the purpose of causing a compile time error if
+        // someone tries to create an instance of this object with the wrong kind of objects.
+        template <typename T1, typename T2>
+        matrix_multiply_exp (T1,T2); 
 
         inline matrix_multiply_exp (
             const LHS& lhs_,
@@ -409,11 +420,14 @@ namespace dlib
         const static long NC = matrix_traits<matrix_add_exp>::NC;
         const static long cost = matrix_traits<matrix_add_exp>::cost;
 
-        /*
         matrix_add_exp (
             const matrix_add_exp& item
         ) : matrix_exp<matrix_add_exp>(*this), lhs(item.lhs), rhs(item.rhs) {}
-        */
+
+        // This constructor exists simply for the purpose of causing a compile time error if
+        // someone tries to create an instance of this object with the wrong kind of objects.
+        template <typename T1, typename T2>
+        matrix_add_exp (T1,T2); 
 
         matrix_add_exp (
             const LHS& lhs_,
@@ -514,6 +528,14 @@ namespace dlib
         const static long NC = matrix_traits<matrix_subtract_exp>::NC;
         const static long cost = matrix_traits<matrix_subtract_exp>::cost;
 
+        matrix_subtract_exp (
+            const matrix_subtract_exp& item
+        ) : matrix_exp<matrix_subtract_exp>(*this), lhs(item.lhs), rhs(item.rhs) {}
+
+        // This constructor exists simply for the purpose of causing a compile time error if
+        // someone tries to create an instance of this object with the wrong kind of objects.
+        template <typename T1, typename T2>
+        matrix_subtract_exp (T1,T2); 
 
         matrix_subtract_exp (
             const LHS& lhs_,
@@ -618,6 +640,15 @@ namespace dlib
         const static long cost = matrix_traits<matrix_div_scal_exp>::cost;
 
         matrix_div_scal_exp (
+            const matrix_div_scal_exp& item
+        ) : matrix_exp<matrix_div_scal_exp>(*this), m(item.m), s(item.s) {}
+
+        // This constructor exists simply for the purpose of causing a compile time error if
+        // someone tries to create an instance of this object with the wrong kind of objects.
+        template <typename T1>
+        matrix_div_scal_exp (T1, const S&); 
+
+        matrix_div_scal_exp (
             const M& m_,
             const S& s_
         ) :
@@ -700,6 +731,15 @@ namespace dlib
         const static long NR = matrix_traits<matrix_mul_scal_exp>::NR;
         const static long NC = matrix_traits<matrix_mul_scal_exp>::NC;
         const static long cost = matrix_traits<matrix_mul_scal_exp>::cost;
+
+        matrix_mul_scal_exp (
+            const matrix_mul_scal_exp& item
+        ) : matrix_exp<matrix_mul_scal_exp>(*this), m(item.m), s(item.s) {}
+
+        // This constructor exists simply for the purpose of causing a compile time error if
+        // someone tries to create an instance of this object with the wrong kind of objects.
+        template <typename T1>
+        matrix_mul_scal_exp (T1, const S&); 
 
         matrix_mul_scal_exp (
             const M& m_,
