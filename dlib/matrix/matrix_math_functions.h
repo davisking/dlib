@@ -17,45 +17,45 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#define DLIB_MATRIX_SIMPLE_STD_FUNCTION(name) struct op_##name {                \
+#define DLIB_MATRIX_SIMPLE_STD_FUNCTION(name,extra_cost) struct op_##name {     \
     template <typename EXP>                                                     \
     struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>          \
     {                                                                           \
+        const static long cost = EXP::cost+(extra_cost);                        \
         typedef typename EXP::type type;                                        \
         template <typename M>                                                   \
         static type apply ( const M& m, long r, long c)                         \
         { return static_cast<type>(std::name(m(r,c))); }                        \
     };};                                                                        \
     template < typename EXP >                                                   \
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_##name> > name (       \
+    const matrix_unary_exp<EXP,op_##name> name (                                \
         const matrix_exp<EXP>& m)                                               \
     {                                                                           \
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_##name> exp;                \
-        return matrix_exp<exp>(exp(m));                                         \
+        return matrix_unary_exp<EXP,op_##name>(m.ref());                        \
     }                                                                           
 
 // ----------------------------------------------------------------------------------------
 
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(abs)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(sqrt)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(log)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(log10)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(exp)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(abs,3)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(sqrt,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(log,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(log10,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(exp,7)
 
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(conj)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(conj,1)
 
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(ceil)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(floor)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(ceil,2)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(floor,20)
 
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(sin)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(cos)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(tan)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(sinh)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(cosh)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(tanh)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(asin)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(acos)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(sin,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(cos,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(tan,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(sinh,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(cosh,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(tanh,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(asin,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(acos,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
 
 // ----------------------------------------------------------------------------------------
 
@@ -64,6 +64,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -76,12 +77,11 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_sigmoid> > sigmoid (
+    const matrix_unary_exp<EXP,op_sigmoid> sigmoid (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_sigmoid> exp;
-        return matrix_exp<exp>(exp(m));
+        return matrix_unary_exp<EXP,op_sigmoid>(m.ref());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -91,6 +91,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost+1;
             typedef typename EXP::type type;
             template <typename M, typename T>
             static type apply ( const M& m, const T& eps, long r, long c)
@@ -107,28 +108,27 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type,op_round_zeros> > round_zeros (
+    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_round_zeros> round_zeros (
         const matrix_exp<EXP>& m
     )
     {
         // you can only round matrices that contain built in scalar types like double, long, float, etc...
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
-        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type, op_round_zeros> exp;
-        return matrix_exp<exp>(exp(m,10*std::numeric_limits<typename EXP::type>::epsilon()));
+        typedef matrix_scalar_binary_exp<EXP,typename EXP::type, op_round_zeros> exp;
+        return exp(m.ref(),10*std::numeric_limits<typename EXP::type>::epsilon());
     }
 
     template <
         typename EXP
         >
-    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type,op_round_zeros> > round_zeros (
+    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_round_zeros> round_zeros (
         const matrix_exp<EXP>& m,
         typename EXP::type eps 
     )
     {
         // you can only round matrices that contain built in scalar types like double, long, float, etc...
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
-        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type, op_round_zeros> exp;
-        return matrix_exp<exp>(exp(m,eps));
+        return matrix_scalar_binary_exp<EXP,typename EXP::type, op_round_zeros>(m.ref(),eps);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -138,6 +138,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost+2;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -151,12 +152,11 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_cubed> > cubed (
+    const matrix_unary_exp<EXP,op_cubed> cubed (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_cubed> exp;
-        return matrix_exp<exp>(exp(m));
+        return matrix_unary_exp<EXP,op_cubed>(m.ref());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -166,6 +166,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost+1;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -179,12 +180,11 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_squared> > squared (
+    const matrix_unary_exp<EXP,op_squared> squared (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_squared> exp;
-        return matrix_exp<exp>(exp(m));
+        return matrix_unary_exp<EXP,op_squared>(m.ref());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -194,6 +194,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost+4;
             typedef typename EXP::type type;
             template <typename M, typename S>
             static type apply ( const M& m, const S& s, long r, long c)
@@ -205,7 +206,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         typename EXP,
         typename S
         >
-    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type,op_pow> > pow (
+    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_pow> pow (
         const matrix_exp<EXP>& m,
         const S& s
     )
@@ -216,8 +217,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
                 is_same_type<typename EXP::type,double>::value == true || 
                 is_same_type<typename EXP::type,long double>::value == true 
         ));
-        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type,op_pow> exp;
-        return matrix_exp<exp>(exp(m,s));
+        return matrix_scalar_binary_exp<EXP,typename EXP::type,op_pow>(m.ref(),s);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -227,6 +227,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost+2;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -243,7 +244,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_reciprocal> > reciprocal (
+    const matrix_unary_exp<EXP,op_reciprocal> reciprocal (
         const matrix_exp<EXP>& m
     )
     {
@@ -253,8 +254,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
                 is_same_type<typename EXP::type,double>::value == true || 
                 is_same_type<typename EXP::type,long double>::value == true 
         ));
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_reciprocal> exp;
-        return matrix_exp<exp>(exp(m));
+        return matrix_unary_exp<EXP,op_reciprocal>(m.ref());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -264,6 +264,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost+1;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, const type& s, long r, long c)
@@ -276,7 +277,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type,op_normalize> > normalize (
+    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_normalize> normalize (
         const matrix_exp<EXP>& m
     )
     {
@@ -286,13 +287,13 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
                 is_same_type<typename EXP::type,double>::value == true || 
                 is_same_type<typename EXP::type,long double>::value == true 
         ));
-        typedef matrix_scalar_binary_exp<matrix_exp<EXP>,typename EXP::type, op_normalize> exp;
+        typedef matrix_scalar_binary_exp<EXP,typename EXP::type, op_normalize> exp;
 
         typename EXP::type temp = std::sqrt(sum(squared(m)));
         if (temp != 0.0)
             temp = 1.0/temp;
 
-        return matrix_exp<exp>(exp(m,temp));
+        return exp(m.ref(),temp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -302,6 +303,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP, typename enabled = void>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost+3;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -314,6 +316,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         struct op<EXP,typename enable_if_c<std::numeric_limits<typename EXP::type>::is_integer>::type > 
                 : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -326,14 +329,14 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_round> > round (
+    const matrix_unary_exp<EXP,op_round> round (
         const matrix_exp<EXP>& m
     )
     {
         // you can only round matrices that contain built in scalar types like double, long, float, etc...
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_round> exp;
-        return matrix_exp<exp>(exp(m));
+        typedef matrix_unary_exp<EXP,op_round> exp;
+        return exp(m.ref());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -343,6 +346,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP1, typename EXP2>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP1,EXP2>
         {
+            const static long cost = EXP1::cost+EXP2::cost+1;
             typedef std::complex<typename EXP1::type> type;
 
             template <typename M1, typename M2>
@@ -355,7 +359,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         typename EXP1,
         typename EXP2
         >
-    const matrix_exp<matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_complex_matrix> > complex_matrix (
+    const matrix_binary_exp<EXP1,EXP2,op_complex_matrix> complex_matrix (
         const matrix_exp<EXP1>& real_part,
         const matrix_exp<EXP2>& imag_part 
     )
@@ -373,8 +377,8 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
             << "\n\timag_part.nr(): " << imag_part.nr()
             << "\n\timag_part.nc(): " << imag_part.nc() 
             );
-        typedef matrix_binary_exp<matrix_exp<EXP1>,matrix_exp<EXP2>,op_complex_matrix> exp;
-        return matrix_exp<exp>(exp(real_part,imag_part));
+        typedef matrix_binary_exp<EXP1,EXP2,op_complex_matrix> exp;
+        return exp(real_part.ref(),imag_part.ref());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -384,6 +388,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost+2;
             typedef typename EXP::type::value_type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -394,12 +399,12 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_norm> > norm (
+    const matrix_unary_exp<EXP,op_norm> norm (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_norm> exp;
-        return matrix_exp<exp>(exp(m));
+        typedef matrix_unary_exp<EXP,op_norm> exp;
+        return exp(m.ref());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -409,6 +414,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost;
             typedef typename EXP::type::value_type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -419,12 +425,12 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_real> > real (
+    const matrix_unary_exp<EXP,op_real> real (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_real> exp;
-        return matrix_exp<exp>(exp(m));
+        typedef matrix_unary_exp<EXP,op_real> exp;
+        return exp(m.ref());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -434,6 +440,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
+            const static long cost = EXP::cost;
             typedef typename EXP::type::value_type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -444,12 +451,12 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan)
     template <
         typename EXP
         >
-    const matrix_exp<matrix_unary_exp<matrix_exp<EXP>,op_imag> > imag (
+    const matrix_unary_exp<EXP,op_imag> imag (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<matrix_exp<EXP>,op_imag> exp;
-        return matrix_exp<exp>(exp(m));
+        typedef matrix_unary_exp<EXP,op_imag> exp;
+        return exp(m.ref());
     }
 
 // ----------------------------------------------------------------------------------------

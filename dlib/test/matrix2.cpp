@@ -300,7 +300,13 @@ namespace
         DLIB_CASSERT((round(m2*m1) == identity_matrix<double,4>()),"");
         DLIB_CASSERT((round(tmp(m2*m1)) == identity_matrix<double,4>()),"");
 
-        DLIB_CASSERT(round(m2*10000) == round(inv(m1)*10000),"");
+        DLIB_CASSERT(round(m2*10000) == round(inv(m1)*10000),
+                     round(m2*10000) - round(inv(m1)*10000)
+                     << "\n\n" << round(m2*10000)
+                     << "\n\n" << round(inv(m1)*10000)
+                     << "\n\n" << m2 
+                     << "\n\n" << inv(m1) 
+                     );
         DLIB_CASSERT(m1 == abs(-1*m1),"");
         DLIB_CASSERT(abs(m2) == abs(-1*m2),"");
 

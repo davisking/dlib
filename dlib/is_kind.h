@@ -45,7 +45,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T>
+    template <typename T, typename helper = void>
     struct is_matrix : public default_is_kind_value  
     {
         /*!
@@ -54,6 +54,9 @@ namespace dlib
             - else
                 - is_matrix<T>::value == false
         !*/
+
+        // Don't set the helper to anything.  Just let it be void.
+        ASSERT_ARE_SAME_TYPE(helper,void);
     };
 
 // ----------------------------------------------------------------------------------------
