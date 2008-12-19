@@ -2071,9 +2071,9 @@ namespace dlib
         parent.invalidate_rectangle(rect+old);
 
         const double old_scale = scale;
-        const vector<double> old_gr_orig(gr_orig);
+        const vector<double,2> old_gr_orig(gr_orig);
         scale = min_scale;
-        gr_orig = vector<double>(0,0,0);
+        gr_orig = vector<double,2>(0,0);
         lr_point = gui_to_graph_space(point(display_rect_.right(),display_rect_.bottom()));
         scale = old_scale;
 
@@ -2148,24 +2148,22 @@ namespace dlib
 
     point zoomable_region::
     graph_to_gui_space (
-        const vector<double>& p
+        const vector<double,2>& p
     ) const
     {
         const point rect_corner(display_rect_.left(), display_rect_.top());
-        const dlib::vector<double> v(p);
-        return (v - gr_orig)*scale + rect_corner;
+        return (p - gr_orig)*scale + rect_corner;
     }
 
 // ----------------------------------------------------------------------------------------
 
-    vector<double> zoomable_region::
+    vector<double,2> zoomable_region::
     gui_to_graph_space (
         const point& p
     ) const
     {
         const point rect_corner(display_rect_.left(), display_rect_.top());
-        const dlib::vector<double> v(p - rect_corner);
-        return v/scale + gr_orig;
+        return (p - rect_corner)/scale + gr_orig;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2217,7 +2215,7 @@ namespace dlib
 
     void zoomable_region::
     center_display_at_graph_point (
-        const vector<double>& p
+        const vector<double,2>& p
     )
     {
         // find the point in the center of the graph area
@@ -2363,11 +2361,11 @@ namespace dlib
     void zoomable_region::
     adjust_origin (
         const point& gui_p,
-        const vector<double>& graph_p
+        const vector<double,2>& graph_p
     )
     {
         const point rect_corner(display_rect_.left(), display_rect_.top());
-        const dlib::vector<double> v(gui_p - rect_corner);
+        const dlib::vector<double,2> v(gui_p - rect_corner);
         gr_orig = graph_p - v/scale;
 
 
@@ -2380,8 +2378,8 @@ namespace dlib
         // make sure the lower right corner of the display_rect_ doesn't map to a point beyond lr_point
         point lr_rect_corner(display_rect_.right(), display_rect_.bottom());
         point p = graph_to_gui_space(lr_point);
-        vector<double> lr_rect_corner_graph_space(gui_to_graph_space(lr_rect_corner));
-        vector<double> delta(lr_point - lr_rect_corner_graph_space);
+        vector<double,2> lr_rect_corner_graph_space(gui_to_graph_space(lr_rect_corner));
+        vector<double,2> delta(lr_point - lr_rect_corner_graph_space);
         if (lr_rect_corner.x() > p.x())
         {
             gr_orig.x() += delta.x();
@@ -2393,7 +2391,7 @@ namespace dlib
         }
 
 
-        const vector<double> ul_rect_corner_graph_space(gui_to_graph_space(rect_corner));
+        const vector<double,2> ul_rect_corner_graph_space(gui_to_graph_space(rect_corner));
         lr_rect_corner_graph_space = gui_to_graph_space(lr_rect_corner);
         // now adjust the scroll bars
 

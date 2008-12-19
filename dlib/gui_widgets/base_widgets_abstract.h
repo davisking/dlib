@@ -1599,9 +1599,6 @@ namespace dlib
                 determined automatically from the size of this object's on screen 
                 rectangle and the value of min_zoom_scale() which determines how far 
                 out you can zoom.
-
-                Also note that while dlib::vector<double> is used to represent graph points
-                the z field is always ignored by this object.
         */
 
     public:
@@ -1719,7 +1716,7 @@ namespace dlib
         !*/
 
         point graph_to_gui_space (
-            const vector<double>& graph_point
+            const vector<double,2>& graph_point
         ) const;
         /*!
             requires
@@ -1729,7 +1726,7 @@ namespace dlib
                   to the given point in Cartesian graph space
         !*/
 
-        vector<double> gui_to_graph_space (
+        vector<double,2> gui_to_graph_space (
             const point& pixel_point
         ) const;
         /*!
@@ -1740,7 +1737,7 @@ namespace dlib
                   pixel location
         !*/
 
-        vector<double> max_graph_point (
+        vector<double,2> max_graph_point (
         ) const;
         /*!
             requires
@@ -1782,7 +1779,7 @@ namespace dlib
         !*/
 
         void center_display_at_graph_point (
-            const vector<double>& graph_point
+            const vector<double,2>& graph_point
         );
         /*!
             requires

@@ -2091,11 +2091,11 @@ namespace dlib
                 }
 
                 bool click_hit_node = false;
-                dlib::vector<double> p(gui_to_graph_space(point(x,y)));
+                dlib::vector<double,2> p(gui_to_graph_space(point(x,y)));
                 // check if this click is on an existing node
                 for (unsigned long i = 0; i < graph_.number_of_nodes(); ++i)
                 {
-                    dlib::vector<double> n(graph_.node(i).data.p);
+                    dlib::vector<double,2> n(graph_.node(i).data.p);
                     if ((p-n).length() < radius)
                     {
                         click_hit_node = true;
@@ -2135,10 +2135,10 @@ namespace dlib
                 {
                     for (unsigned long n = 0; n < graph_.number_of_nodes() && edge_selected == false; ++n)
                     {
-                        const dlib::vector<double> parent_center(graph_to_gui_space(graph_.node(n).data.p));
+                        const dlib::vector<double,2> parent_center(graph_to_gui_space(graph_.node(n).data.p));
                         for (unsigned long e = 0; e < graph_.node(n).number_of_children() && edge_selected == false; ++e)
                         {
-                            const dlib::vector<double> child_center(graph_to_gui_space(graph_.node(n).child(e).data.p));
+                            const dlib::vector<double,2> child_center(graph_to_gui_space(graph_.node(n).child(e).data.p));
 
                             rectangle area;
                             area += parent_center;
@@ -2149,7 +2149,7 @@ namespace dlib
                                 p = point(x,y);
                                 const dlib::vector<double> z(0,0,1);
                                 // find the distance from the line between the two nodes
-                                const dlib::vector<double> perpendicular(z.cross(parent_center-child_center).normalize());
+                                const dlib::vector<double,2> perpendicular(z.cross(parent_center-child_center).normalize());
                                 double distance = std::abs((child_center-p).dot(perpendicular));
                                 if (distance < 8)
                                 {
@@ -2197,11 +2197,11 @@ namespace dlib
                 (state & base_window::SHIFT) && 
                 selected_node != graph_.number_of_nodes() )
             {
-                dlib::vector<double> p(gui_to_graph_space(point(x,y)));
+                dlib::vector<double,2> p(gui_to_graph_space(point(x,y)));
                 // check if this click is on an existing node
                 for (unsigned long i = 0; i < graph_.number_of_nodes(); ++i)
                 {
-                    dlib::vector<double> n(graph_.node(i).data.p);
+                    dlib::vector<double,2> n(graph_.node(i).data.p);
                     if ((p-n).length() < radius)
                     {
                         // add the edge if it doesn't already exist and isn't an edge back to 
@@ -2272,7 +2272,7 @@ namespace dlib
                         color.red = 255;
                         // we need to be careful when drawing this line to not draw it over the node dots since it 
                         // has a different color from them and would look weird
-                        dlib::vector<double> v(p-center);
+                        dlib::vector<double,2> v(p-center);
                         v = v.normalize()*rad;
                         draw_line(c,center+v,p-v ,color, area);
                     }
@@ -2285,11 +2285,11 @@ namespace dlib
                     // draw the triangle pointing to this node
                     if (area.intersect(circle_area).is_empty() == false)
                     {
-                        dlib::vector<double> v(p-center);
+                        dlib::vector<double,2> v(p-center);
                         v = v.normalize();
 
-                        dlib::vector<double> cross = z.cross(v).normalize();
-                        dlib::vector<double> r(center + v*rad);
+                        dlib::vector<double,2> cross = z.cross(v).normalize();
+                        dlib::vector<double,2> r(center + v*rad);
                         for (double i = 0; i < 8*zoom_scale(); i += 0.1)
                             draw_line(c,(r+v*i)+cross*i, (r+v*i)-cross*i,color,area);
                     }

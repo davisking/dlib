@@ -2155,10 +2155,10 @@ namespace dlib
     protected:
 
         point graph_to_gui_space (
-            const vector<double>& p
+            const vector<double,2>& p
         ) const;
 
-        vector<double> gui_to_graph_space (
+        vector<double,2> gui_to_graph_space (
             const point& p
         ) const;
 
@@ -2176,7 +2176,7 @@ namespace dlib
         );
 
         void center_display_at_graph_point (
-            const vector<double>& p
+            const vector<double,2>& p
         );
 
     // ----------- event handlers ---------------
@@ -2227,7 +2227,7 @@ namespace dlib
 
         void adjust_origin (
             const point& gui_p,
-            const vector<double>& graph_p
+            const vector<double,2>& graph_p
         );
         /*!
             ensures
@@ -2237,8 +2237,8 @@ namespace dlib
         !*/
 
 
-        vector<double> gr_orig; // point in graph space such that it's gui space point is the upper left of display_rect_
-        vector<double> lr_point; // point in graph space such that it is at the lower right corner of the screen at max zoom
+        vector<double,2> gr_orig; // point in graph space such that it's gui space point is the upper left of display_rect_
+        vector<double,2> lr_point; // point in graph space such that it is at the lower right corner of the screen at max zoom
 
         mutable std::ostringstream sout;
 
@@ -2249,7 +2249,7 @@ namespace dlib
         rectangle display_rect_;
 
         bool mouse_drag_screen;  // true if the user is dragging the white background area
-        vector<double> drag_screen_point; // the starting point the mouse was at in graph space for the background area drag
+        vector<double,2> drag_screen_point; // the starting point the mouse was at in graph space for the background area drag
 
         scroll_bar vsb;
         scroll_bar hsb;
