@@ -25,18 +25,33 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        struct op_null
+        {
+            template <typename EXP>
+            struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+            {
+                const static long cost = EXP::cost;
+                typedef typename EXP::type type;
+                template <typename M>
+                static type apply ( const M& m, long r, long c)
+                { 
+                    return m(r,c);
+                }
+            };
+        };
+
         template <
             typename EXP
             >
-        const matrix_exp<EXP> make_exp (
-            const EXP& exp
+        const matrix_unary_exp<EXP,op_null> null_exp (
+            const matrix_exp<EXP>& m
         )
         /*!
             The only point of this function is to make it easy to cause the overloads
             of matrix_assign to not trigger for a matrix expression.
         !*/
         {
-            return matrix_exp<EXP>(exp);
+            return matrix_unary_exp<EXP,op_null>(m.ref());
         }
 
     // ------------------------------------------------------------------------------------
@@ -50,18 +65,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-// TODO
-#if 0
-
     template <
         typename matrix_dest_type,
         typename EXP1,
-        typename EXP2,
-        unsigned long count
+        typename EXP2
         >
-    inline typename disable_if_c<ma::matrix_is_vector<EXP1>::value || ma::matrix_is_vector<EXP2>::value>::type matrix_assign_big (
+    typename disable_if_c<ma::matrix_is_vector<EXP1>::value || ma::matrix_is_vector<EXP2>::value>::type 
+    matrix_assign_big (
         matrix_dest_type& dest,
-        const matrix_exp<matrix_multiply_exp<EXP1,EXP2,count> >& src
+        const matrix_multiply_exp<EXP1,EXP2>& src
     )
     /*!
         This overload catches assignments like:
@@ -70,8 +82,8 @@ namespace dlib
     !*/
     {
         using namespace ma;
-        const matrix_exp<EXP1> lhs(src.ref().lhs);
-        const matrix_exp<EXP2> rhs(src.ref().rhs);
+        const matrix_exp<EXP1>& lhs = src.lhs;
+        const matrix_exp<EXP2>& rhs = src.rhs;
         const long bs = 100;
 
         // if the matrices are small enough then just use the simple multiply algorithm
@@ -109,7 +121,7 @@ namespace dlib
                         if (c != 0)
                             set_subm(dest, res_block) = subm(dest,res_block) + subm(lhs,lhs_block)*subm(rhs, rhs_block);
                         else
-                            set_subm(dest, res_block) = make_exp(subm(lhs,lhs_block)*subm(rhs, rhs_block));
+                            set_subm(dest, res_block) = null_exp(subm(lhs,lhs_block)*subm(rhs, rhs_block));
                     }
                 }
             }
@@ -119,8 +131,6 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-
-#endif
 
 }
 

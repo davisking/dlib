@@ -94,7 +94,10 @@ namespace dlib
             - the part of dest outside the above sub matrix remains unchanged
     !*/
     {
-        matrix_assign_big(dest,src);
+        // Call src.ref() here so that the derived type of the matrix_exp shows 
+        // up so we can overload matrix_assign_big() based on various matrix expression
+        // types.
+        matrix_assign_big(dest,src.ref());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -115,7 +118,7 @@ namespace dlib
             - the part of dest outside the above sub matrix remains unchanged
     !*/
     {
-        matrix_assign_small(dest,src);
+        matrix_assign_small(dest,src.ref());
     }
 
 // ----------------------------------------------------------------------------------------

@@ -992,9 +992,6 @@ namespace dlib
             const matrix_exp<EXP>& m
         ): matrix_exp<matrix>(*this) 
         {
-            using namespace std;
-            // TODO
-            //cout << "copy" << endl;
             // You get an error on this line if the matrix m contains a type that isn't
             // the same as the type contained in the target matrix.
             COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true) ||
@@ -1023,9 +1020,6 @@ namespace dlib
             const matrix& m
         ): matrix_exp<matrix>(*this) 
         {
-            using namespace std;
-            // TODO
-            //cout << "copy" << endl;
             data.set_size(m.nr(),m.nc());
             matrix_assign(*this, m);
         }
