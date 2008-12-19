@@ -36,8 +36,10 @@ namespace dlib
 // inline behavior out of GCC.
 #ifdef __GNUC__
 #define DLIB_DONT_INLINE __attribute__((noinline))
+#define DLIB_ALWAYS_INLINE __attribute__((always_inline))
 #else
 #define DLIB_DONT_INLINE 
+#define DLIB_ALWAYS_INLINE 
 #endif
 
     template <

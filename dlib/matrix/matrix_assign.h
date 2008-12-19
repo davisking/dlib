@@ -82,18 +82,25 @@ namespace dlib
     !*/
     {
         using namespace ma;
-        const matrix_exp<EXP1>& lhs = src.lhs;
-        const matrix_exp<EXP2>& rhs = src.rhs;
-        const long bs = 100;
+        const EXP1& lhs = src.lhs;
+        const EXP2& rhs = src.rhs;
+        const long bs = 90;
+        set_all_elements(dest,0);
 
         // if the matrices are small enough then just use the simple multiply algorithm
         if (lhs.nc() <= 2 || rhs.nc() <= 2 || lhs.nr() <= 2 || rhs.nr() <= 2 || (lhs.size() <= bs*10 && rhs.size() <= bs*10) )
         {
-            for (long r = 0; r < src.nr(); ++r)
+            // This loop is optimized assuming that the data is laid out in 
+            // row major order in memory.
+            for (long r = 0; r< lhs.nr(); ++r)
             {
-                for (long c = 0; c < src.nc(); ++c)
+                for (long c = 0; c< lhs.nc(); ++c)
                 {
-                    dest(r,c) = src(r,c);
+                    const typename EXP2::type temp = lhs(r,c);
+                    for (long i = 0; i < rhs.nc(); ++i)
+                    {
+                        dest(r,i) += rhs(c,i)*temp;
+                    }
                 }
             }
         }
@@ -101,6 +108,7 @@ namespace dlib
         {
             // if the lhs and rhs matrices are big enough we should use a cache friendly
             // algorithm that computes the matrix multiply in blocks.  
+
 
             // Loop over all the blocks in the lhs matrix
             for (long r = 0; r < lhs.nr(); r+=bs)
@@ -118,10 +126,20 @@ namespace dlib
 
                         // make a target rect in res
                         rectangle res_block(rhs_block.left(),lhs_block.top(), rhs_block.right(), lhs_block.bottom());
-                        if (c != 0)
-                            set_subm(dest, res_block) = subm(dest,res_block) + subm(lhs,lhs_block)*subm(rhs, rhs_block);
-                        else
-                            set_subm(dest, res_block) = null_exp(subm(lhs,lhs_block)*subm(rhs, rhs_block));
+
+                        // This loop is optimized assuming that the data is laid out in 
+                        // row major order in memory.
+                        for (long r = lhs_block.top(); r <= lhs_block.bottom(); ++r)
+                        {
+                            for (long c = lhs_block.left(); c<= lhs_block.right(); ++c)
+                            {
+                                const typename EXP2::type temp = lhs(r,c);
+                                for (long i = rhs_block.left(); i <= rhs_block.right(); ++i)
+                                {
+                                    dest(r,i) += rhs(c,i)*temp;
+                                }
+                            }
+                        }
                     }
                 }
             }
