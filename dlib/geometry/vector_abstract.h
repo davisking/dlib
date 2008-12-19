@@ -34,6 +34,14 @@ namespace dlib
                 this object is limited to representing points on the XY plane where
                 Z is set to 0.
 
+                Also note that this object performs the appropriate integer and 
+                floating point conversions and promotions when vectors of mixed
+                type are used together.  For example:
+                    vector<int,3> vi;
+                    vector<double,2> vd;
+                    vd + vi == a vector<double,3> object type since that is what
+                               is needed to contain the result of vi+vd without
+                               any loss of information.
         !*/
 
     public:
@@ -316,6 +324,37 @@ namespace dlib
         !*/
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template<typename T, typename U, long NR>
+    vector operator* (
+        const vector<T,NR> & lhs,
+        const U rhs
+    );
+    /*!
+        ensures
+            - returns the result of multiplying the scalar rhs by lhs
+    !*/
+    
+    template<typename T, typename U, long NR>
+    vector operator* (
+        const U lhs,
+        const vector<T,NR> & rhs   
+    );
+    /*! 
+        ensures
+            - returns the result of multiplying the scalar lhs by rhs
+    !*/
+
+    template<typename T, long NR>
+    inline void swap (
+        vector<T,NR> & a, 
+        vector<T,NR> & b 
+    ) { a.swap(b); }   
+    /*!
+        provides a global swap function
+    !*/
 
     template<typename T, long NR>
     inline void swap (

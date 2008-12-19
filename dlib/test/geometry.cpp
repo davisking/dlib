@@ -217,6 +217,27 @@ namespace
             (vd3/2).dot(vd2);
         }
 
+        {
+            dlib::vector<double,2> vd2;
+            dlib::vector<long,3> vl3;
+
+            vl3.x() = 1;
+            vl3.y() = 2;
+            vl3.z() = 3;
+
+            vd2.x() = 6.5;
+            vd2.y() = 7.5;
+
+            DLIB_CASSERT((vl3 + vd2).x() == 1+6.5,"");
+            DLIB_CASSERT((vl3 + vd2).y() == 2+7.5,"");
+            DLIB_CASSERT((vl3 + vd2).z() == 3+0,"");
+
+            DLIB_CASSERT((vl3 - vd2).x() == 1-6.5,"");
+            DLIB_CASSERT((vl3 - vd2).y() == 2-7.5,"");
+            DLIB_CASSERT((vl3 - vd2).z() == 3-0,"");
+
+        }
+
     }
 
 
