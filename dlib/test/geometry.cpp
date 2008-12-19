@@ -202,6 +202,19 @@ namespace
             DLIB_CASSERT(vd3.y() == 4*2 + 5*3 + 6*4,"");
             DLIB_CASSERT(vd3.z() == 7*2 + 8*3 + 9*4,"");
 
+            (vd3*2).dot(vd3);
+            (vd2*2).dot(vd3);
+            (vd3*2).dot(vd2);
+            (vd2*2).dot(vd2);
+            (2*vd3*2).dot(vd3);
+            (2*vd2*2).dot(vd3);
+            (2*vd3*2).dot(vd2);
+            (2*vd2*2).dot(vd2);
+
+            (vd2 + vd3).dot(vd2);
+            (vd2 - vd3).dot(vd2);
+            (vd2/2).dot(vd2);
+            (vd3/2).dot(vd2);
         }
 
     }

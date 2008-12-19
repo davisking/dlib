@@ -54,6 +54,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    // This insanity here is to work around a bug in visual studio 8.   These two rebind
+    // structures are actually declared at a few points in this file because just having the
+    // one declaration here isn't enough for visual studio.  It takes the three spread around
+    // to avoid all its bugs. 
+    template <typename T, long N>
+    struct vc_rebind
+    {
+        typedef vector<T,N> type;
+    };
+    template <typename T, typename U, long N>
+    struct vc_rebind_promote
+    {
+        typedef vector<typename promote<T,U>::type,N> type;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T, typename U, typename enabled = void>
     struct vector_assign_helper
     {
@@ -174,6 +191,18 @@ namespace dlib
                 - (*this)(2) == z() 
 
         !*/
+
+        // This insanity here is to work around a bug in visual studio 8.  
+        template <typename T, long N>
+        struct vc_rebind
+        {
+            typedef vector<T,N> type;
+        };
+            template <typename T, typename U, long N>
+        struct vc_rebind_promote
+        {
+            typedef vector<typename promote<T,U>::type,N> type;
+        };
 
     public:
 
@@ -312,7 +341,7 @@ namespace dlib
 
         // ---------------------------------------
 
-        vector<double,3> normalize (
+        typename vc_rebind<double,3>::type normalize (
         ) const 
         {
             const double tmp = std::sqrt((double)(x()*x() + y()*y() + z()*z()));
@@ -392,7 +421,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U, long N>
-        vector<typename promote<T,U>::type,3> cross (
+        typename vc_rebind_promote<T,U,3>::type cross (
             const vector<U,N>& rhs
         ) const
         {
@@ -456,7 +485,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U, long N>
-        vector<typename promote<T,U>::type,3> operator + (
+        typename vc_rebind_promote<T,U,3>::type operator + (
             const vector<U,N>& rhs
         ) const
         {
@@ -476,7 +505,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U, long N>
-        vector<typename promote<T,U>::type,3> operator - (
+        typename vc_rebind_promote<T,U,3>::type operator - (
             const vector<U,N>& rhs
         ) const
         {
@@ -496,7 +525,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U>
-        vector<typename promote<T,U>::type,3> operator / (
+        typename vc_rebind_promote<T,U,3>::type operator / (
             const U& val
         ) const
         {
@@ -554,6 +583,19 @@ namespace dlib
                 - (*this)(1) == y() 
                 - z() == 0
         !*/
+
+        // This insanity here is to work around a bug in visual studio 8.  
+        template <typename T, long N>
+        struct vc_rebind
+        {
+            typedef vector<T,N> type;
+        };
+            template <typename T, typename U, long N>
+        struct vc_rebind_promote
+        {
+            typedef vector<typename promote<T,U>::type,N> type;
+        };
+
 
     public:
 
@@ -685,13 +727,14 @@ namespace dlib
 
         // ---------------------------------------
 
-        vector<double,2> normalize (
+
+        typename vc_rebind<double,2>::type normalize (
         ) const 
         {
             const double tmp = std::sqrt((double)(x()*x() + y()*y()));
             return vector<double,2> ( x()/tmp,
-                                      y()/tmp
-                                        );
+                         y()/tmp
+            );
         }
 
         // ---------------------------------------
@@ -809,7 +852,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U, long N>
-        vector<typename promote<T,U>::type,N> operator + (
+        typename vc_rebind_promote<T,U,N>::type operator + (
             const vector<U,N>& rhs
         ) const
         {
@@ -829,7 +872,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U, long N>
-        vector<typename promote<T,U>::type,N> operator - (
+        typename vc_rebind_promote<T,U,N>::type operator - (
             const vector<U,N>& rhs
         ) const
         {
@@ -840,7 +883,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U>
-        vector<typename promote<T,U>::type,2> operator / (
+        typename vc_rebind_promote<T,U,2>::type operator / (
             const U& val
         ) const
         {
@@ -899,7 +942,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U, long N>
-        vector<typename promote<T,U>::type,3> cross (
+        typename vc_rebind_promote<T,U,3>::type cross (
             const vector<U,N>& rhs
         ) const
         {
@@ -921,45 +964,49 @@ namespace dlib
 
 
     template <typename T, typename U>
-    inline typename disable_if<is_matrix<U>, const vector<T,2> >::type operator* (
+    inline typename disable_if<is_matrix<U>, const typename vc_rebind_promote<T,U,2>::type >::type operator* (
         const vector<T,2>& v,
         const U& s
     )
     {
-        return vector<T,2>(v.x()*s, v.y()*s);
+        typedef typename vc_rebind_promote<T,U,2>::type ret_type;
+        return ret_type(v.x()*s, v.y()*s);
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename U>
-    inline typename disable_if<is_matrix<U>, const vector<T,2> >::type operator* (
+    inline typename disable_if<is_matrix<U>, const typename vc_rebind_promote<T,U,2>::type >::type operator* (
         const U& s,
         const vector<T,2>& v
     )
     {
-        return vector<T,2>(v.x()*s, v.y()*s);
+        typedef typename vc_rebind_promote<T,U,2>::type ret_type;
+        return ret_type(v.x()*s, v.y()*s);
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename U>
-    inline typename disable_if<is_matrix<U>, const vector<T,3> >::type operator* (
+    inline typename disable_if<is_matrix<U>, const typename vc_rebind_promote<T,U,3>::type >::type operator* (
         const vector<T,3>& v,
         const U& s
     )
     {
-        return vector<T,3>(v.x()*s, v.y()*s, v.z()*s);
+        typedef typename vc_rebind_promote<T,U,3>::type ret_type;
+        return ret_type(v.x()*s, v.y()*s, v.z()*s);
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename U>
-    inline typename disable_if<is_matrix<U>, const vector<T,3> >::type operator* (
+    inline typename disable_if<is_matrix<U>, const typename vc_rebind_promote<T,U,3>::type >::type operator* (
         const U& s,
         const vector<T,3>& v
     )
     {
-        return vector<T,3>(v.x()*s, v.y()*s, v.z()*s);
+        typedef typename vc_rebind_promote<T,U,3>::type ret_type;
+        return ret_type(v.x()*s, v.y()*s, v.z()*s);
     }
 
 // ----------------------------------------------------------------------------------------
