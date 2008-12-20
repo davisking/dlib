@@ -801,7 +801,7 @@
          <file>dlib/geometry.h</file>
          <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
          <description>
-            This object represents a three dimensional vector.
+            This object represents a two or three dimensional vector.
          </description>
       </component>
       
