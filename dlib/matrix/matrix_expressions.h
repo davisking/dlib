@@ -34,6 +34,7 @@ namespace dlib
         typedef typename OP_::template op<M> OP;
         typedef typename OP::type type;
         typedef typename OP::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
@@ -54,6 +55,7 @@ namespace dlib
     public:
         typedef typename matrix_traits<matrix_unary_exp>::type type;
         typedef typename matrix_traits<matrix_unary_exp>::mem_manager_type mem_manager_type;
+        typedef typename matrix_traits<matrix_unary_exp>::layout_type layout_type;
         const static long NR = matrix_traits<matrix_unary_exp>::NR;
         const static long NC = matrix_traits<matrix_unary_exp>::NC;
         const static long cost = matrix_traits<matrix_unary_exp>::cost;
@@ -120,6 +122,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
+        typedef typename M::layout_type layout_type;
     };
 
     template <
@@ -141,6 +144,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_scalar_binary_exp>::NR;
         const static long NC = matrix_traits<matrix_scalar_binary_exp>::NC;
         const static long cost = matrix_traits<matrix_scalar_binary_exp>::cost;
+        typedef typename matrix_traits<matrix_scalar_binary_exp>::layout_type layout_type;
 
         matrix_scalar_binary_exp (
             const matrix_scalar_binary_exp& item
@@ -210,6 +214,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
+        typedef typename M::layout_type layout_type;
     };
 
     template <
@@ -231,6 +236,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_scalar_ternary_exp>::NR;
         const static long NC = matrix_traits<matrix_scalar_ternary_exp>::NC;
         const static long cost = matrix_traits<matrix_scalar_ternary_exp>::cost;
+        typedef typename matrix_traits<matrix_scalar_ternary_exp>::layout_type layout_type;
 
         matrix_scalar_ternary_exp (
             const matrix_scalar_ternary_exp& item
@@ -305,6 +311,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
+        typedef typename M1::layout_type layout_type;
     };
 
     template <
@@ -326,6 +333,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_binary_exp>::NR;
         const static long NC = matrix_traits<matrix_binary_exp>::NC;
         const static long cost = matrix_traits<matrix_binary_exp>::cost;
+        typedef typename matrix_traits<matrix_binary_exp>::layout_type layout_type;
 
         matrix_binary_exp (
             const matrix_binary_exp& item
@@ -393,6 +401,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
+        typedef typename M1::layout_type layout_type;
     };
 
     template <
@@ -415,6 +424,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_ternary_exp>::NR;
         const static long NC = matrix_traits<matrix_ternary_exp>::NC;
         const static long cost = matrix_traits<matrix_ternary_exp>::cost;
+        typedef typename matrix_traits<matrix_ternary_exp>::layout_type layout_type;
 
         matrix_ternary_exp (
             const matrix_ternary_exp& item
@@ -486,6 +496,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
+        typedef typename M1::layout_type layout_type;
     };
 
     template <
@@ -509,6 +520,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_fourary_exp>::NR;
         const static long NC = matrix_traits<matrix_fourary_exp>::NC;
         const static long cost = matrix_traits<matrix_fourary_exp>::cost;
+        typedef typename matrix_traits<matrix_fourary_exp>::layout_type layout_type;
 
         matrix_fourary_exp (
             const matrix_fourary_exp& item
@@ -583,6 +595,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
+        typedef default_matrix_layout layout_type;
     };
 
     template <
@@ -601,6 +614,7 @@ namespace dlib
         const static long NR = matrix_traits<dynamic_matrix_scalar_unary_exp>::NR;
         const static long NC = matrix_traits<dynamic_matrix_scalar_unary_exp>::NC;
         const static long cost = matrix_traits<dynamic_matrix_scalar_unary_exp>::cost;
+        typedef typename matrix_traits<dynamic_matrix_scalar_unary_exp>::layout_type layout_type;
 
         dynamic_matrix_scalar_unary_exp (
             const dynamic_matrix_scalar_unary_exp& item
@@ -668,6 +682,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
+        typedef default_matrix_layout layout_type;
     };
 
     template <
@@ -686,6 +701,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_scalar_unary_exp>::NR;
         const static long NC = matrix_traits<matrix_scalar_unary_exp>::NC;
         const static long cost = matrix_traits<matrix_scalar_unary_exp>::cost;
+        typedef typename matrix_traits<matrix_scalar_unary_exp>::layout_type layout_type;
 
         matrix_scalar_unary_exp (
             const matrix_scalar_unary_exp& item
@@ -745,6 +761,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
+        typedef default_matrix_layout layout_type;
     };
 
     template <
@@ -758,6 +775,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_zeroary_exp>::NR;
         const static long NC = matrix_traits<matrix_zeroary_exp>::NC;
         const static long cost = matrix_traits<matrix_zeroary_exp>::cost;
+        typedef typename matrix_traits<matrix_zeroary_exp>::layout_type layout_type;
 
         matrix_zeroary_exp (
             const matrix_zeroary_exp& item
@@ -810,6 +828,7 @@ namespace dlib
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
         const static long NR = EXPr::NR*EXPr::NC;
         const static long NC = EXPc::NR*EXPr::NC;
         const static long cost = EXPr::cost+EXPc::cost+M::cost;
@@ -832,6 +851,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_sub_range_exp>::NR;
         const static long NC = matrix_traits<matrix_sub_range_exp>::NC;
         const static long cost = matrix_traits<matrix_sub_range_exp>::cost;
+        typedef typename matrix_traits<matrix_sub_range_exp>::layout_type layout_type;
 
         matrix_sub_range_exp (
             const matrix_sub_range_exp& item
@@ -904,6 +924,7 @@ namespace dlib
         const static long NR = 0;
         const static long NC = 1;
         const static long cost = 1;
+        typedef default_matrix_layout layout_type;
     };
 
     template <
@@ -922,6 +943,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_std_vector_exp>::NR;
         const static long NC = matrix_traits<matrix_std_vector_exp>::NC;
         const static long cost = matrix_traits<matrix_std_vector_exp>::cost;
+        typedef typename matrix_traits<matrix_std_vector_exp>::layout_type layout_type;
 
         matrix_std_vector_exp (
             const matrix_std_vector_exp& item
@@ -982,6 +1004,7 @@ namespace dlib
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
+        typedef default_matrix_layout layout_type;
         const static long NR = 0;
         const static long NC = 1;
         const static long cost = 1;
@@ -1003,6 +1026,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_array_exp>::NR;
         const static long NC = matrix_traits<matrix_array_exp>::NC;
         const static long cost = matrix_traits<matrix_array_exp>::cost;
+        typedef typename matrix_traits<matrix_array_exp>::layout_type layout_type;
 
         matrix_array_exp (
             const matrix_array_exp& item
@@ -1063,6 +1087,7 @@ namespace dlib
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
+        typedef default_matrix_layout layout_type;
         const static long NR = 0;
         const static long NC = 0;
         const static long cost = 1;
@@ -1084,6 +1109,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_array2d_exp>::NR;
         const static long NC = matrix_traits<matrix_array2d_exp>::NC;
         const static long cost = matrix_traits<matrix_array2d_exp>::cost;
+        typedef typename matrix_traits<matrix_array2d_exp>::layout_type layout_type;
 
         matrix_array2d_exp (
             const matrix_array2d_exp& item
@@ -1144,6 +1170,7 @@ namespace dlib
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
         const static long NR = 0;
         const static long NC = 0;
         const static long cost = M::cost+1;
@@ -1164,6 +1191,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_sub_exp>::NR;
         const static long NC = matrix_traits<matrix_sub_exp>::NC;
         const static long cost = matrix_traits<matrix_sub_exp>::cost;
+        typedef typename matrix_traits<matrix_sub_exp>::layout_type layout_type;
 
         matrix_sub_exp (
             const matrix_sub_exp& item
@@ -1237,6 +1265,7 @@ namespace dlib
     {
         typedef long type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_matrix_layout layout_type;
         const static long NR = 0;
         const static long NC = 1;
         const static long cost = 1;
@@ -1250,6 +1279,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_range_exp>::NR;
         const static long NC = matrix_traits<matrix_range_exp>::NC;
         const static long cost = matrix_traits<matrix_range_exp>::cost;
+        typedef matrix_traits<matrix_range_exp>::layout_type layout_type;
 
         matrix_range_exp (
             const matrix_range_exp& item
@@ -1331,6 +1361,7 @@ namespace dlib
         const static long NR = tabs<(end - start)>::value/inc_ + 1;
         const static long NC = 1;
         const static long cost = 1;
+        typedef default_matrix_layout layout_type;
     };
 
     template <long start, long inc_, long end>
@@ -1342,6 +1373,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_range_static_exp>::NR;
         const static long NC = matrix_traits<matrix_range_static_exp>::NC;
         const static long cost = matrix_traits<matrix_range_static_exp>::cost;
+        typedef typename matrix_traits<matrix_range_static_exp>::layout_type layout_type;
 
         const static long inc = (start <= end)?inc_:-inc_;
 

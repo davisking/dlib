@@ -65,9 +65,7 @@ namespace dlib
     {
         typedef typename EXP::type type;
         typedef typename EXP::mem_manager_type mem_manager_type;
-        // TODO
-        //typedef typename EXP::layout_type layout_type;
-        
+        typedef typename EXP::layout_type layout_type;
         const static long NR = EXP::NR;
         const static long NC = EXP::NC;
         const static long cost = EXP::cost;
@@ -87,8 +85,7 @@ namespace dlib
     public:
         typedef typename matrix_traits<EXP>::type type;
         typedef typename matrix_traits<EXP>::mem_manager_type mem_manager_type;
-        // TODO
-        //typedef typename matrix_traits<EXP>::layout_type layout_type;
+        typedef typename matrix_traits<EXP>::layout_type layout_type;
         const static long NR = matrix_traits<EXP>::NR;
         const static long NC = matrix_traits<EXP>::NC;
         const static long cost = matrix_traits<EXP>::cost;
@@ -267,6 +264,7 @@ namespace dlib
     {
         typedef typename LHS::type type;
         typedef typename LHS::mem_manager_type mem_manager_type;
+        typedef typename LHS::layout_type layout_type;
         const static long NR = LHS::NR;
         const static long NC = RHS::NC;
 
@@ -305,6 +303,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_multiply_exp>::NR;
         const static long NC = matrix_traits<matrix_multiply_exp>::NC;
         const static long cost = matrix_traits<matrix_multiply_exp>::cost;
+        typedef typename matrix_traits<matrix_multiply_exp>::layout_type layout_type;
 
 
         const static bool lhs_is_costly = matrix_traits<matrix_multiply_exp>::lhs_is_costly;
@@ -398,6 +397,7 @@ namespace dlib
     {
         typedef typename LHS::type type;
         typedef typename LHS::mem_manager_type mem_manager_type;
+        typedef typename LHS::layout_type layout_type;
         const static long NR = (RHS::NR > LHS::NR) ? RHS::NR : LHS::NR;
         const static long NC = (RHS::NC > LHS::NC) ? RHS::NC : LHS::NC;
         const static long cost = LHS::cost+RHS::cost;
@@ -419,6 +419,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_add_exp>::NR;
         const static long NC = matrix_traits<matrix_add_exp>::NC;
         const static long cost = matrix_traits<matrix_add_exp>::cost;
+        typedef typename matrix_traits<matrix_add_exp>::layout_type layout_type;
 
         matrix_add_exp (
             const matrix_add_exp& item
@@ -506,6 +507,7 @@ namespace dlib
     {
         typedef typename LHS::type type;
         typedef typename LHS::mem_manager_type mem_manager_type;
+        typedef typename LHS::layout_type layout_type;
         const static long NR = (RHS::NR > LHS::NR) ? RHS::NR : LHS::NR;
         const static long NC = (RHS::NC > LHS::NC) ? RHS::NC : LHS::NC;
         const static long cost = LHS::cost+RHS::cost;
@@ -527,6 +529,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_subtract_exp>::NR;
         const static long NC = matrix_traits<matrix_subtract_exp>::NC;
         const static long cost = matrix_traits<matrix_subtract_exp>::cost;
+        typedef typename matrix_traits<matrix_subtract_exp>::layout_type layout_type;
 
         matrix_subtract_exp (
             const matrix_subtract_exp& item
@@ -613,6 +616,7 @@ namespace dlib
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
         const static long NR = M::NR;
         const static long NC = M::NC;
         const static long cost = M::cost+1;
@@ -638,6 +642,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_div_scal_exp>::NR;
         const static long NC = matrix_traits<matrix_div_scal_exp>::NC;
         const static long cost = matrix_traits<matrix_div_scal_exp>::cost;
+        typedef typename matrix_traits<matrix_div_scal_exp>::layout_type layout_type;
 
         matrix_div_scal_exp (
             const matrix_div_scal_exp& item
@@ -707,6 +712,7 @@ namespace dlib
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
         const static long NR = M::NR;
         const static long NC = M::NC;
         const static long cost = M::cost+1;
@@ -731,6 +737,7 @@ namespace dlib
         const static long NR = matrix_traits<matrix_mul_scal_exp>::NR;
         const static long NC = matrix_traits<matrix_mul_scal_exp>::NC;
         const static long cost = matrix_traits<matrix_mul_scal_exp>::cost;
+        typedef typename matrix_traits<matrix_mul_scal_exp>::layout_type layout_type;
 
         matrix_mul_scal_exp (
             const matrix_mul_scal_exp& item

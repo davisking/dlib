@@ -24,122 +24,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T,
-        long num_rows,
-        long num_cols,
-        typename mem_manager,
-        typename layout
-        >
-    class matrix_ref
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This object represents a copyable (via the copy constructor but not
-                operator=) reference to a matrix object.  
-        !*/
-    public:
-        typedef T type;
-        typedef matrix_ref ref_type;
-        typedef mem_manager mem_manager_type;
-        typedef layout layout_type;
-        const static long NR = num_rows;
-        const static long NC = num_cols;
-
-        matrix_ref (
-            const matrix<T,num_rows,num_cols,mem_manager,layout>& m
-        );
-        /*!
-            ensures
-                - #aliases(m) == true
-                  (i.e. #*this references/aliases the matrix m.)
-        !*/
-
-        matrix_ref (
-            const matrix_ref& r
-        );
-        /*!
-            ensures
-                - #*this references/aliases the same matrix as r does.
-        !*/
-
-        const T& operator() (
-            long r,
-            long c
-        ) const;
-        /*!
-            requires
-                - 0 <= r < nr()
-                - 0 <= c < nc()
-            ensures
-                - returns a const reference to the value at the given row and column in 
-                  this matrix.
-        !*/
-
-        long nr (
-        ) const;
-        /*!
-            ensures
-                - returns the number of rows in the matrix referenced by *this
-        !*/
-
-        long nc (
-        ) const;
-        /*!
-            ensures
-                - returns the number of columns in the matrix referenced by *this
-        !*/
-
-        long size (
-        ) const;
-        /*!
-            ensures
-                - returns nr()*nc()
-        !*/
-
-        template <typename U, long iNR, long iNC, typename mm, typename l>
-        bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm,l>& item
-        ) const;
-        /*!
-            ensures
-                - returns false
-        !*/
-
-        template <typename U, long iNR, long iNC, typename mm, typename l>
-        bool aliases (
-            const matrix<U,iNR,iNC,mm,l>& item
-        ) const;
-        /*!
-            ensures
-                - if (item is the matrix referenced by *this) then
-                    - returns true
-                - else
-                    - returns false
-        !*/
-
-        const ref_type& ref(
-        ) const { return *this; }
-        /*!
-            ensures
-                - returns *this
-        !*/
-
-    private:
-        // no assignment operator
-        matrix_ref& operator=(const matrix_ref&);
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
         typename EXP
         >
     class matrix_exp
     {
         /*!
             REQUIREMENTS ON EXP
-                - must be a matrix_exp or matrix_ref object (or an object with 
-                  a compatible interface)
+                - must be an object that inherits publicly from matrix_exp (this class).
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents an expression that evaluates to a matrix 
@@ -162,20 +53,13 @@ namespace dlib
 
     public:
         typedef typename EXP::type type;
-        typedef typename EXP::ref_type ref_type;
         typedef typename EXP::mem_manager_type mem_manager_type;
+        typedef typename EXP::layout_type layout_type;
+        const static long cost = EXP::cost;
         const static long NR = EXP::NR;
         const static long NC = EXP::NC;
         typedef matrix<type,NR,NC, mem_manager_type> matrix_type;
-        const static long cost = EXP::cost;
-
-        matrix_exp (
-            const EXP& exp
-        ); 
-        /*!
-            ensures
-                - #ref() == exp.ref()
-        !*/
+        typedef EXP exp_type;
 
         const type operator() (
             long r,
@@ -277,13 +161,30 @@ namespace dlib
                     - returns false
         !*/
 
-        const ref_type& ref (
+        const exp_type& ref (
         ) const; 
         /*!
             ensures
                 - returns a copyable reference to the subexpression contained in *this.
         !*/
 
+    protected:
+
+        explicit matrix_exp (
+            const EXP& exp
+        ); 
+        /*!
+            ensures
+                - #ref() == exp.ref()
+        !*/
+
+    private:
+
+        // you can't copy a matrix_exp at all.  Things that inherit from it must
+        // define their own copy constructors that call the above protected 
+        // constructor so that the reference below is maintained correctly.
+        matrix_exp(const matrix_exp& item);
+        matrix_exp& operator= (const matrix_exp&);
     };
 
 // ----------------------------------------------------------------------------------------
@@ -412,7 +313,7 @@ namespace dlib
         typename mem_manager = memory_manager<char>::kernel_1a,
         typename layout = default_matrix_layout
         >
-    class matrix : public matrix_exp<matrix_ref<T,num_rows,num_cols,mem_manager,layout> > 
+    class matrix : public matrix_exp<matrix<T,num_rows,num_cols,mem_manager,layout> > 
     {
         /*!
             REQUIREMENTS ON num_rows and num_cols
@@ -464,11 +365,11 @@ namespace dlib
 
     public:
         typedef T type;
-        typedef matrix_ref<T,num_rows,num_cols,mem_manager,layout> ref_type;
         typedef mem_manager mem_manager_type;
         typedef layout layout_type;
         const static long NR = num_rows;
         const static long NC = num_cols;
+        const static long cost = 1;
 
         matrix (
         );
