@@ -608,11 +608,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename M, typename S>
+    template <typename M>
     class matrix_div_scal_exp;
 
-    template <typename M, typename S>
-    struct matrix_traits<matrix_div_scal_exp<M,S> >
+    template <typename M>
+    struct matrix_traits<matrix_div_scal_exp<M> >
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
@@ -623,18 +623,13 @@ namespace dlib
     };
 
     template <
-        typename M,
-        typename S
+        typename M
         >
-    class matrix_div_scal_exp : public matrix_exp<matrix_div_scal_exp<M,S> >
+    class matrix_div_scal_exp : public matrix_exp<matrix_div_scal_exp<M> >
     {
         /*!
             REQUIREMENTS ON M 
                 - must be a matrix_exp object.
-
-            REQUIREMENTS ON S
-                - must be some kind of scalar type capable of dividing the elements
-                  of a matrix of type M
         !*/
     public:
         typedef typename matrix_traits<matrix_div_scal_exp>::type type;
@@ -651,11 +646,11 @@ namespace dlib
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1>
-        matrix_div_scal_exp (T1, const S&); 
+        matrix_div_scal_exp (T1, const type&); 
 
         matrix_div_scal_exp (
             const M& m_,
-            const S& s_
+            const type& s_
         ) :
             matrix_exp<matrix_div_scal_exp>(*this),
             m(m_),
@@ -687,28 +682,28 @@ namespace dlib
         ) const { return m.nc(); }
 
         const M& m;
-        const S s;
+        const type s;
     };
 
     template <
         typename EXP,
         typename S 
         >
-    inline const matrix_div_scal_exp<EXP, S>  operator/ (
+    inline const matrix_div_scal_exp<EXP>  operator/ (
         const matrix_exp<EXP>& m,
         const S& s
     )
     {
-        return matrix_div_scal_exp<EXP,S>(m.ref(),s);
+        return matrix_div_scal_exp<EXP>(m.ref(),s);
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename M, typename S>
+    template <typename M>
     class matrix_mul_scal_exp;
 
-    template <typename M, typename S>
-    struct matrix_traits<matrix_mul_scal_exp<M,S> >
+    template <typename M>
+    struct matrix_traits<matrix_mul_scal_exp<M> >
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
@@ -719,17 +714,14 @@ namespace dlib
     };
 
     template <
-        typename M,
-        typename S
+        typename M
         >
-    class matrix_mul_scal_exp : public matrix_exp<matrix_mul_scal_exp<M,S> >
+    class matrix_mul_scal_exp : public matrix_exp<matrix_mul_scal_exp<M> >
     {
         /*!
             REQUIREMENTS ON M 
                 - must be a matrix_exp object.
 
-            REQUIREMENTS ON S
-                - must be some kind of scalar type
         !*/
     public:
         typedef typename matrix_traits<matrix_mul_scal_exp>::type type;
@@ -746,11 +738,11 @@ namespace dlib
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1>
-        matrix_mul_scal_exp (T1, const S&); 
+        matrix_mul_scal_exp (T1, const type&); 
 
         matrix_mul_scal_exp (
             const M& m_,
-            const S& s_
+            const type& s_
         ) :
             matrix_exp<matrix_mul_scal_exp>(*this),
             m(m_),
@@ -782,74 +774,74 @@ namespace dlib
         ) const { return m.nc(); }
 
         const M& m;
-        const S s;
+        const type s;
     };
 
     template <
         typename EXP,
         typename S 
         >
-    inline typename disable_if<is_matrix<S>, const matrix_mul_scal_exp<EXP, S> >::type operator* (
+    inline typename disable_if<is_matrix<S>, const matrix_mul_scal_exp<EXP> >::type operator* (
         const matrix_exp<EXP>& m,
         const S& s
     )
     {
-        return matrix_mul_scal_exp<EXP,S>(m.ref(),s);
+        return matrix_mul_scal_exp<EXP>(m.ref(),s);
     }
 
     template <
         typename EXP,
         typename S 
         >
-    inline typename disable_if<is_matrix<S>, const matrix_mul_scal_exp<EXP, S> >::type operator* (
+    inline typename disable_if<is_matrix<S>, const matrix_mul_scal_exp<EXP> >::type operator* (
         const S& s,
         const matrix_exp<EXP>& m
     )
     {
-        return matrix_mul_scal_exp<EXP,S>(m.ref(),s);
+        return matrix_mul_scal_exp<EXP>(m.ref(),s);
     }
 
     template <
         typename EXP 
         >
-    inline const matrix_mul_scal_exp<EXP, float> operator/ (
+    inline const matrix_mul_scal_exp<EXP> operator/ (
         const matrix_exp<EXP>& m,
         const float& s
     )
     {
-        return matrix_mul_scal_exp<EXP,float>(m.ref(),1.0f/s);
+        return matrix_mul_scal_exp<EXP>(m.ref(),1.0f/s);
     }
 
     template <
         typename EXP
         >
-    inline const matrix_mul_scal_exp<EXP, double> operator/ (
+    inline const matrix_mul_scal_exp<EXP> operator/ (
         const matrix_exp<EXP>& m,
         const double& s
     )
     {
-        return matrix_mul_scal_exp<EXP,double>(m.ref(),1.0/s);
+        return matrix_mul_scal_exp<EXP>(m.ref(),1.0/s);
     }
 
     template <
         typename EXP
         >
-    inline const matrix_mul_scal_exp<matrix_exp<EXP>, long double> operator/ (
+    inline const matrix_mul_scal_exp<EXP> operator/ (
         const matrix_exp<EXP>& m,
         const long double& s
     )
     {
-        return matrix_mul_scal_exp<EXP,long double>(m.ref(),1.0/s);
+        return matrix_mul_scal_exp<EXP>(m.ref(),1.0/s);
     }
 
     template <
         typename EXP
         >
-    inline const matrix_mul_scal_exp<EXP, int> operator- (
+    inline const matrix_mul_scal_exp<EXP> operator- (
         const matrix_exp<EXP>& m
     )
     {
-        return matrix_mul_scal_exp<EXP,int>(m.ref(),-1);
+        return matrix_mul_scal_exp<EXP>(m.ref(),-1);
     }
 
 // ----------------------------------------------------------------------------------------
