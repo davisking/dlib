@@ -98,26 +98,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /* TODO remove this
-    template <
-        typename OP
-        >
-    class matrix_zeroary_exp;  
-
-    template <
-        typename M,
-        typename OP
-        >
-    class matrix_unary_exp;  
-
-    template <
-        typename M1,
-        typename M2,
-        typename OP
-        >
-    class matrix_binary_exp;
-    */
-
     struct has_destructive_aliasing
     {
         template <typename M, typename U, long iNR, long iNC, typename MM, typename L >
