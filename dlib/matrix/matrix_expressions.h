@@ -21,6 +21,188 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+//            Helper templates for making operators used by expression objects
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    /*
+        templates for finding the max of two matrix expressions' dimensions
+    */
+
+    template <typename EXP1, typename EXP2 = void, typename EXP3 = void, typename EXP4 = void>
+    struct max_nr;
+
+    template <typename EXP1>
+    struct max_nr<EXP1,void,void,void>
+    {
+        const static long val = EXP1::NR;
+    };
+
+    template <typename EXP1, typename EXP2>
+    struct max_nr<EXP1,EXP2,void,void>
+    {
+        const static long val = (EXP1::NR > EXP2::NR) ? (EXP1::NR) : (EXP2::NR);
+    };
+
+    template <typename EXP1, typename EXP2, typename EXP3>
+    struct max_nr<EXP1,EXP2,EXP3,void>
+    {
+    private:
+        const static long max12 = (EXP1::NR > EXP2::NR) ? (EXP1::NR) : (EXP2::NR);
+    public:
+        const static long val = (max12 > EXP3::NR) ? (max12) : (EXP3::NR);
+    };
+
+    template <typename EXP1, typename EXP2, typename EXP3, typename EXP4>
+    struct max_nr
+    {
+    private:
+        const static long max12 = (EXP1::NR > EXP2::NR) ? (EXP1::NR) : (EXP2::NR);
+        const static long max34 = (EXP3::NR > EXP4::NR) ? (EXP3::NR) : (EXP4::NR);
+    public:
+        const static long val = (max12 > max34) ? (max12) : (max34);
+    };
+
+
+    template <typename EXP1, typename EXP2 = void, typename EXP3 = void, typename EXP4 = void>
+    struct max_nc;
+
+    template <typename EXP1>
+    struct max_nc<EXP1,void,void,void>
+    {
+        const static long val = EXP1::NC;
+    };
+
+    template <typename EXP1, typename EXP2>
+    struct max_nc<EXP1,EXP2,void,void>
+    {
+        const static long val = (EXP1::NC > EXP2::NC) ? (EXP1::NC) : (EXP2::NC);
+    };
+
+    template <typename EXP1, typename EXP2, typename EXP3>
+    struct max_nc<EXP1,EXP2,EXP3,void>
+    {
+    private:
+        const static long max12 = (EXP1::NC > EXP2::NC) ? (EXP1::NC) : (EXP2::NC);
+    public:
+        const static long val = (max12 > EXP3::NC) ? (max12) : (EXP3::NC);
+    };
+
+    template <typename EXP1, typename EXP2, typename EXP3, typename EXP4>
+    struct max_nc
+    {
+    private:
+        const static long max12 = (EXP1::NC > EXP2::NC) ? (EXP1::NC) : (EXP2::NC);
+        const static long max34 = (EXP3::NC > EXP4::NC) ? (EXP3::NC) : (EXP4::NC);
+    public:
+        const static long val = (max12 > max34) ? (max12) : (max34);
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    struct has_destructive_aliasing
+    {
+        template <typename M, typename U, long iNR, long iNC, typename MM, typename L >
+        static bool destructively_aliases (
+            const M& m,
+            const matrix<U,iNR,iNC,MM,L>& item
+        ) { return m.aliases(item); }
+
+        template <typename M1, typename M2, typename U, long iNR, long iNC, typename MM, typename L >
+        static bool destructively_aliases (
+            const M1& m1,
+            const M2& m2,
+            const matrix<U,iNR,iNC,MM,L>& item
+        ) { return m1.aliases(item) || m2.aliases(item) ; }
+
+        template <typename M1, typename M2, typename M3, typename U, long iNR, long iNC, typename MM, typename L >
+        static bool destructively_aliases (
+            const M1& m1,
+            const M2& m2,
+            const M3& m3,
+            const matrix<U,iNR,iNC,MM,L>& item
+        ) { return m1.aliases(item) || m2.aliases(item) || m3.aliases(item); }
+
+        template <typename M1, typename M2, typename M3, typename M4, typename U, long iNR, long iNC, typename MM, typename L >
+        static bool destructively_aliases (
+            const M1& m1,
+            const M2& m2,
+            const M3& m3,
+            const M4& m4,
+            const matrix<U,iNR,iNC,MM,L>& item
+        ) { return m1.aliases(item) || m2.aliases(item) || m3.aliases(item) || m4.aliases(item); }
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    struct has_nondestructive_aliasing
+    {
+        template <typename M, typename U, long iNR, long iNC, typename MM, typename L >
+        static bool destructively_aliases (
+            const M& m,
+            const matrix<U,iNR,iNC,MM,L>& item
+        ) { return m.destructively_aliases(item); }
+
+        template <typename M1, typename M2, typename U, long iNR, long iNC, typename MM, typename L >
+        static bool destructively_aliases (
+            const M1& m1,
+            const M2& m2,
+            const matrix<U,iNR,iNC, MM, L>& item
+        ) { return m1.destructively_aliases(item) || m2.destructively_aliases(item) ; }
+
+        template <typename M1, typename M2, typename M3, typename U, long iNR, long iNC, typename MM, typename L >
+        static bool destructively_aliases (
+            const M1& m1,
+            const M2& m2,
+            const M3& m3,
+            const matrix<U,iNR,iNC, MM, L>& item
+        ) { return m1.destructively_aliases(item) || m2.destructively_aliases(item) || m3.destructively_aliases(item) ; }
+
+        template <typename M1, typename M2, typename M3, typename M4, typename U, long iNR, long iNC, typename MM, typename L >
+        static bool destructively_aliases (
+            const M1& m1,
+            const M2& m2,
+            const M3& m3,
+            const M4& m4,
+            const matrix<U,iNR,iNC, MM, L>& item
+        ) { return m1.destructively_aliases(item) || 
+                   m2.destructively_aliases(item) || 
+                   m3.destructively_aliases(item) || 
+                   m4.destructively_aliases(item) ; }
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP1, typename EXP2 = void, typename EXP3 = void, typename EXP4 = void>
+    struct preserves_dimensions
+    {
+        const static long NR = max_nr<EXP1,EXP2,EXP3,EXP4>::val;
+        const static long NC = max_nc<EXP1,EXP2,EXP3,EXP4>::val;
+
+        typedef typename EXP1::mem_manager_type mem_manager_type;
+
+        template <typename M>
+        static long nr (const M& m) { return m.nr(); }
+        template <typename M>
+        static long nc (const M& m) { return m.nc(); }
+        template <typename M1, typename M2>
+        static long nr (const M1& m1, const M2& ) { return m1.nr(); }
+        template <typename M1, typename M2>
+        static long nc (const M1& m1, const M2& ) { return m1.nc(); }
+
+        template <typename M1, typename M2, typename M3>
+        static long nr (const M1& m1, const M2&, const M3& ) { return m1.nr(); }
+        template <typename M1, typename M2, typename M3>
+        static long nc (const M1& m1, const M2&, const M3& ) { return m1.nc(); }
+
+        template <typename M1, typename M2, typename M3, typename M4>
+        static long nr (const M1& m1, const M2&, const M3&, const M4& ) { return m1.nr(); }
+        template <typename M1, typename M2, typename M3, typename M4>
+        static long nc (const M1& m1, const M2&, const M3&, const M4& ) { return m1.nc(); }
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 //                General matrix expressions that take operator structs
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
