@@ -595,7 +595,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
-        typedef default_matrix_layout layout_type;
+        typedef row_major_layout layout_type;
     };
 
     template <
@@ -682,7 +682,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
-        typedef default_matrix_layout layout_type;
+        typedef row_major_layout layout_type;
     };
 
     template <
@@ -761,7 +761,7 @@ namespace dlib
         const static long NR = OP::NR;
         const static long NC = OP::NC;
         const static long cost = OP::cost;
-        typedef default_matrix_layout layout_type;
+        typedef row_major_layout layout_type;
     };
 
     template <
@@ -924,7 +924,7 @@ namespace dlib
         const static long NR = 0;
         const static long NC = 1;
         const static long cost = 1;
-        typedef default_matrix_layout layout_type;
+        typedef row_major_layout layout_type;
     };
 
     template <
@@ -1004,7 +1004,7 @@ namespace dlib
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
-        typedef default_matrix_layout layout_type;
+        typedef row_major_layout layout_type;
         const static long NR = 0;
         const static long NC = 1;
         const static long cost = 1;
@@ -1087,7 +1087,7 @@ namespace dlib
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
-        typedef default_matrix_layout layout_type;
+        typedef row_major_layout layout_type;
         const static long NR = 0;
         const static long NC = 0;
         const static long cost = 1;
@@ -1265,7 +1265,7 @@ namespace dlib
     {
         typedef long type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
-        typedef default_matrix_layout layout_type;
+        typedef row_major_layout layout_type;
         const static long NR = 0;
         const static long NC = 1;
         const static long cost = 1;
@@ -1361,7 +1361,7 @@ namespace dlib
         const static long NR = tabs<(end - start)>::value/inc_ + 1;
         const static long NC = 1;
         const static long cost = 1;
-        typedef default_matrix_layout layout_type;
+        typedef row_major_layout layout_type;
     };
 
     template <long start, long inc_, long end>

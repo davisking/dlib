@@ -368,7 +368,7 @@ namespace
         DLIB_CASSERT(sum(abs(sigmoid(dm10) -sigmoid(m10))) < 1e-10,sum(abs(sigmoid(dm10) -sigmoid(m10))) );
 
 
-        matrix<double, 7, 7,MM> m7;
+        matrix<double, 7, 7,MM,column_major_layout> m7;
         matrix<double> dm7(7,7);
         for (long r= 0; r< dm7.nr(); ++r)
         {

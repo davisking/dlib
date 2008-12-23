@@ -311,7 +311,7 @@ namespace dlib
         long num_rows = 0,
         long num_cols = 0,
         typename mem_manager = memory_manager<char>::kernel_1a,
-        typename layout = default_matrix_layout
+        typename layout = row_major_layout 
         >
     class matrix : public matrix_exp<matrix<T,num_rows,num_cols,mem_manager,layout> > 
     {
@@ -357,7 +357,7 @@ namespace dlib
                 unrolling which can result in substantially faster code.
 
                 Also note that the elements of this matrix are laid out in memory by the layout 
-                object supplied as a template argument to this class.  The default_matrix_layout 
+                object supplied as a template argument to this class.  The row_major_layout  
                 sets elements down contiguously in memory and in row major order.  Additionally, 
                 all memory allocations are performed using the memory manager object supplied as 
                 a template argument to this class.

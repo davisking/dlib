@@ -10,7 +10,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct default_matrix_layout;
+    struct row_major_layout;
 
 // ----------------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ namespace dlib
         long num_rows = 0,
         long num_cols = 0,
         typename mem_manager = memory_manager<char>::kernel_1a,
-        typename layout = default_matrix_layout 
+        typename layout = row_major_layout 
         >
     class matrix; 
 

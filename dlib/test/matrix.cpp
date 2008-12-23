@@ -47,7 +47,7 @@ namespace
         }
 
         {
-            matrix<double,5,5> m(5,5);
+            matrix<double,5,5,MM,column_major_layout> m(5,5);
 
             for (long r = 0; r < m.nr(); ++r)
             {
@@ -123,7 +123,7 @@ namespace
 
 
         {
-            matrix<double,5,2> m;
+            matrix<double,5,2,MM,column_major_layout> m;
 
             for (long r = 0; r < m.nr(); ++r)
             {
@@ -164,12 +164,12 @@ namespace
 
         {
             matrix<long> a1(5,1);
-            matrix<long,0,0,MM> a2(1,5);
+            matrix<long,0,0,MM,column_major_layout> a2(1,5);
             matrix<long,5,1> b1(5,1);
             matrix<long,1,5> b2(1,5);
             matrix<long,0,1> c1(5,1);
             matrix<long,1,0> c2(1,5);
-            matrix<long,0,1,MM> d1(5,1);
+            matrix<long,0,1,MM,column_major_layout> d1(5,1);
             matrix<long,1,0,MM> d2(1,5);
 
             for (long i = 0; i < 5; ++i)
@@ -322,7 +322,7 @@ namespace
         }
 
         {
-            matrix<double> a(6,7);
+            matrix<double,0,0,MM,column_major_layout> a(6,7);
 
             for (long r = 0; r < a.nr(); ++r)
             {
@@ -428,7 +428,7 @@ namespace
         }
 
         {
-            matrix<long,5,5> m1, res;
+            matrix<long,5,5,MM,column_major_layout> m1, res;
             matrix<long,2,2> m2;
 
             set_all_elements(m1,0);
