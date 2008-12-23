@@ -285,7 +285,6 @@ namespace dlib
         long nc (
         ) const { return OP::nc(m); }
 
-    private:
 
         const M& m;
     };

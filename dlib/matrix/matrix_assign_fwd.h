@@ -7,11 +7,22 @@
 
 namespace dlib
 {
+    
+    /*
+        The point of the matrix_assign() functions is to contain all the various 
+        optimizations that help the matrix assign a matrix_exp to an actual matrix 
+        object quickly.
+    */
 
 // ----------------------------------------------------------------------------------------
 
     namespace ma
     {
+        // This template here controls how big a compile time sized matrix needs
+        // to be for it to get passed into the optimized versions of the 
+        // matrix_assign() function.  So small matrices are evaluated with a simple
+        // loop like the ones in this file and bigger matrices may get sent to BLAS
+        // routines or some other kind of optimized thing.
         template < typename EXP, typename enable = void >
         struct is_small_matrix { static const bool value = false; };
         template < typename EXP >
