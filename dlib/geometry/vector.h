@@ -12,6 +12,14 @@
 #include "../matrix/matrix.h"
 #include <limits>
 
+#if defined(_MSC_VER) && _MSC_VER < 1400
+// Despite my efforts to disabuse visual studio of its usual nonsense I can't find a 
+// way to make this warning go away without just disabling it.   This is the warning:
+//   dlib\geometry\vector.h(129) : warning C4805: '==' : unsafe mix of type 'std::numeric_limits<_Ty>::is_integer' and type 'bool' in operation
+// 
+#pragma warning(disable:4805)
+#endif
+
 namespace dlib
 {
 
@@ -26,14 +34,13 @@ namespace dlib
     template <typename T, typename U, typename enabled = void> 
     struct promote;
 
-    template <typename T, typename U, typename enabled = void>
+    template <typename T, typename U, bool res = (sizeof(T) <= sizeof(U))>
     struct largest_type
     {
         typedef T type;
     };
-
     template <typename T, typename U>
-    struct largest_type<T,U, typename enable_if_c<(sizeof(T) < sizeof(U))>::type>
+    struct largest_type<T,U,true>
     {
         typedef U type;
     };
@@ -1261,6 +1268,11 @@ namespace std
         }
     };
 }
+
+#if defined(_MSC_VER) && _MSC_VER < 1400
+// turn this warning back on
+#pragma warning(default:4805)
+#endif
 
 #endif // DLIB_VECTOr_H_
 
