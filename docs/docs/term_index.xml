@@ -165,7 +165,7 @@
 
          <term name="get_rect">
             <term link="dlib/gui_widgets/drawable_abstract.h.html#get_rect" name="in drawable object"/>
-            <term link="dlib/matrix/matrix_utilities_abstract.h.html#get_rect" name="for matrix objects"/>
+            <term link="dlib/matrix/matrix_subexp_abstract.h.html#get_rect" name="for matrix objects"/>
          </term>
 
          <term link="dlib/gui_widgets/drawable_abstract.h.html#is_enabled" name="is_enabled"/>
@@ -504,13 +504,17 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#vector_to_matrix" name="vector_to_matrix"/>
          <term link="dlib/matrix/matrix_math_functions_abstract.h.html#squared" name="squared"/>
          <term link="dlib/matrix/matrix_math_functions_abstract.h.html#cubed" name="cubed"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#rowm" name="rowm"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#colm" name="colm"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#subm" name="subm"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#range" name="range"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_rowm" name="set_rowm"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_colm" name="set_colm"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_subm" name="set_subm"/>
+
+
+         <term link="dlib/matrix/matrix_subexp_abstract.h.html#rowm" name="rowm"/>
+         <term link="dlib/matrix/matrix_subexp_abstract.h.html#colm" name="colm"/>
+         <term link="dlib/matrix/matrix_subexp_abstract.h.html#subm" name="subm"/>
+         <term link="dlib/matrix/matrix_subexp_abstract.h.html#range" name="range"/>
+         <term link="dlib/matrix/matrix_subexp_abstract.h.html#set_rowm" name="set_rowm"/>
+         <term link="dlib/matrix/matrix_subexp_abstract.h.html#set_colm" name="set_colm"/>
+         <term link="dlib/matrix/matrix_subexp_abstract.h.html#set_subm" name="set_subm"/>
+
+
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#pointwise_multiply" name="pointwise_multiply"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#equal" name="equal"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv" name="inv"/>

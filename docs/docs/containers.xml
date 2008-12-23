@@ -1318,11 +1318,22 @@
                   anything to get them.  They are included by the <a href="dlib/matrix.h.html">dlib/matrix.h</a> file for you.
                </description>
             </extension>
+
             <extension>
                <name>matrix_math_functions</name>
                <spec_file>dlib/matrix/matrix_math_functions_abstract.h</spec_file>
                <description>This extension contains mathematical functions that operate on each
                   element of a matrix independently.  Note that you don't need to #include
+                  anything to get them.  They are included by the <a href="dlib/matrix.h.html">dlib/matrix.h</a> file for you.
+               </description>
+            </extension>
+
+            <extension>
+               <name>matrix_sub_expressions</name>
+               <spec_file>dlib/matrix/matrix_subexp_abstract.h</spec_file>
+               <description>
+                  This extension contains a number of functions for dealing with sub-matrices.  
+                  Note that you don't need to #include
                   anything to get them.  They are included by the <a href="dlib/matrix.h.html">dlib/matrix.h</a> file for you.
                </description>
             </extension>
