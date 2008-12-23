@@ -3,6 +3,9 @@
     This is an example illustrating the use of the matrix object 
     from the dlib C++ Library.
 
+    This file also contains a discussion of the template expression
+    technique and how it is used by this library.
+
 */
 
 
@@ -245,6 +248,8 @@ int main()
     // MATLAB: var = min(min(A))
     var = min(A);
 
+
+
     // -------------------------  Template Expressions -----------------------------
     // Now I will discuss the "template expressions" technique and how it is 
     // used in the matrix object.  First consider the following expression:
@@ -299,15 +304,15 @@ int main()
 
 
 
-        There is only one caveat in all of this.  It is for statements that involve 
-        the multiplication of a complex matrix_exp such as the following:
+        There is, however, a slight complication in all of this.  It is for statements 
+        that involve the multiplication of a complex matrix_exp such as the following:
     */
         x = M*(M+M+M+M+M+M+M);
     /*
-        This statement computes the value of M*(M+M+M+M+M+M+M) totally without 
-        any temporary matrix objects.  This sounds good but we should take 
-        a closer look.  Consider that the + operator is invoked 6 times.  This
-        means we have something like this:
+        According to the discussion above, this statement would compute the value of 
+        M*(M+M+M+M+M+M+M) totally without any temporary matrix objects.  This sounds 
+        good but we should take a closer look.  Consider that the + operator is 
+        invoked 6 times.  This means we have something like this:
 
         x = M * (matrix_exp representing M+M+M+M+M+M+M);
 
@@ -320,46 +325,35 @@ int main()
         case of our above expression the cost of accessing an element of the 
         matrix_exp on the right hand side is the cost of doing 6 addition operations. 
 
-        Thus, it would be faster to assign M+M+M+M+M+M+M to a real matrix and then
-        multiply that by M.  
+        Thus, it would be faster to assign M+M+M+M+M+M+M to a temporary matrix and then
+        multiply that by M.  This is exactly what the dlib::matrix does under the covers.  
+        This is because it is able to spot expressions where the introduction of a 
+        temporary is needed to speed up the computation and it will automatically do this 
+        for you.  
 
-        So do something like this:
+
+
+        
+        Another complication that is dealt with automatically is aliasing.  Consider
+        the following expressions:
+           (1)  M = M + M
+           (2)  B = M * M. 
+           (3)  M = M * M. 
+
+        Expressions (1) and (3) are an example of aliasing and expression (3) is also
+        an example of destructive aliasing.  
+
+        Expression (1) can and does operate without introducing any temporaries even though
+        there is aliasing present in the expression.  The result is loaded straight into M 
+        using the template expression techniques described above.  Expression (2) also 
+        operates without any temporaries being introduced since there isn't any aliasing at all.
+        Expression (3) however contains destructive aliasing.  This is because we can't 
+        change any of the values in the M matrix without corrupting the ultimate result of
+        the matrix multiply.  So we need to introduce a temporary.  These situations are
+        dealt with by dlib::matrix automatically.  Moreover, it can tell the different between
+        simple aliasing and destructive aliasing and will only introduce temporaries when
+        they are necessary.
     */
-        matrix<double,3,3> Mtemp;
-        Mtemp = M+M+M+M+M+M+M;
-        x = M*Mtemp;
-
-        // Or alternatively you can use the tmp() function like so.
-        x = M*tmp(M+M+M+M+M+M+M);
-    /*
-        tmp() just evaluates a matrix_exp and returns a real matrix object.  So it
-        does the same thing as the above code that uses Mtemp.
-
-        Another example of this would be chains of matrix multiplies.  For example:
-    */
-        x = M*M*M*M;
-        // A much faster version of this expression would be
-        x = tmp(M*M)*tmp(M*M);
-    /*
-
-        Anyway, the point of the above discussion is that you shouldn't multiply
-        complex matrix expressions.  You should instead assign the expression to
-        a matrix object and then use that object in the multiply.  This will ensure
-        that your multiplies are always fast.
-
-
-        Note however, that the following two expressions are not afflicted with the
-        above problem:
-    */
-        double value1 = trans(y)*M*y;
-        double value2 = trans(y)*M*M*y;
-    /*
-        These expressions can be evaluated without using temporaries or
-        needlessly recalculating things as in the case of the above
-        examples.  
-    !*/
-
-    
 }
 
 // ----------------------------------------------------------------------------------------
