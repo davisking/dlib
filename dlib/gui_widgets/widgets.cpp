@@ -5,6 +5,7 @@
 
 #include "widgets.h"
 #include <algorithm>
+#include "../string.h"
 
 namespace dlib
 {
@@ -471,6 +472,14 @@ namespace dlib
     {
         ustring temp_str;
         get_from_clipboard(temp_str);
+
+        // If this is a multi line string then just take the first line.
+        ustring::size_type pos = temp_str.find_first_of('\n');
+        if (pos != ustring::npos)
+        {
+            temp_str = temp_str.substr(0,pos);
+        }
+
         if (highlight_start <= highlight_end)
         {
             text_ = text_.substr(0,highlight_start) + temp_str +
