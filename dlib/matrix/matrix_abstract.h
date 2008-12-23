@@ -165,7 +165,7 @@ namespace dlib
         ) const; 
         /*!
             ensures
-                - returns a copyable reference to the subexpression contained in *this.
+                - returns a reference to the expression contained in *this.
         !*/
 
     protected:
