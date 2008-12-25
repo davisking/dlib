@@ -44,6 +44,13 @@
             </sub>
          </item>
          <item nolink="true">
+            <name>Quntum Computing</name>
+            <sub>
+               <item>quantum_register</item> 
+               <item>gate</item> 
+            </sub>
+         </item>
+         <item nolink="true">
             <name>Geometry</name>
             <sub>
                <item>rectangle</item> 
@@ -865,10 +872,10 @@
          <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
          <description>
                 This object represents something that can learn to normalize a set 
-                of vectors.  In particular, normalized vectors should have zero
-                mean and a variance of one.  
+                of column vectors.  In particular, normalized column vectors should 
+                have zero mean and a variance of one.  
 
-                Also, if desired, this object can also use principal component 
+                Also, if desired, this object can use principal component 
                 analysis for the purposes of reducing the number of elements in a 
                 vector.  
          </description>
@@ -1768,6 +1775,40 @@
             it by a given number of units along the x and y axis relative to
             where it was before the move.
          </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>quantum_register</name>
+         <file>dlib/quantum_computing.h</file>
+         <spec_file link="true">dlib/quantum_computing/quantum_computing_abstract.h</spec_file>
+         <description>        
+                This object represents a set of quantum bits.  It can be used
+                with the quantum <a href="#gate">gate</a> object to simulate
+                quantum algorithms.
+         </description>
+
+         <examples>
+            <example>quantum_computing_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>gate</name>
+         <file>dlib/quantum_computing.h</file>
+         <spec_file link="true">dlib/quantum_computing/quantum_computing_abstract.h</spec_file>
+         <description>        
+            This object represents a quantum gate that operates on a 
+            <a href="#quantum_register">quantum_register</a>.   
+         </description>
+         <examples>
+            <example>quantum_computing_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 

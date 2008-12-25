@@ -12,13 +12,46 @@
 
 <current>
 New Stuff:
+   - Added the bound_function_pointer object.
+   - Added support for futures to the thread_pool object.
+   - Added a set of objects that makes it possible to create simulations
+     of quantum computing algorithms.
+   - Added copy and paste support to the text_field.
+   - matrix object stuff
+      - Added the range() function as well as overloads of all the various 
+        sub-matrix selection functions so that you can pick out slices of 
+        matrices like in Matlab.
+      - Added a new template argument to the matrix object that allows the
+        user to select the memory layout.  Also added a row_major_layout 
+        and column_major_layout.
+      - The matrix object can now be initialized using a comma separated
+        list of values.
 
 Non-Backwards Compatible Changes:
+   - Changed the fatal_error exception class so that it aborts your program
+     and prints a message if you try to construct it more than once since 
+     doing so indicates that you ignored the first fatal error.
+   - The way matrix expressions work in the library has been changed
+     since the last release.  So if you created custom matrix expressions 
+     then they will need to be updated to use the new matrix expression stuff.
 
 Bug fixes:
+   - Fixed a minor bug in how the zoomable_region widget drew itself after 
+     a resize in some cases.
+   - Fixed a problem with draw_line where it didn't always redraw the line 
+     properly.
 
 Other:
-
+   - A lot of the matrix code has been refactored and optimized.  The matrix
+     object will now introduce temporary objects when doing so results in
+     better performance.  I also added a simple system for binding 
+     arbitrary matrix expressions to optimized BLAS routines. 
+   - Cleaned up the vector and point classes.  Now there is only one class, 
+     the vector class, and it is capable of representing everything the old 
+     vector and point class could.  I also added code to make sure the 
+     vector class does the appropriate type promotions when vector objects
+     with different types are used together.
+   - Made the vector class inherit from matrix
 </current>
 
 <!-- *******************************************************************************  -->

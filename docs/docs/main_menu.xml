@@ -192,6 +192,10 @@
                   <link>queue_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Quantum_Computing</name>
+                  <link>quantum_computing_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Pipe</name>
                   <link>pipe_ex.cpp.html</link>
                </item>

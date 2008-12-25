@@ -33,6 +33,7 @@
          <item>is_pointer_type</item>
          <item>is_const_type</item>
          <item>is_same_type</item>
+         <item>is_convertible</item>
          <item>is_function</item>
          <item>is_signed_type</item>
          <item>is_unsigned_type</item>
@@ -179,6 +180,19 @@
       
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>is_convertible</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template that can be used to determine if one type is convertible 
+            into another type.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
       <component>
          <name>is_same_type</name>
          <file>dlib/algs.h</file>

@@ -629,6 +629,7 @@
          <term link="metaprogramming.html#is_pointer_type" name="is_pointer_type"/>
          <term link="metaprogramming.html#is_const_type" name="is_const_type"/>
          <term link="metaprogramming.html#is_same_type" name="is_same_type"/>
+         <term link="metaprogramming.html#is_convertible" name="is_convertible"/>
          <term link="metaprogramming.html#is_function" name="is_function"/>
          <term link="metaprogramming.html#wrap_function" name="wrap_function"/>
          <term link="metaprogramming.html#is_signed_type" name="is_signed_type"/>
@@ -763,6 +764,26 @@
          <term link="dlib/logger/logger_kernel_abstract.h.html#set_all_logging_levels" name="set_all_logging_levels"/>
          <term link="dlib/logger/logger_kernel_abstract.h.html#print_default_logger_header" name="print_default_logger_header"/>
          <term link="dlib/logger/extra_logger_headers.h.html#print_datetime_logger_header" name="print_datetime_logger_header"/>
+
+
+
+
+
+
+         <term link="algorithms.html#quantum_register" name="quantum_register"/>
+         <term link="algorithms.html#gate" name="gate"/>
+
+         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#gate_exp" name="gate_exp"/>
+         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#composite_gate" name="composite_gate"/>
+         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#x" name="x"/>
+         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#y" name="y"/>
+         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#z" name="z"/>
+         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#noop" name="noop"/>
+         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#cnot" name="cnot"/>
+         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#toffoli" name="toffoli"/>
+
+
+
 
       </term_list>
    
