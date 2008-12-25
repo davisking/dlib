@@ -1297,7 +1297,7 @@ namespace dlib
             COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true));
             if (m.destructively_aliases(*this) == false)
             {
-                matrix_assign(*this, m + *this);
+                matrix_assign(*this, *this + m);
             }
             else
             {
@@ -1305,7 +1305,7 @@ namespace dlib
                 // this->data is aliased inside the matrix_exp m somewhere.
                 matrix temp;
                 temp.set_size(m.nr(),m.nc());
-                matrix_assign(temp, m + *this);
+                matrix_assign(temp, *this + m);
                 temp.swap(*this);
             }
             return *this;

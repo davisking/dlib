@@ -3203,14 +3203,14 @@ convergence:
         typename EXP1,
         typename EXP2
         >
-    inline const matrix_exp<matrix_binary_exp<EXP1,EXP2,op_tensor_product> > tensor_product (
+    inline const matrix_binary_exp<EXP1,EXP2,op_tensor_product> tensor_product (
         const matrix_exp<EXP1>& a,
         const matrix_exp<EXP2>& b 
     )
     {
         COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
         typedef matrix_binary_exp<EXP1,EXP2,op_tensor_product> exp;
-        return matrix_exp<exp>(exp(a.ref(),b.ref()));
+        return exp(a.ref(),b.ref());
     }
 
 // ----------------------------------------------------------------------------------------

@@ -26,24 +26,24 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-    // This template struct is used to tell is if two matrix types both contain the same type of 
-    // element, have the same layout, and are both general matrices or both vectors.
         template <typename T, typename U>
         struct same_matrix
         {
             const static bool value = false;
         };
 
-        template <typename T, typename L, long a, long b, long c, long d, typename MM1, typename MM2 >
-        struct same_matrix <matrix<T,a,b,MM1,L>, matrix<T,c,d,MM2,L> >
+        template <typename T1, typename T2, typename L1, typename L2, long NR1, long NC1, long NR2, long NC2, typename MM1, typename MM2 >
+        struct same_matrix <matrix<T1,NR1,NC1,MM1,L1>, matrix<T2,NR2,NC2,MM2,L2> >
         { 
             /*! These two matrices are the same if they are either:
                     - both row vectors
                     - both column vectors
-                    - both not any kind of vector
+                    - both general matrices with the same kind of layout type
             !*/
             
-            const static bool value = (a == 1 && c == 1) || (b==1 && d==1) || (a!=1 && b!=1 && c!=1 && d!=1) ;
+            const static bool value = (NR1 == 1 && NR2 == 1) || 
+                                      (NC1==1 && NC2==1) || 
+                                      (NR1!=1 && NC1!=1 && NR2!=1 && NC2!=1 && is_same_type<L1,L2>::value);
         };
 
     // ------------------------------------------------------------------------------------
@@ -149,6 +149,7 @@ namespace dlib
             const src_exp& src                                                          \
         ) { 
 
+#define DLIB_END_BLAS_BINDING }};
 
     // ------------------------------------------------------------------------------------
 

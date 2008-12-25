@@ -18,21 +18,28 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        // Here we declare some matrix objects for use in the DLIB_ADD_BLAS_BINDING macro.  These
+        // extern declarations don't actually correspond to any real matrix objects.  They are
+        // simply here so we can build matrix expressions with the DLIB_ADD_BLAS_BINDING marco.
+
+
         typedef memory_manager<char>::kernel_1a mm;
-        extern matrix<double,0,0,mm,row_major_layout> dm;
-        extern matrix<float,0,0,mm,row_major_layout>  sm;
+        // Note that the fact that these are double matrices isn't important.  The type
+        // that matters is the one that is the first argument of the DLIB_ADD_BLAS_BINDING.
+        // That type determines what the type of the elements of the matrices that we
+        // are dealing with is.
+        extern matrix<double,0,0,mm,row_major_layout> rm;     // general matrix with row major order
+        extern matrix<double,0,0,mm,column_major_layout> cm;  // general matrix with column major order
+        extern matrix<double,1,0> rv;  // general row vector
+        extern matrix<double,0,1> cv;  // general column vector
 
-        extern matrix<double,1,0,mm,row_major_layout> drv;
-        extern matrix<double,0,1,mm,row_major_layout> dcv;
-
-        extern matrix<float,1,0,mm,row_major_layout>  srv;
-        extern matrix<float,0,1,mm,row_major_layout>  scv;
 
         using namespace std;
 
 #ifdef DLIB_FOUND_BLAS
 
-        DLIB_ADD_BLAS_BINDING(double, row_major_layout, dm*dm)
+        DLIB_ADD_BLAS_BINDING(double, row_major_layout, rm*rm)
+        {
             const CBLAS_ORDER Order = CblasRowMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
             const CBLAS_TRANSPOSE TransB = CblasNoTrans;
@@ -50,10 +57,11 @@ namespace dlib
             const int ldc = src.nc();
 
             cblas_dgemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
-        }};
+        } DLIB_END_BLAS_BINDING
 
 
-        DLIB_ADD_BLAS_BINDING(double, row_major_layout, trans(dm)*dm)
+        DLIB_ADD_BLAS_BINDING(double, row_major_layout, trans(rm)*rm)
+        {
             const CBLAS_ORDER Order = CblasRowMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
             const CBLAS_TRANSPOSE TransB = CblasNoTrans;
@@ -71,12 +79,13 @@ namespace dlib
             const int ldc = src.nc();
 
             cblas_dgemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
-        }};
+        } DLIB_END_BLAS_BINDING
 
 
-// double overloads
+        // -------------------------- float overloads --------------------------
 
-        DLIB_ADD_BLAS_BINDING(float, row_major_layout, sm*sm)
+        DLIB_ADD_BLAS_BINDING(float, row_major_layout, rm*rm)
+        {
             const CBLAS_ORDER Order = CblasRowMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
             const CBLAS_TRANSPOSE TransB = CblasNoTrans;
@@ -94,10 +103,11 @@ namespace dlib
             const int ldc = src.nc();
 
             cblas_sgemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
-        }};
+        } DLIB_END_BLAS_BINDING
 
 
-        DLIB_ADD_BLAS_BINDING(float, row_major_layout, trans(sm)*sm)
+        DLIB_ADD_BLAS_BINDING(float, row_major_layout, trans(rm)*rm)
+        {
             const CBLAS_ORDER Order = CblasRowMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
             const CBLAS_TRANSPOSE TransB = CblasNoTrans;
@@ -115,7 +125,7 @@ namespace dlib
             const int ldc = src.nc();
 
             cblas_sgemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
-        }};
+        } DLIB_END_BLAS_BINDING
 
 
 #endif // DLIB_FOUND_BLAS
