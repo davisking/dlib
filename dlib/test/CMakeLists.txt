@@ -43,6 +43,7 @@ set (tests
    map.cpp
    matrix.cpp
    matrix2.cpp
+   matrix3.cpp
    md5.cpp
    member_function_pointer.cpp
    metaprogramming.cpp

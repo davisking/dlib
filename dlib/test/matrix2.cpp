@@ -23,7 +23,7 @@ namespace
     using namespace dlib;
     using namespace std;
 
-    logger dlog("test.matrix");
+    logger dlog("test.matrix2");
 
     void matrix_test (
     )
