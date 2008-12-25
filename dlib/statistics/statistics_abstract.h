@@ -168,10 +168,10 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents something that can learn to normalize a set 
-                of vectors.  In particular, normalized vectors should have zero
-                mean and a variance of one.  
+                of column vectors.  In particular, normalized column vectors should 
+                have zero mean and a variance of one.  
 
-                Also, if desired, this object can also use principal component 
+                Also, if desired, this object can use principal component 
                 analysis for the purposes of reducing the number of elements in a 
                 vector.  
         !*/
