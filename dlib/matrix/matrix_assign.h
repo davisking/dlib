@@ -69,7 +69,7 @@ namespace dlib
         struct same_exp<matrix_subtract_exp<Tlhs,Trhs>, matrix_subtract_exp<Ulhs,Urhs> > 
         { const static bool value = same_exp<Tlhs,Ulhs>::value && same_exp<Trhs,Urhs>::value; };
 
-        template <typename T, typename U> struct same_exp<matrix_mul_scal_exp<T>, matrix_mul_scal_exp<U> > 
+        template <typename T, typename U, bool Tb, bool Ub> struct same_exp<matrix_mul_scal_exp<T,Tb>, matrix_mul_scal_exp<U,Ub> > 
         { const static bool value = same_exp<T,U>::value; };
 
         template <typename T, typename U> struct same_exp<matrix_div_scal_exp<T>, matrix_div_scal_exp<U> > 
@@ -113,13 +113,7 @@ namespace dlib
                 const EXP& src
             )
             {
-                for (long r = 0; r < src.nr(); ++r)
-                {
-                    for (long c = 0; c < src.nc(); ++c)
-                    {
-                        dest(r,c) = src(r,c);
-                    }
-                }
+                matrix_assign_default(dest,src);
             }
 
             // If we know this is a matrix multiply then apply the
@@ -133,6 +127,75 @@ namespace dlib
             {
                 set_all_elements(dest,0);
                 default_matrix_multiply(dest, src.lhs, src.rhs);
+            }
+
+            template <typename EXP1, typename EXP2>
+            static void assign (
+                matrix<T,NR,NC,MM,L>& dest,
+                const matrix_add_exp<matrix<T,NR,NC,MM,L>, matrix_multiply_exp<EXP1,EXP2> >& src
+            )
+            {
+                if (&dest == &src.lhs)
+                {
+                    default_matrix_multiply(dest, src.rhs.lhs, src.rhs.rhs);
+                }
+                else
+                {
+                    dest = src.lhs;
+                    default_matrix_multiply(dest, src.rhs.lhs, src.rhs.rhs);
+                }
+            }
+
+            template <typename EXP1, typename EXP2>
+            static void assign (
+                matrix<T,NR,NC,MM,L>& dest,
+                const matrix_add_exp<matrix<T,NR,NC,MM,L>, matrix_add_exp<EXP1,EXP2> >& src
+            )
+            {
+                if (EXP1::cost > 50 || EXP2::cost > 5)
+                {
+                    matrix_assign(dest, src.lhs + src.rhs.lhs);
+                    matrix_assign(dest, src.lhs + src.rhs.rhs);
+                }
+                else
+                {
+                    matrix_assign_default(dest,src);
+                }
+            }
+
+            template <typename EXP2>
+            static void assign (
+                matrix<T,NR,NC,MM,L>& dest,
+                const matrix_add_exp<matrix<T,NR,NC,MM,L>,EXP2>& src
+            )
+            {
+                if (EXP2::cost > 50 && &dest != &src.lhs)
+                {
+                    dest = src.lhs;
+                    matrix_assign(dest, dest + src.rhs);
+                }
+                else
+                {
+                    matrix_assign_default(dest,src);
+                }
+            }
+
+
+            template <typename EXP1, typename EXP2>
+            static void assign (
+                matrix<T,NR,NC,MM,L>& dest,
+                const matrix_add_exp<EXP1,EXP2>& src
+            )
+            {
+                if (EXP1::cost > 50 || EXP2::cost > 50)
+                {
+                    matrix_assign(dest,src.lhs);
+                    matrix_assign(dest, dest + src.rhs);
+                }
+                else
+                {
+                    matrix_assign_default(dest,src);
+                }
             }
         };
 

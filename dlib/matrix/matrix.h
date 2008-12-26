@@ -308,6 +308,8 @@ namespace dlib
 
         const static bool lhs_is_costly = matrix_traits<matrix_multiply_exp>::lhs_is_costly;
         const static bool rhs_is_costly = matrix_traits<matrix_multiply_exp>::rhs_is_costly;
+        const static bool either_is_costly = lhs_is_costly || rhs_is_costly;
+        const static bool both_are_costly = lhs_is_costly && rhs_is_costly;
 
         typedef typename conditional_matrix_temp<const LHS,lhs_is_costly == false>::type LHS_ref_type;
         typedef typename conditional_matrix_temp<const RHS,rhs_is_costly == false>::type RHS_ref_type;
@@ -385,6 +387,59 @@ namespace dlib
     )
     {
         return matrix_multiply_exp<EXP1, EXP2>(m1.ref(), m2.ref());
+    }
+
+    template <typename M, bool use_reference = true>
+    class matrix_mul_scal_exp;
+
+    // -------------------------
+
+    // Now we declare some overloads that cause any scalar multiplications to percolate 
+    // up and outside of any matrix multiplies.  Note that we are using the non-reference containing
+    // mode of the matrix_mul_scal_exp object since we are passing in locally constructed matrix_multiply_exp 
+    // objects.  So the matrix_mul_scal_exp object will contain copies of matrix_multiply_exp objects
+    // rather than references to them.  This could result in extra matrix copies if the matrix_multiply_exp
+    // decided it should evaluate any of its arguments.  So we also try to not apply this percolating operation 
+    // if the matrix_multiply_exp would contain a fully evaluated copy of the original matrix_mul_scal_exp 
+    // expression.
+    // 
+    // Also, the reason we want to apply this transformation in the first place is because it (1) makes
+    // the expressions going into matrix multiply expressions simpler and (2) it makes it a lot more
+    // straight forward to bind BLAS calls to matrix expressions involving scalar multiplies.
+    template < typename EXP1, typename EXP2 >
+    inline const typename disable_if_c< matrix_multiply_exp<matrix_mul_scal_exp<EXP1>, matrix_mul_scal_exp<EXP2> >::both_are_costly ,      
+                                        matrix_mul_scal_exp<matrix_multiply_exp<EXP1, EXP2>,false> >::type operator* (
+        const matrix_mul_scal_exp<EXP1>& m1,
+        const matrix_mul_scal_exp<EXP2>& m2
+    )
+    {
+        typedef matrix_multiply_exp<EXP1, EXP2> exp1;
+        typedef matrix_mul_scal_exp<exp1,false> exp2;
+        return exp2(exp1(m1.m, m2.m), m1.s*m2.s);
+    }
+
+    template < typename EXP1, typename EXP2 >
+    inline const typename disable_if_c< matrix_multiply_exp<matrix_mul_scal_exp<EXP1>, EXP2 >::lhs_is_costly ,      
+                                      matrix_mul_scal_exp<matrix_multiply_exp<EXP1, EXP2>,false> >::type operator* (
+        const matrix_mul_scal_exp<EXP1>& m1,
+        const matrix_exp<EXP2>& m2
+    )
+    {
+        typedef matrix_multiply_exp<EXP1, EXP2> exp1;
+        typedef matrix_mul_scal_exp<exp1,false> exp2;
+        return exp2(exp1(m1.m, m2.ref()), m1.s);
+    }
+
+    template < typename EXP1, typename EXP2 >
+    inline const typename disable_if_c< matrix_multiply_exp<EXP1, matrix_mul_scal_exp<EXP2> >::rhs_is_costly ,      
+                                      matrix_mul_scal_exp<matrix_multiply_exp<EXP1, EXP2>,false> >::type operator* (
+        const matrix_exp<EXP1>& m1,
+        const matrix_mul_scal_exp<EXP2>& m2
+    )
+    {
+        typedef matrix_multiply_exp<EXP1, EXP2> exp1;
+        typedef matrix_mul_scal_exp<exp1,false> exp2;
+        return exp2(exp1(m1.ref(), m2.m), m2.s);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -687,23 +742,20 @@ namespace dlib
 
     template <
         typename EXP,
-        typename S 
+        typename S
         >
-    inline const matrix_div_scal_exp<EXP>  operator/ (
+    inline const typename enable_if_c<std::numeric_limits<typename EXP::type>::is_integer, matrix_div_scal_exp<EXP> >::type operator/ (
         const matrix_exp<EXP>& m,
         const S& s
     )
     {
-        return matrix_div_scal_exp<EXP>(m.ref(),s);
+        return matrix_div_scal_exp<EXP>(m.ref(),static_cast<typename EXP::type>(s));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename M>
-    class matrix_mul_scal_exp;
-
-    template <typename M>
-    struct matrix_traits<matrix_mul_scal_exp<M> >
+    template <typename M, bool use_reference >
+    struct matrix_traits<matrix_mul_scal_exp<M,use_reference> >
     {
         typedef typename M::type type;
         typedef typename M::mem_manager_type mem_manager_type;
@@ -713,10 +765,15 @@ namespace dlib
         const static long cost = M::cost+1;
     };
 
+    template <typename T, bool is_ref> struct conditional_reference { typedef T type; };
+    template <typename T> struct conditional_reference<T,true>      { typedef T& type; };
+
+
     template <
-        typename M
+        typename M,
+        bool use_reference
         >
-    class matrix_mul_scal_exp : public matrix_exp<matrix_mul_scal_exp<M> >
+    class matrix_mul_scal_exp : public matrix_exp<matrix_mul_scal_exp<M,use_reference> >
     {
         /*!
             REQUIREMENTS ON M 
@@ -773,7 +830,9 @@ namespace dlib
         long nc (
         ) const { return m.nc(); }
 
-        const M& m;
+        typedef typename conditional_reference<const M,use_reference>::type M_ref_type;
+
+        M_ref_type m;
         const type s;
     };
 
@@ -791,6 +850,19 @@ namespace dlib
 
     template <
         typename EXP,
+        typename S,
+        bool B
+        >
+    inline typename disable_if<is_matrix<S>, const matrix_mul_scal_exp<EXP> >::type operator* (
+        const matrix_mul_scal_exp<EXP,B>& m,
+        const S& s
+    )
+    {
+        return matrix_mul_scal_exp<EXP>(m.m,s*m.s);
+    }
+
+    template <
+        typename EXP,
         typename S 
         >
     inline typename disable_if<is_matrix<S>, const matrix_mul_scal_exp<EXP> >::type operator* (
@@ -802,36 +874,44 @@ namespace dlib
     }
 
     template <
-        typename EXP 
+        typename EXP,
+        typename S,
+        bool B
         >
-    inline const matrix_mul_scal_exp<EXP> operator/ (
-        const matrix_exp<EXP>& m,
-        const float& s
+    inline typename disable_if<is_matrix<S>, const matrix_mul_scal_exp<EXP> >::type operator* (
+        const S& s,
+        const matrix_mul_scal_exp<EXP,B>& m
     )
     {
-        return matrix_mul_scal_exp<EXP>(m.ref(),1.0f/s);
+        return matrix_mul_scal_exp<EXP>(m.m,s*m.s);
     }
 
     template <
-        typename EXP
+        typename EXP ,
+        typename S
         >
-    inline const matrix_mul_scal_exp<EXP> operator/ (
+    inline const typename disable_if_c<std::numeric_limits<typename EXP::type>::is_integer, matrix_mul_scal_exp<EXP> >::type operator/ (
         const matrix_exp<EXP>& m,
-        const double& s
+        const S& s
     )
     {
-        return matrix_mul_scal_exp<EXP>(m.ref(),1.0/s);
+        typedef typename EXP::type type;
+        const type one = 1;
+        return matrix_mul_scal_exp<EXP>(m.ref(),one/static_cast<type>(s));
     }
 
     template <
-        typename EXP
+        typename EXP,
+        bool B,
+        typename S
         >
-    inline const matrix_mul_scal_exp<EXP> operator/ (
-        const matrix_exp<EXP>& m,
-        const long double& s
+    inline const typename disable_if_c<std::numeric_limits<typename EXP::type>::is_integer, matrix_mul_scal_exp<EXP> >::type operator/ (
+        const matrix_mul_scal_exp<EXP,B>& m,
+        const S& s
     )
     {
-        return matrix_mul_scal_exp<EXP>(m.ref(),1.0/s);
+        typedef typename EXP::type type;
+        return matrix_mul_scal_exp<EXP>(m.m,m.s/static_cast<type>(s));
     }
 
     template <
@@ -842,6 +922,17 @@ namespace dlib
     )
     {
         return matrix_mul_scal_exp<EXP>(m.ref(),-1);
+    }
+
+    template <
+        typename EXP,
+        bool B
+        >
+    inline const matrix_mul_scal_exp<EXP> operator- (
+        const matrix_mul_scal_exp<EXP,B>& m
+    )
+    {
+        return matrix_mul_scal_exp<EXP>(m.m,-1*m.s);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1261,8 +1352,18 @@ namespace dlib
                                 (is_matrix<typename EXP::type>::value == true));
             if (m.destructively_aliases(*this) == false)
             {
-                set_size(m.nr(),m.nc());
-                matrix_assign(*this, m);
+                // This if statement is seemingly unnecessary since set_size() contains this
+                // exact same if statement.  However, structuring the code this way causes
+                // gcc to handle the way it inlines this function in a much more favorable way.
+                if (data.nr() == m.nr() && data.nc() == m.nc())
+                {
+                    matrix_assign(*this, m);
+                }
+                else
+                {
+                    set_size(m.nr(),m.nc());
+                    matrix_assign(*this, m);
+                }
             }
             else
             {

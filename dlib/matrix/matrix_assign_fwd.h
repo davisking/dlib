@@ -39,27 +39,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-// In newer versions of GCC it is necessary to explicitly tell it to not try to
-// inline the matrix_assign() function when working with matrix objects that 
-// don't have dimensions that are known at compile time.  Doing this makes the
-// resulting binaries a lot faster when -O3 is used.  This whole deal with
-// different versions of matrix_assign() is just to support getting the right
-// inline behavior out of GCC.
-#ifdef __GNUC__
-#define DLIB_DONT_INLINE __attribute__((noinline))
-#define DLIB_ALWAYS_INLINE __attribute__((always_inline))
-#else
-#define DLIB_DONT_INLINE 
-#define DLIB_ALWAYS_INLINE 
-#endif
-
-    template <
-        typename matrix_dest_type,
-        typename src_exp 
-        >
-    DLIB_DONT_INLINE void matrix_assign_big (
-        matrix_dest_type& dest,
-        const matrix_exp<src_exp>& src
+    template <typename EXP1, typename EXP2>
+    inline static void matrix_assign_default (
+        EXP1& dest,
+        const EXP2& src
     )
     {
         for (long r = 0; r < src.nr(); ++r)
@@ -71,22 +54,18 @@ namespace dlib
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
     template <
         typename matrix_dest_type,
         typename src_exp 
         >
-    inline void matrix_assign_small (
+    void matrix_assign_big (
         matrix_dest_type& dest,
         const matrix_exp<src_exp>& src
     )
     {
-        for (long r = 0; r < src.nr(); ++r)
-        {
-            for (long c = 0; c < src.nc(); ++c)
-            {
-                dest(r,c) = src(r,c);
-            }
-        }
+        matrix_assign_default(dest,src);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -131,7 +110,7 @@ namespace dlib
             - the part of dest outside the above sub matrix remains unchanged
     !*/
     {
-        matrix_assign_small(dest,src.ref());
+        matrix_assign_default(dest,src.ref());
     }
 
 // ----------------------------------------------------------------------------------------
