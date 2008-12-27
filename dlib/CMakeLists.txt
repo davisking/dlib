@@ -48,12 +48,15 @@ set (DLIB_ENABLE_ASSERTS_STR
 "Enable this if you want to turn on the DLIB_ASSERT macro" )
 set (DLIB_ENABLE_SHARED_BUILD_STR
 "Enable this if you want to create a shared dlib library (.dll, .so)" )
+set (DLIB_USE_BLAS_STR
+"Disable this if you don't want to use a BLAS library" )
 
 option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
 option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
 option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
 option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
 option(DLIB_ENABLE_SHARED_BUILD ${DLIB_ENABLE_SHARED_BUILD_STR} OFF)
+option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
 
 
 if (DLIB_ENABLE_SHARED_BUILD)
@@ -142,6 +145,17 @@ if (NOT DLIB_ISO_CPP_ONLY)
       add_global_define(DLIB_PNG_SUPPORT)
    endif()
 
+   if (DLIB_USE_BLAS)
+      # Try to find a BLAS library
+      include(cmake_find_blas.txt)
+      if (blas_found)
+         set (dlib_needed_libraries ${dlib_needed_libraries} ${blas_libraries})
+      else()
+         set(DLIB_USE_BLAS OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
+      endif()
+   endif()
+
+
 
    target_link_libraries(dlib ${dlib_needed_libraries} )
 
@@ -151,6 +165,13 @@ endif ()
 #test for some things that really should be true about the compiler
 include(TestForSTDNamespace)
 include(TestForANSIStreamHeaders)
+
+
+if (DLIB_USE_BLAS AND blas_found)
+   add_global_define(DLIB_USE_BLAS)
+else()
+   remove_global_define(DLIB_USE_BLAS)
+endif()
 
 
 if (DLIB_ISO_CPP_ONLY)

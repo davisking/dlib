@@ -5,7 +5,7 @@
 
 #include "matrix_assign.h"
 
-#ifdef DLIB_FOUND_BLAS
+#ifdef DLIB_USE_BLAS
 #include "cblas.h"
 #endif
 
@@ -16,7 +16,7 @@ namespace dlib
     namespace blas_bindings 
     {
 
-#ifdef DLIB_FOUND_BLAS
+#ifdef DLIB_USE_BLAS
 
     // ----------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------
@@ -356,7 +356,7 @@ namespace dlib
         } DLIB_END_BLAS_BINDING
 
 
-#endif // DLIB_FOUND_BLAS
+#endif // DLIB_USE_BLAS
 
     }
 
