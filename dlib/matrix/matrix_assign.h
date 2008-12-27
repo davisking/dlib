@@ -201,14 +201,14 @@ namespace dlib
 
         // This is a macro to help us add overloads for the matrix_assign_blas_helper template.  
         // Using this macro it is easy to add overloads for arbitrary matrix expressions.
-#define DLIB_ADD_BLAS_BINDING( dest_type, dest_layout, src_expression)                  \
+#define DLIB_ADD_BLAS_BINDING( dest_layout, src_expression)                             \
     template <typename T> struct BOOST_JOIN(blas,__LINE__)                              \
     { const static bool value = sizeof(yes_type) == sizeof(test<T>(src_expression)); }; \
-    template < long NR, long NC, typename MM, typename src_exp >                        \
-    struct matrix_assign_blas_helper<dest_type,NR,NC,MM,dest_layout, src_exp,           \
+    template < typename T, long NR, long NC, typename MM, typename src_exp >            \
+    struct matrix_assign_blas_helper<T,NR,NC,MM,dest_layout, src_exp,                   \
     typename enable_if<BOOST_JOIN(blas,__LINE__)<src_exp> >::type > {                   \
         static void assign (                                                            \
-            matrix<dest_type,NR,NC,MM,dest_layout>& dest,                               \
+            matrix<T,NR,NC,MM,dest_layout>& dest,                                       \
             const src_exp& src                                                          \
         ) { 
 
@@ -224,7 +224,11 @@ namespace dlib
         typename T, long NR, long NC, typename MM, typename L,
         typename src_exp 
         >
-    inline void matrix_assign_big (
+    inline typename enable_if_c<(is_same_type<T,float>::value ||
+                                is_same_type<T,double>::value ||
+                                is_same_type<T,std::complex<float> >::value ||
+                                is_same_type<T,std::complex<double> >::value) 
+    >::type matrix_assign_big (
         matrix<T,NR,NC,MM,L>& dest,
         const src_exp& src
     )
