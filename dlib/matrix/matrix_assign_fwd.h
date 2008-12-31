@@ -44,12 +44,95 @@ namespace dlib
         EXP1& dest,
         const EXP2& src
     )
+    /*!
+        requires
+            - src.destructively_aliases(dest) == false
+        ensures
+            - #dest == src
+    !*/
     {
         for (long r = 0; r < src.nr(); ++r)
         {
             for (long c = 0; c < src.nc(); ++c)
             {
                 dest(r,c) = src(r,c);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP1, typename EXP2>
+    inline static void matrix_assign_default (
+        EXP1& dest,
+        const EXP2& src,
+        typename EXP2::type alpha,
+        bool add_to
+    )
+    /*!
+        requires
+            - src.destructively_aliases(dest) == false
+        ensures
+            - if (add_to == false) then
+                - #dest == alpha*src
+            - else
+                - #dest == dest + alpha*src
+    !*/
+    {
+        if (add_to)
+        {
+            if (alpha == 1)
+            {
+                for (long r = 0; r < src.nr(); ++r)
+                {
+                    for (long c = 0; c < src.nc(); ++c)
+                    {
+                        dest(r,c) += src(r,c);
+                    }
+                }
+            }
+            else if (alpha == -1)
+            {
+                for (long r = 0; r < src.nr(); ++r)
+                {
+                    for (long c = 0; c < src.nc(); ++c)
+                    {
+                        dest(r,c) -= src(r,c);
+                    }
+                }
+            }
+            else
+            {
+                for (long r = 0; r < src.nr(); ++r)
+                {
+                    for (long c = 0; c < src.nc(); ++c)
+                    {
+                        dest(r,c) += alpha*src(r,c);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (alpha == 1)
+            {
+                for (long r = 0; r < src.nr(); ++r)
+                {
+                    for (long c = 0; c < src.nc(); ++c)
+                    {
+                        dest(r,c) = src(r,c);
+                    }
+                }
+            }
+            else
+            {
+                for (long r = 0; r < src.nr(); ++r)
+                {
+                    for (long c = 0; c < src.nc(); ++c)
+                    {
+                        dest(r,c) = alpha*src(r,c);
+                    }
+                }
             }
         }
     }
@@ -83,7 +166,6 @@ namespace dlib
             - src.destructively_aliases(dest) == false
         ensures
             - #dest == src
-            - the part of dest outside the above sub matrix remains unchanged
     !*/
     {
         // Call src.ref() here so that the derived type of the matrix_exp shows 
@@ -107,7 +189,6 @@ namespace dlib
             - src.destructively_aliases(dest) == false
         ensures
             - #dest == src
-            - the part of dest outside the above sub matrix remains unchanged
     !*/
     {
         matrix_assign_default(dest,src.ref());

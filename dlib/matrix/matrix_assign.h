@@ -26,6 +26,39 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+    // This template struct is used to tell us if a matrix expression contains a matrix multiply.
+        template <typename T>
+        struct has_matrix_multiply
+        {
+            const static bool value = false;
+        };
+
+        template <typename T, typename U> 
+        struct has_matrix_multiply<matrix_multiply_exp<T,U> > 
+        { const static bool value = true; };
+
+        template <typename T, typename U> 
+        struct has_matrix_multiply<matrix_add_exp<T,U> >  
+        { const static bool value = has_matrix_multiply<T>::value || has_matrix_multiply<U>::value; };
+
+        template <typename T, typename U> 
+        struct has_matrix_multiply<matrix_subtract_exp<T,U> >  
+        { const static bool value = has_matrix_multiply<T>::value || has_matrix_multiply<U>::value; };
+
+        template <typename T, bool Tb> 
+        struct has_matrix_multiply<matrix_mul_scal_exp<T,Tb> >  
+        { const static bool value = has_matrix_multiply<T>::value; };
+
+        template <typename T> 
+        struct has_matrix_multiply<matrix_div_scal_exp<T> >  
+        { const static bool value = has_matrix_multiply<T>::value; };
+
+        template <typename T, typename OP> 
+        struct has_matrix_multiply<matrix_unary_exp<T,OP> >  
+        { const static bool value = has_matrix_multiply<T>::value; };
+
+    // ------------------------------------------------------------------------------------
+
         template <typename T, typename U>
         struct same_matrix
         {
@@ -110,10 +143,12 @@ namespace dlib
             template <typename EXP>
             static void assign (
                 matrix<T,NR,NC,MM,L>& dest,
-                const EXP& src
+                const EXP& src,
+                typename src_exp::type alpha,
+                bool add_to
             )
             {
-                matrix_assign_default(dest,src);
+                matrix_assign_default(dest,src,alpha,add_to);
             }
 
             // If we know this is a matrix multiply then apply the
@@ -122,79 +157,40 @@ namespace dlib
             template <typename EXP1, typename EXP2>
             static void assign (
                 matrix<T,NR,NC,MM,L>& dest,
-                const matrix_multiply_exp<EXP1,EXP2>& src
+                const matrix_multiply_exp<EXP1,EXP2>& src,
+                typename src_exp::type alpha,
+                bool add_to
             )
             {
-                set_all_elements(dest,0);
-                default_matrix_multiply(dest, src.lhs, src.rhs);
-            }
+                // At some point I need to improve the default (i.e. non BLAS) matrix 
+                // multiplication algorithm...
 
-            template <typename EXP1, typename EXP2>
-            static void assign (
-                matrix<T,NR,NC,MM,L>& dest,
-                const matrix_add_exp<matrix<T,NR,NC,MM,L>, matrix_multiply_exp<EXP1,EXP2> >& src
-            )
-            {
-                if (&dest == &src.lhs)
+                if (alpha == 1)
                 {
-                    default_matrix_multiply(dest, src.rhs.lhs, src.rhs.rhs);
+                    if (add_to)
+                    {
+                        default_matrix_multiply(dest, src.lhs, src.rhs);
+                    }
+                    else
+                    {
+                        set_all_elements(dest,0);
+                        default_matrix_multiply(dest, src.lhs, src.rhs);
+                    }
                 }
                 else
                 {
-                    dest = src.lhs;
-                    default_matrix_multiply(dest, src.rhs.lhs, src.rhs.rhs);
-                }
-            }
-
-            template <typename EXP1, typename EXP2>
-            static void assign (
-                matrix<T,NR,NC,MM,L>& dest,
-                const matrix_add_exp<matrix<T,NR,NC,MM,L>, matrix_add_exp<EXP1,EXP2> >& src
-            )
-            {
-                if (EXP1::cost > 50 || EXP2::cost > 5)
-                {
-                    matrix_assign(dest, src.lhs + src.rhs.lhs);
-                    matrix_assign(dest, src.lhs + src.rhs.rhs);
-                }
-                else
-                {
-                    matrix_assign_default(dest,src);
-                }
-            }
-
-            template <typename EXP2>
-            static void assign (
-                matrix<T,NR,NC,MM,L>& dest,
-                const matrix_add_exp<matrix<T,NR,NC,MM,L>,EXP2>& src
-            )
-            {
-                if (EXP2::cost > 50 && &dest != &src.lhs)
-                {
-                    dest = src.lhs;
-                    matrix_assign(dest, dest + src.rhs);
-                }
-                else
-                {
-                    matrix_assign_default(dest,src);
-                }
-            }
-
-
-            template <typename EXP1, typename EXP2>
-            static void assign (
-                matrix<T,NR,NC,MM,L>& dest,
-                const matrix_add_exp<EXP1,EXP2>& src
-            )
-            {
-                if (EXP1::cost > 50 || EXP2::cost > 50)
-                {
-                    matrix_assign(dest,src.lhs);
-                    matrix_assign(dest, dest + src.rhs);
-                }
-                else
-                {
-                    matrix_assign_default(dest,src);
+                    if (add_to)
+                    {
+                        matrix<T,NR,NC,MM,L> temp(dest);
+                        default_matrix_multiply(temp, src.lhs, src.rhs);
+                        dest = alpha*temp;
+                    }
+                    else
+                    {
+                        set_all_elements(dest,0);
+                        default_matrix_multiply(dest, src.lhs, src.rhs);
+                        dest = alpha*dest;
+                    }
                 }
             }
         };
@@ -209,11 +205,307 @@ namespace dlib
     typename enable_if<BOOST_JOIN(blas,__LINE__)<src_exp> >::type > {                   \
         static void assign (                                                            \
             matrix<T,NR,NC,MM,dest_layout>& dest,                                       \
-            const src_exp& src                                                          \
+            const src_exp& src,                                                         \
+            typename src_exp::type alpha,                                               \
+            bool add_to                                                                 \
         ) { 
 
 #define DLIB_END_BLAS_BINDING }};
 
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+    // ------------------- Forward Declarations -------------------
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp 
+            >
+        void matrix_assign_blas_proxy (
+            matrix<T,NR,NC,MM,L>& dest,
+            const src_exp& src,
+            typename src_exp::type alpha,
+            bool add_to
+        );
+        /*!
+            requires
+                - src.aliases(dest) == false
+        !*/
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp, typename src_exp2 
+            >
+        void matrix_assign_blas_proxy (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_add_exp<src_exp, src_exp2>& src,
+            typename src_exp::type alpha,
+            bool add_to
+        );
+        /*!
+            requires
+                - src.aliases(dest) == false
+        !*/
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp, bool Sb 
+            >
+        void matrix_assign_blas_proxy (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_mul_scal_exp<src_exp,Sb>& src,
+            typename src_exp::type alpha,
+            bool add_to
+        );
+        /*!
+            requires
+                - src.aliases(dest) == false
+        !*/
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp, typename src_exp2 
+            >
+        void matrix_assign_blas_proxy (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_subtract_exp<src_exp, src_exp2>& src,
+            typename src_exp::type alpha,
+            bool add_to
+        );
+        /*!
+            requires
+                - src.aliases(dest) == false
+        !*/
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp 
+            >
+        void matrix_assign_blas (
+            matrix<T,NR,NC,MM,L>& dest,
+            const src_exp& src
+        );
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp 
+            >
+        void matrix_assign_blas (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_add_exp<matrix<T,NR,NC,MM,L> ,src_exp>& src
+        );
+        /*!
+            This function catches the expressions of the form:  
+                M = M + exp; 
+            and converts them into the appropriate matrix_assign_blas() call.
+            This is an important case to catch because it is the expression used
+            to represent the += matrix operator.
+        !*/
+            
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp 
+            >
+        void matrix_assign_blas (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_subtract_exp<matrix<T,NR,NC,MM,L> ,src_exp>& src
+        );
+        /*!
+            This function catches the expressions of the form:  
+                M = M - exp; 
+            and converts them into the appropriate matrix_assign_blas() call.
+            This is an important case to catch because it is the expression used
+            to represent the -= matrix operator.
+        !*/
+
+
+        //   End of forward declarations for overloaded matrix_assign_blas functions
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp 
+            >
+        void matrix_assign_blas_proxy (
+            matrix<T,NR,NC,MM,L>& dest,
+            const src_exp& src,
+            typename src_exp::type alpha,
+            bool add_to
+        )
+        {
+            matrix_assign_blas_helper<T,NR,NC,MM,L,src_exp>::assign(dest,src,alpha,add_to);
+        }
+            
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp, typename src_exp2 
+            >
+        void matrix_assign_blas_proxy (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_add_exp<src_exp, src_exp2>& src,
+            typename src_exp::type alpha,
+            bool add_to
+        )
+        {
+            if (src_exp::cost > 9 || src_exp2::cost > 9)
+            {
+                matrix_assign_blas_proxy(dest, src.lhs, alpha, add_to);
+                matrix_assign_blas_proxy(dest, src.rhs, alpha, true);
+            }
+            else
+            {
+                matrix_assign_default(dest, src, alpha, add_to);
+            }
+        }
+            
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp, bool Sb 
+            >
+        void matrix_assign_blas_proxy (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_mul_scal_exp<src_exp,Sb>& src,
+            typename src_exp::type alpha,
+            bool add_to
+        )
+        {
+            matrix_assign_blas_proxy(dest, src.m, alpha*src.s, add_to);
+        }
+            
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp, typename src_exp2 
+            >
+        void matrix_assign_blas_proxy (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_subtract_exp<src_exp, src_exp2>& src,
+            typename src_exp::type alpha,
+            bool add_to
+        )
+        {
+            if (src_exp::cost > 9 || src_exp2::cost > 9)
+            {
+                matrix_assign_blas_proxy(dest, src.lhs, alpha, add_to);
+                matrix_assign_blas_proxy(dest, src.rhs, -alpha, true);
+            }
+            else
+            {
+                matrix_assign_default(dest, src, alpha, add_to);
+            }
+        }
+            
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+    // Once we get into this function it means that we are dealing with a matrix of float,
+    // double, complex<float>, or complex<double> and the src_exp contains at least one
+    // matrix multiply.
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp 
+            >
+        void matrix_assign_blas (
+            matrix<T,NR,NC,MM,L>& dest,
+            const src_exp& src
+        )
+        {
+            if (src.aliases(dest))
+            {
+                matrix<T,NR,NC,MM,L> temp;
+                matrix_assign_blas_proxy(temp,src,1,false);
+                temp.swap(dest);
+            }
+            else
+            {
+                matrix_assign_blas_proxy(dest,src,1,false);
+            }
+        }
+            
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp 
+            >
+        void matrix_assign_blas (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_add_exp<matrix<T,NR,NC,MM,L> ,src_exp>& src
+        )
+        {
+            if (src_exp::cost > 5)
+            {
+                if (src.rhs.aliases(dest) == false)
+                {
+                    if (&src.lhs != &dest)
+                    {
+                        dest = src.lhs;
+                    }
+
+                    matrix_assign_blas_proxy(dest, src.rhs, 1, true);
+                }
+                else
+                {
+                    matrix<T,NR,NC,MM,L> temp(src.lhs);
+                    matrix_assign_blas_proxy(temp, src.rhs, 1, true);
+                    temp.swap(dest);
+                }
+            }
+            else
+            {
+                matrix_assign_default(dest,src);
+            }
+        }
+            
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp 
+            >
+        void matrix_assign_blas (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_subtract_exp<matrix<T,NR,NC,MM,L> ,src_exp>& src
+        )
+        {
+            if (src_exp::cost > 5)
+            {
+                if (src.rhs.aliases(dest) == false)
+                {
+                    if (&src.lhs != &dest)
+                    {
+                        dest = src.lhs;
+                    }
+
+                    matrix_assign_blas_proxy(dest, src.rhs, -1, true);
+                }
+                else
+                {
+                    matrix<T,NR,NC,MM,L> temp(src.lhs);
+                    matrix_assign_blas_proxy(temp, src.rhs, -1, true);
+                    temp.swap(dest);
+                }
+            }
+            else
+            {
+                matrix_assign_default(dest,src);
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
     } // end of namespace blas_bindings 
@@ -227,13 +519,14 @@ namespace dlib
     inline typename enable_if_c<(is_same_type<T,float>::value ||
                                 is_same_type<T,double>::value ||
                                 is_same_type<T,std::complex<float> >::value ||
-                                is_same_type<T,std::complex<double> >::value) 
+                                is_same_type<T,std::complex<double> >::value) &&
+                                blas_bindings::has_matrix_multiply<src_exp>::value
     >::type matrix_assign_big (
         matrix<T,NR,NC,MM,L>& dest,
         const src_exp& src
     )
     {
-        blas_bindings::matrix_assign_blas_helper<T,NR,NC,MM,L,src_exp>::assign(dest,src);
+        blas_bindings::matrix_assign_blas(dest,src);
     }
 
 // ----------------------------------------------------------------------------------------

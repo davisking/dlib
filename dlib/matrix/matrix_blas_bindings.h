@@ -9,6 +9,8 @@
 #include "cblas.h"
 #endif
 
+#include <iostream>
+
 namespace dlib
 {
 
@@ -219,41 +221,14 @@ namespace dlib
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
-            const T alpha = 1;
             const T* A = &src.lhs(0,0);
             const int lda = src.lhs.nc();
             const T* B = &src.rhs(0,0);
             const int ldb = src.rhs.nc();
 
-            const T beta = 0;
+            const T beta = add_to?1:0;
             T* C = &dest(0,0);
             const int ldc = src.nc();
-
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
-        } DLIB_END_BLAS_BINDING
-
-        DLIB_ADD_BLAS_BINDING(row_major_layout,rm + rm*rm)
-        {
-            if (&src.lhs != &dest)
-            {
-                dest = src.lhs;
-            }
-
-            const CBLAS_ORDER Order = CblasRowMajor;
-            const CBLAS_TRANSPOSE TransA = CblasNoTrans;
-            const CBLAS_TRANSPOSE TransB = CblasNoTrans;
-            const int M = static_cast<int>(src.rhs.nr());
-            const int N = static_cast<int>(src.rhs.nc());
-            const int K = static_cast<int>(src.rhs.lhs.nc());
-            const T alpha = 1;
-            const T* A = &src.rhs.lhs(0,0);
-            const int lda = src.rhs.lhs.nc();
-            const T* B = &src.rhs.rhs(0,0);
-            const int ldb = src.rhs.rhs.nc();
-
-            const T beta = 1;
-            T* C = &dest(0,0);
-            const int ldc = src.rhs.nc();
 
             cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
         } DLIB_END_BLAS_BINDING
@@ -268,93 +243,17 @@ namespace dlib
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
-            const T alpha = 1;
             const T* A = &src.lhs.m(0,0);
             const int lda = src.lhs.m.nc();
             const T* B = &src.rhs(0,0);
             const int ldb = src.rhs.nc();
 
-            const T beta = 0;
+            const T beta = add_to?1:0;
             T* C = &dest(0,0);
             const int ldc = src.nc();
 
             cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
         } DLIB_END_BLAS_BINDING
-
-        DLIB_ADD_BLAS_BINDING(row_major_layout, rm + s*trans(rm)*rm)
-        {
-            if (&src.lhs != &dest)
-            {
-                dest = src.lhs;
-            }
-
-            const CBLAS_ORDER Order = CblasRowMajor;
-            const CBLAS_TRANSPOSE TransA = CblasTrans;
-            const CBLAS_TRANSPOSE TransB = CblasNoTrans;
-            const int M = static_cast<int>(src.rhs.m.nr());
-            const int N = static_cast<int>(src.rhs.m.nc());
-            const int K = static_cast<int>(src.rhs.m.lhs.nc());
-            const T alpha = src.rhs.s;
-            const T* A = &src.rhs.m.lhs.m(0,0);
-            const int lda = src.rhs.m.lhs.m.nc();
-            const T* B = &src.rhs.m.rhs(0,0);
-            const int ldb = src.rhs.m.rhs.nc();
-
-            const T beta = 1;
-            T* C = &dest(0,0);
-            const int ldc = dest.nc();
-
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
-        } DLIB_END_BLAS_BINDING
-
-        DLIB_ADD_BLAS_BINDING(row_major_layout, s*trans(rm)*rm)
-        {
-            const CBLAS_ORDER Order = CblasRowMajor;
-            const CBLAS_TRANSPOSE TransA = CblasTrans;
-            const CBLAS_TRANSPOSE TransB = CblasNoTrans;
-            const int M = static_cast<int>(src.m.nr());
-            const int N = static_cast<int>(src.m.nc());
-            const int K = static_cast<int>(src.m.lhs.nc());
-            const T alpha = src.s;
-            const T* A = &src.m.lhs.m(0,0);
-            const int lda = src.m.lhs.m.nc();
-            const T* B = &src.m.rhs(0,0);
-            const int ldb = src.m.rhs.nc();
-
-            const T beta = 0;
-            T* C = &dest(0,0);
-            const int ldc = dest.nc();
-
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
-        } DLIB_END_BLAS_BINDING
-
-
-        DLIB_ADD_BLAS_BINDING(row_major_layout, rm + trans(rm)*rm)
-        {
-            if (&src.lhs != &dest)
-            {
-                dest = src.lhs;
-            }
-
-            const CBLAS_ORDER Order = CblasRowMajor;
-            const CBLAS_TRANSPOSE TransA = CblasTrans;
-            const CBLAS_TRANSPOSE TransB = CblasNoTrans;
-            const int M = static_cast<int>(src.rhs.nr());
-            const int N = static_cast<int>(src.rhs.nc());
-            const int K = static_cast<int>(src.rhs.lhs.nc());
-            const T alpha = 1;
-            const T* A = &src.rhs.lhs.m(0,0);
-            const int lda = src.rhs.lhs.m.nc();
-            const T* B = &src.rhs.rhs(0,0);
-            const int ldb = src.rhs.rhs.nc();
-
-            const T beta = 1;
-            T* C = &dest(0,0);
-            const int ldc = src.nc();
-
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
-        } DLIB_END_BLAS_BINDING
-
 
 #endif // DLIB_USE_BLAS
 

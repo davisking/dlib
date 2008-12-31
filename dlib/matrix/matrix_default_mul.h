@@ -23,24 +23,25 @@ namespace dlib
 
 // ------------------------------------------------------------------------------------
 
-    template <
-        typename matrix_dest_type,
-        typename EXP1,
-        typename EXP2
-        >
-    typename enable_if_c<ma::matrix_is_vector<EXP1>::value == true && ma::matrix_is_vector<EXP2>::value == true>::type 
-    default_matrix_multiply (
-        matrix_dest_type& dest,
-        const EXP1& lhs,
-        const EXP2& rhs
-    );
-    /*!
-        requires
-            - (lhs*rhs).destructively_aliases(dest) == false
-            - dest.nr() == (lhs*rhs).nr()
-            - dest.nc() == (lhs*rhs).nc()
-        ensures
-            - #dest == dest + lhs*rhs
+    /*!  This file defines the default_matrix_multiply() function.  It is a function 
+         that conforms to the following definition:
+
+        template <
+            typename matrix_dest_type,
+            typename EXP1,
+            typename EXP2
+            >
+        void default_matrix_multiply (
+            matrix_dest_type& dest,
+            const EXP1& lhs,
+            const EXP2& rhs
+        );
+            requires
+                - (lhs*rhs).destructively_aliases(dest) == false
+                - dest.nr() == (lhs*rhs).nr()
+                - dest.nc() == (lhs*rhs).nc()
+            ensures
+                - #dest == dest + lhs*rhs
     !*/
 
 // ------------------------------------------------------------------------------------
