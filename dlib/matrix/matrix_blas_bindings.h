@@ -226,7 +226,7 @@ namespace dlib
             const T* B = &src.rhs(0,0);
             const int ldb = src.rhs.nc();
 
-            const T beta = add_to?1:0;
+            const T beta = static_cast<T>(add_to?1:0);
             T* C = &dest(0,0);
             const int ldc = src.nc();
 
@@ -248,7 +248,7 @@ namespace dlib
             const T* B = &src.rhs(0,0);
             const int ldb = src.rhs.nc();
 
-            const T beta = add_to?1:0;
+            const T beta = static_cast<T>(add_to?1:0);
             T* C = &dest(0,0);
             const int ldc = src.nc();
 
