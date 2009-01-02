@@ -1290,19 +1290,34 @@
          <file>dlib/matrix.h</file>
          <spec_file link="true">dlib/matrix/matrix_abstract.h</spec_file>
          <description>
-           This is a 2D matrix object.  It is implemented using the expression templates 
-           technique which allows us to eliminate the temporary matrix objects that would 
-           normally be returned from expressions such as M = A+B+C+D;  Normally each 
-           invocation of the + operator would construct and return a temporary matrix 
-           object but using this technique we can avoid creating all of these temporary 
-           objects and receive a large speed boost.
-         <p>
-            Note that there is only one implementation of this object so there aren't any
-            different kernels to choose from when you create instances of the matrix object.  
-            So for example, you
-            could declare a matrix of 2 rows and 3 columns using the following statement: 
-            <tt>dlib::matrix&lt;float,2,3&gt; m;</tt>  
-         </p>
+           This is a 2D matrix object that enables you to write code that deals with
+           matrices using a simple syntax similar to what can be written in MATLAB.  It is implemented using 
+           the expression templates technique which allows it to eliminate the 
+           temporary matrix objects that would normally be returned from expressions 
+           such as M = A+B+C+D;  Normally each invocation of the + operator would 
+           construct and return a temporary matrix object but using this technique 
+           we can avoid creating all these temporary objects and receive a large speed boost.
+           <p>
+           This object is also capable of using BLAS libraries such as ATLAS or the Intel
+           MKL when available.   To enable this feature all you have to do is #define 
+           DLIB_USE_BLAS and then make sure you link your application with your 
+           BLAS library.  Additionally, the use of BLAS is transparent to the user, that is, the
+           dlib matrix object uses BLAS internally to optimize all the various forms 
+           of matrix multiplication while still alowing the user to use a simple MATLAB
+           like syntax.  
+           </p>
+           <p>
+           Note that the cmake files that come with dlib know how to link a project with ATLAS or
+           the Intel MKL if you are building on a linux system.  The cmake files may also 
+           work in a few other cases as well but I haven't tested any others.   But in any
+           case, by no means are you required to use the dlib cmake files. 
+           </p>
+           <p>
+              It is also worth nothing that all the preconditions of every function 
+              related to the matrix object are checked by <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a>
+              statements and thus can be enabled by #defining ENABLE_ASSERTS or DEBUG.  Doing
+              this will cause your program to run slower but should catch any usage errors. 
+           </p>
          </description>
          
          <examples>

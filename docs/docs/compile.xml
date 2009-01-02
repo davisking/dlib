@@ -16,9 +16,11 @@
 
 
         <p>
-           To use this library all you have to do is extract the library somewhere, make sure the folder <i>containing</i> 
+           To use this library all you have to do is extract it somewhere, make sure the folder <i>containing</i> 
            the dlib folder is in your include path, and finally add <a href="dlib/all/source.cpp.html">dlib/all/source.cpp</a> 
-           to your project.   
+           to your project.  It is worth noting that most of dlib is "header-only" which means that, in many cases, you
+           don't actually have to build dlib/all/source.cpp into your application.  So if you don't get linker 
+           errors when you don't add dlib/all/source.cpp to your project then you don't need it.
         </p>
         <p>
             An example makefile that uses this library can be found here: 
