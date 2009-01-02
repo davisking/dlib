@@ -71,45 +71,51 @@ namespace dlib
             /*! These two matrices are the same if they are either:
                     - both row vectors
                     - both column vectors
-                    - both general matrices with the same kind of layout type
+                    - both general non-vector matrices 
             !*/
             
             const static bool value = (NR1 == 1 && NR2 == 1) || 
                                       (NC1==1 && NC2==1) || 
-                                      (NR1!=1 && NC1!=1 && NR2!=1 && NC2!=1 && is_same_type<L1,L2>::value);
+                                      (NR1!=1 && NC1!=1 && NR2!=1 && NC2!=1);
         };
 
     // ------------------------------------------------------------------------------------
 
     // This template struct is used to tell us if two matrix expressions both contain the same
-    // sequence of operators, expressions, and work on matrices laid out in memory in compatible ways.
-        template <typename T, typename U>
+    // sequence of operators, expressions.    It also only has a value of true if the T expression
+    // contains only matrices with the given layout. 
+        template <typename T, typename U, typename layout>
         struct same_exp
         {
-            const static bool value = is_same_type<typename T::exp_type, typename U::exp_type>::value ||
-                same_matrix<typename T::exp_type, typename U::exp_type>::value;;
+            const static bool value = (is_same_type<typename T::exp_type, typename U::exp_type>::value ||
+                                       same_matrix<typename T::exp_type, typename U::exp_type>::value) &&
+                                is_same_type<typename T::layout_type,layout>::value;
+
         };
 
-        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs> 
-        struct same_exp<matrix_multiply_exp<Tlhs,Trhs>, matrix_multiply_exp<Ulhs,Urhs> > 
-        { const static bool value = same_exp<Tlhs,Ulhs>::value && same_exp<Trhs,Urhs>::value; };
+        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout> 
+        struct same_exp<matrix_multiply_exp<Tlhs,Trhs>, matrix_multiply_exp<Ulhs,Urhs>,layout > 
+        { const static bool value = same_exp<Tlhs,Ulhs,layout>::value && same_exp<Trhs,Urhs,layout>::value; };
 
-        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs> 
-        struct same_exp<matrix_add_exp<Tlhs,Trhs>, matrix_add_exp<Ulhs,Urhs> > 
-        { const static bool value = same_exp<Tlhs,Ulhs>::value && same_exp<Trhs,Urhs>::value; };
+        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout> 
+        struct same_exp<matrix_add_exp<Tlhs,Trhs>, matrix_add_exp<Ulhs,Urhs>, layout > 
+        { const static bool value = same_exp<Tlhs,Ulhs,layout>::value && same_exp<Trhs,Urhs,layout>::value; };
 
-        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs> 
-        struct same_exp<matrix_subtract_exp<Tlhs,Trhs>, matrix_subtract_exp<Ulhs,Urhs> > 
-        { const static bool value = same_exp<Tlhs,Ulhs>::value && same_exp<Trhs,Urhs>::value; };
+        template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout> 
+        struct same_exp<matrix_subtract_exp<Tlhs,Trhs>, matrix_subtract_exp<Ulhs,Urhs>, layout > 
+        { const static bool value = same_exp<Tlhs,Ulhs,layout>::value && same_exp<Trhs,Urhs,layout>::value; };
 
-        template <typename T, typename U, bool Tb, bool Ub> struct same_exp<matrix_mul_scal_exp<T,Tb>, matrix_mul_scal_exp<U,Ub> > 
-        { const static bool value = same_exp<T,U>::value; };
+        template <typename T, typename U, bool Tb, bool Ub, typename layout> 
+        struct same_exp<matrix_mul_scal_exp<T,Tb>, matrix_mul_scal_exp<U,Ub>, layout > 
+        { const static bool value = same_exp<T,U,layout>::value; };
 
-        template <typename T, typename U> struct same_exp<matrix_div_scal_exp<T>, matrix_div_scal_exp<U> > 
-        { const static bool value = same_exp<T,U>::value; };
+        template <typename T, typename U, typename layout> 
+        struct same_exp<matrix_div_scal_exp<T>, matrix_div_scal_exp<U>, layout > 
+        { const static bool value = same_exp<T,U,layout>::value; };
 
-        template <typename T, typename U, typename OP> struct same_exp<matrix_unary_exp<T,OP>, matrix_unary_exp<U,OP> > 
-        { const static bool value = same_exp<T,U>::value; };
+        template <typename T, typename U, typename OP, typename layout> 
+        struct same_exp<matrix_unary_exp<T,OP>, matrix_unary_exp<U,OP>, layout > 
+        { const static bool value = same_exp<T,U,layout>::value; };
 
     // ------------------------------------------------------------------------------------
 
@@ -123,10 +129,10 @@ namespace dlib
         };
 
         // This is a helper that is used below to apply the same_exp template to matrix expressions.
-        template <typename T, typename U>
-        typename enable_if<same_exp<T,U>,yes_type>::type test(U);
-        template <typename T, typename U>
-        typename disable_if<same_exp<T,U>,no_type>::type test(U);
+        template <typename T, typename layout, typename U>
+        typename enable_if<same_exp<T,U,layout>,yes_type>::type test(U);
+        template <typename T, typename layout, typename U>
+        typename disable_if<same_exp<T,U,layout>,no_type>::type test(U);
 
     // ------------------------------------------------------------------------------------
 
@@ -197,18 +203,19 @@ namespace dlib
 
         // This is a macro to help us add overloads for the matrix_assign_blas_helper template.  
         // Using this macro it is easy to add overloads for arbitrary matrix expressions.
-#define DLIB_ADD_BLAS_BINDING( dest_layout, src_expression)                             \
-    template <typename T> struct BOOST_JOIN(blas,__LINE__)                              \
-    { const static bool value = sizeof(yes_type) == sizeof(test<T>(src_expression)); }; \
-    template < typename T, long NR, long NC, typename MM, typename src_exp >            \
-    struct matrix_assign_blas_helper<T,NR,NC,MM,dest_layout, src_exp,                   \
-    typename enable_if<BOOST_JOIN(blas,__LINE__)<src_exp> >::type > {                   \
+#define DLIB_ADD_BLAS_BINDING(src_expression)                                           \
+    template <typename T, typename L> struct BOOST_JOIN(blas,__LINE__)                  \
+    { const static bool value = sizeof(yes_type) == sizeof(test<T,L>(src_expression)); }; \
+    template < typename T, long NR, long NC, typename MM, typename L, typename src_exp >\
+    struct matrix_assign_blas_helper<T,NR,NC,MM,L, src_exp,                             \
+    typename enable_if<BOOST_JOIN(blas,__LINE__)<src_exp,L> >::type > {                 \
         static void assign (                                                            \
-            matrix<T,NR,NC,MM,dest_layout>& dest,                                       \
+            matrix<T,NR,NC,MM,L>& dest,                                                 \
             const src_exp& src,                                                         \
             typename src_exp::type alpha,                                               \
             bool add_to                                                                 \
-        ) { 
+        ) {                                                                             \
+            const bool is_row_major_order = is_same_type<L,row_major_layout>::value;  
 
 #define DLIB_END_BLAS_BINDING }};
 
