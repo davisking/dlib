@@ -11,8 +11,8 @@
 
 #include "cblas.h"
 
-//#include <iostream>
-//using namespace std;
+#include <iostream>
+using namespace std;
 
 namespace dlib
 {
@@ -206,10 +206,42 @@ namespace dlib
         template <typename T, long NR, long NC, typename MM>
         int get_ld (const matrix<T,NR,NC,MM,column_major_layout>& m) { return m.nr(); }
 
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_ld (const matrix_sub_exp<matrix<T,NR,NC,MM,row_major_layout> >& m) { return m.m.nc(); }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_ld (const matrix_sub_exp<matrix<T,NR,NC,MM,column_major_layout> >& m) { return m.m.nr(); }
+
+
         // --------
 
         template <typename T, long NR, long NC, typename MM, typename L>
         int get_inc (const matrix<T,NR,NC,MM,L>& ) { return 1; }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_colm>& m)
+        {
+            return m.m.nc();
+        }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_rowm>& m)
+        {
+            return 1;
+        }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_colm>& m)
+        {
+            return 1;
+        }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_rowm>& m)
+        {
+            return m.m.nr();
+        }
 
         // --------
 
@@ -218,6 +250,15 @@ namespace dlib
 
         template <typename T, long NR, long NC, typename MM, typename L>
         T* get_ptr (matrix<T,NR,NC,MM,L>& m) { return &m(0,0); }
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        const T* get_ptr (const matrix_sub_exp<matrix<T,NR,NC,MM,L> >& m) { return &m.m(m.r_,m.c_); }
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        const T* get_ptr (const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_colm>& m) { return &m.m(0,m.s); }
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        const T* get_ptr (const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm>& m) { return &m.m(m.s,0); }
 
     // ----------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------

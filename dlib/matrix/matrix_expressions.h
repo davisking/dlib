@@ -375,7 +375,6 @@ namespace dlib
         long nc (
         ) const { return OP::nc(m); }
 
-    private:
 
         const M& m;
         const S s;
@@ -1431,7 +1430,6 @@ namespace dlib
         long nc (
         ) const { return nc_; }
 
-    private:
 
         const M& m;
         const long r_, c_, nr_, nc_;

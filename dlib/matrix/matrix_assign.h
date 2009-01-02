@@ -6,6 +6,7 @@
 #include "../geometry.h"
 #include "matrix.h"
 #include "matrix_utilities.h"
+#include "matrix_subexp.h"
 #include "../enable_if.h"
 #include "matrix_assign_fwd.h"
 #include "matrix_default_mul.h"
@@ -58,27 +59,76 @@ namespace dlib
         { const static bool value = has_matrix_multiply<T>::value; };
 
     // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+        const int unknown_matrix = 0;
+        const int general_matrix = 1;
+        const int row_matrix = 2;
+        const int column_matrix = 3;
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T>
+        struct matrix_type_id
+        {
+            const static int value = unknown_matrix;
+        };
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        struct matrix_type_id<matrix<T,NR,NC,MM,L> >
+        {
+            const static int value = general_matrix;
+        };
+
+        template <typename T, long NR, typename MM, typename L>
+        struct matrix_type_id<matrix<T,NR,1,MM,L> >
+        {
+            const static int value = column_matrix;
+        };
+
+        template <typename T, long NC, typename MM, typename L>
+        struct matrix_type_id<matrix<T,1,NC,MM,L> >
+        {
+            const static int value = row_matrix;
+        };
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        struct matrix_type_id<matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_colm> >
+        {
+            const static int value = column_matrix;
+        };
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        struct matrix_type_id<matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm> >
+        {
+            const static int value = row_matrix;
+        };
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        struct matrix_type_id<matrix_sub_exp<matrix<T,NR,NC,MM,L> > >
+        {
+            const static int value = general_matrix;
+        };
+
+    // ------------------------------------------------------------------------------------
 
         template <typename T, typename U>
         struct same_matrix
         {
-            const static bool value = false;
+            const static int T_id = matrix_type_id<T>::value;
+            const static int U_id = matrix_type_id<U>::value;
+            // The check for unknown_matrix is here so that we can be sure that matrix types
+            // other than the ones specifically enumerated above never get pushed into
+            // any of the BLAS bindings.  So saying they are never the same as anything
+            // else prevents them from matching any of the BLAS bindings.
+            const static bool value = (T_id == U_id) && (T_id != unknown_matrix);
         };
 
-        template <typename T1, typename T2, typename L1, typename L2, long NR1, long NC1, long NR2, long NC2, typename MM1, typename MM2 >
-        struct same_matrix <matrix<T1,NR1,NC1,MM1,L1>, matrix<T2,NR2,NC2,MM2,L2> >
-        { 
-            /*! These two matrices are the same if they are either:
-                    - both row vectors
-                    - both column vectors
-                    - both general non-vector matrices 
-            !*/
-            
-            const static bool value = (NR1 == 1 && NR2 == 1) || 
-                                      (NC1==1 && NC2==1) || 
-                                      (NR1!=1 && NC1!=1 && NR2!=1 && NC2!=1);
-        };
-
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
     // This template struct is used to tell us if two matrix expressions both contain the same
