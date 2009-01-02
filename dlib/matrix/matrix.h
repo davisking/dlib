@@ -171,7 +171,13 @@ namespace dlib
                 << "\n\tnc(): " << nc()
                 << "\n\tthis: " << this
                 );
-            return ref_(0,0);
+
+            // Put the expression contained in this matrix_exp into
+            // a temporary 1x1 matrix so that the expression will encounter
+            // all the overloads of matrix_assign() and have the chance to
+            // go through any applicable optimizations.
+            matrix<type,1,1> temp(ref_);
+            return temp(0);
         }
 
     protected:
