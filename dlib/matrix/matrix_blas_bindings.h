@@ -11,8 +11,8 @@
 
 #include "cblas.h"
 
-#include <iostream>
-using namespace std;
+//#include <iostream>
+//using namespace std;
 
 namespace dlib
 {
