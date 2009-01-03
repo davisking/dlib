@@ -237,9 +237,10 @@ namespace dlib
                 {
                     if (add_to)
                     {
-                        matrix<T,NR,NC,MM,L> temp(dest);
+                        matrix<T,NR,NC,MM,L> temp(dest.nr(),dest.nc());
+                        set_all_elements(temp,0);
                         default_matrix_multiply(temp, src.lhs, src.rhs);
-                        dest = alpha*temp;
+                        dest += alpha*temp;
                     }
                     else
                     {
@@ -288,6 +289,8 @@ namespace dlib
         /*!
             requires
                 - src.aliases(dest) == false
+                - dest.nr() == src.nr()
+                - dest.nc() == src.nc()
         !*/
 
         template <
@@ -303,6 +306,8 @@ namespace dlib
         /*!
             requires
                 - src.aliases(dest) == false
+                - dest.nr() == src.nr()
+                - dest.nc() == src.nc()
         !*/
 
         template <
@@ -318,6 +323,8 @@ namespace dlib
         /*!
             requires
                 - src.aliases(dest) == false
+                - dest.nr() == src.nr()
+                - dest.nc() == src.nc()
         !*/
 
         template <
@@ -333,6 +340,8 @@ namespace dlib
         /*!
             requires
                 - src.aliases(dest) == false
+                - dest.nr() == src.nr()
+                - dest.nc() == src.nc()
         !*/
 
     // ------------------------------------------------------------------------------------
@@ -481,7 +490,7 @@ namespace dlib
         {
             if (src.aliases(dest))
             {
-                matrix<T,NR,NC,MM,L> temp;
+                matrix<T,NR,NC,MM,L> temp(dest.nr(),dest.nc());
                 matrix_assign_blas_proxy(temp,src,1,false);
                 temp.swap(dest);
             }
@@ -524,6 +533,24 @@ namespace dlib
             {
                 matrix_assign_default(dest,src);
             }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L,
+            typename src_exp 
+            >
+        void matrix_assign_blas (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_add_exp<src_exp, matrix<T,NR,NC,MM,L> >& src
+        )
+        {
+            // Just switch around the left and right hand sides of the incoming 
+            // add expression and pass it back into matrix_assign_blas() so that
+            // the above function will be called.
+            typedef matrix_add_exp<matrix<T,NR,NC,MM,L> ,src_exp> swapped_add_exp;
+            matrix_assign_blas(dest, swapped_add_exp(src.rhs, src.lhs)); 
         }
             
     // ------------------------------------------------------------------------------------

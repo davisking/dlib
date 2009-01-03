@@ -47,6 +47,8 @@ namespace dlib
     /*!
         requires
             - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()
+            - dest.nc() == src.nc()
         ensures
             - #dest == src
     !*/
@@ -72,6 +74,8 @@ namespace dlib
     /*!
         requires
             - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()
+            - dest.nc() == src.nc()
         ensures
             - if (add_to == false) then
                 - #dest == alpha*src
@@ -164,6 +168,8 @@ namespace dlib
     /*!
         requires
             - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()
+            - dest.nc() == src.nc()
         ensures
             - #dest == src
     !*/
@@ -187,6 +193,8 @@ namespace dlib
     /*!
         requires
             - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()
+            - dest.nc() == src.nc()
         ensures
             - #dest == src
     !*/
