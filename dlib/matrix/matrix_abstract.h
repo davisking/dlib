@@ -58,7 +58,7 @@ namespace dlib
         const static long cost = EXP::cost;
         const static long NR = EXP::NR;
         const static long NC = EXP::NC;
-        typedef matrix<type,NR,NC, mem_manager_type> matrix_type;
+        typedef matrix<type,NR,NC, mem_manager_type,layout_type> matrix_type;
         typedef EXP exp_type;
 
         const type operator() (
