@@ -4,6 +4,7 @@
 #define DLIB_MATRIx_ASSIGn_FWD_
 
 #include "../enable_if.h"
+#include "matrix_data_layout.h"
 
 namespace dlib
 {
@@ -40,7 +41,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP1, typename EXP2>
-    inline static void matrix_assign_default (
+    inline typename enable_if<is_same_type<typename EXP1::layout_type, row_major_layout> >::type  
+    matrix_assign_default (
         EXP1& dest,
         const EXP2& src
     )
@@ -65,7 +67,34 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP1, typename EXP2>
-    inline static void matrix_assign_default (
+    inline typename enable_if<is_same_type<typename EXP1::layout_type, column_major_layout> >::type  
+    matrix_assign_default (
+        EXP1& dest,
+        const EXP2& src
+    )
+    /*!
+        requires
+            - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()
+            - dest.nc() == src.nc()
+        ensures
+            - #dest == src
+    !*/
+    {
+        for (long c = 0; c < src.nc(); ++c)
+        {
+            for (long r = 0; r < src.nr(); ++r)
+            {
+                dest(r,c) = src(r,c);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP1, typename EXP2>
+    inline typename enable_if<is_same_type<typename EXP1::layout_type, row_major_layout> >::type  
+    matrix_assign_default (
         EXP1& dest,
         const EXP2& src,
         typename EXP2::type alpha,
@@ -133,6 +162,86 @@ namespace dlib
                 for (long r = 0; r < src.nr(); ++r)
                 {
                     for (long c = 0; c < src.nc(); ++c)
+                    {
+                        dest(r,c) = alpha*src(r,c);
+                    }
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP1, typename EXP2>
+    inline typename enable_if<is_same_type<typename EXP1::layout_type, column_major_layout> >::type  
+    matrix_assign_default (
+        EXP1& dest,
+        const EXP2& src,
+        typename EXP2::type alpha,
+        bool add_to
+    )
+    /*!
+        requires
+            - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()
+            - dest.nc() == src.nc()
+        ensures
+            - if (add_to == false) then
+                - #dest == alpha*src
+            - else
+                - #dest == dest + alpha*src
+    !*/
+    {
+        if (add_to)
+        {
+            if (alpha == 1)
+            {
+                for (long c = 0; c < src.nc(); ++c)
+                {
+                    for (long r = 0; r < src.nr(); ++r)
+                    {
+                        dest(r,c) += src(r,c);
+                    }
+                }
+            }
+            else if (alpha == -1)
+            {
+                for (long c = 0; c < src.nc(); ++c)
+                {
+                    for (long r = 0; r < src.nr(); ++r)
+                    {
+                        dest(r,c) -= src(r,c);
+                    }
+                }
+            }
+            else
+            {
+                for (long c = 0; c < src.nc(); ++c)
+                {
+                    for (long r = 0; r < src.nr(); ++r)
+                    {
+                        dest(r,c) += alpha*src(r,c);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (alpha == 1)
+            {
+                for (long c = 0; c < src.nc(); ++c)
+                {
+                    for (long r = 0; r < src.nr(); ++r)
+                    {
+                        dest(r,c) = src(r,c);
+                    }
+                }
+            }
+            else
+            {
+                for (long c = 0; c < src.nc(); ++c)
+                {
+                    for (long r = 0; r < src.nr(); ++r)
                     {
                         dest(r,c) = alpha*src(r,c);
                     }

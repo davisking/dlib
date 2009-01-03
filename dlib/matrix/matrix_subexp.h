@@ -482,6 +482,10 @@ namespace dlib
     class assignable_sub_range_matrix
     {
     public:
+        typedef T type;
+        typedef l layout_type;
+        typedef matrix<T,NR,NC,mm,l> matrix_type;
+
         assignable_sub_range_matrix(
             matrix<T,NR,NC,mm,l>& m_,
             const EXPr& rows_,

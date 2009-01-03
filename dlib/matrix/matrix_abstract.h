@@ -326,8 +326,7 @@ namespace dlib
                 mem_manager::type can be set to anything.
 
             REQUIREMENTS ON layout
-                must be one of the layout objects defined in matrix/matrix_data_layout_abstract.h or an
-                object with a compatible interface.
+                Must be either row_major_layout or column_major_layout
 
             INITIAL VALUE
                 - if (num_rows > 0) then
