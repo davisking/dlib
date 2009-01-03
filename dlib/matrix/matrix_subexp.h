@@ -354,6 +354,10 @@ namespace dlib
     class assignable_sub_matrix
     {
     public:
+        typedef T type;
+        typedef l layout_type;
+        typedef matrix<T,NR,NC,mm,l> matrix_type;
+
         assignable_sub_matrix(
             matrix<T,NR,NC,mm,l>& m_,
             const rectangle& rect_
@@ -363,6 +367,14 @@ namespace dlib
             long r,
             long c
         )
+        {
+            return m(r+rect.top(),c+rect.left());
+        }
+
+        const T& operator() (
+            long r,
+            long c
+        ) const
         {
             return m(r+rect.top(),c+rect.left());
         }
@@ -413,7 +425,6 @@ namespace dlib
             return *this;
         }
 
-    private:
 
         matrix<T,NR,NC,mm,l>& m;
         const rectangle rect;
@@ -615,6 +626,10 @@ namespace dlib
     class assignable_col_matrix
     {
     public:
+        typedef T type;
+        typedef l layout_type;
+        typedef matrix<T,NR,NC,mm,l> matrix_type;
+
         assignable_col_matrix(
             matrix<T,NR,NC,mm,l>& m_,
             const long col_ 
@@ -624,6 +639,14 @@ namespace dlib
             long r,
             long c
         )
+        {
+            return m(r,col);
+        }
+
+        const T& operator() (
+            long r,
+            long c
+        ) const
         {
             return m(r,col);
         }
@@ -670,7 +693,6 @@ namespace dlib
             return *this;
         }
 
-    private:
 
         matrix<T,NR,NC,mm,l>& m;
         const long col;
@@ -702,6 +724,10 @@ namespace dlib
     class assignable_row_matrix
     {
     public:
+        typedef T type;
+        typedef l layout_type;
+        typedef matrix<T,NR,NC,mm,l> matrix_type;
+
         assignable_row_matrix(
             matrix<T,NR,NC,mm,l>& m_,
             const long row_ 
@@ -712,6 +738,14 @@ namespace dlib
             long r,
             long c
         )
+        {
+            return m(row,c);
+        }
+
+        const T& operator() (
+            long r,
+            long c
+        ) const
         {
             return m(row,c);
         }
@@ -759,7 +793,6 @@ namespace dlib
             return *this;
         }
 
-    private:
 
         matrix<T,NR,NC,mm,l>& m;
         const long row;

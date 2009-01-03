@@ -213,6 +213,11 @@ namespace dlib
         template <typename T, long NR, long NC, typename MM>
         int get_ld (const matrix_sub_exp<matrix<T,NR,NC,MM,column_major_layout> >& m) { return m.m.nr(); }
 
+        template <typename T, long NR, long NC, typename MM>
+        int get_ld (const assignable_sub_matrix<T,NR,NC,MM,row_major_layout>& m) { return m.m.nc(); }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_ld (const assignable_sub_matrix<T,NR,NC,MM,column_major_layout>& m) { return m.m.nr(); }
 
         // --------
 
@@ -243,6 +248,31 @@ namespace dlib
             return m.m.nr();
         }
 
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const assignable_row_matrix<T,NR,NC,MM,row_major_layout>& m)
+        {
+            return 1;
+        }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const assignable_row_matrix<T,NR,NC,MM,column_major_layout>& m)
+        {
+            return m.m.nr();
+        }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const assignable_col_matrix<T,NR,NC,MM,row_major_layout>& m)
+        {
+            return m.m.nc();
+        }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const assignable_col_matrix<T,NR,NC,MM,column_major_layout>& m)
+        {
+            return 1;
+        }
+
         // --------
 
         template <typename T, long NR, long NC, typename MM, typename L>
@@ -259,6 +289,16 @@ namespace dlib
 
         template <typename T, long NR, long NC, typename MM, typename L>
         const T* get_ptr (const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm>& m) { return &m.m(m.s,0); }
+
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        T* get_ptr (assignable_col_matrix<T,NR,NC,MM,L>& m) { return &m(0,0); }
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        T* get_ptr (assignable_row_matrix<T,NR,NC,MM,L>& m) { return &m(0,0); }
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        T* get_ptr (assignable_sub_matrix<T,NR,NC,MM,L>& m) { return &m(0,0); }
 
     // ----------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------
@@ -282,6 +322,7 @@ namespace dlib
 
         DLIB_ADD_BLAS_BINDING(m*m)
         {
+            //cout << "BLAS: m*m" << endl;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
             const CBLAS_TRANSPOSE TransB = CblasNoTrans;
