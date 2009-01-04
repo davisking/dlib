@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <complex>
+#include <ctime>
 #include "dlib/quantum_computing.h"
 #include "dlib/string.h"
 
@@ -122,6 +123,15 @@ bool is_key (unsigned long n)
 // ----------------------------------------------------------------------------------------
 
 template <int bits>
+class uf_gate;
+template <int bits>
+struct gate_traits<uf_gate<bits> >
+{
+    static const long num_bits = bits;
+    static const long dims = dlib::qc_helpers::exp_2_n<num_bits>::value;
+};
+
+template <int bits>
 class uf_gate : public gate_exp<uf_gate<bits> >
 {
     /*!
@@ -135,8 +145,8 @@ class uf_gate : public gate_exp<uf_gate<bits> >
 public:
     uf_gate() : gate_exp<uf_gate>(*this) {}
 
-    static const long num_bits = bits;
-    static const long dims = dlib::qc_helpers::exp_2_n<num_bits>::value;
+    static const long num_bits = gate_traits<uf_gate>::num_bits;
+    static const long dims = gate_traits<uf_gate>::dims;
 
     const qc_scalar_type operator() (long r, long c) const 
     { 
@@ -173,6 +183,15 @@ public:
 // ----------------------------------------------------------------------------------------
 
 template <int bits>
+class w_gate;
+template <int bits>
+struct gate_traits<w_gate<bits> >
+{
+    static const long num_bits = bits;
+    static const long dims = dlib::qc_helpers::exp_2_n<num_bits>::value;
+};
+
+template <int bits>
 class w_gate : public gate_exp<w_gate<bits> >
 {
     /*!
@@ -182,8 +201,8 @@ public:
 
     w_gate() : gate_exp<w_gate>(*this) {}
 
-    static const long num_bits = bits;
-    static const long dims = dlib::qc_helpers::exp_2_n<num_bits>::value;
+    static const long num_bits = gate_traits<w_gate>::num_bits;
+    static const long dims = gate_traits<w_gate>::dims;
 
     const qc_scalar_type operator() (long r, long c) const 
     { 
