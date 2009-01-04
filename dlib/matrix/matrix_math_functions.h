@@ -36,7 +36,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(abs,3)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(abs,7)
 DLIB_MATRIX_SIMPLE_STD_FUNCTION(sqrt,7)
 DLIB_MATRIX_SIMPLE_STD_FUNCTION(log,7)
 DLIB_MATRIX_SIMPLE_STD_FUNCTION(log10,7)
@@ -44,8 +44,8 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(exp,7)
 
 DLIB_MATRIX_SIMPLE_STD_FUNCTION(conj,1)
 
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(ceil,2)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(floor,20)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(ceil,7)
+DLIB_MATRIX_SIMPLE_STD_FUNCTION(floor,7)
 
 DLIB_MATRIX_SIMPLE_STD_FUNCTION(sin,7)
 DLIB_MATRIX_SIMPLE_STD_FUNCTION(cos,7)
@@ -91,7 +91,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
-            const static long cost = EXP::cost+1;
+            const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
             template <typename M, typename T>
             static type apply ( const M& m, const T& eps, long r, long c)
@@ -138,7 +138,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
-            const static long cost = EXP::cost+2;
+            const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -166,7 +166,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
-            const static long cost = EXP::cost+1;
+            const static long cost = EXP::cost+6;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -194,7 +194,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
-            const static long cost = EXP::cost+4;
+            const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
             template <typename M, typename S>
             static type apply ( const M& m, const S& s, long r, long c)
@@ -227,7 +227,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
-            const static long cost = EXP::cost+2;
+            const static long cost = EXP::cost+6;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -264,7 +264,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
-            const static long cost = EXP::cost+1;
+            const static long cost = EXP::cost+5;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, const type& s, long r, long c)
@@ -303,7 +303,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         template <typename EXP, typename enabled = void>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
-            const static long cost = EXP::cost+3;
+            const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
@@ -388,7 +388,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         template <typename EXP>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
         {
-            const static long cost = EXP::cost+2;
+            const static long cost = EXP::cost+6;
             typedef typename EXP::type::value_type type;
             template <typename M>
             static type apply ( const M& m, long r, long c)
