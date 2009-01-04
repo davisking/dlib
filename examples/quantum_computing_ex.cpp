@@ -124,12 +124,14 @@ bool is_key (unsigned long n)
 
 template <int bits>
 class uf_gate;
+
+namespace dlib {
 template <int bits>
 struct gate_traits<uf_gate<bits> >
 {
     static const long num_bits = bits;
     static const long dims = dlib::qc_helpers::exp_2_n<num_bits>::value;
-};
+};}
 
 template <int bits>
 class uf_gate : public gate_exp<uf_gate<bits> >
@@ -184,12 +186,14 @@ public:
 
 template <int bits>
 class w_gate;
+
+namespace dlib {
 template <int bits>
 struct gate_traits<w_gate<bits> >
 {
     static const long num_bits = bits;
     static const long dims = dlib::qc_helpers::exp_2_n<num_bits>::value;
-};
+}; }
 
 template <int bits>
 class w_gate : public gate_exp<w_gate<bits> >
