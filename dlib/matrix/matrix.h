@@ -851,7 +851,8 @@ namespace dlib
         const S& s
     )
     {
-        return matrix_mul_scal_exp<EXP>(m.ref(),s);
+        typedef typename EXP::type type;
+        return matrix_mul_scal_exp<EXP>(m.ref(),static_cast<type>(s));
     }
 
     template <
@@ -864,7 +865,8 @@ namespace dlib
         const S& s
     )
     {
-        return matrix_mul_scal_exp<EXP>(m.m,s*m.s);
+        typedef typename EXP::type type;
+        return matrix_mul_scal_exp<EXP>(m.m,static_cast<type>(s)*m.s);
     }
 
     template <
@@ -876,7 +878,8 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        return matrix_mul_scal_exp<EXP>(m.ref(),s);
+        typedef typename EXP::type type;
+        return matrix_mul_scal_exp<EXP>(m.ref(),static_cast<type>(s));
     }
 
     template <
@@ -889,7 +892,8 @@ namespace dlib
         const matrix_mul_scal_exp<EXP,B>& m
     )
     {
-        return matrix_mul_scal_exp<EXP>(m.m,s*m.s);
+        typedef typename EXP::type type;
+        return matrix_mul_scal_exp<EXP>(m.m,static_cast<type>(s)*m.s);
     }
 
     template <

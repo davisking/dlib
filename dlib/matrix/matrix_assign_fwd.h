@@ -28,7 +28,7 @@ namespace dlib
         struct is_small_matrix { static const bool value = false; };
         template < typename EXP >
         struct is_small_matrix<EXP, typename enable_if_c<EXP::NR>=1 && EXP::NC>=1 &&
-        EXP::NR<=30 && EXP::NC<=30 && (EXP::cost < 70)>::type> { static const bool value = true; };
+        EXP::NR<=30 && EXP::NC<=30 && (EXP::cost <= 70)>::type> { static const bool value = true; };
     }
 
 // ----------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP1, typename EXP2>
-    inline typename enable_if<is_same_type<typename EXP1::layout_type, row_major_layout> >::type  
+    inline void //inline typename enable_if<is_same_type<typename EXP1::layout_type, row_major_layout> >::type  
     matrix_assign_default (
         EXP1& dest,
         const EXP2& src,
@@ -172,6 +172,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+#if 0
     template <typename EXP1, typename EXP2>
     inline typename enable_if<is_same_type<typename EXP1::layout_type, column_major_layout> >::type  
     matrix_assign_default (
@@ -249,6 +250,7 @@ namespace dlib
             }
         }
     }
+#endif
 
 // ----------------------------------------------------------------------------------------
 

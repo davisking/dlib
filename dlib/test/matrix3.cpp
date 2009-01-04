@@ -87,6 +87,12 @@ namespace
     }
 
     template <typename type>
+    type rnd_num (dlib::rand::float_1a& rnd)
+    {
+        return static_cast<type>(10*rnd.get_random_double());
+    }
+
+    template <typename type>
     void test_blas( long rows, long cols)
     {
         // The tests in this function exercise the BLAS bindings located in the matrix/matrix_blas_bindings.h file.
@@ -103,7 +109,7 @@ namespace
             {
                 for (long c = 0; c < a.nc(); ++c)
                 {
-                    a(r,c) = static_cast<type>(10*rnd.get_random_double());
+                    a(r,c) = rnd_num<type>(rnd);
                 }
             }
             matrix<type> at;
@@ -114,7 +120,7 @@ namespace
             {
                 for (long c = 0; c < a.nc(); ++c)
                 {
-                    c_a(r,c) = complex<type>(10*rnd.get_random_double(),10*rnd.get_random_double());
+                    c_a(r,c) = complex<type>(rnd_num<type>(rnd),rnd_num<type>(rnd));
                 }
             }
             c_at = trans(c_a);
@@ -124,43 +130,43 @@ namespace
 
             const type one = 1;
             const type two = 1;
-            const type num1 = 3.6;
-            const type num2 = 6.6;
-            const type num3 = 8.6;
+            const type num1 = static_cast<type>(3.6);
+            const type num2 = static_cast<type>(6.6);
+            const type num3 = static_cast<type>(8.6);
 
             matrix<complex<type>,0,1> c_cv4(cols), c_cv3(rows);
             matrix<complex<type>,1,0> c_rv4(cols), c_rv3(rows);
 
             matrix<type,0,1> cv4(cols);
 
-            for (long i = 0; i < cv4.size(); ++i)
-                cv4(i) = 10*rnd.get_random_double();
+            for (long idx = 0; idx < cv4.size(); ++idx)
+                cv4(idx) = rnd_num<type>(rnd);
 
-            for (long i = 0; i < c_cv4.size(); ++i)
-                c_cv4(i) = complex<type>(10*rnd.get_random_double(),10*rnd.get_random_double());
+            for (long idx = 0; idx < c_cv4.size(); ++idx)
+                c_cv4(idx) = complex<type>(rnd_num<type>(rnd),rnd_num<type>(rnd));
 
             matrix<type,1,0> rv3(rows);
 
-            for (long i = 0; i < rv3.size(); ++i)
-                rv3(i) = 10*rnd.get_random_double();
+            for (long idx = 0; idx < rv3.size(); ++idx)
+                rv3(idx) = rnd_num<type>(rnd);
 
-            for (long i = 0; i < c_rv3.size(); ++i)
-                c_rv3(i) = complex<type>(10*rnd.get_random_double(),10*rnd.get_random_double());
+            for (long idx = 0; idx < c_rv3.size(); ++idx)
+                c_rv3(idx) = complex<type>(rnd_num<type>(rnd),rnd_num<type>(rnd));
 
             matrix<type,0,1> cv3(rows);
 
-            for (long i = 0; i < cv3.size(); ++i)
-                cv3(i) = 10*rnd.get_random_double();
+            for (long idx = 0; idx < cv3.size(); ++idx)
+                cv3(idx) = rnd_num<type>(rnd);
 
-            for (long i = 0; i < c_cv3.size(); ++i)
-                c_cv3(i) = complex<type>(10*rnd.get_random_double(),10*rnd.get_random_double());
+            for (long idx = 0; idx < c_cv3.size(); ++idx)
+                c_cv3(idx) = complex<type>(rnd_num<type>(rnd),rnd_num<type>(rnd));
 
             matrix<type,1,0> rv4(cols);
-            for (long i = 0; i < rv4.size(); ++i)
-                rv4(i) = 10*rnd.get_random_double();
+            for (long idx = 0; idx < rv4.size(); ++idx)
+                rv4(idx) = rnd_num<type>(rnd);
 
-            for (long i = 0; i < c_rv4.size(); ++i)
-                c_rv4(i) = complex<type>(10*rnd.get_random_double(),10*rnd.get_random_double());
+            for (long idx = 0; idx < c_rv4.size(); ++idx)
+                c_rv4(idx) = complex<type>(rnd_num<type>(rnd),rnd_num<type>(rnd));
 
 
 
