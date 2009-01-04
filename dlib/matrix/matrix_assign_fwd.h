@@ -28,7 +28,7 @@ namespace dlib
         struct is_small_matrix { static const bool value = false; };
         template < typename EXP >
         struct is_small_matrix<EXP, typename enable_if_c<EXP::NR>=1 && EXP::NC>=1 &&
-        EXP::NR<=100 && EXP::NC<=100>::type > { static const bool value = true; };
+        EXP::NR<=100 && EXP::NC<=100 && (EXP::cost < 70)>::type> { static const bool value = true; };
     }
 
 // ----------------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ namespace dlib
     {
         if (add_to)
         {
-            if (alpha == 1)
+            if (alpha == static_cast<typename EXP2::type>(1))
             {
                 for (long r = 0; r < src.nr(); ++r)
                 {
@@ -124,7 +124,7 @@ namespace dlib
                     }
                 }
             }
-            else if (alpha == -1)
+            else if (alpha == static_cast<typename EXP2::type>(-1))
             {
                 for (long r = 0; r < src.nr(); ++r)
                 {
@@ -147,7 +147,7 @@ namespace dlib
         }
         else
         {
-            if (alpha == 1)
+            if (alpha == static_cast<typename EXP2::type>(1))
             {
                 for (long r = 0; r < src.nr(); ++r)
                 {
