@@ -14,6 +14,9 @@
 namespace dlib
 {
 
+    template <typename T>
+    struct gate_traits {};
+
     namespace qc_helpers
     {
 
@@ -250,8 +253,8 @@ namespace dlib
     class gate_exp
     {
     public:
-        static const long num_bits = T::num_bits;
-        static const long dims = T::dims;
+        static const long num_bits = gate_traits<T>::num_bits;
+        static const long dims = gate_traits<T>::dims;
 
         gate_exp(T& exp_) : exp(exp_) {}
 
@@ -342,7 +345,7 @@ namespace dlib
                 );
 
 
-            return exp.compute_state_element(reg,row_idx);
+            return this->exp.compute_state_element(reg,row_idx);
         }
 
         const T& ref() const { return exp; }
@@ -352,6 +355,17 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+
+
+    template <typename T, typename U>
+    class composite_gate;
+
+    template <typename T, typename U>
+    struct gate_traits<composite_gate<T,U> >
+    {
+        static const long num_bits = T::num_bits + U::num_bits;
+        static const long dims = qc_helpers::exp_2_n<num_bits>::value;
+    };
 
     template <typename T, typename U>
     class composite_gate : public gate_exp<composite_gate<T,U> >
@@ -370,8 +384,8 @@ namespace dlib
 
 
 
-        static const long num_bits = T::num_bits + U::num_bits;
-        static const long dims = qc_helpers::exp_2_n<num_bits>::value;
+        static const long num_bits = gate_traits<composite_gate>::num_bits;
+        static const long dims = gate_traits<composite_gate>::dims;
 
         const qc_scalar_type operator() (long r, long c) const { return lhs(r/U::dims,c/U::dims)*rhs(r%U::dims, c%U::dims); }
 
@@ -414,6 +428,17 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <long bits>
+    class gate;
+    template <long bits>
+    struct gate_traits<gate<bits> >
+    {
+        static const long num_bits = bits;
+        static const long dims = qc_helpers::exp_2_n<num_bits>::value;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <long bits>
     class gate : public gate_exp<gate<bits> >
     {
     public:
@@ -433,8 +458,8 @@ namespace dlib
             }
         }
 
-        static const long num_bits = bits;
-        static const long dims = qc_helpers::exp_2_n<num_bits>::value;
+        static const long num_bits = gate_traits<gate>::num_bits;
+        static const long dims = gate_traits<gate>::dims;
 
         const qc_scalar_type& operator() (long r, long c) const { return data(r,c); }
         qc_scalar_type& operator() (long r, long c)  { return data(r,c); }
@@ -568,6 +593,33 @@ namespace dlib
 
     namespace quantum_gates
     {
+        template <int control_bit, int target_bit>
+        class cnot;
+
+        template <int control_bit1, int control_bit2, int target_bit>
+        class toffoli;
+    }
+
+    template <int control_bit, int target_bit>
+    struct gate_traits<quantum_gates::cnot<control_bit, target_bit> >
+    {
+        static const long num_bits = tabs<control_bit-target_bit>::value+1;
+        static const long dims = qc_helpers::exp_2_n<num_bits>::value;
+    };
+
+    template <int control_bit1, int control_bit2, int target_bit>
+    struct gate_traits<quantum_gates::toffoli<control_bit1, control_bit2, target_bit> >
+    {
+        static const long num_bits = tmax<tabs<control_bit1-target_bit>::value, 
+                                            tabs<control_bit2-target_bit>::value>::value+1;
+        static const long dims = qc_helpers::exp_2_n<num_bits>::value;
+    };
+
+
+// ----------------------------------------------------------------------------------------
+
+    namespace quantum_gates
+    {
 
         inline const gate<1> hadamard(
         )
@@ -647,8 +699,8 @@ namespace dlib
                     target_mask <<= 1;
             }
 
-            static const long num_bits = tabs<control_bit-target_bit>::value+1;
-            static const long dims = qc_helpers::exp_2_n<num_bits>::value;
+            static const long num_bits = gate_traits<cnot>::num_bits;
+            static const long dims = gate_traits<cnot>::dims;
 
             const qc_scalar_type operator() (long r, long c) const 
             { 
@@ -732,9 +784,8 @@ namespace dlib
                     target_mask <<= 1;
             }
 
-            static const long num_bits = tmax<tabs<control_bit1-target_bit>::value, 
-                                              tabs<control_bit2-target_bit>::value>::value+1;
-            static const long dims = qc_helpers::exp_2_n<num_bits>::value;
+            static const long num_bits = gate_traits<toffoli>::num_bits;
+            static const long dims = gate_traits<toffoli>::dims;
 
             const qc_scalar_type operator() (long r, long c) const 
             { 
