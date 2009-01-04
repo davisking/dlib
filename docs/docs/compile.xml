@@ -32,7 +32,7 @@
             <a href="examples/CMakeLists.txt.html">examples/CMakeLists.txt</a>
         </p>
         <p>
-        I try to make sure everything compiles fine under Visual Studio .NET 2003 (and above) and gcc.  The compilers that will give you trouble are listed at the bottom of the page.
+        I try to make sure everything compiles fine under Visual Studio .NET 2003 (and above) and gcc (3.3 and above).  The compilers that will give you trouble are listed at the bottom of the page.
         </p>
         <p>
            Again, note that you should <b><i>not</i></b> add the dlib folder itself to your compiler's include path.  
@@ -141,7 +141,7 @@
 
         <h2>gcc</h2>
         <p>
-        I generally use gcc version 4.1 but most other versions of gcc work just fine also (except 2.95, see below).
+        I generally use the newest version of gcc but most other versions of gcc work just fine also (except 2.95, see below).
         </p>
         <p>
         The command line I generally use is "g++ -D NO_MAKEFILE -lnsl -lpthread file.cpp" I think you need to
