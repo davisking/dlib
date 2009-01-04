@@ -58,19 +58,7 @@ namespace dlib
         const EXP2& rhs
     )
     {
-        // This loop is optimized assuming that the data is laid out in 
-        // row major order in memory.
-        for (long r = 0; r< lhs.nr(); ++r)
-        {
-            for (long c = 0; c< lhs.nc(); ++c)
-            {
-                const typename EXP2::type temp = lhs(r,c);
-                for (long i = 0; i < rhs.nc(); ++i)
-                {
-                    dest(r,i) += rhs(c,i)*temp;
-                }
-            }
-        }
+        matrix_assign_default(dest, lhs*rhs, 1, true);
     }
 
 // ------------------------------------------------------------------------------------
@@ -92,19 +80,7 @@ namespace dlib
         // if the matrices are small enough then just use the simple multiply algorithm
         if (lhs.nc() <= 2 || rhs.nc() <= 2 || lhs.nr() <= 2 || rhs.nr() <= 2 || (lhs.size() <= bs*10 && rhs.size() <= bs*10) )
         {
-            // This loop is optimized assuming that the data is laid out in 
-            // row major order in memory.
-            for (long r = 0; r< lhs.nr(); ++r)
-            {
-                for (long c = 0; c< lhs.nc(); ++c)
-                {
-                    const typename EXP2::type temp = lhs(r,c);
-                    for (long i = 0; i < rhs.nc(); ++i)
-                    {
-                        dest(r,i) += rhs(c,i)*temp;
-                    }
-                }
-            }
+            matrix_assign_default(dest, lhs*rhs, 1, true);
         }
         else
         {
