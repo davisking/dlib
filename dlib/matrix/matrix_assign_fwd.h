@@ -5,6 +5,7 @@
 
 #include "../enable_if.h"
 #include "matrix_data_layout.h"
+#include "../algs.h"
 
 namespace dlib
 {
@@ -29,6 +30,16 @@ namespace dlib
         template < typename EXP >
         struct is_small_matrix<EXP, typename enable_if_c<EXP::NR>=1 && EXP::NC>=1 &&
         EXP::NR<=17 && EXP::NC<=17 && (EXP::cost <= 70)>::type> { static const bool value = true; };
+
+
+        template < typename EXP, typename enable = void >
+        struct has_column_major_layout { static const bool value = false; };
+        template < typename EXP >
+        struct has_column_major_layout<EXP, typename enable_if<is_same_type<typename EXP::layout_type, column_major_layout> >::type > 
+        { static const bool value = true; };
+
+
+        
     }
 
 // ----------------------------------------------------------------------------------------
@@ -93,7 +104,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP1, typename EXP2>
-    inline typename enable_if<is_same_type<typename EXP1::layout_type, row_major_layout> >::type  
+    inline typename disable_if<ma::has_column_major_layout<EXP1> >::type  
     matrix_assign_default (
         EXP1& dest,
         const EXP2& src,
@@ -173,7 +184,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP1, typename EXP2>
-    inline typename enable_if<is_same_type<typename EXP1::layout_type, column_major_layout> >::type  
+    inline typename enable_if<ma::has_column_major_layout<EXP1> >::type  
     matrix_assign_default (
         EXP1& dest,
         const EXP2& src,
