@@ -47,17 +47,6 @@ if (UNIX)
    # try to find some other BLAS libraries if we didn't find the MKL
    
    if (NOT blas_found)
-      find_library(generic_cblas cblas)
-      if (generic_cblas)
-         set(blas_libraries ${generic_cblas})
-         set(blas_found 1)
-         message(STATUS "Found CBLAS library")
-      endif()
-      mark_as_advanced( generic_cblas)
-   endif()
-
-   
-   if (NOT blas_found)
       find_library(atlas_lib atlas)
       if (atlas_lib)
          set(blas_libraries ${atlas_lib})
