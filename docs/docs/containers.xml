@@ -1303,7 +1303,7 @@
            DLIB_USE_BLAS and then make sure you link your application with your 
            BLAS library.  Additionally, the use of BLAS is transparent to the user, that is, the
            dlib matrix object uses BLAS internally to optimize all the various forms 
-           of matrix multiplication while still alowing the user to use a simple MATLAB
+           of matrix multiplication while still allowing the user to use a simple MATLAB
            like syntax.  
            </p>
            <p>
