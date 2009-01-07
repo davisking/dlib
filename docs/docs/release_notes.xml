@@ -12,6 +12,18 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.13" date="Jan 05, 2009">
+New Stuff:
    - Added the bound_function_pointer object.
    - Added support for futures to the thread_pool object.
    - Added a set of objects that makes it possible to create simulations
@@ -52,7 +64,7 @@ Other:
      vector class does the appropriate type promotions when vector objects
      with different types are used together.
    - Made the vector class inherit from matrix
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
