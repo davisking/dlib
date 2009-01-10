@@ -904,6 +904,93 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // text_box styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    void text_box_style_default::
+    draw_text_box (
+        const canvas& c,
+        const rectangle& display_rect,
+        const rectangle& text_rect,
+        const bool enabled,
+        const font& mfont,
+        const ustring& text,
+        const rectangle& cursor_rect,
+        const rgb_pixel& text_color,
+        const rgb_pixel& bg_color,
+        const bool has_focus,
+        const bool cursor_visible,
+        const long highlight_start,
+        const long highlight_end
+    ) const 
+    {
+        rectangle area = display_rect.intersect(c);
+
+        if (enabled)
+        {
+            // first fill our area with the bg_color
+            fill_rect(c, area,bg_color);
+        }
+        else
+        {
+            // first fill our area with gray 
+            fill_rect(c, area,rgb_pixel(212,208,200));
+        }
+
+
+        if (enabled)
+            mfont.draw_string(c,text_rect,text,text_color, 0, ustring::npos, area);
+        else
+            mfont.draw_string(c,text_rect,text,rgb_pixel(128,128,128), 0, ustring::npos, area);
+
+
+        // now draw the highlight if there is any
+        if (highlight_start <= highlight_end && enabled)
+        {
+            const rectangle first_pos = mfont.compute_cursor_rect(text_rect, text, highlight_start);
+            const rectangle last_pos = mfont.compute_cursor_rect(text_rect, text, highlight_end+1);
+
+            const rgb_alpha_pixel color(10, 30, 106, 90);
+
+            // if the highlighted text is all on one line
+            if (first_pos.top() == last_pos.top())
+            {
+                fill_rect(c, (first_pos + last_pos).intersect(display_rect), color);
+            }
+            else
+            {
+                const rectangle min_boundary(display_rect.left()+4, display_rect.top()+4,
+                                             display_rect.right()-4, display_rect.bottom()-4);
+                const rectangle boundary( display_rect.intersect(text_rect) + min_boundary);
+
+                rectangle first_row, last_row, middle_rows;
+                first_row += first_pos;
+                first_row += point(boundary.right(), first_pos.top());
+                last_row += last_pos;
+                last_row += point(boundary.left(), last_pos.bottom());
+
+                middle_rows.left() = boundary.left();
+                middle_rows.right() = boundary.right();
+                middle_rows.top() = first_row.bottom()+1;
+                middle_rows.bottom() = last_row.top()-1;
+
+                fill_rect(c, first_row.intersect(display_rect), color);
+                fill_rect(c, middle_rows, color);
+                fill_rect(c, last_row.intersect(display_rect), color);
+            }
+        }
+
+        // now draw the cursor if we need to
+        if (cursor_visible && has_focus && enabled)
+        {
+            draw_line(c, point(cursor_rect.left(), cursor_rect.top()),point(cursor_rect.left(), cursor_rect.bottom()), 0, area);
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 

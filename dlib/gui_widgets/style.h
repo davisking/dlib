@@ -663,6 +663,82 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+    // text_box styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class text_box_style
+    {
+    public:
+
+        text_box_style()
+        {
+        }
+
+        virtual ~text_box_style() 
+        {}
+
+        virtual unsigned long get_padding (
+            const font& mfont 
+        ) const = 0;
+
+        virtual void draw_text_box (
+            const canvas& c,
+            const rectangle& display_rect,
+            const rectangle& text_rect,
+            const bool enabled,
+            const font& mfont,
+            const ustring& text,
+            const rectangle& cursor_rect,
+            const rgb_pixel& text_color,
+            const rgb_pixel& bg_color,
+            const bool has_focus,
+            const bool cursor_visible,
+            const long highlight_start,
+            const long highlight_end
+        ) const = 0;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class text_box_style_default : public text_box_style
+    {
+    public:
+
+        text_box_style_default()
+        {
+        }
+
+        scrollable_region_style_default get_scrollable_region_style (
+        ) const { return scrollable_region_style_default(); }
+
+        virtual ~text_box_style_default() 
+        {}
+
+        virtual unsigned long get_padding (
+            const font& mfont 
+        ) const { return 1; }
+
+        virtual void draw_text_box (
+            const canvas& c,
+            const rectangle& display_rect,
+            const rectangle& text_rect,
+            const bool enabled,
+            const font& mfont,
+            const ustring& text,
+            const rectangle& cursor_rect,
+            const rgb_pixel& text_color,
+            const rgb_pixel& bg_color,
+            const bool has_focus,
+            const bool cursor_visible,
+            const long highlight_start,
+            const long highlight_end
+        ) const;
+
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
     // text_field styles  
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

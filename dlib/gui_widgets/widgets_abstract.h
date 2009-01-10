@@ -625,6 +625,195 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+    // class text_box
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class text_box : public drawable
+    {
+        /*!
+            INITIAL VALUE
+                - text() == ""
+                - The text color will be black.
+                - width() == 100
+                - height() == 100
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a simple multi-line text input box.  
+        !*/
+
+    public:
+
+        text_box(  
+            drawable_window& w
+        );
+        /*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/
+
+        virtual ~text_box(
+        );
+        /*!
+            ensures
+                - all resources associated with *this have been released
+        !*/
+
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style
+        );
+        /*!
+            requires
+                - style_type == a type that inherits from text_box_style 
+            ensures
+                - this text_box object will draw itself using the given
+                  text box style
+        !*/
+
+        void set_text (const std::wstring& text);
+        void set_text (const dlib::ustring& text);
+        void set_text (
+            const std::string& text
+        );
+        /*!
+            ensures
+                - #text() == text
+            throws
+                - std::bad_alloc
+        !*/
+
+        const std::wstring  wtext () const;
+        const dlib::ustring utext () const;
+        const std::string   text (
+        ) const;
+        /*!
+            ensures
+                - returns the text of this text_box
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_size (
+            unsigned long width,
+            unsigned long height 
+        );
+        /*! 
+            ensures
+                - #width() == width_
+                - #height() == height_
+                - #top() == top()
+                - #left() == left()
+                - i.e. The location of the upper left corner of this widget stays the
+                  same but its width and height are modified
+        !*/
+
+        void set_text_color (
+            const rgb_pixel color
+        );
+        /*!
+            ensures
+                - #text_color() == color
+        !*/
+
+        const rgb_pixel text_color (
+        ) const;
+        /*! 
+            ensures
+                - returns the color used to draw the text in this widget
+        !*/
+
+        void set_background_color (
+            const rgb_pixel color
+        );
+        /*!
+            ensures
+                - #background_color() == color
+        !*/
+
+        const rgb_pixel background_color (
+        ) const;
+        /*! 
+            ensures
+                - returns the color used to fill in the background of this widget
+        !*/
+
+        template <
+            typename T
+            >
+        void set_text_modified_handler (
+            T& object,
+            void (T::*event_handler)()
+        );
+        /*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - the event_handler function is called on object when the text
+                  in this text_box is modified by the user.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        template <
+            typename T
+            >
+        void set_enter_key_handler (
+            T& object,
+            void (T::*event_handler)()
+        );
+        /*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - the event_handler function is called on object when this text box
+                  has input focus and the user hits the enter key on their keyboard.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        template <
+            typename T
+            >
+        void set_focus_lost_handler (
+            T& object,
+            void (T::*event_handler)()
+        );
+        /*!
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - the event_handler function is called on object when this object
+                  loses input focus due to the user clicking outside the text box
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+    private:
+
+        // restricted functions
+        text_box(text_box&);        // copy constructor
+        text_box& operator=(text_box&);    // assignment operator
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
     // class check_box
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

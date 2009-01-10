@@ -435,26 +435,26 @@ namespace dlib
             }
 
             // find the start of the given line
-            typename string::size_type last_pos = pos;
             for (typename string::size_type i = first; i <= last && line != 0; ++i)
             {
                 if (str[i] == '\n')
                 {
                     --line;
-                    pos += (i - last_pos);
-                    last_pos = pos;
+                    pos = i + 1;
                 }
             }
 
+
             // now str[pos] == the first character of the start of the line
             // that contains the cursor.
+            const typename string::size_type start_of_line = pos;
 
 
             long cur_x = f.left_overflow();
             // set the current cursor position to where the mouse clicked
             while (pos <= last)
             {
-                if (x <= cur_x)
+                if (x <= cur_x || str[pos] == '\n')
                     break;
 
                 if (is_combining_char(str[pos]) == false &&
@@ -467,8 +467,10 @@ namespace dlib
 
             if (x <= cur_x)
             {
-                if (pos != first)
+                if (pos != start_of_line)
                 {
+                    // we might actually be closer to the previous character 
+                    // so check for that and if so then jump us back one.
                     const long width = f[str[pos-1]].width();
                     if (x < cur_x - width/2)
                         --pos;

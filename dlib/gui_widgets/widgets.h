@@ -651,6 +651,379 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+    // class text_box
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class text_box : public scrollable_region
+    {
+        /*!
+            INITIAL VALUE
+                text_color_ == rgb_pixel(0,0,0)
+                bg_color_ == rgb_pixel(255,255,255)
+                cursor_pos == 0
+                text_ == ""
+                has_focus == false
+                cursor_visible == false
+                recent_movement == false
+                highlight_start == 0
+                highlight_end == -1
+                shift_pos == -1
+    
+            CONVENTION
+                - cursor_pos == the position of the cursor in the string text_.  The 
+                  cursor appears before the letter text_[cursor_pos]
+                - cursor_rect == The rectangle that should be drawn for the cursor. 
+                  The position is relative to total_rect().
+                - has_focus == true if this text field has keyboard input focus
+                - cursor_visible == true if the cursor should be painted
+                - text_ == text()
+
+                - if (has_focus && the user has recently moved the cursor) then
+                    - recent_movement == true
+                - else
+                    - recent_movement == false
+
+                - if (highlight_start <= highlight_end) then
+                    - text[highlight_start] though text[highlight_end] should be
+                      highlighted
+
+                - if (shift_pos != -1) then
+                    - has_focus == true
+                    - the shift key is being held down or the left mouse button is
+                      being held down.
+                    - shift_pos == the position of the cursor when the shift or mouse key
+                      was first pressed.
+
+                - text_color() == text_color_
+                - background_color() == bg_color_
+        !*/
+
+    public:
+        text_box(
+            drawable_window& w
+        ) : 
+            scrollable_region(w,MOUSE_CLICK | KEYBOARD_EVENTS | MOUSE_MOVE | STRING_PUT),
+            text_color_(0,0,0),
+            bg_color_(255,255,255),
+            recent_movement(false),
+            has_focus(false),
+            cursor_visible(false),
+            cursor_pos(0),
+            highlight_start(0),
+            highlight_end(-1),
+            shift_pos(-1),
+            t(*this,&text_box::timer_action),
+            right_click_menu(w)
+        {
+            style.reset(new text_box_style_default());
+
+            const long padding = static_cast<long>(style->get_padding(*mfont));
+            cursor_rect = mfont->compute_cursor_rect(rectangle(padding,padding,1000000,1000000), text_, 0);
+
+            adjust_total_rect();
+
+            set_vertical_mouse_wheel_scroll_increment(mfont->height());
+            set_horizontal_mouse_wheel_scroll_increment(mfont->height());
+
+            right_click_menu.menu().add_menu_item(menu_item_text("Cut",*this,&text_box::on_cut,'t'));
+            right_click_menu.menu().add_menu_item(menu_item_text("Copy",*this,&text_box::on_copy,'C'));
+            right_click_menu.menu().add_menu_item(menu_item_text("Paste",*this,&text_box::on_paste,'P'));
+            right_click_menu.menu().add_menu_item(menu_item_text("Delete",*this,&text_box::on_delete_selected,'D'));
+            right_click_menu.menu().add_menu_item(menu_item_separator());
+            right_click_menu.menu().add_menu_item(menu_item_text("Select All",*this,&text_box::on_select_all,'A'));
+
+            right_click_menu.set_rect(get_text_rect());
+
+            set_size(100,100);
+
+            enable_events();
+
+            t.set_delay_time(500);
+        }
+
+        ~text_box (
+        )
+        {
+            disable_events();
+            parent.invalidate_rectangle(rect); 
+            t.stop_and_wait();
+        }
+
+        template <
+            typename style_type
+            >
+        void set_style (
+            const style_type& style_
+        )
+        {
+            auto_mutex M(m);
+            style.reset(new style_type(style_));
+
+            scrollable_region::set_style(style_.get_scrollable_region_style());
+            // call this just so that this widget redraws itself with the new style
+            set_main_font(mfont);
+        }
+
+        void set_text (
+            const std::string& text_
+        );
+
+        void set_text (
+            const std::wstring& text_
+        );
+
+        void set_text (
+            const dlib::ustring& text_
+        );
+
+        const std::string text (
+        ) const;
+
+        const std::wstring wtext (
+        ) const;
+
+        const dlib::ustring utext (
+        ) const;
+
+        void set_text_color (
+            const rgb_pixel color
+        );
+
+        const rgb_pixel text_color (
+        ) const;
+
+        void set_background_color (
+            const rgb_pixel color
+        );
+
+        const rgb_pixel background_color (
+        ) const;
+
+        void set_size (
+            unsigned long width,
+            unsigned long height 
+        );
+
+        void set_pos (
+            long x,
+            long y
+        );
+
+        void set_main_font (
+            const shared_ptr_thread_safe<font>& f
+        );
+
+        int next_free_user_event_number (
+        ) const
+        {
+            return scrollable_region::next_free_user_event_number()+1;
+        }
+
+        void disable (
+        );
+
+        void enable (
+        );
+
+        void hide (
+        );
+
+        void show (
+        );
+
+        template <
+            typename T
+            >
+        void set_text_modified_handler (
+            T& object,
+            void (T::*event_handler)()
+        )
+        {
+            auto_mutex M(m);
+            text_modified_handler.set(object,event_handler);
+        }
+
+        template <
+            typename T
+            >
+        void set_enter_key_handler (
+            T& object,
+            void (T::*event_handler)()
+        )
+        {
+            auto_mutex M(m);
+            enter_key_handler.set(object,event_handler);
+        }
+
+
+        template <
+            typename T
+            >
+        void set_focus_lost_handler (
+            T& object,
+            void (T::*event_handler)()
+        )
+        {
+            auto_mutex M(m);
+            focus_lost_handler.set(object,event_handler);
+        }
+
+    private:
+
+        void on_cut (
+        );
+        
+        void on_copy (
+        );
+
+        void on_paste (
+        );
+
+        void on_select_all (
+        );
+
+        void on_delete_selected (
+        );
+
+        void on_text_is_selected (
+        );
+
+        void on_no_text_selected (
+        );
+
+        void on_user_event (
+            int num
+        )
+        {
+            // ignore this user event if it isn't for us
+            if (num != scrollable_region::next_free_user_event_number())
+                return;
+
+            if (recent_movement == false)
+            {
+                cursor_visible = !cursor_visible; 
+                parent.invalidate_rectangle(rect); 
+            }
+            else
+            {
+                if (cursor_visible == false)
+                {
+                    cursor_visible = true;
+                    parent.invalidate_rectangle(rect); 
+                }
+                recent_movement = false;
+            }
+        }
+
+        // The reason for using user actions here rather than just having the timer just call
+        // what it needs directly is to avoid a potential deadlock during destruction of this widget.
+        void timer_action (
+        ) { parent.trigger_user_event(this,scrollable_region::next_free_user_event_number()); }
+        /*!
+            ensures
+                - flips the state of cursor_visible
+        !*/
+
+        void move_cursor (
+            unsigned long pos
+        );
+        /*!
+            requires
+                - pos <= text_.size() 
+            ensures
+                - moves the cursor to the position given by pos and moves the text 
+                  in the text box if necessary
+                - if the position changes then the parent window will be updated
+        !*/
+
+        rectangle get_text_rect (
+        ) const;
+        /*!
+            ensures
+                - returns the rectangle that should contain the text in this widget
+        !*/
+
+        void adjust_total_rect (
+        );
+        /*!
+            ensures
+                - adjusts total_rect() so that it is big enough to contain the text
+                  currently in this object.
+        !*/
+
+        dlib::ustring text_;
+        rgb_pixel text_color_;
+        rgb_pixel bg_color_;
+
+
+
+        bool recent_movement;
+        bool has_focus;
+        bool cursor_visible;
+        long cursor_pos;
+        rectangle cursor_rect;
+
+        // this tells you what part of the text is highlighted
+        long highlight_start;
+        long highlight_end;
+        long shift_pos;
+        member_function_pointer<>::kernel_1a_c text_modified_handler;
+        member_function_pointer<>::kernel_1a_c enter_key_handler;
+        member_function_pointer<>::kernel_1a_c focus_lost_handler;
+
+        scoped_ptr<text_box_style> style;
+
+        timer<text_box>::kernel_2a t;
+
+        popup_menu_region right_click_menu;
+
+        // restricted functions
+        text_box(text_box&);        // copy constructor
+        text_box& operator=(text_box&);    // assignment operator
+
+
+    protected:
+
+        void draw (
+            const canvas& c
+        ) const;
+
+
+        void on_mouse_down (
+            unsigned long btn,
+            unsigned long state,
+            long x,
+            long y,
+            bool is_double_click
+        );
+
+        void on_mouse_up (
+            unsigned long btn,
+            unsigned long state,
+            long x,
+            long y
+        );
+
+        void on_mouse_move (
+            unsigned long state,
+            long x,
+            long y
+        );
+
+        void on_keydown (
+            unsigned long key,
+            bool is_printable,
+            unsigned long state
+        );
+
+        void on_string_put (
+            const std::wstring &str
+        );
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
     // class check_box
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

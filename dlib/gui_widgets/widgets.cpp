@@ -4676,6 +4676,958 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+    // text_field object methods  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    rectangle text_box::
+    get_text_rect (
+    ) const
+    {
+        const unsigned long padding = style->get_padding(*mfont);
+
+        rectangle text_rect;
+        text_rect.set_left(total_rect().left()+padding);
+        text_rect.set_top(total_rect().top()+padding);
+        text_rect.set_right(total_rect().right()-padding);
+        text_rect.set_bottom(total_rect().bottom()-padding);
+        return text_rect;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    enable (
+    )
+    {
+        scrollable_region::enable();
+        right_click_menu.enable();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_cut (
+    )
+    {
+        on_copy();
+        on_delete_selected();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_copy (
+    )
+    {
+        if (highlight_start <= highlight_end)
+        {
+            put_on_clipboard(text_.substr(highlight_start, highlight_end-highlight_start+1));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_paste (
+    )
+    {
+        ustring temp_str;
+        get_from_clipboard(temp_str);
+
+
+        if (highlight_start <= highlight_end)
+        {
+            text_ = text_.substr(0,highlight_start) + temp_str +
+                text_.substr(highlight_end+1,text_.size()-highlight_end-1);
+            move_cursor(highlight_start+temp_str.size());
+            highlight_start = 0;
+            highlight_end = -1;
+            parent.invalidate_rectangle(rect);
+            on_no_text_selected();
+
+            // send out the text modified event
+            if (text_modified_handler.is_set())
+                text_modified_handler();
+        }
+        else
+        {
+            text_ = text_.substr(0,cursor_pos) + temp_str +
+                text_.substr(cursor_pos,text_.size()-cursor_pos);
+            move_cursor(cursor_pos+temp_str.size());
+
+            // send out the text modified event
+            if (temp_str.size() != 0 && text_modified_handler.is_set())
+                text_modified_handler();
+        }
+
+        adjust_total_rect();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_select_all (
+    )
+    {
+        move_cursor(static_cast<long>(text_.size()));
+        highlight_start = 0;
+        highlight_end = static_cast<long>(text_.size()-1);
+        if (highlight_start <= highlight_end)
+            on_text_is_selected();
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_delete_selected (
+    )
+    {
+        if (highlight_start <= highlight_end)
+        {
+            text_ = text_.erase(highlight_start,highlight_end-highlight_start+1);
+            move_cursor(highlight_start);
+            highlight_start = 0;
+            highlight_end = -1;
+
+            on_no_text_selected();
+            // send out the text modified event
+            if (text_modified_handler.is_set())
+                text_modified_handler();
+
+            adjust_total_rect();
+
+            parent.invalidate_rectangle(rect);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_text_is_selected (
+    )
+    {
+        right_click_menu.menu().enable_menu_item(0);
+        right_click_menu.menu().enable_menu_item(1);
+        right_click_menu.menu().enable_menu_item(3);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_no_text_selected (
+    )
+    {
+        right_click_menu.menu().disable_menu_item(0);
+        right_click_menu.menu().disable_menu_item(1);
+        right_click_menu.menu().disable_menu_item(3);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    show (
+    )
+    {
+        scrollable_region::show();
+        right_click_menu.show();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    disable (
+    )
+    {
+        auto_mutex M(m);
+        scrollable_region::disable();
+        t.stop();
+        has_focus = false;
+        cursor_visible = false;
+        right_click_menu.disable();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    hide (
+    )
+    {
+        auto_mutex M(m);
+        scrollable_region::hide();
+        t.stop();
+        has_focus = false;
+        cursor_visible = false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    adjust_total_rect (
+    )
+    {
+        const unsigned long padding = style->get_padding(*mfont);
+        unsigned long text_width;
+        unsigned long text_height;
+
+        mfont->compute_size(text_, text_width, text_height);
+
+        set_total_rect_size(text_width + padding*2, text_height + padding*2);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    set_main_font (
+        const shared_ptr_thread_safe<font>& f
+    )
+    {
+        auto_mutex M(m);
+        mfont = f;
+        adjust_total_rect();
+        right_click_menu.set_rect(display_rect());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    draw (
+        const canvas& c
+    ) const
+    {
+        scrollable_region::draw(c);
+        rectangle area = rect.intersect(c);
+        if (area.is_empty())
+            return;
+       
+        const point origin(total_rect().left(), total_rect().top());
+
+        style->draw_text_box(c,display_rect(),get_text_rect(), enabled, *mfont, text_, 
+                             translate_rect(cursor_rect, origin), 
+                               text_color_, bg_color_, has_focus, cursor_visible, highlight_start,
+                               highlight_end);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    set_text (
+        const std::string& text
+    )
+    {
+        set_text(convert_mbstring_to_wstring(text));
+    }
+
+    void text_box::
+    set_text (
+        const std::wstring& text
+    )
+    {
+        set_text(convert_wstring_to_utf32(text));
+    }
+
+    void text_box::
+    set_text (
+        const dlib::ustring& text
+    )
+    {
+        auto_mutex M(m);
+        // do this to get rid of any reference counting that may be present in 
+        // the std::string implementation.
+        text_ = text.c_str();
+                
+        adjust_total_rect();
+        move_cursor(0);
+
+        highlight_start = 0;
+        highlight_end = -1;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const std::string text_box::
+    text (
+    ) const
+    {
+        std::string temp = convert_wstring_to_mbstring(wtext());
+        return temp;
+    }
+
+    const std::wstring text_box::
+    wtext (
+    ) const
+    {
+        std::wstring temp = convert_utf32_to_wstring(utext());
+        return temp;
+    }
+    
+    const dlib::ustring text_box::
+    utext (
+    ) const
+    {
+        auto_mutex M(m);
+        // do this to get rid of any reference counting that may be present in 
+        // the dlib::ustring implementation.
+        dlib::ustring temp = text_.c_str();
+        return temp;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    set_size (
+        unsigned long width,
+        unsigned long height 
+    )
+    {        
+        auto_mutex M(m);
+        scrollable_region::set_size(width,height);
+        right_click_menu.set_rect(display_rect());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    set_pos (
+        long x,
+        long y
+    )
+    {
+        scrollable_region::set_pos(x,y);
+        right_click_menu.set_rect(get_text_rect());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    set_background_color (
+        const rgb_pixel color
+    )
+    {
+        auto_mutex M(m);
+        bg_color_ = color;
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const rgb_pixel text_box::
+    background_color (
+    ) const
+    {
+        auto_mutex M(m);
+        return bg_color_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    set_text_color (
+        const rgb_pixel color
+    )
+    {
+        auto_mutex M(m);
+        text_color_ = color;
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const rgb_pixel text_box::
+    text_color (
+    ) const
+    {
+        auto_mutex M(m);
+        return text_color_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_mouse_move (
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        if (!enabled || hidden || !has_focus)
+        {
+            return;
+        }
+
+        if (state & base_window::LEFT)
+        {
+            if (highlight_start <= highlight_end)
+            {
+                if (highlight_start == cursor_pos)
+                    shift_pos = highlight_end + 1;
+                else
+                    shift_pos = highlight_start;
+            }
+
+            unsigned long new_pos = mfont->compute_cursor_pos(get_text_rect(),text_,x,y);
+            if (static_cast<long>(new_pos) != cursor_pos)
+            {
+                move_cursor(new_pos);
+                parent.invalidate_rectangle(rect);
+            }
+        }
+        else if (shift_pos != -1)
+        {
+            shift_pos = -1;
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_mouse_up (
+        unsigned long btn,
+        unsigned long,
+        long ,
+        long 
+    )
+    {
+        if (!enabled || hidden)
+            return;
+
+        if (btn == base_window::LEFT)
+            shift_pos = -1;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_mouse_down (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y,
+        bool double_clicked 
+    )
+    {
+        using namespace std;
+        if (!enabled || hidden || btn != (unsigned long)base_window::LEFT)
+            return;
+
+        if (display_rect().contains(x,y))
+        {
+            has_focus = true;
+            cursor_visible = true;
+            parent.invalidate_rectangle(rect);
+            t.start();
+
+            
+            if (double_clicked)
+            {
+                // highlight the double clicked word
+                string::size_type first, last;
+                const ustring ustr = convert_utf8_to_utf32(std::string(" \t\n"));
+                first = text_.substr(0,cursor_pos).find_last_of(ustr.c_str());
+                last = text_.find_first_of(ustr.c_str(),cursor_pos);
+                long f = static_cast<long>(first);
+                long l = static_cast<long>(last);
+                if (first == string::npos)
+                    f = -1;
+                if (last == string::npos)
+                    l = static_cast<long>(text_.size());
+
+                ++f;
+                --l;
+
+                move_cursor(l+1);
+                highlight_start = f;
+                highlight_end = l;
+                on_text_is_selected();
+            }
+            else
+            {
+                if (state & base_window::SHIFT)
+                {
+                    if (highlight_start <= highlight_end)
+                    {
+                        if (highlight_start == cursor_pos)
+                            shift_pos = highlight_end + 1;
+                        else
+                            shift_pos = highlight_start;
+                    }
+                    else
+                    {
+                        shift_pos = cursor_pos;
+                    }
+                }
+
+                bool at_end = false;
+                if (cursor_pos == 0 || cursor_pos == static_cast<long>(text_.size()))
+                    at_end = true;
+                const long old_pos = cursor_pos;
+
+                unsigned long new_pos = mfont->compute_cursor_pos(get_text_rect(),text_,x,y);
+                move_cursor(new_pos);
+
+                shift_pos = cursor_pos;
+
+                if (at_end && cursor_pos == old_pos)
+                {
+                    highlight_start = 0;
+                    highlight_end = -1;
+                    on_no_text_selected();
+                }
+            }
+
+        }
+        else if (has_focus && rect.contains(x,y) == false)
+        {
+            t.stop();
+            has_focus = false;
+            cursor_visible = false;
+            shift_pos = -1;
+            highlight_start = 0;
+            highlight_end = -1;
+            on_no_text_selected();
+
+            if (focus_lost_handler.is_set())
+                focus_lost_handler();
+            parent.invalidate_rectangle(rect);
+        }
+        else
+        {
+            has_focus = false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    on_keydown (
+        unsigned long key,
+        bool is_printable,
+        unsigned long state
+    )
+    {
+        // If the right click menu is up then we don't want to do anything with
+        // the keyboard ourselves.  Let the popup menu use the keyboard for now.
+        if (right_click_menu.popup_menu_visible())
+            return;
+
+        if (has_focus && enabled && !hidden)
+        {
+            const ustring space_str = convert_utf8_to_utf32(std::string(" \t\n"));
+            const bool shift = (state&base_window::KBD_MOD_SHIFT) != 0;
+            const bool ctrl = (state&base_window::KBD_MOD_CONTROL) != 0;
+
+            if (shift && is_printable == false)
+            {
+                if (shift_pos == -1)
+                {
+                    if (highlight_start <= highlight_end)
+                    {
+                        if (highlight_start == cursor_pos)
+                            shift_pos = highlight_end + 1;
+                        else
+                            shift_pos = highlight_start;
+                    }
+                    else
+                    {
+                        shift_pos = cursor_pos;
+                    }
+                }
+            }
+            else
+            {
+                shift_pos = -1;
+            }
+
+            if (key == base_window::KEY_LEFT)
+            {
+                if (cursor_pos != 0)
+                {
+                    unsigned long new_pos;
+                    if (ctrl)
+                    {
+                        // find the first non-whitespace to our left
+                        std::string::size_type pos = text_.find_last_not_of(space_str.c_str(),cursor_pos);
+                        if (pos != std::string::npos)
+                        {
+                            pos = text_.find_last_of(space_str.c_str(),pos);
+                            if (pos != std::string::npos)
+                                new_pos = static_cast<unsigned long>(pos);
+                            else
+                                new_pos = 0;
+                        }
+                        else
+                        {
+                            new_pos = 0;
+                        }
+                    }
+                    else
+                    {
+                        new_pos = cursor_pos-1;
+                    }
+
+                    move_cursor(new_pos);
+                }
+                else if (shift_pos == -1)
+                {
+                    highlight_start = 0;
+                    highlight_end = -1;
+                    on_no_text_selected();
+                    parent.invalidate_rectangle(rect);
+                }
+
+            }
+            else if (key == base_window::KEY_RIGHT)
+            {
+                if (cursor_pos != static_cast<long>(text_.size()))
+                {
+                    unsigned long new_pos;
+                    if (ctrl)
+                    {
+                        // find the first non-whitespace to our left
+                        std::string::size_type pos = text_.find_first_not_of(space_str.c_str(),cursor_pos);
+                        if (pos != std::string::npos)
+                        {
+                            pos = text_.find_first_of(space_str.c_str(),pos);
+                            if (pos != std::string::npos)
+                                new_pos = static_cast<unsigned long>(pos+1);
+                            else
+                                new_pos = static_cast<unsigned long>(text_.size());
+                        }
+                        else
+                        {
+                            new_pos = static_cast<unsigned long>(text_.size());
+                        }
+                    }
+                    else
+                    {
+                        new_pos = cursor_pos+1;
+                    }
+
+                    move_cursor(new_pos);
+                }
+                else if (shift_pos == -1)
+                {
+                    highlight_start = 0;
+                    highlight_end = -1;
+                    on_no_text_selected();
+                    parent.invalidate_rectangle(rect);
+                }
+            }
+            else if (key == base_window::KEY_UP)
+            {
+                if (ctrl)
+                {
+                    move_cursor(0);
+                }
+                else
+                {
+                    const point origin(total_rect().left(), total_rect().top());
+                    // move the cursor so the position that is just a few pixels above 
+                    // the current cursor_rect
+                    move_cursor(mfont->compute_cursor_pos(
+                            get_text_rect(), text_, cursor_rect.left()+origin.x(), 
+                            cursor_rect.top()+origin.y()-mfont->height()/2));
+
+                }
+
+                if (shift_pos == -1)
+                {
+                    highlight_start = 0;
+                    highlight_end = -1;
+                    on_no_text_selected();
+                    parent.invalidate_rectangle(rect);
+                }
+            }
+            else if (key == base_window::KEY_DOWN)
+            {
+                if (ctrl)
+                {
+                    move_cursor(static_cast<unsigned long>(text_.size()));
+                }
+                else
+                {
+                    const point origin(total_rect().left(), total_rect().top());
+                    // move the cursor so the position that is just a few pixels above 
+                    // the current cursor_rect
+                    move_cursor(mfont->compute_cursor_pos(
+                            get_text_rect(), text_, cursor_rect.left()+origin.x(), 
+                            cursor_rect.bottom()+origin.y()+mfont->height()/2));
+                }
+
+                if (shift_pos == -1)
+                {
+                    highlight_start = 0;
+                    highlight_end = -1;
+                    on_no_text_selected();
+                    parent.invalidate_rectangle(rect);
+                }
+            }
+            else if (is_printable)
+            {
+                if (ctrl)
+                {
+                    if (key == 'a')
+                    {
+                        on_select_all();
+                    }
+                    else if (key == 'c')
+                    {
+                        on_copy();
+                    }
+                    else if (key == 'v')
+                    {
+                        on_paste();
+                    }
+                    else if (key == 'x')
+                    {
+                        on_cut();
+                    }
+                }
+                else 
+                {
+                    if (highlight_start <= highlight_end)
+                    {
+                        text_ = text_.substr(0,highlight_start) + static_cast<unichar>(key) +
+                            text_.substr(highlight_end+1,text_.size()-highlight_end-1);
+
+                        adjust_total_rect();
+                        move_cursor(highlight_start+1);
+                        highlight_start = 0;
+                        highlight_end = -1;
+                        on_no_text_selected();
+                    }
+                    else
+                    {
+                        text_ = text_.substr(0,cursor_pos) + static_cast<unichar>(key) +
+                            text_.substr(cursor_pos,text_.size()-cursor_pos);
+                        adjust_total_rect();
+                        move_cursor(cursor_pos+1);
+                    }
+
+                    // send out the text modified event
+                    if (text_modified_handler.is_set())
+                        text_modified_handler();
+
+                }
+
+                if (key == '\n')
+                {
+                    if (enter_key_handler.is_set())
+                        enter_key_handler();
+                }
+            }
+            else if (key == base_window::KEY_BACKSPACE)
+            {                
+                // if something is highlighted then delete that
+                if (highlight_start <= highlight_end)
+                {
+                    on_delete_selected();
+                }
+                else if (cursor_pos != 0)
+                {
+                    text_ = text_.erase(cursor_pos-1,1);
+                    adjust_total_rect();
+                    move_cursor(cursor_pos-1);
+
+                    // send out the text modified event
+                    if (text_modified_handler.is_set())
+                        text_modified_handler();
+                }
+                else
+                {
+                    // do this just so it repaints itself right
+                    move_cursor(cursor_pos);
+                }
+
+            }
+            else if (key == base_window::KEY_DELETE)
+            {
+                // if something is highlighted then delete that
+                if (highlight_start <= highlight_end)
+                {
+                    on_delete_selected();
+                }
+                else if (cursor_pos != static_cast<long>(text_.size()))
+                {
+                    text_ = text_.erase(cursor_pos,1);
+
+                    adjust_total_rect();
+                    // send out the text modified event
+                    if (text_modified_handler.is_set())
+                        text_modified_handler();
+                }
+                else
+                {
+                    // do this just so it repaints itself right
+                    move_cursor(cursor_pos);
+                }
+
+            }
+            else if (key == base_window::KEY_HOME)
+            {
+                if (ctrl)
+                {
+                    move_cursor(0);
+                }
+                else if (cursor_pos != 0)
+                {
+                    // find the start of the current line
+                    ustring::size_type pos = text_.find_last_of('\n',cursor_pos-1);
+                    if (pos == ustring::npos)
+                        pos = 0;
+                    else
+                        pos += 1;
+                    move_cursor(static_cast<unsigned long>(pos));
+
+                }
+
+                if (shift_pos == -1)
+                {
+                    highlight_start = 0;
+                    highlight_end = -1;
+                    on_no_text_selected();
+                    parent.invalidate_rectangle(rect);
+                }
+            }
+            else if (key == base_window::KEY_END)
+            {
+                if (ctrl)
+                {
+                    move_cursor(static_cast<unsigned long>(text_.size()));
+                }
+                {
+                    ustring::size_type pos = text_.find_first_of('\n',cursor_pos);
+                    if (pos == ustring::npos)
+                        pos = text_.size();
+
+                    move_cursor(static_cast<unsigned long>(pos));
+                }
+
+                if (shift_pos == -1)
+                {
+                    highlight_start = 0;
+                    highlight_end = -1;
+                    on_no_text_selected();
+                    parent.invalidate_rectangle(rect);
+                }
+            }
+            else if (key == base_window::KEY_PAGE_DOWN || key == base_window::KEY_PAGE_UP)
+            {
+                long jump_size = display_rect().height() - 
+                    std::min(mfont->height()*3, display_rect().height()/5);
+
+                // if we are supposed to page up then just jump in the other direction
+                if (key == base_window::KEY_PAGE_UP)
+                    jump_size = -jump_size;
+
+                scroll_to_rect(translate_rect(display_rect(), point(0, jump_size ))); 
+            }
+
+            cursor_visible = true;
+            recent_movement = true;
+
+        }
+    }
+
+// ---------------------------------------------------------------------------------------- 
+
+    void text_box::
+    on_string_put(
+        const std::wstring &str
+    )
+    {
+        if (has_focus && enabled && !hidden)
+        {
+            ustring ustr = convert_wstring_to_utf32(str);
+            if (highlight_start <= highlight_end)
+            {
+                text_ = text_.substr(0,highlight_start) + ustr +
+                    text_.substr(highlight_end+1,text_.size()-highlight_end-1);
+
+                adjust_total_rect();
+                move_cursor(highlight_start+ustr.size());
+                highlight_start = 0;
+                highlight_end = -1;
+                on_no_text_selected();
+            }
+            else
+            {
+                text_ = text_.substr(0,cursor_pos) + ustr +
+                    text_.substr(cursor_pos,text_.size()-cursor_pos);
+
+                adjust_total_rect();
+                move_cursor(cursor_pos+ustr.size());
+            }
+
+
+            // send out the text modified event
+            if (text_modified_handler.is_set())
+                text_modified_handler();
+        }
+    }
+    
+// ----------------------------------------------------------------------------------------
+
+    void text_box::
+    move_cursor (
+        unsigned long pos
+    )
+    {
+        using namespace std;
+        const long old_cursor_pos = cursor_pos;
+
+
+
+        // figure out where the cursor is supposed to be
+        cursor_rect = mfont->compute_cursor_rect(get_text_rect(), text_, pos);
+        const point origin(total_rect().left(), total_rect().top());
+
+
+        cursor_pos = pos;     
+
+
+        const unsigned long padding = style->get_padding(*mfont);
+
+        // find the delta between the cursor rect and the corner of the total rect 
+        point delta = point(cursor_rect.left(), cursor_rect.top()) - point(total_rect().left(), total_rect().top());
+
+        // now scroll us so that we can see the current cursor 
+        scroll_to_rect(centered_rect(cursor_rect, cursor_rect.width() + padding + 6, cursor_rect.height() + 1));
+
+        // adjust the cursor_rect so that it is relative to the total_rect
+        cursor_rect = translate_rect(cursor_rect, -origin);
+
+        parent.set_im_pos(cursor_rect.left(), cursor_rect.top());
+
+        if (old_cursor_pos != cursor_pos)
+        {
+            if (shift_pos != -1)
+            {
+                highlight_start = std::min(shift_pos,cursor_pos);
+                highlight_end = std::max(shift_pos,cursor_pos)-1;
+            }
+
+            if (highlight_start > highlight_end)
+                on_no_text_selected();
+            else
+                on_text_is_selected();
+
+            recent_movement = true;
+            cursor_visible = true;
+            parent.invalidate_rectangle(display_rect());
+        }
+
+        if (shift_pos == -1)
+        {
+            highlight_start = 0;
+            highlight_end = -1;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 

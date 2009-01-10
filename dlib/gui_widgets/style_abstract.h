@@ -51,7 +51,7 @@ namespace dlib
                 - rect == the get_rect() that defines where the button is
             ensures
                 - returns a rectangle that should be invalidated whenever a button
-                  needs to redraw itself.  (If you wanted your button style to
+                  needs to redraw itself.  (e.g. If you wanted your button style to
                   draw outside the button then you could return a larger rectangle)
         !*/
 
@@ -491,6 +491,97 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+    // text_box styles  
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class text_box_style
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an abstract class that defines the interface a
+                text_box style object must implement.
+
+                Note that derived classes must be copyable via
+                their copy constructors.
+        !*/
+    public:
+
+        virtual ~text_field_style() {}
+
+        scrollable_region_style_type get_scrollable_region_style (
+        ) const;
+        /*!
+            ensures
+                - returns the style of scrollable_region to use for the 
+                  text_box.
+        !*/
+
+        virtual unsigned long get_padding (
+            const font& mfont 
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+            ensures
+                - returns the number of pixels that separate the text in the text_box 
+                  from the edge of the text_box widget itself.
+        !*/
+
+        virtual void draw_text_box (
+            const canvas& c,
+            const rectangle& display_rect,
+            const rectangle& text_rect,
+            const bool enabled,
+            const font& mfont,
+            const ustring& text,
+            const rectangle& cursor_rect,
+            const rgb_pixel& text_color,
+            const rgb_pixel& bg_color,
+            const bool has_focus,
+            const bool cursor_visible,
+            const long highlight_start,
+            const long highlight_end
+        ) const = 0;
+        /*!
+            requires
+                - the mutex drawable::m is locked
+                - c == the canvas to draw on
+                - enabled and mfont are the variables defined in the protected section 
+                - text_rect == the rectangle in which we should draw the given text
+                  of the drawable class.
+                - display_rect == the rectangle returned by scrollable_region::display_rect()
+                - text == the current text in the text_box 
+                - cursor_rect == A rectangle of width 1 that represents the current
+                  position of the cursor on the screen.
+                - text_color == the color of the text to be drawn
+                - bg_color == the background color of the text field
+                - has_focus == true if this text field has keyboard input focus
+                - cursor_visible == true if the cursor should be drawn 
+                - if (highlight_start <= highlight_end) then
+                    - text[highlight_start] though text[highlight_end] should be
+                      highlighted
+            ensures
+                - draws the text_box on the canvas c at the location given by text_rect.
+                  (Note that the scroll bars and borders are drawn by the scrollable_region
+                  and therefore the style returned by get_scrollable_region_style() 
+                  controls how those appear)
+                - doesn't draw anything outside display_rect
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class text_box_style_default : public text_box_style
+    {
+    public:
+        /*!
+            This is the default style for text_box objects.  
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
     // list_box styles  
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -604,7 +695,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an abstract class that defines the interface a
-                list_box style object must implement.
+                text_field style object must implement.
 
                 Note that derived classes must be copyable via
                 their copy constructors.
@@ -647,7 +738,7 @@ namespace dlib
                 - rect, enabled, and mfont are the variables defined in the protected section 
                   of the drawable class.
                 - text == the current text in the text_field 
-                - text_rect == the rectanle in which we should draw the given text
+                - text_rect == the rectangle in which we should draw the given text
                 - cursor_x == the x coordinate of the cursor relative to the left side 
                   of rect.  i.e. the number of pixels that separate the cursor from the
                   left side of the text_field.
@@ -661,7 +752,7 @@ namespace dlib
                     - text[highlight_start] though text[highlight_end] should be
                       highlighted
             ensures
-                - draws the button on the canvas c at the location given by rect.  
+                - draws the text_field on the canvas c at the location given by rect.  
         !*/
 
     };

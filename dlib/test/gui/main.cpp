@@ -236,6 +236,11 @@ class win : public drawable_window
         else
             tf.disable();
 
+        if (sb_enabled.is_checked())
+            tb.enable();
+        else
+            tb.disable();
+
     }
 
     void cb_sb_shown (
@@ -428,6 +433,7 @@ public:
         tab_label(*this),
         tabs(*this),
         tf(*this),
+        tb(*this),
         mbar(*this)
     {
         bool use_bdf_fonts = false;
@@ -635,6 +641,13 @@ public:
         tf.set_enter_key_handler(*this,&win::on_enter_key);
         tf.set_focus_lost_handler(*this,&win::on_tf_focus_lost);
         
+        tb.set_pos(250,400);
+        tb.set_text("initial test\nstring");
+        tb.set_size(300,300);
+        tb.set_text_color(rgb_pixel(255,0,0));
+        tb.set_enter_key_handler(*this,&win::on_enter_key);
+        tb.set_focus_lost_handler(*this,&win::on_tf_focus_lost);
+        
 
         button_count = 0;
         count = 0;
@@ -646,7 +659,7 @@ public:
             b.set_main_font(f);
 
 
-        set_size(800,500);
+        set_size(815,730);
 
         nrect.wrap_around(
             cbox.get_rect() +
@@ -660,7 +673,10 @@ public:
         save_file_box(*this,&win::on_open_file);
 
         if (use_bdf_fonts)
+        {
             tf.set_main_font(f);
+            tb.set_main_font(f);
+        }
         if (use_bdf_fonts)
             tabs.set_main_font(f);
 
@@ -676,7 +692,7 @@ private:
 
     void on_tf_focus_lost()
     {
-        cout << "text field lost focus" << endl;
+        cout << "text field/box lost focus" << endl;
     }
 
 
@@ -766,6 +782,7 @@ private:
     label tab_label;
     tabbed_display tabs;
     text_field tf;
+    text_box tb;
     menu_bar mbar;
     popup_menu submenu;
 
