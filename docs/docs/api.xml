@@ -160,6 +160,10 @@
                                <link>dlib/gui_widgets/widgets_abstract.h.html#text_field</link>
                            </item>
                            <item>
+                               <name>text_box</name>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#text_box</link>
+                           </item>
+                           <item>
                                <name>tabbed_display</name>
                                <link>dlib/gui_widgets/widgets_abstract.h.html#tabbed_display</link>
                            </item>
@@ -249,6 +253,16 @@
                         <item>
                            <name>text_field_style_default</name>
                            <link>dlib/gui_widgets/style_abstract.h.html#text_field_style_default</link>
+                        </item>
+
+
+                        <item>
+                           <name>text_box_style</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#text_box_style</link>
+                        </item>
+                        <item>
+                           <name>text_box_style_default</name>
+                           <link>dlib/gui_widgets/style_abstract.h.html#text_box_style_default</link>
                         </item>
                      </sub>
                   </item>

@@ -217,6 +217,8 @@
 
          <term link="dlib/gui_widgets/style_abstract.h.html#text_field_style" name="text_field_style"/>
          <term link="dlib/gui_widgets/style_abstract.h.html#text_field_style_default" name="text_field_style_default"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#text_box_style" name="text_box_style"/>
+         <term link="dlib/gui_widgets/style_abstract.h.html#text_box_style_default" name="text_box_style_default"/>
 
 
          <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style" name="toggle_button_style"/>
@@ -281,6 +283,7 @@
          <term link="dlib/gui_widgets/widgets_abstract.h.html#text_grid" name="text_grid"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#directed_graph_drawer" name="directed_graph_drawer"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#text_field" name="text_field"/>
+         <term link="dlib/gui_widgets/widgets_abstract.h.html#text_box" name="text_box"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#check_box" name="check_box"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#radio_button" name="radio_button"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#tabbed_display" name="tabbed_display"/>

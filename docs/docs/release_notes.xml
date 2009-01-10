@@ -12,6 +12,7 @@
 
 <current>
 New Stuff:
+   - Added the multi-line text_box GUI widget.
 
 Non-Backwards Compatible Changes:
 
