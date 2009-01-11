@@ -124,7 +124,7 @@
          <file>dlib/string.h</file>
          <spec_file link="true">dlib/string/string_abstract.h</spec_file>
          <description>
-            This is a function to pad whitespace (or user specfied characters) onto the right most end of a string.
+            This is a function to pad whitespace (or user specified characters) onto the right most end of a string.
          </description>
                                  
       </component>
@@ -136,7 +136,7 @@
          <file>dlib/string.h</file>
          <spec_file link="true">dlib/string/string_abstract.h</spec_file>
          <description>
-            This is a function to pad whitespace (or user specfied characters) onto the left most end of a string.
+            This is a function to pad whitespace (or user specified characters) onto the left most end of a string.
          </description>
                                  
       </component>
@@ -148,7 +148,7 @@
          <file>dlib/string.h</file>
          <spec_file link="true">dlib/string/string_abstract.h</spec_file>
          <description>
-            This is a function to pad whitespace (or user specfied characters) onto the ends of a string.
+            This is a function to pad whitespace (or user specified characters) onto the ends of a string.
          </description>
                                  
       </component>
@@ -160,7 +160,7 @@
          <file>dlib/string.h</file>
          <spec_file link="true">dlib/string/string_abstract.h</spec_file>
          <description>
-            This is a function to remove the whitespace (or user specfied characters) from the right most end of a string.
+            This is a function to remove the whitespace (or user specified characters) from the right most end of a string.
          </description>
                                  
       </component>
@@ -172,7 +172,7 @@
          <file>dlib/string.h</file>
          <spec_file link="true">dlib/string/string_abstract.h</spec_file>
          <description>
-            This is a function to remove the whitespace (or user specfied characters) from the left most end of a string.
+            This is a function to remove the whitespace (or user specified characters) from the left most end of a string.
          </description>
                                  
       </component>
@@ -184,7 +184,7 @@
          <file>dlib/string.h</file>
          <spec_file link="true">dlib/string/string_abstract.h</spec_file>
          <description>
-            This is a function to remove the whitespace (or user specfied characters) from the ends of a string.
+            This is a function to remove the whitespace (or user specified characters) from the ends of a string.
          </description>
                                  
       </component>

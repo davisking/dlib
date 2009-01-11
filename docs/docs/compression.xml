@@ -190,7 +190,7 @@
                <name>compress_stream_kernel_3</name>
                <file>dlib/compress_stream/compress_stream_kernel_3.h</file>
                <description> 
-                  This implementation is done using the the <a href="#lzp_buffer">lzp_buffer</a> object and
+                  This implementation is done using the <a href="#lzp_buffer">lzp_buffer</a> object and
                   <a href="other.html#crc32">crc32</a> object.  It does not use any sort of entropy coding, instead
                   a byte aligned output method is used.
                </description> 
@@ -289,7 +289,7 @@
                   semi-sorted order to speed up the calculation of the cumulative count.  This implementation
                   also uses the <a href="other.html#memory_manager">memory_manager</a> component to create a 
                   memory pool of linked list nodes.  This implementation is especially useful for high order
-                  contexts and/or very large and sparce alphabets.
+                  contexts and/or very large and sparse alphabets.
                </description> 
     
     
@@ -829,7 +829,7 @@
          <file>dlib/lzp_buffer.h</file>
          <spec_file>dlib/lzp_buffer/lzp_buffer_kernel_abstract.h</spec_file>
          <description>
-                This object represents some varation on the LZP algorithm
+                This object represents some variation on the LZP algorithm
                 described by Charles Bloom in his paper "LZP: a new data
                 compression algorithm"
          </description>

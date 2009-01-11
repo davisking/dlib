@@ -163,7 +163,7 @@
          <file>dlib/algs.h</file>
          <spec_file link="true">dlib/algs.h</spec_file>
          <description>
-            This is a templated function object that makes coppies of something. 
+            This is a templated function object that makes copies of something. 
          </description>
          
       </component>
@@ -368,7 +368,7 @@
             <extension>
                <name>bit_stream_multi</name>
                <spec_file>dlib/bit_stream/bit_stream_multi_abstract.h</spec_file>
-               <description>This extension gives a bit_stream object the ability to read/write multible bits at a time.</description>
+               <description>This extension gives a bit_stream object the ability to read/write multiple bits at a time.</description>
                <implementations>
                   <implementation>
                      <name>bit_stream_multi_1</name>
@@ -429,7 +429,7 @@
          <description>
                 This object represents some kind of stateless memory manager or memory pool.  
                 Stateless means that all instances (instances of the same type that is) 
-                of this object are identical and can be used interchangably.  Note that 
+                of this object are identical and can be used interchangeably.  Note that 
                 implementations are allowed to have some shared global state such as a 
                 global memory pool.  This object is also thread safe.
          </description>
@@ -623,7 +623,7 @@
                <file>dlib/memory_manager/memory_manager_kernel_2.h</file>
                <description> 
                 This memory manager implementation allocates memory in blocks of chunk_size*sizeof(T)
-                bytes.  All the sizeof(T) subblocks are kept in a linked list of free memory blocks
+                bytes.  All the sizeof(T) sub-blocks are kept in a linked list of free memory blocks
                 and are given out whenever an allocation request occurs.  Also, memory is not freed
                 until this object is destructed.  
                 Also note that array allocations are not managed at all but are passed directly 
@@ -660,7 +660,7 @@
                <file>dlib/memory_manager/memory_manager_kernel_3.h</file>
                <description> 
                 This memory manager implementation allocates memory in blocks of chunk_size*sizeof(T)
-                bytes.  All the sizeof(T) subblocks are kept in a linked list of free memory blocks
+                bytes.  All the sizeof(T) sub-blocks are kept in a linked list of free memory blocks
                 and are given out whenever an allocation request occurs.  Note that array allocations 
                 are managed.  So this object is just like kernel_2 but it also pools memory from 
                 array allocations (chunk_size has no effect with respect to array allocations, each array
@@ -801,7 +801,7 @@
                <name>timer_kernel_2</name>
                <file>dlib/timer/timer_kernel_2.h</file>
                <description> 
-                  This implemenation has a single master thread that does all the waiting.
+                  This implementation has a single master thread that does all the waiting.
                   This master thread creates and dispatches threads to specific timer objects
                   when they need to run their action functions.  When a timer object isn't executing 
                   its action function then it doesn't have any thread allocated to it at all.  So
@@ -862,7 +862,7 @@
       <a href="dlib/test/CMakeLists.txt.html">dlib/test/CMakeLists.txt</a> to build it.  
       </p>
       <p>
-         What you may find more useful however is the testing framework itself.  It uses a faily simple
+         What you may find more useful however is the testing framework itself.  It uses a fairly simple
          and modular design.  Each test is contained in its own cpp file and when compiled into the
          program it automatically shows up in the list of tests to run.  If you want to use the
          testing framework all you need to do is add the files <a href="dlib/test/tester.h.html">dlib/test/tester.h</a>,

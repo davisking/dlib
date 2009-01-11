@@ -32,10 +32,6 @@ add row_cat and col_cat matrix functions
 
 
 
-make a multiline text field
-
-
-
 
 make htmlify work right on tempalte function calls
 

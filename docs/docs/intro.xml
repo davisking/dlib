@@ -118,7 +118,7 @@
                 <br/><u>missing ensures</u>:    This means that the effects of the function are unspecified.  This is often used
                 for call backs where the client programmer implements the actual function. 
                 <br/><u>missing throws</u>:     This doesn't mean anything.  A function without a throws block
-                might throw excepitons or it might not.
+                might throw exceptions or it might not.
                                     
                 <br/>
                 <br/>
@@ -164,7 +164,7 @@
             
             <br/><li/> <anchor>CONVENTION</anchor> <b> CONVENTION </b>
             <ul>
-                This is a section of the formal comment which appears at the top of all classes which are 
+                This is a section of the formal comment which appears at the top of classes which are 
                 actual implementations (as opposed to specifications).  This section of the comment contains
                 a list of invariants that tell you what the member variables are used for.  It also relates 
                 the state of the member variables to the class interface.
@@ -312,8 +312,8 @@
         <a href="containers.html#queue">here</a>.
         </p>
         <p>
-        None of the above applies to the API components (or any global functions or objects that don't list multiple implemenations
-        in their documenation).  To use/create them you just need to include
+        None of the above applies to the API components (or any global functions or objects that don't list multiple implementations
+        in their documentation).  To use/create them you just need to include
         the appropriate headers.  For example, to create a mutex object from the <a href="api.html#threads">
         threads</a> component you would simply type <tt>dlib::mutex my_mutex;</tt>.  There is no 
         need to specify which kernel implementation.  The correct kernel implementation 

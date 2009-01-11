@@ -698,7 +698,7 @@
          <description>
                 This is an implementation of a very simple templated container object.
                 It contains between 0 and 31 objects where each object is listed
-                explicity in the tuple's template arguments.   
+                explicitly in the tuple's template arguments.   
 
             <p>
                Note that there is only one implementation of this object so there aren't any

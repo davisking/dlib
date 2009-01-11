@@ -44,7 +44,7 @@
             </sub>
          </item>
          <item nolink="true">
-            <name>Quntum Computing</name>
+            <name>Quantum Computing</name>
             <sub>
                <item>quantum_register</item> 
                <item>gate</item> 
@@ -637,7 +637,7 @@
                <file>dlib/bigint/bigint_kernel_2.h</file>
                <description> 
                   This implementation is basically the same as kernel_1 except it uses the 
-                  Fast Fourier Transform to perform multiplcations much faster.  
+                  Fast Fourier Transform to perform multiplications much faster.  
                </description> 
     
                <typedefs>
@@ -756,7 +756,7 @@
          <file>dlib/geometry.h</file>
          <spec_file>dlib/geometry/rectangle_abstract.h</spec_file>
          <description>
-            This object represents a rectangular region inside a cartesian 
+            This object represents a rectangular region inside a Cartesian 
             coordinate system.  It allows you to easily represent and manipulate
             rectangles.
          </description>
@@ -1089,7 +1089,7 @@
                 This object represents a container for another function
                 object and an instance of the <a href="#vector_normalizer">vector_normalizer</a> object.  
 
-                It automatically noramlizes all inputs before passing them
+                It automatically normalizes all inputs before passing them
                 off to the contained function object.
          </description>
          <examples>
@@ -1448,7 +1448,7 @@
          <file>dlib/algs.h</file>
          <spec_file link="true">dlib/algs.h</spec_file>
          <description>
-            This function takes three paramaters and finds the median of the three.  The median is swapped into
+            This function takes three parameters and finds the median of the three.  The median is swapped into
             the first parameter and the first parameter ends up in one of the other two, unless the first parameter was
             the median to begin with of course. 
          </description>
@@ -1704,7 +1704,7 @@
          <description>        
             This function takes a <a href="#rectangle">rectangle</a> and a 
             <a href="#point">point</a> and returns the point in the given 
-            rectangle that is nearst to the given point.
+            rectangle that is nearest to the given point.
          </description>
                                  
       </component>

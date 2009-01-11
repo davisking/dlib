@@ -158,7 +158,7 @@
          <file>dlib/enable_if.h</file>
          <description>
             This is a family of templates from the Boost C++ libraries that makes it somewhat easier to control
-            template specilization.  For the details see <a href="enable_if.html">
+            template specialization.  For the details see <a href="enable_if.html">
                this page</a>.  Note that the header <tt>dlib/enable_if.h</tt> brings
                these templates into the dlib namespace.<br/>
          </description>
@@ -349,7 +349,7 @@
          <spec_file>dlib/assert.h</spec_file>
          <description>
       <p>
-            This is a macro function for debuging.  Its form is <tt>ASSERT_ARE_NOT_SAME_TYPE(type1, type2)</tt>.  
+            This is a macro function for debugging.  Its form is <tt>ASSERT_ARE_NOT_SAME_TYPE(type1, type2)</tt>.  
             If type1 and type2 are the same type then the compile will fail.  This is sometimes useful 
             in validating template arguments.
       </p>
@@ -365,7 +365,7 @@
          <spec_file>dlib/assert.h</spec_file>
          <description>
       <p>
-            This is a macro function for debuging.  Its form is <tt>ASSERT_ARE_SAME_TYPE(type1, type2)</tt>.  
+            This is a macro function for debugging.  Its form is <tt>ASSERT_ARE_SAME_TYPE(type1, type2)</tt>.  
             If type1 and type2 are not the same type then the compile will fail.  This is sometimes useful 
             in validating template arguments.
       </p>
@@ -381,7 +381,7 @@
          <spec_file>dlib/assert.h</spec_file>
          <description>
       <p>
-            This is a macro function for debuging.  Its form is <tt>COMPILE_TIME_ASSERT(condition that should 
+            This is a macro function for debugging.  Its form is <tt>COMPILE_TIME_ASSERT(condition that should 
             be true)</tt>.  The condition must be a compile time constant and if it is false then the compile
             will fail.
       </p>
@@ -397,13 +397,13 @@
          <spec_file>dlib/assert.h</spec_file>
          <description>
       <p>
-         This is a macro function that is identicial to the <a href="#DLIB_ASSERT">DLIB_ASSERT</a> macro
+         This is a macro function that is identical to the <a href="#DLIB_ASSERT">DLIB_ASSERT</a> macro
          except that it is always enabled.  Even if _DEBUG, DEBUG and ENABLE_ASSERTS are not defined.
       </p>
       <p>
          Note that when this macro fails and throws an exception it also calls the global
          C function dlib_assert_breakpoint().  This behavior makes it easy to set a debugging
-         tool to break when DLIB_CASSERT fails by setting a breakpoing on dlib_assert_breakpoint().
+         tool to break when DLIB_CASSERT fails by setting a breakpoint on dlib_assert_breakpoint().
       </p>
          </description>
                                  
@@ -418,7 +418,7 @@
          <spec_file>dlib/assert.h</spec_file>
          <description>
       <p>
-            This is a macro function for debuging.  Its form is <tt>DLIB_ASSERT(condition that should be 
+            This is a macro function for debugging.  Its form is <tt>DLIB_ASSERT(condition that should be 
             true,error message)</tt>.  If the condition is false DLIB_ASSERT throws an exception of type 
             dlib::fatal_error with fatal_error::type == EBROKEN_ASSERT.  An error message detailing
             the nature of the problem is stored in the member variable info which is of type std::string.  
@@ -432,7 +432,7 @@
       <p>
          Note that when this macro fails and throws an exception it also calls the global
          C function dlib_assert_breakpoint().  This behavior makes it easy to set a debugging
-         tool to break when DLIB_CASSERT fails by setting a breakpoing on dlib_assert_breakpoint().
+         tool to break when DLIB_CASSERT fails by setting a breakpoint on dlib_assert_breakpoint().
       </p>
          </description>
                                  

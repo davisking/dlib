@@ -166,7 +166,7 @@
                   <li>Many <a href="containers.html">container classes</a></li>
                   <li><a href="other.html#serialize">Serialization support</a></li>
                   <li>Many <a href="other.html#memory_manager">memory manager</a> objects that implement 
-                  differnt memory pooling strategies</li>
+                  different memory pooling strategies</li>
                </ul>
             </li>
          </ul>
