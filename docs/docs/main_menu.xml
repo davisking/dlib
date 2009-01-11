@@ -73,6 +73,10 @@
             <link>license.html</link>
          </item>
          <item>
+            <name>How to contribute</name>
+            <link>howto_contribute.html</link>
+         </item>
+         <item>
             <name>Index</name>
             <link>term_index.html</link>
          </item>

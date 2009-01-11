@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+    <title>How to Contribute</title>
+
+
+
+    <!-- ************************************************************************* -->
+
+    <body>
+        <br/><br/>
+        
+
+        <!--   ****************************   EASY CONTRIBUTIONS  ****************************    -->
+
+         There are some simple ways to contribute to dlib:
+
+         <ul>
+            <li> You could make a dlib logo </li>
+            <li> Find confusing or incorrect documentation </li>
+            <li> Help make the web page prettier </li>
+            <li> Link to dlib from your web page </li>
+            <li> Add yourself or your project to the list of 
+            <a href="http://dclib.wiki.sourceforge.net/dlib_users">dlib users</a> </li>
+            <li> Try to compile the dlib regression test suite on any platforms you
+            have access to </li>
+         </ul>
+
+        <!--   ****************************   CODE CONTRIBUTIONS  ****************************    -->
+
+         Code contributions are also welcome, however, you should read over the coding guidelines below
+         and try to follow them.  It is also probably a good idea to read the books Effective C++ and 
+         More Effective C++ by Scott Myers.   And as always, feel free to contact me if you have any questions.
+
+        
+         <h2>Coding Guidelines</h2>
+
+         1. <a href="#1">Use Design by Contract</a><br/>
+         2. <a href="#2">Use spaces instead of tabs.</a><br/>
+         3. <a href="#3">Use the standard C++ naming convention</a><br/>
+         4. <a href="#4">Use RAII</a><br/>
+         5. <a href="#5">Don't use pointers</a><br/>
+         6. <a href="#6">Don't use #define for constants.</a><br/>
+         7. <a href="#7">Don't use stack based arrays.</a><br/>
+         8. <a href="#8">Use exceptions, but don't abuse them</a><br/>
+         9. <a href="#9">Write portable code</a><br/>
+         10. <a href="#10">Setup regression tests</a><br/>
+         11. <a href="#11">Use the Boost Software License</a><br/>
+
+
+         <ul>
+        <!--   ****************************  -->
+            <anchor>1</anchor>
+            <li> <h3> Apply Design by Contract to Your Code  </h3>
+               <ul><p>
+                  The most important part of a software library isn't the code, it is the set
+                  of interfaces the library exposes to the user.  These interfaces need to be easy 
+                  to use right, and hard to use wrong.  The only way this
+                  happens is if the interfaces are documented in a simple, consistent, and precise way.
+               </p>
+               <p>
+                  The name for the way I design and document these interfaces is known as
+                  Design by Contract.   There is a lot that can be said about Design by Contract, in fact,
+                  whole books have been written about it, and programming languages exist which
+                  use Design by Contract as a central element.  Here I will just go over some
+                  of the basic ways it is used in dlib as well some of the reasons why it is a Good Thing.
+               </p>
+               <li> <b>Functions should have documented preconditions which are programmatically verifiable</b>
+                  <ul>
+                     <p>
+                     Many functions have a set of requirements or preconditions that need to be satisfied
+                     if they are to be used.  If these requirements are not satisfied 
+                     when a function is called then the function will not do what it is supposed to do.  Moreover,
+                     any piece of software that calls a function but doesn't make sure all preconditions
+                     are satisfied contains a bug, <i>by definition</i>.  
+                     </p>
+                     <p>
+                        This means all functions must precisely document their preconditions if they are to be
+                        usable.  In fact, all preconditions should be programmatically verifiable.  Doing this
+                        has a number of benefits.  First, it means they are unambiguous.  English
+                        can be confusing and vague, but saying "<tt>some_predicate == true</tt>" uses a 
+                        formal language, C++, that we all should understand quite well.  Second, it means 
+                        you can put checks into the code that will catch <i>all</i> usage errors. 
+                     </p>
+                     <p>
+                        These checks should always be implemented using 
+                        <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a> or
+                        <a href="metaprogramming.html#DLIB_CASSERT">DLIB_CASSERT</a> and they should always
+                        cover all preconditions.   
+                        These macros take a boolean argument and if it is false they throw dlib::fatal_error.  So
+                        you can use them to check that all your preconditions are true.  Also, don't forget that
+                        a violated function precondition indicates a bug in a program.  
+                        That is, when dlib::fatal_error is thrown it means a bug has been found and the only thing 
+                        an application can do at that point is print an error message and terminate.  
+                        In fact, dlib::fatal_error has checks in it to make sure someone doesn't catch the
+                        exception and ignore it.  These checks will abruptly terminate any program that attempts
+                        to ignore fatal errors.   
+                     </p>
+                     <p>
+                        The above considerations bring me to my next bit of advice.  Developers new to Design by Contract
+                        often think input validation should be part of a function's preconditions.
+                        They then complain that labeling invalid program input as a bug, throwing fatal_error, and 
+                        terminating the application is a very bad thing.  They are right, that would be a bad thing
+                        and you should not write software that behaves that way.  The way out of this problem is, of
+                        course, to not consider invalid input a bug.  Instead, you should perform explicit input validation 
+                        on any
+                        data coming into your program <i>before</i> it gets to any functions that have preconditions
+                        which demand the validated inputs.  Moreover, if you make your preconditions programmatically verifiable
+                        then it should be easy to validate any inputs by simply using whatever it is you
+                        use to check your preconditions.  
+                     </p>
+                     <p>
+                        Consider the function <a href="algorithms.html#cross_validate_trainer">cross_validate_trainer</a> as an 
+                        example.  One of its requirements is that the input forms a valid binary classification problem.
+                        This is documented in the list of preconditions as 
+                        "<tt>is_binary_classification_problem(x,y) == true</tt>".  This precondition is just saying 
+                        that when you call
+                        the <tt>is_binary_classification_problem</tt> function on the x and y inputs it had better return true 
+                        if you want to use those inputs with the <tt>cross_validate_trainer</tt> function.   
+                        Given this information it is trivial to perform input validation.  All you have to do is
+                        call <tt>is_binary_classification_problem</tt> on your input data and you are done.   
+                     </p>
+                     <p>
+                        Using the above technique you have validated your inputs, documented your preconditions, and are
+                        buffered by DLIB_ASSERT statements that will catch you if you accidentally forget to validate any
+                        inputs.   
+                     </p>
+                     <p>The thing to understand here is that
+                        a violation of a function's preconditions means you have a bug on your hands.  Or in other words,
+                        you should never intentionally violate any function preconditions.  But of course 
+                        it will happen from time to time because bugs are unavoidable.  But at least with 
+                        this approach you will get a detailed error message early in development rather than a 
+                        mysterious segmentation fault days or weeks later.
+                     </p>
+                  </ul></li>
+               <li> <b>Functions should have documented postconditions  </b>
+                  <ul><p>
+                     I don't have nearly as much to say about postconditions as I did about function requirements.  You should
+                     strive to write programmatically verifiable postconditions because that makes your postconditions
+                     more precise.  However, it is sometimes the case that this isn't practical and that is fine.  
+                     But whatever you do write needs to clearly communicate to the
+                     user what it is your function does.  
+                  </p></ul></li>
+               <p>
+                  Now you may be wondering why this is called <i>Design</i> by Contract and not Documentation
+                  by Contract.  The reason is that the process of writing down all these detailed descriptions
+                  of what your code does becomes part of how you design software.  For example, often you 
+                  will find that when you go to write down the requirements for calling a function you are unable 
+                  to do so.  This may be because the requirements are so complex you can't think of a way 
+                  to describe them, or you may realize that you yourself don't even know what they are.  Alternatively, 
+                  you may know what they are but there isn't any way to verify them programmatically.   All these
+                  things are symptoms of a bad <i>design</i> and the reason you became aware of this design problem 
+                  was by attempting to apply Design by Contract.  
+               </p>
+               <p>
+                  After you get enough practice with this way of writing software you begin to think a lot
+                  more about questions like "how can I design this class such that every member function
+                  has a very simple set of requirements and postconditions?"  Once you start doing this
+                  you are well on your way to creating software components that are easy to use right, and 
+                  hard to use wrong.
+               </p>
+               <p>
+                  The notation dlib uses to document preconditions and postconditions is located in
+                  the <a href="intro.html#notation">introduction</a>.  All code that goes into dlib
+                  must document itself using this notation.  You should also separate the implementation
+                  and specification of a component into two separate files as described in the introduction.  This
+                  way users don't even see implementation details when they look at the documentation for a 
+                  component.  
+               </p>
+               </ul>
+            </li>
+
+
+        <!--   ****************************  -->
+            <anchor>2</anchor>
+            <li><h3>Use spaces instead of tabs.   </h3>
+            <ul> <p>This is just generally good advice but
+                  it is especially important in dlib since everything is viewable 
+                  as pretty-printed HTML.  Tabs show up as 8 characters in most browsers
+                  and this results in the HTML version being difficult to read.  So 
+                  don't use tabs.</p>
+            </ul></li>
+           
+
+
+        <!--   ****************************  -->
+            <anchor>3</anchor>
+           <li><h3> Never use capitol letters in the names of variables, functions, or
+              classes.  Use the _ character to separate words.  </h3>
+            <ul>
+               <p>
+                  The reason dlib uses this style is because it is the style used by the
+                  C++ standard library.  But more importantly, dlib currently provides
+                  an interface to users that has a consistent look and feel and it is
+                  important to continue to do so.   
+               </p>
+                  <p>
+                     As for constants, they should usually contain all upper case letters 
+                     but all lowercase is ok sometimes.
+                  </p>
+            </ul></li>
+
+        <!--   ****************************  -->
+            <anchor>4</anchor>
+            <li> <h3> Don't use manual resource management.  Use RAII
+               instead.</h3>
+               <ul><p>
+                  You should not be calling new and delete in your own code.  You should instead
+                  be using objects like the std::vector, <a href="containers.html#scoped_ptr">scoped_ptr</a>,
+                  or any number of other objects that manage resources such as memory for you.  If you want
+                  an array use std::vector (or the checked <a href="containers.html#std_vector_c">std_vector_c</a>).
+                  If you want to make a lookup table use a <a href="containers.html#map">map</a>.  If you want
+                  a two dimensional array use <a href="containers.html#matrix">matrix</a> or 
+                  <a href="containers.html#array2d">array2d</a>.
+               </p>
+               <p>
+                  These container objects are examples of what is called RAII (Resource Acquisition Is Initialization)
+                  in C++.  It is essentially a name for the fact that, in C++, you can have totally automated and
+                  deterministic resource management by always associating resource acquisition with the construction
+                  of an object and resource release with the destruction of an object.  I say resource management 
+                  here rather than memory management
+                  because, unlike Java, RAII can be used for more than memory management.  For example, when
+                  you use a <a href="dlib/threads/threads_kernel_abstract.h.html#mutex">mutex</a> you first lock
+                  it, do something, and then you need to remember to unlock it.  The RAII way of doing this is
+                  to use the <a href="api.html#auto_mutex">auto_mutex</a> which will lock a mutex and automatically
+                  unlock it for you.   Or suppose you have made a TCP <a href="api.html#sockets">connection</a> 
+                  to another machine and you want to be certain the resources associated with that connection 
+                  are always released.  You can easily accomplish this with RAII by using the scoped_ptr as
+                  shown in <a href="sockets_ex_2.cpp.html">this</a> example program.
+               </p>
+               <p>
+                  RAII is a trivial technique to use.  All you have to do is not call new and delete yourself and
+                  you will never have another memory leak.  Just use the appropriate <a href="containers.html">container</a>
+                  instead.  Finally, if you don't use RAII then your code is almost certainly not exception safe.  
+               </p>
+               </ul>
+            </li>
+
+        <!--   ****************************  -->
+            <anchor>5</anchor>
+            <li> <h3>Don't use pointers </h3>
+               <ul><p>
+                  There are a number of reasons to not use pointers.  First, if you are using pointers then
+                  you are probably not using RAII.  Second, pointers are ambiguous.  When I see a pointer
+                  I don't know if it is a pointer to a single item, a pointer to nothing, or 
+                  a pointer to an array of who knows how many things.   On the other hand, when I see a 
+                  std::vector I know with certainty that I'm dealing with a kind of array.  Or if I see a 
+                  reference to something then I know I'm dealing with exactly one instance of some object.  
+               </p>
+               <p>
+                  Most importantly, it is impossible to validate the state of a pointer.  Consider two
+                  functions:  
+                  <blockquote><tt>double compute_sum_of_array_elements(const double* array, int array_size);  <br/>
+                     double compute_sum_of_array_elements(const std::vector&lt;double&gt;&amp; array); </tt></blockquote>
+
+                  The first function is inherently unsafe.  If the user accidentally passes in an invalid pointer
+                  or sets the size argument incorrectly then their program will crash and this will turn into a 
+                  potentially hard to find bug.  This is because there is absolutely nothing you can do inside
+                  the first function to tell the difference between a valid pointer and size pair and an invalid
+                  pointer and size pair.  <b><i>Nothing</i></b>.   The second function has none of these difficulties.
+               </p>
+               <p>
+                  If you absolutely need pointer semantics then you can usually use a smart pointer like
+                  <a href="containers.html#scoped_ptr">scoped_ptr</a> or <a href="containers.html#shared_ptr">shared_ptr</a>.
+                  If that still isn't good enough for you and you <i>really</i> need to use a normal C style pointer
+                  then isolate your pointers inside a class so that they are contained in a small area of the code.  
+                  However, in practice the container classes in dlib and the STL are more than sufficient in nearly 
+                  every case where pointers would otherwise be used.
+               </p>
+               </ul>
+            </li>
+
+        <!--   ****************************  -->
+            <anchor>6</anchor>
+            <li> <h3> Don't use #define for constants.   </h3>
+               <ul><p>
+                  dlib is meant to be integrated into other people's projects.  Because of this everything
+                  in dlib is contained inside the dlib namespace to avoid naming conflicts with user's code.
+                  #defines don't respect namespaces at all.  For example, if you #define a constant called SIZE then it
+                  will cause a conflict with any piece of code <i>anywhere</i> that contains the identifier SIZE.  
+                  This means that #define based constants must be avoided and constants should be created using the
+                  const keyword instead.
+               </p>
+               </ul>
+            </li>
+
+        <!--   ****************************  -->
+            <anchor>7</anchor>
+            <li> <h3>Don't use stack based arrays.   </h3>
+               <ul><p>
+                  A stack based array, or C style array, is an array declared like this:
+                  <blockquote><tt>int array[200];</tt></blockquote>
+                  Most of my criticisms of pointers also apply to stack based arrays.  So you should 
+                  use a container class instead and preferably one with the ability to do range
+                  checking such as the  <a href="containers.html#std_vector_c">std_vector_c</a>.   
+               </p></ul>
+            </li>
+
+
+
+        <!--   ****************************  -->
+            <anchor>8</anchor>
+            <li> <h3> Use exceptions, but don't abuse them. </h3>
+               <ul><p>
+                  Exceptions are good but should only be used for <i>exceptional</i> conditions.
+                  This means that in the vast majority of use cases a user shouldn't 
+                  need to deal with the exceptions thrown by a library component near the point
+                  of use.  If that isn't true then whatever condition is triggering your exception
+                  isn't exceptional.  Or in other words, if the user would have to put try/catch
+                  blocks around individual calls to your code then you are almost certainly using 
+                  exceptions wrong.
+               </p>
+               <p>
+                  A good example of an exceptional condition is running out of memory.  It doesn't happen
+                  very often, and when it does happen it is hardly ever the case that you want to
+                  deal with the out of memory exception right next to the place where you are 
+                  attempting to allocate memory.  
+               </p>
+               <p>
+                  Another way of looking at it is that exceptions shouldn't occur in the normal use
+                  cases associated with a library component.  For example, the C++ I/O streams allow
+                  you to read the contents of a file on disk and when you hit the end of file they
+                  do not throw an exception.   The difference between hitting EOF and running
+                  out of memory is that when everything is working properly your application will
+                  routinely encounter ends of files but hopefully you do not routinely run out of memory.
+               </p>
+               <p>
+                  As an aside, it is also important that your exception classes inherit from 
+                  <a href="other.html#error">dlib::error</a>.
+               </p>
+               </ul>
+            </li>
+
+
+        <!--   ****************************  -->
+            <anchor>9</anchor>
+            <li> <h3>Write portable code</h3>
+               <ul>
+                  <li> <b>Don't make assumptions about how objects are laid out in memory. </b>
+                     <ul> <p>
+                         If you have been following the prohibition against messing around with
+                         pointers then this won't even be an issue for you.  Moreover, just about the only
+                         time this should even come up is when you are casting blocks of 
+                         memory into structs or dumping the contents of memory to an I/O channel.
+                         All of these things are highly non-portable so don't do them.
+                        </p>
+                     </ul>
+                  </li>
+                  <li> <b> Don't make assumptions about endianness  </b>
+                     <ul><p>
+                        This is self explanatory.  Some machines are little endian and some are big endian.  
+                        It is just a fact of life.  If you need to convert between the two then 
+                        please use the <a href="other.html#byte_orderer">byte_orderer</a> since it 
+                        can deal with these issues in a type safe way.  
+                     </p></ul>
+                  </li>
+                  <li> <b> All code that calls functions that aren't in dlib or the C++
+                     standard library must be isolated inside the API wrappers.</b>
+                     <ul><p>
+                        If you want to contribute code to dlib that needs to use something that isn't 
+                        in the C++ standard then we need to introduce a new library component
+                        in the <a href="api.html">API wrappers</a> section.  The new component would
+                        provide whatever functionality you need.  This new component would have
+                        to provide at least POSIX and win32 implementations.  
+                     </p>
+                     <p>
+                        It is also worth pointing out that <i>simple</i> wrappers around operating system 
+                        specific calls are usually a bad solution.  This is because there are
+                        invariably subtle, if not huge, differences between what is available on different 
+                        operating systems.
+                        So being truly portable takes a lot of work.  It involves reading everything
+                        you can find about all the APIs needed to implement the feature on each target platform.
+                        In many cases there will be important details that are undocumented and you will
+                        only be able to find out about them by searching the internet for other developers
+                        complaining about bugs in API functions X, Y, and Z.  All this stuff needs to be abstracted
+                        away to put a portable and simple interface in front of it.  So this is a task 
+                        that shouldn't be taken lightly.
+                     </p>
+                     </ul>
+                  </li>
+               </ul></li>
+
+
+        <!--   ****************************  -->
+            <anchor>10</anchor>
+            <li> <h3>Library components should have regression tests</h3>
+               <ul>
+                  <p>
+                     dlib has a <a href="other.html#dlib_testing_suite">regression test suite</a> located in 
+                     the dlib/test folder.  Whenever possible, library components should have tests
+                     associated with them.  GUI components get a pass since it isn't very easy to setup
+                     automatic tests for them but pretty much everything else should have some sort
+                     of test.
+                  </p>
+               </ul>
+            </li>
+
+        <!--   ****************************  -->
+            <anchor>11</anchor>
+            <li> <h3>You must use the Boost Software License</h3>
+               <ul>
+                  <p>
+                     Having the library use more than one open source license is confusing
+                     so I ask that any code contributions be licensed under the Boost Software
+                     License.
+                  </p>
+               </ul>
+            </li>
+
+
+         </ul>
+
+
+        <!--   ****************************  -->
+
+
+
+
+    
+    </body>
+
+
+
+    <!-- ************************************************************************* -->
+
+</doc>
+
