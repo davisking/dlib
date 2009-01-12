@@ -162,7 +162,7 @@
                </p>
                <p>
                   The notation dlib uses to document preconditions and postconditions is located in
-                  the <a href="intro.html#notation">introduction</a>.  All code that goes into dlib
+                  the <a href="intro.html#Notation">introduction</a>.  All code that goes into dlib
                   must document itself using this notation.  You should also separate the implementation
                   and specification of a component into two separate files as described in the introduction.  This
                   way users don't even see implementation details when they look at the documentation for a 
