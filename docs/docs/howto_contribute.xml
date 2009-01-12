@@ -255,7 +255,7 @@
                      double compute_sum_of_array_elements(const std::vector&lt;double&gt;&amp; array); </tt></blockquote>
 
                   The first function is inherently unsafe.  If the user accidentally passes in an invalid pointer
-                  or sets the size argument incorrectly then their program will crash and this will turn into a 
+                  or sets the size argument incorrectly then their program may crash and this will turn into a 
                   potentially hard to find bug.  This is because there is absolutely nothing you can do inside
                   the first function to tell the difference between a valid pointer and size pair and an invalid
                   pointer and size pair.  <b><i>Nothing</i></b>.   The second function has none of these difficulties.
@@ -345,6 +345,13 @@
                          memory into structs or dumping the contents of memory to an I/O channel.
                          All of these things are highly non-portable so don't do them.
                         </p>
+                        <p>
+                           If you want a portable way to write the state of an object to an
+                           IO channel the I recommend you use the <a href="other.html#serialize">serialization</a>
+                           capability in dlib.  If that still doesn't suit your needs then do 
+                           something else but whatever you do don't dump the contents of memory.  
+                           Convert your data into some portable format first.
+                        </p>
                      </ul>
                   </li>
                   <li> <b> Don't make assumptions about endianness  </b>
@@ -358,7 +365,7 @@
                   <li> <b> All code that calls functions that aren't in dlib or the C++
                      standard library must be isolated inside the API wrappers.</b>
                      <ul><p>
-                        If you want to contribute code to dlib that needs to use something that isn't 
+                        If you want to contribute code to dlib which needs to use something that isn't 
                         in the C++ standard then we need to introduce a new library component
                         in the <a href="api.html">API wrappers</a> section.  The new component would
                         provide whatever functionality you need.  This new component would have
