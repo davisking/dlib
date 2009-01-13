@@ -379,32 +379,32 @@
                   have been working with bodies of software that disregard the above rules regarding questions
                   1 and 2.  Indeed, when exceptions are used for flow control the results are horrifying.  Using
                   exceptions for events that occur in the normal use of a library component, especially when
-                  the events need to be dealt with near where they happen result in a spaghetti like mess
+                  the events need to be dealt with near where they happen result in a spaghetti-like mess
                   of throw statements and try/catch blocks.  Clearly, exceptions should be used judiciously.  
                   So please, take my advice regarding questions 1 and 2 to heart. 
                </p>
                <p>
-                  Now lets go back to my claim that exceptions are an important part of making
-                  a library that is hard to use wrong.  But first lets be honest about one thing,  
-                  many developers don't think very hard about error handing and they similarly aren't very
+                  Now let's go back to my claim that exceptions are an important part of making
+                  a library that is hard to use wrong.  But first let's be honest about one thing,  
+                  many developers don't think very hard about error handling and they similarly aren't very
                   careful about checking function return codes.  Moreover, even the most studious of
-                  us can easily forget to check error codes.  It is also easy to forget to add 
+                  us can easily forget to add these checks.  It is also easy to forget to add 
                   appropriate exception catch blocks.
                </p>
                <p>
-                  So what is so great about exceptions then?  Well, lets imagine some error just occurred
+                  So what is so great about exceptions then?  Well, let's imagine some error just occurred
                   and it caused an exception to be thrown.   If you forgot to setup catch blocks to deal with
                   the error then your program will be aborted.  Not exactly a great thing.  But you will, however,
-                  be able to easily find out what exception was thrown.  Additionally, exceptions typically contain an error
-                  message telling you all about the error that caused the exception to be thrown.  Moreover, 
+                  be able to easily find out what exception was thrown.  Additionally, exceptions typically contain a
+                  message telling you all about the error.  Moreover, 
                   any debugger worth its
-                  salt will be able to show you a stack trace that lets you see exactly where the exception came from.
+                  salt will be able to show you a stack trace that let's you see exactly where the exception came from.
                    The exception <i>forces</i> you, the user, to 
                   be aware of this potential error and to add a catch block to deal with it. 
                   This is where the "hard to use wrong" comes from. 
                </p>
                <p>
-                  Now lets imagine that we are using return codes to communicate errors to the user and the 
+                  Now let's imagine that we are using return codes to communicate errors to the user and the 
                   same error occurs.  If you forgot to do all your return code checking then you will
                   simply be unaware of the error.  Maybe your program will crash right away.  But more likely, it
                   will continue to run for a while before crashing at some random place far away from the source
@@ -412,15 +412,15 @@
                   together trying to figure out what went wrong.  
                </p>
                <p>
-                  The above considerations are why I maintain that exceptions, used properly, contribute to 
-                  the "hard to use wrong" factor of a library.  There are however other reasons to use exceptions.
+                  The above considerations are why I maintain that exceptions, when used properly, contribute to 
+                  the "hard to use wrong" factor of a library. There are also other reasons to use exceptions.
                   They free the user from needing to clutter up code with lots of return code checking.  This makes
-                  code easier to read and lets you focus more on the algorithm you are trying to implement and less
+                  code easier to read and let's you focus more on the algorithm you are trying to implement and less
                   on the bookkeeping.  
                </p>
                <p>
                   Finally, it is important to note that there is a place for return codes.  When you answer "no"
-                  to questions 1 and 2 I suggest using exceptions.  However, if you answer "yes" to even one
+                  to questions 1 and 2, I suggest using exceptions.  However, if you answer "yes" to even one
                   of them then I would recommend pretty much anything other than throwing an exception.  In this
                   case error codes are often an excellent idea.
                </p>
@@ -454,7 +454,7 @@
                            Convert your data into some portable format and then output that.
                         </p>
                         <p>
-                           As an example of something else you might do, suppose you have a bunch of integers 
+                           As an example of something else you might do: suppose you have a bunch of integers 
                            you want to write to disk.  Assuming all your integers are positive numbers representable 
                            using 32 or fewer bits you could store all your numbers in 
                            <a href="other.html#uint32">dlib::uint32</a> variables and then convert them
@@ -472,15 +472,15 @@
                            <p>
                            There are three important things to understand about this process.  First, you need
                            to pick variables that always have the same size on all platforms.  This means you
-                           can't use <i>any</i> of the built in C++ types like int, float, double, long, etc... All 
+                           can't use <i>any</i> of the built in C++ types like int, float, double, long, etc. All 
                            of these types have different sizes depending on your platform and even compiler settings. 
                            So you need to use something like dlib::uint32 to obtain a type of a known size.
                            </p>
                            <p>
                            Second, you need to convert each thing you write out into either big or little endian byte order.  
                            The reason for this is, again, portability.  If you don't explicitly convert to one
-                           of these byte orders then you end up writing data out using whatever the byte order
-                           is on your current machine.  If you do this then only machines that have the same
+                           of these byte orders then you end up writing data out using whatever byte order
+                           is used by your current machine.  If you do this then only machines that have the same
                            byte order as yours will be able to read in your data.  If you use the dlib::byte_orderer
                            object this is easy.  It is very type safe.  In fact, you should have a hard time even getting
                            it to compile if you use it wrong.
