@@ -380,7 +380,7 @@
                   1 and 2.  Indeed, when exceptions are used for flow control the results are horrifying.  Using
                   exceptions for events that occur in the normal use of a library component, especially when
                   the events need to be dealt with near where they happen result in a spaghetti like mess
-                  of throw statements and try/catch blocks.  Clearly, exceptions should be used sparingly.  
+                  of throw statements and try/catch blocks.  Clearly, exceptions should be used judiciously.  
                   So please, take my advice regarding questions 1 and 2 to heart. 
                </p>
                <p>
