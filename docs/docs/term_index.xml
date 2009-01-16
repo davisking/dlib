@@ -470,6 +470,7 @@
          <term link="containers.html#graph" name="graph"/>
          <term link="containers.html#directed_graph" name="directed_graph"/>
          <term link="containers.html#tuple" name="tuple"/>
+         <term link="containers.html#type_safe_union" name="type_safe_union"/>
          <term link="containers.html#array" name="array"/>
          <term link="containers.html#array2d" name="array2d"/>
          <term link="containers.html#binary_search_tree" name="binary_search_tree"/>

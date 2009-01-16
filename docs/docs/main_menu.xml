@@ -204,6 +204,10 @@
                   <link>pipe_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Pipe_2</name>
+                  <link>pipe_ex_2.cpp.html</link>
+               </item>
+               <item>
                   <name>Timer</name>
                   <link>timer_ex.cpp.html</link>
                </item>

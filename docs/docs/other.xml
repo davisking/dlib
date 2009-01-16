@@ -220,7 +220,7 @@
       </component>
       
    <!-- ************************************************************************* -->
-      
+
       <component>
          <name>pipe</name>
          <file>dlib/pipe.h</file>
@@ -232,6 +232,7 @@
          
          <examples>
             <example>pipe_ex.cpp.html</example>
+            <example>pipe_ex_2.cpp.html</example>
          </examples>
 
          <implementations>

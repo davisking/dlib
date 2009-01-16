@@ -62,6 +62,7 @@
          <item>matrix</item> 
          <item>queue</item> 
          <item>reference_counter</item> 
+         <item>type_safe_union</item> 
          <item>sequence</item> 
          <item>set</item> 
          <item>stack</item> 
@@ -652,6 +653,27 @@
       </component>
       
    <!-- ************************************************************************* -->
+
+      <component>
+         <name>type_safe_union</name>
+         <file>dlib/type_safe_union.h</file>
+         <spec_file link="true">dlib/type_safe_union/type_safe_union_kernel_abstract.h</spec_file>
+         <description>
+                This object is a type safe analogue of the classic C union object. 
+                The type_safe_union, unlike a union, can contain non-POD types such 
+                as std::string.    
+                <p>It is also implemented without performing any
+                   heap memory allocations and instead it stores everything on the stack.</p>
+         </description>
+         
+         <examples>
+            <example>pipe_ex_2.cpp.html</example>
+         </examples>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
 
       <component>
          <name>shared_ptr_thread_safe</name>

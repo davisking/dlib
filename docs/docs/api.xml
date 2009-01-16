@@ -109,7 +109,7 @@
                            </item>
                            <item>
                                <name>message_box_blocking</name>
-                               <link>dlib/gui_widgets/widgets_abstract.h.html#message_box</link>
+                               <link>dlib/gui_widgets/widgets_abstract.h.html#message_box_blocking</link>
                            </item>
                            <item>
                                <name>open_file_box</name>
