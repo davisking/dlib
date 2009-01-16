@@ -23,7 +23,7 @@
             <li> Link to dlib from your web page </li>
             <li> Add yourself or your project to the list of 
             <a href="http://dclib.wiki.sourceforge.net/dlib_users">dlib users</a> </li>
-            <li> Try to compile the dlib regression test suite on any platforms you
+            <li> Try to run the dlib regression test suite on any platforms you
             have access to </li>
          </ul>
 
