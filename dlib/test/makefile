@@ -81,6 +81,7 @@ SRC += thread_pool.cpp
 SRC += timer.cpp
 SRC += tokenizer.cpp
 SRC += tuple.cpp
+SRC += type_safe_union.cpp
 
 
 ####################################################

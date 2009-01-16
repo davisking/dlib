@@ -71,6 +71,7 @@ set (tests
    timer.cpp
    tokenizer.cpp
    tuple.cpp
+   type_safe_union.cpp
    )
 
 # create a variable called target_name and set it to the string "test"
