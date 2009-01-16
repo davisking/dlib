@@ -200,6 +200,37 @@ namespace
             DLIB_CASSERT(a.get<char>() == 'b',"");
             DLIB_CASSERT(b.get<char>() == 'a',"");
 
+        // -----------
+
+            a.get<char>() = 'a';
+            b.get<std::string>() = "a string";
+
+            DLIB_CASSERT(a.is_empty() == false,"");
+            DLIB_CASSERT(a.contains<char>() == true,"");
+            DLIB_CASSERT(b.is_empty() == false,"");
+            DLIB_CASSERT(b.contains<char>() == false,"");
+            DLIB_CASSERT(a.contains<std::string>() == false,"");
+            DLIB_CASSERT(b.contains<std::string>() == true,"");
+
+
+            DLIB_CASSERT(a.get<char>() == 'a',"");
+            DLIB_CASSERT(b.get<std::string>() == "a string","");
+
+            swap(a,b);
+
+            DLIB_CASSERT(b.is_empty() == false,"");
+            DLIB_CASSERT(b.contains<char>() == true,"");
+            DLIB_CASSERT(a.is_empty() == false,"");
+            DLIB_CASSERT(a.contains<char>() == false,"");
+            DLIB_CASSERT(b.contains<std::string>() == false,"");
+            DLIB_CASSERT(a.contains<std::string>() == true,"");
+
+
+            DLIB_CASSERT(b.get<char>() == 'a',"");
+            DLIB_CASSERT(a.get<std::string>() == "a string","");
+
+
+
         }
 
     };
