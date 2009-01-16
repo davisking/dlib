@@ -116,7 +116,8 @@
                         This is documented in the list of preconditions as 
                         "<tt>is_binary_classification_problem(x,y) == true</tt>".  This precondition is just saying 
                         that when you call
-                        the <tt>is_binary_classification_problem</tt> function on the x and y inputs it had better return true 
+                        the <a href="algorithms.html#is_binary_classification_problem">is_binary_classification_problem</a> 
+                        function on the x and y inputs it had better return true 
                         if you want to use those inputs with the <tt>cross_validate_trainer</tt> function.   
                         Given this information it is trivial to perform input validation.  All you have to do is
                         call <tt>is_binary_classification_problem</tt> on your input data and you are done.   
@@ -165,8 +166,7 @@
                   the <a href="intro.html#Notation">introduction</a>.  All code that goes into dlib
                   must document itself using this notation.  You should also separate the implementation
                   and specification of a component into two separate files as described in the introduction.  This
-                  way users don't even see implementation details when they look at the documentation for a 
-                  component.  
+                  way users aren't confused or distracted by implementation details when they look at the documentation.  
                </p>
                </ul>
             </li>
