@@ -26,6 +26,17 @@ namespace dlib
         >
     class type_safe_union : noncopyable
     {
+        /*!
+            CONVENTION
+                - is_empty() ==  (type_identity == 0)
+                - contains<T>() == (type_identity == get_id<T>())
+                - mem.data == the block of memory on the stack which is
+                  where objects in the union are stored
+        !*/
+
+    private:
+
+
         template <typename A, typename B>
         struct max
         {
