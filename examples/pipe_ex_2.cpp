@@ -72,10 +72,10 @@ public:
         message_pipe.wait_until_empty();
 
         // Now disable the message_pipe.  Doing this will cause all calls to 
-        // message_pipe.dequeue() to return false so our threads will terminate
+        // message_pipe.dequeue() to return false so our thread will terminate
         message_pipe.disable();
 
-        // now block until all the threads have terminated
+        // now block until our thread has terminated
         wait();
     }
 
