@@ -36,20 +36,16 @@ namespace dlib
 
     private:
 
-
-        template <typename A, typename B>
-        struct max
-        {
-            const static size_t value = tmax<sizeof(A), sizeof(B)>::value;
-        };
-
-        template <typename A, typename B, typename C>
-        struct max<max<A,B>, C>
-        {
-            const static size_t value = tmax<max<A,B>::value, sizeof(C)>::value;
-        };
-
-        const static size_t max_size = max<max<max<max<max<max<max<max<max<T1,T2>,T3>,T4>,T5>,T6>,T7>,T8>,T9>,T10>::value; 
+        const static size_t max_size = tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<sizeof(T1),
+                                                        sizeof(T2)>::value,
+                                                        sizeof(T3)>::value,
+                                                        sizeof(T4)>::value,
+                                                        sizeof(T5)>::value,
+                                                        sizeof(T6)>::value,
+                                                        sizeof(T7)>::value,
+                                                        sizeof(T8)>::value,
+                                                        sizeof(T9)>::value,
+                                                        sizeof(T10)>::value; 
 
         union mem_block
         {

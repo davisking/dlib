@@ -77,7 +77,7 @@ namespace
 
 
 
-            f_val = 4.345;
+            f_val = 4.345f;
             a.get<float>() = f_val;
 
             DLIB_CASSERT(a.is_empty() == false,"");
