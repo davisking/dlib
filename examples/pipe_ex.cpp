@@ -148,7 +148,16 @@ int main()
         dlog << LINFO << "Add job " << i << " to pipe";
         job j;
         j.id = i;
-        // Add this job to the pipe.  One of our three threads will get it and process it
+
+
+        // Add this job to the pipe.  One of our three threads will get it and process it.
+        // It should also be pointed out that the enqueue() function uses the global
+        // swap function to move jobs into the pipe.  This means that it modifies the
+        // jobs we are passing in to it.  This allows you to implement a fast swap 
+        // operator for your jobs.  For example, std::vector objects have a global
+        // swap and it can execute in constant time by just swapping pointers inside 
+        // std::vector.  This means that the dlib::pipe is effectively a zero-copy 
+        // message passing system if you setup global swap for your jobs.   
         pe.job_pipe.enqueue(j);
     }
 
