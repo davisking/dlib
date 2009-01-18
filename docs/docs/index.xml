@@ -63,7 +63,7 @@
                      abstraction layers or is pure ISO C++.  </li>
                   <li>Big/little endian agnostic</li>
                   <li>No other packages are required to use the library.  Only APIs that are
-                     provided by an out of the box OS are used. </li> 
+                     provided by an out of the box OS are needed. </li> 
                   <li>The library is tested regularly on win32, Linux, and Mac OS X systems.  However, it should 
                      work on any POSIX system and has been tested on Solaris, HPUX, and the BSDs.</li>
                </ul>
