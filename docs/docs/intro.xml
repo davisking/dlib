@@ -32,11 +32,11 @@
         </p>
         <p>
          This library also aims to be simple, portable, and modern.  Everything is developed with the 
-         <a href="http://en.wikipedia.org/wiki/Design_by_contract">Design by Contract</a>
-         methodology.  You can read about Design by Contract on the internet 
-         for more information but from
-         the point of view of a user of this library it basically means that there exists complete and precise 
-         documentation and aggressive debugging modes that can be enabled.  
+         Design by Contract methodology.  You can read about Design by Contract on the 
+         <a href="howto_contribute.html#1">how to contribute</a> page
+         for more information.  However, from the point of view of a user of this library it basically 
+         means there exists complete and precise documentation for every function and class in the library   
+         as well as aggressive debugging modes that can be enabled.  
         </p>
         <p>
          I always try to make sure everything is as portable as possible.  All platform specific code is

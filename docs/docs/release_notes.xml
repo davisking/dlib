@@ -25,6 +25,8 @@ Bug fixes:
 Other:
    - Added an example showing how to use the type_safe_union and pipe
      together.
+   - Added a page to the documentation that discusses the dlib coding
+     standards and how to contribute to the project.
 </current>
 
 <!-- *******************************************************************************  -->

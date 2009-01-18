@@ -111,12 +111,12 @@
                         use to check your preconditions.  
                      </p>
                      <p>
-                        Consider the function <a href="algorithms.html#cross_validate_trainer">cross_validate_trainer</a> as an 
+                        Consider the function <a href="dlib/svm/svm_abstract.h.html#cross_validate_trainer">cross_validate_trainer</a> as an 
                         example.  One of its requirements is that the input forms a valid binary classification problem.
                         This is documented in the list of preconditions as 
                         "<tt>is_binary_classification_problem(x,y) == true</tt>".  This precondition is just saying 
                         that when you call
-                        the <a href="algorithms.html#is_binary_classification_problem">is_binary_classification_problem</a> 
+                        the <a href="dlib/svm/svm_abstract.h.html#is_binary_classification_problem">is_binary_classification_problem</a> 
                         function on the x and y inputs it had better return true 
                         if you want to use those inputs with the <tt>cross_validate_trainer</tt> function.   
                         Given this information it is trivial to perform input validation.  All you have to do is
@@ -438,6 +438,54 @@
             <anchor>9</anchor>
             <li> <h3>Write portable code</h3>
                <ul>
+                  <li> <b>Don't complicate the build process </b>
+                     <ul> <p>
+                        One of dlib's design goals is to not require any installation 
+                        process before it can be used.  A user should be able to copy 
+                        the dlib folder into their project and have it just work.  
+                     </p>
+                     <p>
+                        In particular, using dlib in a project should not make it difficult to
+                        compile the project from the command line.  For example, all the 
+                        example programs provided with dlib can be compiled using a single 
+                        statement on the command line.  
+                     </p>
+                     <p>
+                        Similarly, the user should be able to check the dlib folder into whatever
+                        version control system they use without running into any difficulties.  
+                        The user should then be able to check out copies of the code on any
+                        of the dlib supported platforms and have their project build without
+                        needing to mess with anything.  
+                     </p> 
+                     <p>
+                        It is also important to know that dlib is mostly a header-only library. 
+                        This is primarily a result of the heavy use of C++ templates.  Because of this, 
+                        in many cases, all that is needed to use the library is to
+                        add dlib into a compiler's include search path.  However, the most important
+                        reason you need to know this is so you don't hassle me about providing a
+                        "shared library" version of dlib. :)
+                     </p>
+                     <p>
+                        This point deserves some explaining.  When you write a piece of
+                        software that links against a shared library you need two things.  First,
+                        you need the shared library object files and second you need the header files
+                        for the library itself so you can #include them in your application.  However,
+                        since nearly all the code in dlib is <i>in the header files</i> there isn't
+                        any point in distributing it as a shared library.  
+                     </p>
+                     <p>
+                        There are also a lot of technical problems with C++ shared libraries in general. 
+                        You can read about shared libraries on 
+                        <a href="http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html">this page</a> 
+                        for more details.   If you still think C++ template libraries like dlib should be built as
+                        shared libraries then you should refer yourself to the following documents which
+                        have been submitted to the C++ standards committee:   
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2316.pdf">N2316: Modules in C++</a>, 
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1496.html">N1496: Draft Proposal for 
+Dynamic Libraries in C++</a>, and
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2425.html">N2425: Minimal Dynamic Library Support</a>.
+                     </p>
+                     </ul></li>
                   <li> <b>Don't make assumptions about how objects are laid out in memory. </b>
                      <ul> <p>
                          If you have been following the prohibition against messing around with
