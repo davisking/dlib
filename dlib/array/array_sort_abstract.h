@@ -16,7 +16,8 @@ namespace dlib
 
         /*!
             REQUIREMENTS ON ARRAY_BASE
-                must be an implementation of array/array_kernel_abstract.h 
+                - must be an implementation of array/array_kernel_abstract.h 
+                - array_base::type must be a type with that is comparable via operator<
 
             POINTERS AND REFERENCES
                 sort() may invalidate pointers and references to internal data.

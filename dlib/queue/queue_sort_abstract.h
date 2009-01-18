@@ -17,8 +17,8 @@ namespace dlib
 
         /*!
             REQUIREMENTS ON QUEUE_BASE
-                queue_base is instantiated with type T and
-                is an implementation of queue/queue_kernel_abstract.h
+                - is an implementation of queue/queue_kernel_abstract.h
+                - queue_base::type must be a type with that is comparable via operator<
 
             POINTERS AND REFERENCES TO INTERNAL DATA
                 sort() may invalidate pointers and references to internal data.
