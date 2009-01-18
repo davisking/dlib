@@ -46,8 +46,6 @@ set (DLIB_ENABLE_STACK_TRACE_STR
 "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
 set (DLIB_ENABLE_ASSERTS_STR 
 "Enable this if you want to turn on the DLIB_ASSERT macro" )
-set (DLIB_ENABLE_SHARED_BUILD_STR
-"Enable this if you want to create a shared dlib library (.dll, .so)" )
 set (DLIB_USE_BLAS_STR
 "Disable this if you don't want to use a BLAS library" )
 
@@ -55,15 +53,10 @@ option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
 option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
 option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
 option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
-option(DLIB_ENABLE_SHARED_BUILD ${DLIB_ENABLE_SHARED_BUILD_STR} OFF)
 option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
 
 
-if (DLIB_ENABLE_SHARED_BUILD)
-  add_library(dlib SHARED all/source.cpp )
-else ()
-  add_library(dlib STATIC all/source.cpp )
-endif ()
+add_library(dlib STATIC all/source.cpp )
 
 
 if (NOT DLIB_ISO_CPP_ONLY)
