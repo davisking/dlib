@@ -526,6 +526,21 @@ namespace dlib
                       nothing else changes.
         !*/
 
+        void give_input_focus (
+        );
+        /*!
+            ensures
+                - gives this text field input keyboard focus
+        !*/
+
+        void select_all_text (
+        );
+        /*!
+            ensures
+                - causes all the text in the text field to become selected.
+                  (note that it doesn't give input focus)
+        !*/
+
         void set_text_color (
             const rgb_pixel color
         );

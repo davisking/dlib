@@ -409,6 +409,12 @@ namespace dlib
             const std::wstring& text_
         );
 
+        void give_input_focus (
+        );
+
+        void select_all_text (
+        );
+
         void set_text (
             const dlib::ustring& text_
         );

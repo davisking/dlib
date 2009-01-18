@@ -445,6 +445,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void text_field::
+    give_input_focus (
+    )
+    {
+        auto_mutex M(m);
+        has_focus = true;
+        cursor_visible = true;
+        parent.invalidate_rectangle(rect);
+        t.start();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
+    select_all_text (
+    )
+    {
+        auto_mutex M(m);
+        on_select_all();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void text_field::
     on_cut (
     )
     {
