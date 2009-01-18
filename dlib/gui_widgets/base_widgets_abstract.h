@@ -158,7 +158,7 @@ namespace dlib
                 is_mouse_over() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a drawable object with the additoin of two events
+                This object represents a drawable object with the addition of two events
                 that will alert you when the mouse enters or leaves your drawable object.
 
                 You use it by inheriting from it and defining the draw() method and any
@@ -848,6 +848,8 @@ namespace dlib
                 - if (size() == 0) then
                     - #get_rect().is_empty() == true
                 - else
+                    - recursively calls fit_to_contents() on any widget_groups inside
+                      this object.
                     - #get_rect() will be the smallest rectangle that contains all the 
                       widgets in this group and the upper left corner of get_rect(). 
         !*/
@@ -1258,7 +1260,7 @@ namespace dlib
                 - #get_hot_key() == hotkey
         !*/
         
-        // overloads for wide charactor strings
+        // overloads for wide character strings
         template <
             typename T
             >
@@ -1302,7 +1304,7 @@ namespace dlib
                 - #get_hot_key() == hotkey
         !*/
 
-        //overloads for wide charactor strings
+        //overloads for wide character strings
         menu_item_submenu (
             const std::wstring& str,
             unichar hotkey = 0

@@ -11,6 +11,7 @@
 #include "../member_function_pointer.h"
 #include "../timer.h"
 #include "../map.h"
+#include "../set.h"
 #include "../array2d.h"
 #include "../pixel.h"
 #include "../image_transforms.h"
@@ -283,8 +284,10 @@ namespace dlib
                 widgets.size() == 0
 
             CONVENTION
-                Widgets contains all the drawable objects and their relative positions
-                that are in *this.
+                - widgets contains all the drawable objects and their relative positions
+                  that are in *this.
+                - wg_widgets contains pointers to just the widgets that happen
+                  to be widget_group objects.  
         !*/
 
         struct relpos
@@ -306,6 +309,12 @@ namespace dlib
 
         void add (
             drawable& widget,
+            unsigned long x,
+            unsigned long y
+        );
+
+        void add (
+            widget_group& widget,
             unsigned long x,
             unsigned long y
         );
@@ -355,6 +364,8 @@ namespace dlib
     private:
 
         map<drawable*,relpos>::kernel_1a_c widgets;
+        set<widget_group*>::kernel_1a_c wg_widgets;
+
 
         // restricted functions
         widget_group(widget_group&);        // copy constructor

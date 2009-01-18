@@ -1304,6 +1304,7 @@ namespace dlib
     {  
         auto_mutex M(m); 
         widgets.clear(); 
+        wg_widgets.clear();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1345,6 +1346,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void widget_group::
+    add (
+        widget_group& widget,
+        unsigned long x,
+        unsigned long y
+    )
+    {
+        auto_mutex M(m); 
+        drawable& w = widget;
+        add(w, x, y);
+
+        widget_group* wg = &widget;
+        wg_widgets.add(wg);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     bool widget_group::
     is_member (
         const drawable& widget
@@ -1366,9 +1384,15 @@ namespace dlib
         drawable* w = const_cast<drawable*>(&widget);
         if (widgets.is_in_domain(w))
         {
-            relpos junk;
-            drawable* junk2;
-            widgets.remove(w,junk2,junk);
+            widgets.destroy(w);
+
+            // check if we also have an entry in the wg_widgets set and if
+            // so then remove that too
+            widget_group* wg = reinterpret_cast<widget_group*>(w);
+            if (wg_widgets.is_member(wg))
+            {
+                wg_widgets.destroy(wg);
+            }
         }
     }
 
@@ -1473,6 +1497,13 @@ namespace dlib
     )
     {
         auto_mutex M(m);
+
+        // call fit_to_contents on all the widget_groups we contain
+        wg_widgets.reset();
+        while (wg_widgets.move_next())
+            wg_widgets.element()->fit_to_contents();
+
+        // now accumulate a rectangle that contains everything in this widget_group
         rectangle r;
         widgets.reset();
         while (widgets.move_next())
