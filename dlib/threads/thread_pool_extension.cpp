@@ -18,7 +18,7 @@ namespace dlib
         task_ready_signaler(m),
         we_are_destructing(false)
     {
-        tasks.expand(num_threads);
+        tasks.resize(num_threads);
         for (unsigned long i = 0; i < num_threads; ++i)
         {
             register_thread(*this, &thread_pool::thread);

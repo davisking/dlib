@@ -17,7 +17,7 @@ namespace dlib
 
     public:
 
-        void expand (
+        void resize (
             unsigned long new_size
         );
 
@@ -61,7 +61,7 @@ namespace dlib
         typename array_base
         >
     void array_expand_1<array_base>::
-    expand (
+    resize (
         unsigned long new_size
     )
     {

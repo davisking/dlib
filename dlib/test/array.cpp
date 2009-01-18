@@ -491,7 +491,7 @@ namespace
         DLIB_CASSERT(a1.size() == 0,"");
         DLIB_CASSERT(a1.max_size() == 0,"");
 
-        a1.expand(10);
+        a1.resize(10);
         DLIB_CASSERT(a1.size() == 10,"");
         DLIB_CASSERT(a1.max_size() == 10,"");
 
@@ -501,7 +501,7 @@ namespace
         }
 
         print_spinner();
-        a1.expand(100);
+        a1.resize(100);
         DLIB_CASSERT(a1.size() == 100,"");
         DLIB_CASSERT(a1.max_size() == 100,"");
 
@@ -510,7 +510,7 @@ namespace
             DLIB_CASSERT(a1[i] == i,"");
         }
 
-        a1.expand(50);
+        a1.resize(50);
         DLIB_CASSERT(a1.size() == 50,"");
         DLIB_CASSERT(a1.max_size() == 100,"");
 
@@ -519,7 +519,7 @@ namespace
             DLIB_CASSERT(a1[i] == i,"");
         }
 
-        a1.expand(10);
+        a1.resize(10);
         DLIB_CASSERT(a1.size() == 10,"");
         DLIB_CASSERT(a1.max_size() == 100,"");
 
@@ -528,7 +528,7 @@ namespace
             DLIB_CASSERT(a1[i] == i,"");
         }
 
-        a1.expand(20);
+        a1.resize(20);
         DLIB_CASSERT(a1.size() == 20,"");
         DLIB_CASSERT(a1.max_size() == 100,"");
 
@@ -538,7 +538,7 @@ namespace
         }
 
 
-        a1.expand(100);
+        a1.resize(100);
         DLIB_CASSERT(a1.size() == 100,"");
         DLIB_CASSERT(a1.max_size() == 100,"");
 

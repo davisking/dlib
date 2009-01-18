@@ -444,7 +444,7 @@ namespace dlib
         specified_default_char( default_char_ )
     {
         // make sure gl contains at least one letter
-        gl.expand(1);
+        gl.resize(1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -503,7 +503,7 @@ namespace dlib
         bdf_parser::header_info hinfo;
         bdf_parser::char_info cinfo;
 
-        gl.expand(max_enc+1);
+        gl.resize(max_enc+1);
         hinfo.default_char =  - 1;
         if ( is_initialized == false || static_cast<std::streamoff>(in.tellg()) == std::ios::beg )
         {

@@ -792,8 +792,8 @@ namespace dlib
 
         };
 
-        array<task_state_type>::expand_1c_c tasks;
-        array<thread_id_type>::expand_1c_c worker_thread_ids;
+        array<task_state_type>::expand_1d_c tasks;
+        array<thread_id_type>::expand_1d_c worker_thread_ids;
 
         mutex m;
         signaler task_done_signaler;

@@ -1225,7 +1225,7 @@ namespace dlib
             {
                 create_bayesian_network_join_tree(bn, join_tree, join_tree_values);
 
-                cliques.expand(bn.number_of_nodes());
+                cliques.resize(bn.number_of_nodes());
 
                 // figure out which cliques contain each node
                 for (unsigned long i = 0; i < cliques.size(); ++i)
@@ -1496,8 +1496,8 @@ namespace dlib
                 // we are done
                 dlib::array<dlib::set<unsigned long>::compare_1b_c>::expand_1a_c remaining_msg_to_send;
                 dlib::array<dlib::set<unsigned long>::compare_1b_c>::expand_1a_c remaining_msg_to_receive;
-                remaining_msg_to_receive.expand(join_tree.number_of_nodes());
-                remaining_msg_to_send.expand(join_tree.number_of_nodes());
+                remaining_msg_to_receive.resize(join_tree.number_of_nodes());
+                remaining_msg_to_send.resize(join_tree.number_of_nodes());
                 for (unsigned long i = 0; i < remaining_msg_to_receive.size(); ++i)
                 {
                     for (unsigned long j = 0; j < join_tree.node(i).number_of_neighbors(); ++j)

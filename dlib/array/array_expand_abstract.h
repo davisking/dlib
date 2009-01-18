@@ -19,7 +19,7 @@ namespace dlib
                 must be an implementation of array/array_kernel_abstract.h 
 
             POINTERS AND REFERENCES
-                expand() may invalidate pointers and references to internal data.
+                resize() may invalidate pointers and references to internal data.
 
             WHAT THIS EXTENSION DOES FOR ARRAY
                 This extension gives an array the ability to expand its size() beyond
@@ -30,7 +30,7 @@ namespace dlib
             typedef typename array_base::type T;
         public:
 
-            void expand (
+            void resize (
                 unsigned long new_size
             );
             /*!

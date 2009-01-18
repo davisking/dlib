@@ -173,7 +173,7 @@ namespace dlib
         {
             unsigned long num;
             deserialize(num, in);
-            item.centers.expand(num);
+            item.centers.resize(num);
             for (unsigned long i = 0; i < item.centers.size(); ++i)
             {
                 scoped_ptr<kcentroid<kernel_type> > temp(new kcentroid<kernel_type>(kernel_type()));
@@ -215,7 +215,7 @@ namespace dlib
                 centers[i]->train(initial_centers(i));
             }
 
-            assignments.expand(samples.size());
+            assignments.resize(samples.size());
 
             bool assignment_changed = true;
 
