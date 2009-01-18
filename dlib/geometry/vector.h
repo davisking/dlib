@@ -523,6 +523,14 @@ namespace dlib
         // ---------------------------------------
 
         vector operator - (
+        ) const
+        {
+            return vector(-x(), -y(), -z());
+        }
+
+        // ---------------------------------------
+
+        vector operator - (
             const vector& rhs
         ) const
         {
@@ -865,6 +873,14 @@ namespace dlib
         {
             typedef vector<typename promote<T,U>::type,N> ret_type;
             return ret_type(*this) + ret_type(rhs);
+        }
+
+        // ---------------------------------------
+
+        vector operator - (
+        ) const
+        {
+            return vector(-x(), -y());
         }
 
         // ---------------------------------------

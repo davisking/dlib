@@ -38,6 +38,10 @@ namespace
         DLIB_CASSERT(p2.x() == 2,"");
         DLIB_CASSERT(p2.y() == 3,"");
 
+        DLIB_CASSERT((-p2).x() == -2,"");
+        DLIB_CASSERT((-p2).y() == -3,"");
+
+
         p2 += p2;
         DLIB_CASSERT(p2.x() == 4,"");
         DLIB_CASSERT(p2.y() == 6,"");
@@ -236,6 +240,13 @@ namespace
             DLIB_CASSERT((vl3 - vd2).y() == 2-7.5,"");
             DLIB_CASSERT((vl3 - vd2).z() == 3-0,"");
 
+        }
+
+        {
+            dlib::vector<double> v(3,4,5);
+            DLIB_CASSERT((-v).x() == -3.0,"");
+            DLIB_CASSERT((-v).y() == -4.0,"");
+            DLIB_CASSERT((-v).z() == -5.0,"");
         }
 
     }

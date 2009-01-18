@@ -145,7 +145,7 @@ namespace dlib
         !*/
 
 
-        T length(
+        double length(
         ) const;
         /*!
             ensures
@@ -216,7 +216,7 @@ namespace dlib
                 - returns the result of the cross product between *this and rhs
         !*/
 
-        vector normalize (
+        vector<double,NR> normalize (
         ) const;
         /*!
             ensures
@@ -237,6 +237,13 @@ namespace dlib
         /*!
             ensures
                 - returns the result of subtracting rhs from *this
+        !*/
+
+        vector operator- (
+        ) const;
+        /*!
+            ensures
+                - returns -1*(*this) 
         !*/
 
         vector operator/ (
