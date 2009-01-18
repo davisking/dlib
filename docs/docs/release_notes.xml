@@ -16,6 +16,9 @@ New Stuff:
    - Added the type_safe_union object
 
 Non-Backwards Compatible Changes:
+   - Renamed the array::expand() function to array::resize() since it does 
+     basically the same thing as std::vector::resize() and more than one
+     user has told me they found the name "expand" to be confusing.
 
 Bug fixes:
 

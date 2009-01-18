@@ -12,9 +12,13 @@
          Many of these containers were inspired by the RESOLVE/C++ course sequence at Ohio State.  As such, most of 
          the objects do not support copying in any form, only swapping is allowed. That is, when objects 
          are added or removed from any of these containers they are swapped in and out, not copied. 
+         </p>
 
+         <p>
          This allows you to do things like have containers of containers of containers without encountering the 
-         overhead of the massive copying that would likely result if you did the same thing with the STL.
+         overhead of the massive copying that would likely result if you did the same thing with the STL. 
+         It also means you can store objects that are not copyable inside these containers, which is not 
+         something you can do with the STL.  
          </p>
 
          <p>
