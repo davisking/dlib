@@ -132,7 +132,7 @@ int main()
     tsu_type msg;
 
     // Treat our msg as a float and assign it 4.567
-    msg.get<float>() = 4.567;
+    msg.get<float>() = 4.567f;
     // Now put the message into the pipe
     pe.message_pipe.enqueue(msg);
 
