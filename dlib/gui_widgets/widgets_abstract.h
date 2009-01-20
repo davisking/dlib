@@ -32,7 +32,10 @@ namespace dlib
 
         EVENT HANDLERS
             Note that all event handlers, including the user registered callback
-            functions, are executed in the event handling thread. 
+            functions, are executed in the event handling thread.   Additionally,
+            the drawable::m mutex will always be locked while these event handlers
+            are running.  Also, don't rely on get_thread_id() always returning the 
+            same ID from inside event handlers.
     !*/
 
 // ----------------------------------------------------------------------------------------
