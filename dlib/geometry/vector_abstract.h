@@ -364,15 +364,6 @@ namespace dlib
     !*/
 
     template<typename T, long NR>
-    inline void swap (
-        vector<T,NR> & a, 
-        vector<T,NR> & b 
-    ) { a.swap(b); }   
-    /*!
-        provides a global swap function
-    !*/
-
-    template<typename T, long NR>
     void serialize (
         const vector<T,NR>& item, 
         std::ostream& out
