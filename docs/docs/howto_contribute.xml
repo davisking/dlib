@@ -99,11 +99,14 @@
                      </p>
                      <p>
                         The above considerations bring me to my next bit of advice.  Developers new to Design by Contract
-                        often think input validation should be part of a function's preconditions.
-                        They then complain that labeling invalid program input as a bug, throwing fatal_error, and 
-                        terminating the application is a very bad thing.  They are right, that would be a bad thing
+                        often confuse input validation requirements with function preconditions.   When I tell them 
+                        to consider any violation of a function's preconditions a bug and terminate their application 
+                        with an error message they complain that this is not at all what an application should do when 
+                        it receives invalid user inputs.
+
+                        They are right, that would be a bad thing
                         and you should not write software that behaves that way.  The way out of this problem is, of
-                        course, to not consider invalid input a bug.  Instead, you should perform explicit input validation 
+                        course, to not consider invalid input as a bug.  Instead, you should perform explicit input validation 
                         on any
                         data coming into your program <i>before</i> it gets to any functions that have preconditions
                         which demand the validated inputs.  Moreover, if you make your preconditions programmatically verifiable
@@ -149,7 +152,7 @@
                   of what your code does becomes part of how you design software.  For example, often you 
                   will find that when you go to write down the requirements for calling a function you are unable 
                   to do so.  This may be because the requirements are so complex you can't think of a way 
-                  to describe them, or you may realize that you yourself don't even know what they are.  Alternatively, 
+                  to describe them, or you may realize that you don't even know what they are.  Alternatively, 
                   you may know what they are but there isn't any way to verify them programmatically.   All these
                   things are symptoms of a bad <i>design</i> and the reason you became aware of this design problem 
                   was by attempting to apply Design by Contract.  
