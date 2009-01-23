@@ -326,8 +326,6 @@ namespace dlib
             //cout << "BLAS GEMM: m*m" << endl;
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
-            const CBLAS_TRANSPOSE TransA = CblasNoTrans;
-            const CBLAS_TRANSPOSE TransB = CblasNoTrans;
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
@@ -340,7 +338,11 @@ namespace dlib
             T* C = get_ptr(dest);
             const int ldc = get_ld(dest);
 
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            if (transpose == false)
+                cblas_gemm(Order, CblasNoTrans, CblasNoTrans, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            else
+                cblas_gemm(Order, CblasTrans, CblasTrans, M, N, K, alpha, B, ldb, A, lda, beta, C, ldc);
+
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -364,7 +366,11 @@ namespace dlib
             T* C = get_ptr(dest);
             const int ldc = get_ld(dest);
 
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            if (transpose == false)
+                cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            else
+                cblas_gemm(Order, TransA, TransB, M, N, K, alpha, B, ldb, A, lda, beta, C, ldc);
+
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -388,18 +394,20 @@ namespace dlib
             T* C = get_ptr(dest);
             const int ldc = get_ld(dest);
 
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            if (transpose == false)
+                cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            else
+                cblas_gemm(Order, TransA, TransB, M, N, K, alpha, B, ldb, A, lda, beta, C, ldc);
+
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
 
         DLIB_ADD_BLAS_BINDING(trans(m)*trans(m))
         {
-            //cout << "BLAS GEMM: trans(m)*trans(m)" << endl;
+            cout << "BLAS GEMM: trans(m)*trans(m)" << endl;
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
-            const CBLAS_TRANSPOSE TransA = CblasTrans;
-            const CBLAS_TRANSPOSE TransB = CblasTrans;
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
@@ -412,7 +420,10 @@ namespace dlib
             T* C = get_ptr(dest);
             const int ldc = get_ld(dest);
 
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            if (transpose == false)
+                cblas_gemm(Order, CblasTrans, CblasTrans, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            else
+                cblas_gemm(Order, CblasNoTrans, CblasNoTrans, M, N, K, alpha, B, ldb, A, lda, beta, C, ldc);
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -438,7 +449,11 @@ namespace dlib
             T* C = get_ptr(dest);
             const int ldc = get_ld(dest);
 
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            if (transpose == false)
+                cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            else
+                matrix_assign_default(dest, trans(src), alpha, add_to);
+
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -462,7 +477,10 @@ namespace dlib
             T* C = get_ptr(dest);
             const int ldc = get_ld(dest);
 
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            if (transpose == false)
+                cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            else
+                matrix_assign_default(dest, trans(src), alpha, add_to);
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -486,7 +504,10 @@ namespace dlib
             T* C = get_ptr(dest);
             const int ldc = get_ld(dest);
 
-            cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            if (transpose == false)
+                cblas_gemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+            else
+                matrix_assign_default(dest, trans(src), alpha, add_to);
         } DLIB_END_BLAS_BINDING
 
     // ----------------------------------------------------------------------------------------
@@ -795,7 +816,11 @@ namespace dlib
             T* A = get_ptr(dest);
             const int lda = get_ld(dest);
 
-            cblas_ger(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            if (transpose == false)
+                cblas_ger(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            else
+                cblas_ger(Order, M, N, alpha, Y, incY, X, incX, A, lda);
+
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -818,7 +843,10 @@ namespace dlib
             T* A = get_ptr(dest);
             const int lda = get_ld(dest);
 
-            cblas_ger(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            if (transpose == false)
+                cblas_ger(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            else
+                cblas_ger(Order, M, N, alpha, Y, incY, X, incX, A, lda);
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -841,7 +869,10 @@ namespace dlib
             T* A = get_ptr(dest);
             const int lda = get_ld(dest);
 
-            cblas_ger(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            if (transpose == false)
+                cblas_ger(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            else
+                cblas_ger(Order, M, N, alpha, Y, incY, X, incX, A, lda);
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -864,7 +895,10 @@ namespace dlib
             T* A = get_ptr(dest);
             const int lda = get_ld(dest);
 
-            cblas_ger(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            if (transpose == false)
+                cblas_ger(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            else
+                cblas_ger(Order, M, N, alpha, Y, incY, X, incX, A, lda);
         } DLIB_END_BLAS_BINDING
 
     // ----------------------------------------------------------------------------------------
@@ -891,7 +925,10 @@ namespace dlib
             T* A = get_ptr(dest);
             const int lda = get_ld(dest);
 
-            cblas_gerc(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            if (transpose == false)
+                cblas_gerc(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            else
+                cblas_gerc(Order, M, N, alpha, Y, incY, X, incX, A, lda);
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -914,7 +951,10 @@ namespace dlib
             T* A = get_ptr(dest);
             const int lda = get_ld(dest);
 
-            cblas_gerc(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            if (transpose == false)
+                cblas_gerc(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            else
+                cblas_gerc(Order, M, N, alpha, Y, incY, X, incX, A, lda);
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -937,7 +977,10 @@ namespace dlib
             T* A = get_ptr(dest);
             const int lda = get_ld(dest);
 
-            cblas_gerc(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            if (transpose == false)
+                cblas_gerc(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            else
+                cblas_gerc(Order, M, N, alpha, Y, incY, X, incX, A, lda);
         } DLIB_END_BLAS_BINDING
 
         // --------------------------------------
@@ -960,7 +1003,10 @@ namespace dlib
             T* A = get_ptr(dest);
             const int lda = get_ld(dest);
 
-            cblas_gerc(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            if (transpose == false)
+                cblas_gerc(Order, M, N, alpha, X, incX, Y, incY, A, lda);
+            else
+                cblas_gerc(Order, M, N, alpha, Y, incY, X, incX, A, lda);
         } DLIB_END_BLAS_BINDING
 
     // ----------------------------------------------------------------------------------------

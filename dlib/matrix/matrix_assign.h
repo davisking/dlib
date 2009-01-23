@@ -217,10 +217,14 @@ namespace dlib
                 dest_exp& dest,
                 const EXP& src,
                 typename src_exp::type alpha,
-                bool add_to
+                bool add_to,
+                bool transpose
             )
             {
-                matrix_assign_default(dest,src,alpha,add_to);
+                if (transpose == false)
+                    matrix_assign_default(dest,src,alpha,add_to);
+                else
+                    matrix_assign_default(dest,trans(src),alpha,add_to);
             }
 
             // If we know this is a matrix multiply then apply the
@@ -231,7 +235,8 @@ namespace dlib
                 dest_exp& dest,
                 const matrix_multiply_exp<EXP1,EXP2>& src,
                 typename src_exp::type alpha,
-                bool add_to
+                bool add_to,
+                bool transpose
             )
             {
                 // At some point I need to improve the default (i.e. non BLAS) matrix 
@@ -239,15 +244,15 @@ namespace dlib
 
                 if (alpha == static_cast<typename src_exp::type>(1))
                 {
-                    if (add_to)
-                    {
-                        default_matrix_multiply(dest, src.lhs, src.rhs);
-                    }
-                    else
+                    if (add_to == false)
                     {
                         zero_matrix(dest);
-                        default_matrix_multiply(dest, src.lhs, src.rhs);
                     }
+
+                    if (transpose == false)
+                        default_matrix_multiply(dest, src.lhs, src.rhs);
+                    else
+                        default_matrix_multiply(dest, trans(src.rhs), trans(src.lhs));
                 }
                 else
                 {
@@ -255,13 +260,26 @@ namespace dlib
                     {
                         typename dest_exp::matrix_type temp(dest.nr(),dest.nc());
                         zero_matrix(temp);
-                        default_matrix_multiply(temp, src.lhs, src.rhs);
+
+                        if (transpose == false)
+                            default_matrix_multiply(temp, src.lhs, src.rhs);
+                        else
+                        {
+                            default_matrix_multiply(temp, trans(src.rhs), trans(src.lhs));
+                            cout << "\ndo default mul" << endl;
+                        }
+
                         matrix_assign_default(dest,temp, alpha,true);
                     }
                     else
                     {
                         zero_matrix(dest);
-                        default_matrix_multiply(dest, src.lhs, src.rhs);
+                        
+                        if (transpose == false)
+                            default_matrix_multiply(dest, src.lhs, src.rhs);
+                        else
+                            default_matrix_multiply(dest, trans(src.rhs), trans(src.lhs));
+
                         matrix_assign_default(dest,dest, alpha, false);
                     }
                 }
@@ -281,7 +299,8 @@ namespace dlib
             dest_exp& dest,                                                                \
             const src_exp& src,                                                             \
             typename src_exp::type alpha,                                                   \
-            bool add_to                                                                     \
+            bool add_to,                                                                    \
+            bool transpose                                                                  \
         ) {                                                                                 \
             typedef typename dest_exp::type T;                                             
 
@@ -301,7 +320,8 @@ namespace dlib
             dest_exp& dest,
             const src_exp& src,
             typename src_exp::type alpha,
-            bool add_to
+            bool add_to,
+            bool transpose
         );
         /*!
             requires
@@ -318,7 +338,8 @@ namespace dlib
             dest_exp& dest,
             const matrix_add_exp<src_exp, src_exp2>& src,
             typename src_exp::type alpha,
-            bool add_to
+            bool add_to,
+            bool transpose
         );
         /*!
             requires
@@ -335,7 +356,26 @@ namespace dlib
             dest_exp& dest,
             const matrix_mul_scal_exp<src_exp,Sb>& src,
             typename src_exp::type alpha,
-            bool add_to
+            bool add_to,
+            bool transpose
+        );
+        /*!
+            requires
+                - src.aliases(dest) == false
+                - dest.nr() == src.nr()
+                - dest.nc() == src.nc()
+        !*/
+
+        template <
+            typename dest_exp,
+            typename src_exp
+            >
+        void matrix_assign_blas_proxy (
+            dest_exp& dest,
+            const matrix_unary_exp<src_exp,op_trans>& src,
+            typename src_exp::type alpha,
+            bool add_to,
+            bool transpose
         );
         /*!
             requires
@@ -352,7 +392,8 @@ namespace dlib
             dest_exp& dest,
             const matrix_subtract_exp<src_exp, src_exp2>& src,
             typename src_exp::type alpha,
-            bool add_to
+            bool add_to,
+            bool transpose
         );
         /*!
             requires
@@ -435,10 +476,11 @@ namespace dlib
             dest_exp& dest,
             const src_exp& src,
             typename src_exp::type alpha,
-            bool add_to
+            bool add_to,
+            bool transpose
         )
         {
-            matrix_assign_blas_helper<dest_exp,src_exp>::assign(dest,src,alpha,add_to);
+            matrix_assign_blas_helper<dest_exp,src_exp>::assign(dest,src,alpha,add_to, transpose);
         }
             
     // ------------------------------------------------------------------------------------
@@ -451,17 +493,22 @@ namespace dlib
             dest_exp& dest,
             const matrix_add_exp<src_exp, src_exp2>& src,
             typename src_exp::type alpha,
-            bool add_to
+            bool add_to,
+            bool transpose
         )
         {
             if (has_matrix_multiply<src_exp>::value || has_matrix_multiply<src_exp2>::value)
             {
-                matrix_assign_blas_proxy(dest, src.lhs, alpha, add_to);
-                matrix_assign_blas_proxy(dest, src.rhs, alpha, true);
+                cout << "\n1 trans: " << transpose << " \n";
+                matrix_assign_blas_proxy(dest, src.lhs, alpha, add_to, transpose);
+                matrix_assign_blas_proxy(dest, src.rhs, alpha, true, transpose);
             }
             else
             {
-                matrix_assign_default(dest, src, alpha, add_to);
+                if (transpose == false)
+                    matrix_assign_default(dest, src, alpha, add_to);
+                else
+                    matrix_assign_default(dest, trans(src), alpha, add_to);
             }
         }
             
@@ -475,10 +522,28 @@ namespace dlib
             dest_exp& dest,
             const matrix_mul_scal_exp<src_exp,Sb>& src,
             typename src_exp::type alpha,
-            bool add_to
+            bool add_to,
+            bool transpose
         )
         {
-            matrix_assign_blas_proxy(dest, src.m, alpha*src.s, add_to);
+            matrix_assign_blas_proxy(dest, src.m, alpha*src.s, add_to, transpose);
+        }
+            
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename dest_exp,
+            typename src_exp
+            >
+        void matrix_assign_blas_proxy (
+            dest_exp& dest,
+            const matrix_unary_exp<src_exp,op_trans>& src,
+            typename src_exp::type alpha,
+            bool add_to,
+            bool transpose
+        )
+        {
+            matrix_assign_blas_proxy(dest, src.m, alpha, add_to, !transpose);
         }
             
     // ------------------------------------------------------------------------------------
@@ -491,18 +556,22 @@ namespace dlib
             dest_exp& dest,
             const matrix_subtract_exp<src_exp, src_exp2>& src,
             typename src_exp::type alpha,
-            bool add_to
+            bool add_to,
+            bool transpose
         )
         {
             
             if (has_matrix_multiply<src_exp>::value || has_matrix_multiply<src_exp2>::value)
             {
-                matrix_assign_blas_proxy(dest, src.lhs, alpha, add_to);
-                matrix_assign_blas_proxy(dest, src.rhs, -alpha, true);
+                matrix_assign_blas_proxy(dest, src.lhs, alpha, add_to, transpose);
+                matrix_assign_blas_proxy(dest, src.rhs, -alpha, true, transpose);
             }
             else
             {
-                matrix_assign_default(dest, src, alpha, add_to);
+                if (transpose == false)
+                    matrix_assign_default(dest, src, alpha, add_to);
+                else
+                    matrix_assign_default(dest, trans(src), alpha, add_to);
             }
         }
             
@@ -525,12 +594,12 @@ namespace dlib
             if (src.aliases(dest))
             {
                 matrix<T,NR,NC,MM,L> temp(dest.nr(),dest.nc());
-                matrix_assign_blas_proxy(temp,src,1,false);
+                matrix_assign_blas_proxy(temp,src,1,false, false);
                 temp.swap(dest);
             }
             else
             {
-                matrix_assign_blas_proxy(dest,src,1,false);
+                matrix_assign_blas_proxy(dest,src,1,false, false);
             }
         }
             
@@ -548,12 +617,12 @@ namespace dlib
             if (src.aliases(dest.m))
             {
                 matrix<T,NR,NC,MM,L> temp(dest.nr(),dest.nc());
-                matrix_assign_blas_proxy(temp,src,1,false);
+                matrix_assign_blas_proxy(temp,src,1,false, false);
                 matrix_assign_default(dest,temp);
             }
             else
             {
-                matrix_assign_blas_proxy(dest,src,1,false);
+                matrix_assign_blas_proxy(dest,src,1,false, false);
             }
         }
             
@@ -571,12 +640,12 @@ namespace dlib
             if (src.aliases(dest.m))
             {
                 matrix<T,NR,NC,MM,L> temp(dest.nr(),dest.nc());
-                matrix_assign_blas_proxy(temp,src,1,false);
+                matrix_assign_blas_proxy(temp,src,1,false, false);
                 matrix_assign_default(dest,temp);
             }
             else
             {
-                matrix_assign_blas_proxy(dest,src,1,false);
+                matrix_assign_blas_proxy(dest,src,1,false, false);
             }
         }
             
@@ -594,12 +663,12 @@ namespace dlib
             if (src.aliases(dest.m))
             {
                 matrix<T,NR,NC,MM,L> temp(dest.nr(),dest.nc());
-                matrix_assign_blas_proxy(temp,src,1,false);
+                matrix_assign_blas_proxy(temp,src,1,false, false);
                 matrix_assign_default(dest,temp);
             }
             else
             {
-                matrix_assign_blas_proxy(dest,src,1,false);
+                matrix_assign_blas_proxy(dest,src,1,false, false);
             }
         }
             
@@ -621,12 +690,12 @@ namespace dlib
                     dest = src.lhs;
                 }
 
-                matrix_assign_blas_proxy(dest, src.rhs, 1, true);
+                matrix_assign_blas_proxy(dest, src.rhs, 1, true, false);
             }
             else
             {
                 matrix<T,NR,NC,MM,L> temp(src.lhs);
-                matrix_assign_blas_proxy(temp, src.rhs, 1, true);
+                matrix_assign_blas_proxy(temp, src.rhs, 1, true, false);
                 temp.swap(dest);
             }
         }
@@ -667,12 +736,12 @@ namespace dlib
                     dest = src.lhs;
                 }
 
-                matrix_assign_blas_proxy(dest, src.rhs, -1, true);
+                matrix_assign_blas_proxy(dest, src.rhs, -1, true, false);
             }
             else
             {
                 matrix<T,NR,NC,MM,L> temp(src.lhs);
-                matrix_assign_blas_proxy(temp, src.rhs, -1, true);
+                matrix_assign_blas_proxy(temp, src.rhs, -1, true, false);
                 temp.swap(dest);
             }
         }
