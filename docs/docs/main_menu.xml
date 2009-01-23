@@ -92,6 +92,10 @@
                   <link>krls_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Optimization</name>
+                  <link>optimization_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Kernel_RLS_Filtering</name>
                   <link>krls_filter_ex.cpp.html</link>
                </item>

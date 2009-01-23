@@ -12,6 +12,20 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+   - Added an example program that shows how to use the optimization 
+     functions
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.14" date="Jan 18, 2009">
+New Stuff:
    - Added the multi-line text_box GUI widget.
    - Added the type_safe_union object
 
@@ -27,7 +41,7 @@ Other:
      together.
    - Added a page to the documentation that discusses the dlib coding
      standards and how to contribute to the project.
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 

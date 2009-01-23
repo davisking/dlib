@@ -342,6 +342,9 @@
              Performs an unconstrained minimization of the potentially nonlinear function f() using the 
              BFGS quasi newton method.  
          </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
@@ -355,6 +358,9 @@
              Performs an unconstrained minimization of the potentially nonlinear function f() using a 
               conjugate gradient method. 
          </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
@@ -369,6 +375,9 @@
              BFGS quasi newton method.  This version doesn't take a gradient function of f()
               but instead numerically approximates the gradient.
          </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
@@ -383,6 +392,9 @@
               conjugate gradient method. This version doesn't take a gradient function of f()
               but instead numerically approximates the gradient.
          </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
