@@ -500,7 +500,7 @@ namespace dlib
             matrix<T,N,N,MM1,L1>& a,
             matrix<long,N,NX,MM2,L2>& indx,
             T& d,
-            matrix<T,N,NX,MM3,L3> vv
+            matrix<T,N,NX,MM3,L3>& vv
         )
         /*!
             ( this function is derived from the one in numerical recipes in C chapter 2.3)
