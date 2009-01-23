@@ -264,10 +264,7 @@ namespace dlib
                         if (transpose == false)
                             default_matrix_multiply(temp, src.lhs, src.rhs);
                         else
-                        {
                             default_matrix_multiply(temp, trans(src.rhs), trans(src.lhs));
-                            cout << "\ndo default mul" << endl;
-                        }
 
                         matrix_assign_default(dest,temp, alpha,true);
                     }
@@ -499,7 +496,6 @@ namespace dlib
         {
             if (has_matrix_multiply<src_exp>::value || has_matrix_multiply<src_exp2>::value)
             {
-                cout << "\n1 trans: " << transpose << " \n";
                 matrix_assign_blas_proxy(dest, src.lhs, alpha, add_to, transpose);
                 matrix_assign_blas_proxy(dest, src.rhs, alpha, true, transpose);
             }
