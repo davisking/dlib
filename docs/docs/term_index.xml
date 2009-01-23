@@ -483,6 +483,7 @@
          <term link="containers.html#matrix" name="matrix"/>
 
          <term link="dlib/matrix/matrix_abstract.h.html#matrix_exp" name="matrix_exp"/>
+         <term link="dlib/matrix/matrix_abstract.h.html#const_temp_matrix" name="const_temp_matrix"/>
 
          <term link="dlib/matrix/matrix_math_functions_abstract.h.html#sigmoid" name="sigmoid"/>
          <term link="dlib/matrix/matrix_math_functions_abstract.h.html#reciprocal" name="reciprocal"/>
@@ -494,6 +495,8 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#diag" name="diag"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#diagm" name="diagm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#trans" name="trans"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#lowerm" name="lowerm"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#upperm" name="upperm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#uniform_matrix" name="uniform_matrix"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#identity_matrix" name="identity_matrix"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#rotate" name="rotate"/>
