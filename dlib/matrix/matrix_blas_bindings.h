@@ -405,7 +405,7 @@ namespace dlib
 
         DLIB_ADD_BLAS_BINDING(trans(m)*trans(m))
         {
-            cout << "BLAS GEMM: trans(m)*trans(m)" << endl;
+            //cout << "BLAS GEMM: trans(m)*trans(m)" << endl;
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(src.nr());
