@@ -746,6 +746,58 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP>
+    class const_temp_matrix : public matrix_exp<const_temp_matrix<EXP> >, noncopyable 
+    {
+        /*!
+            REQUIREMENTS ON EXP
+                - must be an object that inherits publicly from matrix_exp.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a copy of a matrix expression.  The twist
+                is that it only actually makes a copy of its input matrix expression
+                if that matrix expression is costly to evaluate.  If it has
+                low cost then this object just stores a reference.  
+
+                This class is useful in cases where you write a function that
+                takes a matrix_exp object as input and you want to do some
+                intensive computation that looks at each element of that matrix_exp
+                many times.  If the input matrix_exp has a high cost then you want
+                to store it into a temporary matrix.  But if it has low cost then
+                it is faster if you just use a reference to it.  The const_temp_matrix
+                makes doing this easy.
+        !*/
+    public:
+
+        const_temp_matrix (
+            const matrix_exp<EXP>& item
+        );
+        /*!
+            ensures
+                - #*this == item
+                - if (EXP::cost <= 1) then
+                    - this const_temp_matrix stores a reference to the item matrix
+                - else
+                    - this const_temp_matrix creates a temporary matrix and copies 
+                      item into it
+        !*/
+
+        const_temp_matrix (
+            const EXP& item
+        );
+        /*!
+            ensures
+                - #*this == item
+                - if (EXP::cost <= 1) then
+                    - this const_temp_matrix stores a reference to the item matrix
+                - else
+                    - this const_temp_matrix creates a temporary matrix and copies 
+                      item into it
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_ABSTRACT_

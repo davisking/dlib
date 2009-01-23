@@ -1221,10 +1221,10 @@ convergence:
                 }
             }
 
-            template <typename M>
-            static long nr (const M& m) { return m.nr() - 1; }
-            template <typename M>
-            static long nc (const M& m) { return m.nc() - 1; }
+            template <typename M, typename S>
+            static long nr (const M& m, S&, S&) { return m.nr() - 1; }
+            template <typename M, typename S>
+            static long nc (const M& m, S&, S&) { return m.nc() - 1; }
         };
     };
 
@@ -3211,6 +3211,117 @@ convergence:
         COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
         typedef matrix_binary_exp<EXP1,EXP2,op_tensor_product> exp;
         return exp(a.ref(),b.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+
+    struct op_lowerm
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+1;
+            typedef typename EXP::type type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                if (r >= c)
+                    return m(r,c); 
+                else
+                    return 0;
+            }
+
+            template <typename M>
+            static type apply ( const M& m, const type& s, long r, long c)
+            { 
+                if (r > c)
+                    return m(r,c); 
+                else if (r==c)
+                    return s;
+                else
+                    return 0;
+            }
+        };
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_unary_exp<EXP,op_lowerm> lowerm (
+        const matrix_exp<EXP>& m
+    )
+    {
+        typedef matrix_unary_exp<EXP,op_lowerm> exp;
+        return exp(m.ref());
+    }
+
+    template <
+        typename EXP
+        >
+    const matrix_scalar_binary_exp<EXP, typename EXP::type,op_lowerm> lowerm (
+        const matrix_exp<EXP>& m,
+        typename EXP::type s
+        )
+    {
+        typedef matrix_scalar_binary_exp<EXP, typename EXP::type, op_lowerm> exp;
+        return exp(m.ref(),s);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_upperm
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+1;
+            typedef typename EXP::type type;
+
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                if (r <= c)
+                    return m(r,c); 
+                else
+                    return 0;
+            }
+
+            template <typename M>
+            static type apply ( const M& m, const type& s, long r, long c)
+            { 
+                if (r < c)
+                    return m(r,c); 
+                else if (r==c)
+                    return s;
+                else
+                    return 0;
+            }
+        };
+    };
+
+
+    template <
+        typename EXP
+        >
+    const matrix_unary_exp<EXP,op_upperm> upperm (
+        const matrix_exp<EXP>& m
+    )
+    {
+        typedef matrix_unary_exp<EXP,op_upperm> exp;
+        return exp(m.ref());
+    }
+
+    template <
+        typename EXP
+        >
+    const matrix_scalar_binary_exp<EXP, typename EXP::type,op_upperm> upperm (
+        const matrix_exp<EXP>& m,
+        typename EXP::type s
+        )
+    {
+        typedef matrix_scalar_binary_exp<EXP, typename EXP::type ,op_upperm> exp;
+        return exp(m.ref(),s);
     }
 
 // ----------------------------------------------------------------------------------------

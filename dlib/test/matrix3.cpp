@@ -522,6 +522,54 @@ namespace
             dlog << LTRACE << "testing done";
         }
 
+
+        {
+            matrix<long> m(3,4), ml(3,4), mu(3,4);
+            m = 1,2,3,4,
+                4,5,6,7,
+                7,8,9,0;
+
+            ml = 1,0,0,0,
+                 4,5,0,0,
+                 7,8,9,0;
+
+            mu = 1,2,3,4,
+                 0,5,6,7,
+                 0,0,9,0;
+
+
+            DLIB_CASSERT(lowerm(m) == ml,"");
+            DLIB_CASSERT(upperm(m) == mu,"");
+
+            ml = 3,0,0,0,
+                 4,3,0,0,
+                 7,8,3,0;
+
+            mu = 4,2,3,4,
+                 0,4,6,7,
+                 0,0,4,0;
+
+            DLIB_CASSERT(lowerm(m,3) == ml,"");
+            DLIB_CASSERT(upperm(m,4) == mu,"");
+
+        }
+
+        {
+            matrix<long> m(3,4), row(1,3), col(2,1);
+            m = 1,2,3,4,
+                4,5,6,7,
+                7,8,9,0;
+
+            row = 4,5,6;
+            col = 3,6;
+
+            DLIB_CASSERT(rowm(m, 1, 3) == row,"");
+            DLIB_CASSERT(colm(m, 2, 2) == col,"");
+
+        }
+
+
+
     }
 
 

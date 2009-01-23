@@ -1734,6 +1734,79 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP>
+    class const_temp_matrix;
+
+    template <
+        typename EXP
+        >
+    struct matrix_traits<const_temp_matrix<EXP> >
+    {
+        typedef typename EXP::type type;
+        typedef typename EXP::mem_manager_type mem_manager_type;
+        typedef typename EXP::layout_type layout_type;
+        const static long NR = EXP::NR;
+        const static long NC = EXP::NC;
+        const static long cost = 1;
+    };
+
+    template <typename EXP>
+    class const_temp_matrix : public matrix_exp<const_temp_matrix<EXP> >, noncopyable 
+    {
+    public:
+        typedef typename matrix_traits<const_temp_matrix>::type type;
+        typedef typename matrix_traits<const_temp_matrix>::mem_manager_type mem_manager_type;
+        typedef typename matrix_traits<const_temp_matrix>::layout_type layout_type;
+        const static long NR = matrix_traits<const_temp_matrix>::NR;
+        const static long NC = matrix_traits<const_temp_matrix>::NC;
+        const static long cost = matrix_traits<const_temp_matrix>::cost;
+
+        const_temp_matrix (
+            const matrix_exp<EXP>& item
+        ) :
+            matrix_exp<const_temp_matrix>(*this),
+            ref_(item.ref())
+        {}
+        const_temp_matrix (
+            const EXP& item
+        ) :
+            matrix_exp<const_temp_matrix>(*this),
+            ref_(item)
+        {}
+
+        const type operator() (
+            long r, 
+            long c
+        ) const { return ref_(r,c); }
+
+        const type operator() ( long i ) const 
+        { return ref_(i); }
+
+        template <typename U, long iNR, long iNC, typename MM, typename L >
+        bool aliases (
+            const matrix<U,iNR,iNC,MM,L>& item
+        ) const { return ref_.aliases(item); }
+
+        template <typename U, long iNR, long iNC, typename MM, typename L >
+        bool destructively_aliases (
+            const matrix<U,iNR,iNC,MM,L>& item
+        ) const { return ref_.destructively_aliases(item); }
+
+        long nr (
+        ) const { return ref_.nr(); }
+
+        long nc (
+        ) const { return ref_.nc(); }
+
+    private:
+
+        typename conditional_matrix_temp<const EXP, (EXP::cost <= 1)>::type ref_;
+    };
+
+// ----------------------------------------------------------------------------------------
 
 }
 

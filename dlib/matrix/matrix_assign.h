@@ -124,6 +124,18 @@ namespace dlib
         };
 
         template <typename T, long NR, long NC, typename MM, typename L>
+        struct matrix_type_id<matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,L>,long,op_colm2> >
+        {
+            const static int value = column_matrix;
+        };
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        struct matrix_type_id<matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm2> >
+        {
+            const static int value = row_matrix;
+        };
+
+        template <typename T, long NR, long NC, typename MM, typename L>
         struct matrix_type_id<matrix_sub_exp<matrix<T,NR,NC,MM,L> > >
         {
             const static int value = general_matrix;

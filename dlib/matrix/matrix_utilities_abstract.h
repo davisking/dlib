@@ -53,6 +53,82 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp lowerm (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - returns a matrix M such that:
+                - M::type == the same type that was in m
+                - M has the same dimensions as m
+                - M is the lower triangular part of m.  That is:
+                    - if (r >= c) then
+                        - M(r,c) == m(r,c)
+                    - else
+                        - M(r,c) == 0
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp lowerm (
+        const matrix_exp& m,
+        const matrix_exp::type scalar_value
+    );
+    /*!
+        ensures
+            - returns a matrix M such that:
+                - M::type == the same type that was in m
+                - M has the same dimensions as m
+                - M is the lower triangular part of m except that the diagonal has
+                  been set to scalar_value.  That is:
+                    - if (r > c) then
+                        - M(r,c) == m(r,c)
+                    - else if (r == c) then
+                        - M(r,c) == scalar_value 
+                    - else
+                        - M(r,c) == 0
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp upperm (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - returns a matrix M such that:
+                - M::type == the same type that was in m
+                - M has the same dimensions as m
+                - M is the upper triangular part of m.  That is:
+                    - if (r <= c) then
+                        - M(r,c) == m(r,c)
+                    - else
+                        - M(r,c) == 0
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp upperm (
+        const matrix_exp& m,
+        const matrix_exp::type scalar_value
+    );
+    /*!
+        ensures
+            - returns a matrix M such that:
+                - M::type == the same type that was in m
+                - M has the same dimensions as m
+                - M is the upper triangular part of m except that the diagonal has
+                  been set to scalar_value.  That is:
+                    - if (r < c) then
+                        - M(r,c) == m(r,c)
+                    - else if (r == c) then
+                        - M(r,c) == scalar_value 
+                    - else
+                        - M(r,c) == 0
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T, 
         long NR, 

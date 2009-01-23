@@ -238,6 +238,20 @@ namespace dlib
         }
 
         template <typename T, long NR, long NC, typename MM>
+        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_colm2>& m)
+        {
+            return m.m.nc();
+        }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_rowm2>& m)
+        {
+            return 1;
+        }
+
+
+
+        template <typename T, long NR, long NC, typename MM>
         int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_colm>& m)
         {
             return 1;
@@ -248,6 +262,19 @@ namespace dlib
         {
             return m.m.nr();
         }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_colm2>& m)
+        {
+            return 1;
+        }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_rowm2>& m)
+        {
+            return m.m.nr();
+        }
+
 
 
         template <typename T, long NR, long NC, typename MM>
@@ -290,6 +317,12 @@ namespace dlib
 
         template <typename T, long NR, long NC, typename MM, typename L>
         const T* get_ptr (const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm>& m) { return &m.m(m.s,0); }
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        const T* get_ptr (const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,L>,long,op_colm2>& m) { return &m.m(0,m.s1); }
+
+        template <typename T, long NR, long NC, typename MM, typename L>
+        const T* get_ptr (const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm2>& m) { return &m.m(m.s1,0); }
 
 
         template <typename T, long NR, long NC, typename MM, typename L>

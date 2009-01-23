@@ -154,6 +154,25 @@ namespace dlib
 
     const matrix_exp rowm (
         const matrix_exp& m,
+        long row,
+        long length
+    );
+    /*!
+        requires
+            - 0 <= row < m.nr()
+            - 0 <= length < m.nc()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == 1
+                - R.nc() == length
+                - for all valid i:
+                  R(i) == m(row,i)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp rowm (
+        const matrix_exp& m,
         const matrix_exp& rows
     );
     /*!
@@ -183,6 +202,25 @@ namespace dlib
         ensures
             - returns a matrix R such that:
                 - R.nr() == m.nr() 
+                - R.nc() == 1
+                - for all valid i:
+                  R(i) == m(i,col)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp colm (
+        const matrix_exp& m,
+        long col,
+        long length
+    );
+    /*!
+        requires
+            - 0 <= col < m.nr()
+            - 0 <= length < m.nc()
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == length 
                 - R.nc() == 1
                 - for all valid i:
                   R(i) == m(i,col)

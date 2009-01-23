@@ -204,6 +204,52 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct op_rowm2
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long cost = EXP::cost;
+            const static long NR = 1;
+            const static long NC = 0;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long row, long length, long r, long c)
+            { return m(row,c); }
+
+            template <typename M>
+            static long nr (const M& m, long, long) { return 1; }
+            template <typename M>
+            static long nc (const M& m, long, long length) { return length; }
+        };
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_scalar_ternary_exp<EXP,long,op_rowm2> rowm (
+        const matrix_exp<EXP>& m,
+        long row,
+        long length
+    )
+    {
+        DLIB_ASSERT(row >= 0 && row < m.nr() && 
+                    length >= 0 && length < m.nc(), 
+            "\tconst matrix_exp rowm(const matrix_exp& m, row, length)"
+            << "\n\tYou have specified invalid sub matrix dimensions"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\trow:    " << row 
+            << "\n\tlength: " << length 
+            );
+
+        typedef matrix_scalar_ternary_exp<EXP,long,op_rowm2> exp;
+        return exp(m.ref(),row, length);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     struct op_rowm_range
     {
         template <typename EXP1, typename EXP2>
@@ -294,6 +340,52 @@ namespace dlib
 
         typedef matrix_scalar_binary_exp<EXP,long,op_colm> exp;
         return exp(m.ref(),col);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_colm2
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long cost = EXP::cost;
+            const static long NR = 0;
+            const static long NC = 1;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long col, long length, long r, long c)
+            { return m(r,col); }
+
+            template <typename M>
+            static long nr (const M& m, long, long length) { return length; }
+            template <typename M>
+            static long nc (const M& m, long, long) { return 1; }
+        };
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_scalar_ternary_exp<EXP,long,op_colm2> colm (
+        const matrix_exp<EXP>& m,
+        long col,
+        long length
+    )
+    {
+        DLIB_ASSERT(col >= 0 && col < m.nc() && 
+                    length >= 0 && length < m.nr(), 
+            "\tconst matrix_exp colm(const matrix_exp& m, col, length)"
+            << "\n\tYou have specified invalid sub matrix dimensions"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tcol:    " << col 
+            << "\n\tlength: " << length 
+            );
+
+        typedef matrix_scalar_ternary_exp<EXP,long,op_colm2> exp;
+        return exp(m.ref(),col, length);
     }
 
 // ----------------------------------------------------------------------------------------

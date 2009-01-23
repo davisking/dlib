@@ -465,12 +465,11 @@ namespace dlib
         ) const { return OP::destructively_aliases(m,item); }
 
         long nr (
-        ) const { return OP::nr(m); }
+        ) const { return OP::nr(m,s1,s2); }
 
         long nc (
-        ) const { return OP::nc(m); }
+        ) const { return OP::nc(m,s1,s2); }
 
-    private:
 
         const M& m;
         const S s1;
