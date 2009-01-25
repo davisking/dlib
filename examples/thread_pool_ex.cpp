@@ -15,17 +15,17 @@
 
 using namespace dlib;
 
-
-// Here we make an instance of the thread pool object
-thread_pool tp(3);
-
-
 // We will be using the dlib logger object to print out messages in this example
 // because its output is timestamped and labeled with the thread that the log
 // message came from.  So this will make it easier to see what is going on in 
 // this example.  Here we make an instance of the logger.  See the logger 
 // documentation and examples for detailed information regarding its use.
 logger dlog("main");
+
+
+// Here we make an instance of the thread pool object
+thread_pool tp(3);
+
 
 // ----------------------------------------------------------------------------------------
 
