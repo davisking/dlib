@@ -107,6 +107,7 @@ namespace dlib
                 // in this case we just let the thread pool know that it
                 // should self destruct whenever it gets a chance
                 should_destruct = true;
+                data_ready.broadcast();
                 data_mutex.unlock();
             }
         }
