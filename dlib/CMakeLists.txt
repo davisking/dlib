@@ -48,12 +48,15 @@ set (DLIB_ENABLE_ASSERTS_STR
 "Enable this if you want to turn on the DLIB_ASSERT macro" )
 set (DLIB_USE_BLAS_STR
 "Disable this if you don't want to use a BLAS library" )
+set (DLIB_LINK_WITH_LIBPNG_STR
+"Disable this if you don't want to link against libpng" )
 
 option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
 option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
 option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
 option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
 option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
+option(DLIB_LINK_WITH_LIBPNG ${DLIB_LINK_WITH_LIBPNG_STR} ON)
 
 
 add_library(dlib STATIC all/source.cpp )
@@ -128,15 +131,19 @@ if (NOT DLIB_ISO_CPP_ONLY)
 
 
 
-   # try to find libpng 
-   set(ZLIB_FIND_QUIETLY ON)
-   set(PNG_FIND_QUIETLY ON)
-   include(FindPNG)
-   if (PNG_FOUND)
-      include_directories(${PNG_PNG_INCLUDE_DIR})
-      set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
-      add_global_define(DLIB_PNG_SUPPORT)
+   if (DLIB_LINK_WITH_LIBPNG)
+      # try to find libpng 
+      set(ZLIB_FIND_QUIETLY ON)
+      set(PNG_FIND_QUIETLY ON)
+      include(FindPNG)
+      if (PNG_FOUND)
+         include_directories(${PNG_PNG_INCLUDE_DIR})
+         set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
+      else()
+         set(DLIB_LINK_WITH_LIBPNG OFF CACHE STRING ${DLIB_LINK_WITH_LIBPNG_STR} FORCE )
+      endif()
    endif()
+
 
    if (DLIB_USE_BLAS)
       # Try to find a BLAS library
@@ -158,6 +165,13 @@ endif ()
 #test for some things that really should be true about the compiler
 include(TestForSTDNamespace)
 include(TestForANSIStreamHeaders)
+
+
+if (DLIB_LINK_WITH_LIBPNG)
+   add_global_define(DLIB_PNG_SUPPORT)
+else()
+   remove_global_define(DLIB_PNG_SUPPORT)
+endif()
 
 
 if (DLIB_USE_BLAS AND blas_found)
