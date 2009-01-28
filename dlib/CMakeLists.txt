@@ -127,7 +127,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
       endif()
 
       mark_as_advanced(nsllib pthreadlib socketlib)
-   endif () ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
+   endif () ##################################################################################
 
 
 
@@ -159,7 +159,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
 
    target_link_libraries(dlib ${dlib_needed_libraries} )
 
-endif ()
+endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
 
 #test for some things that really should be true about the compiler
