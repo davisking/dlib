@@ -233,7 +233,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
             static type apply ( const M& m, long r, long c)
             { 
                 const type temp = m(r,c);
-                if (temp != 0)
+                if (temp != static_cast<type>(0))
                     return static_cast<type>(1.0/temp);
                 else
                     return 0;
@@ -252,7 +252,10 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         COMPILE_TIME_ASSERT((
                 is_same_type<typename EXP::type,float>::value == true || 
                 is_same_type<typename EXP::type,double>::value == true || 
-                is_same_type<typename EXP::type,long double>::value == true 
+                is_same_type<typename EXP::type,long double>::value == true  ||
+                is_same_type<typename EXP::type,std::complex<float> >::value == true || 
+                is_same_type<typename EXP::type,std::complex<double> >::value == true || 
+                is_same_type<typename EXP::type,std::complex<long double> >::value == true 
         ));
         return matrix_unary_exp<EXP,op_reciprocal>(m.ref());
     }

@@ -153,7 +153,8 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, long double, std::complex<float>,
+              std::complex<double>, or std::complex<long double>
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
