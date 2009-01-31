@@ -160,7 +160,7 @@ namespace dlib
     /*!
         requires
             - 0 <= row < m.nr()
-            - 0 <= length < m.nc()
+            - 0 <= length <= m.nc()
         ensures
             - returns a matrix R such that:
                 - R.nr() == 1
@@ -198,7 +198,7 @@ namespace dlib
     );
     /*!
         requires
-            - 0 <= col < m.nr()
+            - 0 <= col < m.nc()
         ensures
             - returns a matrix R such that:
                 - R.nr() == m.nr() 
@@ -216,8 +216,8 @@ namespace dlib
     );
     /*!
         requires
-            - 0 <= col < m.nr()
-            - 0 <= length < m.nc()
+            - 0 <= col < m.nc()
+            - 0 <= length <= m.nr()
         ensures
             - returns a matrix R such that:
                 - R.nr() == length 

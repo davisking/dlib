@@ -235,7 +235,7 @@ namespace dlib
     )
     {
         DLIB_ASSERT(row >= 0 && row < m.nr() && 
-                    length >= 0 && length < m.nc(), 
+                    length >= 0 && length <= m.nc(), 
             "\tconst matrix_exp rowm(const matrix_exp& m, row, length)"
             << "\n\tYou have specified invalid sub matrix dimensions"
             << "\n\tm.nr(): " << m.nr()
@@ -375,7 +375,7 @@ namespace dlib
     )
     {
         DLIB_ASSERT(col >= 0 && col < m.nc() && 
-                    length >= 0 && length < m.nr(), 
+                    length >= 0 && length <= m.nr(), 
             "\tconst matrix_exp colm(const matrix_exp& m, col, length)"
             << "\n\tYou have specified invalid sub matrix dimensions"
             << "\n\tm.nr(): " << m.nr()
