@@ -10,6 +10,186 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//                             Global linear algebra functions 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp::matrix_type inv (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m is a square matrix
+        ensures
+            - returns the inverse of m 
+              (Note that if m is singular or so close to being singular that there
+              is a lot of numerical error then the returned matrix will be bogus.  
+              You can check by seeing if m*inv(m) is an identity matrix)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix pinv (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - returns the Moore-Penrose pseudoinverse of m.
+            - The returned matrix has m.nc() rows and m.nr() columns.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void svd (
+        const matrix_exp& m,
+        matrix<matrix_exp::type>& u,
+        matrix<matrix_exp::type>& w,
+        matrix<matrix_exp::type>& v
+    );
+    /*!
+        ensures
+            - computes the singular value decomposition of m
+            - m == #u*#w*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - diag(#w) == the singular values of the matrix m in no 
+              particular order.  All non-diagonal elements of #w are
+              set to 0.
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nc()
+            - #w.nr() == m.nc()
+            - #w.nc() == m.nc()
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    long svd2 (
+        bool withu, 
+        bool withv, 
+        const matrix_exp& m,
+        matrix<matrix_exp::type>& u,
+        matrix<matrix_exp::type>& w,
+        matrix<matrix_exp::type>& v
+    );
+    /*!
+        requires
+            - m.nr() >= m.nc()
+        ensures
+            - computes the singular value decomposition of matrix m
+            - m == subm(#u,get_rect(m))*diagm(#w)*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the singular values of the matrix m in no 
+              particular order.  
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nr()
+            - #w.nr() == m.nc()
+            - #w.nc() == 1 
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+            - if (widthu == false) then
+                - ignore the above regarding #u, it isn't computed and its
+                  output state is undefined.
+            - if (widthv == false) then
+                - ignore the above regarding #v, it isn't computed and its
+                  output state is undefined.
+            - returns an error code of 0, if no errors and 'k' if we fail to
+              converge at the 'kth' singular value.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void svd3 (
+        const matrix_exp& m,
+        matrix<matrix_exp::type>& u,
+        matrix<matrix_exp::type>& w,
+        matrix<matrix_exp::type>& v
+    );
+    /*!
+        ensures
+            - computes the singular value decomposition of m
+            - m == #u*diagm(#w)*trans(#v)
+            - trans(#u)*#u == identity matrix
+            - trans(#v)*#v == identity matrix
+            - #w == the singular values of the matrix m in no 
+              particular order.  
+            - #u.nr() == m.nr()
+            - #u.nc() == m.nc()
+            - #w.nr() == m.nc()
+            - #w.nc() == 1 
+            - #v.nr() == m.nc()
+            - #v.nc() == m.nc()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp::type det (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m is a square matrix
+        ensures
+            - returns the determinant of m
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp::matrix_type chol (
+        const matrix_exp& A
+    );
+    /*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A has a Cholesky Decomposition) then
+                - returns the decomposition of A.  That is, returns a matrix L
+                  such that L*trans(L) == A.  L will also be lower triangular.
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be a decomposition.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp::matrix_type inv_lower_triangular (
+        const matrix_exp& A
+    );
+    /*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A is lower triangular) then
+                - returns the inverse of A. 
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be an inverse.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp::matrix_type inv_upper_triangular (
+        const matrix_exp& A
+    );
+    /*!
+        requires
+            - A is a square matrix
+        ensures
+            - if (A is upper triangular) then
+                - returns the inverse of A. 
+            - else
+                - returns a matrix with the same dimensions as A but it 
+                  will have a bogus value.  I.e. it won't be an inverse.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//                             Matrix decomposition classes 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename matrix_exp_type

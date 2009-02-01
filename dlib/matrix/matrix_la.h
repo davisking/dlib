@@ -4,7 +4,10 @@
 #define DLIB_MATRIx_LA_FUNCTS_ 
 
 #include "matrix_la_abstract.h"
+#include "matrix_utilities.h"
 
+// The 4 decomposition objects described in the matrix_la_abstract.h file are
+// actually implemented in the following 4 files.  
 #include "matrix_lu.h"
 #include "matrix_qr.h"
 #include "matrix_cholesky.h"
@@ -12,6 +15,1500 @@
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace nric
+    {
+        // This namespace contains stuff adapted from the algorithms 
+        // described in the book Numerical Recipes in C
+
+        template <typename T>
+        inline T pythag(const T& a, const T& b)
+        {
+            T absa,absb;
+            absa=std::abs(a);
+            absb=std::abs(b);
+            if (absa > absb) 
+            {
+                T val = absb/absa;
+                val *= val;
+                return absa*std::sqrt(1.0+val);
+            }
+            else 
+            {
+                if (absb == 0.0)
+                {
+                    return 0.0;
+                }
+                else
+                {
+                    T val = absa/absb;
+                    val *= val;
+                    return  absb*std::sqrt(1.0+val);
+                }
+            }
+        }
+
+        template <typename T>
+        inline T sign(const T& a, const T& b)
+        {
+            if (b < 0)
+            {
+                return -std::abs(a);
+            }
+            else
+            {
+                return std::abs(a);
+            }
+        }
+
+
+        template <
+            typename T,
+            long M, long N,
+            long wN, long wX,
+            long vN, 
+            long rN, long rX,
+            typename MM1,
+            typename MM2,
+            typename MM3,
+            typename MM4,
+            typename L1,
+            typename L2,
+            typename L3,
+            typename L4
+            >
+        bool svdcmp(
+            matrix<T,M,N,MM1,L1>& a,  
+            matrix<T,wN,wX,MM2,L2>& w,
+            matrix<T,vN,vN,MM3,L3>& v,
+            matrix<T,rN,rX,MM4,L4>& rv1
+        )
+        /*!  ( this function is derived from the one in numerical recipes in C chapter 2.6)
+            requires
+                - w.nr() == a.nc()
+                - w.nc() == 1
+                - v.nr() == a.nc()
+                - v.nc() == a.nc()
+                - rv1.nr() == a.nc()
+                - rv1.nc() == 1
+            ensures
+                - computes the singular value decomposition of a
+                - let W be the matrix such that diag(W) == #w then:
+                    - a == #a*W*trans(#v)
+                - trans(#a)*#a == identity matrix
+                - trans(#v)*#v == identity matrix
+                - #rv1 == some undefined value
+                - returns true for success and false for failure
+        !*/
+        {
+
+            DLIB_ASSERT(
+                 w.nr() == a.nc() &&
+                 w.nc() == 1 &&
+                 v.nr() == a.nc() &&
+                 v.nc() == a.nc() &&
+                 rv1.nr() == a.nc() &&
+                 rv1.nc() == 1, "");
+
+            COMPILE_TIME_ASSERT(wX == 0 || wX == 1);
+            COMPILE_TIME_ASSERT(rX == 0 || rX == 1);
+
+            const T one = 1.0;
+            const long max_iter = 30;
+            const long n = a.nc();
+            const long m = a.nr();
+            const T eps = std::numeric_limits<T>::epsilon();
+            long nm = 0, l = 0;
+            bool flag;
+            T anorm,c,f,g,h,s,scale,x,y,z;
+            g = 0.0;
+            scale = 0.0;
+            anorm = 0.0; 
+
+            for (long i = 0; i < n; ++i) 
+            {
+                l = i+1;
+                rv1(i) = scale*g;
+                g = s = scale = 0.0;
+                if (i < m) 
+                {
+                    for (long k = i; k < m; ++k) 
+                        scale += std::abs(a(k,i));
+
+                    if (scale) 
+                    {
+                        for (long k = i; k < m; ++k) 
+                        {
+                            a(k,i) /= scale;
+                            s += a(k,i)*a(k,i);
+                        }
+                        f = a(i,i);
+                        g = -sign(std::sqrt(s),f);
+                        h = f*g - s;
+                        a(i,i) = f - g;
+                        for (long j = l; j < n; ++j) 
+                        {
+                            s = 0.0;
+                            for (long k = i; k < m; ++k) 
+                                s += a(k,i)*a(k,j);
+
+                            f = s/h;
+
+                            for (long k = i; k < m; ++k) 
+                                a(k,j) += f*a(k,i);
+                        }
+                        for (long k = i; k < m; ++k) 
+                            a(k,i) *= scale;
+                    }
+                }
+
+                w(i) = scale *g;
+
+                g=s=scale=0.0;
+
+                if (i < m && i < n-1) 
+                {
+                    for (long k = l; k < n; ++k) 
+                        scale += std::abs(a(i,k));
+
+                    if (scale) 
+                    {
+                        for (long k = l; k < n; ++k) 
+                        {
+                            a(i,k) /= scale;
+                            s += a(i,k)*a(i,k);
+                        }
+                        f = a(i,l);
+                        g = -sign(std::sqrt(s),f);
+                        h = f*g - s;
+                        a(i,l) = f - g;
+
+                        for (long k = l; k < n; ++k) 
+                            rv1(k) = a(i,k)/h;
+
+                        for (long j = l; j < m; ++j) 
+                        {
+                            s = 0.0;
+                            for (long k = l; k < n; ++k) 
+                                s += a(j,k)*a(i,k);
+
+                            for (long k = l; k < n; ++k) 
+                                a(j,k) += s*rv1(k);
+                        }
+                        for (long k = l; k < n; ++k) 
+                            a(i,k) *= scale;
+                    }
+                }
+                anorm = std::max(anorm,(std::abs(w(i))+std::abs(rv1(i))));
+            }
+            for (long i = n-1; i >= 0; --i) 
+            { 
+                if (i < n-1) 
+                {
+                    if (g != 0) 
+                    {
+                        for (long j = l; j < n ; ++j) 
+                            v(j,i) = (a(i,j)/a(i,l))/g;
+
+                        for (long j = l; j < n; ++j) 
+                        {
+                            s = 0.0;
+                            for (long k = l; k < n; ++k) 
+                                s += a(i,k)*v(k,j);
+
+                            for (long k = l; k < n; ++k) 
+                                v(k,j) += s*v(k,i);
+                        }
+                    }
+
+                    for (long j = l; j < n; ++j) 
+                        v(i,j) = v(j,i) = 0.0;
+                }
+
+                v(i,i) = 1.0;
+                g = rv1(i);
+                l = i;
+            }
+
+            for (long i = std::min(m,n)-1; i >= 0; --i) 
+            { 
+                l = i + 1;
+                g = w(i);
+
+                for (long j = l; j < n; ++j) 
+                    a(i,j) = 0.0;
+
+                if (g != 0) 
+                {
+                    g = 1.0/g;
+
+                    for (long j = l; j < n; ++j) 
+                    {
+                        s = 0.0;
+                        for (long k = l; k < m; ++k) 
+                            s += a(k,i)*a(k,j);
+
+                        f=(s/a(i,i))*g;
+
+                        for (long k = i; k < m; ++k) 
+                            a(k,j) += f*a(k,i);
+                    }
+                    for (long j = i; j < m; ++j) 
+                        a(j,i) *= g;
+                } 
+                else 
+                {
+                    for (long j = i; j < m; ++j) 
+                        a(j,i) = 0.0;
+                }
+
+                ++a(i,i);
+            }
+
+            for (long k = n-1; k >= 0; --k) 
+            { 
+                for (long its = 1; its <= max_iter; ++its) 
+                { 
+                    flag = true;
+                    for (l = k; l >= 1; --l) 
+                    { 
+                        nm = l - 1; 
+                        if (std::abs(rv1(l)) <= eps*anorm) 
+                        {
+                            flag = false;
+                            break;
+                        }
+                        if (std::abs(w(nm)) <= eps*anorm) 
+                        {
+                            break;
+                        }
+                    }
+
+                    if (flag) 
+                    {
+                        c = 0.0;  
+                        s = 1.0;
+                        for (long i = l; i <= k; ++i) 
+                        {
+                            f = s*rv1(i);
+                            rv1(i) = c*rv1(i);
+                            if (std::abs(f) <= eps*anorm) 
+                                break;
+
+                            g = w(i);
+                            h = pythag(f,g);
+                            w(i) = h;
+                            h = 1.0/h;
+                            c = g*h;
+                            s = -f*h;
+                            for (long j = 0; j < m; ++j) 
+                            {
+                                y = a(j,nm);
+                                z = a(j,i);
+                                a(j,nm) = y*c + z*s;
+                                a(j,i) = z*c - y*s;
+                            }
+                        }
+                    }
+
+                    z = w(k);
+                    if (l == k) 
+                    { 
+                        if (z < 0.0) 
+                        {
+                            w(k) = -z;
+                            for (long j = 0; j < n; ++j) 
+                                v(j,k) = -v(j,k);
+                        }
+                        break;
+                    }
+
+                    if (its == max_iter) 
+                        return false;
+
+                    x = w(l); 
+                    nm = k - 1;
+                    y = w(nm);
+                    g = rv1(nm);
+                    h = rv1(k);
+                    f = ((y-z)*(y+z) + (g-h)*(g+h))/(2.0*h*y);
+                    g = pythag(f,one);
+                    f = ((x-z)*(x+z) + h*((y/(f+sign(g,f)))-h))/x;
+                    c = s = 1.0; 
+                    for (long j = l; j <= nm; ++j) 
+                    {
+                        long i = j + 1;
+                        g = rv1(i);
+                        y = w(i);
+                        h = s*g;
+                        g = c*g;
+                        z = pythag(f,h);
+                        rv1(j) = z;
+                        c = f/z;
+                        s = h/z;
+                        f = x*c + g*s;
+                        g = g*c - x*s;
+                        h = y*s;
+                        y *= c;
+                        for (long jj = 0; jj < n; ++jj) 
+                        {
+                            x = v(jj,j);
+                            z = v(jj,i);
+                            v(jj,j) = x*c + z*s;
+                            v(jj,i) = z*c - x*s;
+                        }
+                        z = pythag(f,h);
+                        w(j) = z; 
+                        if (z != 0) 
+                        {
+                            z = 1.0/z;
+                            c = f*z;
+                            s = h*z;
+                        }
+                        f = c*g + s*y;
+                        x = c*y - s*g;
+                        for (long jj = 0; jj < m; ++jj) 
+                        {
+                            y = a(jj,j);
+                            z = a(jj,i);
+                            a(jj,j) = y*c + z*s;
+                            a(jj,i) = z*c - y*s;
+                        }
+                    }
+                    rv1(l) = 0.0;
+                    rv1(k) = f;
+                    w(k) = x;
+                }
+            }
+            return true;
+        }
+
+
+        template <
+            typename T,
+            long N,
+            long NX,
+            typename MM1,
+            typename MM2,
+            typename MM3,
+            typename L1,
+            typename L2,
+            typename L3
+            >
+        bool ludcmp (
+            matrix<T,N,N,MM1,L1>& a,
+            matrix<long,N,NX,MM2,L2>& indx,
+            T& d,
+            matrix<T,N,NX,MM3,L3>& vv
+        )
+        /*!
+            ( this function is derived from the one in numerical recipes in C chapter 2.3)
+            ensures
+                - #a == both the L and U matrices
+                - #indx == the permutation vector (see numerical recipes in C)
+                - #d == some other thing (see numerical recipes in C)
+                - #vv == some undefined value.  this is just used for scratch space
+                - if (the matrix is singular and we can't do anything) then
+                    - returns false
+                - else
+                    - returns true
+        !*/
+        {
+            DLIB_ASSERT(indx.nc() == 1,"in dlib::nric::ludcmp() the indx matrix must be a column vector");
+            DLIB_ASSERT(vv.nc() == 1,"in dlib::nric::ludcmp() the vv matrix must be a column vector");
+            const long n = a.nr();
+            long imax = 0;
+            T big, dum, sum, temp;
+
+            d = 1.0;
+            for (long i = 0; i < n; ++i)
+            {
+                big = 0;
+                for (long j = 0; j < n; ++j)
+                {
+                    if ((temp=std::abs(a(i,j))) > big)
+                        big = temp;
+                }
+                if (big == 0.0)
+                {
+                    return false;
+                }
+                vv(i) = 1/big;
+            }
+
+            for (long j = 0; j < n; ++j)
+            {
+                for (long i = 0; i < j; ++i)
+                {
+                    sum = a(i,j);
+                    for (long k = 0; k < i; ++k)
+                        sum -= a(i,k)*a(k,j);
+                    a(i,j) = sum;
+                }
+                big = 0;
+                for (long i = j; i < n; ++i)
+                {
+                    sum = a(i,j);
+                    for (long k = 0; k < j; ++k)
+                        sum -= a(i,k)*a(k,j);
+                    a(i,j) = sum;
+                    if ( (dum=vv(i)*std::abs(sum)) >= big)
+                    {
+                        big = dum;
+                        imax = i;
+                    }
+                }
+                if (j != imax)
+                {
+                    for (long k = 0; k < n; ++k)
+                    {
+                        dum = a(imax,k);
+                        a(imax,k) = a(j,k);
+                        a(j,k) = dum;
+                    }
+                    d = -d;
+                    vv(imax) = vv(j);
+                }
+                indx(j) = imax;
+
+                if (j < n-1)
+                {
+                    dum = 1/a(j,j);
+                    for (long i = j+1; i < n; ++i)
+                        a(i,j) *= dum;
+                }
+            }
+            return true;
+        }
+
+// ----------------------------------------------------------------------------------------
+
+        template <
+            typename T,
+            long N,
+            long NX,
+            typename MM1,
+            typename MM2,
+            typename MM3,
+            typename L1,
+            typename L2,
+            typename L3
+            >
+        void lubksb (
+            const matrix<T,N,N,MM1,L1>& a,
+            const matrix<long,N,NX,MM2,L2>& indx,
+            matrix<T,N,NX,MM3,L3>& b
+        )
+        /*!
+            ( this function is derived from the one in numerical recipes in C chapter 2.3)
+            requires
+                - a == the LU decomposition you get from ludcmp()
+                - indx == the indx term you get out of ludcmp()
+                - b == the right hand side vector from the expression a*x = b
+            ensures
+                - #b == the solution vector x from the expression a*x = b
+                  (basically, this function solves for x given b and a)
+        !*/
+        {
+            DLIB_ASSERT(indx.nc() == 1,"in dlib::nric::lubksb() the indx matrix must be a column vector");
+            DLIB_ASSERT(b.nc() == 1,"in dlib::nric::lubksb() the b matrix must be a column vector");
+            const long n = a.nr();
+            long i, ii = -1, ip, j;
+            T sum;
+
+            for (i = 0; i < n; ++i)
+            {
+                ip = indx(i);
+                sum=b(ip);
+                b(ip) = b(i);
+                if (ii != -1)
+                {
+                    for (j = ii; j < i; ++j)
+                        sum -= a(i,j)*b(j);
+                }
+                else if (sum)
+                {
+                    ii = i;
+                }
+                b(i) = sum;
+            }
+            for (i = n-1; i >= 0; --i)
+            {
+                sum = b(i);
+                for (j = i+1; j < n; ++j)
+                    sum -= a(i,j)*b(j);
+                b(i) = sum/a(i,i);
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP,
+        long qN, long qX,
+        long uM, 
+        long vN, 
+        typename MM1,
+        typename MM2,
+        typename MM3,
+        typename L1,
+        typename L2,
+        typename L3
+        >
+    long svd2 (
+        bool withu, 
+        bool withv, 
+        const matrix_exp<EXP>& a,
+        matrix<typename EXP::type,uM,uM,MM1,L1>& u, 
+        matrix<typename EXP::type,qN,qX,MM2,L2>& q, 
+        matrix<typename EXP::type,vN,vN,MM3,L3>& v
+    )
+    {
+        /*  
+            Singular value decomposition. Translated to 'C' from the
+            original Algol code in "Handbook for Automatic Computation,
+            vol. II, Linear Algebra", Springer-Verlag.  Note that this
+            published algorithm is considered to be the best and numerically
+            stable approach to computing the real-valued svd and is referenced
+            repeatedly in ieee journal papers, etc where the svd is used.
+
+            This is almost an exact translation from the original, except that
+            an iteration counter is added to prevent stalls. This corresponds
+            to similar changes in other translations.
+
+            Returns an error code = 0, if no errors and 'k' if a failure to
+            converge at the 'kth' singular value.
+
+            USAGE: given the singular value decomposition a = u * diagm(q) * trans(v) for an m*n 
+                    matrix a with m >= n ...  
+                    After the svd call u is an m x m matrix which is columnwise 
+                    orthogonal. q will be an n element vector consisting of singular values 
+                    and v an n x n orthogonal matrix. eps and tol are tolerance constants. 
+                    Suitable values are eps=1e-16 and tol=(1e-300)/eps if T == double. 
+
+                    If withu == false then u won't be computed and similarly if withv == false
+                    then v won't be computed.
+        */
+
+        const long NR = matrix_exp<EXP>::NR;
+        const long NC = matrix_exp<EXP>::NC;
+
+        // make sure the output matrices have valid dimensions if they are statically dimensioned
+        COMPILE_TIME_ASSERT(qX == 0 || qX == 1);
+        COMPILE_TIME_ASSERT(NR == 0 || uM == 0 || NR == uM);
+        COMPILE_TIME_ASSERT(NC == 0 || vN == 0 || NC == vN);
+
+        DLIB_ASSERT(a.nr() >= a.nc(), 
+            "\tconst matrix_exp svd2()"
+            << "\n\tYou have given an invalidly sized matrix"
+            << "\n\ta.nr(): " << a.nr()
+            << "\n\ta.nc(): " << a.nc() 
+            );
+
+
+        typedef typename EXP::type T;
+
+        using std::abs;
+        using std::sqrt;
+
+        T eps = std::numeric_limits<T>::epsilon();
+        T tol = std::numeric_limits<T>::min()/eps;
+
+        const long m = a.nr();
+        const long n = a.nc();
+        long i, j, k, l = 0, l1, iter, retval;
+        T c, f, g, h, s, x, y, z;
+
+        matrix<T,qN,1,MM2> e(n,1); 
+        q.set_size(n,1);
+        u.set_size(m,m);
+        retval = 0;
+
+        if (withv)
+        {
+            v.set_size(n,n);
+        }
+
+        /* Copy 'a' to 'u' */    
+        for (i=0; i<m; i++) 
+        {
+            for (j=0; j<n; j++)
+                u(i,j) = a(i,j);
+        }
+
+        /* Householder's reduction to bidiagonal form. */
+        g = x = 0.0;    
+        for (i=0; i<n; i++) 
+        {
+            e(i) = g;
+            s = 0.0;
+            l = i + 1;
+
+            for (j=i; j<m; j++)
+                s += (u(j,i) * u(j,i));
+
+            if (s < tol)
+                g = 0.0;
+            else 
+            {
+                f = u(i,i);
+                g = (f < 0) ? sqrt(s) : -sqrt(s);
+                h = f * g - s;
+                u(i,i) = f - g;
+
+                for (j=l; j<n; j++) 
+                {
+                    s = 0.0;
+
+                    for (k=i; k<m; k++)
+                        s += (u(k,i) * u(k,j));
+
+                    f = s / h;
+
+                    for (k=i; k<m; k++)
+                        u(k,j) += (f * u(k,i));
+                } /* end j */
+            } /* end s */
+
+            q(i) = g;
+            s = 0.0;
+
+            for (j=l; j<n; j++)
+                s += (u(i,j) * u(i,j));
+
+            if (s < tol)
+                g = 0.0;
+            else 
+            {
+                f = u(i,i+1);
+                g = (f < 0) ? sqrt(s) : -sqrt(s);
+                h = f * g - s;
+                u(i,i+1) = f - g;
+
+                for (j=l; j<n; j++) 
+                    e(j) = u(i,j) / h;
+
+                for (j=l; j<m; j++) 
+                {
+                    s = 0.0;
+
+                    for (k=l; k<n; k++) 
+                        s += (u(j,k) * u(i,k));
+
+                    for (k=l; k<n; k++)
+                        u(j,k) += (s * e(k));
+                } /* end j */
+            } /* end s */
+
+            y = abs(q(i)) + abs(e(i));                         
+            if (y > x)
+                x = y;
+        } /* end i */
+
+        /* accumulation of right-hand transformations */
+        if (withv) 
+        {
+            for (i=n-1; i>=0; i--) 
+            {
+                if (g != 0.0) 
+                {
+                    h = u(i,i+1) * g;
+
+                    for (j=l; j<n; j++)
+                        v(j,i) = u(i,j)/h;
+
+                    for (j=l; j<n; j++) 
+                    {
+                        s = 0.0;
+
+                        for (k=l; k<n; k++) 
+                            s += (u(i,k) * v(k,j));
+
+                        for (k=l; k<n; k++)
+                            v(k,j) += (s * v(k,i));
+                    } /* end j */
+                } /* end g */
+
+                for (j=l; j<n; j++)
+                    v(i,j) = v(j,i) = 0.0;
+
+                v(i,i) = 1.0;
+                g = e(i);
+                l = i;
+            } /* end i */
+        } /* end withv, parens added for clarity */
+
+        /* accumulation of left-hand transformations */
+        if (withu) 
+        {
+            for (i=n; i<m; i++) 
+            {
+                for (j=n;j<m;j++)
+                    u(i,j) = 0.0;
+
+                u(i,i) = 1.0;
+            }
+        }
+
+        if (withu) 
+        {
+            for (i=n-1; i>=0; i--) 
+            {
+                l = i + 1;
+                g = q(i);
+
+                for (j=l; j<m; j++)  /* upper limit was 'n' */
+                    u(i,j) = 0.0;
+
+                if (g != 0.0) 
+                {
+                    h = u(i,i) * g;
+
+                    for (j=l; j<m; j++) 
+                    { /* upper limit was 'n' */
+                        s = 0.0;
+
+                        for (k=l; k<m; k++)
+                            s += (u(k,i) * u(k,j));
+
+                        f = s / h;
+
+                        for (k=i; k<m; k++) 
+                            u(k,j) += (f * u(k,i));
+                    } /* end j */
+
+                    for (j=i; j<m; j++) 
+                        u(j,i) /= g;
+                } /* end g */
+                else 
+                {
+                    for (j=i; j<m; j++)
+                        u(j,i) = 0.0;
+                }
+
+                u(i,i) += 1.0;
+            } /* end i*/
+        } /* end withu, parens added for clarity */
+
+        /* diagonalization of the bidiagonal form */
+        eps *= x;
+
+        for (k=n-1; k>=0; k--) 
+        {
+            iter = 0;
+
+test_f_splitting:
+
+            for (l=k; l>=0; l--) 
+            {
+                if (abs(e(l)) <= eps) 
+                    goto test_f_convergence;
+
+                if (abs(q(l-1)) <= eps) 
+                    goto cancellation;
+            } /* end l */
+
+            /* cancellation of e(l) if l > 0 */
+
+cancellation:
+
+            c = 0.0;
+            s = 1.0;
+            l1 = l - 1;
+
+            for (i=l; i<=k; i++) 
+            {
+                f = s * e(i);
+                e(i) *= c;
+
+                if (abs(f) <= eps) 
+                    goto test_f_convergence;
+
+                g = q(i);
+                h = q(i) = sqrt(f*f + g*g);
+                c = g / h;
+                s = -f / h;
+
+                if (withu) 
+                {
+                    for (j=0; j<m; j++) 
+                    {
+                        y = u(j,l1);
+                        z = u(j,i);
+                        u(j,l1) = y * c + z * s;
+                        u(j,i) = -y * s + z * c;
+                    } /* end j */
+                } /* end withu, parens added for clarity */
+            } /* end i */
+
+test_f_convergence:
+
+            z = q(k);
+            if (l == k) 
+                goto convergence;
+
+            /* shift from bottom 2x2 minor */
+            iter++;
+            if (iter > 30) 
+            {
+                retval = k;
+                break;
+            }
+            x = q(l);
+            y = q(k-1);
+            g = e(k-1);
+            h = e(k);
+            f = ((y - z) * (y + z) + (g - h) * (g + h)) / (2 * h * y);
+            g = sqrt(f * f + 1.0);
+            f = ((x - z) * (x + z) + h * (y / ((f < 0)?(f - g) : (f + g)) - h)) / x;
+
+            /* next QR transformation */
+            c = s = 1.0;
+
+            for (i=l+1; i<=k; i++) 
+            {
+                g = e(i);
+                y = q(i);
+                h = s * g;
+                g *= c;
+                e(i-1) = z = sqrt(f * f + h * h);
+                c = f / z;
+                s = h / z;
+                f = x * c + g * s;
+                g = -x * s + g * c;
+                h = y * s;
+                y *= c;
+
+                if (withv) 
+                {
+                    for (j=0;j<n;j++) 
+                    {
+                        x = v(j,i-1);
+                        z = v(j,i);
+                        v(j,i-1) = x * c + z * s;
+                        v(j,i) = -x * s + z * c;
+                    } /* end j */
+                } /* end withv, parens added for clarity */
+
+                q(i-1) = z = sqrt(f * f + h * h);
+                c = f / z;
+                s = h / z;
+                f = c * g + s * y;
+                x = -s * g + c * y;
+                if (withu) 
+                {
+                    for (j=0; j<m; j++) 
+                    {
+                        y = u(j,i-1);
+                        z = u(j,i);
+                        u(j,i-1) = y * c + z * s;
+                        u(j,i) = -y * s + z * c;
+                    } /* end j */
+                } /* end withu, parens added for clarity */
+            } /* end i */
+
+            e(l) = 0.0;
+            e(k) = f;
+            q(k) = x;
+
+            goto test_f_splitting;
+
+convergence:
+
+            if (z < 0.0) 
+            {
+                /* q(k) is made non-negative */
+                q(k) = -z;
+                if (withv) 
+                {
+                    for (j=0; j<n; j++)
+                        v(j,k) = -v(j,k);
+                } /* end withv, parens added for clarity */
+            } /* end z */
+        } /* end k */
+
+        return retval;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP,
+        long N
+        >
+    struct inv_helper
+    {
+        static const typename matrix_exp<EXP>::matrix_type inv (
+            const matrix_exp<EXP>& m
+        )
+        {
+            using namespace nric;
+            typedef typename EXP::mem_manager_type MM;
+            // you can't invert a non-square matrix
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC || 
+                                matrix_exp<EXP>::NR == 0 ||
+                                matrix_exp<EXP>::NC == 0);
+            DLIB_ASSERT(m.nr() == m.nc(), 
+                "\tconst matrix_exp::type inv(const matrix_exp& m)"
+                << "\n\tYou can only apply inv() to a square matrix"
+                << "\n\tm.nr(): " << m.nr()
+                << "\n\tm.nc(): " << m.nc() 
+                );
+            typedef typename matrix_exp<EXP>::type type;
+
+            matrix<type, N, N,MM> a(m), y(m.nr(),m.nr());
+            matrix<long,N,1,MM> indx(m.nr(),1);
+            matrix<type,N,1,MM> col(m.nr(),1);
+            matrix<type,N,1,MM> vv(m.nr(),1);
+            type d;
+            long i, j;
+            if (ludcmp(a,indx,d,vv))
+            {
+                for (j = 0; j < m.nr(); ++j)
+                {
+                    for (i = 0; i < m.nr(); ++i)
+                        col(i) = 0;
+                    col(j) = 1;
+                    lubksb(a,indx,col);
+                    for (i = 0; i < m.nr(); ++i)
+                        y(i,j) = col(i);
+                }
+            }
+            else
+            {
+                // m is singular so lets just set y equal to m just so that 
+                // it has some value
+                y = m;
+            }
+            return y;
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    struct inv_helper<EXP,1>
+    {
+        static const typename matrix_exp<EXP>::matrix_type inv (
+            const matrix_exp<EXP>& m
+        )
+        {
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
+            typedef typename matrix_exp<EXP>::type type;
+
+            matrix<type, 1, 1, typename EXP::mem_manager_type> a;
+            a(0) = 1/m(0);
+            return a;
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    struct inv_helper<EXP,2>
+    {
+        static const typename matrix_exp<EXP>::matrix_type inv (
+            const matrix_exp<EXP>& m
+        )
+        {
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
+            typedef typename matrix_exp<EXP>::type type;
+
+            matrix<type, 2, 2, typename EXP::mem_manager_type> a;
+            type d = static_cast<type>(1.0/det(m));
+            a(0,0) = m(1,1)*d;
+            a(0,1) = m(0,1)*-d;
+            a(1,0) = m(1,0)*-d;
+            a(1,1) = m(0,0)*d;
+            return a;
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    struct inv_helper<EXP,3>
+    {
+        static const typename matrix_exp<EXP>::matrix_type inv (
+            const matrix_exp<EXP>& m
+        )
+        {
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
+            typedef typename matrix_exp<EXP>::type type;
+
+            matrix<type, 3, 3, typename EXP::mem_manager_type> ret;
+            const type de = static_cast<type>(1.0/det(m));
+            const type a = m(0,0);
+            const type b = m(0,1);
+            const type c = m(0,2);
+            const type d = m(1,0);
+            const type e = m(1,1);
+            const type f = m(1,2);
+            const type g = m(2,0);
+            const type h = m(2,1);
+            const type i = m(2,2);
+
+            ret(0,0) = (e*i - f*h)*de;
+            ret(1,0) = (f*g - d*i)*de;
+            ret(2,0) = (d*h - e*g)*de;
+
+            ret(0,1) = (c*h - b*i)*de;
+            ret(1,1) = (a*i - c*g)*de;
+            ret(2,1) = (b*g - a*h)*de;
+
+            ret(0,2) = (b*f - c*e)*de;
+            ret(1,2) = (c*d - a*f)*de;
+            ret(2,2) = (a*e - b*d)*de;
+
+            return ret;
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    struct inv_helper<EXP,4>
+    {
+        static const typename matrix_exp<EXP>::matrix_type inv (
+            const matrix_exp<EXP>& m
+        )
+        {
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
+            typedef typename matrix_exp<EXP>::type type;
+
+            matrix<type, 4, 4, typename EXP::mem_manager_type> ret;
+            const type de = static_cast<type>(1.0/det(m));
+            ret(0,0) =  det(removerc<0,0>(m));
+            ret(0,1) = -det(removerc<0,1>(m));
+            ret(0,2) =  det(removerc<0,2>(m));
+            ret(0,3) = -det(removerc<0,3>(m));
+
+            ret(1,0) = -det(removerc<1,0>(m));
+            ret(1,1) =  det(removerc<1,1>(m));
+            ret(1,2) = -det(removerc<1,2>(m));
+            ret(1,3) =  det(removerc<1,3>(m));
+
+            ret(2,0) =  det(removerc<2,0>(m));
+            ret(2,1) = -det(removerc<2,1>(m));
+            ret(2,2) =  det(removerc<2,2>(m));
+            ret(2,3) = -det(removerc<2,3>(m));
+
+            ret(3,0) = -det(removerc<3,0>(m));
+            ret(3,1) =  det(removerc<3,1>(m));
+            ret(3,2) = -det(removerc<3,2>(m));
+            ret(3,3) =  det(removerc<3,3>(m));
+
+            return trans(ret)*de;
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    inline const typename matrix_exp<EXP>::matrix_type inv (
+        const matrix_exp<EXP>& m
+    ) { return inv_helper<EXP,matrix_exp<EXP>::NR>::inv(m); }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP>
+    const typename matrix_exp<EXP>::matrix_type  inv_lower_triangular (
+        const matrix_exp<EXP>& A 
+    )
+    {
+        DLIB_ASSERT(A.nr() == A.nc(), 
+            "\tconst matrix inv_lower_triangular(const matrix_exp& A)"
+            << "\n\tA must be a square matrix"
+            << "\n\tA.nr(): " << A.nr()
+            << "\n\tA.nc(): " << A.nc() 
+            );
+
+        typedef typename matrix_exp<EXP>::matrix_type matrix_type;
+        typedef typename matrix_type::type type;
+
+        matrix_type m(A);
+
+        for(long c = 0; c < m.nc(); ++c)
+        {
+            if( m(c,c) == 0 )
+            {
+                // there isn't an inverse so just give up
+                return m;
+            }
+
+            // compute m(c,c)
+            m(c,c) = 1/m(c,c);
+
+            // compute the values in column c that are below m(c,c).
+            // We do this by just doing the same thing we do for upper triangular
+            // matrices because we take the transpose of m which turns m into an
+            // upper triangular matrix.
+            for(long r = 0; r < c; ++r)
+            {
+                const long n = c-r;
+                m(c,r) = -m(c,c)*subm(trans(m),r,r,1,n)*subm(trans(m),r,c,n,1);
+            }
+        }
+
+        return m;
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP>
+    const typename matrix_exp<EXP>::matrix_type  inv_upper_triangular (
+        const matrix_exp<EXP>& A 
+    )
+    {
+        DLIB_ASSERT(A.nr() == A.nc(), 
+            "\tconst matrix inv_upper_triangular(const matrix_exp& A)"
+            << "\n\tA must be a square matrix"
+            << "\n\tA.nr(): " << A.nr()
+            << "\n\tA.nc(): " << A.nc() 
+            );
+
+        typedef typename matrix_exp<EXP>::matrix_type matrix_type;
+        typedef typename matrix_type::type type;
+
+        matrix_type m(A);
+
+        for(long c = 0; c < m.nc(); ++c)
+        {
+            if( m(c,c) == 0 )
+            {
+                // there isn't an inverse so just give up
+                return m;
+            }
+
+            // compute m(c,c)
+            m(c,c) = 1/m(c,c);
+
+            // compute the values in column c that are above m(c,c)
+            for(long r = 0; r < c; ++r)
+            {
+                const long n = c-r;
+                m(r,c) = -m(c,c)*subm(m,r,r,1,n)*subm(m,r,c,n,1);
+            }
+        }
+
+        return m;
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    inline const typename matrix_exp<EXP>::matrix_type chol (
+        const matrix_exp<EXP>& A
+    )
+    {
+        DLIB_ASSERT(A.nr() == A.nc(), 
+            "\tconst matrix chol(const matrix_exp& A)"
+            << "\n\tYou can only apply the chol to a square matrix"
+            << "\n\tA.nr(): " << A.nr()
+            << "\n\tA.nc(): " << A.nc() 
+            );
+
+        typename matrix_exp<EXP>::matrix_type L(A.nr(),A.nc());
+        typedef typename EXP::type T;
+        set_all_elements(L,0);
+
+        // do nothing if the matrix is empty
+        if (A.size() == 0)
+            return L;
+
+        // compute the upper left corner
+        if (A(0,0) > 0)
+            L(0,0) = std::sqrt(A(0,0));
+
+        // compute the first column
+        for (long r = 1; r < A.nr(); ++r)
+        {
+            if (L(0,0) > 0)
+                L(r,0) = A(r,0)/L(0,0);
+            else
+                L(r,0) = A(r,0);
+        }
+
+        // now compute all the other columns
+        for (long c = 1; c < A.nc(); ++c)
+        {
+            // compute the diagonal element
+            T temp = A(c,c);
+            for (long i = 0; i < c; ++i)
+            {
+                temp -= L(c,i)*L(c,i);
+            }
+            if (temp > 0)
+                L(c,c) = std::sqrt(temp);
+
+            // compute the non diagonal elements
+            for (long r = c+1; r < A.nr(); ++r)
+            {
+                temp = A(r,c);
+                for (long i = 0; i < c; ++i)
+                {
+                    temp -= L(r,i)*L(c,i);
+                }
+                if (L(c,c) > 0)
+                    L(r,c) = temp/L(c,c);
+                else
+                    L(r,c) = temp;
+            }
+        }
+
+        return L;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    inline const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv ( 
+        const matrix_exp<EXP>& m
+    )
+    { 
+        typename matrix_exp<EXP>::matrix_type u;
+        typedef typename EXP::mem_manager_type MM1;
+        matrix<typename EXP::type, EXP::NC, EXP::NC,MM1 > v;
+
+        typedef typename matrix_exp<EXP>::type T;
+
+        v.set_size(m.nc(),m.nc());
+
+        typedef typename matrix_exp<EXP>::type T;
+        u = m;
+
+        matrix<T,matrix_exp<EXP>::NC,1,MM1> w(m.nc(),1);
+        matrix<T,matrix_exp<EXP>::NC,1,MM1> rv1(m.nc(),1);
+
+        nric::svdcmp(u,w,v,rv1);
+
+        const double machine_eps = std::numeric_limits<typename EXP::type>::epsilon();
+        // compute a reasonable epsilon below which we round to zero before doing the
+        // reciprocal
+        const double eps = machine_eps*std::max(m.nr(),m.nc())*max(w);
+
+        // now compute the pseudoinverse
+        return tmp(scale_columns(v,reciprocal(round_zeros(w,eps))))*trans(u);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP,
+        long uNR, 
+        long uNC,
+        long wN, 
+        long vN,
+        long wX,
+        typename MM1,
+        typename MM2,
+        typename MM3,
+        typename L1,
+        typename L2,
+        typename L3
+        >
+    inline void svd3 (
+        const matrix_exp<EXP>& m,
+        matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1>& u,
+        matrix<typename matrix_exp<EXP>::type, wN, wX,MM2,L2>& w,
+        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3,L3>& v
+    )
+    {
+        typedef typename matrix_exp<EXP>::type T;
+        const long NR = matrix_exp<EXP>::NR;
+        const long NC = matrix_exp<EXP>::NC;
+
+        // make sure the output matrices have valid dimensions if they are statically dimensioned
+        COMPILE_TIME_ASSERT(NR == 0 || uNR == 0 || NR == uNR);
+        COMPILE_TIME_ASSERT(NC == 0 || uNC == 0 || NC == uNC);
+        COMPILE_TIME_ASSERT(NC == 0 || wN == 0 || NC == wN);
+        COMPILE_TIME_ASSERT(NC == 0 || vN == 0 || NC == vN);
+        COMPILE_TIME_ASSERT(wX == 0 || wX == 1);
+
+        v.set_size(m.nc(),m.nc());
+
+        typedef typename matrix_exp<EXP>::type T;
+        u = m;
+
+        w.set_size(m.nc(),1);
+        matrix<T,matrix_exp<EXP>::NC,1,MM1> rv1(m.nc(),1);
+        nric::svdcmp(u,w,v,rv1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP,
+        long uNR, 
+        long uNC,
+        long wN, 
+        long vN,
+        typename MM1,
+        typename MM2,
+        typename MM3,
+        typename L1,
+        typename L2,
+        typename L3
+        >
+    inline void svd (
+        const matrix_exp<EXP>& m,
+        matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1>& u,
+        matrix<typename matrix_exp<EXP>::type, wN, wN,MM2,L2>& w,
+        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3,L3>& v
+    )
+    {
+        typedef typename matrix_exp<EXP>::type T;
+        const long NR = matrix_exp<EXP>::NR;
+        const long NC = matrix_exp<EXP>::NC;
+
+        // make sure the output matrices have valid dimensions if they are statically dimensioned
+        COMPILE_TIME_ASSERT(NR == 0 || uNR == 0 || NR == uNR);
+        COMPILE_TIME_ASSERT(NC == 0 || uNC == 0 || NC == uNC);
+        COMPILE_TIME_ASSERT(NC == 0 || wN == 0 || NC == wN);
+        COMPILE_TIME_ASSERT(NC == 0 || vN == 0 || NC == vN);
+
+        matrix<T,matrix_exp<EXP>::NC,1,MM1> W;
+        svd3(m,u,W,v);
+        w = diagm(W);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP,
+        long N = EXP::NR
+        >
+    struct det_helper
+    {
+        static const typename matrix_exp<EXP>::type det (
+            const matrix_exp<EXP>& m
+        )
+        {
+            using namespace nric;
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC ||
+                                matrix_exp<EXP>::NR == 0 ||
+                                matrix_exp<EXP>::NC == 0 
+                                );
+            DLIB_ASSERT(m.nr() == m.nc(), 
+                "\tconst matrix_exp::type det(const matrix_exp& m)"
+                << "\n\tYou can only apply det() to a square matrix"
+                << "\n\tm.nr(): " << m.nr()
+                << "\n\tm.nc(): " << m.nc() 
+                );
+            typedef typename matrix_exp<EXP>::type type;
+            typedef typename matrix_exp<EXP>::mem_manager_type MM;
+
+            matrix<type, N, N,MM> lu(m);
+            matrix<long,N,1,MM> indx(m.nr(),1);
+            matrix<type,N,1,MM> vv(m.nr(),1);
+            type d;
+            if (ludcmp(lu,indx,d,vv) == false)
+            {
+                // the matrix is singular so its det is 0
+                return 0;
+            }
+
+            return prod(diag(lu))*d;
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    struct det_helper<EXP,1>
+    {
+        static const typename matrix_exp<EXP>::type det (
+            const matrix_exp<EXP>& m
+        )
+        {
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
+            typedef typename matrix_exp<EXP>::type type;
+
+            return m(0);
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    struct det_helper<EXP,2>
+    {
+        static const typename matrix_exp<EXP>::type det (
+            const matrix_exp<EXP>& m
+        )
+        {
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
+            typedef typename matrix_exp<EXP>::type type;
+
+            return m(0,0)*m(1,1) - m(0,1)*m(1,0);
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    struct det_helper<EXP,3>
+    {
+        static const typename matrix_exp<EXP>::type det (
+            const matrix_exp<EXP>& m
+        )
+        {
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
+            typedef typename matrix_exp<EXP>::type type;
+
+            type temp = m(0,0)*(m(1,1)*m(2,2) - m(1,2)*m(2,1)) -
+                        m(0,1)*(m(1,0)*m(2,2) - m(1,2)*m(2,0)) +
+                        m(0,2)*(m(1,0)*m(2,1) - m(1,1)*m(2,0));
+            return temp;
+        }
+    };
+
+
+    template <
+        typename EXP
+        >
+    inline const typename matrix_exp<EXP>::type det (
+        const matrix_exp<EXP>& m
+    ) { return det_helper<EXP>::det(m); }
+
+
+    template <
+        typename EXP
+        >
+    struct det_helper<EXP,4>
+    {
+        static const typename matrix_exp<EXP>::type det (
+            const matrix_exp<EXP>& m
+        )
+        {
+            COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC);
+            typedef typename matrix_exp<EXP>::type type;
+
+            type temp = m(0,0)*(dlib::det(removerc<0,0>(m))) -
+                        m(0,1)*(dlib::det(removerc<0,1>(m))) +
+                        m(0,2)*(dlib::det(removerc<0,2>(m))) -
+                        m(0,3)*(dlib::det(removerc<0,3>(m)));
+            return temp;
+        }
+    };
+
+// ----------------------------------------------------------------------------------------
 
 }
 
