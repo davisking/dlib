@@ -44,6 +44,7 @@ set (tests
    matrix.cpp
    matrix2.cpp
    matrix3.cpp
+   matrix_la.cpp
    md5.cpp
    member_function_pointer.cpp
    metaprogramming.cpp

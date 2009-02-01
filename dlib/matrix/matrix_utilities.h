@@ -2030,13 +2030,13 @@ convergence:
     template <
         typename EXP
         >
-    inline const typename matrix_exp<EXP>::matrix_type cholesky_decomposition (
+    inline const typename matrix_exp<EXP>::matrix_type chol (
         const matrix_exp<EXP>& A
     )
     {
         DLIB_ASSERT(A.nr() == A.nc(), 
-            "\tconst matrix cholesky_decomposition(const matrix_exp& A)"
-            << "\n\tYou can only apply the cholesky_decomposition to a square matrix"
+            "\tconst matrix chol(const matrix_exp& A)"
+            << "\n\tYou can only apply the chol to a square matrix"
             << "\n\tA.nr(): " << A.nr()
             << "\n\tA.nc(): " << A.nc() 
             );

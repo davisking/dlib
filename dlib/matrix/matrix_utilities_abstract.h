@@ -725,7 +725,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const matrix_exp::matrix_type cholesky_decomposition (
+    const matrix_exp::matrix_type chol (
         const matrix_exp& A
     );
     /*!

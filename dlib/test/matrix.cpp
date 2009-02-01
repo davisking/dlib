@@ -608,7 +608,7 @@ namespace
             // make m be symmetric
             m = m*trans(m);
 
-            matrix<double> L = cholesky_decomposition(m);
+            matrix<double> L = chol(m);
             DLIB_CASSERT(equal(L*trans(L), m), "");
 
             DLIB_CASSERT(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "") 
@@ -633,7 +633,7 @@ namespace
             // make m be symmetric
             m = m*trans(m);
 
-            matrix<double> L = cholesky_decomposition(m);
+            matrix<double> L = chol(m);
             DLIB_CASSERT(equal(L*trans(L), m, 1e-10), L*trans(L)-m);
 
             DLIB_CASSERT(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "") 
@@ -667,7 +667,7 @@ namespace
 
             matrix<double,6,6> m(identity_matrix<double>(6)*4.5);
 
-            matrix<double> L = cholesky_decomposition(m);
+            matrix<double> L = chol(m);
             DLIB_CASSERT(equal(L*trans(L), m, 1e-10), L*trans(L)-m);
 
             DLIB_CASSERT(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "") 

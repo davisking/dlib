@@ -8,6 +8,7 @@
 #include "matrix/matrix_subexp.h"
 #include "matrix/matrix_math_functions.h"
 #include "matrix/matrix_assign.h"
+#include "matrix/matrix_la.h"
 
 #ifdef DLIB_USE_BLAS
 #include "matrix/matrix_blas_bindings.h"
