@@ -243,7 +243,7 @@ int main()
     svd(E,A,B,C);
 
     // MATLAB: A = chol(E,'lower') 
-    A = cholesky_decomposition(E);
+    A = chol(E);
 
     // MATLAB: var = min(min(A))
     var = min(A);
