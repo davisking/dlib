@@ -28,8 +28,8 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename matrix_type>
-    const typename matrix_type::matrix_type symm(const matrix_type& m) { return m*trans(m); }
+    template <typename mat_type>
+    const matrix<typename mat_type::type> symm(const mat_type& m) { return m*trans(m); }
 
 // ----------------------------------------------------------------------------------------
 

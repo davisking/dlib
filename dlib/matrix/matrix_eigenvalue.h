@@ -478,7 +478,7 @@ namespace dlib
 
         type f = 0.0;
         type tst1 = 0.0;
-        type eps = pow(2.0,-52.0);
+        const type eps = std::numeric_limits<type>::epsilon();
         for (int l = 0; l < n; l++) 
         {
 
@@ -747,7 +747,7 @@ namespace dlib
         int n = nn-1;
         int low = 0;
         int high = nn-1;
-        type eps = pow(2.0,-52.0);
+        const type eps = std::numeric_limits<type>::epsilon();
         type exshift = 0.0;
         type p=0,q=0,r=0,s=0,z=0,t,w,x,y;
 

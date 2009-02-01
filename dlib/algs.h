@@ -35,6 +35,10 @@
 // Disable warnings about conversion from size_t to unsigned long and long.
 #pragma warning(disable : 4267)
 
+// Disable warnings about conversion from double to float  
+#pragma warning(disable : 4244)
+#pragma warning(disable : 4305)
+
 #endif
 
 #ifdef __BORLANDC__

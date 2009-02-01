@@ -27,7 +27,7 @@ namespace dlib
         typedef typename matrix_exp_type::mem_manager_type mem_manager_type;
         typedef typename matrix_exp_type::layout_type layout_type;
 
-        typedef typename matrix_exp_type::matrix_type matrix_type;
+        typedef matrix<type,0,0,mem_manager_type,layout_type>  matrix_type;
         typedef matrix<type,NR,1,mem_manager_type,layout_type> column_vector_type;
 
         // You have supplied an invalid type of matrix_exp_type.  You have
@@ -49,7 +49,7 @@ namespace dlib
         ) const;
 
         template <typename EXP>
-        const matrix<type,matrix_exp_type::NR,EXP::NC,mem_manager_type,layout_type> solve (
+        const typename EXP::matrix_type solve (
             const matrix_exp<EXP>& B
         ) const;
 
@@ -159,11 +159,7 @@ namespace dlib
 
     template <typename matrix_exp_type>
     template <typename EXP>
-    const matrix<typename matrix_exp_type::type,
-                 matrix_exp_type::NR, 
-                 EXP::NC, 
-                 typename matrix_exp_type::mem_manager_type, 
-                 typename matrix_exp_type::layout_type>   cholesky_decomposition<matrix_exp_type>::
+    const typename EXP::matrix_type cholesky_decomposition<matrix_exp_type>::
     solve(
         const matrix_exp<EXP>& B
     ) const
