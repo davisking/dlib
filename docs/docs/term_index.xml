@@ -506,11 +506,27 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#matrix_cast" name="matrix_cast"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_all_elements" name="set_all_elements"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#tmp" name="tmp"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#cholesky_decomposition" name="cholesky_decomposition"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#array_to_matrix" name="array_to_matrix"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#vector_to_matrix" name="vector_to_matrix"/>
          <term link="dlib/matrix/matrix_math_functions_abstract.h.html#squared" name="squared"/>
          <term link="dlib/matrix/matrix_math_functions_abstract.h.html#cubed" name="cubed"/>
+
+
+         <term link="dlib/matrix/matrix_la_abstract.h.html#lu_decomposition" name="lu_decomposition"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#qr_decomposition" name="qr_decomposition"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#cholesky_decomposition" name="cholesky_decomposition"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#eigenvalue_decomposition" name="eigenvalue_decomposition"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#inv" name="inv"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#inv_lower_triangular" name="inv_lower_triangular"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#inv_upper_triangular" name="inv_upper_triangular"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#pinv" name="pinv"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#svd" name="svd"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#svd" name="singular value decomposition"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#svd2" name="svd2"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#svd3" name="svd3"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#det" name="det"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#chol" name="chol"/>
+
 
 
          <term link="dlib/matrix/matrix_subexp_abstract.h.html#rowm" name="rowm"/>
@@ -524,16 +540,8 @@
 
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#pointwise_multiply" name="pointwise_multiply"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#equal" name="equal"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv" name="inv"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv_lower_triangular" name="inv_lower_triangular"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#inv_upper_triangular" name="inv_upper_triangular"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#pinv" name="pinv"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#pinv" name="pinv"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd" name="svd"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd" name="singular value decomposition"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd2" name="svd2"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#svd3" name="svd3"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#det" name="det"/>
+
+
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#scale_columns" name="scale_columns"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#sort_columns" name="sort_columns"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#rsort_columns" name="rsort_columns"/>

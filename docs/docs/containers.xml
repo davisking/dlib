@@ -1339,11 +1339,15 @@
            case, by no means are you required to use the dlib cmake files. 
            </p>
            <p>
-              It is also worth nothing that all the preconditions of every function 
+              It is also worth noting that all the preconditions of every function 
               related to the matrix object are checked by <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a>
               statements and thus can be enabled by #defining ENABLE_ASSERTS or DEBUG.  Doing
               this will cause your program to run slower but should catch any usage errors. 
            </p>
+           <p>
+              Finally, you don't need to #include anything to get the matrix extensions listed below.  
+              They are included by the <a href="dlib/matrix.h.html">dlib/matrix.h</a> file for you.
+            </p>
          </description>
          
          <examples>
@@ -1354,9 +1358,20 @@
             <extension>
                <name>matrix_utilities</name>
                <spec_file>dlib/matrix/matrix_utilities_abstract.h</spec_file>
-               <description>This extension contains miscellaneous utility functions
-                  for manipulating matrix objects.  Note that you don't need to #include
-                  anything to get them.  They are included by the <a href="dlib/matrix.h.html">dlib/matrix.h</a> file for you.
+               <description>
+                  This extension contains miscellaneous utility functions
+                  for manipulating matrix objects.  
+               </description>
+            </extension>
+
+            <extension>
+               <name>matrix_la</name>
+               <spec_file>dlib/matrix/matrix_la_abstract.h</spec_file>
+               <description>
+                  This extension contains linear algebra functions to calculate 
+                  QR, LU, Cholesky, eigenvalue, and singular value decompositions.  It also
+                  contains a few other miscellaneous functions that solve systems of 
+                  equations or calculate values derived from the above decompositions.
                </description>
             </extension>
 
@@ -1364,8 +1379,7 @@
                <name>matrix_math_functions</name>
                <spec_file>dlib/matrix/matrix_math_functions_abstract.h</spec_file>
                <description>This extension contains mathematical functions that operate on each
-                  element of a matrix independently.  Note that you don't need to #include
-                  anything to get them.  They are included by the <a href="dlib/matrix.h.html">dlib/matrix.h</a> file for you.
+                  element of a matrix independently.  
                </description>
             </extension>
 
@@ -1374,8 +1388,6 @@
                <spec_file>dlib/matrix/matrix_subexp_abstract.h</spec_file>
                <description>
                   This extension contains a number of functions for dealing with sub-matrices.  
-                  Note that you don't need to #include
-                  anything to get them.  They are included by the <a href="dlib/matrix.h.html">dlib/matrix.h</a> file for you.
                </description>
             </extension>
          </extensions>              

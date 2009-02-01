@@ -12,8 +12,11 @@
 
 <current>
 New Stuff:
+   - Matrix related
+      - Added QR, LU, Cholesky, and eigenvalue decomposition class objects
 
 Non-Backwards Compatible Changes:
+   - Renamed the cholesky_decomposition() function to chol()
 
 Bug fixes:
 
