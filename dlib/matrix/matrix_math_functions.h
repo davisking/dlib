@@ -36,7 +36,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(abs,7)
 DLIB_MATRIX_SIMPLE_STD_FUNCTION(sqrt,7)
 DLIB_MATRIX_SIMPLE_STD_FUNCTION(log,7)
 DLIB_MATRIX_SIMPLE_STD_FUNCTION(log10,7)
@@ -339,6 +338,46 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         // you can only round matrices that contain built in scalar types like double, long, float, etc...
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
         typedef matrix_unary_exp<EXP,op_round> exp;
+        return exp(m.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_abs
+    {
+        template <typename EXP, typename return_type = typename EXP::type>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+7;
+            typedef typename EXP::type type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                return static_cast<type>(std::abs(m(r,c))); 
+            }
+        };
+
+        template <typename EXP, typename T>
+        struct op<EXP, std::complex<T> > : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost;
+            typedef T type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                return static_cast<type>(std::abs(m(r,c))); 
+            }
+        };
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_unary_exp<EXP,op_abs> abs (
+        const matrix_exp<EXP>& m
+    )
+    {
+        typedef matrix_unary_exp<EXP,op_abs> exp;
         return exp(m.ref());
     }
 

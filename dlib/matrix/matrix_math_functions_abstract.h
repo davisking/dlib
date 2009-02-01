@@ -140,10 +140,14 @@ namespace dlib
     /*!
         ensures
             - returns a matrix R such that:
-                - R::type == the same type that was in m
+                - if (m contains std::complex<T> objects) then
+                    - R::type == T 
+                - else
+                    - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
                   R(r,c) == std::abs(m(r,c)) 
+                  (note that if m is complex then std::abs(val) performs sqrt(std::norm(val))
     !*/
 
 // ----------------------------------------------------------------------------------------
