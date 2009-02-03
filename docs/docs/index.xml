@@ -105,7 +105,7 @@
                   <li>A fast <a href="containers.html#matrix">matrix</a> object implemented using the expression 
                      templates technique and capable of using BLAS libraries when available.</li>
                   <li>Numerous linear algebra and mathematical operations are defined for the matrix object such as the 
-                     <a href="dlib/matrix/matrix_utilities_abstract.h.html#svd">singular value decomposition</a>, 
+                     <a href="dlib/matrix/matrix_la_abstract.h.html#svd">singular value decomposition</a>, 
                      <a href="dlib/matrix/matrix_utilities_abstract.h.html#trans">transpose</a>, 
                      <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc...</li>
                   <li>Unconstrained non-linear optimization algorithms such as 

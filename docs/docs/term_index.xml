@@ -520,6 +520,7 @@
          <term link="dlib/matrix/matrix_la_abstract.h.html#inv_lower_triangular" name="inv_lower_triangular"/>
          <term link="dlib/matrix/matrix_la_abstract.h.html#inv_upper_triangular" name="inv_upper_triangular"/>
          <term link="dlib/matrix/matrix_la_abstract.h.html#pinv" name="pinv"/>
+         <term link="dlib/matrix/matrix_la_abstract.h.html#real_eigenvalues" name="real_eigenvalues"/>
          <term link="dlib/matrix/matrix_la_abstract.h.html#svd" name="svd"/>
          <term link="dlib/matrix/matrix_la_abstract.h.html#svd" name="singular value decomposition"/>
          <term link="dlib/matrix/matrix_la_abstract.h.html#svd2" name="svd2"/>

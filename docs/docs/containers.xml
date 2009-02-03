@@ -242,6 +242,10 @@
                         <name>eigenvalue_decomposition</name>
                         <link>dlib/matrix/matrix_la_abstract.h.html#eigenvalue_decomposition</link>
                      </item>
+                     <item>
+                        <name>real_eigenvalues</name>
+                        <link>dlib/matrix/matrix_la_abstract.h.html#real_eigenvalues</link>
+                     </item>
                   </sub>
                </item>
                <item nolink="true">
