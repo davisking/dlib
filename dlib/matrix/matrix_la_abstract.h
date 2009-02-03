@@ -126,6 +126,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix real_eigenvalues (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.nr() == m.nc()
+        ensures
+            - returns a matrix E such that:
+                - E.nr() == m.nr()
+                - E.nc() == 1
+                - E contains the real part of all eigenvalues of the matrix m.
+                  (note that the eigenvalues are not sorted)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp::type det (
         const matrix_exp& m
     );

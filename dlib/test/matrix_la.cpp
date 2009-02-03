@@ -263,6 +263,12 @@ namespace
         DLIB_CASSERT(equal(real(diag(test.get_d())), test.get_real_eigenvalues(), eps), ""); 
         DLIB_CASSERT(equal(imag(diag(test.get_d())), test.get_imag_eigenvalues(), eps), ""); 
 
+        matrix<type> eig1 ( real_eigenvalues(m));
+        matrix<type> eig2 ( test.get_real_eigenvalues());
+        sort(&eig1(0), &eig1(0) + eig1.size());
+        sort(&eig2(0), &eig2(0) + eig2.size());
+        DLIB_CASSERT(max(abs(eig1 - eig2)) < eps, "");
+
         const matrix<type> V = test.get_pseudo_v();
         const matrix<type> D = test.get_pseudo_d();
         const matrix<complex<type> > CV = test.get_v();

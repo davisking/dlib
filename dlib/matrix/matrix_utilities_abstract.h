@@ -423,10 +423,7 @@ namespace dlib
     /*!
         ensures
             - returns a temporary matrix object that is a copy of m. 
-              (This is useful because it allows you to easily force a matrix_exp to 
-              fully evaluate before giving it to some other function that queries
-              the elements of the matrix more than once each, such as the matrix
-              multiplication operator.)
+              (This allows you to easily force a matrix_exp to fully evaluate)
     !*/
 
 // ----------------------------------------------------------------------------------------

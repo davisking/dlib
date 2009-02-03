@@ -1510,6 +1510,49 @@ convergence:
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP>
+    const matrix<typename EXP::type, EXP::NR, 1, typename EXP::mem_manager_type, typename EXP::layout_type> real_eigenvalues (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.nr() == m.nc(), 
+            "\tconst matrix real_eigenvalues()"
+            << "\n\tYou have given an invalidly sized matrix"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            );
+
+        if (m.nr() == 2)
+        {
+            typedef typename EXP::type T;
+            const T m00 = m(0,0);
+            const T m01 = m(0,1);
+            const T m10 = m(1,0);
+            const T m11 = m(1,1);
+
+            const T b = -(m00 + m11);
+            const T c = m00*m11 - m01*m10;
+            matrix<T,EXP::NR,1, typename EXP::mem_manager_type, typename EXP::layout_type> v(2);
+
+
+            T disc = b*b - 4*c;
+            if (disc >= 0)
+                disc = std::sqrt(disc);
+            else
+                disc = 0;
+
+            v(0) = (-b + disc)/2;
+            v(1) = (-b - disc)/2;
+            return v;
+        }
+        else
+        {
+            return eigenvalue_decomposition<EXP>(m).get_real_eigenvalues();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_LA_FUNCTS_
