@@ -80,9 +80,6 @@ public:
     }
 
     // Here we declare our pipe object.  It will contain our messages.
-    // There are only two requirements on the type of objects you can use in a
-    // pipe, first they must have a default constructor and second they must
-    // be swappable by a global swap().
     pipe_type message_pipe;
 
 
