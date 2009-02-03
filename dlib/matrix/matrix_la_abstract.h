@@ -132,6 +132,7 @@ namespace dlib
     /*!
         requires
             - m.nr() == m.nc()
+            - matrix_exp::type == float or double
         ensures
             - returns a matrix E such that:
                 - E.nr() == m.nr()
@@ -216,6 +217,7 @@ namespace dlib
             REQUIREMENTS ON matrix_exp_type
                 must be some kind of matrix expression as defined in the 
                 dlib/matrix/matrix_abstract.h file.   (e.g. a dlib::matrix object)
+                The matrix type must also contain float or double values.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents something that can compute an LU 
@@ -361,6 +363,7 @@ namespace dlib
             REQUIREMENTS ON matrix_exp_type
                 must be some kind of matrix expression as defined in the 
                 dlib/matrix/matrix_abstract.h file.   (e.g. a dlib::matrix object)
+                The matrix type must also contain float or double values.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents something that can compute a cholesky 
@@ -453,6 +456,7 @@ namespace dlib
             REQUIREMENTS ON matrix_exp_type
                 must be some kind of matrix expression as defined in the 
                 dlib/matrix/matrix_abstract.h file.   (e.g. a dlib::matrix object)
+                The matrix type must also contain float or double values.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents something that can compute a classical
@@ -589,6 +593,7 @@ namespace dlib
             REQUIREMENTS ON matrix_exp_type
                 must be some kind of matrix expression as defined in the 
                 dlib/matrix/matrix_abstract.h file.   (e.g. a dlib::matrix object)
+                The matrix type must also contain float or double values.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents something that can compute an eigenvalue 

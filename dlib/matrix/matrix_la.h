@@ -1515,6 +1515,10 @@ convergence:
         const matrix_exp<EXP>& m
     )
     {
+        // You can only use this function with matrices that contain float or double values
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP::type, float>::value ||
+                             is_same_type<typename EXP::type, double>::value));
+
         DLIB_ASSERT(m.nr() == m.nc(), 
             "\tconst matrix real_eigenvalues()"
             << "\n\tYou have given an invalidly sized matrix"
