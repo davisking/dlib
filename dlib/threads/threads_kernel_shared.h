@@ -34,7 +34,6 @@ namespace dlib
                     - destructed is associated with the mutex data_mutex
                     - destruct == false
                     - total_count == 0
-                    - should_destruct == false
                     - function_pointer == 0
 
                 CONVENTION
@@ -60,11 +59,6 @@ namespace dlib
                     - thread_ids is locked by the data_mutex
                     - thread_ids == a set that contains the thread id for each thread spawned by this
                       object.
-
-                    - if (destruct_when_ready() has been called) then
-                        - should_destruct == true
-                    - else
-                        - should_destruct == false
             !*/
 
 
@@ -75,15 +69,14 @@ namespace dlib
             ~threader (
             );
 
-            void destruct_when_ready (
+            void destruct_if_ready (
             );
             /*!
                 ensures
                     - if (there are no threads currently running) then
                         - calls delete this
                     - else
-                        - sets a flag that will cause the last thread to 
-                          call delete this when it finishes
+                        - does nothing
             !*/
 
             bool create_new_thread (
@@ -163,7 +156,6 @@ namespace dlib
             signaler data_empty;        // signaler to signal when the data is empty
             bool destruct;
             signaler destructed;        // signaler to signal when a thread has ended 
-            bool should_destruct;
 
             struct registry_type
             {
@@ -196,6 +188,7 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        extern bool thread_pool_has_been_destroyed;
     }
 
     bool is_dlib_thread (
@@ -251,7 +244,14 @@ namespace dlib
         void (T::*handler)()
     )
     {
-        threads_kernel_shared::thread_pool().unregister_thread_end_handler(obj,handler);
+        // Check if the thread pool has been destroyed and if it has then don't do anything.
+        // This bool here is always true except when the program has started to terminate and
+        // the thread pool object has been destroyed.  This if is here to catch other global
+        // objects that have destructors that try to call unregister_thread_end_handler().  
+        // Without this check we get into trouble if the thread pool is destroyed before these
+        // objects.
+        if (threads_kernel_shared::thread_pool_has_been_destroyed == false)
+            threads_kernel_shared::thread_pool().unregister_thread_end_handler(obj,handler);
     }
 
 // ----------------------------------------------------------------------------------------

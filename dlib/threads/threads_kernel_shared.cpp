@@ -25,6 +25,10 @@ namespace dlib
     namespace threads_kernel_shared 
     {
 
+        bool thread_pool_has_been_destroyed = false;
+
+// ----------------------------------------------------------------------------------------
+
         threader& thread_pool (
         ) 
         {
@@ -40,7 +44,7 @@ namespace dlib
             // global objects start to be destroyed
             ~threader_destruct_helper()
             {
-                thread_pool().destruct_when_ready();
+                thread_pool().destruct_if_ready();
             }
         };
         static threader_destruct_helper a;
@@ -67,8 +71,7 @@ namespace dlib
             data_ready(data_mutex),
             data_empty(data_mutex),
             destruct(false),
-            destructed(data_mutex),
-            should_destruct(false)
+            destructed(data_mutex)
         {}
 
 // ----------------------------------------------------------------------------------------
@@ -84,13 +87,15 @@ namespace dlib
             // wait for all the threads to end
             while (total_count > 0)
                 destructed.wait();
+
+            thread_pool_has_been_destroyed = true;
             data_mutex.unlock();
         }
 
 // ----------------------------------------------------------------------------------------
 
         void threader::
-        destruct_when_ready (
+        destruct_if_ready (
         )
         {
             data_mutex.lock();
@@ -99,16 +104,10 @@ namespace dlib
             // in the pool then just destroy the threader
             if (total_count == pool_count)
             {
-                data_mutex.unlock();
-                delete this;
-            }
-            else
-            {
-                // in this case we just let the thread pool know that it
-                // should self destruct whenever it gets a chance
-                should_destruct = true;
+                destruct = true;
                 data_ready.broadcast();
                 data_mutex.unlock();
+                delete this;
             }
         }
 
@@ -198,7 +197,6 @@ namespace dlib
             // get a reference to the calling threader object
             threader& self = *reinterpret_cast<threader*>(object);
 
-            bool should_destroy_threader = false;
 
             {
             auto_mutex M(self.data_mutex);
@@ -210,7 +208,7 @@ namespace dlib
             // indicate that this thread is now in the thread pool
             ++self.pool_count;
 
-            while (true)
+            while (self.destruct == false)
             {
                 // if data is ready then process it and launch the thread
                 // if its not ready then go back into the pool
@@ -264,7 +262,7 @@ namespace dlib
                     ++self.pool_count;
                 }
 
-                if (self.destruct == true || self.should_destruct == true)
+                if (self.destruct == true)
                     break;
 
                 // if we timed out and there isn't any work to do then
@@ -285,13 +283,7 @@ namespace dlib
 
             self.destructed.signal();
 
-            if (self.should_destruct && self.total_count == 0)
-                should_destroy_threader = true;
-
             } // end of auto_mutex M(self.data_mutex) block
-
-            if (should_destroy_threader)
-                delete &self;
         }
 
     // ------------------------------------------------------------------------------------
