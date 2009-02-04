@@ -96,6 +96,7 @@ namespace dlib
     ~global_data (
     )
     {
+        unregister_thread_end_handler(*this,&global_data::thread_end_handler);
     }
 
 // ----------------------------------------------------------------------------------------
