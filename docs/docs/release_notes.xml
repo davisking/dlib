@@ -14,15 +14,26 @@
 New Stuff:
    - Matrix related
       - Added QR, LU, Cholesky, and eigenvalue decomposition class objects
+      - Added overloads for rowm() and colm() that allow you to pick out
+        less than an entire vector
+      - Added the lowerm() and upperm() functions
+      - Added the const_temp_matrix class
 
 Non-Backwards Compatible Changes:
    - Renamed the cholesky_decomposition() function to chol()
 
 Bug fixes:
+   - Fixed some errors in the requirements for calling the new rowm() and 
+     colm() functions.
+   - Fixed dlib::abs() so that it returns the right type when used
+     with complex matrices.
 
 Other:
    - Added an example program that shows how to use the optimization 
-     functions
+     functions.
+   - Gave the matrix object the ability to factor expressions containing
+     trans() function calls into more efficient forms.
+   - Generally cleaned up the matrix code 
 </current>
 
 <!-- *******************************************************************************  -->
