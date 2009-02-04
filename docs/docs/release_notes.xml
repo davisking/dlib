@@ -27,6 +27,10 @@ Bug fixes:
      colm() functions.
    - Fixed dlib::abs() so that it returns the right type when used
      with complex matrices.
+   - Fixed a race condition in the logger object.  It was missing a needed call
+     to unregister_thread_end_handler().  What could happen in some scenarios is,
+     during program termination, a global part of the logger object could be destructed
+     when it still had outstanding thread end handlers registered to it.  
 
 Other:
    - Added an example program that shows how to use the optimization 
