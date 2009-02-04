@@ -10,8 +10,6 @@
 #include "matrix_assign.h"
 #include "matrix_conj_trans.h"
 
-#include "cblas.h"
-
 //#include <iostream>
 //using namespace std;
 
@@ -21,6 +19,85 @@ namespace dlib
 
     namespace blas_bindings 
     {
+
+        extern "C"
+        {
+            // Here we declare the prototypes for the CBLAS calls used by the BLAS bindings below
+
+            enum CBLAS_ORDER {CblasRowMajor=101, CblasColMajor=102};
+            enum CBLAS_TRANSPOSE {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113};
+
+            void cblas_sgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
+                             const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
+                             const int K, const float alpha, const float *A,
+                             const int lda, const float *B, const int ldb,
+                             const float beta, float *C, const int ldc);
+            void cblas_dgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
+                             const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
+                             const int K, const double alpha, const double *A,
+                             const int lda, const double *B, const int ldb,
+                             const double beta, double *C, const int ldc);
+            void cblas_cgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
+                             const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
+                             const int K, const void *alpha, const void *A,
+                             const int lda, const void *B, const int ldb,
+                             const void *beta, void *C, const int ldc);
+            void cblas_zgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
+                             const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
+                             const int K, const void *alpha, const void *A,
+                             const int lda, const void *B, const int ldb,
+                             const void *beta, void *C, const int ldc);
+            void cblas_sgemv(const enum CBLAS_ORDER order,
+                             const enum CBLAS_TRANSPOSE TransA, const int M, const int N,
+                             const float alpha, const float *A, const int lda,
+                             const float *X, const int incX, const float beta,
+                             float *Y, const int incY);
+            void cblas_dgemv(const enum CBLAS_ORDER order,
+                             const enum CBLAS_TRANSPOSE TransA, const int M, const int N,
+                             const double alpha, const double *A, const int lda,
+                             const double *X, const int incX, const double beta,
+                             double *Y, const int incY);
+            void cblas_cgemv(const enum CBLAS_ORDER order,
+                             const enum CBLAS_TRANSPOSE TransA, const int M, const int N,
+                             const void *alpha, const void *A, const int lda,
+                             const void *X, const int incX, const void *beta,
+                             void *Y, const int incY);
+            void cblas_zgemv(const enum CBLAS_ORDER order,
+                             const enum CBLAS_TRANSPOSE TransA, const int M, const int N,
+                             const void *alpha, const void *A, const int lda,
+                             const void *X, const int incX, const void *beta,
+                             void *Y, const int incY);
+            void cblas_sger(const enum CBLAS_ORDER order, const int M, const int N,
+                            const float alpha, const float *X, const int incX,
+                            const float *Y, const int incY, float *A, const int lda);
+            void cblas_dger(const enum CBLAS_ORDER order, const int M, const int N,
+                            const double alpha, const double *X, const int incX,
+                            const double *Y, const int incY, double *A, const int lda);
+            void cblas_cgerc(const enum CBLAS_ORDER order, const int M, const int N,
+                             const void *alpha, const void *X, const int incX,
+                             const void *Y, const int incY, void *A, const int lda);
+            void cblas_zgerc(const enum CBLAS_ORDER order, const int M, const int N,
+                             const void *alpha, const void *X, const int incX,
+                             const void *Y, const int incY, void *A, const int lda);
+            float  cblas_sdot(const int N, const float  *X, const int incX,
+                              const float  *Y, const int incY);
+            double cblas_ddot(const int N, const double *X, const int incX,
+                              const double *Y, const int incY);
+            void   cblas_cdotu_sub(const int N, const void *X, const int incX,
+                                   const void *Y, const int incY, void *dotu);
+            void   cblas_zdotu_sub(const int N, const void *X, const int incX,
+                                   const void *Y, const int incY, void *dotu);
+            void   cblas_cdotc_sub(const int N, const void *X, const int incX,
+                                   const void *Y, const int incY, void *dotc);
+            void   cblas_zdotc_sub(const int N, const void *X, const int incX,
+                                   const void *Y, const int incY, void *dotc);
+            void cblas_cgeru(const enum CBLAS_ORDER order, const int M, const int N,
+                             const void *alpha, const void *X, const int incX,
+                             const void *Y, const int incY, void *A, const int lda);
+            void cblas_zgeru(const enum CBLAS_ORDER order, const int M, const int N,
+                             const void *alpha, const void *X, const int incX,
+                             const void *Y, const int incY, void *A, const int lda);
+        }
 
     // ----------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------
