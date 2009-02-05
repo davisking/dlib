@@ -120,12 +120,11 @@ namespace dlib
             reg.m.lock();
             const thread_id_type id = get_thread_id();
             thread_id_type id_copy;
-            unsigned long count = reg.reg.count(id);
             member_function_pointer<>::kernel_1a mfp;
 
             // Remove all the member function pointers for this thread from the tree 
             // and call them.
-            for (unsigned long i = 0; i < count; ++i)
+            while (reg.reg[id] != 0)
             {
                 reg.reg.remove(id,id_copy,mfp);
                 reg.m.unlock();
