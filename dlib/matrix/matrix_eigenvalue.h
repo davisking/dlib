@@ -111,7 +111,7 @@ namespace dlib
 
         // Complex scalar division.
         type cdivr, cdivi;
-        void cdiv(type xr, type xi, type yr, type yi);
+        void cdiv_(type xr, type xi, type yr, type yi);
 
 
         // Nonsymmetric reduction from Hessenberg to real Schur form.
@@ -704,7 +704,7 @@ namespace dlib
 
     template <typename matrix_exp_type>
     void eigenvalue_decomposition<matrix_exp_type>::
-    cdiv(type xr, type xi, type yr, type yi)  
+    cdiv_(type xr, type xi, type yr, type yi)  
     {
         using std::abs;
         type r,d;
@@ -1159,7 +1159,7 @@ namespace dlib
                 } 
                 else 
                 {
-                    cdiv(0.0,-H(n-1,n),H(n-1,n-1)-p,q);
+                    cdiv_(0.0,-H(n-1,n),H(n-1,n-1)-p,q);
                     H(n-1,n-1) = cdivr;
                     H(n-1,n) = cdivi;
                 }
@@ -1188,7 +1188,7 @@ namespace dlib
                         l = i;
                         if (e(i) == 0) 
                         {
-                            cdiv(-ra,-sa,w,q);
+                            cdiv_(-ra,-sa,w,q);
                             H(i,n-1) = cdivr;
                             H(i,n) = cdivi;
                         } 
@@ -1206,7 +1206,7 @@ namespace dlib
                                 vr = eps * norm * (abs(w) + abs(q) +
                                                    abs(x) + abs(y) + abs(z));
                             }
-                            cdiv(x*r-z*ra+q*sa,x*s-z*sa-q*ra,vr,vi);
+                            cdiv_(x*r-z*ra+q*sa,x*s-z*sa-q*ra,vr,vi);
                             H(i,n-1) = cdivr;
                             H(i,n) = cdivi;
                             if (abs(x) > (abs(z) + abs(q))) 
@@ -1216,7 +1216,7 @@ namespace dlib
                             }
                             else 
                             {
-                                cdiv(-r-y*H(i,n-1),-s-y*H(i,n),z,q);
+                                cdiv_(-r-y*H(i,n-1),-s-y*H(i,n),z,q);
                                 H(i+1,n-1) = cdivr;
                                 H(i+1,n) = cdivi;
                             }
