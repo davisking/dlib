@@ -26,7 +26,7 @@ namespace
     logger dlog("test.matrix3");
 
 
-    const double eps_mul = 500000;
+    const double eps_mul = 200;
 
     template <typename T, typename U>
     void check_equal (
@@ -42,8 +42,8 @@ namespace
             for (long c = 0; c < a.nc(); ++c)
             {
                 type error = std::abs(a(r,c) - b(r,c));
-                DLIB_CASSERT(error < std::numeric_limits<type>::epsilon()*eps_mul, "error: " << error <<
-                             "    eps: " << std::numeric_limits<type>::epsilon()*eps_mul);
+                DLIB_CASSERT(error < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul, "error: " << error <<
+                             "    eps: " << std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul);
             }
         }
     }
@@ -62,8 +62,8 @@ namespace
             for (long c = 0; c < a.nc(); ++c)
             {
                 typename type::value_type error = std::abs(a(r,c) - b(r,c));
-                DLIB_CASSERT(error < std::numeric_limits<typename type::value_type>::epsilon()*eps_mul, "error: " << error <<
-                             "    eps: " << std::numeric_limits<typename type::value_type>::epsilon()*eps_mul);
+                DLIB_CASSERT(error < std::sqrt(std::numeric_limits<typename type::value_type>::epsilon())*eps_mul, "error: " << error <<
+                             "    eps: " << std::sqrt(std::numeric_limits<typename type::value_type>::epsilon())*eps_mul);
             }
         }
     }
@@ -470,8 +470,8 @@ namespace
             c_check_equal( tmp(c_temp + conj(c_rv4)*c_cv4), c_temp + conj(c_rv4)*c_cv4);
             c_check_equal( tmp(c_temp + trans(conj(c_cv4))*trans(c_rv4)), c_temp + trans(conj(c_cv4))*trans(c_rv4));
 
-            DLIB_CASSERT(abs((static_cast<complex<type> >(c_rv4*c_cv4) + i) - ((c_rv4*c_cv4)(0) + i)) < std::numeric_limits<type>::epsilon()*eps_mul ,"");
-            DLIB_CASSERT(abs((rv4*cv4 + 1.0) - ((rv4*cv4)(0) + 1.0)) < std::numeric_limits<type>::epsilon()*eps_mul,"");
+            DLIB_CASSERT(abs((static_cast<complex<type> >(c_rv4*c_cv4) + i) - ((c_rv4*c_cv4)(0) + i)) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul ,"");
+            DLIB_CASSERT(abs((rv4*cv4 + 1.0) - ((rv4*cv4)(0) + 1.0)) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul,"");
 
         }
     }
