@@ -17,11 +17,20 @@ SET(blas_found 0)
 
 
 if (UNIX)
-   message(STATUS "Searching for a BLAS library")
+    message(STATUS "Searching for a BLAS library")
 
-   set( mkl_search_path
-      /opt/intel/mkl/*/lib/32
-      )
+    include(CheckTypeSize)
+    check_type_size( "void*" SIZE_OF_VOID_PTR)
+
+    if (SIZE_OF_VOID_PTR EQUAL 8)
+        set( mkl_search_path
+            /opt/intel/mkl/*/lib/em64t
+            )
+	else()
+        set( mkl_search_path
+            /opt/intel/mkl/*/lib/32
+            )
+    endif()
 
    include(CheckLibraryExists)
 
