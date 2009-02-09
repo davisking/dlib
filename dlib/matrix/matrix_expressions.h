@@ -1498,7 +1498,7 @@ namespace dlib
 
         long operator() (
             long r, 
-            long c
+            long 
         ) const { return start + r*inc;  }
 
         long operator() (

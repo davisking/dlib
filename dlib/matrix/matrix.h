@@ -98,7 +98,7 @@ namespace dlib
             long c
         ) const 
         { 
-            DLIB_ASSERT(r < nr() && c < nc() && r >= 0 && c >= c, 
+            DLIB_ASSERT(r < nr() && c < nc() && r >= 0 && c >= 0, 
                 "\tconst type matrix_exp::operator(r,c)"
                 << "\n\tYou must give a valid row and column"
                 << "\n\tr:    " << r 
