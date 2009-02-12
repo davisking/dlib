@@ -3,6 +3,11 @@
 # information about it at http://www.cmake.org
 #
 
+SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+cmake_minimum_required(VERSION 2.4)
+if(COMMAND cmake_policy) 
+   cmake_policy(SET CMP0003 NEW) 
+endif()
 
 # create a variable called target_name and set it to the string "htmlify"
 set (target_name htmlify)
