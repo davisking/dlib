@@ -18,8 +18,8 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a rectangular region inside a Cartesian 
-                coordinate system.  The region is the rectangle with its upper 
-                left corner at position (left(),top()) and its lower right corner 
+                coordinate system.  The region is the rectangle with its top 
+                left corner at position (left(),top()) and its bottom right corner 
                 at (right(),bottom()).
 
                 Note that the origin of the coordinate system, i.e. (0,0), is located
@@ -189,6 +189,38 @@ namespace dlib
         /*!
             ensures
                 - #bottom() == bottom_
+        !*/
+
+        const point tl_corner (
+        ) const;
+        /*!
+            ensures
+                - returns point(left(), top()) 
+                  (i.e. returns the top left corner point for this rectangle)
+        !*/
+
+        const point bl_corner (
+        ) const;
+        /*!
+            ensures
+                - returns point(left(), bottom()) 
+                  (i.e. returns the bottom left corner point for this rectangle)
+        !*/
+
+        const point tr_corner (
+        ) const;
+        /*!
+            ensures
+                - returns point(right(), top()) 
+                  (i.e. returns the top right corner point for this rectangle)
+        !*/
+
+        const point br_corner (
+        ) const;
+        /*!
+            ensures
+                - returns point(right(), bottom()) 
+                  (i.e. returns the bottom right corner point for this rectangle)
         !*/
 
         bool is_empty (

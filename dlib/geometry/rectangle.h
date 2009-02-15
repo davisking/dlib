@@ -125,6 +125,18 @@ namespace dlib
         void set_bottom (
             long bottom_
         ) { b = bottom_; }
+
+        const point tl_corner (
+        ) const { return point(left(), top()); }
+
+        const point bl_corner (
+        ) const { return point(left(), bottom()); } 
+
+        const point tr_corner (
+        ) const { return point(right(), top()); }
+
+        const point br_corner (
+        ) const { return point(right(), bottom()); }
        
         unsigned long width (
         ) const 

@@ -249,6 +249,26 @@ namespace
             DLIB_CASSERT((-v).z() == -5.0,"");
         }
 
+        {
+            rectangle rect;
+
+            point tl(2,3);
+            point tr(8,3);
+            point bl(2,9);
+            point br(8,9);
+
+            rect += tl;
+            rect += tr;
+            rect += bl;
+            rect += br;
+
+            DLIB_CASSERT(rect.tl_corner() == tl, "");
+            DLIB_CASSERT(rect.tr_corner() == tr, "");
+            DLIB_CASSERT(rect.bl_corner() == bl, "");
+            DLIB_CASSERT(rect.br_corner() == br, "");
+
+        }
+
     }
 
 
