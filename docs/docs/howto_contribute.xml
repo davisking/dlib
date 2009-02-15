@@ -165,7 +165,7 @@
                   hard to use wrong.
                </p>
                <p>
-                  The notation dlib uses to document preconditions and postconditions is located in
+                  The notation dlib uses to document preconditions and postconditions is described in
                   the <a href="intro.html#Notation">introduction</a>.  All code that goes into dlib
                   must document itself using this notation.  You should also separate the implementation
                   and specification of a component into two separate files as described in the introduction.  This
@@ -381,7 +381,7 @@
                   it hard to understand the flow of a program with exceptions in it."   Invariably they
                   have been working with bodies of software that disregard the above rules regarding questions
                   1 and 2.  Indeed, when exceptions are used for flow control the results are horrifying.  Using
-                  exceptions for events that occur in the normal use of a library component, especially when
+                  exceptions for events that occur in the normal use of a software component, especially when
                   the events need to be dealt with near where they happen result in a spaghetti-like mess
                   of throw statements and try/catch blocks.  Clearly, exceptions should be used judiciously.  
                   So please, take my advice regarding questions 1 and 2 to heart. 
