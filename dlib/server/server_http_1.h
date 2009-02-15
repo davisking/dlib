@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include "../logger.h"
+#include "../string.h"
 
 #ifdef  __INTEL_COMPILER
 // ignore the bogus warning about hiding on_connect()
@@ -262,7 +263,7 @@ namespace dlib
                 // If there is data being posted back to us as a query string then
                 // just stick it onto the end of the path so the following code can
                 // then just pick it out like we do for GET requests.
-                if (rtype == post && content_type == "application/x-www-form-urlencoded" 
+                if (rtype == post && tolower(left_substr(content_type,";")) == "application/x-www-form-urlencoded" 
                     && content_length > 0)
                 {
                     line.resize(content_length);
