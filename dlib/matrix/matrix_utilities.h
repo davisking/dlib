@@ -25,6 +25,39 @@ namespace dlib
     template <
         typename EXP
         >
+    void find_min_and_max (
+        const matrix_exp<EXP>& m,
+        typename EXP::type& min_val,
+        typename EXP::type& max_val
+    )
+    {
+        DLIB_ASSERT(m.size() > 0, 
+            "\ttype max(const matrix_exp& m)"
+            << "\n\tYou can't ask for the max() of an empty matrix"
+            << "\n\tm.size():     " << m.size() 
+            );
+        typedef typename matrix_exp<EXP>::type type;
+
+        min_val = m(0,0);
+        max_val = min_val;
+        for (long r = 0; r < m.nr(); ++r)
+        {
+            for (long c = 0; c < m.nc(); ++c)
+            {
+                type temp = m(r,c);
+                if (temp > max_val)
+                    max_val = temp;
+                if (temp < min_val)
+                    min_val = temp;
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
     const typename matrix_exp<EXP>::type max (
         const matrix_exp<EXP>& m
     )

@@ -215,13 +215,15 @@ namespace dlib
             << "\n\tthis: " << this
             );
 
-        type eps = max(abs(diag(LU)));
+        type max_val, min_val;
+        find_min_and_max (abs(diag(LU)), min_val, max_val);
+        type eps = max_val;
         if (eps != 0)
             eps *= std::sqrt(std::numeric_limits<type>::epsilon())/10;
         else
             eps = 1;  // there is no max so just use 1
 
-        return min(abs(diag(LU))) < eps;
+        return min_val < eps;
     }
 
 // ----------------------------------------------------------------------------------------

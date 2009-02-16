@@ -623,6 +623,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void find_min_and_max (
+        const matrix_exp& m,
+        matrix_exp::type& min_val,
+        matrix_exp::type& max_val
+    );
+    /*!
+        requires
+            - m.size() > 0
+        ensures
+            - #min_val == min(m)
+            - #max_val == max(m)
+            - This function computes both the min and max in just one pass
+              over the elements of the matrix m.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp::type sum (
         const matrix_exp& m
     );
