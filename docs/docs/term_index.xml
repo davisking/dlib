@@ -550,6 +550,7 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#length" name="length"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#length_squared" name="length_squared"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#min" name="min"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#find_min_and_max" name="find_min_and_max"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#max" name="max"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#sum" name="sum"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#prod" name="prod"/>

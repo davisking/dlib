@@ -309,6 +309,10 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#min</link>
                      </item>
                      <item>
+                        <name>find_min_and_max</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#find_min_and_max</link>
+                     </item>
+                     <item>
                         <name>variance</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#variance</link>
                      </item>
