@@ -1,3 +1,4 @@
+// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
     This is a rather involved example illustrating the use of the GUI api from 
     the dlib C++ Library.   This program is a fully functional utility for

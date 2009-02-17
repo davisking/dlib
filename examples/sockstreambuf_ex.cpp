@@ -1,3 +1,4 @@
+// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
     This is an example illustrating the use of the sockets,

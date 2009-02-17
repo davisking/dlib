@@ -1,3 +1,4 @@
+// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
     This is a very simple example that illustrates the use of the
     thread_function object from the dlib C++ Library.
