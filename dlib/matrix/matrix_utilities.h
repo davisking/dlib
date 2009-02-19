@@ -32,7 +32,7 @@ namespace dlib
     )
     {
         DLIB_ASSERT(m.size() > 0, 
-            "\ttype max(const matrix_exp& m)"
+            "\ttype find_min_and_max(const matrix_exp& m, min_val, max_val)"
             << "\n\tYou can't ask for the max() of an empty matrix"
             << "\n\tm.size():     " << m.size() 
             );
