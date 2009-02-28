@@ -640,6 +640,40 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP
+        >
+    long index_of_max (
+        const matrix_exp<EXP>& m
+    );
+    /*!
+        requires
+            - m.nr() == 1 || m.nc() == 1 (i.e. m must be a row or column vector)
+            - m.size() > 0 
+        ensures
+            - returns the index of the largest element in m.  
+              (i.e. m(index_of_max(m)) == max(m))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    long index_of_min (
+        const matrix_exp<EXP>& m
+    );
+    /*!
+        requires
+            - m.nr() == 1 || m.nc() == 1 (i.e. m must be a row or column vector)
+            - m.size() > 0 
+        ensures
+            - returns the index of the smallest element in m.  
+              (i.e. m(index_of_min(m)) == min(m))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp::type sum (
         const matrix_exp& m
     );

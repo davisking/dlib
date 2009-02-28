@@ -33,7 +33,7 @@ namespace dlib
     {
         DLIB_ASSERT(m.size() > 0, 
             "\ttype find_min_and_max(const matrix_exp& m, min_val, max_val)"
-            << "\n\tYou can't ask for the max() of an empty matrix"
+            << "\n\tYou can't ask for the min and max of an empty matrix"
             << "\n\tm.size():     " << m.size() 
             );
         typedef typename matrix_exp<EXP>::type type;
@@ -51,6 +51,70 @@ namespace dlib
                     min_val = temp;
             }
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    long index_of_max (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.size() > 0 && (m.nr() == 1 || m.nc() == 1), 
+            "\tlong index_of_max(const matrix_exp& m)"
+            << "\n\tm must be a row or column matrix"
+            << "\n\tm.size():   " << m.size() 
+            << "\n\tm.nr():     " << m.nr() 
+            << "\n\tm.nc():     " << m.nc() 
+            );
+        typedef typename matrix_exp<EXP>::type type;
+
+        type val = m(0);
+        long best_idx = 0;
+        for (long i = 1; i < m.size(); ++i)
+        {
+            type temp = m(i);
+            if (temp > val)
+            {
+                val = temp;
+                best_idx = i;
+            }
+        }
+        return best_idx;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    long index_of_min (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.size() > 0 && (m.nr() == 1 || m.nc() == 1), 
+            "\tlong index_of_min(const matrix_exp& m)"
+            << "\n\tm must be a row or column matrix"
+            << "\n\tm.size():   " << m.size() 
+            << "\n\tm.nr():     " << m.nr() 
+            << "\n\tm.nc():     " << m.nc() 
+            );
+        typedef typename matrix_exp<EXP>::type type;
+
+        type val = m(0);
+        long best_idx = 0;
+        for (long i = 1; i < m.size(); ++i)
+        {
+            type temp = m(i);
+            if (temp < val)
+            {
+                val = temp;
+                best_idx = i;
+            }
+        }
+        return best_idx;
     }
 
 // ----------------------------------------------------------------------------------------
