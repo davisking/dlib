@@ -1033,6 +1033,14 @@ namespace
             DLIB_CASSERT(m3(0) == 1 && m3(1) == 5 ,"");
         }
 
+        {
+            matrix<double> m(4,1);
+            m = 3, 1, 5, 2;
+            DLIB_CASSERT(index_of_min(m) == 1, "");
+            DLIB_CASSERT(index_of_max(m) == 2, "");
+            DLIB_CASSERT(index_of_min(trans(m)) == 1, "");
+            DLIB_CASSERT(index_of_max(trans(m)) == 2, "");
+        }
 
     }
 
