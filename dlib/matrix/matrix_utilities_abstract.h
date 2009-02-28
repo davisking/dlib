@@ -640,11 +640,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename EXP
-        >
     long index_of_max (
-        const matrix_exp<EXP>& m
+        const matrix_exp& m
     );
     /*!
         requires
@@ -657,11 +654,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename EXP
-        >
     long index_of_min (
-        const matrix_exp<EXP>& m
+        const matrix_exp& m
     );
     /*!
         requires
