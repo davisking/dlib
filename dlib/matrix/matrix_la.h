@@ -1391,6 +1391,28 @@ convergence:
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename EXP
+        >
+    const typename matrix_exp<EXP>::type trace (
+        const matrix_exp<EXP>& m
+    ) 
+    { 
+        COMPILE_TIME_ASSERT(matrix_exp<EXP>::NR == matrix_exp<EXP>::NC ||
+                            matrix_exp<EXP>::NR == 0 ||
+                            matrix_exp<EXP>::NC == 0 
+                            );
+        DLIB_ASSERT(m.nr() == m.nc(), 
+            "\tconst matrix_exp::type trace(const matrix_exp& m)"
+            << "\n\tYou can only apply trace() to a square matrix"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            );
+        return sum(diag(m));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename EXP,
         long N = EXP::NR
         >

@@ -155,6 +155,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp::type trace (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m is a square matrix
+        ensures
+            - returns the trace of m
+              (i.e. returns sum(diag(m)))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp::matrix_type chol (
         const matrix_exp& A
     );
