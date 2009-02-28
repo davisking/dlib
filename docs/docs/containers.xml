@@ -215,6 +215,10 @@
                         <link>dlib/matrix/matrix_la_abstract.h.html#det</link>
                      </item>
                      <item>
+                        <name>trace</name>
+                        <link>dlib/matrix/matrix_la_abstract.h.html#trace</link>
+                     </item>
+                     <item>
                         <name>chol</name>
                         <link>dlib/matrix/matrix_la_abstract.h.html#chol</link>
                      </item>
