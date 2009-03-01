@@ -956,16 +956,31 @@
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/kcentroid_abstract.h</spec_file>
          <description>
-                This is an implementation of an online algorithm for recursively estimating the
-                centroid of a sequence of training points.  It uses the sparsification technique
-                described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
 
-            <p>
-                This object then allows you to compute the distance between the center of mass
-                and any test points.  So you can use this object to predict how similar a test
-                point is to the data this object has been trained on (larger distances from the
-                centroid indicate dissimilarity/anomalous points).
-            </p>
+                This object represents a weighted sum of sample points in a kernel induced
+                feature space.  It can be used to kernelized any algorithm that requires only
+                the ability to perform vector addition, subtraction, scalar multiplication,
+                and inner products.  
+
+                  <p>
+                An example use of this object is as an online algorithm for recursively estimating 
+                the centroid of a sequence of training points.  This object then allows you to 
+                compute the distance between the centroid and any test points.  So you can use 
+                this object to predict how similar a test point is to the data this object has 
+                been trained on (larger distances from the centroid indicate dissimilarity/anomalous 
+                points).  
+                  </p>
+
+                  <p>
+                The object internally keeps a set of "dictionary vectors" 
+                that are used to represent the centroid.  It manages these vectors using the 
+                sparsification technique described in the paper The Kernel Recursive Least 
+                Squares Algorithm by Yaakov Engel.  This technique allows us to keep the 
+                number of dictionary vectors down to a minimum.  In fact, the object has a 
+                user selectable tolerance parameter that controls the trade off between 
+                accuracy and number of stored dictionary vectors.
+                  </p>
+
          </description>
 
          <examples>
