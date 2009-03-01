@@ -41,7 +41,9 @@ namespace dlib
         ) : 
             kernel(kernel_), 
             my_tolerance(tolerance_),
-            my_max_dictionary_size(max_dictionary_size_)
+            my_max_dictionary_size(max_dictionary_size_),
+            bias(0),
+            bias_is_stale(false)
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(tolerance_ >= 0,
@@ -97,7 +99,29 @@ namespace dlib
             refresh_bias();
             x.refresh_bias();
 
-            scalar_type temp = 0;
+            scalar_type temp = x.bias + bias - 2*inner_product(x);
+
+            if (temp > 0)
+                return std::sqrt(temp);
+            else
+                return 0;
+        }
+
+        scalar_type inner_product (
+            const sample_type& x
+        ) const
+        {
+            scalar_type temp = 0; 
+            for (unsigned long i = 0; i < alpha.size(); ++i)
+                temp += alpha[i]*kernel(dictionary[i], x);
+            return temp;
+        }
+
+        scalar_type inner_product (
+            const kcentroid& x
+        ) const
+        {
+            scalar_type temp = 0; 
             for (unsigned long i = 0; i < alpha.size(); ++i)
             {
                 for (unsigned long j = 0; j < x.alpha.size(); ++j)
@@ -105,12 +129,14 @@ namespace dlib
                     temp += alpha[i]*x.alpha[j]*kernel(dictionary[i], x.dictionary[j]);
                 }
             }
+            return temp;
+        }
 
-            temp = x.bias + bias - 2*temp;
-            if (temp > 0)
-                return std::sqrt(temp);
-            else
-                return 0;
+        scalar_type squared_norm (
+        ) const
+        {
+            refresh_bias();
+            return bias;
         }
 
         scalar_type operator() (
@@ -120,12 +146,9 @@ namespace dlib
             // make sure the bias terms are up to date
             refresh_bias();
 
-            scalar_type temp = 0;
             const scalar_type kxx = kernel(x,x);
-            for (unsigned long i = 0; i < alpha.size(); ++i)
-                temp += alpha[i]*kernel(dictionary[i], x);
 
-            temp = kxx + bias - 2*temp;
+            scalar_type temp = kxx + bias - 2*inner_product(x);
             if (temp > 0)
                 return std::sqrt(temp);
             else
@@ -166,6 +189,16 @@ namespace dlib
         {
             ++samples_seen;
             return train_and_maybe_test(x,cscale,xscale,true);
+        }
+
+        void scale_by (
+            scalar_type cscale
+        )
+        {
+            for (unsigned long i = 0; i < alpha.size(); ++i)
+            {
+                alpha[i] = cscale*alpha[i];
+            }
         }
 
         void train (

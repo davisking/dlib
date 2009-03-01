@@ -24,20 +24,29 @@ namespace dlib
                 - samples_trained() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of an online algorithm for recursively estimating the
-                centroid of a sequence of training points.  It uses the sparsification technique
-                described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
+                This object represents a weighted sum of sample points in a kernel induced
+                feature space.  It can be used to kernelized any algorithm that requires only
+                the ability to perform vector addition, subtraction, scalar multiplication,
+                and inner products.  
 
-                This object then allows you to compute the distance between the centroid 
-                and any test points.  So you can use this object to predict how similar a test
-                point is to the data this object has been trained on (larger distances from the
-                centroid indicate dissimilarity/anomalous points).
+                An example use of this object is as an online algorithm for recursively estimating 
+                the centroid of a sequence of training points.  This object then allows you to 
+                compute the distance between the centroid and any test points.  So you can use 
+                this object to predict how similar a test point is to the data this object has 
+                been trained on (larger distances from the centroid indicate dissimilarity/anomalous 
+                points).  
 
                 Also note that the algorithm internally keeps a set of "dictionary vectors" 
                 that are used to represent the centroid.  You can force the algorithm to use 
                 no more than a set number of vectors by setting the 3rd constructor argument 
                 to whatever you want.  However, note that doing this causes the algorithm 
                 to bias it's results towards more recent training examples.  
+
+                This object also uses the sparsification technique described in the paper The 
+                Kernel Recursive Least Squares Algorithm by Yaakov Engel.  This technique
+                allows us to keep the number of dictionary vectors down to a minimum.  In fact,
+                the object has a user selectable tolerance parameter that controls the trade off
+                between accuracy and number of stored dictionary vectors.
         !*/
 
     public:
@@ -75,6 +84,13 @@ namespace dlib
                 - returns the maximum number of dictionary vectors this object
                   will use at a time.  That is, dictionary_size() will never be
                   greater than max_dictionary_size().
+        !*/
+
+        unsigned long dictionary_size (
+        ) const;
+        /*!
+            ensures
+                - returns the number of "support vectors" in the dictionary.  
         !*/
 
         scalar_type samples_trained (
@@ -126,6 +142,32 @@ namespace dlib
                   to this object so far.
         !*/
 
+        scalar_type inner_product (
+            const sample_type& x
+        ) const;
+        /*!
+            ensures
+                - returns the inner product of the given x point and the current
+                  estimate of the centroid of the training samples given to this object
+                  so far.
+        !*/
+
+        scalar_type inner_product (
+            const kcentroid& x
+        ) const;
+        /*!
+            ensures
+                - returns the inner product between x and this centroid object.
+        !*/
+
+        scalar_type squared_norm (
+        ) const;
+        /*!
+            ensures
+                - returns the squared norm of the centroid vector represented by this
+                  object.  I.e. returns this->inner_product(*this)
+        !*/
+
         void train (
             const sample_type& x
         );
@@ -149,6 +191,17 @@ namespace dlib
                     - new_centroid = cscale*old_centroid + xscale*x
                 - This function allows you to weight different samples however 
                   you want.
+        !*/
+
+        void scale_by (
+            scalar_type cscale
+        );
+        /*!
+            ensures
+                - multiplies the current centroid vector by the given scale value.  
+                  This function is equivalent to calling train(some_x_value, cscale, 0).
+                  So it performs:   
+                    - new_centroid == cscale*old_centroid
         !*/
 
         scalar_type test_and_train (
@@ -183,13 +236,6 @@ namespace dlib
         /*!
             ensures
                 - swaps *this with item
-        !*/
-
-        unsigned long dictionary_size (
-        ) const;
-        /*!
-            ensures
-                - returns the number of "support vectors" in the dictionary.  
         !*/
 
         distance_function<kernel_type> get_distance_function (
