@@ -361,6 +361,89 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    struct offset_kernel
+    {
+        typedef typename T::scalar_type scalar_type;
+        typedef typename T::sample_type sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        offset_kernel(const T& k, const scalar_type& offset_
+        ) : kernel(k), offset(offset_) {}
+        offset_kernel() : offset(0.01) {}
+        offset_kernel(
+            const offset_kernel& k
+        ) : kernel(k.kernel), offset(k.offset) {}
+
+        const T kernel;
+        const scalar_type offset;
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const
+        { 
+            return kernel(a,b) + offset;
+        }
+
+        offset_kernel& operator= (
+            const offset_kernel& k
+        )
+        {
+            const_cast<T&>(kernel) = k.kernel;
+            const_cast<scalar_type&>(offset) = k.offset;
+            return *this;
+        }
+
+        bool operator== (
+            const offset_kernel& k
+        ) const
+        {
+            return k.kernel == kernel && offset == k.offset;
+        }
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const offset_kernel<T>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.offset, out);
+            serialize(item.kernel, out);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type offset_kernel"); 
+        }
+    }
+
+    template <
+        typename T
+        >
+    void deserialize (
+        offset_kernel<T>& item,
+        std::istream& in 
+    )
+    {
+        typedef typename offset_kernel<T>::scalar_type scalar_type;
+        try
+        {
+            deserialize(const_cast<scalar_type&>(item.offset), in);
+            deserialize(const_cast<T&>(item.kernel), in);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while deserializing object of type offset_kernel"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_KERNEL

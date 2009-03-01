@@ -130,7 +130,7 @@ namespace dlib
     !*/
 
     template <
-        typename K
+        typename T
         >
     void deserialize (
         radial_basis_kernel<T>& item,
@@ -171,7 +171,7 @@ namespace dlib
         !*/
 
         sigmoid_kernel(
-            const radial_basis_kernel& k
+            const sigmoid_kernel& k
         );
         /*!
             ensures
@@ -236,7 +236,7 @@ namespace dlib
     !*/
 
     template <
-        typename K
+        typename T
         >
     void deserialize (
         sigmoid_kernel<T>& item,
@@ -280,7 +280,7 @@ namespace dlib
         !*/
 
         polynomial_kernel(
-            const radial_basis_kernel& k
+            const polynomial_kernel& k
         );
         /*!
             ensures
@@ -349,7 +349,7 @@ namespace dlib
     !*/
 
     template <
-        typename K
+        typename T
         >
     void deserialize (
         polynomial_kernel<T>& item,
@@ -412,7 +412,7 @@ namespace dlib
     !*/
 
     template <
-        typename K
+        typename T
         >
     void deserialize (
         linear_kernel<T>& item,
@@ -422,6 +422,109 @@ namespace dlib
         provides deserialization support for linear_kernel 
     !*/
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    struct offset_kernel
+    {
+        /*!
+            REQUIREMENTS ON T
+                T must be a kernel object (e.g. radial_basis_kernel, polynomial_kernel, etc...) 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a kernel with a fixed value offset
+                added to it.
+        !*/
+
+        typedef typename T::scalar_type scalar_type;
+        typedef typename T::sample_type sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        const T kernel;
+        const scalar_type offset;
+
+        offset_kernel(
+        );
+        /*!
+            ensures
+                - #offset == 0.01 
+        !*/
+
+        offset_kernel(
+            const offset_kernel& k
+        );
+        /*!
+            ensures
+                - #offset == k.offset
+                - #kernel == k.kernel
+        !*/
+
+        offset_kernel(
+            const T& k,
+            const scalar_type& off
+        );
+        /*!
+            ensures
+                - #kernel == k 
+                - #offset == off 
+        !*/
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const;
+        /*!
+            ensures
+                - returns kernel(a,b) + offset
+        !*/
+
+        offset_kernel& operator= (
+            const offset_kernel& k
+        );
+        /*!
+            ensures
+                - #offset == k.offset
+                - #kernel == k.kernel
+        !*/
+
+        bool operator== (
+            const offset_kernel& k
+        ) const;
+        /*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const offset_kernel<T>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for offset_kernel
+    !*/
+
+    template <
+        typename T
+        >
+    void deserialize (
+        offset_kernel<T>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support for offset_kernel
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
