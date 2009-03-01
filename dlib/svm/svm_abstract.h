@@ -213,8 +213,10 @@ namespace dlib
                   1.  It is the parameter that determines the trade off between
                   trying to fit the training data exactly or allowing more errors 
                   but hopefully improving the generalization ability of the 
-                  resulting classifier.  For more information you should consult
-                  the papers referenced above.
+                  resulting classifier.  Smaller values encourage exact fitting 
+                  while larger values of nu may encourage better generalization. 
+                  For more information you should consult the papers referenced 
+                  above.
         !*/
 
         template <
