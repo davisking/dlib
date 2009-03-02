@@ -156,7 +156,7 @@ namespace dlib
                 w.train(x,  1 - learning_rate*lambda,  y*learning_rate);
 
                 scalar_type wnorm = std::sqrt(w.squared_norm());
-                scalar_type temp = (1/sqrt(lambda))/(wnorm);
+                scalar_type temp = (1/std::sqrt(lambda))/(wnorm);
                 if (temp < 1)
                     w.scale_by(temp);
             }
