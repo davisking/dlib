@@ -3,7 +3,6 @@
 #undef DLIB_RVm_ABSTRACT_
 #ifdef DLIB_RVm_ABSTRACT_
 
-#include "rvm_abstract.h"
 #include <cmath>
 #include <limits>
 #include "../matrix.h"
