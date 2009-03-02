@@ -121,6 +121,7 @@
                      <item>polynomial_kernel</item>
                      <item>sigmoid_kernel</item>
                      <item>linear_kernel</item>
+                     <item>offset_kernel</item>
                   </sub>
                </item>
                <item nolink="true">
@@ -150,6 +151,10 @@
                <item>reduced</item> 
                <item>reduced_decision_function_trainer2</item> 
                <item>reduced2</item> 
+               <item>batch</item> 
+               <item>verbose_batch</item> 
+               <item>batch_trainer</item> 
+               <item>svm_pegasos</item> 
             </sub>
          </item>
          <item>randomize_samples</item> 
@@ -861,6 +866,30 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>svm_pegasos</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/pegasos_abstract.h</spec_file>
+         <description>
+                This object implements an online algorithm for training a support 
+                vector machine for solving binary classification problems.  
+
+            <p>
+                The implementation of the Pegasos algorithm used by this object is based
+                on the following excellent paper:
+               <blockquote>
+                    Pegasos: Primal estimated sub-gradient solver for SVM (2007)
+                    by Yoram Singer, Nathan Srebro 
+                    In ICML 
+               </blockquote>
+            </p>
+         </description>
+
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>kkmeans</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/kkmeans_abstract.h</spec_file>
@@ -1176,6 +1205,19 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>offset_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
+         <description>
+                This object represents a kernel with a fixed value offset
+                added to it.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>linear_kernel</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
@@ -1274,6 +1316,51 @@
          <examples>
             <example>rank_features_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>batch</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/pegasos_abstract.h</spec_file>
+         <description>
+            This is a convenience function for creating 
+            <a href="#batch_trainer">batch_trainer</a> objects.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>verbose_batch</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/pegasos_abstract.h</spec_file>
+         <description>
+            This is a convenience function for creating 
+            <a href="#batch_trainer">batch_trainer</a> objects.  This function
+            generates a batch_trainer that will print status messages to standard
+            output so that you can observe the progress of a training algorithm.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>batch_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/pegasos_abstract.h</spec_file>
+         <description>
+               This is a batch trainer object that is meant to wrap other online trainer objects 
+               that create <a href="#decision_function">decision_functions</a>.  It
+               turns an online learning object such as the <a href="#svm_pegasos">svm_pegasos</a>
+               object into a batch learning object.  This allows you to use objects like
+               svm_pegasos with functions, such as <a href="#cross_validate_trainer">cross_validate_trainer</a>,
+               that expect batch mode training objects.
+         </description>
                                  
       </component>
       

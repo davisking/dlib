@@ -411,6 +411,10 @@
 
 
 
+         <term link="algorithms.html#svm_pegasos" name="svm_pegasos"/>
+         <term link="algorithms.html#batch" name="batch"/>
+         <term link="algorithms.html#verbose_batch" name="verbose_batch"/>
+         <term link="algorithms.html#batch_trainer" name="batch_trainer"/>
          <term link="algorithms.html#randomize_samples" name="randomize_samples"/>
          <term link="algorithms.html#is_binary_classification_problem" name="is_binary_classification_problem"/>
          <term link="algorithms.html#square_root" name="square_root"/>
@@ -447,6 +451,7 @@
          <term link="algorithms.html#distance_function" name="distance_function"/>
          <term link="algorithms.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
          <term link="algorithms.html#linear_kernel" name="linear_kernel"/>
+         <term link="algorithms.html#offset_kernel" name="offset_kernel"/>
          <term link="algorithms.html#polynomial_kernel" name="polynomial_kernel"/>
          <term link="algorithms.html#sigmoid_kernel" name="sigmoid_kernel"/>
          <term link="algorithms.html#radial_basis_kernel" name="radial_basis_kernel"/>
