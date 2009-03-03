@@ -1354,12 +1354,12 @@
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/pegasos_abstract.h</spec_file>
          <description>
-               This is a batch trainer object that is meant to wrap other online trainer objects 
+               This is a trainer object that is meant to wrap online trainer objects 
                that create <a href="#decision_function">decision_functions</a>.  It
-               turns an online learning object such as the <a href="#svm_pegasos">svm_pegasos</a>
-               object into a batch learning object.  This allows you to use objects like
-               svm_pegasos with functions, such as <a href="#cross_validate_trainer">cross_validate_trainer</a>,
-               that expect batch mode training objects.
+               turns an online learning algorithm such as <a href="#svm_pegasos">svm_pegasos</a>
+               into a batch learning object.  This allows you to use objects like
+               svm_pegasos with functions (e.g. <a href="#cross_validate_trainer">cross_validate_trainer</a>)
+               that expect batch mode training objects. 
          </description>
                                  
       </component>
