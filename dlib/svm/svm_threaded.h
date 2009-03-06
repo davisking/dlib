@@ -89,7 +89,16 @@ namespace dlib
                 matrix<scalar_type, 1, 2, mem_manager_type> temp_res;
                 while (job_pipe.dequeue(j))
                 {
-                    temp_res = test_binary_decision_function(j.trainer.train(j.x_train, j.y_train), j.x_test, j.y_test);
+                    try
+                    {
+                        temp_res = test_binary_decision_function(j.trainer.train(j.x_train, j.y_train), j.x_test, j.y_test);
+                    }
+                    catch (invalid_svm_nu_error&)
+                    {
+                        // If this is a svm_nu_trainer then we might get this exception if the nu is
+                        // invalid.  In this case just return a cross validation score of 0.
+                        temp_res = 0;
+                    }
 
                     res_pipe.enqueue(temp_res);
                 }
