@@ -464,8 +464,17 @@ namespace dlib
                 train_neg_idx = (train_neg_idx+1)%x.nr();
             }
 
-            // do the training and testing
-            res += test_binary_decision_function(trainer.train(x_train,y_train),x_test,y_test);
+            try
+            {
+                // do the training and testing
+                res += test_binary_decision_function(trainer.train(x_train,y_train),x_test,y_test);
+            }
+            catch (invalid_svm_nu_error&)
+            {
+                // Just ignore the error in this case since we are going to
+                // interpret an invalid nu value the same as generating a decision
+                // function that miss-classifies everything.
+            }
 
         } // for (long i = 0; i < folds; ++i)
 
