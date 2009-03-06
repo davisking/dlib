@@ -332,6 +332,10 @@
                         <name>covariance</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#covariance</link>
                      </item>
+                     <item>
+                        <name>randm</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#randm</link>
+                     </item>
                   </sub>
                </item>
                <item nolink="true">
@@ -445,6 +449,18 @@
                      <item>
                         <name>clamp</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#clamp</link>
+                     </item>
+                     <item>
+                        <name>linspace</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#linspace</link>
+                     </item>
+                     <item>
+                        <name>logspace</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#logspace</link>
+                     </item>
+                     <item>
+                        <name>cartesian_product</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#cartesian_product</link>
                      </item>
                   </sub>
                </item>

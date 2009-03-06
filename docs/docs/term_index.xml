@@ -497,6 +497,12 @@
          <term link="dlib/matrix/matrix_math_functions_abstract.h.html#complex_matrix" name="complex_matrix"/>
          <term link="dlib/matrix/matrix_math_functions_abstract.h.html#normalize" name="normalize"/>
 
+
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#linspace" name="linspace"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#logspace" name="logspace"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#cartesian_product" name="cartesian_product"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#randm" name="randm"/>
+
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#diag" name="diag"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#diagm" name="diagm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#trans" name="trans"/>
