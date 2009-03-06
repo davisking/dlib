@@ -1009,7 +1009,7 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const static long NR = EXPr::NR*EXPr::NC;
-        const static long NC = EXPc::NR*EXPr::NC;
+        const static long NC = EXPc::NR*EXPc::NC;
         const static long cost = EXPr::cost+EXPc::cost+M::cost;
     };
 
@@ -1647,8 +1647,8 @@ namespace dlib
     {
         typedef long type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
-        const static long NR = tabs<(end - start)>::value/inc_ + 1;
-        const static long NC = 1;
+        const static long NR = 1;
+        const static long NC = tabs<(end - start)>::value/inc_ + 1;
         const static long cost = 1;
         typedef row_major_layout layout_type;
     };
@@ -1680,11 +1680,11 @@ namespace dlib
         long operator() (
             long r, 
             long c
-        ) const { return start + r*inc;  }
+        ) const { return start + c*inc;  }
 
         long operator() (
-            long r
-        ) const { return start + r*inc;  }
+            long c
+        ) const { return start + c*inc;  }
 
         template <typename U, long iNR, long iNC , typename MM, typename L>
         bool aliases (
