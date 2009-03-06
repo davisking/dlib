@@ -88,6 +88,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    const matrix_exp pow (
+        const T& b,
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - matrix_exp::type == float, double, or long double 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == pow(b, m(r,c)) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp squared (
         const matrix_exp& m
     );

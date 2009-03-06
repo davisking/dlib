@@ -1936,6 +1936,148 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename rand_gen>
+    inline const matrix<double> randm( 
+        long nr,
+        long nc,
+        rand_gen& rnd
+    )
+    {
+        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+            "\tconst matrix randm(nr, nc, rnd)"
+            << "\n\tInvalid inputs to this function"
+            << "\n\tnr: " << nr 
+            << "\n\tnc: " << nc 
+            );
+
+        matrix<double> m(nr,nc);
+        for (long r = 0; r < m.nr(); ++r)
+        {
+            for (long c = 0; c < m.nc(); ++c)
+            {
+                m(r,c) = rnd.get_random_double();
+            }
+        }
+
+        return m;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline const matrix<double> randm( 
+        long nr,
+        long nc
+    )
+    {
+        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+            "\tconst matrix randm(nr, nc)"
+            << "\n\tInvalid inputs to this function"
+            << "\n\tnr: " << nr 
+            << "\n\tnc: " << nc 
+            );
+
+        matrix<double> m(nr,nc);
+        // make a double that contains RAND_MAX + the smallest number that still
+        // makes the resulting double slightly bigger than static_cast<double>(RAND_MAX)
+        double max_val = RAND_MAX;
+        max_val += std::numeric_limits<double>::epsilon()*RAND_MAX;
+
+        for (long r = 0; r < m.nr(); ++r)
+        {
+            for (long c = 0; c < m.nc(); ++c)
+            {
+                m(r,c) = std::rand()/max_val;
+            }
+        }
+
+        return m;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline const matrix_range_exp<double> linspace (
+        double start,
+        double end,
+        long num
+    ) 
+    { 
+        DLIB_ASSERT(num >= 0, 
+            "\tconst matrix_exp linspace(start, end, num)"
+            << "\n\tInvalid inputs to this function"
+            << "\n\tstart: " << start 
+            << "\n\tend:   " << end
+            << "\n\tnum:   " << num 
+            );
+
+        return matrix_range_exp<double>(start,end,num,false); 
+    }
+
+// ----------------------------------------------------------------------------------------
+    
+    inline const matrix_log_range_exp<double> logspace (
+        double start,
+        double end,
+        long num
+    ) 
+    { 
+        DLIB_ASSERT(num >= 0, 
+            "\tconst matrix_exp logspace(start, end, num)"
+            << "\n\tInvalid inputs to this function"
+            << "\n\tstart: " << start 
+            << "\n\tend:   " << end
+            << "\n\tnum:   " << num 
+            );
+
+        return matrix_log_range_exp<double>(start,end,num); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_cart_prod
+    {
+        template <typename EXP1, typename EXP2>
+        struct op : has_destructive_aliasing 
+        {
+            const static long cost = EXP1::cost+EXP2::cost+1;
+            typedef typename EXP1::type type;
+
+            typedef typename EXP1::mem_manager_type mem_manager_type;
+            const static long NR = EXP1::NR+EXP2::NR;
+            const static long NC = EXP1::NC*EXP2::NC;
+
+            template <typename M1, typename M2>
+            static type apply ( const M1& m1, const M2& m2 , long r, long c)
+            { 
+                if (r < m1.nr())
+                    return m1(r, c/m2.nc());
+                else
+                    return m2(r-m1.nr(), c%m2.nc());
+            }
+
+            template <typename M1, typename M2>
+            static long nr (const M1& m1, const M2& m2) { return m1.nr() + m2.nr(); }
+            template <typename M1, typename M2>
+            static long nc (const M1& m1, const M2& m2) { return m1.nc() * m2.nc(); }
+        };
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    const matrix_binary_exp<EXP1,EXP2,op_cart_prod> cartesian_product (
+        const matrix_exp<EXP1>& a,
+        const matrix_exp<EXP2>& b 
+    )
+    {
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+
+        typedef matrix_binary_exp<EXP1,EXP2,op_cart_prod> exp;
+        return exp(a.ref(),b.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_UTILITIES_

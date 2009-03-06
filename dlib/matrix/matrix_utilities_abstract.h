@@ -210,6 +210,49 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp linspace (
+        double start,
+        double end,
+        long num
+    );
+    /*!
+        requires
+            - num >= 0
+        ensures
+            - returns a matrix M such that:
+                - M::type == double 
+                - M.nr() == 1
+                - M.nc() == num
+                - M == a row vector with num linearly spaced values beginning with start
+                  and stopping with end.  
+                - M(num-1) == end 
+                - if (num > 1) then
+                    - M(0) == start
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp logspace (
+        double start,
+        double end,
+        long num
+    );
+    /*!
+        requires
+            - num >= 0
+        ensures
+            - returns a matrix M such that:
+                - M::type == double 
+                - M.nr() == 1
+                - M.nc() == num
+                - M == a row vector with num logarithmically spaced values beginning with 
+                  10^start and stopping with 10^end.  
+                  (i.e. M == pow(10, linspace(start, end, num)))
+                - M(num-1) == 10^end
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         long R,
         long C
@@ -493,11 +536,39 @@ namespace dlib
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in a and b.
-                - R.nr() == a.nr()*b.nr()  
-                - R.nc() == a.nc()*b.nc()  
+                - R.nr() == a.nr() * b.nr()  
+                - R.nc() == a.nc() * b.nc()  
                 - for all valid r and c:
                   R(r,c) == a(r/b.nr(), c/b.nc()) * b(r%b.nr(), c%b.nc())
                 - I.e. R is the tensor product of matrix a with matrix b
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp cartesian_product (
+        const matrix_exp& A,
+        const matrix_exp& B 
+    );
+    /*!
+        requires
+            - A and B both contain the same type of element
+        ensures
+            - Think of A and B as sets of column vectors.  Then this function 
+              returns a matrix that contains a set of column vectors that is
+              the Cartesian product of the sets A and B.  That is, the resulting
+              matrix contains every possible combination of vectors from both A and
+              B.
+            - returns a matrix R such that:
+                - R::type == the same type that was in A and B.
+                - R.nr() == A.nr() + B.nr()  
+                - R.nc() == A.nc() * B.nc()  
+                - Each column of R is the concatenation of a column vector
+                  from A with a column vector from B.  
+                - for all valid r and c:
+                    - if (r < A.nr()) then
+                        - R(r,c) == A(r, c/B.nc())
+                    - else
+                        - R(r,c) == B(r-A.nr(), c%B.nc())
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -730,6 +801,49 @@ namespace dlib
               (i.e. 1.0/(m.nr()-1)*(sum of all (m(i) - mean(m))*trans(m(i) - mean(m))))
             - the returned matrix will contain elements of type matrix_exp::type::type.
             - the returned matrix will have m(0).nr() rows and columns.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename rand_gen>
+    const matrix<double> randm( 
+        long nr,
+        long nc,
+        rand_gen& rnd
+    );
+    /*!
+        requires
+            - nr >= 0
+            - nc >= 0
+            - rand_gen == an object that implements the rand/rand_float_abstract.h interface
+        ensures
+            - generates a random matrix using the given rnd random number generator
+            - returns a matrix M such that
+                - M::type == double
+                - M.nr() == nr
+                - M.nc() == nc
+                - for all valid i, j:
+                    - M(i,j) == a random number such that 0 <= M(i,j) < 1
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline const matrix<double> randm( 
+        long nr,
+        long nc
+    );
+    /*!
+        requires
+            - nr >= 0
+            - nc >= 0
+        ensures
+            - generates a random matrix using std::rand() 
+            - returns a matrix M such that
+                - M::type == double
+                - M.nr() == nr
+                - M.nc() == nc
+                - for all valid i, j:
+                    - M(i,j) == a random number such that 0 <= M(i,j) < 1
     !*/
 
 // ----------------------------------------------------------------------------------------

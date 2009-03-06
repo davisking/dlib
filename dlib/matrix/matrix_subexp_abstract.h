@@ -32,8 +32,8 @@ namespace dlib
         ensures
             - returns a matrix R such that:
                 - R::type == long
-                - R.nr() == abs(end - start)/inc + 1
-                - R.nc() == 1
+                - R.nr() == 1
+                - R.nc() == abs(end - start)/inc + 1
                 - if (start <= end) then
                     - R(i) == start + i*inc
                 - else
@@ -55,8 +55,8 @@ namespace dlib
         ensures
             - returns a matrix R such that:
                 - R::type == long
-                - R.nr() == abs(end - start)/inc + 1
-                - R.nc() == 1
+                - R.nr() == 1
+                - R.nc() == abs(end - start)/inc + 1
                 - if (start <= end) then
                     - R(i) == start + i*inc
                 - else

@@ -1445,8 +1445,8 @@ namespace dlib
         typedef T type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
         typedef row_major_layout layout_type;
-        const static long NR = 0;
-        const static long NC = 1;
+        const static long NR = 1;
+        const static long NC = 0;
         const static long cost = 1;
     };
 
@@ -1465,7 +1465,7 @@ namespace dlib
             const matrix_range_exp& item
         ) :
             matrix_exp<matrix_range_exp>(*this),
-            nr_(item.nr_),
+            nc_(item.nc_),
             start(item.start),
             inc(item.inc)
         {}
@@ -1481,7 +1481,7 @@ namespace dlib
                 inc = 1;
             else 
                 inc = -1;
-            nr_ = std::abs(end_ - start_) + 1;
+            nc_ = std::abs(end_ - start_) + 1;
         }
         matrix_range_exp (
             T start_,
@@ -1491,21 +1491,43 @@ namespace dlib
             matrix_exp<matrix_range_exp>(*this)
         {
             start = start_;
-            nr_ = std::abs(end_ - start_)/inc_ + 1;
+            nc_ = std::abs(end_ - start_)/inc_ + 1;
             if (start_ <= end_)
                 inc = inc_;
             else
                 inc = -inc_;
         }
 
-        T operator() (
-            long r, 
-            long 
-        ) const { return start + r*inc;  }
+        matrix_range_exp (
+            T start_,
+            T end_,
+            long num,
+            bool
+        ) :
+            matrix_exp<matrix_range_exp>(*this)
+        {
+            start = start_;
+            nc_ = num;
+            if (num > 1)
+            {
+                inc = (end_-start_)/(num-1);
+            }
+            else 
+            {
+                inc = 0;
+                start = end_;
+            }
+
+        }
 
         T operator() (
-            long r
-        ) const { return start + r*inc;  }
+            long, 
+            long c
+        ) const { return start + c*inc;  }
+
+        T operator() (
+            long c
+        ) const { return start + c*inc;  }
 
         template <typename U, long iNR, long iNC , typename MM, typename L>
         bool aliases (
@@ -1518,12 +1540,99 @@ namespace dlib
         ) const { return false; }
 
         long nr (
-        ) const { return nr_; }
+        ) const { return NR; }
 
         long nc (
-        ) const { return NC; }
+        ) const { return nc_; }
 
-        long nr_;
+        long nc_;
+        T start;
+        T inc;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    class matrix_log_range_exp;
+
+    template <typename T>
+    struct matrix_traits<matrix_log_range_exp<T> >
+    {
+        typedef T type;
+        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef row_major_layout layout_type;
+        const static long NR = 1;
+        const static long NC = 0;
+        const static long cost = 1;
+    };
+
+    template <typename T>
+    class matrix_log_range_exp : public matrix_exp<matrix_log_range_exp<T> >
+    {
+    public:
+        typedef typename matrix_traits<matrix_log_range_exp>::type type;
+        typedef typename matrix_traits<matrix_log_range_exp>::mem_manager_type mem_manager_type;
+        const static long NR = matrix_traits<matrix_log_range_exp>::NR;
+        const static long NC = matrix_traits<matrix_log_range_exp>::NC;
+        const static long cost = matrix_traits<matrix_log_range_exp>::cost;
+        typedef typename matrix_traits<matrix_log_range_exp>::layout_type layout_type;
+
+        matrix_log_range_exp (
+            const matrix_log_range_exp& item
+        ) :
+            matrix_exp<matrix_log_range_exp>(*this),
+            nc_(item.nc_),
+            start(item.start),
+            inc(item.inc)
+        {}
+
+        matrix_log_range_exp (
+            T start_,
+            T end_,
+            long num
+        ) :
+            matrix_exp<matrix_log_range_exp>(*this)
+        {
+            start = start_;
+            nc_ = num;
+            if (num > 1)
+            {
+                inc = (end_-start_)/(num-1);
+            }
+            else 
+            {
+                inc = 0;
+                start = end_;
+            }
+
+        }
+
+        T operator() (
+            long,
+            long c
+        ) const { return std::pow(10,start + c*inc);  }
+
+        T operator() (
+            long c
+        ) const { return std::pow(10,start + c*inc);  }
+
+        template <typename U, long iNR, long iNC , typename MM, typename L>
+        bool aliases (
+            const matrix<U,iNR,iNC,MM,L>& item
+        ) const { return false; }
+
+        template <typename U, long iNR, long iNC, typename MM, typename L >
+        bool destructively_aliases (
+            const matrix<U,iNR,iNC,MM,L>& item
+        ) const { return false; }
+
+        long nr (
+        ) const { return NR; }
+
+        long nc (
+        ) const { return nc_; }
+
+        long nc_;
         T start;
         T inc;
     };

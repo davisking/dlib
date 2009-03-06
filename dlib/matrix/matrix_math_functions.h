@@ -221,6 +221,39 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
 
 // ----------------------------------------------------------------------------------------
 
+    struct op_pow2
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+7;
+            typedef typename EXP::type type;
+            template <typename M, typename S>
+            static type apply ( const M& m, const S& s, long r, long c)
+            { return static_cast<type>(std::pow(s,m(r,c))); }
+        };
+    };
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_pow2> pow (
+        const S& s,
+        const matrix_exp<EXP>& m
+    )
+    {
+        // you can only round matrices that contain floats, doubles or long doubles.
+        COMPILE_TIME_ASSERT((
+                is_same_type<typename EXP::type,float>::value == true || 
+                is_same_type<typename EXP::type,double>::value == true || 
+                is_same_type<typename EXP::type,long double>::value == true 
+        ));
+        return matrix_scalar_binary_exp<EXP,typename EXP::type,op_pow2>(m.ref(),s);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     struct op_reciprocal
     {
         template <typename EXP>
