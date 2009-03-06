@@ -48,7 +48,7 @@ namespace dlib
     { 
         DLIB_ASSERT(inc > 0, 
             "\tconst matrix_exp range(start, inc, end)"
-            << "\n\tstart can't be bigger than end"
+            << "\n\tInvalid inputs to this function"
             << "\n\tstart: " << start 
             << "\n\tinc:   " << inc
             << "\n\tend:   " << end
