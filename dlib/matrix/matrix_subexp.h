@@ -32,15 +32,15 @@ namespace dlib
         return matrix_range_static_exp<start,1,end>(); 
     }
 
-    inline const matrix_range_exp range (
+    inline const matrix_range_exp<long> range (
         long start,
         long end
     ) 
     { 
-        return matrix_range_exp(start,end); 
+        return matrix_range_exp<long>(start,end); 
     }
 
-    inline const matrix_range_exp range (
+    inline const matrix_range_exp<long> range (
         long start,
         long inc,
         long end
@@ -54,7 +54,7 @@ namespace dlib
             << "\n\tend:   " << end
             );
 
-        return matrix_range_exp(start,inc,end); 
+        return matrix_range_exp<long>(start,inc,end); 
     }
 
 // ----------------------------------------------------------------------------------------
@@ -675,7 +675,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, long NR, long NC, typename mm, typename l, typename EXPr>
-    assignable_sub_range_matrix<T,NR,NC,mm,l,EXPr,matrix_range_exp > set_rowm (
+    assignable_sub_range_matrix<T,NR,NC,mm,l,EXPr,matrix_range_exp<long> > set_rowm (
         matrix<T,NR,NC,mm,l>& m,
         const matrix_exp<EXPr>& rows
     )
@@ -691,13 +691,13 @@ namespace dlib
             << "\n\trows.nc():  " << rows.nc()
             );
 
-        return assignable_sub_range_matrix<T,NR,NC,mm,l,EXPr,matrix_range_exp >(m,rows.ref(),range(0,m.nc()-1));
+        return assignable_sub_range_matrix<T,NR,NC,mm,l,EXPr,matrix_range_exp<long> >(m,rows.ref(),range(0,m.nc()-1));
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename T, long NR, long NC, typename mm, typename l, typename EXPc>
-    assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_range_exp,EXPc > set_colm (
+    assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_range_exp<long>,EXPc > set_colm (
         matrix<T,NR,NC,mm,l>& m,
         const matrix_exp<EXPc>& cols
     )
@@ -713,7 +713,7 @@ namespace dlib
             << "\n\tcols.nc():  " << cols.nc()
             );
 
-        return assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_range_exp,EXPc >(m,range(0,m.nr()-1),cols.ref());
+        return assignable_sub_range_matrix<T,NR,NC,mm,l,matrix_range_exp<long>,EXPc >(m,range(0,m.nr()-1),cols.ref());
     }
 
 // ----------------------------------------------------------------------------------------

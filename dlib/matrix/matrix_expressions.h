@@ -1436,12 +1436,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
     class matrix_range_exp;
 
-    template <>
-    struct matrix_traits<matrix_range_exp>
+    template <typename T>
+    struct matrix_traits<matrix_range_exp<T> >
     {
-        typedef long type;
+        typedef T type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 0;
@@ -1449,15 +1450,16 @@ namespace dlib
         const static long cost = 1;
     };
 
-    class matrix_range_exp : public matrix_exp<matrix_range_exp>
+    template <typename T>
+    class matrix_range_exp : public matrix_exp<matrix_range_exp<T> >
     {
     public:
-        typedef matrix_traits<matrix_range_exp>::type type;
-        typedef matrix_traits<matrix_range_exp>::mem_manager_type mem_manager_type;
+        typedef typename matrix_traits<matrix_range_exp>::type type;
+        typedef typename matrix_traits<matrix_range_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_range_exp>::NR;
         const static long NC = matrix_traits<matrix_range_exp>::NC;
         const static long cost = matrix_traits<matrix_range_exp>::cost;
-        typedef matrix_traits<matrix_range_exp>::layout_type layout_type;
+        typedef typename matrix_traits<matrix_range_exp>::layout_type layout_type;
 
         matrix_range_exp (
             const matrix_range_exp& item
@@ -1469,8 +1471,8 @@ namespace dlib
         {}
 
         matrix_range_exp (
-            long start_,
-            long end_
+            T start_,
+            T end_
         ) :
             matrix_exp<matrix_range_exp>(*this)
         {
@@ -1482,9 +1484,9 @@ namespace dlib
             nr_ = std::abs(end_ - start_) + 1;
         }
         matrix_range_exp (
-            long start_,
-            long inc_,
-            long end_
+            T start_,
+            T inc_,
+            T end_
         ) :
             matrix_exp<matrix_range_exp>(*this)
         {
@@ -1496,12 +1498,12 @@ namespace dlib
                 inc = -inc_;
         }
 
-        long operator() (
+        T operator() (
             long r, 
             long 
         ) const { return start + r*inc;  }
 
-        long operator() (
+        T operator() (
             long r
         ) const { return start + r*inc;  }
 
@@ -1522,8 +1524,8 @@ namespace dlib
         ) const { return NC; }
 
         long nr_;
-        long start;
-        long inc;
+        T start;
+        T inc;
     };
 
 // ----------------------------------------------------------------------------------------
