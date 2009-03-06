@@ -140,6 +140,9 @@ int main()
     // MATLAB: B = ones(3,4)
     B = uniform_matrix<double>(3,4, 1);
 
+    // MATLAB: B = rand(3,4)
+    B = randm(3,4);
+
     // MATLAB: C = 1.4*A
     C = 1.4*A;
 
@@ -186,14 +189,11 @@ int main()
     // MATLAB: A = B(:,1)
     A = colm(B,0);
 
-    // MATLAB: A = [1:5]'
+    // MATLAB: A = [1:5]
     Blong = range(1,5);
 
-    // MATLAB: A = [1:5]
-    Blong = trans(range(1,5));
-
     // MATLAB: A = [1:2:5]
-    Blong = trans(range(1,2,5));
+    Blong = range(1,2,5);
 
     // MATLAB: A = B([1:3], [1:2])
     A = subm(B, range(0,2), range(0,1));
