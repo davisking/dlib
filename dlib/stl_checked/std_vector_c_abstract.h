@@ -83,9 +83,25 @@ namespace dlib
                 - #*this == x
         !*/
 
+        std_vector_c(
+            const std::vector<T,Allocator>& x
+        );
+        /*!
+            ensures
+                - #*this == x
+        !*/
 
         std_vector_c<T,Allocator>& operator= (
             const std_vector_c<T,Allocator>& x
+        );
+        /*!
+            ensures
+                - #*this == x
+                - returns #*this
+        !*/
+
+        std_vector_c<T,Allocator>& operator= (
+            const std::vector<T,Allocator>& x
         );
         /*!
             ensures

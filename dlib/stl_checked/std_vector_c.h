@@ -48,11 +48,17 @@ namespace dlib
                      const Allocator& alloc= Allocator()) : impl(first,last,alloc) {}
 
         std_vector_c(const std_vector_c<T,Allocator>& x) : impl(x.impl) {}
-
+        std_vector_c(const std::vector<T,Allocator>& x) : impl(x) {}
 
         std_vector_c<T,Allocator>& operator=(const std_vector_c<T,Allocator>& x)
         {
             impl = x.impl;
+            return *this;
+        }
+
+        std_vector_c<T,Allocator>& operator=(const std::vector<T,Allocator>& x)
+        {
+            impl = x;
             return *this;
         }
 
