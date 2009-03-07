@@ -1610,7 +1610,7 @@ namespace dlib
         T operator() (
             long,
             long c
-        ) const { return std::pow(10,start + c*inc);  }
+        ) const { return std::pow((T)10,start + c*inc);  }
 
         T operator() (
             long c
