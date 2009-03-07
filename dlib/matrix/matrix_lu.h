@@ -111,7 +111,7 @@ namespace dlib
         // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
 
 
-        piv = range(0,m-1);
+        piv = trans(range(0,m-1));
         pivsign = 1;
 
         column_vector_type LUcolj(m);
