@@ -177,6 +177,11 @@ namespace dlib
             return temp;
         }
 
+        typedef int socket_descriptor_type;
+
+        socket_descriptor_type get_socket_descriptor (
+        ) const { return connection_socket; }
+
     private:
 
 

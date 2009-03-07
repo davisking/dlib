@@ -13,6 +13,7 @@
 #include <string>
 #include "../threads.h"
 #include "../smart_pointers.h"
+#include "../uintn.h"
 
 
 namespace dlib
@@ -128,6 +129,15 @@ namespace dlib
 
         int shutdown (
         );
+
+        // I would use SOCKET here but I don't want to include the windows
+        // header files since they bring in a bunch of unpleasantness.  So
+        // I'm doing this instead which should ultimately be the same type
+        // as the SOCKET win the windows API.
+        typedef unsigned_type<void*>::type socket_descriptor_type;
+
+        socket_descriptor_type get_socket_descriptor (
+        ) const;
 
     private:
    

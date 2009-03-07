@@ -331,6 +331,20 @@ namespace dlib
                 - returns OTHER_ERROR if there was an error 
         !*/
 
+        typedef platform_specific_type socket_descriptor_type;
+        socket_descriptor_type get_socket_descriptor (
+        ) const;
+        /*!
+            ensures
+                - returns the underlying socket descriptor for this connection
+                  object.  The reason you might want access to this is to 
+                  pass it to some other library that requires a socket file 
+                  descriptor.  However, if you do this then you probably shouldn't 
+                  use the dlib::connection read() and write() anymore since
+                  whatever you are doing with the socket descriptor is probably 
+                  doing I/O with the socket.
+        !*/
+
     private:
         // restricted functions
         connection();
