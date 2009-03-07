@@ -416,10 +416,10 @@ namespace dlib
     )
     {
         // you can't remove a row from a matrix with only one row
-        COMPILE_TIME_ASSERT(EXP::NR > R || EXP::NR == 0);
+        COMPILE_TIME_ASSERT((EXP::NR > R && R >= 0) || EXP::NR == 0);
         // you can't remove a column from a matrix with only one column 
-        COMPILE_TIME_ASSERT(EXP::NC > C || EXP::NR == 0);
-        DLIB_ASSERT(m.nr() > R && m.nc() > C, 
+        COMPILE_TIME_ASSERT((EXP::NC > C && C >= 0) || EXP::NR == 0);
+        DLIB_ASSERT(m.nr() > R && R >= 0 && m.nc() > C && C >= 0, 
             "\tconst matrix_exp removerc<R,C>(const matrix_exp& m)"
             << "\n\tYou can't remove a row/column from a matrix if it doesn't have that row/column"
             << "\n\tm.nr(): " << m.nr()
@@ -440,7 +440,7 @@ namespace dlib
         long C
     )
     {
-        DLIB_ASSERT(m.nr() > R && m.nc() > C, 
+        DLIB_ASSERT(m.nr() > R && R >= 0 && m.nc() > C && C >= 0, 
             "\tconst matrix_exp removerc(const matrix_exp& m,R,C)"
             << "\n\tYou can't remove a row/column from a matrix if it doesn't have that row/column"
             << "\n\tm.nr(): " << m.nr()
@@ -525,8 +525,8 @@ namespace dlib
     {
         // You can't remove the given column from the matrix because the matrix doesn't
         // have a column with that index.
-        COMPILE_TIME_ASSERT(EXP::NC > C || EXP::NC == 0);
-        DLIB_ASSERT(m.nc() > C , 
+        COMPILE_TIME_ASSERT((EXP::NC > C && C >= 0) || EXP::NC == 0);
+        DLIB_ASSERT(m.nc() > C && C >= 0 , 
             "\tconst matrix_exp remove_col<C>(const matrix_exp& m)"
             << "\n\tYou can't remove a col from a matrix if it doesn't have it"
             << "\n\tm.nr(): " << m.nr()
@@ -545,7 +545,7 @@ namespace dlib
         long C
     )
     {
-        DLIB_ASSERT(m.nc() > C , 
+        DLIB_ASSERT(m.nc() > C && C >= 0 , 
             "\tconst matrix_exp remove_col(const matrix_exp& m,C)"
             << "\n\tYou can't remove a col from a matrix if it doesn't have it"
             << "\n\tm.nr(): " << m.nr()
@@ -629,8 +629,8 @@ namespace dlib
     {
         // You can't remove the given row from the matrix because the matrix doesn't
         // have a row with that index.
-        COMPILE_TIME_ASSERT(EXP::NR > R || EXP::NR == 0);
-        DLIB_ASSERT(m.nr() > R , 
+        COMPILE_TIME_ASSERT((EXP::NR > R && R >= 0) || EXP::NR == 0);
+        DLIB_ASSERT(m.nr() > R && R >= 0, 
             "\tconst matrix_exp remove_row<R>(const matrix_exp& m)"
             << "\n\tYou can't remove a row from a matrix if it doesn't have it"
             << "\n\tm.nr(): " << m.nr()
@@ -649,7 +649,7 @@ namespace dlib
         long R
     )
     {
-        DLIB_ASSERT(m.nr() > R , 
+        DLIB_ASSERT(m.nr() > R && R >= 0, 
             "\tconst matrix_exp remove_row(const matrix_exp& m, long R)"
             << "\n\tYou can't remove a row from a matrix if it doesn't have it"
             << "\n\tm.nr(): " << m.nr()
@@ -1218,18 +1218,6 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        // You can't rotate a matrix by more rows than it has.
-        COMPILE_TIME_ASSERT(R < EXP::NR || EXP::NR == 0);
-        // You can't rotate a matrix by more columns than it has.
-        COMPILE_TIME_ASSERT(C < EXP::NC || EXP::NC == 0);
-        DLIB_ASSERT( R < m.nr() && C < m.nc(),
-            "\tconst matrix_exp::type rotate(const matrix_exp& m)"
-            << "\n\tYou can't rotate a matrix by more rows or columns than it has"
-            << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
-            << "\n\tR:      " << R 
-            << "\n\tC:      " << C 
-            );
         typedef matrix_unary_exp<EXP,op_rotate<R,C> > exp;
         return exp(m.ref());
     }

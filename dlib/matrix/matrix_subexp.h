@@ -82,7 +82,7 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(r >= 0 && c >= 0 && r+nr <= m.nr() && c+nc <= m.nc(), 
+        DLIB_ASSERT(r >= 0 && c >= 0 && nr >= 0 && nc >= 0 && r+nr <= m.nr() && c+nc <= m.nc(), 
             "\tconst matrix_exp subm(const matrix_exp& m, r, c, nr, nc)"
             << "\n\tYou have specified invalid sub matrix dimensions"
             << "\n\tm.nr(): " << m.nr()
@@ -554,7 +554,7 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(r >= 0 && c >= 0 && r+nr <= m.nr() && c+nc <= m.nc(), 
+        DLIB_ASSERT(r >= 0 && c >= 0 && nr >= 0 && nc >= 0 && r+nr <= m.nr() && c+nc <= m.nc(), 
                     "\tassignable_matrix_expression set_subm(matrix& m, r, c, nr, nc)"
                     << "\n\tYou have specified invalid sub matrix dimensions"
                     << "\n\tm.nr(): " << m.nr()

@@ -104,8 +104,10 @@ namespace dlib
     /*!
         requires
             - row >= 0
-            - row + nr <= m.nr()
             - col >= 0
+            - nr >= 0
+            - nc >= 0
+            - row + nr <= m.nr()
             - col + nc <= m.nc()
         ensures
             - returns a matrix R such that:
@@ -259,8 +261,10 @@ namespace dlib
     /*!
         requires
             - row >= 0
-            - row + nr <= m.nr()
             - col >= 0
+            - nr >= 0
+            - nc >= 0
+            - row + nr <= m.nr()
             - col + nc <= m.nc()
         ensures
             - statements of the following form:

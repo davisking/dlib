@@ -261,9 +261,6 @@ namespace dlib
         const matrix_exp& m
     );
     /*!
-        requires
-            - R < m.nr()
-            - C < m.nc()
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
@@ -329,8 +326,8 @@ namespace dlib
     );
     /*!
         requires
-            - m.nr() > R
-            - m.nc() > C
+            - m.nr() > R >= 0
+            - m.nc() > C >= 0
         ensures
             - returns a matrix M such that:
                 - M.nr() == m.nr() - 1
@@ -347,8 +344,8 @@ namespace dlib
     );
     /*!
         requires
-            - m.nr() > R
-            - m.nc() > C
+            - m.nr() > R >= 0
+            - m.nc() > C >= 0
         ensures
             - returns a matrix M such that:
                 - M.nr() == m.nr() - 1
@@ -366,7 +363,7 @@ namespace dlib
     );
     /*!
         requires
-            - m.nr() > R
+            - m.nr() > R >= 0
         ensures
             - returns a matrix M such that:
                 - M.nr() == m.nr() - 1
@@ -382,7 +379,7 @@ namespace dlib
     );
     /*!
         requires
-            - m.nr() > R
+            - m.nr() > R >= 0
         ensures
             - returns a matrix M such that:
                 - M.nr() == m.nr() - 1
@@ -400,7 +397,7 @@ namespace dlib
     );
     /*!
         requires
-            - m.nc() > C
+            - m.nc() > C >= 0
         ensures
             - returns a matrix M such that:
                 - M.nr() == m.nr() 
@@ -416,7 +413,7 @@ namespace dlib
     );
     /*!
         requires
-            - m.nc() > C
+            - m.nc() > C >= 0
         ensures
             - returns a matrix M such that:
                 - M.nr() == m.nr() 
