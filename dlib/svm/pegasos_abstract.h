@@ -5,8 +5,8 @@
 
 #include <cmath>
 #include "../algs.h"
-#include "function.h"
-#include "kernel.h"
+#include "function_abstract.h"
+#include "kernel_abstract.h"
 
 namespace dlib
 {
