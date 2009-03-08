@@ -73,14 +73,14 @@ int main()
 
     sample(0) = 3.123;
     sample(1) = 4;
-    cout << "This sample should close to 1 and it is classified as a " << net(sample) << endl;
+    cout << "This sample should be close to 1 and it is classified as a " << net(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 9.3545;
-    cout << "This sample should close to 0 and it is classified as a " << net(sample) << endl;
+    cout << "This sample should be close to 0 and it is classified as a " << net(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 0;
-    cout << "This sample should close to 0 and it is classified as a " << net(sample) << endl;
+    cout << "This sample should be close to 0 and it is classified as a " << net(sample) << endl;
 }
 
