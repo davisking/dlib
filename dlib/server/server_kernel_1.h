@@ -449,7 +449,7 @@ namespace dlib
 
 
             // make a param structure
-            param* temp;
+            param* temp = 0;
             try{
             temp = new param (
                             *this,
