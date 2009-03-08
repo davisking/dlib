@@ -75,7 +75,7 @@ int main()
 
             // save this sample so we can use it with the batch training examples below
             samples.push_back(sample);
-            labels.push_back(1);
+            labels.push_back(+1);
         }
         else
         {
@@ -89,7 +89,7 @@ int main()
     }
 
     // Now we have trained our SVM.  Lets see how well it did.  
-    // each of these statements prints out the output of the SVM given a particular sample.  
+    // Each of these statements prints out the output of the SVM given a particular sample.  
     // The SVM outputs a number > 0 if a sample is predicted to be in the +1 class and < 0 
     // if a sample is predicted to be in the -1 class.
 
@@ -109,7 +109,7 @@ int main()
 
 
 
-    // The previous parts of this example program showed you how to perform online training
+    // The previous part of this example program showed you how to perform online training
     // with the pegasos algorithm.  But it is often the case that you have a dataset and you 
     // just want to perform batch learning on that dataset and get the resulting decision
     // function.  To support this the dlib library provides functions for converting an online
