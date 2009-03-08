@@ -17,6 +17,7 @@
 
 
 #include <iostream>
+#include <ctime>
 #include <vector>
 #include "dlib/svm.h"
 
