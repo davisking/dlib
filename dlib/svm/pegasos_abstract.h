@@ -83,8 +83,10 @@ namespace dlib
         /*!
             ensures
                 - #get_train_count() == 0
-                - This object has the state is had just after it was constructed
-                  (e.g. clears out any memory of previous calls to train())
+                - clears out any memory of previous calls to train()
+                - #get_lambda() == get_lambda()
+                - #get_tolerance() == get_tolerance()
+                - #get_kernel() == get_kernel()
         !*/
 
         const scalar_type get_lambda (
