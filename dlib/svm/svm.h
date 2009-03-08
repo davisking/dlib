@@ -208,7 +208,16 @@ namespace dlib
             if (is_cached(i) == false)
                 add_col_to_cache(i);
 
-            return &cache(lookup(i),0); 
+            // find where this column is in the cache
+            long idx = lookup(i);
+            if (idx == next)
+            {
+                // if this column was the next to be replaced
+                // then make sure that doesn't happen
+                next = (next + 1)%cache.nr();
+            }
+
+            return &cache(idx,0); 
         }
         const scalar_type* diag() const { return &diag_cache(0); }
 
