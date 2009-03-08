@@ -31,6 +31,17 @@ namespace dlib
                     Pegasos: Primal estimated sub-gradient solver for SVM (2007)
                     by Yoram Singer, Nathan Srebro 
                     In ICML 
+
+                This SVM training algorithm has two interesting properties.  First, the 
+                pegasos algorithm itself converges to the solution in an amount of time
+                unrelated to the size of the training set (in addition to being quite fast
+                to begin with).  This makes it an appropriate algorithm for learning from
+                very large datasets.  Second, this object uses the dlib::kcentroid object 
+                to maintain a sparse approximation of the learned decision function.  
+                This means that the number of support vectors in the resulting decision 
+                function is also unrelated to the size of the dataset (in normal SVM
+                training algorithms, the number of support vectors grows approximately 
+                linearly with the size of the training set).  
         !*/
 
     public:
@@ -76,6 +87,39 @@ namespace dlib
                   (e.g. clears out any memory of previous calls to train())
         !*/
 
+        const scalar_type get_lambda (
+        ) const;
+        /*!
+            ensures
+                - returns the SVM regularization term.  It is the parameter that 
+                  determines the trade off between trying to fit the training data 
+                  exactly or allowing more errors but hopefully improving the 
+                  generalization ability of the resulting classifier.  Smaller 
+                  values encourage exact fitting while larger values may encourage 
+                  better generalization. It is also worth noting that the number 
+                  of iterations it takes for this algorithm to converge is 
+                  proportional to 1/lambda.  So smaller values of this term cause 
+                  the running time of this algorithm to increase.  For more 
+                  information you should consult the paper referenced above.
+        !*/
+
+        const scalar_type get_tolerance (
+        ) const;
+        /*!
+            ensures
+                - returns the tolerance used by the internal kcentroid object to 
+                  represent the learned decision function.  Smaller values of this 
+                  tolerance will result in a more accurate representation of the 
+                  decision function but will use more support vectors.  
+        !*/
+
+        const kernel_type get_kernel (
+        ) const;
+        /*!
+            ensures
+                - returns the kernel used by this object
+        !*/
+
         void set_kernel (
             kernel_type k
         );
@@ -118,21 +162,6 @@ namespace dlib
                   since this object was constructed or last cleared.  
         !*/
 
-        const scalar_type get_lambda (
-        ) const;
-        /*!
-        !*/
-
-        const scalar_type get_tolerance (
-        ) const;
-        /*!
-        !*/
-
-        const kernel_type get_kernel (
-        ) const;
-        /*!
-        !*/
-
         scalar_type train (
             const sample_type& x,
             const scalar_type& y
@@ -142,27 +171,77 @@ namespace dlib
                 - y == 1 || y == -1
             ensures
                 - trains this svm using the given sample x and label y
+                - #get_train_count() == get_train_count() + 1
                 - returns the current learning rate
+                  (i.e. 1/(get_lambda()*get_train_count()))
         !*/
 
         scalar_type operator() (
             const sample_type& x
         ) const;
         /*!
+            ensures
+                - classifies the given x sample using the decision function
+                  this object has learned so far.  
+                - if (x is a sample predicted have +1 label) then
+                    - returns a number >= 0 
+                - else
+                    - returns a number < 0
         !*/
 
         const decision_function<kernel_type> get_decision_function (
         ) const;
         /*!
+            ensures
+                - returns a decision function F that represents the function learned 
+                  by this object so far.  I.e. it is the case that:
+                    - for all x: F(x) == (*this)(x)
         !*/
 
         void swap (
             svm_pegasos& item
         );
         /*!
+            ensures
+                - swaps *this and item
         !*/
 
     }; 
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename kern_type 
+        >
+    void swap(
+        svm_pegasos<kern_type>& a, 
+        svm_pegasos<kern_type>& b
+    ) { a.swap(b); }
+    /*!
+        provides a global swap function
+    !*/
+
+    template <
+        typename kern_type
+        >
+    void serialize (
+        const svm_pegasos<kern_type>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for svm_pegasos objects
+    !*/
+
+    template <
+        typename kern_type 
+        >
+    void deserialize (
+        svm_pegasos<kern_type>& item,
+        std::istream& in 
+    );
+    /*!
+        provides serialization support for svm_pegasos objects
+    !*/
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -173,6 +252,18 @@ namespace dlib
         >
     class batch_trainer 
     {
+        /*!
+            REQUIREMENTS ON trainer_type
+                - trainer_type == some kind of online trainer object (e.g. svm_pegasos)
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a trainer object that is meant to wrap online trainer objects 
+                that create decision_functions. It turns an online learning algorithm 
+                such as svm_pegasos into a batch learning object.  This allows you to 
+                use objects like svm_pegasos with functions (e.g. cross_validate_trainer) 
+                that expect batch mode training objects.
+        !*/
+
     public:
         typedef typename trainer_type::kernel_type kernel_type;
         typedef typename trainer_type::scalar_type scalar_type;
@@ -184,19 +275,43 @@ namespace dlib
         batch_trainer (
         );
         /*!
+            ensures
+                - This object is in an uninitialized state.  You must
+                  construct a real one with the other constructor and assign it
+                  to this instance before you use this object.
         !*/
 
         batch_trainer (
-            const trainer_type& trainer_, 
+            const trainer_type& online_trainer, 
             const scalar_type min_learning_rate_,
             bool verbose_
         );
         /*!
+            requires
+                - min_learning_rate_ > 0
+            ensures
+                - returns a batch trainer object that uses the given online_trainer object
+                  to train a decision function.
+                - #get_kernel() == trainer.get_kernel()
+                - #get_min_learning_rate() == min_learning_rate_
+                - if (verbose_ == true) then
+                    - this object will output status messages to standard out while
+                      training is under way.
+        !*/
+
+        const scalar_type get_min_learning_rate (
+        ) const;
+        /*!
+            ensures
+                - returns the min learning rate that the online trainer must reach
+                  before this object considers training to be complete.
         !*/
 
         const kernel_type get_kernel (
         ) const;
         /*!
+            ensures
+                - returns the kernel used by this trainer object
         !*/
 
         template <
@@ -208,6 +323,14 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const;
         /*!
+            ensures
+                - trains and returns a decision_function using the trainer that was 
+                  supplied to this object's constructor.
+                - training continues until the online training object indicates that
+                  its learning rate has dropped below get_min_learning_rate().
+            throws
+                - std::bad_alloc
+                - any exceptions thrown by the trainer_type object
         !*/
 
     }; 
@@ -222,6 +345,13 @@ namespace dlib
         const typename trainer_type::scalar_type min_learning_rate = 0.1
     ) { return batch_trainer<trainer_type>(trainer, min_learning_rate, false); }
     /*!
+        requires
+            - min_learning_rate > 0
+            - trainer_type == some kind of online trainer object that creates decision_function
+              objects (e.g. svm_pegasos)
+        ensures
+            - returns a batch_trainer object that has been instantiated with the 
+              given arguments.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -234,6 +364,13 @@ namespace dlib
         const typename trainer_type::scalar_type min_learning_rate = 0.1
     ) { return batch_trainer<trainer_type>(trainer, min_learning_rate, true); }
     /*!
+        requires
+            - min_learning_rate > 0
+            - trainer_type == some kind of online trainer object that creates decision_function
+              objects (e.g. svm_pegasos)
+        ensures
+            - returns a batch_trainer object that has been instantiated with the 
+              given arguments (and is verbose).
     !*/
 
 // ----------------------------------------------------------------------------------------

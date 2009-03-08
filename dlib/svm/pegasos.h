@@ -132,18 +132,12 @@ namespace dlib
             const sample_type& x,
             const scalar_type& y
         ) 
-            /*!
-                requires
-                    - y == 1 || y == -1
-                ensures
-                    - trains this svm using the given sample x and label y
-            - returns the current learning rate
-            !*/
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(y == -1 || y == 1,
-                        "\tdecision_function svm_pegasos::train(x,y)"
+                        "\tscalar_type svm_pegasos::train(x,y)"
                         << "\n\t invalid inputs were given to this function"
+                        << "\n\t y: " << y
             );
             ++train_count;
             const scalar_type learning_rate = 1/(lambda*train_count);
@@ -152,7 +146,7 @@ namespace dlib
             if (y*w.inner_product(x) < 1)
             {
 
-                // w = (1-learning_rate*lambda) + y*learning_rate*x
+                // compute: w = (1-learning_rate*lambda) + y*learning_rate*x
                 w.train(x,  1 - learning_rate*lambda,  y*learning_rate);
 
                 scalar_type wnorm = std::sqrt(w.squared_norm());
@@ -194,6 +188,26 @@ namespace dlib
             exchange(w,              item.w);
         }
 
+        friend void serialize(const svm_pegasos& item, std::ostream& out)
+        {
+            serialize(item.kernel, out);
+            serialize(item.lambda, out);
+            serialize(item.tau, out);
+            serialize(item.tolerance, out);
+            serialize(item.train_count, out);
+            serialize(item.w, out);
+        }
+
+        friend void deserialize(svm_pegasos& item, std::istream& in)
+        {
+            deserialize(item.kernel, in);
+            deserialize(item.lambda, in);
+            deserialize(item.tau, in);
+            deserialize(item.tolerance, in);
+            deserialize(item.train_count, in);
+            deserialize(item.w, in);
+        }
+
     private:
 
         kernel_type kernel;
@@ -204,6 +218,14 @@ namespace dlib
         kc_type w;
 
     }; // end of class svm_pegasos
+
+    template <
+        typename K 
+        >
+    void swap (
+        svm_pegasos<K>& a,
+        svm_pegasos<K>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -239,7 +261,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(0 < min_learning_rate_,
-                        "\tsvm_pegasos_trainer::svm_pegasos_trainer(kernel,lambda)"
+                        "\tbatch_trainer::batch_trainer()"
                         << "\n\t invalid inputs were given to this function"
                         << "\n\t min_learning_rate_: " << min_learning_rate_ 
             );
@@ -249,6 +271,12 @@ namespace dlib
         ) const
         {
             return trainer.get_kernel();
+        }
+
+        const scalar_type get_min_learning_rate (
+        ) const 
+        {
+            return min_learning_rate;
         }
 
         template <
@@ -276,17 +304,6 @@ namespace dlib
         {
             typedef typename decision_function<kernel_type>::sample_vector_type sample_vector_type;
             typedef typename decision_function<kernel_type>::scalar_vector_type scalar_vector_type;
-
-            // make sure requires clause is not broken
-            DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
-                        "\tdecision_function batch_trainer::train(x,y)"
-                        << "\n\t invalid inputs were given to this function"
-                        << "\n\t x.nr(): " << x.nr() 
-                        << "\n\t y.nr(): " << y.nr() 
-                        << "\n\t x.nc(): " << x.nc() 
-                        << "\n\t y.nc(): " << y.nc() 
-                        << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
-            );
 
             dlib::rand::kernel_1a rnd;
 
