@@ -896,6 +896,9 @@
             </p>
          </description>
 
+         <examples>
+            <example>svm_pegasos_ex.cpp.html</example>
+         </examples>
       </component>
       
       
@@ -1040,7 +1043,7 @@
          <description>
             <p>
                Trains a <a href="#probabilistic_decision_function">probabilistic_decision_function</a> using 
-               some sort of trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or
+               some sort of batch trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or
                <a href="#rbf_network_trainer">rbf_network_trainer</a>.
             </p>
             The probability model is created by using the technique described in the paper:
@@ -1366,7 +1369,7 @@
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/pegasos_abstract.h</spec_file>
          <description>
-               This is a trainer object that is meant to wrap online trainer objects 
+               This is a batch trainer object that is meant to wrap online trainer objects 
                that create <a href="#decision_function">decision_functions</a>.  It
                turns an online learning algorithm such as <a href="#svm_pegasos">svm_pegasos</a>
                into a batch learning object.  This allows you to use objects like
@@ -1397,7 +1400,7 @@
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/reduced_abstract.h</spec_file>
          <description>
-               This is a trainer object that is meant to wrap other trainer objects 
+               This is a batch trainer object that is meant to wrap other batch trainer objects 
                that create <a href="#decision_function">decision_function</a> objects.
                It performs post processing on the output decision_function objects 
                with the intent of representing the decision_function with fewer 
@@ -1431,7 +1434,7 @@
          <spec_file link="true">dlib/svm/reduced_abstract.h</spec_file>
          <description>
                <p>
-               This is a trainer object that is meant to wrap other trainer objects 
+               This is a batch trainer object that is meant to wrap other batch trainer objects 
                that create <a href="#decision_function">decision_function</a> objects.
                It performs post processing on the output decision_function objects 
                with the intent of representing the decision_function with fewer 

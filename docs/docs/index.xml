@@ -122,6 +122,7 @@
                   <li>Relevance vector machines for <a href="algorithms.html#rvm_trainer">classification</a> 
                       and <a href="algorithms.html#rvm_regression_trainer">regression</a> </li>
                   <li>An online <a href="algorithms.html#krls">kernel RLS regression</a> algorithm</li>
+                  <li>An online <a href="algorithms.html#svm_pegasos">SVM classification</a> algorithm</li>
                   <li>An online kernelized <a href="algorithms.html#kcentroid">centroid estimator</a>/novelty detector</li>
                   <li>A kernelized <a href="algorithms.html#kkmeans">k-means</a> clustering algorithm</li>
                   <li><a href="algorithms.html#rbf_network_trainer">Radial Basis Function Networks</a></li>

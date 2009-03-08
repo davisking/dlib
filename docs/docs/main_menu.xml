@@ -132,6 +132,10 @@
                   <link>svm_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Online_SVM</name>
+                  <link>svm_pegasos_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Neural_Network</name>
                   <link>mlp_ex.cpp.html</link>
                </item>
