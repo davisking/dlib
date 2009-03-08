@@ -284,7 +284,7 @@ namespace dlib
         requires
             - 1 < folds <= x.nr()
             - is_binary_classification_problem(x,y) == true
-            - trainer_type == some kind of trainer object (e.g. svm_nu_trainer)
+            - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
         ensures
             - trains a nu support vector classifier given the training samples in x and 
               labels in y.  

@@ -23,7 +23,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON trainer_type
-                - trainer_type == some kind of trainer object (e.g. svm_nu_trainer)
+                - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents an implementation of a reduced set algorithm
@@ -105,7 +105,7 @@ namespace dlib
     /*!
         requires
             - num_sv > 0
-            - trainer_type == some kind of trainer object that creates decision_function
+            - trainer_type == some kind of batch trainer object that creates decision_function
               objects (e.g. svm_nu_trainer)
         ensures
             - returns a reduced_decision_function_trainer object that has been
@@ -123,7 +123,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON trainer_type
-                - trainer_type == some kind of trainer object (e.g. svm_nu_trainer)
+                - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
                 - trainer_type::sample_type must be a dlib::matrix object
                 - kernel_derivative<trainer_type::kernel_type> must be defined
 
@@ -219,7 +219,7 @@ namespace dlib
     /*!
         requires
             - num_sv > 0
-            - trainer_type == some kind of trainer object that creates decision_function
+            - trainer_type == some kind of batch trainer object that creates decision_function
               objects (e.g. svm_nu_trainer)
             - kernel_derivative<trainer_type::kernel_type> is defined
             - eps > 0
