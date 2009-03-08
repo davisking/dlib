@@ -13,6 +13,41 @@
 <current>
 New Stuff:
    - Matrix related
+      - Added the find_min_and_max(), index_of_min(), index_of_max(), trace(),
+        randm(), linspace(), logspace(), and cartesian_product() functions.
+   - Machine learning related
+      - Added the offset_kernel
+      - Added some functions to the kcentroid to allow the user to compute 
+        the inner_product of kcentroids as well as a few other useful things.
+      - Added a kernelized version of the Pegasos SVM training algorithm.
+
+Non-Backwards Compatible Changes:
+   - Changed the range() function so that it returns row vectors
+     instead of column vectors.  
+
+Bug fixes:
+   - Changed threading code to avoid a potential race condition during 
+     program termination.
+   - Fixed a few incorrect DLIB_ASSERT statements
+   - Fixed a bug in the way Content-type was handled in HTTP posts.
+   - Fixed a bug in subm() that showed up when statically dimensioned row 
+     vectors were used to select a sub matrix.
+
+Other:
+   - Added some functions to the rectangle to make it easy
+     to get the corner points.
+   - The cross validation functions no longer allow invalid_svm_nu_error 
+     exceptions to escape.  Instead, they are assigned low CV scores.
+   - Made std_vector_c able to copy directly from std::vector objects.
+   - Added a get_socket_descriptor() function to the connection class.
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.15" date="Feb 03, 2009">
+New Stuff:
+   - Matrix related
       - Added QR, LU, Cholesky, and eigenvalue decomposition class objects
       - Added overloads for rowm() and colm() that allow you to pick out
         less than an entire vector
@@ -38,7 +73,7 @@ Other:
    - Gave the matrix object the ability to factor expressions containing
      trans() function calls into more efficient forms.
    - Generally cleaned up the matrix code 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 

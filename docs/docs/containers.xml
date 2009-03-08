@@ -342,6 +342,10 @@
                   <name>utilities</name>
                   <sub>
                      <item>
+                        <name>const_temp_matrix</name>
+                        <link>dlib/matrix/matrix_abstract.h.html#const_temp_matrix</link>
+                     </item>
+                     <item>
                         <name>diag</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#diag</link>
                      </item>
