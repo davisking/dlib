@@ -882,6 +882,18 @@
                     In ICML 
                </blockquote>
             </p>
+            <p>
+                This SVM training algorithm has two interesting properties.  First, the 
+                pegasos algorithm itself converges to the solution in an amount of time
+                unrelated to the size of the training set (in addition to being quite fast
+                to begin with).  This makes it an appropriate algorithm for learning from
+                very large datasets.  Second, this object uses the <a href="#kcentroid">kcentroid</a> object 
+                to maintain a sparse approximation of the learned decision function.  
+                This means that the number of support vectors in the resulting decision 
+                function is also unrelated to the size of the dataset (in normal SVM
+                training algorithms, the number of support vectors grows approximately 
+                linearly with the size of the training set).  
+            </p>
          </description>
 
       </component>
