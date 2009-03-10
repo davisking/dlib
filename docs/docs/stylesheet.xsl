@@ -47,6 +47,23 @@
                - <xsl:value-of select="title" />
                </xsl:if>
             </title>
+
+
+            <!-- Piwik -->
+            <script type="text/javascript">
+            var pkBaseURL = (("https:" == document.location.protocol) ? "https://apps.sourceforge.net/piwik/dclib/" : "http://apps.sourceforge.net/piwik/dclib/");
+            document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+            </script><script type="text/javascript">
+            piwik_action_name = '';
+            piwik_idsite = 1;
+            piwik_url = pkBaseURL + "piwik.php";
+            piwik_log(piwik_action_name, piwik_idsite, piwik_url);
+            </script>
+            <object><noscript><p><img src="http://apps.sourceforge.net/piwik/dclib/piwik.php?idsite=1" alt="piwik"/></p></noscript></object>
+            <!-- End Piwik Tag -->
+
+
+
             <!-- [client side code for collapsing and unfolding branches] -->
             <script language="JavaScript">
 
@@ -704,7 +721,7 @@
        </font>
    </xsl:template>   
    <xsl:template match="img">
-      <img src="{@src}" border="0">
+      <img src="{@src}" border="0" height="{@height}" width="{@width}" alt="{@alt}">
          <xsl:apply-templates/>
        </img>
    </xsl:template>   
