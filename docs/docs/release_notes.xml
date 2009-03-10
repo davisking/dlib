@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.16" date="Mar 08, 2009">
+New Stuff:
    - Matrix related
       - Added the find_min_and_max(), index_of_min(), index_of_max(), trace(),
         randm(), linspace(), logspace(), and cartesian_product() functions.
@@ -41,7 +54,7 @@ Other:
    - Made std_vector_c able to copy directly from std::vector objects.
    - Added a get_socket_descriptor() function to the connection class.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
