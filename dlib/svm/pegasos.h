@@ -146,7 +146,7 @@ namespace dlib
             if (y*w.inner_product(x) < 1)
             {
 
-                // compute: w = (1-learning_rate*lambda) + y*learning_rate*x
+                // compute: w = (1-learning_rate*lambda)*w + y*learning_rate*x
                 w.train(x,  1 - learning_rate*lambda,  y*learning_rate);
 
                 scalar_type wnorm = std::sqrt(w.squared_norm());
