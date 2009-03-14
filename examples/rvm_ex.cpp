@@ -178,19 +178,19 @@ int main()
 
     sample(0) = 3.123;
     sample(1) = 2;
-    cout << "This +1 example should have high probability.  It's probability is: " << learned_pfunct(sample) << endl;
+    cout << "This +1 example should have high probability.  Its probability is: " << learned_pfunct(sample) << endl;
 
     sample(0) = 3.123;
     sample(1) = 9.3545;
-    cout << "This +1 example should have high probability.  It's probability is: " << learned_pfunct(sample) << endl;
+    cout << "This +1 example should have high probability.  Its probability is: " << learned_pfunct(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 9.3545;
-    cout << "This -1 example should have low probability.  It's probability is: " << learned_pfunct(sample) << endl;
+    cout << "This -1 example should have low probability.  Its probability is: " << learned_pfunct(sample) << endl;
 
     sample(0) = 13.123;
     sample(1) = 0;
-    cout << "This -1 example should have low probability.  It's probability is: " << learned_pfunct(sample) << endl;
+    cout << "This -1 example should have low probability.  Its probability is: " << learned_pfunct(sample) << endl;
 
 
 
