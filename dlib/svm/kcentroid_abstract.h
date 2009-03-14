@@ -39,10 +39,9 @@ namespace dlib
                 Also note that the algorithm internally keeps a set of "dictionary vectors" 
                 that are used to represent the centroid.  You can force the algorithm to use 
                 no more than a set number of vectors by setting the 3rd constructor argument 
-                to whatever you want.  However, note that doing this causes the algorithm 
-                to bias it's results towards more recent training examples.  
+                to whatever you want.  
 
-                This object also uses the sparsification technique described in the paper The 
+                This object uses the sparsification technique described in the paper The 
                 Kernel Recursive Least Squares Algorithm by Yaakov Engel.  This technique
                 allows us to keep the number of dictionary vectors down to a minimum.  In fact,
                 the object has a user selectable tolerance parameter that controls the trade off
@@ -58,16 +57,19 @@ namespace dlib
         explicit kcentroid (
             const kernel_type& kernel_, 
             scalar_type tolerance_ = 0.001,
-            unsigned long max_dictionary_size_ = 1000000
+            unsigned long max_dictionary_size_ = 1000000,
+            bool remove_oldest_first_ = true
         );
         /*!
             requires
                 - tolerance >= 0
+                - max_dictionary_size_ > 0
             ensures
                 - this object is properly initialized
                 - #tolerance() == tolerance_
                 - #get_kernel() == kernel_
                 - #max_dictionary_size() == max_dictionary_size_
+                - #remove_oldest_first() == remove_oldest_first_
         !*/
 
         const kernel_type& get_kernel (
@@ -84,6 +86,19 @@ namespace dlib
                 - returns the maximum number of dictionary vectors this object
                   will use at a time.  That is, dictionary_size() will never be
                   greater than max_dictionary_size().
+        !*/
+
+        bool remove_oldest_first (
+        ) const;
+        /*!
+            ensures
+                - When the maximum dictionary size is reached then this object sometimes
+                  needs to discard dictionary vectors when new samples are added via
+                  one of the train functions.  If remove_oldest_first() returns true then 
+                  this object discards the oldest dictionary vectors when the maximum 
+                  dictionary size is reached.   Otherise, if this function returns false 
+                  then it means that this object discards the most linearly dependent 
+                  dictionary vectors.
         !*/
 
         unsigned long dictionary_size (

@@ -59,23 +59,27 @@ namespace dlib
                 - #get_lambda() == 0.0001
                 - #get_tolerance() == 0.01
                 - #get_train_count() == 0
+                - #get_max_num_sv() == 40
         !*/
 
         svm_pegasos (
             const kernel_type& kernel_, 
             const scalar_type& lambda_,
-            const scalar_type& tolerance_
+            const scalar_type& tolerance_,
+            unsigned long max_num_sv
         );
         /*!
             requires
                 - lambda_ > 0
                 - tolerance_ > 0
+                - max_num_sv > 0
             ensures
                 - this object is properly initialized 
                 - #get_lambda() == lambda_ 
                 - #get_tolerance() == tolerance_
                 - #get_kernel() == kernel_
                 - #get_train_count() == 0
+                - #get_max_num_sv() == max_num_sv
         !*/
 
         void clear (
@@ -115,6 +119,14 @@ namespace dlib
                   decision function but will use more support vectors.  
         !*/
 
+        unsigned long get_max_num_sv (
+        ) const;
+        /*!
+            ensures
+                - returns the maximum number of support vectors this object is
+                  allowed to use.
+        !*/
+
         const kernel_type get_kernel (
         ) const;
         /*!
@@ -140,6 +152,18 @@ namespace dlib
                 - tol > 0
             ensures
                 - #get_tolerance() == tol
+                - #get_train_count() == 0
+                  (i.e. clears any memory of previous training)
+        !*/
+
+        void set_max_num_sv (
+            unsigned long max_num_sv
+        );
+        /*!
+            requires
+                - max_num_sv > 0
+            ensures
+                - #get_max_num_sv() == max_num_sv 
                 - #get_train_count() == 0
                   (i.e. clears any memory of previous training)
         !*/

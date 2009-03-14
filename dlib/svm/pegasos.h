@@ -32,31 +32,35 @@ namespace dlib
 
         svm_pegasos (
         ) :
+            max_sv(40),
             lambda(0.0001),
             tau(0.01),
             tolerance(0.01),
             train_count(0),
-            w(offset_kernel<kernel_type>(kernel,tau),tolerance)
+            w(offset_kernel<kernel_type>(kernel,tau),tolerance, max_sv, false)
         {
         }
 
         svm_pegasos (
             const kernel_type& kernel_, 
             const scalar_type& lambda_,
-            const scalar_type& tolerance_
+            const scalar_type& tolerance_,
+            unsigned long max_num_sv
         ) :
+            max_sv(max_num_sv),
             kernel(kernel_),
             lambda(lambda_),
             tau(0.01),
             tolerance(tolerance_),
             train_count(0),
-            w(offset_kernel<kernel_type>(kernel,tau),tolerance)
+            w(offset_kernel<kernel_type>(kernel,tau),tolerance, max_sv, false)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(lambda > 0 && tolerance > 0,
+            DLIB_ASSERT(lambda > 0 && tolerance > 0 && max_num_sv > 0,
                         "\tsvm_pegasos::svm_pegasos(kernel,lambda,tolerance)"
                         << "\n\t invalid inputs were given to this function"
                         << "\n\t lambda: " << lambda 
+                        << "\n\t max_num_sv: " << max_num_sv 
             );
         }
 
@@ -64,7 +68,7 @@ namespace dlib
         )
         {
             // reset the w vector back to its initial state
-            w = kc_type(offset_kernel<kernel_type>(kernel,tau),tolerance);
+            w = kc_type(offset_kernel<kernel_type>(kernel,tau),tolerance, max_sv, false);
             train_count = 0;
         }
 
@@ -74,6 +78,26 @@ namespace dlib
         {
             kernel = k;
             clear();
+        }
+
+        void set_max_num_sv (
+            unsigned long max_num_sv
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(max_num_sv > 0,
+                        "\tvoid svm_pegasos::set_max_num_sv(max_num_sv)"
+                        << "\n\t invalid inputs were given to this function"
+                        << "\n\t max_num_sv: " << max_num_sv 
+            );
+            max_sv = max_num_sv; 
+            clear();
+        }
+
+        unsigned long get_max_num_sv (
+        ) const
+        {
+            return max_sv;
         }
 
         void set_tolerance (
@@ -180,6 +204,7 @@ namespace dlib
             svm_pegasos& item
         )
         {
+            exchange(max_sv,         item.max_sv);
             exchange(kernel,         item.kernel);
             exchange(lambda,         item.lambda);
             exchange(tau,            item.tau);
@@ -190,6 +215,7 @@ namespace dlib
 
         friend void serialize(const svm_pegasos& item, std::ostream& out)
         {
+            serialize(item.max_sv, out);
             serialize(item.kernel, out);
             serialize(item.lambda, out);
             serialize(item.tau, out);
@@ -200,6 +226,7 @@ namespace dlib
 
         friend void deserialize(svm_pegasos& item, std::istream& in)
         {
+            deserialize(item.max_sv, in);
             deserialize(item.kernel, in);
             deserialize(item.lambda, in);
             deserialize(item.tau, in);
@@ -210,6 +237,7 @@ namespace dlib
 
     private:
 
+        unsigned long max_sv;
         kernel_type kernel;
         scalar_type lambda;
         scalar_type tau;

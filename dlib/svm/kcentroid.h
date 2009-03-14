@@ -19,13 +19,46 @@ namespace dlib
     class kcentroid
     {
         /*!
-            This is an implementation of an online algorithm for recursively estimating the
-            centroid of a sequence of training points.  It uses the sparsification technique
-            described in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
+            This object represents a weighted sum of sample points in a kernel induced
+            feature space.  It can be used to kernelized any algorithm that requires only
+            the ability to perform vector addition, subtraction, scalar multiplication,
+            and inner products.  It uses the sparsification technique described in the 
+            paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
 
-            To understand the code it would also be useful to consult page 114 of the book Kernel 
-            Methods for Pattern Analysis by Taylor and Cristianini as well as page 554 
-            (particularly equation 18.31) of the book Learning with Kernels by Scholkopf and Smola.
+            To understand the code it would also be useful to consult page 114 of the book 
+            Kernel Methods for Pattern Analysis by Taylor and Cristianini as well as page 554 
+            (particularly equation 18.31) of the book Learning with Kernels by Scholkopf and 
+            Smola.  Everything you really need to know is in the Engel paper.  But the other 
+            books help give more perspective on the issues involved.
+
+
+            INITIAL VALUE
+                - min_strength == 0
+                - min_vect_idx == 0
+                - K_inv.size() == 0
+                - K.size() == 0
+                - dictionary.size() == 0
+                - bias == 0
+                - bias_is_stale == false
+
+            CONVENTION
+                - max_dictionary_size() == my_max_dictionary_size
+                - get_kernel() == kernel
+
+                - K.nr() == dictionary.size()
+                - K.nc() == dictionary.size()
+                - for all valid r,c:
+                    - K(r,c) == kernel(dictionary[r], dictionary[c])
+                - K_inv == inv(K)
+
+                - if (dictionary.size() == my_max_dictionary_size && my_remove_oldest_first == false) then
+                    - for all valid 0 < i < dictionary.size():
+                        - Let STRENGTHS[i] == the delta you would get for dictionary[i] (i.e. Approximately 
+                          Linearly Dependent value) if you removed dictionary[i] from this object and then 
+                          tried to add it back in.
+                        - min_strength == the minimum value from STRENGTHS
+                        - min_vect_idx == the index of the element in STRENGTHS with the smallest value
+
         !*/
 
     public:
@@ -37,8 +70,10 @@ namespace dlib
         explicit kcentroid (
             const kernel_type& kernel_, 
             scalar_type tolerance_ = 0.001,
-            unsigned long max_dictionary_size_ = 1000000
+            unsigned long max_dictionary_size_ = 1000000,
+            bool remove_oldest_first_ = true
         ) : 
+            my_remove_oldest_first(remove_oldest_first_),
             kernel(kernel_), 
             my_tolerance(tolerance_),
             my_max_dictionary_size(max_dictionary_size_),
@@ -46,11 +81,12 @@ namespace dlib
             bias_is_stale(false)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(tolerance_ >= 0,
+            DLIB_ASSERT(tolerance_ >= 0 && max_dictionary_size_ > 0,
                 "\tkcentroid::kcentroid()"
                 << "\n\t You have to give a positive tolerance"
-                << "\n\t this: " << this
-                << "\n\t tolerance: " << tolerance_ 
+                << "\n\t this:                 " << this
+                << "\n\t tolerance_:           " << tolerance_ 
+                << "\n\t max_dictionary_size_: " << max_dictionary_size_ 
                 );
 
             clear_dictionary();
@@ -66,6 +102,12 @@ namespace dlib
             return my_max_dictionary_size;
         }
 
+        bool remove_oldest_first (
+        ) const
+        {
+            return my_remove_oldest_first;
+        }
+
         const kernel_type& get_kernel (
         ) const
         {
@@ -77,6 +119,8 @@ namespace dlib
             dictionary.clear();
             alpha.clear();
 
+            min_strength = 0;
+            min_vect_idx = 0;
             K_inv.set_size(0,0);
             K.set_size(0,0);
             samples_seen = 0;
@@ -215,6 +259,10 @@ namespace dlib
             kcentroid& item
         )
         {
+            exchange(min_strength, item.min_strength);
+            exchange(min_vect_idx, item.min_vect_idx);
+            exchange(my_remove_oldest_first, item.my_remove_oldest_first);
+
             exchange(kernel, item.kernel);
             dictionary.swap(item.dictionary);
             alpha.swap(item.alpha);
@@ -234,6 +282,10 @@ namespace dlib
 
         friend void serialize(const kcentroid& item, std::ostream& out)
         {
+            serialize(item.min_strength, out);
+            serialize(item.min_vect_idx, out);
+            serialize(item.my_remove_oldest_first, out);
+
             serialize(item.kernel, out);
             serialize(item.dictionary, out);
             serialize(item.alpha, out);
@@ -248,6 +300,10 @@ namespace dlib
 
         friend void deserialize(kcentroid& item, std::istream& in)
         {
+            deserialize(item.min_strength, in);
+            deserialize(item.min_vect_idx, in);
+            deserialize(item.my_remove_oldest_first, in);
+
             deserialize(item.kernel, in);
             deserialize(item.dictionary, in);
             deserialize(item.alpha, in);
@@ -313,6 +369,7 @@ namespace dlib
 
                 if (do_test)
                 {
+                    refresh_bias();
                     test_result = std::sqrt(kx + bias - 2*trans(vector_to_matrix(alpha))*k);
                 }
 
@@ -323,13 +380,29 @@ namespace dlib
 
                 // if this new vector isn't approximately linearly dependent on the vectors
                 // in our dictionary.
-                if (delta > my_tolerance)
+                if (delta > min_strength && delta > my_tolerance)
                 {
+                    bool need_to_update_min_strength = false;
                     if (dictionary.size() >= my_max_dictionary_size)
                     {
                         // We need to remove one of the old members of the dictionary before
-                        // we proceed with adding a new one.  So remove the oldest dictionary vector.
-                        const long idx_to_remove = 0;
+                        // we proceed with adding a new one.  
+                        long idx_to_remove;
+                        if (my_remove_oldest_first)
+                        {
+                            // remove the oldest one
+                            idx_to_remove = 0;
+                        }
+                        else
+                        {
+                            // if we have never computed the min_strength then we should compute it 
+                            if (min_strength == 0)
+                                recompute_min_strength();
+
+                            // select the dictionary vector that is most linearly dependent for removal
+                            idx_to_remove = min_vect_idx;
+                            need_to_update_min_strength = true;
+                        }
 
                         remove_dictionary_vector(idx_to_remove);
 
@@ -377,6 +450,13 @@ namespace dlib
                         alpha[i] *= cscale;
                     }
                     alpha.push_back(xscale);
+
+
+                    if (need_to_update_min_strength)
+                    {
+                        // now we have to recompute the min_strength in this case
+                        recompute_min_strength();
+                    }
                 }
                 else
                 {
@@ -432,6 +512,35 @@ namespace dlib
             K = removerc(K,i,i);
         }
 
+        void recompute_min_strength (
+        )
+        /*!
+            ensures
+                - recomputes the min_strength and min_vect_idx values
+                  so that they are correct with respect to the CONVENTION
+                - uses the this->a variable so after this function runs that variable
+                  will contain a different value.  
+        !*/
+        {
+            min_strength = std::numeric_limits<scalar_type>::max();
+
+            // here we loop over each dictionary vector and compute what its delta would be if
+            // we were to remove it from the dictionary and then try to add it back in.
+            for (unsigned long i = 0; i < dictionary.size(); ++i)
+            {
+                // compute a = K_inv*k but where dictionary vector i has been removed
+                a = (removerc(K_inv,i,i) - remove_row(colm(K_inv,i)/K_inv(i,i),i)*remove_col(rowm(K_inv,i),i)) *
+                    (remove_row(colm(K,i),i));
+                scalar_type delta = K(i,i) - trans(remove_row(colm(K,i),i))*a;
+
+                if (delta < min_strength)
+                {
+                    min_strength = delta;
+                    min_vect_idx = i;
+                }
+            }
+        }
+
 
 
         typedef std_allocator<sample_type, mem_manager_type> alloc_sample_type;
@@ -439,6 +548,10 @@ namespace dlib
         typedef std::vector<sample_type,alloc_sample_type> dictionary_vector_type;
         typedef std::vector<scalar_type,alloc_scalar_type> alpha_vector_type;
 
+
+        scalar_type min_strength;
+        unsigned long min_vect_idx;
+        bool my_remove_oldest_first;
 
         kernel_type kernel;
         dictionary_vector_type dictionary;
