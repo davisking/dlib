@@ -135,6 +135,9 @@ namespace dlib
                 {
                     if (dictionary.size() == my_max_dictionary_size)
                     {
+                        // if we have never computed the min_strength then we should compute it 
+                        if (min_strength == 0)
+                            recompute_min_strength();
 
                         const long i = min_vect_idx;
 
