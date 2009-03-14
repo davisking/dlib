@@ -50,7 +50,14 @@ int main()
     // description of what these parameters are. 
     trainer.set_lambda(0.00001);
     trainer.set_kernel(kernel_type(0.005));
-    trainer.set_tolerance(0.2);
+
+    // Set the maximum number of support vectors we want the trainer object to use
+    // in representing the decision function it is going to learn.  In general, 
+    // supplying a bigger number here will only ever give you a more accurate
+    // answer.  However, giving a smaller number will make the algorithm run
+    // faster and decision rules that involve fewer support vectors also take
+    // less time to evaluate.  
+    trainer.set_max_num_sv(10);
 
     std::vector<sample_type> samples;
     std::vector<double> labels;
