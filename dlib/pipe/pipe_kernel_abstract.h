@@ -85,7 +85,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - blocls until one of the following is the case: 
+                - blocks until one of the following is the case: 
                     - size() == 0 and the number of threads blocked on calls 
                       to dequeue() and dequeue_or_timeout() is greater than 
                       or equal to num.
