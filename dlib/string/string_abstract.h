@@ -159,6 +159,38 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename traits,
+        typename alloc
+        >
+    bool strings_equal_ignore_case (
+        const std::basic_string<char,traits,alloc>& str1,
+        const std::basic_string<char,traits,alloc>& str2
+    );
+    /*!
+        ensures
+            - returns tolower(str1) == tolower(str2)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename traits,
+        typename alloc
+        >
+    bool strings_equal_ignore_case (
+        const std::basic_string<char,traits,alloc>& str1,
+        const std::basic_string<char,traits,alloc>& str2,
+        unsigned long num
+    );
+    /*!
+        ensures
+            - returns tolower(str1.substr(0,num)) == tolower(str2.substr(0,num))
+              (i.e. only compares the first num characters)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename charT,
         typename traits,
         typename alloc

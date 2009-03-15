@@ -3,12 +3,12 @@
 #ifndef DLIB_STRINg_
 #define DLIB_STRINg_ 
 
+#include "string_abstract.h"
 #include "../algs.h"
 #include <string>
 #include <iostream>
 #include "../error.h"
 #include "../assert.h"
-#include "string_abstract.h"
 #include "../uintn.h"
 #include <cctype>
 #include <algorithm>
@@ -55,6 +55,129 @@ namespace dlib
             temp[i] = (char)std::toupper(str[i]);
 
         return temp;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename traits,
+        typename alloc
+        >
+    bool strings_equal_ignore_case (
+        const std::basic_string<char,traits,alloc>& str1,
+        const std::basic_string<char,traits,alloc>& str2
+    )
+    {
+        if (str1.size() != str2.size())
+            return false;
+
+        for (typename std::basic_string<char,traits,alloc>::size_type i = 0; i < str1.size(); ++i)
+        {
+            if (std::tolower(str1[i]) != std::tolower(str2[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    template <
+        typename traits,
+        typename alloc
+        >
+    bool strings_equal_ignore_case (
+        const std::basic_string<char,traits,alloc>& str1,
+        const char* str2
+    )
+    {
+        typename std::basic_string<char,traits,alloc>::size_type i;
+        for (i = 0; i < str1.size(); ++i)
+        {
+            // if we hit the end of str2 then the strings aren't the same length
+            if (str2[i] == '\0')
+                return false;
+
+            if (std::tolower(str1[i]) != std::tolower(str2[i]))
+                return false;
+        }
+
+        // This happens when str2 is longer than str1
+        if (str2[i] != '\0')
+            return false;
+
+        return true;
+    }
+
+    template <
+        typename traits,
+        typename alloc
+        >
+    bool strings_equal_ignore_case (
+        const char* str1,
+        const std::basic_string<char,traits,alloc>& str2
+    )
+    {
+        return strings_equal_ignore_case(str2, str1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename traits,
+        typename alloc
+        >
+    bool strings_equal_ignore_case (
+        const std::basic_string<char,traits,alloc>& str1,
+        const std::basic_string<char,traits,alloc>& str2,
+        unsigned long num
+    )
+    {
+        if (str1.size() != str2.size() && (str1.size() < num || str2.size() < num))
+            return false;
+
+        for (typename std::basic_string<char,traits,alloc>::size_type i = 0; i < str1.size() && i < num; ++i)
+        {
+            if (std::tolower(str1[i]) != std::tolower(str2[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    template <
+        typename traits,
+        typename alloc
+        >
+    bool strings_equal_ignore_case (
+        const std::basic_string<char,traits,alloc>& str1,
+        const char* str2,
+        unsigned long num
+    )
+    {
+        typename std::basic_string<char,traits,alloc>::size_type i;
+        for (i = 0; i < str1.size() && i < num; ++i)
+        {
+            // if we hit the end of str2 then the strings aren't the same length
+            if (str2[i] == '\0')
+                return false;
+
+            if (std::tolower(str1[i]) != std::tolower(str2[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    template <
+        typename traits,
+        typename alloc
+        >
+    bool strings_equal_ignore_case (
+        const char* str1,
+        const std::basic_string<char,traits,alloc>& str2,
+        unsigned long num
+    )
+    {
+        return strings_equal_ignore_case(str2, str1, num);
     }
 
 // ----------------------------------------------------------------------------------------
