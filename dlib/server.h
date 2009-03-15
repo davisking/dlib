@@ -30,9 +30,6 @@ namespace dlib
         typedef sockstreambuf::kernel_1a ssbuf1a;
         typedef sockstreambuf::kernel_2a ssbuf2a;
 
-        typedef map<std::string,std::string>::kernel_1a_c map_ss_type;
-        typedef queue<std::string>::kernel_1a_c queue_type;
-
         typedef map<uint64,connection*,memory_manager<char>::kernel_2a>::kernel_1b id_map;
 
     public:
@@ -52,9 +49,9 @@ namespace dlib
                     iostream_1a_c;
 
         // http_1a
-        typedef     server_http_1<iostream_1a,map_ss_type,queue_type>
+        typedef     server_http_1<iostream_1a>
                     http_1a;
-        typedef     server_http_1<iostream_1a_c,map_ss_type,queue_type>
+        typedef     server_http_1<iostream_1a_c>
                     http_1a_c;
 
     };
