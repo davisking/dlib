@@ -12,12 +12,27 @@
 
 <current>
 New Stuff:
+   - Added the strings_equal_ignore_case() functions
 
 Non-Backwards Compatible Changes:
+   - Changed the on_request() function in the http server
+   - Changed the serialization format of the kcentroid and svm_pegasos
+     objects
 
 Bug fixes:
 
 Other:
+   - Split the algorithms documentation page into three pages, algorithms,
+     machine learning, and bayes nets.
+   - Merged in Steven Van Ingelgem's patch to cleanup the HTTP server and
+     add new functionality.  This breaks backwards compatibility with the
+     previous on_request() interface but it is easy to update old code and
+     it is now much cleaner and easier to use.
+   - Changed the kcentroid so that you can tell it to keep the most linearly 
+     independent vectors rather than the newest vectors.  I then changed the
+     svm_pegasos object so that it has a max number of support vector setting
+     so that the user can supply an upper limit on the number of support 
+     vectors to use.  
 
 </current>
 

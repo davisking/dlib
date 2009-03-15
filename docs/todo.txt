@@ -2,11 +2,6 @@
 
 
 
-maybe add a function to find the distance between two column vectors
-
-
-
-
 
 move all the function bodies in widgets.h to cpp.
 
