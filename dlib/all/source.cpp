@@ -13,7 +13,6 @@
 #include "../entropy_encoder/entropy_encoder_kernel_1.cpp"
 #include "../entropy_encoder/entropy_encoder_kernel_2.cpp"
 #include "../md5/md5_kernel_1.cpp"
-#include "../pixel.cpp"
 #include "../tokenizer/tokenizer_kernel_1.cpp"
 #include "../unicode/unicode.cpp"
 
