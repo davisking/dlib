@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>Bayesian Networks</title>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <br/><br/>
+
+         <p>
+            This page documents all the tools within the dlib library that relate
+            to the construction and evaluation of Bayesian networks.  If you want
+            a quick introduction to the tools then you should consult the 
+            Bayesian Net <a href="bayes_net_ex.cpp.html">example program</a>.  
+            
+         </p>
+         <p>
+            The
+            library also comes with a graphical application to assist in the 
+            creation of bayesian networks.  This application is one of the example
+            programs, so to use it you have to compile it yourself or download
+            one of the binaries from the sourceforge download page.
+         </p>
+
+   </body>
+
+   <!-- ************************************************************************* -->
+
+   <menu width="150">
+    <top>
+      <section>
+         <name>Tools</name>
+         <item>assignment</item>
+         <item>joint_probability_table</item>
+         <item>conditional_probability_table</item>
+         <item>bayes_node</item>
+         <item>bayesian_network_gibbs_sampler</item>
+         <item>bayesian_network_join_tree</item>
+
+      </section>
+
+      <section>
+         <name>Node Utilities</name>
+         <item>set_node_value</item>
+         <item>node_value</item>
+         <item>node_is_evidence</item>
+         <item>set_node_as_evidence</item>
+         <item>set_node_as_nonevidence</item>
+         <item>set_node_num_values</item>
+         <item>node_num_values</item>
+         <item>node_probability</item>
+         <item>set_node_probability</item>
+         <item>node_first_parent_assignment</item>
+         <item>node_next_parent_assignment</item>
+         <item>node_cpt_filled_out</item>
+
+      </section>
+
+    </top>  
+   </menu>
+
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
+   <components>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bayesian_network_join_tree</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object represents an implementation of the join tree algorithm 
+            (a.k.a. the junction tree algorithm)
+            for inference in bayesian networks.  
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+            <example>bayes_net_gui_ex.cpp.html</example>
+            <example>bayes_net_from_disk_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bayesian_network_gibbs_sampler</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object performs Markov Chain Monte Carlo sampling of a bayesian
+            network using the Gibbs sampling technique. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bayes_node</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object represents a node in a bayesian network.  It is
+            intended to be used inside the <a href="containers.html#directed_graph">directed_graph</a> object to
+            represent bayesian networks.
+         </description>
+                                 
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>conditional_probability_table</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object represents a conditional probability table.
+         </description>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>joint_probability_table</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object represents a joint probability table.  
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>assignment</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This object models an assignment of random variables to particular values.
+            It is used with the <a href="#joint_probability_table">joint_probability_table</a> and 
+            <a href="#conditional_probability_table">conditional_probability_table</a>
+            objects to represent assignments of various random variables to actual values.
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_probability</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily set the probability of a  
+            <a href="#bayes_node">bayes_node</a> given its parents when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_first_parent_assignment</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain an <a href="#assignment">assignment</a>
+            that contains all the parents of a node in a bayesian network.
+         </description>
+         <examples>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_next_parent_assignment</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily loop through all the parent <a href="#assignment">assignments</a>
+            of a node in a bayesian network.
+         </description>
+         <examples>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_cpt_filled_out</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily verify that a node
+            in a bayesian network has its <a href="#conditional_probability_table">conditional_probability_table</a> 
+            completely filled out.
+         </description>
+         <examples>
+            <example>bayes_net_gui_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
+         <name>node_probability</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain the probability of a  
+            <a href="#bayes_node">bayes_node</a> given its parents when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_num_values</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain the number of values of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_num_values</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily set the number of values of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_as_nonevidence</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily remove the evidence flag of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_as_evidence</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily set the evidence flag of a  
+            <a href="#bayes_node">bayes_node</a> when it is inside 
+            a <a href="containers.html#directed_graph">directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_is_evidence</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily determine if a  
+            <a href="#bayes_node">bayes_node</a> is evidence when it is inside 
+            a <a href="containers.html#directed_graph"> directed_graph</a> object. 
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>node_value</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily obtain the value of a 
+            <a href="#bayes_node">bayes_node</a> when it is inside a <a href="containers.html#directed_graph">
+            directed_graph</a> object. 
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>set_node_value</name>
+         <file>dlib/bayes_utils.h</file>
+         <spec_file link="true">dlib/bayes_utils/bayes_utils_abstract.h</spec_file>
+         <description>
+            This is a function declared in the dlib::bayes_node_utils namespace.  It 
+            is a convenience function that allows you to easily modify the value of a 
+            <a href="#bayes_node">bayes_node</a> when it is inside a <a href="containers.html#directed_graph">
+            directed_graph</a> object. 
+         </description>
+         <examples>
+            <example>bayes_net_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+   </components>
+
+   <!-- ************************************************************************* -->
+
+
+</doc>
+
+

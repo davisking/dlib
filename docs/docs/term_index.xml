@@ -355,27 +355,26 @@
          <term link="algorithms.html#find_min_quasi_newton2" name="find_min_quasi_newton2"/>
          <term link="algorithms.html#find_min_conjugate_gradient2" name="find_min_conjugate_gradient2"/>
 
+         <term link="bayes.html#set_node_value" name="set_node_value"/>
+         <term link="bayes.html#node_value" name="node_value"/>
+         <term link="bayes.html#node_is_evidence" name="node_is_evidence"/>
+         <term link="bayes.html#set_node_as_evidence" name="set_node_as_evidence"/>
+         <term link="bayes.html#set_node_as_nonevidence" name="set_node_as_nonevidence"/>
+         <term link="bayes.html#set_node_num_values" name="set_node_num_values"/>
+         <term link="bayes.html#node_num_values" name="node_num_values"/>
+         <term link="bayes.html#node_probability" name="node_probability"/>
+         <term link="bayes.html#set_node_probability" name="set_node_probability"/>
+         <term link="bayes.html#assignment" name="assignment"/>
+         <term link="bayes.html#joint_probability_table" name="joint_probability_table"/>
+         <term link="bayes.html#conditional_probability_table" name="conditional_probability_table"/>
+         <term link="bayes.html#bayes_node" name="bayes_node"/>
+         <term link="bayes.html#bayesian_network_gibbs_sampler" name="bayesian_network_gibbs_sampler"/>
+         <term link="bayes.html#bayesian_network_join_tree" name="bayesian_network_join_tree"/>
+         <term link="bayes.html#node_first_parent_assignment" name="node_first_parent_assignment"/>
+         <term link="bayes.html#node_next_parent_assignment" name="node_next_parent_assignment"/>
+         <term link="bayes.html#node_cpt_filled_out" name="node_cpt_filled_out"/>
 
          <term link="algorithms.html#rectangle" name="rectangle"/>
-         <term link="algorithms.html#set_node_value" name="set_node_value"/>
-         <term link="algorithms.html#node_value" name="node_value"/>
-         <term link="algorithms.html#node_is_evidence" name="node_is_evidence"/>
-         <term link="algorithms.html#set_node_as_evidence" name="set_node_as_evidence"/>
-         <term link="algorithms.html#set_node_as_nonevidence" name="set_node_as_nonevidence"/>
-         <term link="algorithms.html#set_node_num_values" name="set_node_num_values"/>
-         <term link="algorithms.html#node_num_values" name="node_num_values"/>
-         <term link="algorithms.html#node_probability" name="node_probability"/>
-         <term link="algorithms.html#set_node_probability" name="set_node_probability"/>
-         <term link="algorithms.html#assignment" name="assignment"/>
-         <term link="algorithms.html#joint_probability_table" name="joint_probability_table"/>
-         <term link="algorithms.html#conditional_probability_table" name="conditional_probability_table"/>
-         <term link="algorithms.html#bayes_node" name="bayes_node"/>
-         <term link="algorithms.html#bayesian_network_gibbs_sampler" name="bayesian_network_gibbs_sampler"/>
-         <term link="algorithms.html#bayesian_network_join_tree" name="bayesian_network_join_tree"/>
-         <term link="algorithms.html#node_first_parent_assignment" name="node_first_parent_assignment"/>
-         <term link="algorithms.html#node_next_parent_assignment" name="node_next_parent_assignment"/>
-         <term link="algorithms.html#node_cpt_filled_out" name="node_cpt_filled_out"/>
-
 
          <term link="algorithms.html#edge" name="edge"/>
          <term link="algorithms.html#is_join_tree" name="is_join_tree"/>
@@ -391,9 +390,6 @@
          <term link="algorithms.html#isort_array" name="isort_array"/>
          <term link="algorithms.html#md5" name="md5"/>
          <term link="algorithms.html#median" name="median"/>
-         <term link="algorithms.html#mlp" name="mlp"/>
-         <term link="algorithms.html#mlp" name="multi-layer perceptron"/>
-         <term link="algorithms.html#mlp" name="neural network"/>
          <term link="algorithms.html#qsort_array" name="qsort_array"/>
          <term link="algorithms.html#rand" name="rand"/>
          <term link="algorithms.html#rand" name="Mersenne Twister"/>
@@ -408,53 +404,55 @@
          <term link="algorithms.html#graph_is_connected" name="graph_is_connected"/>
          <term link="algorithms.html#is_clique" name="is_clique"/>
          <term link="algorithms.html#is_maximal_clique" name="is_maximal_clique"/>
-
-
-
-         <term link="algorithms.html#svm_pegasos" name="svm_pegasos"/>
-         <term link="algorithms.html#batch" name="batch"/>
-         <term link="algorithms.html#verbose_batch" name="verbose_batch"/>
-         <term link="algorithms.html#batch_trainer" name="batch_trainer"/>
-         <term link="algorithms.html#randomize_samples" name="randomize_samples"/>
-         <term link="algorithms.html#is_binary_classification_problem" name="is_binary_classification_problem"/>
          <term link="algorithms.html#square_root" name="square_root"/>
-         <term link="algorithms.html#svm_nu_trainer" name="svm_nu_trainer"/>
-         <term link="algorithms.html#rvm_trainer" name="rvm_trainer"/>
-         <term link="algorithms.html#rvm_regression_trainer" name="rvm_regression_trainer"/>
-         <term link="algorithms.html#rbf_network_trainer" name="rbf_network_trainer"/>
-         <term link="algorithms.html#reduced" name="reduced"/>
-         <term link="algorithms.html#reduced_decision_function_trainer" name="reduced_decision_function_trainer"/>
-         <term link="algorithms.html#reduced2" name="reduced2"/>
-         <term link="algorithms.html#reduced_decision_function_trainer2" name="reduced_decision_function_trainer2"/>
-         <term link="algorithms.html#train_probabilistic_decision_function" name="train_probabilistic_decision_function"/>
-         <term link="algorithms.html#cross_validate_trainer" name="cross_validate_trainer"/>
-         <term link="algorithms.html#cross_validate_trainer_threaded" name="cross_validate_trainer_threaded"/>
-         <term link="algorithms.html#test_binary_decision_function" name="test_binary_decision_function"/>
-         <term link="algorithms.html#svm_nu_trainer" name="support vector machine"/>
-         <term link="algorithms.html#rvm_trainer" name="relevance vector machine"/>
          <term link="algorithms.html#vector" name="vector"/>
          <term link="algorithms.html#point" name="point"/>
-         <term link="algorithms.html#krls" name="krls"/>
-         <term link="algorithms.html#kcentroid" name="kcentroid"/>
-         <term link="algorithms.html#linearly_independent_subset_finder" name="linearly_independent_subset_finder"/>
          <term link="algorithms.html#running_stats" name="running_stats"/>
-         <term link="algorithms.html#vector_normalizer" name="vector_normalizer"/>
-         <term link="algorithms.html#kkmeans" name="kkmeans"/>
-         <term link="algorithms.html#pick_initial_centers" name="pick_initial_centers"/>
-         <term link="algorithms.html#rank_features" name="rank_features"/>
 
-         
+
+
+
+         <term link="ml.html#mlp" name="mlp"/>
+         <term link="ml.html#mlp" name="multi-layer perceptron"/>
+         <term link="ml.html#mlp" name="neural network"/>
+         <term link="ml.html#svm_pegasos" name="svm_pegasos"/>
+         <term link="ml.html#batch" name="batch"/>
+         <term link="ml.html#verbose_batch" name="verbose_batch"/>
+         <term link="ml.html#batch_trainer" name="batch_trainer"/>
+         <term link="ml.html#randomize_samples" name="randomize_samples"/>
+         <term link="ml.html#is_binary_classification_problem" name="is_binary_classification_problem"/>
+         <term link="ml.html#svm_nu_trainer" name="svm_nu_trainer"/>
+         <term link="ml.html#rvm_trainer" name="rvm_trainer"/>
+         <term link="ml.html#rvm_regression_trainer" name="rvm_regression_trainer"/>
+         <term link="ml.html#rbf_network_trainer" name="rbf_network_trainer"/>
+         <term link="ml.html#reduced" name="reduced"/>
+         <term link="ml.html#reduced_decision_function_trainer" name="reduced_decision_function_trainer"/>
+         <term link="ml.html#reduced2" name="reduced2"/>
+         <term link="ml.html#reduced_decision_function_trainer2" name="reduced_decision_function_trainer2"/>
+         <term link="ml.html#train_probabilistic_decision_function" name="train_probabilistic_decision_function"/>
+         <term link="ml.html#cross_validate_trainer" name="cross_validate_trainer"/>
+         <term link="ml.html#cross_validate_trainer_threaded" name="cross_validate_trainer_threaded"/>
+         <term link="ml.html#test_binary_decision_function" name="test_binary_decision_function"/>
+         <term link="ml.html#svm_nu_trainer" name="support vector machine"/>
+         <term link="ml.html#rvm_trainer" name="relevance vector machine"/>
+         <term link="ml.html#krls" name="krls"/>
+         <term link="ml.html#kcentroid" name="kcentroid"/>
+         <term link="ml.html#linearly_independent_subset_finder" name="linearly_independent_subset_finder"/>
+         <term link="ml.html#vector_normalizer" name="vector_normalizer"/>
+         <term link="ml.html#kkmeans" name="kkmeans"/>
+         <term link="ml.html#pick_initial_centers" name="pick_initial_centers"/>
+         <term link="ml.html#rank_features" name="rank_features"/>
          <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>
 
-         <term link="algorithms.html#decision_function" name="decision_function"/>
-         <term link="algorithms.html#normalized_function" name="normalized_function"/>
-         <term link="algorithms.html#distance_function" name="distance_function"/>
-         <term link="algorithms.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
-         <term link="algorithms.html#linear_kernel" name="linear_kernel"/>
-         <term link="algorithms.html#offset_kernel" name="offset_kernel"/>
-         <term link="algorithms.html#polynomial_kernel" name="polynomial_kernel"/>
-         <term link="algorithms.html#sigmoid_kernel" name="sigmoid_kernel"/>
-         <term link="algorithms.html#radial_basis_kernel" name="radial_basis_kernel"/>
+         <term link="ml.html#decision_function" name="decision_function"/>
+         <term link="ml.html#normalized_function" name="normalized_function"/>
+         <term link="ml.html#distance_function" name="distance_function"/>
+         <term link="ml.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
+         <term link="ml.html#linear_kernel" name="linear_kernel"/>
+         <term link="ml.html#offset_kernel" name="offset_kernel"/>
+         <term link="ml.html#polynomial_kernel" name="polynomial_kernel"/>
+         <term link="ml.html#sigmoid_kernel" name="sigmoid_kernel"/>
+         <term link="ml.html#radial_basis_kernel" name="radial_basis_kernel"/>
 
          <term link="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects" name="Kernel Function Objects"/>
          <term link="dlib/svm/kernel_abstract.h.html#kernel_derivative" name="kernel_derivative"/>
@@ -761,6 +759,7 @@
          <term link="parsing.html#ustring" name="ustring"/>
          <term link="parsing.html#convert_utf8_to_utf32" name="convert_utf8_to_utf32"/>
          <term link="parsing.html#is_combining_char" name="is_combining_char"/>
+         <term link="parsing.html#strings_equal_ignore_case" name="strings_equal_ignore_case"/>
          <term link="dlib/unicode/unicode_abstract.h.html#invalid_utf8_error" name="invalid_utf8_error"/>
 
 

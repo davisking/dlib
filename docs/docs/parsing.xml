@@ -57,6 +57,7 @@
          <item>toupper</item> 
          <item>convert_utf8_to_utf32</item> 
          <item>is_combining_char</item> 
+         <item>strings_equal_ignore_case</item> 
       </section>
     </top>
    </menu>
@@ -212,6 +213,18 @@
             wrap_string is a function that takes a string and breaks it into a number of
             lines of a given length.  You can use this to make a string
             fit nicely into a command prompt window for example.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>strings_equal_ignore_case</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>        
+            This is a pair of functions to do a case insensitive comparison between strings.
          </description>
                                  
       </component>

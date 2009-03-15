@@ -26,7 +26,9 @@
          short section about the component you would like to use. Then pick which implementation you 
          would like and typedef it to something nice. Here is an example of creating a typedef for 
          a set of integers using the first kernel implementation. <br/>
-         <tt>typedef dlib::set&lt;int&gt;::kernel_1a set_of_ints;</tt> 
+         <tt>typedef dlib::set&lt;int&gt;::kernel_1a set_of_ints;</tt>.  Or as another example,
+         if you wanted to make an expandable array of ints you might say <br/>
+         <tt>typedef dlib::array&lt;int&gt;::expand_1d_c array_of_ints;</tt>. 
          </p>
 
 
