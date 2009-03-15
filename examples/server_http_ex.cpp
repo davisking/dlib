@@ -19,18 +19,9 @@ using namespace std;
 
 class web_server : public server::http_1a_c
 {
-    void on_request (
-        const std::string& path,
-        std::string& result,
-        const map_type& queries,
-        const map_type& cookies,
-        queue_type& new_cookies,
-        const map_type& incoming_headers,
-        map_type& response_headers,
-        const std::string& foreign_ip,
-        const std::string& local_ip,
-        unsigned short foreign_port,
-        unsigned short local_port
+    const std::string on_request ( 
+        const incoming_things& incoming,
+        outgoing_things& outgoing
     )
     {
         try
@@ -45,56 +36,55 @@ class web_server : public server::http_1a_c
                 << "User password: <input name='pass' type='text'> <input type='submit'> "
                 << " </form>"; 
 
-            sout << "<br>  path = "         << path << endl;
-            sout << "<br>  foreign_ip = "   << foreign_ip << endl;
-            sout << "<br>  foreign_port = " << foreign_port << endl;
-            sout << "<br>  local_ip = "     << local_ip << endl;
-            sout << "<br>  local_port = "   << local_port << endl;
+            // Write out some of the inputs to this request so that they show up on the
+            // resulting web page.
+            sout << "<br>  path = "         << incoming.path << endl;
+            sout << "<br>  request_type = " << incoming.request_type << endl;
+            sout << "<br>  content_type = " << incoming.content_type << endl;
+            sout << "<br>  foreign_ip = "   << incoming.foreign_ip << endl;
+            sout << "<br>  foreign_port = " << incoming.foreign_port << endl;
+            sout << "<br>  local_ip = "     << incoming.local_ip << endl;
+            sout << "<br>  local_port = "   << incoming.local_port << endl;
 
 
             // If this request is the result of the user submitting the form then echo back
             // the submission.
-            if (path == "/form_handler")
+            if (incoming.path == "/form_handler")
             {
                 sout << "<h2> Stuff from the query string </h2>" << endl;
-                sout << "<br>  user = " << queries["user"] << endl;
-                sout << "<br>  pass = " << queries["pass"] << endl;
+                sout << "<br>  user = " << incoming.queries["user"] << endl;
+                sout << "<br>  pass = " << incoming.queries["pass"] << endl;
 
                 // save these form submissions as cookies.  
-                string cookie;
-                cookie = "user=" + queries["user"]; 
-                new_cookies.enqueue(cookie);
-                cookie = "pass=" + queries["pass"]; 
-                new_cookies.enqueue(cookie);
+                outgoing.cookies["user"] = incoming.queries["user"];
+                outgoing.cookies["pass"] = incoming.queries["pass"];
             }
 
 
             // Echo any cookies back to the client browser 
-            sout << "<h2>Cookies we got back from the server</h2>";
-            cookies.reset();
-            while (cookies.move_next())
+            sout << "<h2>Cookies we sent to the server</h2>";
+            for ( key_value_map::const_iterator ci = incoming.cookies.begin(); ci != incoming.cookies.end(); ++ci )
             {
-                sout << "<br/>" << cookies.element().key() << " = " << cookies.element().value() << endl;
+                sout << "<br/>" << ci->first << " = " << ci->second << endl;
             }
 
             sout << "<br/><br/>";
 
             sout << "<h2>HTTP Headers we sent to the server</h2>";
             // Echo out all the HTTP headers we received from the client web browser
-            incoming_headers.reset();
-            while (incoming_headers.move_next())
+            for ( key_value_map::const_iterator ci = incoming.headers.begin(); ci != incoming.headers.end(); ++ci )
             {
-                sout << "<br/>" << incoming_headers.element().key() << ": " << incoming_headers.element().value() << endl;
+                sout << "<br/>" << ci->first << ": " << ci->second << endl;
             }
 
 
             sout << "</body> </html>";
 
-            result = sout.str();
+            return sout.str();
         }
         catch (exception& e)
         {
-            cout << e.what() << endl;
+            return e.what();
         }
     }
 
@@ -128,4 +118,5 @@ int main()
         cout << e.what() << endl;
     }
 }
+
 
