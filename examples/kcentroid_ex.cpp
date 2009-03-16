@@ -7,7 +7,8 @@
     computes the centroid (i.e. average) of a set of points.  The interesting
     thing about dlib::kcentroid is that it does so in a kernel induced feature
     space.  This means that you can use it as a non-linear one-class classifier.
-    So you might use it to perform online novelty detection.  
+    So you might use it to perform online novelty detection (although, it has
+    other uses, see the svm_pegasos or kkmeans examples for example).  
     
     This example will train an instance of it on points from the sinc function.
 
@@ -43,27 +44,15 @@ int main()
     // results without much fiddling.
     typedef radial_basis_kernel<sample_type> kernel_type;
 
-    // Here we declare an instance of the kcentroid object.  The first argument to the constructor
-    // is the kernel we wish to use.  The second is a parameter that determines the numerical 
-    // accuracy with which the object will perform part of the learning algorithm.  Generally
-    // smaller values give better results but cause the algorithm to run slower.  You just have
-    // to play with it to decide what balance of speed and accuracy is right for your problem.
-    // Here we have set it to 0.01.
-    //
-    // Also, since we are using the radial basis kernel we have to pick the RBF width parameter.
-    // Here we have it set to 0.1.  But in general, a reasonable way of picking this value is
-    // to start with some initial guess and to just run the algorithm.  Then print out 
-    // test.dictionary_size() to see how many support vectors the kcentroid object is using.
-    // And a good rule of thumb is that you should have somewhere in the range of 10-100 
-    // support vectors.  So if you aren't in that range then you can change the RBF parameter.
-    // Making it smaller will decrease the dictionary size and making it bigger will increase
-    // the dictionary size.   
-    //
-    // So what I often do is I set the kcentroid's second parameter to 0.01 or 0.001.  Then
-    // I find an RBF kernel parameter that gives me the number of support vectors that I 
-    // feel is appropriate for the problem I'm trying to solve.  Again, this just comes down
-    // to playing with it and getting a feel for how things work.  
-    kcentroid<kernel_type> test(kernel_type(0.1),0.01);
+    // Here we declare an instance of the kcentroid object.  The kcentroid has 3 parameters 
+    // you need to set.  The first argument to the constructor is the kernel we wish to 
+    // use.  The second is a parameter that determines the numerical accuracy with which 
+    // the object will perform the centroid estimation.  Generally, smaller values 
+    // give better results but cause the algorithm to attempt to use more support vectors 
+    // (and thus run slower and use more memory).  The third argument, however, is the 
+    // maximum number of support vectors a kcentroid is allowed to use.  So you can use
+    // it to control the runtime complexity.  
+    kcentroid<kernel_type> test(kernel_type(0.1),0.01, 15);
 
 
     // now we train our object on a few samples of the sinc function.
@@ -105,25 +94,31 @@ int main()
     m(0) = -1.5; m(1) = sinc(m(0))+0.9; cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
     m(0) = -0.5; m(1) = sinc(m(0))+1;   cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
 
+    cout << "\nmean: " << rs.mean() << endl;
+    cout << "standard deviation: " << sqrt(rs.variance()) << endl;
+
     // The output is as follows:
     /*
         Points that are on the sinc function:
-            0.869861
-            0.869861
-            0.873182
-            0.872628
-            0.870352
-            0.869861
-            0.872628
+            0.869913
+            0.869913
+            0.873408
+            0.872807
+            0.870432
+            0.869913
+            0.872807
 
         Points that are NOT on the sinc function:
-            1.06306 is 125.137 standard deviations from sinc.
-            1.0215 is 98.0313 standard deviations from sinc.
-            0.92136 is 32.717 standard deviations from sinc.
-            0.918282 is 30.7096 standard deviations from sinc.
-            0.930931 is 38.9595 standard deviations from sinc.
-            0.897916 is 17.4264 standard deviations from sinc.
-            0.913855 is 27.822 standard deviations from sinc.
+            1.06366 is 119.65 standard deviations from sinc.
+            1.02212 is 93.8106 standard deviations from sinc.
+            0.921382 is 31.1458 standard deviations from sinc.
+            0.918439 is 29.3147 standard deviations from sinc.
+            0.931428 is 37.3949 standard deviations from sinc.
+            0.898018 is 16.6121 standard deviations from sinc.
+            0.914425 is 26.8183 standard deviations from sinc.
+
+            mean: 0.871313
+            standard deviation: 0.00160756
     */
 
     // So we can see that in this example the kcentroid object correctly indicates that 

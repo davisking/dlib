@@ -98,17 +98,15 @@ int main()
     typedef radial_basis_kernel<sample_type> kernel_type;
     
     // Here we declare an instance of the kcentroid object.  It is used by rank_features() 
-    // two represent the centroids of the two classes.  The kcentroid has 4 parameters 
+    // two represent the centroids of the two classes.  The kcentroid has 3 parameters 
     // you need to set.  The first argument to the constructor is the kernel we wish to 
     // use.  The second is a parameter that determines the numerical accuracy with which 
     // the object will perform part of the ranking algorithm.  Generally, smaller values 
     // give better results but cause the algorithm to attempt to use more support vectors 
     // (and thus run slower and use more memory).  The third argument, however, is the 
     // maximum number of support vectors a kcentroid is allowed to use.  So you can use
-    // it to control the complexity.  Finally, the last argument should always be set to 
-    // false when using a kcentroid for ranking (see the kcentroid docs for details on 
-    // this parameter).
-    kcentroid<kernel_type> kc(kernel_type(0.05), 0.001, 25, false);
+    // it to control the runtime complexity.  
+    kcentroid<kernel_type> kc(kernel_type(0.05), 0.001, 25);
 
     // And finally we get to the feature ranking. Here we call rank_features() with the kcentroid we just made,
     // the samples and labels we made above, and the number of features we want it to rank.  

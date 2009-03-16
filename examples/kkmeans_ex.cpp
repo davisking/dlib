@@ -42,17 +42,15 @@ int main()
 
 
     // Here we declare an instance of the kcentroid object.  It is the object used to 
-    // represent each of the centers used for clustering.  The kcentroid has 4 parameters 
+    // represent each of the centers used for clustering.  The kcentroid has 3 parameters 
     // you need to set.  The first argument to the constructor is the kernel we wish to 
     // use.  The second is a parameter that determines the numerical accuracy with which 
     // the object will perform part of the learning algorithm.  Generally, smaller values 
     // give better results but cause the algorithm to attempt to use more support vectors 
     // (and thus run slower and use more memory).  The third argument, however, is the 
     // maximum number of support vectors a kcentroid is allowed to use.  So you can use
-    // it to control the complexity.  Finally, the last argument should always be set to 
-    // false when using a kcentroid for clustering (see the kcentroid docs for details on 
-    // this parameter).
-    kcentroid<kernel_type> kc(kernel_type(0.1),0.01, 8, false);
+    // it to control the runtime complexity.  
+    kcentroid<kernel_type> kc(kernel_type(0.1),0.01, 8);
 
     // Now we make an instance of the kkmeans object and tell it to use kcentroid objects
     // that are configured with the parameters from the kc object we defined above.
