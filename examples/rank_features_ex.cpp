@@ -97,23 +97,29 @@ int main()
     // classification and feature ranking. 
     typedef radial_basis_kernel<sample_type> kernel_type;
     
-    // This line here declares the kcentroid object we want to use for feature ranking.  Note that there
-    // are two numbers in it.  The first is the argument to the kernel.  The second is a tolerance argument
-    // for the kcentroid object.  This tolerance is basically a control on the number of support vectors it
-    // will use, with a smaller tolerance giving better accuracy but longer running times.  Generally
-    // something in the range 0.01 to 0.001 is a good choice.
-    kcentroid<kernel_type> kc(kernel_type(0.05), 0.001);
+    // Here we declare an instance of the kcentroid object.  It is used by rank_features() 
+    // two represent the centroids of the two classes.  The kcentroid has 4 parameters 
+    // you need to set.  The first argument to the constructor is the kernel we wish to 
+    // use.  The second is a parameter that determines the numerical accuracy with which 
+    // the object will perform part of the ranking algorithm.  Generally, smaller values 
+    // give better results but cause the algorithm to attempt to use more support vectors 
+    // (and thus run slower and use more memory).  The third argument, however, is the 
+    // maximum number of support vectors a kcentroid is allowed to use.  So you can use
+    // it to control the complexity.  Finally, the last argument should always be set to 
+    // false when using a kcentroid for ranking (see the kcentroid docs for details on 
+    // this parameter).
+    kcentroid<kernel_type> kc(kernel_type(0.05), 0.001, 25, false);
 
     // And finally we get to the feature ranking. Here we call rank_features() with the kcentroid we just made,
     // the samples and labels we made above, and the number of features we want it to rank.  
-    cout << rank_features(kc, samples, labels, 4) << endl;
+    cout << rank_features(kc, samples, labels) << endl;
 
     // The output is:
     /*
-       1 0.514169 
-       0 0.810535 
-       3        1 
-       2 0.966936 
+        1 0.514254 
+        0 0.810668 
+        3        1 
+        2 0.994169 
     */
 
     // The first column is a list of the features in order of decreasing goodness.  So the rank_features() function
@@ -128,10 +134,10 @@ int main()
     // indicate a larger separation.
 
     // So to break it down a little more.
-    //    1 0.514169   <-- class separation of feature 1 all by itself
-    //    0 0.810535   <-- class separation of feature 1 and 0
+    //    1 0.514254   <-- class separation of feature 1 all by itself
+    //    0 0.810668   <-- class separation of feature 1 and 0
     //    3        1   <-- class separation of feature 1, 0, and 3
-    //    2 0.966936   <-- class separation of feature 1, 0, 3, and 2
+    //    2 0.994169   <-- class separation of feature 1, 0, 3, and 2
         
 
 }
