@@ -49,6 +49,7 @@
             </title>
 
 
+      <xsl:if test="$is_chm != 'true'">
             <!-- Piwik -->
             <script type="text/javascript">
             var pkBaseURL = (("https:" == document.location.protocol) ? "https://apps.sourceforge.net/piwik/dclib/" : "http://apps.sourceforge.net/piwik/dclib/");
@@ -61,6 +62,7 @@
             </script>
             <object><noscript><p><img src="http://apps.sourceforge.net/piwik/dclib/piwik.php?idsite=1" alt="piwik"/></p></noscript></object>
             <!-- End Piwik Tag -->
+       </xsl:if>
 
 
 
