@@ -71,7 +71,7 @@ namespace dlib
             const kernel_type& kernel_, 
             scalar_type tolerance_ = 0.001,
             unsigned long max_dictionary_size_ = 1000000,
-            bool remove_oldest_first_ = true
+            bool remove_oldest_first_ = false 
         ) : 
             my_remove_oldest_first(remove_oldest_first_),
             kernel(kernel_), 
