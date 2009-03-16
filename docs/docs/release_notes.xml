@@ -18,6 +18,8 @@ Non-Backwards Compatible Changes:
    - Changed the on_request() function in the http server
    - Changed the serialization format of the kcentroid and svm_pegasos
      objects
+   - By default, the kcentroid now keeps the most linearly independent 
+     dictionary vectors rather than the newest
 
 Bug fixes:
 
