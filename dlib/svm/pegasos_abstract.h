@@ -116,7 +116,8 @@ namespace dlib
                 - returns the tolerance used by the internal kcentroid object to 
                   represent the learned decision function.  Smaller values of this 
                   tolerance will result in a more accurate representation of the 
-                  decision function but will use more support vectors.  
+                  decision function but will use more support vectors (up to
+                  a max of get_max_num_sv()).  
         !*/
 
         unsigned long get_max_num_sv (

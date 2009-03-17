@@ -83,22 +83,29 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the maximum number of dictionary vectors this object
-                  will use at a time.  That is, dictionary_size() will never be
-                  greater than max_dictionary_size().
+                - returns the maximum number of dictionary vectors (i.e. support 
+                  vectors) this object will use at a time.  That is, dictionary_size() 
+                  will never be greater than max_dictionary_size().
         !*/
 
         bool remove_oldest_first (
         ) const;
         /*!
             ensures
-                - When the maximum dictionary size is reached then this object sometimes
+                - When the maximum dictionary size is reached this object sometimes
                   needs to discard dictionary vectors when new samples are added via
-                  one of the train functions.  If remove_oldest_first() returns true then 
-                  this object discards the oldest dictionary vectors when the maximum 
-                  dictionary size is reached.   Otherise, if this function returns false 
-                  then it means that this object discards the most linearly dependent 
-                  dictionary vectors.
+                  one of the train functions.  When this happens this object chooses 
+                  the dictionary vector to discard based on the setting of the
+                  remove_oldest_first() parameter.
+                - if (remove_oldest_first() == true) then
+                    - This object discards the oldest dictionary vectors when necessary.  
+                      This is an appropriate mode when using this object in an online
+                      setting and the input training samples come from a slowly 
+                      varying distribution.
+                - else (remove_oldest_first() == false) then
+                    - This object discards the most linearly dependent dictionary vectors 
+                      when necessary.  This it the default behavior and should be used 
+                      in most cases.
         !*/
 
         unsigned long dictionary_size (
@@ -122,10 +129,12 @@ namespace dlib
                 - returns the tolerance to use for the approximately linearly dependent 
                   test used for sparsification (see the KRLS paper for details).  This is 
                   a number which governs how accurately this object will approximate the 
-                  centroid it is learning.  Smaller values generally result in a more accurate 
-                  estimate while also resulting in a bigger set of support vectors in 
-                  the learned dictionary.  Bigger tolerances values result in a 
-                  less accurate estimate but also in less support vectors.
+                  centroid it is learning.  Smaller values generally result in a more 
+                  accurate estimate while also resulting in a bigger set of support 
+                  vectors in the learned dictionary.  Bigger tolerances values result in 
+                  a less accurate estimate but also in less support vectors.  (Note
+                  that in any case, the max_dictionary_size() limits the number
+                  of support vectors no matter the setting of the tolerance)
         !*/
 
         void clear_dictionary (
