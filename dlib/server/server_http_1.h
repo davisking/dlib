@@ -66,11 +66,12 @@ namespace dlib
 
         struct incoming_things 
         {
-            incoming_things() : foreign_port(0), local_port(0), content_length(0) {}
+            incoming_things() : foreign_port(0), local_port(0) {}
 
             std::string path;
             std::string request_type;
             std::string content_type;
+            std::string body;
 
             key_value_map queries;
             key_value_map cookies;
@@ -80,9 +81,6 @@ namespace dlib
             unsigned short foreign_port;
             std::string local_ip;
             unsigned short local_port;
-
-            unsigned long content_length;
-
         };
 
         struct outgoing_things 
@@ -175,6 +173,36 @@ namespace dlib
             return result;
         }
 
+        void parse_url(std::string word, key_value_map& queries)
+        /*!
+            Parses the query string of a URL.  word should be the stuff that comes
+            after the ? in the query URL.
+        !*/
+        {
+            std::string::size_type pos;
+
+            for (pos = 0; pos < word.size(); ++pos)
+            {
+                if (word[pos] == '&')
+                    word[pos] = ' ';
+            }
+
+            std::istringstream sin(word);
+            sin >> word;
+            while (sin)
+            {
+                pos = word.find_first_of("=");
+                if (pos != std::string::npos)
+                {
+                    std::string key = urldecode(word.substr(0,pos));
+                    std::string value = urldecode(word.substr(pos+1));
+
+                    queries[key] = value;
+                }
+                sin >> word;
+            }
+        }
+
         void on_connect (
             std::istream& in,
             std::ostream& out,
@@ -206,10 +234,9 @@ namespace dlib
 
                 key_value_map& incoming_headers = incoming.headers;
                 key_value_map& cookies          = incoming.cookies;
-                key_value_map& queries          = incoming.queries;
                 std::string& path               = incoming.path;
                 std::string& content_type       = incoming.content_type;
-                unsigned long& content_length   = incoming.content_length;
+                unsigned long content_length = 0;
 
                 string line;
                 getline(in,line);
@@ -295,45 +322,26 @@ namespace dlib
                     getline(in,line);
                 } // while (line.size() > 2 )
 
-                // If there is data being posted back to us as a query string then
-                // just stick it onto the end of the path so the following code can
-                // then just pick it out like we do for GET requests.
-                if (strings_equal_ignore_case(incoming.request_type, "POST") && 
-                    strings_equal_ignore_case(left_substr(content_type,";"), "application/x-www-form-urlencoded") 
-                    && content_length > 0)
+                // If there is data being posted back to us then load it into the incoming.body
+                // string.
+                if ( content_length > 0 )
                 {
-                    line.resize(content_length);
-                    in.read(&line[0],content_length);
+                    incoming.body.resize(content_length);
+                    in.read(&incoming.body[0],content_length);
+                }
 
-                    path += (path.find('?') == std::string::npos) ? '?' : '&';
-                    path += line;
+                // If there is data being posted back to us as a query string then
+                // pick out the queries using parse_url.
+                if (strings_equal_ignore_case(incoming.request_type, "POST") && 
+                    strings_equal_ignore_case(left_substr(content_type,";"), "application/x-www-form-urlencoded"))
+                {
+                    parse_url(incoming.body, incoming.queries);
                 }
 
                 string::size_type pos = path.find_first_of("?");
                 if (pos != string::npos)
                 {
-                    std::string word = path.substr(pos+1);
-                    path = path.substr(0,pos);
-                    for (pos = 0; pos < word.size(); ++pos)
-                    {
-                        if (word[pos] == '&')
-                            word[pos] = ' ';
-                    }
-
-                    istringstream sin(word);
-                    sin >> word;
-                    while (sin)
-                    {
-                        pos = word.find_first_of("=");
-                        if (pos != string::npos)
-                        {
-                            string key = urldecode(word.substr(0,pos));
-                            string value = urldecode(word.substr(pos+1));
-
-                            queries[key] = value;
-                        }
-                        sin >> word;
-                    }
+                    parse_url(path.substr(pos+1), incoming.queries);
                 }
 
 

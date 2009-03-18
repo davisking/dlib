@@ -95,6 +95,7 @@ namespace dlib
             std::string path;
             std::string request_type;
             std::string content_type;
+            std::string body;
 
             key_value_map queries;
             key_value_map cookies;
@@ -104,8 +105,6 @@ namespace dlib
             unsigned short foreign_port;
             std::string local_ip;
             unsigned short local_port;
-
-            unsigned long content_length;
         };
 
         struct outgoing_things 
@@ -131,6 +130,9 @@ namespace dlib
                     - incoming.path == the path being requested by this request
                     - incoming.request_type == the type of request, GET or POST
                     - incoming.content_type == the content type associated with this request
+                    - incoming.body == a string that contains the data that was posted back to the
+                      web server by the client (e.g. The string has the length specified by the
+                      Content-Length header).
                     - incoming.queries == a map that contains all the key/value pairs in the query 
                       string of this request.  The key and value strings of the query string will
                       have been decoded back into their original form before being sent to this
@@ -145,7 +147,6 @@ namespace dlib
                     - incoming.foreign_port == the foreign port number for this request
                     - incoming.local_ip == the IP of the local interface this request is coming in on 
                     - incoming.local_port == the local port number this request is coming in on 
-                    - incoming.content_length == the value from the incoming Content-Length header
                 - in outgoing:
                     - outgoing.cookies.size() == 0
                     - outgoing.headers.size() == 0
