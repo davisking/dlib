@@ -13,6 +13,7 @@
 #include "svm/reduced.h"
 #include "svm/rvm.h"
 #include "svm/pegasos.h"
+#include "svm/sparse_kernel.h"
 
 #endif // DLIB_SVm_HEADER
 

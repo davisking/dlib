@@ -1,0 +1,405 @@
+// Copyright (C) 2009  Davis E. King (davisking@users.sourceforge.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
+#undef DLIB_SVm_SPARSE_KERNEL_ABSTRACT_
+#ifdef DLIB_SVm_SPARSE_KERNEL_ABSTRACT_
+
+#include <cmath>
+#include <limits>
+#include "../algs.h"
+#include "../serialize.h"
+#include "kernel_abstract.h"
+#include "sparse_vector_abstract.h"
+
+namespace dlib
+{
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    struct sparse_radial_basis_kernel
+    {
+        /*!
+            REQUIREMENTS ON T
+                Must be a sparse vector as defined in dlib/svm/sparse_vector_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a radial basis function kernel
+                that works with sparse vectors.
+        !*/
+
+        typedef typename T::value_type::second_type scalar_type;
+        typedef T sample_type;
+        typedef dlib::memory_manager<char>::kernel_1a mem_manager_type;
+
+        const scalar_type gamma;
+
+        sparse_radial_basis_kernel(
+        );
+        /*!
+            ensures
+                - #gamma == 0.1 
+        !*/
+
+        sparse_radial_basis_kernel(
+            const sparse_radial_basis_kernel& k
+        );
+        /*!
+            ensures
+                - #gamma == k.gamma
+        !*/
+
+        sparse_radial_basis_kernel(
+            const scalar_type g
+        );
+        /*!
+            ensures
+                - #gamma == g
+        !*/
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const;
+        /*!
+            requires
+                - a contains a sorted range 
+                - b contains a sorted range 
+            ensures
+                - returns exp(-gamma * sparse_vector::distance_squared(a,b))
+        !*/
+
+        sparse_radial_basis_kernel& operator= (
+            const sparse_radial_basis_kernel& k
+        );
+        /*!
+            ensures
+                - #gamma = k.gamma
+                - returns *this
+        !*/
+
+        bool operator== (
+            const sparse_radial_basis_kernel& k
+        ) const;
+        /*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const sparse_radial_basis_kernel<T>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for sparse_radial_basis_kernel
+    !*/
+
+    template <
+        typename T
+        >
+    void deserialize (
+        sparse_radial_basis_kernel<T>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support for sparse_radial_basis_kernel
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    struct sparse_sigmoid_kernel
+    {
+        /*!
+            REQUIREMENTS ON T
+                Must be a sparse vector as defined in dlib/svm/sparse_vector_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a sigmoid kernel
+                that works with sparse vectors.
+        !*/
+
+        typedef typename T::value_type::second_type scalar_type;
+        typedef T sample_type;
+        typedef dlib::memory_manager<char>::kernel_1a mem_manager_type;
+
+        const scalar_type gamma;
+        const scalar_type coef;
+
+        sparse_sigmoid_kernel(
+        );
+        /*!
+            ensures
+                - #gamma == 0.1 
+                - #coef == -1.0 
+        !*/
+
+        sparse_sigmoid_kernel(
+            const sparse_sigmoid_kernel& k
+        );
+        /*!
+            ensures
+                - #gamma == k.gamma
+                - #coef == k.coef
+        !*/
+
+        sparse_sigmoid_kernel(
+            const scalar_type g,
+            const scalar_type c
+        );
+        /*!
+            ensures
+                - #gamma == g
+                - #coef == c
+        !*/
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const;
+        /*!
+            requires
+                - a contains a sorted range 
+                - b contains a sorted range 
+            ensures
+                - returns tanh(gamma * sparse_vector::dot(a,b) + coef)
+        !*/
+
+        sparse_sigmoid_kernel& operator= (
+            const sparse_sigmoid_kernel& k
+        );
+        /*!
+            ensures
+                - #gamma = k.gamma
+                - #coef = k.coef
+                - returns *this
+        !*/
+
+        bool operator== (
+            const sparse_sigmoid_kernel& k
+        ) const;
+        /*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const sparse_sigmoid_kernel<T>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for sparse_sigmoid_kernel
+    !*/
+
+    template <
+        typename T
+        >
+    void deserialize (
+        sparse_sigmoid_kernel<T>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support for sparse_sigmoid_kernel
+    !*/
+
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    struct sparse_polynomial_kernel
+    {
+        /*!
+            REQUIREMENTS ON T
+                Must be a sparse vector as defined in dlib/svm/sparse_vector_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a polynomial kernel
+                that works with sparse vectors.
+        !*/
+
+        typedef typename T::value_type::second_type scalar_type;
+        typedef T sample_type;
+        typedef dlib::memory_manager<char>::kernel_1a mem_manager_type;
+
+        const scalar_type gamma;
+        const scalar_type coef;
+        const scalar_type degree;
+
+        sparse_polynomial_kernel(
+        );
+        /*!
+            ensures
+                - #gamma == 1 
+                - #coef == 0 
+                - #degree == 1 
+        !*/
+
+        sparse_polynomial_kernel(
+            const sparse_polynomial_kernel& k
+        );
+        /*!
+            ensures
+                - #gamma == k.gamma
+                - #coef == k.coef
+                - #degree == k.degree
+        !*/
+
+        sparse_polynomial_kernel(
+            const scalar_type g,
+            const scalar_type c,
+            const scalar_type d
+        );
+        /*!
+            ensures
+                - #gamma == g
+                - #coef == c
+                - #degree == d
+        !*/
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const;
+        /*!
+            requires
+                - a contains a sorted range 
+                - b contains a sorted range 
+            ensures
+                - returns pow(gamma * sparse_vector::dot(a,b) + coef, degree)
+        !*/
+
+        sparse_polynomial_kernel& operator= (
+            const sparse_polynomial_kernel& k
+        );
+        /*!
+            ensures
+                - #gamma = k.gamma
+                - #coef = k.coef
+                - #degree = k.degree
+                - returns *this
+        !*/
+
+        bool operator== (
+            const sparse_polynomial_kernel& k
+        ) const;
+        /*!
+            ensures
+                - if (k and *this are identical) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const sparse_polynomial_kernel<T>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for sparse_polynomial_kernel
+    !*/
+
+    template <
+        typename T
+        >
+    void deserialize (
+        sparse_polynomial_kernel<T>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support for sparse_polynomial_kernel
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    struct sparse_linear_kernel
+    {
+        /*!
+            REQUIREMENTS ON T
+                Must be a sparse vector as defined in dlib/svm/sparse_vector_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a linear function kernel
+                that works with sparse vectors.
+        !*/
+
+        typedef typename T::value_type::second_type scalar_type;
+        typedef T sample_type;
+        typedef dlib::memory_manager<char>::kernel_1a mem_manager_type;
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const;
+        /*!
+            requires
+                - a contains a sorted range 
+                - b contains a sorted range 
+            ensures
+                - returns sparse_vector::dot(a,b) 
+        !*/
+
+        bool operator== (
+            const sparse_linear_kernel& k
+        ) const;
+        /*!
+            ensures
+                - returns true
+        !*/
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const sparse_linear_kernel<T>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for sparse_linear_kernel
+    !*/
+
+    template <
+        typename T
+        >
+    void deserialize (
+        sparse_linear_kernel<T>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support for sparse_linear_kernel 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+}
+
+#endif // DLIB_SVm_SPARSE_KERNEL_ABSTRACT_
+
+
