@@ -50,6 +50,22 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
         template <typename T, typename U>
+        typename T::value_type::second_type distance (
+            const T& a,
+            const U& b
+        );
+        /*!
+            requires
+                - a is a sorted range of std::pair objects
+                - b is a sorted range of std::pair objects
+            ensures
+                - returns the distance between the vectors
+                  a and b.  (i.e. std::sqrt(distance_squared(a,b)))
+        !*/
+
+    // ----------------------------------------------------------------------------------------
+
+        template <typename T, typename U>
         typename T::value_type::second_type dot_product (
             const T& a,
             const U& b
@@ -74,6 +90,20 @@ namespace dlib
                 - b is a sorted range of std::pair objects
             ensures
                 - returns dot(a,a) 
+        !*/
+
+    // ----------------------------------------------------------------------------------------
+
+        template <typename T>
+        typename T::value_type::second_type length (
+            const T& a
+        );
+        /*!
+            requires
+                - a is a sorted range of std::pair objects
+                - b is a sorted range of std::pair objects
+            ensures
+                - returns std::sqrt(length_squared(a,a))
         !*/
 
     }

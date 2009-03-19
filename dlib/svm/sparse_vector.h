@@ -57,13 +57,26 @@ namespace dlib
             while (ai != a.end())
             {
                 sum += ai->second*ai->second;
+                ++ai;
             }
             while (bi != b.end())
             {
                 sum += bi->second*bi->second;
+                ++bi;
             }
 
             return sum;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, typename U>
+        typename T::value_type::second_type distance (
+            const T& a,
+            const U& b
+        )
+        {
+            return std::sqrt(distance_squared(a,b));
         }
 
     // ------------------------------------------------------------------------------------
@@ -113,15 +126,26 @@ namespace dlib
         {
             typedef typename T::value_type::second_type scalar_type;
 
-            typename T::const_iterator i = a.begin();
+            typename T::const_iterator i;
 
             scalar_type sum = 0;
-            while (i != a.end())
+
+            for (i = a.begin(); i != a.end(); ++i)
             {
                 sum += i->second * i->second;
             }
 
             return sum;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T>
+        typename T::value_type::second_type length (
+            const T& a
+        )
+        {
+            return std::sqrt(length_squared(a));
         }
 
     }

@@ -370,7 +370,7 @@ namespace dlib
 
         offset_kernel(const T& k, const scalar_type& offset_
         ) : kernel(k), offset(offset_) {}
-        offset_kernel() : offset(0.01) {}
+        offset_kernel() : kernel(T()), offset(0.01) {}
         offset_kernel(
             const offset_kernel& k
         ) : kernel(k.kernel), offset(k.offset) {}
