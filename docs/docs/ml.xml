@@ -76,6 +76,12 @@
          <item>sigmoid_kernel</item>
          <item>linear_kernel</item>
          <item>offset_kernel</item>
+
+         <item>sparse_radial_basis_kernel</item>
+         <item>sparse_polynomial_kernel</item>
+         <item>sparse_sigmoid_kernel</item>
+         <item>sparse_linear_kernel</item>
+
       </section>
 
       <section>
@@ -594,6 +600,63 @@
          <examples>
             <example>svm_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>sparse_linear_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/sparse_kernel_abstract.h</spec_file>
+         <description>
+                This object represents a linear function kernel for use with
+                kernel learning machines that operate on 
+                <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>sparse_sigmoid_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/sparse_kernel_abstract.h</spec_file>
+         <description>
+                This object represents a sigmoid kernel for use with
+                kernel learning machines that operate on 
+                <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>sparse_polynomial_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/sparse_kernel_abstract.h</spec_file>
+         <description>
+                This object represents a polynomial kernel for use with
+                kernel learning machines that operate 
+                <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>sparse_radial_basis_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/sparse_kernel_abstract.h</spec_file>
+         <description>
+                This object represents a radial basis function kernel for use with
+                kernel learning machines that operate 
+                <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+         </description>
                                  
       </component>
       

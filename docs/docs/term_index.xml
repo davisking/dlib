@@ -454,6 +454,11 @@
          <term link="ml.html#sigmoid_kernel" name="sigmoid_kernel"/>
          <term link="ml.html#radial_basis_kernel" name="radial_basis_kernel"/>
 
+         <term link="ml.html#sparse_linear_kernel" name="sparse_linear_kernel"/>
+         <term link="ml.html#sparse_polynomial_kernel" name="sparse_polynomial_kernel"/>
+         <term link="ml.html#sparse_sigmoid_kernel" name="sparse_sigmoid_kernel"/>
+         <term link="ml.html#sparse_radial_basis_kernel" name="sparse_radial_basis_kernel"/>
+
          <term link="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects" name="Kernel Function Objects"/>
          <term link="dlib/svm/kernel_abstract.h.html#kernel_derivative" name="kernel_derivative"/>
 
@@ -558,7 +563,12 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#rsort_columns" name="rsort_columns"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#tensor_product" name="tensor_product"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#length" name="length"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#length_squared" name="length_squared"/>
+
+         <term name="length_squared">
+            <term link="dlib/matrix/matrix_utilities_abstract.h.html#length_squared" name="for matrix objects"/>
+            <term link="dlib/svm/sparse_vector_abstract.h.html#length_squared" name="for sparse vectors"/>
+         </term>
+
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#min" name="min"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#find_min_and_max" name="find_min_and_max"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#index_of_max" name="index_of_max"/>
@@ -572,6 +582,10 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#pixel_to_vector" name="pixel_to_vector"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#vector_to_pixel" name="vector_to_pixel"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#clamp" name="clamp"/>
+
+
+         <term link="dlib/svm/sparse_vector_abstract.h.html#dot_product" name="dot_product"/>
+         <term link="dlib/svm/sparse_vector_abstract.h.html#distance_squared" name="distance_squared"/>
 
          <term link="containers.html#queue" name="queue"/>
          <term link="containers.html#reference_counter" name="reference_counter"/>
