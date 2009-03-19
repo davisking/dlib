@@ -12,7 +12,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /*!
+    /*!A sparse_vectors
         In dlib, sparse vectors are represented using the container objects
         in the C++ STL.  In particular, a sparse vector is any container that 
         contains a sorted range of std::pair<key, scalar_value> objects where:
