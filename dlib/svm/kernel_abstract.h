@@ -28,7 +28,7 @@ namespace dlib
                   long double type.
                 - an overloaded operator() that operates on two items of sample_type 
                   and returns a scalar_type.  
-                  (e.g. scalar_type val = kernel_function(sample(i),sample(j)); 
+                  (e.g. scalar_type val = kernel_function(sample1,sample2); 
                    would be a valid expression)
                 - a public typedef named mem_manager_type that is an implementation of 
                   dlib/memory_manager/memory_manager_kernel_abstract.h or
