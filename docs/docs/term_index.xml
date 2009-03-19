@@ -562,7 +562,11 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#sort_columns" name="sort_columns"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#rsort_columns" name="rsort_columns"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#tensor_product" name="tensor_product"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#length" name="length"/>
+
+         <term name="length">
+            <term link="dlib/matrix/matrix_utilities_abstract.h.html#length" name="for matrix objects"/>
+            <term link="dlib/svm/sparse_vector_abstract.h.html#length" name="for sparse vectors"/>
+         </term>
 
          <term name="length_squared">
             <term link="dlib/matrix/matrix_utilities_abstract.h.html#length_squared" name="for matrix objects"/>
@@ -586,6 +590,7 @@
 
          <term link="dlib/svm/sparse_vector_abstract.h.html#dot_product" name="dot_product"/>
          <term link="dlib/svm/sparse_vector_abstract.h.html#distance_squared" name="distance_squared"/>
+         <term link="dlib/svm/sparse_vector_abstract.h.html#distance" name="distance"/>
 
          <term link="containers.html#queue" name="queue"/>
          <term link="containers.html#reference_counter" name="reference_counter"/>
