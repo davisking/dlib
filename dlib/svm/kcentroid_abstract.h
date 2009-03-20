@@ -180,6 +180,8 @@ namespace dlib
             const kcentroid& x
         ) const;
         /*!
+            requires
+                - x.get_kernel() == get_kernel()
             ensures
                 - returns the inner product between x and this centroid object.
         !*/

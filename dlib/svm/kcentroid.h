@@ -165,6 +165,13 @@ namespace dlib
             const kcentroid& x
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(x.get_kernel() == get_kernel(),
+                "\tscalar_type kcentroid::inner_product(const kcentroid& x)"
+                << "\n\tYou can only compare two kcentroid objects if they use the same kernel"
+                << "\n\tthis: " << this
+                );
+
             scalar_type temp = 0; 
             for (unsigned long i = 0; i < alpha.size(); ++i)
             {
