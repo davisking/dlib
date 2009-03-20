@@ -145,7 +145,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
         template <typename T, typename U>
-        typename T::value_type::second_type scale_by (
+        void scale_by (
             T& a,
             const U& value
         );
