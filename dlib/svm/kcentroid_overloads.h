@@ -537,7 +537,12 @@ namespace dlib
         ) const 
         { 
             if (samples_seen > 0)
-                return 1;
+            {
+                if (std::abs(w_extra) > std::numeric_limits<scalar_type>::epsilon())
+                    return 1;
+                else
+                    return 2;
+            }
             else
                 return 0;
         }
@@ -1155,9 +1160,16 @@ namespace dlib
         ) const 
         { 
             if (samples_seen > 0)
-                return 1;
+            {
+                if (std::abs(w_extra) > std::numeric_limits<scalar_type>::epsilon())
+                    return 1;
+                else
+                    return 2;
+            }
             else
+            {
                 return 0;
+            }
         }
 
         friend void serialize(const kcentroid& item, std::ostream& out)
