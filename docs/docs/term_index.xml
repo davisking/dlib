@@ -588,6 +588,7 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#clamp" name="clamp"/>
 
 
+         <term link="dlib/svm/sparse_vector_abstract.h.html#scale_by" name="scale_by"/>
          <term link="dlib/svm/sparse_vector_abstract.h.html#dot_product" name="dot_product"/>
          <term link="dlib/svm/sparse_vector_abstract.h.html#distance_squared" name="distance_squared"/>
          <term link="dlib/svm/sparse_vector_abstract.h.html#distance" name="distance"/>
