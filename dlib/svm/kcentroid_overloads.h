@@ -884,7 +884,7 @@ namespace dlib
             {
                 temp.b = squared_norm();
                 temp.support_vectors.set_size(1);
-                temp.support_vectors(0) = w;
+                temp.support_vectors(0) = sample_type(w.begin(), w.end());
                 temp.alpha.set_size(1);
                 temp.alpha(0) = alpha;
             }
@@ -1222,7 +1222,7 @@ namespace dlib
                     scale = (x_extra/w_extra);
                     temp.support_vectors.set_size(1);
                     temp.alpha.set_size(1);
-                    temp.support_vectors(0) = w;
+                    temp.support_vectors(0) = sample_type(w.begin(), w.end());
                     sparse_vector::scale_by(temp.support_vectors(0), scale);
                     temp.alpha(0) = alpha/scale;
                 }
@@ -1232,10 +1232,10 @@ namespace dlib
                     // thing in the output support vector set is by using two vectors
                     temp.support_vectors.set_size(2);
                     temp.alpha.set_size(2);
-                    temp.support_vectors(0) = w;
+                    temp.support_vectors(0) = sample_type(w.begin(), w.end());
                     sparse_vector::scale_by(temp.support_vectors(0), 2);
                     temp.alpha(0) = alpha;
-                    temp.support_vectors(1) = w;
+                    temp.support_vectors(1) = sample_type(w.begin(), w.end());
                     temp.alpha(1) = -alpha;
                 }
 
@@ -1292,7 +1292,7 @@ namespace dlib
 
         kernel_type kernel;
 
-        sample_type w;
+        std::map<long,scalar_type> w;
         scalar_type alpha;
 
         scalar_type w_extra;
