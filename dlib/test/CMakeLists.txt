@@ -39,6 +39,7 @@ set (tests
    hash_set.cpp
    hash_table.cpp
    image.cpp
+   kcentroid.cpp
    lz77_buffer.cpp
    map.cpp
    matrix.cpp

@@ -49,6 +49,7 @@ SRC += hash_map.cpp
 SRC += hash_set.cpp
 SRC += hash_table.cpp
 SRC += image.cpp
+SRC += kcentroid.cpp
 SRC += lz77_buffer.cpp
 SRC += map.cpp
 SRC += matrix.cpp
