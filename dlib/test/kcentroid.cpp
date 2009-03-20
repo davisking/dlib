@@ -327,9 +327,10 @@ namespace
 
         temp = 1,0,3,0;
         DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), "");
+        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val), 1e-7), 
+                     test(temp2) - dist(k,temp2,val));
         DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
-        DLIB_CASSERT(approx_equal(test(test), 0), "");
+        DLIB_CASSERT(approx_equal(test(test), 0, 1e-7), test(test));
 
 
         val2 =  0,1,2.6,8,b;
@@ -344,7 +345,7 @@ namespace
         DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
         DLIB_CASSERT(approx_equal(test.inner_product(test), length_squared(val)), "");
         DLIB_CASSERT(approx_equal(test(test), 0), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(test.get_distance_function()), 0), 
+        DLIB_CASSERT(approx_equal(test.get_distance_function()(test.get_distance_function()), 0, 1e-6), 
                      test.get_distance_function()(test.get_distance_function()));
     }
 
@@ -616,7 +617,8 @@ namespace
         temp[0] = 1;
         temp[2] = 3;
         DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), "");
+        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val), 1e-7), 
+                     test(temp2) - dist(k,temp2,val));
         DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
 
 
