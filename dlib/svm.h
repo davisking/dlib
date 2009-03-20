@@ -6,6 +6,7 @@
 #include "svm/svm.h"
 #include "svm/krls.h"
 #include "svm/kcentroid.h"
+#include "svm/kcentroid_overloads.h"
 #include "svm/kkmeans.h"
 #include "svm/feature_ranking.h"
 #include "svm/rbf_network.h"
