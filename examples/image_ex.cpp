@@ -23,48 +23,6 @@ using namespace dlib;
 
 //  ----------------------------------------------------------------------------
 
-class win : public drawable_window 
-{
-    /*
-        Here we are making a GUI window that will be capable of displaying
-        an image.
-    */
-public:
-
-    template <typename image_type>
-    win(
-        const image_type& img
-    ) :
-        gui_img(*this)
-    {
-        // set the size of this window to match the size of the input image
-        set_size(img.nc(),img.nr());
-
-        // Now load the image into the image widget so it has something to display.
-        gui_img.set_image(img);
-
-        set_title("image example");
-
-        // show this window on the screen
-        show();
-    } 
-
-    ~win(
-    )
-    {
-        // You should always call close_window() in the destructor of window
-        // objects to ensure that no events will be sent to this window while 
-        // it is being destructed.  
-        close_window();
-    }
-
-private:
-
-    image_widget gui_img;
-};
-
-//  ----------------------------------------------------------------------------
-
 int main(int argc, char** argv)
 {
     try
@@ -109,10 +67,10 @@ int main(int argc, char** argv)
 
 
         // create a window to display the edge image 
-        win my_window(edge_image);
+        image_window my_window(edge_image);
 
         // also make a window to display the original image
-        win my_window2(img);
+        image_window my_window2(img);
 
         // wait until the user closes both windows before we let the program 
         // terminate.
