@@ -234,6 +234,7 @@
 
          <examples>
             <example>svm_pegasos_ex.cpp.html</example>
+            <example>svm_sparse_ex.cpp.html</example>
          </examples>
       </component>
       
@@ -615,6 +616,9 @@
                 kernel learning machines that operate on 
                 <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
          </description>
+         <examples>
+            <example>svm_sparse_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
