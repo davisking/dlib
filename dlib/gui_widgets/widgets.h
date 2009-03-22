@@ -3159,6 +3159,11 @@ namespace dlib
         image_window(
         ); 
 
+        template < typename image_type >
+        image_window(
+            const image_type& img
+        ) : gui_img(*this) { set_image(img); show(); }
+
         ~image_window(
         );
 
@@ -3167,11 +3172,12 @@ namespace dlib
             const image_type& img
         ) 
         { 
+            const unsigned long padding = scrollable_region_style_default().get_border_size();
             auto_mutex M(wm);
             gui_img.set_image(img); 
 
             // set the size of this window to match the size of the input image
-            set_size(img.nc(),img.nr());
+            set_size(img.nc()+padding*2,img.nr()+padding*2);
 
             // call this to make sure everything else is setup properly
             on_window_resized();

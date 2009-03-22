@@ -2234,6 +2234,19 @@ namespace dlib
                 - this object is properly initialized
         !*/
 
+        template <typename image_type>
+        image_window(
+            const image_type& img
+        ); 
+        /*!
+            requires
+                - image_type == an implementation of array2d/array2d_kernel_abstract.h
+                - pixel_traits<typename image_type::type> must be defined 
+            ensures
+                - this object is properly initialized 
+                - #*this window is now displaying the given image img.
+        !*/
+
         ~image_window(
         );
         /*!
@@ -2241,7 +2254,7 @@ namespace dlib
                 - any resources associated with this object have been released
         !*/
 
-        template < typename image_type >
+        template <typename image_type>
         void set_image (
             const image_type& img
         );
@@ -2250,7 +2263,7 @@ namespace dlib
                 - image_type == an implementation of array2d/array2d_kernel_abstract.h
                 - pixel_traits<typename image_type::type> must be defined 
             ensures
-                - #*this window is now displaying the given image new_img.
+                - #*this window is now displaying the given image img.
         !*/
 
         void add_overlay (
