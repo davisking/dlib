@@ -291,6 +291,8 @@
          <term link="dlib/gui_widgets/widgets_abstract.h.html#mouse_tracker" name="mouse_tracker"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#list_box" name="list_box"/>
          <term link="dlib/gui_widgets/widgets_abstract.h.html#menu_bar" name="menu_bar"/>
+         <term link="dlib/gui_widgets/widgets_abstract.h.html#image_display" name="image_display"/>
+         <term link="dlib/gui_widgets/widgets_abstract.h.html#image_window" name="image_window"/>
 
          <term link="dlib/gui_widgets/fonts_abstract.h.html#letter" name="letter"/>
          <term link="dlib/gui_widgets/fonts_abstract.h.html#font" name="font"/>
