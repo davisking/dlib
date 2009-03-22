@@ -5651,6 +5651,240 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//       image_display member functions
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    image_display::
+    image_display(  
+        drawable_window& w
+    ): scrollable_region(w)  
+    { 
+        enable_mouse_drag();
+
+        set_horizontal_scroll_increment(1);
+        set_vertical_scroll_increment(1);
+        set_horizontal_mouse_wheel_scroll_increment(30);
+        set_vertical_mouse_wheel_scroll_increment(30);
+
+        enable_events(); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    image_display::
+    ~image_display(
+    )
+    {
+        disable_events();
+        parent.invalidate_rectangle(rect); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    add_overlay (
+        const overlay_rect& overlay
+    )
+    {
+        auto_mutex M(m);
+        // push this new overlay into our overlay vector
+        overlay_rects.push_back(overlay);
+
+        // make the parent window redraw us now that we changed the overlay
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    add_overlay (
+        const overlay_line& overlay
+    )
+    {
+        auto_mutex M(m);
+
+        // push this new overlay into our overlay vector
+        overlay_lines.push_back(overlay);
+
+        // make the parent window redraw us now that we changed the overlay
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    add_overlay (
+        const std::vector<overlay_rect>& overlay
+    )
+    {
+        auto_mutex M(m);
+
+        // push this new overlay into our overlay vector
+        overlay_rects.insert(overlay_rects.end(), overlay.begin(), overlay.end());
+
+        // make the parent window redraw us now that we changed the overlay
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    add_overlay (
+        const std::vector<overlay_line>& overlay
+    )
+    {
+        auto_mutex M(m);
+
+        // push this new overlay into our overlay vector
+        overlay_lines.insert(overlay_lines.end(), overlay.begin(), overlay.end());
+
+        // make the parent window redraw us now that we changed the overlay
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    clear_overlay (
+    )
+    {
+        auto_mutex M(m);
+        overlay_rects.clear();
+        overlay_lines.clear();
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    draw (
+        const canvas& c
+    ) const
+    {
+        scrollable_region::draw(c);
+
+        rectangle area = display_rect().intersect(c);
+        if (area.is_empty())
+            return;
+
+        const point origin(total_rect().tl_corner());
+
+        draw_image(c, origin, img, area);
+
+        // now draw all the overlay rectangles
+        for (unsigned long i = 0; i < overlay_rects.size(); ++i)
+        {
+            draw_rectangle(c, translate_rect(overlay_rects[i].rect, origin), overlay_rects[i].color, area);
+            if (overlay_rects[i].label.size() != 0)
+            {
+                // make a rectangle that is at the spot we want to draw our string
+                rectangle r(overlay_rects[i].rect.br_corner(),  
+                            overlay_rects[i].rect.br_corner() + point(10000,10000));
+                r = translate_rect(r, origin);
+                mfont->draw_string(c, r, overlay_rects[i].label, overlay_rects[i].color, 0, 
+                                   std::string::npos, area);
+            }
+        }
+
+        // now draw all the overlay lines 
+        for (unsigned long i = 0; i < overlay_lines.size(); ++i)
+        {
+            draw_line(c, overlay_lines[i].p1+origin, overlay_lines[i].p2+origin, overlay_lines[i].color, area);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//         image_window member functions
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    image_window::
+    image_window(
+    ) :
+        gui_img(*this)
+    {
+        // show this window on the screen
+        show();
+    } 
+
+// ----------------------------------------------------------------------------------------
+
+    image_window::
+    ~image_window(
+    )
+    {
+        // You should always call close_window() in the destructor of window
+        // objects to ensure that no events will be sent to this window while 
+        // it is being destructed.  
+        close_window();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    add_overlay (
+        const overlay_rect& overlay
+    ) 
+    { 
+        gui_img.add_overlay(overlay); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    add_overlay (
+        const overlay_line& overlay
+    ) 
+    { 
+        gui_img.add_overlay(overlay); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    add_overlay (
+        const std::vector<overlay_rect>& overlay
+    ) 
+    { 
+        gui_img.add_overlay(overlay); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    add_overlay (
+        const std::vector<overlay_line>& overlay
+    ) 
+    { 
+        gui_img.add_overlay(overlay); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    clear_overlay (
+    ) 
+    { 
+        gui_img.clear_overlay(); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    on_window_resized(
+    )
+    {
+        drawable_window::on_window_resized();
+        unsigned long width, height;
+        get_size(width,height);
+        gui_img.set_size(width, height);
+
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 

@@ -15,6 +15,7 @@
 #include "base_widgets.h"
 #include "../member_function_pointer.h"
 #include "../array.h"
+#include "../array2d.h"
 #include "../sequence.h"
 #include "../dir_nav.h"
 #include "../queue.h"
@@ -23,6 +24,7 @@
 #include "../string.h"
 #include "../misc_api.h"
 #include <cctype>
+#include <vector>
 
 #ifdef _MSC_VER
 // This #pragma directive is also located in the algs.h file but for whatever
@@ -3040,6 +3042,170 @@ namespace dlib
         timer<text_grid>::kernel_2a cursor_timer;
         rgb_pixel border_color_;
         member_function_pointer<unsigned long, unsigned long>::kernel_1a_c text_modified_handler;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class image_display : public scrollable_region 
+    {
+        /*!
+            INITIAL VALUE
+                - img.size() == 0
+                - overlay_rects.size() == 0
+                - overlay_lines.size() == 0
+
+            CONVENTION
+                - img == the image this object displays
+                - overlay_rects == the overlay rectangles this object displays
+                - overlay_lines == the overlay lines this object displays
+        !*/
+
+    public:
+
+        image_display(  
+            drawable_window& w
+        );
+
+        ~image_display(
+        );
+
+        template <
+            typename image_type
+            >
+        void set_image (
+            const image_type& new_img
+        )
+        {
+            auto_mutex M(m);
+            assign_image(img,new_img);
+            set_total_rect_size(img.nc(), img.nr());
+        }
+
+        struct overlay_rect
+        {
+            overlay_rect() { assign_pixel(color, 0);}
+
+            template <typename pixel_type>
+            overlay_rect(const rectangle& r, pixel_type p) 
+                : rect(r) { assign_pixel(color, p); }
+
+            template <typename pixel_type>
+            overlay_rect(const rectangle& r, pixel_type p, const std::string& l) 
+                : rect(r),label(l) { assign_pixel(color, p); }
+
+            rectangle rect;
+            rgb_alpha_pixel color;
+            std::string label;
+        };
+
+        struct overlay_line
+        {
+            overlay_line() { assign_pixel(color, 0);}
+
+            template <typename pixel_type>
+            overlay_line(const point& p1_, const point& p2_, pixel_type p) 
+                : p1(p1_), p2(p2_) { assign_pixel(color, p); }
+
+            point p1;
+            point p2;
+            rgb_alpha_pixel color;
+        };
+
+        void add_overlay (
+            const overlay_rect& overlay
+        );
+
+        void add_overlay (
+            const overlay_line& overlay
+        );
+
+        void add_overlay (
+            const std::vector<overlay_rect>& overlay
+        );
+
+        void add_overlay (
+            const std::vector<overlay_line>& overlay
+        );
+
+        void clear_overlay (
+        );
+
+    private:
+
+        void draw (
+            const canvas& c
+        ) const;
+
+        array2d<rgb_alpha_pixel>::kernel_1a img;
+
+
+        std::vector<overlay_rect> overlay_rects;
+        std::vector<overlay_line> overlay_lines;
+
+        // restricted functions
+        image_display(image_display&);        // copy constructor
+        image_display& operator=(image_display&);    // assignment operator
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class image_window : public drawable_window 
+    {
+    public:
+
+        typedef image_display::overlay_rect overlay_rect;
+        typedef image_display::overlay_line overlay_line;
+
+        image_window(
+        ); 
+
+        ~image_window(
+        );
+
+        template < typename image_type >
+        void set_image (
+            const image_type& img
+        ) 
+        { 
+            auto_mutex M(wm);
+            gui_img.set_image(img); 
+
+            // set the size of this window to match the size of the input image
+            set_size(img.nc(),img.nr());
+
+            // call this to make sure everything else is setup properly
+            on_window_resized();
+        }
+
+        void add_overlay (
+            const overlay_rect& overlay
+        );
+
+        void add_overlay (
+            const overlay_line& overlay
+        );
+
+        void add_overlay (
+            const std::vector<overlay_rect>& overlay
+        );
+
+        void add_overlay (
+            const std::vector<overlay_line>& overlay
+        );
+
+        void clear_overlay (
+        );
+
+    private:
+
+        void on_window_resized(
+        );
+
+        // restricted functions
+        image_window(image_window&);
+        image_window& operator= (image_window&);
+
+        image_display gui_img;
     };
 
 // ----------------------------------------------------------------------------------------

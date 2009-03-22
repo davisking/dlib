@@ -2020,6 +2020,291 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class image_display : public scrollable_region 
+    {
+        /*!
+            INITIAL VALUE
+                This object isn't displaying anything. 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an image inside a scrollable region.  
+                You give it an image to display by calling set_image().
+                This widget also allows you to add rectangle and line overlays that
+                will be drawn on top of the image.
+
+                The image is drawn such that:
+                    - the pixel img[0][0] is the upper left corner of the image.
+                    - the pixel img[img.nr()-1][0] is the lower left corner of the image.
+                    - the pixel img[0][img.nc()-1] is the upper right corner of the image.
+                    - the pixel img[img.nr()-1][img.nc()-1] is the lower right corner of the image.
+        !*/
+
+    public:
+
+        image_display(  
+            drawable_window& w
+        );
+        /*!
+            ensures 
+                - #*this is properly initialized 
+                - #*this has been added to window w
+                - #parent_window() == w
+        !*/
+
+        ~image_display(
+        );
+        /*!
+            ensures
+                - all resources associated with *this have been released
+        !*/
+
+        template <
+            typename image_type
+            >
+        void set_image (
+            const image_type& new_img
+        );
+        /*!
+            requires
+                - image_type == an implementation of array2d/array2d_kernel_abstract.h
+                - pixel_traits<typename image_type::type> must be defined 
+            ensures
+                - #*this widget is now displaying the given image new_img.
+        !*/
+
+        struct overlay_rect
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents a rectangle that is drawn on top of the
+                    image shown by this object.  Each rectangle is represented by 
+                    a rectangle object as well as a color and text label.  The label
+                    is drawn below the lower right corner of the rectangle.
+            !*/
+
+            rectangle rect;
+            rgb_alpha_pixel color;
+            std::string label;
+
+            overlay_rect(
+            ); 
+            /*!
+                ensures
+                    - #color == rgb_alpha_pixel(0,0,0,0) 
+                    - #rect == rectangle()
+                    - #label.size() == 0
+            !*/
+
+            template <typename pixel_type>
+            overlay_rect(
+                const rectangle& r, 
+                pixel_type p
+            );
+            /*!
+                ensures
+                    - #rect == r
+                    - performs assign_pixel(color, p) 
+                    - #label.size() == 0
+            !*/
+
+            template <typename pixel_type>
+            overlay_rect(
+                const rectangle& r,
+                pixel_type p,
+                const std::string& l
+            );
+            /*!
+                ensures
+                    - #rect == r
+                    - performs assign_pixel(color, p)
+                    - #label = l
+            !*/
+
+        };
+
+        struct overlay_line
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents a line that is drawn on top of the
+                    image shown by this object.  Each line is represented by 
+                    its two end points (p1 and p2) as well as a color.
+            !*/
+
+            point p1;
+            point p2;
+            rgb_alpha_pixel color;
+
+            overlay_line(
+            );
+            /*!
+                ensures
+                    - #color == rgb_alpha_pixel(0,0,0,0)
+                    - #p1 == point()
+                    - #p2 == point()
+            !*/
+
+            template <typename pixel_type>
+            overlay_line(
+                const point& p1_,
+                const point& p2_,
+                pixel_type p
+            ); 
+            /*!
+                ensures
+                    - performs assign_pixel(color, p)
+                    - #p1 == p1_
+                    - #p2 == p2_
+            !*/
+
+        };
+
+        void add_overlay (
+            const overlay_rect& overlay
+        );
+        /*!
+            ensures
+                - adds the given overlay rectangle into this object such
+                  that it will be displayed. 
+        !*/
+
+        void add_overlay (
+            const overlay_line& overlay
+        );
+        /*!
+            ensures
+                - adds the given overlay line into this object such
+                  that it will be displayed. 
+        !*/
+
+        void add_overlay (
+            const std::vector<overlay_rect>& overlay
+        );
+        /*!
+            ensures
+                - adds the given set of overlay rectangles into this object such
+                  that they will be displayed. 
+        !*/
+
+        void add_overlay (
+            const std::vector<overlay_line>& overlay
+        );
+        /*!
+            ensures
+                - adds the given set of overlay lines into this object such
+                  that they will be displayed. 
+        !*/
+
+        void clear_overlay (
+        );
+        /*!
+            ensures
+                - removes all overlays from this object.  
+        !*/
+
+    private:
+
+        // restricted functions
+        image_display(image_display&);        // copy constructor
+        image_display& operator=(image_display&);    // assignment operator
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class image_window : public drawable_window 
+    {
+        /*!
+            INITIAL VALUE
+                - initially, this object is visible on the screen
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple window that is just a container for an image_display.  
+                It exists to make it easy to throw image_displays onto the screen 
+                without having to put together your own drawable_window objects.
+        !*/
+    public:
+
+        typedef image_display::overlay_rect overlay_rect;
+        typedef image_display::overlay_line overlay_line;
+
+        image_window(
+        ); 
+        /*!
+            ensures
+                - this object is properly initialized
+        !*/
+
+        ~image_window(
+        );
+        /*!
+            ensures
+                - any resources associated with this object have been released
+        !*/
+
+        template < typename image_type >
+        void set_image (
+            const image_type& img
+        );
+        /*!
+            requires
+                - image_type == an implementation of array2d/array2d_kernel_abstract.h
+                - pixel_traits<typename image_type::type> must be defined 
+            ensures
+                - #*this window is now displaying the given image new_img.
+        !*/
+
+        void add_overlay (
+            const overlay_rect& overlay
+        );
+        /*!
+            ensures
+                - adds the given overlay rectangle into this object such
+                  that it will be displayed. 
+        !*/
+
+        void add_overlay (
+            const overlay_line& overlay
+        );
+        /*!
+            ensures
+                - adds the given overlay line into this object such
+                  that it will be displayed. 
+        !*/
+
+        void add_overlay (
+            const std::vector<overlay_rect>& overlay
+        );
+        /*!
+            ensures
+                - adds the given set of overlay rectangles into this object such
+                  that they will be displayed. 
+        !*/
+
+        void add_overlay (
+            const std::vector<overlay_line>& overlay
+        );
+        /*!
+            ensures
+                - adds the given set of overlay lines into this object such
+                  that they will be displayed. 
+        !*/
+
+        void clear_overlay (
+        );
+        /*!
+            ensures
+                - removes all overlays from this object.  
+        !*/
+
+    private:
+
+        // restricted functions
+        image_window(image_window&);
+        image_window& operator= (image_window&);
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_WIDGETs_ABSTRACT_
