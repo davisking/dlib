@@ -91,6 +91,22 @@ namespace dlib
                 - #*this == x
         !*/
 
+        operator const std::vector<T,Allocator>& (
+        ) const;
+        /*!
+            ensures
+                - returns a const reference to the normal unchecked std::vector
+                  object contained inside *this
+        !*/
+
+        operator std::vector<T,Allocator>& (
+        );
+        /*!
+            ensures
+                - returns a non-const reference to the normal unchecked std::vector
+                  object contained inside *this
+        !*/
+
         std_vector_c<T,Allocator>& operator= (
             const std_vector_c<T,Allocator>& x
         );

@@ -50,6 +50,9 @@ namespace dlib
         std_vector_c(const std_vector_c<T,Allocator>& x) : impl(x.impl) {}
         std_vector_c(const std::vector<T,Allocator>& x) : impl(x) {}
 
+        operator const base_type& () const { return impl; }
+        operator base_type& () { return impl; }
+
         std_vector_c<T,Allocator>& operator=(const std_vector_c<T,Allocator>& x)
         {
             impl = x.impl;
