@@ -228,7 +228,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     uint64 thread_pool::
-    add_task (
+    add_task_internal (
         const bfp_type& bfp
     )
     {

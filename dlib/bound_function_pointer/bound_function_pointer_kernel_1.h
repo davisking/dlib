@@ -47,7 +47,7 @@ namespace dlib
 
     // ----------------
 
-        template <typename F, typename T1, typename T2 = void, typename T3 = void, typename T4 = void>
+        template <typename F, typename T1 = void, typename T2 = void, typename T3 = void, typename T4 = void>
         class bound_function_helper : public bound_function_helper_base<T1,T2,T3,T4>
         {
         public:
@@ -70,6 +70,33 @@ namespace dlib
             }
 
             void (*fp)(T1, T2, T3, T4);
+        };
+
+    // ----------------
+
+        template <typename F>
+        class bound_function_helper<F,void,void,void,void> : public bound_function_helper_base<void,void,void,void>
+        {
+        public:
+            void call() const
+            {
+                (*fp)();
+            }
+
+            typename strip<F>::type* fp;
+        };
+
+        template <>
+        class bound_function_helper<void,void,void,void,void> : public bound_function_helper_base<void,void,void,void>
+        {
+        public:
+            void call() const
+            {
+                if (this->mfp)    this->mfp();
+                else if (fp) fp();
+            }
+
+            void (*fp)();
         };
 
     // ----------------
@@ -258,6 +285,24 @@ namespace dlib
     //      set function object overloads
     // -------------------------------------------
 
+        template <typename F>
+        void set (
+            F& function_object
+        )
+        {
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            using namespace bfp1_helpers;
+            destroy_bf_memory();
+            typedef bound_function_helper_T<bound_function_helper<F> > bf_helper_type;
+
+            bf_helper_type temp;
+            temp.fp = &function_object;
+
+            temp.safe_clone(bf_memory.data);
+        }
+
         template <typename F, typename A1 >
         void set (
             F& function_object,
@@ -352,6 +397,40 @@ namespace dlib
 
     // -------------------------------------------
     //      set mfp overloads
+    // -------------------------------------------
+
+        template <typename T>
+        void set (
+            T& object,
+            void (T::*funct)()
+        )
+        {
+            using namespace bfp1_helpers;
+            destroy_bf_memory();
+            typedef bound_function_helper_T<bound_function_helper<void> > bf_helper_type;
+
+            bf_helper_type temp;
+            temp.mfp.set(object,funct);
+
+            temp.safe_clone(bf_memory.data);
+        }
+
+        template <typename T >
+        void set (
+            const T& object,
+            void (T::*funct)()const
+        )
+        {
+            using namespace bfp1_helpers;
+            destroy_bf_memory();
+            typedef bound_function_helper_T<bound_function_helper<void> > bf_helper_type;
+
+            bf_helper_type temp;
+            temp.mfp.set(object,funct);
+
+            temp.safe_clone(bf_memory.data);
+        }
+
     // -------------------------------------------
 
         template <typename T, typename T1, typename A1 >
@@ -543,6 +622,20 @@ namespace dlib
     // -------------------------------------------
     //      set fp overloads
     // -------------------------------------------
+
+        void set (
+            void (*funct)()
+        )
+        {
+            using namespace bfp1_helpers;
+            destroy_bf_memory();
+            typedef bound_function_helper_T<bound_function_helper<void> > bf_helper_type;
+
+            bf_helper_type temp;
+            temp.fp = funct;
+
+            temp.safe_clone(bf_memory.data);
+        }
 
         template <typename T1, typename A1>
         void set (

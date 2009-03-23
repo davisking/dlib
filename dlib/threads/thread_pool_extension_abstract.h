@@ -450,7 +450,8 @@ namespace dlib
 
         // --------------------------------------------------------------------------------
         // The remainder of this class just contains overloads for add_task() that take up 
-        // to 4 futures.  Their behavior is identical to the above add_task() functions.
+        // to 4 futures (as well as 0 futures).  Their behavior is identical to the above 
+        // add_task() functions.
         // --------------------------------------------------------------------------------
 
         template <typename F, typename A1, typename A2>
@@ -576,6 +577,23 @@ namespace dlib
             future<A3>& arg3,
             future<A4>& arg4
         );
+
+        // --------------------
+
+        template <typename F>
+        uint64 add_task (
+            F& function_object
+        );
+
+        template <typename T>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)() const,
+        ); 
+        
+        uint64 add_task (
+            void (*funct)()
+        ); 
 
         // --------------------
 

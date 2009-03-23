@@ -25,6 +25,8 @@ namespace
         float val;
     };
 
+    int global_var = 0;
+
     struct add_functor
     {
         template <typename T, typename U, typename V>
@@ -33,7 +35,18 @@ namespace
             dlib::sleep(20);
             res = a + b;
         }
+
+        void set_global_var() { global_var = 9; }
+        void set_global_var_const() const { global_var = 9; }
+
+        void operator()()
+        {
+            global_var = 9;
+        }
     };
+
+
+    void set_global_var() {  global_var = 9; }
 
     void gset_struct_to_zero (some_struct& a) { a.val = 0; }
     void gset_to_zero (int& a) { a = 0; }
@@ -197,6 +210,34 @@ namespace
                     DLIB_CASSERT(a == 1,"");
                     DLIB_CASSERT(b == 2,"");
                     DLIB_CASSERT(res == 3,"");
+
+                    global_var = 0;
+                    DLIB_CASSERT(global_var == 0,"");
+                    id = tp.add_task(&set_global_var);
+                    tp.wait_for_task(id);
+                    DLIB_CASSERT(global_var == 9,"");
+
+                    global_var = 0;
+                    DLIB_CASSERT(global_var == 0,"");
+                    id = tp.add_task(f);
+                    tp.wait_for_task(id);
+                    DLIB_CASSERT(global_var == 9,"");
+
+                    global_var = 0;
+                    DLIB_CASSERT(global_var == 0,"");
+                    id = tp.add_task(f, &add_functor::set_global_var);
+                    tp.wait_for_task(id);
+                    DLIB_CASSERT(global_var == 9,"");
+
+
+                    global_var = 0;
+                    DLIB_CASSERT(global_var == 0,"");
+                    id = tp.add_task(f, &add_functor::set_global_var_const);
+                    tp.wait_for_task(id);
+                    DLIB_CASSERT(global_var == 9,"");
+
+
+
                 }
             }
         }

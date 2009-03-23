@@ -296,6 +296,47 @@ namespace dlib
 
         // --------------------
 
+        template <typename F>
+        uint64 add_task (
+            F& function_object
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object);
+            uint64 id = add_task_internal(temp);
+
+            return id;
+        }
+        
+        template <typename T>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)() const
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj,funct);
+            uint64 id = add_task_internal(temp);
+
+            return id;
+        }
+        
+        uint64 add_task (
+            void (*funct)()
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct);
+            uint64 id = add_task_internal(temp);
+
+            return id;
+        }
+
+        // --------------------
+
         template <typename F, typename A1>
         uint64 add_task (
             F& function_object,
@@ -307,7 +348,7 @@ namespace dlib
             
             bfp_type temp;
             temp.set(function_object,arg1.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the future to this task
             arg1.task_id = id;
@@ -324,7 +365,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(obj,funct,arg1.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the future to this task
             arg1.task_id = id;
@@ -341,7 +382,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(obj,funct,arg1.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the future to this task
             arg1.task_id = id;
@@ -357,7 +398,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(funct,arg1.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the future to this task
             arg1.task_id = id;
@@ -379,7 +420,7 @@ namespace dlib
             
             bfp_type temp;
             temp.set(function_object, arg1.get(), arg2.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the future to this task
             arg1.task_id = id;
@@ -400,7 +441,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(obj, funct, arg1.get(), arg2.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the futures to this task
             arg1.task_id = id;
@@ -421,7 +462,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(obj, funct, arg1.get(), arg2.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the futures to this task
             arg1.task_id = id;
@@ -441,7 +482,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(funct, arg1.get(), arg2.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the futures to this task
             arg1.task_id = id;
@@ -466,7 +507,7 @@ namespace dlib
             
             bfp_type temp;
             temp.set(function_object, arg1.get(), arg2.get(), arg3.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the future to this task
             arg1.task_id = id;
@@ -491,7 +532,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the futures to this task
             arg1.task_id = id;
@@ -516,7 +557,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the futures to this task
             arg1.task_id = id;
@@ -540,7 +581,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(funct, arg1.get(), arg2.get(), arg3.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the futures to this task
             arg1.task_id = id;
@@ -568,7 +609,7 @@ namespace dlib
             
             bfp_type temp;
             temp.set(function_object, arg1.get(), arg2.get(), arg3.get(), arg4.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the future to this task
             arg1.task_id = id;
@@ -597,7 +638,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the futures to this task
             arg1.task_id = id;
@@ -626,7 +667,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the futures to this task
             arg1.task_id = id;
@@ -654,7 +695,7 @@ namespace dlib
         { 
             bfp_type temp;
             temp.set(funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
-            uint64 id = add_task(temp);
+            uint64 id = add_task_internal(temp);
 
             // tie the futures to this task
             arg1.task_id = id;
@@ -672,7 +713,7 @@ namespace dlib
 
     private:
 
-        uint64 add_task (
+        uint64 add_task_internal (
             const bfp_type& bfp
         );
         /*!
