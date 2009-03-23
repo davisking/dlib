@@ -61,6 +61,8 @@ namespace dlib
 
     public:
 
+        typedef T type;
+
         explicit pipe_kernel_1 (  
             unsigned long maximum_size
         );
