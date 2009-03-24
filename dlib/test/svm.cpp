@@ -335,11 +335,11 @@ namespace
         typedef radial_basis_kernel<sample_type> kernel_type;
 
         rbf_network_trainer<kernel_type> rbf_trainer;
-        rbf_trainer.set_kernel(kernel_type(gamma));
-        rbf_trainer.set_num_centers(30);
+        rbf_trainer.set_kernel(kernel_type(0.5*gamma));
+        rbf_trainer.set_num_centers(100);
 
         rvm_trainer<kernel_type> rvm_trainer;
-        rvm_trainer.set_kernel(kernel_type(gamma));
+        rvm_trainer.set_kernel(kernel_type(2*gamma));
 
         svm_pegasos<kernel_type> pegasos_trainer;
         pegasos_trainer.set_kernel(kernel_type(gamma));
@@ -378,7 +378,7 @@ namespace
         dlog << LDEBUG << "num rv: " << num_rv;
 
         DLIB_CASSERT(num_rv <= 17, "");
-        DLIB_CASSERT(num_sv <= 45, "");
+        DLIB_CASSERT(num_sv <= 45, num_sv);
 
         decision_function<kernel_type> df = reduced2(trainer, 19).train(x,y);
         print_spinner();
