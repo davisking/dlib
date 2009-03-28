@@ -13,6 +13,25 @@ namespace test
 
 // -----------------------------------------------------------------------------
 
+    void check_test (
+        bool _exp,
+        long line,
+        const char* file,
+        const char* _exp_str
+    )
+    {
+        if ( !(_exp) )                                                         
+        {                                                                       
+            std::ostringstream dlib__out;                                       
+                dlib__out << "\n\nError occurred at line " << line << ".\n";    
+                dlib__out << "Error occurred in file " << file << ".\n";      
+                dlib__out << "Failing expression was " << _exp_str << ".\n";           
+                throw dlib::error(dlib__out.str());      
+        }
+    }                                                                      
+
+// -----------------------------------------------------------------------------
+
     map_of_testers& testers (
     )
     {
