@@ -38,7 +38,7 @@ namespace
 
         assign_image(img2, img1);
 
-        DLIB_CASSERT(img1.nr() == 100 && img1.nc() == 100 &&
+        DLIB_TEST_MSG(img1.nr() == 100 && img1.nc() == 100 &&
                      img2.nr() == 100 && img2.nc() == 100,"");
 
 
@@ -46,8 +46,8 @@ namespace
         {
             for (long c = 0; c < img1.nc(); ++c)
             {
-                DLIB_CASSERT(img1[r][c] == 7,"");
-                DLIB_CASSERT(img2[r][c] == 7,"");
+                DLIB_TEST(img1[r][c] == 7);
+                DLIB_TEST(img2[r][c] == 7);
             }
         }
 
@@ -58,8 +58,8 @@ namespace
         {
             for (long c = 0; c < img1.nc(); ++c)
             {
-                DLIB_CASSERT(img1[r][c] == 7,"");
-                DLIB_CASSERT(img2[r][c] == on_pixel,"");
+                DLIB_TEST(img1[r][c] == 7);
+                DLIB_TEST(img2[r][c] == on_pixel);
             }
         }
 
@@ -81,21 +81,21 @@ namespace
             istringstream sin(sout.str());
 
             img.clear();
-            DLIB_CASSERT(img.nr() == 0,"");
-            DLIB_CASSERT(img.nc() == 0,"");
+            DLIB_TEST(img.nr() == 0);
+            DLIB_TEST(img.nc() == 0);
 
             load_dng(img, sin);
             
-            DLIB_CASSERT(img.nr() == 14,"");
-            DLIB_CASSERT(img.nc() == 15,"");
+            DLIB_TEST(img.nr() == 14);
+            DLIB_TEST(img.nc() == 15);
 
             for (long r = 0; r < 14; ++r)
             {
                 for (long c = 0; c < 15; ++c)
                 {
-                    DLIB_CASSERT(img[r][c].h == r*14 + c + 1, "");
-                    DLIB_CASSERT(img[r][c].s == r*14 + c + 2, "");
-                    DLIB_CASSERT(img[r][c].i == r*14 + c + 3, "");
+                    DLIB_TEST(img[r][c].h == r*14 + c + 1);
+                    DLIB_TEST(img[r][c].s == r*14 + c + 2);
+                    DLIB_TEST(img[r][c].i == r*14 + c + 3);
                 }
             }
         }
@@ -122,22 +122,22 @@ namespace
             istringstream sin(sout.str());
 
             img.clear();
-            DLIB_CASSERT(img.nr() == 0,"");
-            DLIB_CASSERT(img.nc() == 0,"");
+            DLIB_TEST(img.nr() == 0);
+            DLIB_TEST(img.nc() == 0);
 
             load_dng(img, sin);
             
-            DLIB_CASSERT(img.nr() == 14,"");
-            DLIB_CASSERT(img.nc() == 15,"");
+            DLIB_TEST(img.nr() == 14);
+            DLIB_TEST(img.nc() == 15);
 
             for (long r = 0; r < 14; ++r)
             {
                 for (long c = 0; c < 15; ++c)
                 {
-                    DLIB_CASSERT(img[r][c].red == r*14 + c + 1, "");
-                    DLIB_CASSERT(img[r][c].green == r*14 + c + 2, "");
-                    DLIB_CASSERT(img[r][c].blue == r*14 + c + 3, "");
-                    DLIB_CASSERT(img[r][c].alpha == r*14 + c + 4, "");
+                    DLIB_TEST(img[r][c].red == r*14 + c + 1);
+                    DLIB_TEST(img[r][c].green == r*14 + c + 2);
+                    DLIB_TEST(img[r][c].blue == r*14 + c + 3);
+                    DLIB_TEST(img[r][c].alpha == r*14 + c + 4);
                 }
             }
         }
@@ -167,40 +167,40 @@ namespace
             for (int i  = 0; i < 2; ++i)
             {
                 img.clear();
-                DLIB_CASSERT(img.nr() == 0,"");
-                DLIB_CASSERT(img.nc() == 0,"");
+                DLIB_TEST(img.nr() == 0);
+                DLIB_TEST(img.nc() == 0);
 
                 load_dng(img, sin);
 
-                DLIB_CASSERT(img.nr() == 14,"");
-                DLIB_CASSERT(img.nc() == 15,"");
+                DLIB_TEST(img.nr() == 14);
+                DLIB_TEST(img.nc() == 15);
 
                 for (long r = 0; r < 14; ++r)
                 {
                     for (long c = 0; c < 15; ++c)
                     {
-                        DLIB_CASSERT(img[r][c].red == r*14 + c + 1, "");
-                        DLIB_CASSERT(img[r][c].green == r*14 + c + 2, "");
-                        DLIB_CASSERT(img[r][c].blue == r*14 + c + 3, "");
+                        DLIB_TEST(img[r][c].red == r*14 + c + 1);
+                        DLIB_TEST(img[r][c].green == r*14 + c + 2);
+                        DLIB_TEST(img[r][c].blue == r*14 + c + 3);
                     }
                 }
 
                 img.clear();
-                DLIB_CASSERT(img.nr() == 0,"");
-                DLIB_CASSERT(img.nc() == 0,"");
+                DLIB_TEST(img.nr() == 0);
+                DLIB_TEST(img.nc() == 0);
 
                 load_bmp(img, sin);
 
-                DLIB_CASSERT(img.nr() == 14,"");
-                DLIB_CASSERT(img.nc() == 15,"");
+                DLIB_TEST(img.nr() == 14);
+                DLIB_TEST(img.nc() == 15);
 
                 for (long r = 0; r < 14; ++r)
                 {
                     for (long c = 0; c < 15; ++c)
                     {
-                        DLIB_CASSERT(img[r][c].red == r*14 + c + 1, "got " << (int)img[r][c].red << "  but expected " << r*14 + c + 1);
-                        DLIB_CASSERT(img[r][c].green == r*14 + c + 2, "");
-                        DLIB_CASSERT(img[r][c].blue == r*14 + c + 3, "");
+                        DLIB_TEST_MSG(img[r][c].red == r*14 + c + 1, "got " << (int)img[r][c].red << "  but expected " << r*14 + c + 1);
+                        DLIB_TEST(img[r][c].green == r*14 + c + 2);
+                        DLIB_TEST(img[r][c].blue == r*14 + c + 3);
                     }
                 }
             }
@@ -225,19 +225,19 @@ namespace
             istringstream sin(sout.str());
 
             img.clear();
-            DLIB_CASSERT(img.nr() == 0,"");
-            DLIB_CASSERT(img.nc() == 0,"");
+            DLIB_TEST(img.nr() == 0);
+            DLIB_TEST(img.nc() == 0);
 
             load_dng(img, sin);
             
-            DLIB_CASSERT(img.nr() == 14,"");
-            DLIB_CASSERT(img.nc() == 15,"");
+            DLIB_TEST(img.nr() == 14);
+            DLIB_TEST(img.nc() == 15);
 
             for (long r = 0; r < 14; ++r)
             {
                 for (long c = 0; c < 15; ++c)
                 {
-                    DLIB_CASSERT(img[r][c] == r*14 + c + 0xFF, "");
+                    DLIB_TEST(img[r][c] == r*14 + c + 0xFF);
                 }
             }
         }
@@ -265,37 +265,37 @@ namespace
             for (int i = 0; i < 2; ++i)
             {
                 img.clear();
-                DLIB_CASSERT(img.nr() == 0,"");
-                DLIB_CASSERT(img.nc() == 0,"");
+                DLIB_TEST(img.nr() == 0);
+                DLIB_TEST(img.nc() == 0);
 
                 load_dng(img, sin);
 
-                DLIB_CASSERT(img.nr() == 14,"");
-                DLIB_CASSERT(img.nc() == 15,"");
+                DLIB_TEST(img.nr() == 14);
+                DLIB_TEST(img.nc() == 15);
 
                 for (long r = 0; r < 14; ++r)
                 {
                     for (long c = 0; c < 15; ++c)
                     {
-                        DLIB_CASSERT(img[r][c] == r*14 + c, "");
+                        DLIB_TEST(img[r][c] == r*14 + c);
                     }
                 }
 
 
                 img.clear();
-                DLIB_CASSERT(img.nr() == 0,"");
-                DLIB_CASSERT(img.nc() == 0,"");
+                DLIB_TEST(img.nr() == 0);
+                DLIB_TEST(img.nc() == 0);
 
                 load_bmp(img, sin);
 
-                DLIB_CASSERT(img.nr() == 14,"");
-                DLIB_CASSERT(img.nc() == 15,"");
+                DLIB_TEST(img.nr() == 14);
+                DLIB_TEST(img.nc() == 15);
 
                 for (long r = 0; r < 14; ++r)
                 {
                     for (long c = 0; c < 15; ++c)
                     {
-                        DLIB_CASSERT(img[r][c] == r*14 + c, "");
+                        DLIB_TEST(img[r][c] == r*14 + c);
                     }
                 }
             }
@@ -326,37 +326,37 @@ namespace
             for (int i = 0; i < 2; ++i)
             {
                 img.clear();
-                DLIB_CASSERT(img.nr() == 0,"");
-                DLIB_CASSERT(img.nc() == 0,"");
+                DLIB_TEST(img.nr() == 0);
+                DLIB_TEST(img.nc() == 0);
 
                 load_dng(img, sin);
 
-                DLIB_CASSERT(img.nr() == 14,"");
-                DLIB_CASSERT(img.nc() == 15,"");
+                DLIB_TEST(img.nr() == 14);
+                DLIB_TEST(img.nc() == 15);
 
                 for (long r = 0; r < 14; ++r)
                 {
                     for (long c = 0; c < 15; ++c)
                     {
-                        DLIB_CASSERT(img[r][c] == r*14 + c, "");
+                        DLIB_TEST(img[r][c] == r*14 + c);
                     }
                 }
 
 
                 img.clear();
-                DLIB_CASSERT(img.nr() == 0,"");
-                DLIB_CASSERT(img.nc() == 0,"");
+                DLIB_TEST(img.nr() == 0);
+                DLIB_TEST(img.nc() == 0);
 
                 load_bmp(img, sin);
 
-                DLIB_CASSERT(img.nr() == 14,"");
-                DLIB_CASSERT(img.nc() == 15,"");
+                DLIB_TEST(img.nr() == 14);
+                DLIB_TEST(img.nc() == 15);
 
                 for (long r = 0; r < 14; ++r)
                 {
                     for (long c = 0; c < 15; ++c)
                     {
-                        DLIB_CASSERT(img[r][c] == r*14 + c, "");
+                        DLIB_TEST(img[r][c] == r*14 + c);
                     }
                 }
             }
@@ -380,11 +380,11 @@ namespace
                     if ((r == 5 && c == 5) ||
                         (r == 7 && c == 7))
                     {
-                        DLIB_CASSERT(img2[r][c] == 255, "");
+                        DLIB_TEST(img2[r][c] == 255);
                     }
                     else
                     {
-                        DLIB_CASSERT(img2[r][c] == 0, "");
+                        DLIB_TEST(img2[r][c] == 0);
                     }
                 }
             }

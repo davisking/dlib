@@ -76,33 +76,33 @@ namespace
 
         lu_decomposition<matrix_type> test(m);
 
-        DLIB_CASSERT(test.is_square() == (m.nr() == m.nc()), "");
+        DLIB_TEST(test.is_square() == (m.nr() == m.nc()));
 
-        DLIB_CASSERT(test.nr() == m.nr(),"");
-        DLIB_CASSERT(test.nc() == m.nc(),"");
+        DLIB_TEST(test.nr() == m.nr());
+        DLIB_TEST(test.nc() == m.nc());
 
         type temp;
-        DLIB_CASSERT( (temp= max(abs(test.get_l()*test.get_u() - rowm(m,test.get_pivot())))) < eps,temp);
+        DLIB_TEST_MSG( (temp= max(abs(test.get_l()*test.get_u() - rowm(m,test.get_pivot())))) < eps,temp);
 
         if (test.is_square())
         {
             // none of the matrices we should be passing in to test_lu() should be singular.  
-            DLIB_CASSERT (abs(test.det()) > eps/100, "det: " << test.det() );
+            DLIB_TEST_MSG (abs(test.det()) > eps/100, "det: " << test.det() );
             dlog << LDEBUG << "big det: " << test.det();
 
-            DLIB_CASSERT(test.is_singular() == false,"");
+            DLIB_TEST(test.is_singular() == false);
 
             matrix<type> m2;
             matrix<type,0,1> col;
 
             m2 = identity_matrix<type>(m.nr());
-            DLIB_CASSERT(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
+            DLIB_TEST_MSG(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
             m2 = randmat<type>(m.nr(),5);
-            DLIB_CASSERT(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
+            DLIB_TEST_MSG(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
             m2 = randmat<type>(m.nr(),1);
-            DLIB_CASSERT(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
+            DLIB_TEST_MSG(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
             col = randmat<type>(m.nr(),1);
-            DLIB_CASSERT(equal(m*test.solve(col), col,eps),max(abs(m*test.solve(m2)- m2)));
+            DLIB_TEST_MSG(equal(m*test.solve(col), col,eps),max(abs(m*test.solve(m2)- m2)));
 
             // now make us a singular matrix
             if (m.nr() > 1)
@@ -111,13 +111,13 @@ namespace
                 set_colm(sm,0) = colm(sm,1);
 
                 lu_decomposition<matrix_type> test2(sm);
-                DLIB_CASSERT( (temp= max(abs(test2.get_l()*test2.get_u() - rowm(sm,test2.get_pivot())))) < eps,temp);
+                DLIB_TEST_MSG( (temp= max(abs(test2.get_l()*test2.get_u() - rowm(sm,test2.get_pivot())))) < eps,temp);
 
                 // these checks are only accurate for small matrices
                 if (test2.nr() < 100)
                 {
-                    DLIB_CASSERT(test2.is_singular() == true,"det: " << test2.det());
-                    DLIB_CASSERT(abs(test2.det()) < eps,"det: " << test2.det());
+                    DLIB_TEST_MSG(test2.is_singular() == true,"det: " << test2.det());
+                    DLIB_TEST_MSG(abs(test2.det()) < eps,"det: " << test2.det());
                 }
 
             }

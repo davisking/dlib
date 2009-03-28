@@ -66,11 +66,11 @@ namespace
                 for (unsigned long i = 0; i < proc1_count; ++i)
                 {
                     int cur;
-                    DLIB_CASSERT(p.dequeue(cur) == true,"");
-                    DLIB_CASSERT(last + 1 == cur,"");
+                    DLIB_TEST(p.dequeue(cur) == true);
+                    DLIB_TEST(last + 1 == cur);
                     last = cur;
                 }
-                DLIB_CASSERT(p.size() == 0,"");
+                DLIB_TEST(p.size() == 0);
             }
             catch(exception& e)
             {
@@ -103,7 +103,7 @@ namespace
                 int cur;
                 while (p.dequeue(cur))
                 {
-                    DLIB_CASSERT(last < cur,"");
+                    DLIB_TEST(last < cur);
                     last = cur;
                 }
                 auto_mutex M(m);
@@ -139,7 +139,7 @@ namespace
                 int cur;
                 while (p.dequeue_or_timeout(cur,100000))
                 {
-                    DLIB_CASSERT(last < cur,"");
+                    DLIB_TEST(last < cur);
                     last = cur;
                 }
                 auto_mutex M(m);
@@ -184,47 +184,47 @@ namespace
         pipe test_0(0), test2_0(0);
         pipe test_1(1), test2_1(1);
 
-        DLIB_CASSERT(test.size() == 0,"");
-        DLIB_CASSERT(test2.size() == 0,"");
-        DLIB_CASSERT(test_0.size() == 0,"");
-        DLIB_CASSERT(test2_0.size() == 0,"");
-        DLIB_CASSERT(test_1.size() == 0,"");
-        DLIB_CASSERT(test2_1.size() == 0,"");
+        DLIB_TEST(test.size() == 0);
+        DLIB_TEST(test2.size() == 0);
+        DLIB_TEST(test_0.size() == 0);
+        DLIB_TEST(test2_0.size() == 0);
+        DLIB_TEST(test_1.size() == 0);
+        DLIB_TEST(test2_1.size() == 0);
 
         test.empty();
         test2.empty();
-        DLIB_CASSERT(test.size() == 0,"");
-        DLIB_CASSERT(test2.size() == 0,"");
+        DLIB_TEST(test.size() == 0);
+        DLIB_TEST(test2.size() == 0);
 
         test_0.empty();
         test2_0.empty();
-        DLIB_CASSERT(test_0.size() == 0,"");
-        DLIB_CASSERT(test2_0.size() == 0,"");
+        DLIB_TEST(test_0.size() == 0);
+        DLIB_TEST(test2_0.size() == 0);
 
         test_1.empty();
         test2_1.empty();
-        DLIB_CASSERT(test_1.size() == 0,"");
-        DLIB_CASSERT(test2_1.size() == 0,"");
+        DLIB_TEST(test_1.size() == 0);
+        DLIB_TEST(test2_1.size() == 0);
 
 
 
         int a;
         a = 3;
         test.enqueue(a);
-        DLIB_CASSERT(test.size() == 1,"");
+        DLIB_TEST(test.size() == 1);
         a = 5;
         test.enqueue(a);
-        DLIB_CASSERT(test.size() == 2,"");
+        DLIB_TEST(test.size() == 2);
 
         a = 0;
         test.dequeue(a);
-        DLIB_CASSERT(a == 3,"");
-        DLIB_CASSERT(test.size() == 1,"");
+        DLIB_TEST(a == 3);
+        DLIB_TEST(test.size() == 1);
 
         a = 0;
         test.dequeue(a);
-        DLIB_CASSERT(a == 5,"");
-        DLIB_CASSERT(test.size() == 0,"");
+        DLIB_TEST(a == 5);
+        DLIB_TEST(test.size() == 0);
 
 
         print_spinner();
@@ -240,9 +240,9 @@ namespace
                 a = i;
                 test.enqueue(a);
             }
-            DLIB_CASSERT(test.is_enqueue_enabled() == true,"");
+            DLIB_TEST(test.is_enqueue_enabled() == true);
             test.disable_enqueue();
-            DLIB_CASSERT(test.is_enqueue_enabled() == false,"");
+            DLIB_TEST(test.is_enqueue_enabled() == false);
             for (unsigned long i = 0; i < proc1_count; ++i)
             {
                 a = i;
@@ -259,11 +259,11 @@ namespace
             }
 
             test2.wait_for_num_blocked_dequeues(3);
-            DLIB_CASSERT(test2.size() == 0,"");
+            DLIB_TEST(test2.size() == 0);
             test2.disable();
 
             wait_for_threads();
-            DLIB_CASSERT(test2.size() == 0,"");
+            DLIB_TEST(test2.size() == 0);
 
             test2.enable();
 
@@ -283,11 +283,11 @@ namespace
             }
 
             test2.wait_for_num_blocked_dequeues(2);
-            DLIB_CASSERT(test2.size() == 0,"");
+            DLIB_TEST(test2.size() == 0);
             test2.disable();
 
             wait_for_threads();
-            DLIB_CASSERT(test2.size() == 0,"");
+            DLIB_TEST(test2.size() == 0);
 
         }
 
@@ -308,9 +308,9 @@ namespace
             }
 
             dlog << LTRACE << "0: 2";
-            DLIB_CASSERT(test_0.is_enqueue_enabled() == true,"");
+            DLIB_TEST(test_0.is_enqueue_enabled() == true);
             test_0.disable_enqueue();
-            DLIB_CASSERT(test_0.is_enqueue_enabled() == false,"");
+            DLIB_TEST(test_0.is_enqueue_enabled() == false);
             for (unsigned long i = 0; i < proc1_count; ++i)
             {
                 a = i;
@@ -330,11 +330,11 @@ namespace
             print_spinner();
             dlog << LTRACE << "0: 4";
             test2_0.wait_for_num_blocked_dequeues(3);
-            DLIB_CASSERT(test2_0.size() == 0,"");
+            DLIB_TEST(test2_0.size() == 0);
             test2_0.disable();
 
             wait_for_threads();
-            DLIB_CASSERT(test2_0.size() == 0,"");
+            DLIB_TEST(test2_0.size() == 0);
 
             dlog << LTRACE << "0: 5";
             test2_0.enable();
@@ -358,11 +358,11 @@ namespace
 
             dlog << LTRACE << "0: 6";
             test2_0.wait_for_num_blocked_dequeues(2);
-            DLIB_CASSERT(test2_0.size() == 0,"");
+            DLIB_TEST(test2_0.size() == 0);
             test2_0.disable();
 
             wait_for_threads();
-            DLIB_CASSERT(test2_0.size() == 0,"");
+            DLIB_TEST(test2_0.size() == 0);
 
             dlog << LTRACE << "0: 7";
         }
@@ -380,9 +380,9 @@ namespace
                 a = i;
                 test_1.enqueue(a);
             }
-            DLIB_CASSERT(test_1.is_enqueue_enabled() == true,"");
+            DLIB_TEST(test_1.is_enqueue_enabled() == true);
             test_1.disable_enqueue();
-            DLIB_CASSERT(test_1.is_enqueue_enabled() == false,"");
+            DLIB_TEST(test_1.is_enqueue_enabled() == false);
             for (unsigned long i = 0; i < proc1_count; ++i)
             {
                 a = i;
@@ -400,11 +400,11 @@ namespace
             }
 
             test2_1.wait_for_num_blocked_dequeues(3);
-            DLIB_CASSERT(test2_1.size() == 0,"");
+            DLIB_TEST(test2_1.size() == 0);
             test2_1.disable();
 
             wait_for_threads();
-            DLIB_CASSERT(test2_1.size() == 0,"");
+            DLIB_TEST(test2_1.size() == 0);
 
             test2_1.enable();
 
@@ -423,11 +423,11 @@ namespace
             }
 
             test2_1.wait_for_num_blocked_dequeues(2);
-            DLIB_CASSERT(test2_1.size() == 0,"");
+            DLIB_TEST(test2_1.size() == 0);
             test2_1.disable();
 
             wait_for_threads();
-            DLIB_CASSERT(test2_1.size() == 0,"");
+            DLIB_TEST(test2_1.size() == 0);
 
         }
 
@@ -435,19 +435,19 @@ namespace
         test_0.enable_enqueue();
         test_1.enable_enqueue();
 
-        DLIB_CASSERT(test.is_enabled(),"");
-        DLIB_CASSERT(test.is_enqueue_enabled(),"");
-        DLIB_CASSERT(test_0.is_enabled(),"");
-        DLIB_CASSERT(test_0.is_enqueue_enabled(),"");
-        DLIB_CASSERT(test_1.is_enabled(),"");
-        DLIB_CASSERT(test_1.is_enqueue_enabled(),"");
+        DLIB_TEST(test.is_enabled());
+        DLIB_TEST(test.is_enqueue_enabled());
+        DLIB_TEST(test_0.is_enabled());
+        DLIB_TEST(test_0.is_enqueue_enabled());
+        DLIB_TEST(test_1.is_enabled());
+        DLIB_TEST(test_1.is_enqueue_enabled());
 
-        DLIB_CASSERT(test.size() == 0,"");
-        DLIB_CASSERT(test_0.size() == 0,"");
-        DLIB_CASSERT(test_1.size() == 0,"");
-        DLIB_CASSERT(test.max_size() == 10,"");
-        DLIB_CASSERT(test_0.max_size() == 0,"");
-        DLIB_CASSERT(test_1.max_size() == 1,"");
+        DLIB_TEST(test.size() == 0);
+        DLIB_TEST(test_0.size() == 0);
+        DLIB_TEST(test_1.size() == 0);
+        DLIB_TEST(test.max_size() == 10);
+        DLIB_TEST(test_0.max_size() == 0);
+        DLIB_TEST(test_1.max_size() == 1);
 
 
         for (int i = 0; i < 100; ++i)
@@ -460,61 +460,61 @@ namespace
             test_1.enqueue_or_timeout(a,0);
         }
 
-        DLIB_CASSERT(test.size() == 10,"size: " << test.size() );
-        DLIB_CASSERT(test_0.size() == 0,"size: " << test.size() );
-        DLIB_CASSERT(test_1.size() == 1,"size: " << test.size() );
+        DLIB_TEST_MSG(test.size() == 10,"size: " << test.size() );
+        DLIB_TEST_MSG(test_0.size() == 0,"size: " << test.size() );
+        DLIB_TEST_MSG(test_1.size() == 1,"size: " << test.size() );
 
         for (int i = 0; i < 10; ++i)
         {
             a = 0;
-            DLIB_CASSERT(test.enqueue_or_timeout(a,10) == false,"");
+            DLIB_TEST(test.enqueue_or_timeout(a,10) == false);
             a = 0;
-            DLIB_CASSERT(test_0.enqueue_or_timeout(a,10) == false,"");
+            DLIB_TEST(test_0.enqueue_or_timeout(a,10) == false);
             a = 0;
-            DLIB_CASSERT(test_1.enqueue_or_timeout(a,10) == false,"");
+            DLIB_TEST(test_1.enqueue_or_timeout(a,10) == false);
         }
 
-        DLIB_CASSERT(test.size() == 10,"size: " << test.size() );
-        DLIB_CASSERT(test_0.size() == 0,"size: " << test.size() );
-        DLIB_CASSERT(test_1.size() == 1,"size: " << test.size() );
+        DLIB_TEST_MSG(test.size() == 10,"size: " << test.size() );
+        DLIB_TEST_MSG(test_0.size() == 0,"size: " << test.size() );
+        DLIB_TEST_MSG(test_1.size() == 1,"size: " << test.size() );
 
         for (int i = 0; i < 10; ++i)
         {
             a = 0;
-            DLIB_CASSERT(test.dequeue_or_timeout(a,0) == true,"");
-            DLIB_CASSERT(a == 1,"");
+            DLIB_TEST(test.dequeue_or_timeout(a,0) == true);
+            DLIB_TEST(a == 1);
         }
 
-        DLIB_CASSERT(test.max_size() == 10,"");
-        DLIB_CASSERT(test_0.max_size() == 0,"");
-        DLIB_CASSERT(test_1.max_size() == 1,"");
+        DLIB_TEST(test.max_size() == 10);
+        DLIB_TEST(test_0.max_size() == 0);
+        DLIB_TEST(test_1.max_size() == 1);
 
         a = 0;
-        DLIB_CASSERT(test_1.dequeue_or_timeout(a,0) == true,"");
+        DLIB_TEST(test_1.dequeue_or_timeout(a,0) == true);
 
-        DLIB_CASSERT(test.max_size() == 10,"");
-        DLIB_CASSERT(test_0.max_size() == 0,"");
-        DLIB_CASSERT(test_1.max_size() == 1,"");
+        DLIB_TEST(test.max_size() == 10);
+        DLIB_TEST(test_0.max_size() == 0);
+        DLIB_TEST(test_1.max_size() == 1);
 
 
-        DLIB_CASSERT(a == 1,"a: " << a);
+        DLIB_TEST_MSG(a == 1,"a: " << a);
 
-        DLIB_CASSERT(test.size() == 0,"");
-        DLIB_CASSERT(test_0.size() == 0,"");
-        DLIB_CASSERT(test_1.size() == 0,"");
+        DLIB_TEST(test.size() == 0);
+        DLIB_TEST(test_0.size() == 0);
+        DLIB_TEST(test_1.size() == 0);
 
-        DLIB_CASSERT(test.dequeue_or_timeout(a,0) == false,"");
-        DLIB_CASSERT(test_0.dequeue_or_timeout(a,0) == false,"");
-        DLIB_CASSERT(test_1.dequeue_or_timeout(a,0) == false,"");
-        DLIB_CASSERT(test.dequeue_or_timeout(a,10) == false,"");
-        DLIB_CASSERT(test_0.dequeue_or_timeout(a,10) == false,"");
-        DLIB_CASSERT(test_1.dequeue_or_timeout(a,10) == false,"");
+        DLIB_TEST(test.dequeue_or_timeout(a,0) == false);
+        DLIB_TEST(test_0.dequeue_or_timeout(a,0) == false);
+        DLIB_TEST(test_1.dequeue_or_timeout(a,0) == false);
+        DLIB_TEST(test.dequeue_or_timeout(a,10) == false);
+        DLIB_TEST(test_0.dequeue_or_timeout(a,10) == false);
+        DLIB_TEST(test_1.dequeue_or_timeout(a,10) == false);
 
-        DLIB_CASSERT(test.size() == 0,"");
-        DLIB_CASSERT(test_0.size() == 0,"");
-        DLIB_CASSERT(test_1.size() == 0,"");
+        DLIB_TEST(test.size() == 0);
+        DLIB_TEST(test_0.size() == 0);
+        DLIB_TEST(test_1.size() == 0);
 
-        DLIB_CASSERT(found_error == false,"");
+        DLIB_TEST(found_error == false);
     }
 
 

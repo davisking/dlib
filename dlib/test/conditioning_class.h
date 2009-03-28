@@ -57,20 +57,20 @@ namespace
             cc2 test2(gs2);
 
 
-            DLIB_CASSERT(test.get_memory_usage() != 0,"");
+            DLIB_TEST(test.get_memory_usage() != 0);
 
             const unsigned long alphabet_size = 2;                
 
 
-            DLIB_CASSERT(test.get_total() == 1,"");
+            DLIB_TEST(test.get_total() == 1);
 
-            DLIB_CASSERT(test.get_count(alphabet_size-1)==1,"");
+            DLIB_TEST(test.get_count(alphabet_size-1)==1);
             for (unsigned long i = 0; i < alphabet_size-1; ++i)
             {
                 unsigned long low_count, high_count, total_count;
-                DLIB_CASSERT(test.get_range(i,low_count,high_count,total_count) == 0,i);
-                DLIB_CASSERT(test.get_count(i) == 0,"");
-                DLIB_CASSERT(test.get_total() == 1,"");
+                DLIB_TEST_MSG(test.get_range(i,low_count,high_count,total_count) == 0,i);
+                DLIB_TEST(test.get_count(i) == 0);
+                DLIB_TEST(test.get_total() == 1);
             }
 
 
@@ -82,25 +82,25 @@ namespace
 
                 if (i ==alphabet_size-1)
                 {
-                    DLIB_CASSERT(test.get_range(i,low_count,high_count,total_count) == 1+amount,"");
+                    DLIB_TEST(test.get_range(i,low_count,high_count,total_count) == 1+amount);
 
-                    DLIB_CASSERT(high_count == low_count+1+amount,"");
-                    DLIB_CASSERT(total_count == test.get_total(),"");
+                    DLIB_TEST(high_count == low_count+1+amount);
+                    DLIB_TEST(total_count == test.get_total());
 
 
-                    DLIB_CASSERT(test.get_count(i) == 1+amount,"");
+                    DLIB_TEST(test.get_count(i) == 1+amount);
                 }
                 else
                 {
-                    DLIB_CASSERT(test.get_range(i,low_count,high_count,total_count) == amount,"");
+                    DLIB_TEST(test.get_range(i,low_count,high_count,total_count) == amount);
 
-                    DLIB_CASSERT(high_count == low_count+amount,"");
-                    DLIB_CASSERT(total_count == test.get_total(),"");
+                    DLIB_TEST(high_count == low_count+amount);
+                    DLIB_TEST(total_count == test.get_total());
 
 
-                    DLIB_CASSERT(test.get_count(i) == amount,"");
+                    DLIB_TEST(test.get_count(i) == amount);
                 }
-                DLIB_CASSERT(test.get_total() == (i+1)*amount + 1,"");
+                DLIB_TEST(test.get_total() == (i+1)*amount + 1);
             } 
 
 
@@ -112,11 +112,11 @@ namespace
                     test.increment_count(i,static_cast<unsigned short>(amount));
                     if (i == alphabet_size-1)
                     {
-                        DLIB_CASSERT(test.get_count(i) == (j+1)*amount + 1 + amount,"");                    
+                        DLIB_TEST(test.get_count(i) == (j+1)*amount + 1 + amount);                    
                     }
                     else
                     {
-                        DLIB_CASSERT(test.get_count(i) == (j+1)*amount + amount,"");                    
+                        DLIB_TEST(test.get_count(i) == (j+1)*amount + amount);                    
                     }
                 }
 
@@ -125,21 +125,21 @@ namespace
 
                 if (i == alphabet_size-1)
                 {
-                    DLIB_CASSERT(test.get_range(symbol,low_count,high_count,total_count)==temp*amount+1+amount,"");
-                    DLIB_CASSERT(high_count-low_count == temp*amount+1+amount,"");
+                    DLIB_TEST(test.get_range(symbol,low_count,high_count,total_count)==temp*amount+1+amount);
+                    DLIB_TEST(high_count-low_count == temp*amount+1+amount);
                 }
                 else
                 {
-                    DLIB_CASSERT(test.get_range(symbol,low_count,high_count,total_count)==temp*amount + amount,"");
-                    DLIB_CASSERT(high_count-low_count == temp*amount + amount,"");
+                    DLIB_TEST(test.get_range(symbol,low_count,high_count,total_count)==temp*amount + amount);
+                    DLIB_TEST(high_count-low_count == temp*amount + amount);
                 }
-                DLIB_CASSERT(total_count == test.get_total(),"");
+                DLIB_TEST(total_count == test.get_total());
 
                 test.get_symbol(target,symbol,low_count,high_count);
-                DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
-                DLIB_CASSERT(low_count <= target,"");
-                DLIB_CASSERT(target < high_count,"");
-                DLIB_CASSERT(high_count <= test.get_total(),"");
+                DLIB_TEST(test.get_count(symbol) == high_count-low_count);
+                DLIB_TEST(low_count <= target);
+                DLIB_TEST(target < high_count);
+                DLIB_TEST(high_count <= test.get_total());
 
             }
 
@@ -150,13 +150,13 @@ namespace
             {
                 test.increment_count(i);
                 unsigned long low_count, high_count, total_count;
-                DLIB_CASSERT(test.get_range(i,low_count,high_count,total_count) == 1,"");
+                DLIB_TEST(test.get_range(i,low_count,high_count,total_count) == 1);
 
-                DLIB_CASSERT(high_count == low_count+1,"");
-                DLIB_CASSERT(total_count == test.get_total(),"");
+                DLIB_TEST(high_count == low_count+1);
+                DLIB_TEST(total_count == test.get_total());
 
-                DLIB_CASSERT(test.get_count(i) == 1,"");
-                DLIB_CASSERT(test.get_total() == i+2,"");
+                DLIB_TEST(test.get_count(i) == 1);
+                DLIB_TEST(test.get_total() == i+2);
             } 
 
 
@@ -212,13 +212,13 @@ namespace
                     {
                         temp_total += test.get_count(a);
                     }
-                    DLIB_CASSERT(temp_total == test.get_total(),
+                    DLIB_TEST_MSG(temp_total == test.get_total(),
                                  "temp_total == " << temp_total << endl <<
                                  "test.get_total() == " << test.get_total()
                     );
 
-                    DLIB_CASSERT(test.get_count(alphabet_size-1) == counts[alphabet_size-1],"");
-                    DLIB_CASSERT(test.get_total() == total,
+                    DLIB_TEST(test.get_count(alphabet_size-1) == counts[alphabet_size-1]);
+                    DLIB_TEST_MSG(test.get_total() == total,
                                  "test.get_total() == " << test.get_total() << endl <<
                                  "total == " << total
                     );
@@ -227,16 +227,16 @@ namespace
                     unsigned long symbol = i, low_count = 0, high_count = 0, total_count = 0;
 
 
-                    DLIB_CASSERT(test.get_range(symbol,low_count,high_count,total_count)==counts[symbol],"");
+                    DLIB_TEST(test.get_range(symbol,low_count,high_count,total_count)==counts[symbol]);
 
                     if (counts[symbol] != 0)
                     {
-                        DLIB_CASSERT(total_count == total,"");
+                        DLIB_TEST(total_count == total);
 
-                        DLIB_CASSERT(high_count <= total,"");
-                        DLIB_CASSERT(low_count < high_count,"");
-                        DLIB_CASSERT(high_count <= test.get_total(),"");
-                        DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
+                        DLIB_TEST(high_count <= total);
+                        DLIB_TEST(low_count < high_count);
+                        DLIB_TEST(high_count <= test.get_total());
+                        DLIB_TEST(test.get_count(symbol) == high_count-low_count);
                     }
 
 
@@ -245,11 +245,11 @@ namespace
                         test.get_symbol(target,symbol,low_count,high_count);
 
 
-                        DLIB_CASSERT(high_count <= total,"");
-                        DLIB_CASSERT(low_count < high_count,"");
-                        DLIB_CASSERT(high_count <= test.get_total(),"");
-                        DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
-                        DLIB_CASSERT(test.get_count(symbol) == counts[symbol],"");
+                        DLIB_TEST(high_count <= total);
+                        DLIB_TEST(low_count < high_count);
+                        DLIB_TEST(high_count <= test.get_total());
+                        DLIB_TEST(test.get_count(symbol) == high_count-low_count);
+                        DLIB_TEST(test.get_count(symbol) == counts[symbol]);
                     }
 
 
@@ -264,7 +264,7 @@ namespace
             for (unsigned long h = 0; h < 10; ++h)
             {
                 test.clear();
-                DLIB_CASSERT(test.get_total() == 1,"");
+                DLIB_TEST(test.get_total() == 1);
 
                 // fill out test with some numbers
                 unsigned long temp = ::rand()%30000 + 50000;
@@ -286,7 +286,7 @@ namespace
                 {
                     temp_total += test.get_count(j);
                 }
-                DLIB_CASSERT(temp_total == test.get_total(),"");
+                DLIB_TEST(temp_total == test.get_total());
 
 
                 unsigned long low_counts[alphabet_size];
@@ -296,8 +296,8 @@ namespace
                 {
                     unsigned long total;
                     unsigned long count = test.get_range(j,low_counts[j],high_counts[j],total);
-                    DLIB_CASSERT(count == test.get_count(j),"");
-                    DLIB_CASSERT(count == high_counts[j] - low_counts[j],"");
+                    DLIB_TEST(count == test.get_count(j));
+                    DLIB_TEST(count == high_counts[j] - low_counts[j]);
 
                 }
 
@@ -309,8 +309,8 @@ namespace
                     {
                         unsigned long symbol, low_count, high_count;
                         test.get_symbol(k,symbol,low_count,high_count);
-                        DLIB_CASSERT(high_count - low_count == test.get_count(symbol),"");
-                        DLIB_CASSERT(j == symbol,
+                        DLIB_TEST(high_count - low_count == test.get_count(symbol));
+                        DLIB_TEST_MSG(j == symbol,
                                      "j == " << j << endl <<
                                      "k == " << k << endl <<
                                      "symbol == " << symbol << endl <<
@@ -322,12 +322,12 @@ namespace
                                      "high_count == " << high_count << endl << 
                                      "temp.count(j) == " << test.get_count(j)
                         );
-                        DLIB_CASSERT(low_count == low_counts[j],
+                        DLIB_TEST_MSG(low_count == low_counts[j],
                                      "symbol:        " << j << "\n" <<
                                      "target:        " << k << "\n" <<
                                      "low_count:     " << low_count << "\n" <<
                                      "low_counts[j]: " << low_counts[j]);
-                        DLIB_CASSERT(high_count == high_counts[j],"");
+                        DLIB_TEST(high_count == high_counts[j]);
                     }
 
                 }
@@ -378,22 +378,22 @@ namespace
                 }
 
 
-                DLIB_CASSERT(test.get_total() == total,"");
+                DLIB_TEST(test.get_total() == total);
 
                 unsigned long target = test.get_total()/2;
                 unsigned long symbol = i, low_count = 0, high_count = 0, total_count = 0;
 
 
-                DLIB_CASSERT(test.get_range(symbol,low_count,high_count,total_count)==counts[symbol],"");
+                DLIB_TEST(test.get_range(symbol,low_count,high_count,total_count)==counts[symbol]);
 
                 if (counts[symbol] != 0)
                 {
-                    DLIB_CASSERT(total_count == total,"");
+                    DLIB_TEST(total_count == total);
 
-                    DLIB_CASSERT(high_count <= total,"");
-                    DLIB_CASSERT(low_count < high_count,"");
-                    DLIB_CASSERT(high_count <= test.get_total(),"");
-                    DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
+                    DLIB_TEST(high_count <= total);
+                    DLIB_TEST(low_count < high_count);
+                    DLIB_TEST(high_count <= test.get_total());
+                    DLIB_TEST(test.get_count(symbol) == high_count-low_count);
                 }
 
 
@@ -401,11 +401,11 @@ namespace
                 test.get_symbol(target,symbol,low_count,high_count);
 
 
-                DLIB_CASSERT(high_count <= total,"");
-                DLIB_CASSERT(low_count < high_count,"");
-                DLIB_CASSERT(high_count <= test.get_total(),"");
-                DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
-                DLIB_CASSERT(test.get_count(symbol) == counts[symbol],"");
+                DLIB_TEST(high_count <= total);
+                DLIB_TEST(low_count < high_count);
+                DLIB_TEST(high_count <= test.get_total());
+                DLIB_TEST(test.get_count(symbol) == high_count-low_count);
+                DLIB_TEST(test.get_count(symbol) == counts[symbol]);
 
 
 
@@ -436,20 +436,20 @@ namespace
             cc test(gs);
             cc test2(gs);
 
-            DLIB_CASSERT(test.get_memory_usage() != 0,"");
+            DLIB_TEST(test.get_memory_usage() != 0);
 
             const unsigned long alphabet_size = 256;                
 
 
-            DLIB_CASSERT(test.get_total() == 1,"");
+            DLIB_TEST(test.get_total() == 1);
 
-            DLIB_CASSERT(test.get_count(alphabet_size-1)==1,"");
+            DLIB_TEST(test.get_count(alphabet_size-1)==1);
             for (unsigned long i = 0; i < alphabet_size-1; ++i)
             {
                 unsigned long low_count, high_count, total_count;
-                DLIB_CASSERT(test.get_range(i,low_count,high_count,total_count) == 0,"");
-                DLIB_CASSERT(test.get_count(i) == 0,"");
-                DLIB_CASSERT(test.get_total() == 1,"");
+                DLIB_TEST(test.get_range(i,low_count,high_count,total_count) == 0);
+                DLIB_TEST(test.get_count(i) == 0);
+                DLIB_TEST(test.get_total() == 1);
             }
 
 
@@ -465,26 +465,26 @@ namespace
                 {
                     if (i ==alphabet_size-1)
                     {
-                        DLIB_CASSERT(test.get_range(i,low_count,high_count,total_count) == 1+amount,"");
+                        DLIB_TEST(test.get_range(i,low_count,high_count,total_count) == 1+amount);
 
-                        DLIB_CASSERT(high_count == low_count+1+amount,"");
-                        DLIB_CASSERT(total_count == test.get_total(),"");
+                        DLIB_TEST(high_count == low_count+1+amount);
+                        DLIB_TEST(total_count == test.get_total());
 
 
-                        DLIB_CASSERT(test.get_count(i) == 1+amount,"");
+                        DLIB_TEST(test.get_count(i) == 1+amount);
                     }
                     else
                     {
-                        DLIB_CASSERT(test.get_range(i,low_count,high_count,total_count) == amount,"");
+                        DLIB_TEST(test.get_range(i,low_count,high_count,total_count) == amount);
 
-                        DLIB_CASSERT(high_count == low_count+amount,"");
-                        DLIB_CASSERT(total_count == test.get_total(),"");
+                        DLIB_TEST(high_count == low_count+amount);
+                        DLIB_TEST(total_count == test.get_total());
 
 
-                        DLIB_CASSERT(test.get_count(i) == amount,"");
+                        DLIB_TEST(test.get_count(i) == amount);
                     }
                     if (!oom)
-                        DLIB_CASSERT(test.get_total() == (i+1)*amount + 1,"");
+                        DLIB_TEST(test.get_total() == (i+1)*amount + 1);
                 }
             } 
 
@@ -502,11 +502,11 @@ namespace
                     {
                         if (i == alphabet_size-1)
                         {
-                            DLIB_CASSERT(test.get_count(i) == (j+1)*amount + 1 + amount,"");                    
+                            DLIB_TEST(test.get_count(i) == (j+1)*amount + 1 + amount);                    
                         }
                         else
                         {
-                            DLIB_CASSERT(test.get_count(i) == (j+1)*amount + amount,"");                    
+                            DLIB_TEST(test.get_count(i) == (j+1)*amount + amount);                    
                         }
                     }
                 }
@@ -518,22 +518,22 @@ namespace
                 {
                     if (i == alphabet_size-1)
                     {
-                        DLIB_CASSERT(test.get_range(symbol,low_count,high_count,total_count)==temp*amount+1+amount,"");
-                        DLIB_CASSERT(high_count-low_count == temp*amount+1+amount,"");
+                        DLIB_TEST(test.get_range(symbol,low_count,high_count,total_count)==temp*amount+1+amount);
+                        DLIB_TEST(high_count-low_count == temp*amount+1+amount);
                     }
                     else
                     {
-                        DLIB_CASSERT(test.get_range(symbol,low_count,high_count,total_count)==temp*amount + amount,"");
-                        DLIB_CASSERT(high_count-low_count == temp*amount + amount,"");
+                        DLIB_TEST(test.get_range(symbol,low_count,high_count,total_count)==temp*amount + amount);
+                        DLIB_TEST(high_count-low_count == temp*amount + amount);
                     }
-                    DLIB_CASSERT(total_count == test.get_total(),"");
+                    DLIB_TEST(total_count == test.get_total());
 
 
                     test.get_symbol(target,symbol,low_count,high_count);
-                    DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
-                    DLIB_CASSERT(low_count <= target,"");
-                    DLIB_CASSERT(target < high_count,"");
-                    DLIB_CASSERT(high_count <= test.get_total(),"");
+                    DLIB_TEST(test.get_count(symbol) == high_count-low_count);
+                    DLIB_TEST(low_count <= target);
+                    DLIB_TEST(target < high_count);
+                    DLIB_TEST(high_count <= test.get_total());
                 }
 
             }
@@ -550,13 +550,13 @@ namespace
 
                 if (!oom)
                 {
-                    DLIB_CASSERT(test.get_range(i,low_count,high_count,total_count) == 1,"");
+                    DLIB_TEST(test.get_range(i,low_count,high_count,total_count) == 1);
 
-                    DLIB_CASSERT(high_count == low_count+1,"");
-                    DLIB_CASSERT(total_count == test.get_total(),"");
+                    DLIB_TEST(high_count == low_count+1);
+                    DLIB_TEST(total_count == test.get_total());
 
-                    DLIB_CASSERT(test.get_count(i) == 1,"");
-                    DLIB_CASSERT(test.get_total() == i+2,"");
+                    DLIB_TEST(test.get_count(i) == 1);
+                    DLIB_TEST(test.get_total() == i+2);
                 }
             } 
 
@@ -617,13 +617,13 @@ namespace
 
                     if (!oom)
                     {
-                        DLIB_CASSERT(temp_total == test.get_total(),
+                        DLIB_TEST_MSG(temp_total == test.get_total(),
                                      "temp_total == " << temp_total << endl <<
                                      "test.get_total() == " << test.get_total()
                         );
 
-                        DLIB_CASSERT(test.get_count(alphabet_size-1) == counts[alphabet_size-1],"");
-                        DLIB_CASSERT(test.get_total() == total,
+                        DLIB_TEST(test.get_count(alphabet_size-1) == counts[alphabet_size-1]);
+                        DLIB_TEST_MSG(test.get_total() == total,
                                      "test.get_total() == " << test.get_total() << endl <<
                                      "total == " << total
                         );
@@ -635,16 +635,16 @@ namespace
                     if (!oom)
                     {
 
-                        DLIB_CASSERT(test.get_range(symbol,low_count,high_count,total_count)==counts[symbol],"");
+                        DLIB_TEST(test.get_range(symbol,low_count,high_count,total_count)==counts[symbol]);
 
                         if (counts[symbol] != 0)
                         {
-                            DLIB_CASSERT(total_count == total,"");
+                            DLIB_TEST(total_count == total);
 
-                            DLIB_CASSERT(high_count <= total,"");
-                            DLIB_CASSERT(low_count < high_count,"");
-                            DLIB_CASSERT(high_count <= test.get_total(),"");
-                            DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
+                            DLIB_TEST(high_count <= total);
+                            DLIB_TEST(low_count < high_count);
+                            DLIB_TEST(high_count <= test.get_total());
+                            DLIB_TEST(test.get_count(symbol) == high_count-low_count);
                         }
 
 
@@ -653,11 +653,11 @@ namespace
                             test.get_symbol(target,symbol,low_count,high_count);
 
 
-                            DLIB_CASSERT(high_count <= total,"");
-                            DLIB_CASSERT(low_count < high_count,"");
-                            DLIB_CASSERT(high_count <= test.get_total(),"");
-                            DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
-                            DLIB_CASSERT(test.get_count(symbol) == counts[symbol],"");
+                            DLIB_TEST(high_count <= total);
+                            DLIB_TEST(low_count < high_count);
+                            DLIB_TEST(high_count <= test.get_total());
+                            DLIB_TEST(test.get_count(symbol) == high_count-low_count);
+                            DLIB_TEST(test.get_count(symbol) == counts[symbol]);
                         }
                     }
 
@@ -671,7 +671,7 @@ namespace
             for (unsigned long h = 0; h < 10; ++h)
             {
                 test.clear();
-                DLIB_CASSERT(test.get_total() == 1,"");
+                DLIB_TEST(test.get_total() == 1);
 
                 // fill out test with some numbers
                 unsigned long temp = ::rand()%30000 + 50000;
@@ -695,7 +695,7 @@ namespace
                     temp_total += test.get_count(j);
                 }
                 if (!oom)
-                    DLIB_CASSERT(temp_total == test.get_total(),"");
+                    DLIB_TEST(temp_total == test.get_total());
 
 
                 unsigned long low_counts[alphabet_size];
@@ -709,8 +709,8 @@ namespace
                     {
                         unsigned long total;
                         unsigned long count = test.get_range(j,low_counts[j],high_counts[j],total);
-                        DLIB_CASSERT(count == test.get_count(j),"");
-                        DLIB_CASSERT(count == high_counts[j] - low_counts[j],"");
+                        DLIB_TEST(count == test.get_count(j));
+                        DLIB_TEST(count == high_counts[j] - low_counts[j]);
 
                     }
 
@@ -724,8 +724,8 @@ namespace
                         {
                             unsigned long symbol, low_count, high_count;
                             test.get_symbol(k,symbol,low_count,high_count);
-                            DLIB_CASSERT(high_count - low_count == test.get_count(symbol),"");
-                            DLIB_CASSERT(j == symbol,
+                            DLIB_TEST(high_count - low_count == test.get_count(symbol));
+                            DLIB_TEST_MSG(j == symbol,
                                          "j == " << j << endl <<
                                          "k == " << k << endl <<
                                          "symbol == " << symbol << endl <<
@@ -737,12 +737,12 @@ namespace
                                          "high_count == " << high_count << endl << 
                                          "temp.count(j) == " << test.get_count(j)
                             );
-                            DLIB_CASSERT(low_count == low_counts[j],
+                            DLIB_TEST_MSG(low_count == low_counts[j],
                                          "symbol:        " << j << "\n" <<
                                          "target:        " << k << "\n" <<
                                          "low_count:     " << low_count << "\n" <<
                                          "low_counts[j]: " << low_counts[j]);
-                            DLIB_CASSERT(high_count == high_counts[j],"");
+                            DLIB_TEST(high_count == high_counts[j]);
                         }
 
                     }
@@ -793,22 +793,22 @@ namespace
                 }
 
 
-                DLIB_CASSERT(test.get_total() == total,"");
+                DLIB_TEST(test.get_total() == total);
 
                 unsigned long target = test.get_total()/2;
                 unsigned long symbol = i, low_count = 0, high_count = 0, total_count = 0;
 
 
-                DLIB_CASSERT(test.get_range(symbol,low_count,high_count,total_count)==counts[symbol],"");
+                DLIB_TEST(test.get_range(symbol,low_count,high_count,total_count)==counts[symbol]);
 
                 if (counts[symbol] != 0)
                 {
-                    DLIB_CASSERT(total_count == total,"");
+                    DLIB_TEST(total_count == total);
 
-                    DLIB_CASSERT(high_count <= total,"");
-                    DLIB_CASSERT(low_count < high_count,"");
-                    DLIB_CASSERT(high_count <= test.get_total(),"");
-                    DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
+                    DLIB_TEST(high_count <= total);
+                    DLIB_TEST(low_count < high_count);
+                    DLIB_TEST(high_count <= test.get_total());
+                    DLIB_TEST(test.get_count(symbol) == high_count-low_count);
                 }
 
 
@@ -816,11 +816,11 @@ namespace
                 test.get_symbol(target,symbol,low_count,high_count);
 
 
-                DLIB_CASSERT(high_count <= total,"");
-                DLIB_CASSERT(low_count < high_count,"");
-                DLIB_CASSERT(high_count <= test.get_total(),"");
-                DLIB_CASSERT(test.get_count(symbol) == high_count-low_count,"");
-                DLIB_CASSERT(test.get_count(symbol) == counts[symbol],"");
+                DLIB_TEST(high_count <= total);
+                DLIB_TEST(low_count < high_count);
+                DLIB_TEST(high_count <= test.get_total());
+                DLIB_TEST(test.get_count(symbol) == high_count-low_count);
+                DLIB_TEST(test.get_count(symbol) == counts[symbol]);
 
 
 

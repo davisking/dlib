@@ -68,50 +68,50 @@ namespace
 
             set s;
 
-            DLIB_CASSERT(s.size() == 0,"");
-            DLIB_CASSERT(s.at_start(),"");
-            DLIB_CASSERT(s.current_element_valid() == false,"");
-            DLIB_CASSERT(s.move_next() == false,"");
-            DLIB_CASSERT(s.current_element_valid() == false,"");
-            DLIB_CASSERT(s.at_start() == false,"");
+            DLIB_TEST(s.size() == 0);
+            DLIB_TEST(s.at_start());
+            DLIB_TEST(s.current_element_valid() == false);
+            DLIB_TEST(s.move_next() == false);
+            DLIB_TEST(s.current_element_valid() == false);
+            DLIB_TEST(s.at_start() == false);
 
             s.load(q);
-            DLIB_CASSERT(s.at_start(),"");
+            DLIB_TEST(s.at_start());
             set se;
             se.load(q);
 
-            DLIB_CASSERT(se.size() == 0,"");
-            DLIB_CASSERT(se.at_start() == true,"");
-            DLIB_CASSERT(se.current_element_valid() == false,"");     
-            DLIB_CASSERT(se.move_next() == false,"");
-            DLIB_CASSERT(se.at_start() == false,"");
-            DLIB_CASSERT(se.current_element_valid() == false,"");
+            DLIB_TEST(se.size() == 0);
+            DLIB_TEST(se.at_start() == true);
+            DLIB_TEST(se.current_element_valid() == false);     
+            DLIB_TEST(se.move_next() == false);
+            DLIB_TEST(se.at_start() == false);
+            DLIB_TEST(se.current_element_valid() == false);
 
 
-            DLIB_CASSERT(s.size() == qb.size(),"");
-            DLIB_CASSERT(s.at_start() == true,"");
-            DLIB_CASSERT(s.current_element_valid() == false,"");     
-            DLIB_CASSERT(s.move_next() == true,"");
-            DLIB_CASSERT(s.at_start() == false,"");
-            DLIB_CASSERT(s.current_element_valid() == true,"");
+            DLIB_TEST(s.size() == qb.size());
+            DLIB_TEST(s.at_start() == true);
+            DLIB_TEST(s.current_element_valid() == false);     
+            DLIB_TEST(s.move_next() == true);
+            DLIB_TEST(s.at_start() == false);
+            DLIB_TEST(s.current_element_valid() == true);
             s.reset();
             se.reset();
 
             swap(se,s);
 
-            DLIB_CASSERT(s.size() == 0,"");
-            DLIB_CASSERT(s.at_start() == true,"");
-            DLIB_CASSERT(s.current_element_valid() == false,"");     
-            DLIB_CASSERT(s.move_next() == false,"");
-            DLIB_CASSERT(s.at_start() == false,"");
-            DLIB_CASSERT(s.current_element_valid() == false,"");
+            DLIB_TEST(s.size() == 0);
+            DLIB_TEST(s.at_start() == true);
+            DLIB_TEST(s.current_element_valid() == false);     
+            DLIB_TEST(s.move_next() == false);
+            DLIB_TEST(s.at_start() == false);
+            DLIB_TEST(s.current_element_valid() == false);
 
-            DLIB_CASSERT(se.size() == qb.size(),"");
-            DLIB_CASSERT(se.at_start() == true,"");
-            DLIB_CASSERT(se.current_element_valid() == false,"");     
-            DLIB_CASSERT(se.move_next() == true,"");
-            DLIB_CASSERT(se.at_start() == false,"");
-            DLIB_CASSERT(se.current_element_valid() == true,"");
+            DLIB_TEST(se.size() == qb.size());
+            DLIB_TEST(se.at_start() == true);
+            DLIB_TEST(se.current_element_valid() == false);     
+            DLIB_TEST(se.move_next() == true);
+            DLIB_TEST(se.at_start() == false);
+            DLIB_TEST(se.current_element_valid() == true);
             s.reset();
             se.reset();
 
@@ -122,7 +122,7 @@ namespace
             int last = 0;
             while (s.move_next())
             {
-                DLIB_CASSERT(last <= s.element(),"");
+                DLIB_TEST(last <= s.element());
                 last = s.element();
             }
 
@@ -132,8 +132,8 @@ namespace
             {
                 int a;
                 qb.dequeue(a);
-                DLIB_CASSERT(s.is_member(a),"");
-                DLIB_CASSERT(!se.is_member(a),"");
+                DLIB_TEST(s.is_member(a));
+                DLIB_TEST(!se.is_member(a));
 
                 // make sure is_member() doesn't hang
                 for (int l = 0; l < 100; ++l)
@@ -149,30 +149,30 @@ namespace
             // load the state back into se.
             ostringstream sout;
             serialize(se,sout);
-            DLIB_CASSERT(se.at_start() == true,"");
+            DLIB_TEST(se.at_start() == true);
             istringstream sin(sout.str());
             se.clear();
             deserialize(se,sin);
-            DLIB_CASSERT(se.at_start() == true,"");
+            DLIB_TEST(se.at_start() == true);
 
 
             last = 0;
             while (se.move_next())
             {
-                DLIB_CASSERT(last <= se.element(),"");
+                DLIB_TEST(last <= se.element());
                 last = se.element();
             }
 
 
-            DLIB_CASSERT(s.size() == 0,"");
-            DLIB_CASSERT(se.size() == qc.size(),"");
+            DLIB_TEST(s.size() == 0);
+            DLIB_TEST(se.size() == qc.size());
 
             while (qc.move_next())
             {
                 int a;
                 qc.dequeue(a);
-                DLIB_CASSERT(se.is_member(a),"");
-                DLIB_CASSERT(!s.is_member(a),"");
+                DLIB_TEST(se.is_member(a));
+                DLIB_TEST(!s.is_member(a));
             }
 
 

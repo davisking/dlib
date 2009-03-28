@@ -24,28 +24,28 @@ namespace
     public:
         test1 ()
         {
-            DLIB_CASSERT(number_of_threads_registered() == 0,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 0);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             clear();
-            DLIB_CASSERT(number_of_threads_registered() == 0,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 0);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
         }
 
         ~test1 ()
         {
-            DLIB_CASSERT(number_of_threads_registered() == 0,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 0);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             stop();
-            DLIB_CASSERT(number_of_threads_registered() == 0,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 0);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             wait();
-            DLIB_CASSERT(number_of_threads_registered() == 0,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 0);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
         }
 
     private:
@@ -56,36 +56,36 @@ namespace
     public:
         test2()
         {
-            DLIB_CASSERT(number_of_threads_registered() == 0,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 0);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             register_thread(*this,&test2::thread);
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             clear();
-            DLIB_CASSERT(number_of_threads_registered() == 0,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 0);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             register_thread(*this,&test2::thread);
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
         }
 
         ~test2()
         {
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             stop();
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             wait();
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
         }
 
     private:
@@ -103,28 +103,28 @@ namespace
     public:
         test3_c1()
         {
-            DLIB_CASSERT(number_of_threads_registered() == 0,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 0);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             register_thread(*this,&test3_c1::thread);
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             start();
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(is_running() == true,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(is_running() == true);
         }
 
         ~test3_c1()
         {
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
             stop();
-            DLIB_CASSERT(is_running() == false,"");
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
+            DLIB_TEST(is_running() == false);
+            DLIB_TEST(number_of_threads_registered() == 1);
             wait();
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
         }
 
     private:
@@ -146,55 +146,55 @@ namespace
     public:
         test4_c2()
         {
-            DLIB_CASSERT(number_of_threads_registered() == 0,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 0);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             register_thread(*this,&test4_c2::thread);
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
             start();
-            DLIB_CASSERT(number_of_threads_registered() == 1,"");
-            DLIB_CASSERT(number_of_threads_alive() == 1,"");
-            DLIB_CASSERT(is_running() == true,"");
+            DLIB_TEST(number_of_threads_registered() == 1);
+            DLIB_TEST(number_of_threads_alive() == 1);
+            DLIB_TEST(is_running() == true);
             register_thread(*this,&test4_c2::thread);
-            DLIB_CASSERT(number_of_threads_registered() == 2,"");
-            DLIB_CASSERT(number_of_threads_alive() == 2,"");
-            DLIB_CASSERT(is_running() == true,"");
+            DLIB_TEST(number_of_threads_registered() == 2);
+            DLIB_TEST(number_of_threads_alive() == 2);
+            DLIB_TEST(is_running() == true);
             start();
-            DLIB_CASSERT(number_of_threads_registered() == 2,"");
-            DLIB_CASSERT(number_of_threads_alive() == 2,"");
-            DLIB_CASSERT(is_running() == true,"");
+            DLIB_TEST(number_of_threads_registered() == 2);
+            DLIB_TEST(number_of_threads_alive() == 2);
+            DLIB_TEST(is_running() == true);
             start();
-            DLIB_CASSERT(number_of_threads_registered() == 2,"");
-            DLIB_CASSERT(number_of_threads_alive() == 2,"");
-            DLIB_CASSERT(is_running() == true,"");
+            DLIB_TEST(number_of_threads_registered() == 2);
+            DLIB_TEST(number_of_threads_alive() == 2);
+            DLIB_TEST(is_running() == true);
             start();
-            DLIB_CASSERT(number_of_threads_registered() == 2,"");
-            DLIB_CASSERT(number_of_threads_alive() == 2,"");
-            DLIB_CASSERT(is_running() == true,"");
+            DLIB_TEST(number_of_threads_registered() == 2);
+            DLIB_TEST(number_of_threads_alive() == 2);
+            DLIB_TEST(is_running() == true);
             start();
-            DLIB_CASSERT(number_of_threads_registered() == 2,"");
-            DLIB_CASSERT(number_of_threads_alive() == 2,"");
-            DLIB_CASSERT(is_running() == true,"");
+            DLIB_TEST(number_of_threads_registered() == 2);
+            DLIB_TEST(number_of_threads_alive() == 2);
+            DLIB_TEST(is_running() == true);
             pause();
-            DLIB_CASSERT(number_of_threads_registered() == 2,"");
-            DLIB_CASSERT(number_of_threads_alive() == 2,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 2);
+            DLIB_TEST(number_of_threads_alive() == 2);
+            DLIB_TEST(is_running() == false);
         }
 
         ~test4_c2()
         {
-            DLIB_CASSERT(number_of_threads_registered() == 2,"");
-            DLIB_CASSERT(number_of_threads_alive() == 2,"");
-            DLIB_CASSERT(is_running() == false,"is_running(): " << is_running());
+            DLIB_TEST(number_of_threads_registered() == 2);
+            DLIB_TEST(number_of_threads_alive() == 2);
+            DLIB_TEST_MSG(is_running() == false,"is_running(): " << is_running());
             stop();
-            DLIB_CASSERT(number_of_threads_registered() == 2,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 2);
+            DLIB_TEST(is_running() == false);
             wait();
-            DLIB_CASSERT(number_of_threads_registered() == 2,"");
-            DLIB_CASSERT(number_of_threads_alive() == 0,"");
-            DLIB_CASSERT(is_running() == false,"");
+            DLIB_TEST(number_of_threads_registered() == 2);
+            DLIB_TEST(number_of_threads_alive() == 0);
+            DLIB_TEST(is_running() == false);
         }
 
     private:
@@ -270,7 +270,7 @@ namespace
                 test4_c2 a4;
                 test5 a5;
             }
-            DLIB_CASSERT(count == (i+1)*3,"");
+            DLIB_TEST(count == (i+1)*3);
         }
         count = 0;
 
@@ -284,7 +284,7 @@ namespace
                 test5 a5;
                 dlib::sleep(50);
             }
-            DLIB_CASSERT(count == (i+1)*3,"");
+            DLIB_TEST(count == (i+1)*3);
         }
     }
 

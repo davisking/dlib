@@ -27,36 +27,36 @@ namespace
         config_reader& cr
     )
     {
-        DLIB_CASSERT(cr.is_key_defined("global"),"");
-        DLIB_CASSERT(cr.is_block_defined("all"),"");
-        DLIB_CASSERT(cr.is_key_defined("globalasfd") == false,"");
-        DLIB_CASSERT(cr.is_block_defined("all!") == false,"");
-        DLIB_CASSERT(cr.size() == 1,"");
-        DLIB_CASSERT(cr["global"] == "hmm","");
-        DLIB_CASSERT(cr["global2"] == "hmm2","");
-        DLIB_CASSERT(cr.block("all").size() == 4,""); 
-        DLIB_CASSERT(cr.block("all").block("block1").size() == 0,""); 
-        DLIB_CASSERT(cr.block("all").block("block2").size() == 0,""); 
-        DLIB_CASSERT(cr.block("all").block("block3").size() == 0,""); 
-        DLIB_CASSERT(cr.block("all").block("block4").size() == 0,""); 
+        DLIB_TEST(cr.is_key_defined("global"));
+        DLIB_TEST(cr.is_block_defined("all"));
+        DLIB_TEST(cr.is_key_defined("globalasfd") == false);
+        DLIB_TEST(cr.is_block_defined("all!") == false);
+        DLIB_TEST(cr.size() == 1);
+        DLIB_TEST(cr["global"] == "hmm");
+        DLIB_TEST(cr["global2"] == "hmm2");
+        DLIB_TEST(cr.block("all").size() == 4); 
+        DLIB_TEST(cr.block("all").block("block1").size() == 0); 
+        DLIB_TEST(cr.block("all").block("block2").size() == 0); 
+        DLIB_TEST(cr.block("all").block("block3").size() == 0); 
+        DLIB_TEST(cr.block("all").block("block4").size() == 0); 
 
-        DLIB_CASSERT(cr.block("all").block("block1").is_key_defined("name"),""); 
-        DLIB_CASSERT(cr.block("all").block("block2").is_key_defined("name"),""); 
-        DLIB_CASSERT(cr.block("all").block("block3").is_key_defined("name"),""); 
-        DLIB_CASSERT(cr.block("all").block("block4").is_key_defined("name"),""); 
-        DLIB_CASSERT(cr.block("all").block("block1").is_key_defined("age"),""); 
-        DLIB_CASSERT(cr.block("all").block("block2").is_key_defined("age"),""); 
-        DLIB_CASSERT(cr.block("all").block("block3").is_key_defined("age"),""); 
-        DLIB_CASSERT(cr.block("all").block("block4").is_key_defined("age"),""); 
+        DLIB_TEST(cr.block("all").block("block1").is_key_defined("name")); 
+        DLIB_TEST(cr.block("all").block("block2").is_key_defined("name")); 
+        DLIB_TEST(cr.block("all").block("block3").is_key_defined("name")); 
+        DLIB_TEST(cr.block("all").block("block4").is_key_defined("name")); 
+        DLIB_TEST(cr.block("all").block("block1").is_key_defined("age")); 
+        DLIB_TEST(cr.block("all").block("block2").is_key_defined("age")); 
+        DLIB_TEST(cr.block("all").block("block3").is_key_defined("age")); 
+        DLIB_TEST(cr.block("all").block("block4").is_key_defined("age")); 
 
-        DLIB_CASSERT(cr.block("all").block("block1")["name"] == "davis king",""); 
-        DLIB_CASSERT(cr.block("all").block("block2")["name"] == "joel",""); 
-        DLIB_CASSERT(cr.block("all").block("block3")["name"] == "john",""); 
-        DLIB_CASSERT(cr.block("all").block("block4")["name"] == "dude",""); 
-        DLIB_CASSERT(cr.block("all").block("block1")["age"] == "24",""); 
-        DLIB_CASSERT(cr.block("all").block("block2")["age"] == "24",""); 
-        DLIB_CASSERT(cr.block("all").block("block3")["age"] == "24",""); 
-        DLIB_CASSERT(cr.block("all").block("block4")["age"] == "53",""); 
+        DLIB_TEST(cr.block("all").block("block1")["name"] == "davis king"); 
+        DLIB_TEST(cr.block("all").block("block2")["name"] == "joel"); 
+        DLIB_TEST(cr.block("all").block("block3")["name"] == "john"); 
+        DLIB_TEST(cr.block("all").block("block4")["name"] == "dude"); 
+        DLIB_TEST(cr.block("all").block("block1")["age"] == "24"); 
+        DLIB_TEST(cr.block("all").block("block2")["age"] == "24"); 
+        DLIB_TEST(cr.block("all").block("block3")["age"] == "24"); 
+        DLIB_TEST(cr.block("all").block("block4")["age"] == "53"); 
 
 
         int count1 = 0;
@@ -64,26 +64,26 @@ namespace
         while (cr.move_next())
         {
             ++count1;
-            DLIB_CASSERT(cr.current_block_name() == "all","");
-            DLIB_CASSERT(cr.element().is_key_defined("global") == false,"");
-            DLIB_CASSERT(cr.element().is_key_defined("global2") == false,"");
-            DLIB_CASSERT(cr.element().is_key_defined("name") == false,"");
-            DLIB_CASSERT(cr.element().is_key_defined("age") == false,"");
+            DLIB_TEST(cr.current_block_name() == "all");
+            DLIB_TEST(cr.element().is_key_defined("global") == false);
+            DLIB_TEST(cr.element().is_key_defined("global2") == false);
+            DLIB_TEST(cr.element().is_key_defined("name") == false);
+            DLIB_TEST(cr.element().is_key_defined("age") == false);
             while (cr.element().move_next())
             {
                 ++count2;
                 ostringstream sout;
                 sout << "block" << count2;
-                DLIB_CASSERT(cr.element().current_block_name() == sout.str(),"");
-                DLIB_CASSERT(cr.element().size() == 4,"");
-                DLIB_CASSERT(cr.element().element().size() == 0,"");
-                DLIB_CASSERT(cr.element().element().is_key_defined("name"),"");
-                DLIB_CASSERT(cr.element().element().is_key_defined("age"),"");
+                DLIB_TEST(cr.element().current_block_name() == sout.str());
+                DLIB_TEST(cr.element().size() == 4);
+                DLIB_TEST(cr.element().element().size() == 0);
+                DLIB_TEST(cr.element().element().is_key_defined("name"));
+                DLIB_TEST(cr.element().element().is_key_defined("age"));
             }
         }
 
-        DLIB_CASSERT(count1 == 1,"");
-        DLIB_CASSERT(count2 == 4,"");
+        DLIB_TEST(count1 == 1);
+        DLIB_TEST(count2 == 4);
 
     }
 
@@ -163,8 +163,8 @@ namespace
             do_the_tests(cr2);
 
             cr.clear();
-            DLIB_CASSERT(cr.size() == 0,"");
-            DLIB_CASSERT(cr.is_key_defined("global") == false,"");
+            DLIB_TEST(cr.size() == 0);
+            DLIB_TEST(cr.is_key_defined("global") == false);
         }
 
 
@@ -215,10 +215,10 @@ namespace
             catch (typename config_reader::config_reader_error& e)
             {
                 error_found = true;
-                DLIB_CASSERT(e.line_number == 16,"");
-                DLIB_CASSERT(e.redefinition == false,"");
+                DLIB_TEST(e.line_number == 16);
+                DLIB_TEST(e.redefinition == false);
             }
-            DLIB_CASSERT(error_found,"");
+            DLIB_TEST(error_found);
         }
 
         {
@@ -268,10 +268,10 @@ namespace
             catch (typename config_reader::config_reader_error& e)
             {
                 error_found = true;
-                DLIB_CASSERT(e.line_number == 31,e.line_number);
-                DLIB_CASSERT(e.redefinition == true,"");
+                DLIB_TEST_MSG(e.line_number == 31,e.line_number);
+                DLIB_TEST(e.redefinition == true);
             }
-            DLIB_CASSERT(error_found,"");
+            DLIB_TEST(error_found);
         }
 
 
@@ -321,10 +321,10 @@ namespace
             catch (typename config_reader::config_reader_error& e)
             {
                 error_found = true;
-                DLIB_CASSERT(e.line_number == 13,e.line_number);
-                DLIB_CASSERT(e.redefinition == true,"");
+                DLIB_TEST_MSG(e.line_number == 13,e.line_number);
+                DLIB_TEST(e.redefinition == true);
             }
-            DLIB_CASSERT(error_found,"");
+            DLIB_TEST(error_found);
         }
 
 

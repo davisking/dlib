@@ -37,22 +37,22 @@ namespace
 
         buf test;
 
-        DLIB_CASSERT(test.size() == 0,"");
+        DLIB_TEST(test.size() == 0);
 
         test.set_size(3);
         buf test2;
 
-        DLIB_CASSERT(test.size() == 8,"");
+        DLIB_TEST(test.size() == 8);
 
         for (int g = 0; g < 2; ++g)
         {
 
             test.clear();
 
-            DLIB_CASSERT(test.size() == 0,"");
+            DLIB_TEST(test.size() == 0);
             test.set_size(2);
 
-            DLIB_CASSERT(test.size() == 4,"");
+            DLIB_TEST(test.size() == 4);
 
 
 
@@ -62,186 +62,186 @@ namespace
             test[3] = 'f';
 
             unsigned long id = test.get_element_id(2);
-            DLIB_CASSERT(test[test.get_element_index(id)] == 'd',"");
+            DLIB_TEST(test[test.get_element_index(id)] == 'd');
 
 
-            DLIB_CASSERT(test[0] == 'a',"");
-            DLIB_CASSERT(test[1] == 's',"");
-            DLIB_CASSERT(test[2] == 'd',"");
-            DLIB_CASSERT(test[3] == 'f',"");
+            DLIB_TEST(test[0] == 'a');
+            DLIB_TEST(test[1] == 's');
+            DLIB_TEST(test[2] == 'd');
+            DLIB_TEST(test[3] == 'f');
 
-            DLIB_CASSERT(test2.size() == 0,"");
+            DLIB_TEST(test2.size() == 0);
             swap(test,test2);
-            DLIB_CASSERT(test2.size() == 4,"");
+            DLIB_TEST(test2.size() == 4);
 
-            DLIB_CASSERT(test2[0] == 'a',"");
-            DLIB_CASSERT(test2[1] == 's',"");
-            DLIB_CASSERT(test2[2] == 'd',"");
-            DLIB_CASSERT(test2[3] == 'f',"");
+            DLIB_TEST(test2[0] == 'a');
+            DLIB_TEST(test2[1] == 's');
+            DLIB_TEST(test2[2] == 'd');
+            DLIB_TEST(test2[3] == 'f');
 
             swap(test,test2);
 
             test.rotate_left(4);
 
 
-            DLIB_CASSERT(test[test.get_element_index(id)] == 'd',"");
+            DLIB_TEST(test[test.get_element_index(id)] == 'd');
 
-            DLIB_CASSERT(test[0] == 'a',"");
-            DLIB_CASSERT(test[1] == 's',"");
-            DLIB_CASSERT(test[2] == 'd',"");
-            DLIB_CASSERT(test[3] == 'f',"");
+            DLIB_TEST(test[0] == 'a');
+            DLIB_TEST(test[1] == 's');
+            DLIB_TEST(test[2] == 'd');
+            DLIB_TEST(test[3] == 'f');
 
             test.rotate_right(1);
 
-            DLIB_CASSERT(test[test.get_element_index(id)] == 'd',"");
+            DLIB_TEST(test[test.get_element_index(id)] == 'd');
 
-            DLIB_CASSERT(test[0] == 's',"");
-            DLIB_CASSERT(test[1] == 'd',"");
-            DLIB_CASSERT(test[2] == 'f',"");
-            DLIB_CASSERT(test[3] == 'a',"");   
+            DLIB_TEST(test[0] == 's');
+            DLIB_TEST(test[1] == 'd');
+            DLIB_TEST(test[2] == 'f');
+            DLIB_TEST(test[3] == 'a');   
 
 
             test.rotate_left(1);
 
-            DLIB_CASSERT(test[test.get_element_index(id)] == 'd',"");
-            DLIB_CASSERT(test[0] == 'a',"");
-            DLIB_CASSERT(test[1] == 's',"");
-            DLIB_CASSERT(test[2] == 'd',"");
-            DLIB_CASSERT(test[3] == 'f',"");
+            DLIB_TEST(test[test.get_element_index(id)] == 'd');
+            DLIB_TEST(test[0] == 'a');
+            DLIB_TEST(test[1] == 's');
+            DLIB_TEST(test[2] == 'd');
+            DLIB_TEST(test[3] == 'f');
 
 
             test.rotate_left(16);
 
-            DLIB_CASSERT(test[test.get_element_index(id)] == 'd',"");
-            DLIB_CASSERT(test[0] == 'a',"");
-            DLIB_CASSERT(test[1] == 's',"");
-            DLIB_CASSERT(test[2] == 'd',"");
-            DLIB_CASSERT(test[3] == 'f',"");
+            DLIB_TEST(test[test.get_element_index(id)] == 'd');
+            DLIB_TEST(test[0] == 'a');
+            DLIB_TEST(test[1] == 's');
+            DLIB_TEST(test[2] == 'd');
+            DLIB_TEST(test[3] == 'f');
 
 
             test.rotate_left(2);
 
-            DLIB_CASSERT(test[test.get_element_index(id)] == 'd',"");
+            DLIB_TEST(test[test.get_element_index(id)] == 'd');
 
-            DLIB_CASSERT(test[0] == 'd',"");
-            DLIB_CASSERT(test[1] == 'f',"");
-            DLIB_CASSERT(test[2] == 'a',"");
-            DLIB_CASSERT(test[3] == 's',"");
-
-            test.rotate_left(1);
-
-            DLIB_CASSERT(test[test.get_element_index(id)] == 'd',"");
-            DLIB_CASSERT(test[0] == 's',"");
-            DLIB_CASSERT(test[1] == 'd',"");
-            DLIB_CASSERT(test[2] == 'f',"");
-            DLIB_CASSERT(test[3] == 'a',"");
+            DLIB_TEST(test[0] == 'd');
+            DLIB_TEST(test[1] == 'f');
+            DLIB_TEST(test[2] == 'a');
+            DLIB_TEST(test[3] == 's');
 
             test.rotate_left(1);
 
-            DLIB_CASSERT(test[test.get_element_index(id)] == 'd',"");
-            DLIB_CASSERT(test[0] == 'a',"");
-            DLIB_CASSERT(test[1] == 's',"");
-            DLIB_CASSERT(test[2] == 'd',"");
-            DLIB_CASSERT(test[3] == 'f',"");
+            DLIB_TEST(test[test.get_element_index(id)] == 'd');
+            DLIB_TEST(test[0] == 's');
+            DLIB_TEST(test[1] == 'd');
+            DLIB_TEST(test[2] == 'f');
+            DLIB_TEST(test[3] == 'a');
 
-            DLIB_CASSERT(test.size() == 4,"");
+            test.rotate_left(1);
+
+            DLIB_TEST(test[test.get_element_index(id)] == 'd');
+            DLIB_TEST(test[0] == 'a');
+            DLIB_TEST(test[1] == 's');
+            DLIB_TEST(test[2] == 'd');
+            DLIB_TEST(test[3] == 'f');
+
+            DLIB_TEST(test.size() == 4);
 
             test[0] = 'x';
 
-            DLIB_CASSERT(test[0] == 'x',"");
-            DLIB_CASSERT(test[1] == 's',"");
-            DLIB_CASSERT(test[2] == 'd',"");
-            DLIB_CASSERT(test[3] == 'f',"");
+            DLIB_TEST(test[0] == 'x');
+            DLIB_TEST(test[1] == 's');
+            DLIB_TEST(test[2] == 'd');
+            DLIB_TEST(test[3] == 'f');
 
             test.rotate_left(1);
 
-            DLIB_CASSERT(test[0] == 'f',test[0]);
-            DLIB_CASSERT(test[1] == 'x',"");
-            DLIB_CASSERT(test[2] == 's',"");
-            DLIB_CASSERT(test[3] == 'd',"");
+            DLIB_TEST_MSG(test[0] == 'f',test[0]);
+            DLIB_TEST(test[1] == 'x');
+            DLIB_TEST(test[2] == 's');
+            DLIB_TEST(test[3] == 'd');
 
 
             test[0] = 'x';
 
-            DLIB_CASSERT(test[0] == 'x',"");
-            DLIB_CASSERT(test[1] == 'x',"");
-            DLIB_CASSERT(test[2] == 's',"");
-            DLIB_CASSERT(test[3] == 'd',"");
+            DLIB_TEST(test[0] == 'x');
+            DLIB_TEST(test[1] == 'x');
+            DLIB_TEST(test[2] == 's');
+            DLIB_TEST(test[3] == 'd');
 
 
             test.rotate_left(1);
 
 
-            DLIB_CASSERT(test[0] == 'd',"");
-            DLIB_CASSERT(test[1] == 'x',"");
-            DLIB_CASSERT(test[2] == 'x',"");
-            DLIB_CASSERT(test[3] == 's',"");
+            DLIB_TEST(test[0] == 'd');
+            DLIB_TEST(test[1] == 'x');
+            DLIB_TEST(test[2] == 'x');
+            DLIB_TEST(test[3] == 's');
 
 
 
-            DLIB_CASSERT(test.at_start() == true,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.move_next() == true,"");
-            DLIB_CASSERT(test.at_start() == false,"");
-            DLIB_CASSERT(test.current_element_valid() == true,"");
+            DLIB_TEST(test.at_start() == true);
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.move_next() == true);
+            DLIB_TEST(test.at_start() == false);
+            DLIB_TEST(test.current_element_valid() == true);
 
             test.clear();
             test2.clear();
 
 
-            DLIB_CASSERT(test.size() == 0,"");
-            DLIB_CASSERT(test.at_start() == true,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.move_next() == false,"");
-            DLIB_CASSERT(test.at_start() == false,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
+            DLIB_TEST(test.size() == 0);
+            DLIB_TEST(test.at_start() == true);
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.move_next() == false);
+            DLIB_TEST(test.at_start() == false);
+            DLIB_TEST(test.current_element_valid() == false);
 
             swap(test,test2);
 
-            DLIB_CASSERT(test2.at_start() == false,"");
-            DLIB_CASSERT(test2.current_element_valid() == false,"");
-            DLIB_CASSERT(test2.move_next() == false,"");
-            DLIB_CASSERT(test2.at_start() == false,"");
-            DLIB_CASSERT(test2.current_element_valid() == false,"");
+            DLIB_TEST(test2.at_start() == false);
+            DLIB_TEST(test2.current_element_valid() == false);
+            DLIB_TEST(test2.move_next() == false);
+            DLIB_TEST(test2.at_start() == false);
+            DLIB_TEST(test2.current_element_valid() == false);
 
 
-            DLIB_CASSERT(test.at_start() == true,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.move_next() == false,"");
-            DLIB_CASSERT(test.at_start() == false,"");
+            DLIB_TEST(test.at_start() == true);
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.move_next() == false);
+            DLIB_TEST(test.at_start() == false);
 
             test.set_size(3);
-            DLIB_CASSERT(test.size() == 8,"");
+            DLIB_TEST(test.size() == 8);
 
-            DLIB_CASSERT(test.at_start() == true,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.move_next() == true,"");
-            DLIB_CASSERT(test.at_start() == false,"");
-            DLIB_CASSERT(test.current_element_valid() == true,"");
+            DLIB_TEST(test.at_start() == true);
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.move_next() == true);
+            DLIB_TEST(test.at_start() == false);
+            DLIB_TEST(test.current_element_valid() == true);
             test.reset();
-            DLIB_CASSERT(test.size() == 8,"");
-            DLIB_CASSERT(test.at_start() == true,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.move_next() == true,"");
-            DLIB_CASSERT(test.at_start() == false,"");
-            DLIB_CASSERT(test.current_element_valid() == true,"");
+            DLIB_TEST(test.size() == 8);
+            DLIB_TEST(test.at_start() == true);
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.move_next() == true);
+            DLIB_TEST(test.at_start() == false);
+            DLIB_TEST(test.current_element_valid() == true);
 
 
             test.rotate_right(1);
-            DLIB_CASSERT(test.size() == 8,"");
-            DLIB_CASSERT(test.at_start() == true,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.move_next() == true,"");
-            DLIB_CASSERT(test.at_start() == false,"");
-            DLIB_CASSERT(test.current_element_valid() == true,"");
+            DLIB_TEST(test.size() == 8);
+            DLIB_TEST(test.at_start() == true);
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.move_next() == true);
+            DLIB_TEST(test.at_start() == false);
+            DLIB_TEST(test.current_element_valid() == true);
 
             test.rotate_left(1);
-            DLIB_CASSERT(test.size() == 8,"");
-            DLIB_CASSERT(test.at_start() == true,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.move_next() == true,"");
-            DLIB_CASSERT(test.at_start() == false,"");
-            DLIB_CASSERT(test.current_element_valid() == true,"");
+            DLIB_TEST(test.size() == 8);
+            DLIB_TEST(test.at_start() == true);
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.move_next() == true);
+            DLIB_TEST(test.at_start() == false);
+            DLIB_TEST(test.current_element_valid() == true);
             test.reset();
 
 
@@ -253,11 +253,11 @@ namespace
             unsigned long count = 0;
             while (test.move_next())
             {
-                DLIB_CASSERT(test.element() == count,"");
+                DLIB_TEST(test.element() == count);
                 ++count;
             }
 
-            DLIB_CASSERT(count == test.size(),"");
+            DLIB_TEST(count == test.size());
 
 
             test2.clear();
@@ -270,14 +270,14 @@ namespace
 
             char ch;
             sin >> ch;
-            DLIB_CASSERT( !sin, "");
+            DLIB_TEST( !sin);
 
-            DLIB_CASSERT(test2.size() == test.size(),"");
+            DLIB_TEST(test2.size() == test.size());
 
 
             for (unsigned long i = 0; i < test.size(); ++i)
             {
-                DLIB_CASSERT(test[i] == test2[i],
+                DLIB_TEST_MSG(test[i] == test2[i],
                              "\ni:        " << i <<
                              "\ntest[i]:  " << test[i] <<
                              "\ntest2[i]: " << test2[i]);
@@ -286,13 +286,13 @@ namespace
             count = 0;
             while (test.move_next() && test2.move_next())
             {
-                DLIB_CASSERT(test.element() == count,"");
-                DLIB_CASSERT(test2.element() == count,"");
+                DLIB_TEST(test.element() == count);
+                DLIB_TEST(test2.element() == count);
                 ++count;
             }
 
-            DLIB_CASSERT(test2.size() == count,"");
-            DLIB_CASSERT(test.size() == count,"");
+            DLIB_TEST(test2.size() == count);
+            DLIB_TEST(test.size() == count);
 
             test2.clear();
 

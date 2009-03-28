@@ -41,14 +41,17 @@ namespace
             dlog << dlib::LINFO << "some message you want to log";
 
             // This test is considered a success if this function doesn't throw an exception.  
-            // So we can use the DLIB_CASSERT macro to perform our tests since it throws an 
+            // So we can use the DLIB_TEST_MSG macro to perform our tests since it throws an 
             // exception containing a message if its first argument is false.  
 
             // make sure 3 is bigger than 2
-            DLIB_CASSERT(3 > 2,"This message prints if your compiler doesn't know 3 is bigger than 2");
+            DLIB_TEST_MSG(3 > 2,"This message prints if your compiler doesn't know 3 is bigger than 2");
 
             // make sure 5 is not equal to 9
-            DLIB_CASSERT(5 != 9,"This message prints if your compiler thinks 5 is the same as 9");
+            DLIB_TEST_MSG(5 != 9,"This message prints if your compiler thinks 5 is the same as 9");
+
+            // This is a form of test you can use when you don't care about haivng a message
+            DLIB_TEST(5 != 8);
 
             // If your test takes a long time to run you can also call print_spinner() 
             // periodically.  This will cause a spinning / character to display on the

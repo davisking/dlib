@@ -42,43 +42,43 @@ namespace
 
 
 
-        DLIB_CASSERT(a1.size() == 0,"");
-        DLIB_CASSERT(a1.at_start(),"");
-        DLIB_CASSERT(a1.current_element_valid() == false,"");
-        DLIB_CASSERT(a1.move_next() == false,"");
-        DLIB_CASSERT(a1.size() == 0,"");
-        DLIB_CASSERT(a1.current_element_valid() == false,"");
-        DLIB_CASSERT(a1.at_start() == false,"");
-        DLIB_CASSERT(a1.move_next() == false,"");
-        DLIB_CASSERT(a1.current_element_valid() == false,"");
-        DLIB_CASSERT(a1.size() == 0,"");
-        DLIB_CASSERT(a1.at_start() == false,"");            
-        DLIB_CASSERT(a1.size() == 0,"");
+        DLIB_TEST(a1.size() == 0);
+        DLIB_TEST(a1.at_start());
+        DLIB_TEST(a1.current_element_valid() == false);
+        DLIB_TEST(a1.move_next() == false);
+        DLIB_TEST(a1.size() == 0);
+        DLIB_TEST(a1.current_element_valid() == false);
+        DLIB_TEST(a1.at_start() == false);
+        DLIB_TEST(a1.move_next() == false);
+        DLIB_TEST(a1.current_element_valid() == false);
+        DLIB_TEST(a1.size() == 0);
+        DLIB_TEST(a1.at_start() == false);            
+        DLIB_TEST(a1.size() == 0);
 
         swap(a1,a2);
-        DLIB_CASSERT(a2.size() == 0,"");
-        DLIB_CASSERT(a2.current_element_valid() == false,"");
-        DLIB_CASSERT(a2.at_start() == false,"");
-        DLIB_CASSERT(a2.move_next() == false,"");
-        DLIB_CASSERT(a2.current_element_valid() == false,"");
-        DLIB_CASSERT(a2.size() == 0,"");
-        DLIB_CASSERT(a2.at_start() == false,"");            
-        DLIB_CASSERT(a2.size() == 0,"");
+        DLIB_TEST(a2.size() == 0);
+        DLIB_TEST(a2.current_element_valid() == false);
+        DLIB_TEST(a2.at_start() == false);
+        DLIB_TEST(a2.move_next() == false);
+        DLIB_TEST(a2.current_element_valid() == false);
+        DLIB_TEST(a2.size() == 0);
+        DLIB_TEST(a2.at_start() == false);            
+        DLIB_TEST(a2.size() == 0);
 
 
 
-        DLIB_CASSERT(a1.size() == 0,"");
-        DLIB_CASSERT(a1.at_start(),"");
-        DLIB_CASSERT(a1.current_element_valid() == false,"");
-        DLIB_CASSERT(a1.move_next() == false,"");
-        DLIB_CASSERT(a1.size() == 0,"");
-        DLIB_CASSERT(a1.current_element_valid() == false,"");
-        DLIB_CASSERT(a1.at_start() == false,"");
-        DLIB_CASSERT(a1.move_next() == false,"");
-        DLIB_CASSERT(a1.current_element_valid() == false,"");
-        DLIB_CASSERT(a1.size() == 0,"");
-        DLIB_CASSERT(a1.at_start() == false,"");            
-        DLIB_CASSERT(a1.size() == 0,"");
+        DLIB_TEST(a1.size() == 0);
+        DLIB_TEST(a1.at_start());
+        DLIB_TEST(a1.current_element_valid() == false);
+        DLIB_TEST(a1.move_next() == false);
+        DLIB_TEST(a1.size() == 0);
+        DLIB_TEST(a1.current_element_valid() == false);
+        DLIB_TEST(a1.at_start() == false);
+        DLIB_TEST(a1.move_next() == false);
+        DLIB_TEST(a1.current_element_valid() == false);
+        DLIB_TEST(a1.size() == 0);
+        DLIB_TEST(a1.at_start() == false);            
+        DLIB_TEST(a1.size() == 0);
 
         a1.reset();
         a2.reset();
@@ -86,85 +86,85 @@ namespace
         for (unsigned long k = 0; k < 4; ++k)
         {
 
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.at_start(),"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.move_next() == false,"");
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.at_start() == false,"");
-            DLIB_CASSERT(a1.move_next() == false,"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.at_start() == false,"");            
-            DLIB_CASSERT(a1.size() == 0,"");
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.at_start());
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.move_next() == false);
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.at_start() == false);
+            DLIB_TEST(a1.move_next() == false);
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.size() == 0);
 
             swap(a1,a2);
-            DLIB_CASSERT(a2.size() == 0,"");
-            DLIB_CASSERT(a2.current_element_valid() == false,"");
-            DLIB_CASSERT(a2.at_start() == false,"");
-            DLIB_CASSERT(a2.move_next() == false,"");
-            DLIB_CASSERT(a2.current_element_valid() == false,"");
-            DLIB_CASSERT(a2.size() == 0,"");
-            DLIB_CASSERT(a2.at_start() == false,"");            
-            DLIB_CASSERT(a2.size() == 0,"");
+            DLIB_TEST(a2.size() == 0);
+            DLIB_TEST(a2.current_element_valid() == false);
+            DLIB_TEST(a2.at_start() == false);
+            DLIB_TEST(a2.move_next() == false);
+            DLIB_TEST(a2.current_element_valid() == false);
+            DLIB_TEST(a2.size() == 0);
+            DLIB_TEST(a2.at_start() == false);            
+            DLIB_TEST(a2.size() == 0);
 
 
 
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.at_start(),"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.move_next() == false,"");
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.at_start() == false,"");
-            DLIB_CASSERT(a1.move_next() == false,"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.at_start() == false,"");            
-            DLIB_CASSERT(a1.size() == 0,"");
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.at_start());
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.move_next() == false);
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.at_start() == false);
+            DLIB_TEST(a1.move_next() == false);
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.size() == 0);
 
             a1.clear();
             a2.clear();
 
 
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.at_start(),"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.move_next() == false,"");
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.at_start() == false,"");
-            DLIB_CASSERT(a1.move_next() == false,"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.at_start() == false,"");            
-            DLIB_CASSERT(a1.size() == 0,"");
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.at_start());
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.move_next() == false);
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.at_start() == false);
+            DLIB_TEST(a1.move_next() == false);
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.size() == 0);
 
             swap(a1,a2);
-            DLIB_CASSERT(a2.size() == 0,"");
-            DLIB_CASSERT(a2.current_element_valid() == false,"");
-            DLIB_CASSERT(a2.at_start() == false,"");
-            DLIB_CASSERT(a2.move_next() == false,"");
-            DLIB_CASSERT(a2.current_element_valid() == false,"");
-            DLIB_CASSERT(a2.size() == 0,"");
-            DLIB_CASSERT(a2.at_start() == false,"");            
-            DLIB_CASSERT(a2.size() == 0,"");
+            DLIB_TEST(a2.size() == 0);
+            DLIB_TEST(a2.current_element_valid() == false);
+            DLIB_TEST(a2.at_start() == false);
+            DLIB_TEST(a2.move_next() == false);
+            DLIB_TEST(a2.current_element_valid() == false);
+            DLIB_TEST(a2.size() == 0);
+            DLIB_TEST(a2.at_start() == false);            
+            DLIB_TEST(a2.size() == 0);
 
 
 
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.at_start(),"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.move_next() == false,"");
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.at_start() == false,"");
-            DLIB_CASSERT(a1.move_next() == false,"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a1.at_start() == false,"");            
-            DLIB_CASSERT(a1.size() == 0,"");
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.at_start());
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.move_next() == false);
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.at_start() == false);
+            DLIB_TEST(a1.move_next() == false);
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.size() == 0);
 
             a1.clear();
             a2.clear();
@@ -176,53 +176,53 @@ namespace
                 a1.push(a);
             }
 
-            DLIB_CASSERT(a1.size() == 100,"");
+            DLIB_TEST(a1.size() == 100);
 
             int count = 99;
             while (a1.move_next())
             {
-                DLIB_CASSERT(a1.element() == count,a1.element() << " : " << count);
+                DLIB_TEST_MSG(a1.element() == count,a1.element() << " : " << count);
                 --count;
             }
 
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.at_start() == false,"");
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.at_start() == false);
 
             a1.swap(a2);
 
             count = 99;
-            DLIB_CASSERT(a2.current_element_valid() == false,"");
-            DLIB_CASSERT(a2.at_start() == false,"");
-            DLIB_CASSERT(a1.current_element_valid() == false,"");
-            DLIB_CASSERT(a1.at_start() == true,"");
+            DLIB_TEST(a2.current_element_valid() == false);
+            DLIB_TEST(a2.at_start() == false);
+            DLIB_TEST(a1.current_element_valid() == false);
+            DLIB_TEST(a1.at_start() == true);
 
-            DLIB_CASSERT(a1.size() == 0,"");
-            DLIB_CASSERT(a2.size() == 100,"");
-            DLIB_CASSERT(a2.current() == 99,"");
+            DLIB_TEST(a1.size() == 0);
+            DLIB_TEST(a2.size() == 100);
+            DLIB_TEST(a2.current() == 99);
 
             a2.reset();
             while (a2.move_next())
             {
-                DLIB_CASSERT(a2.element() == count--,"");
+                DLIB_TEST(a2.element() == count--);
             }                
 
-            DLIB_CASSERT(a2.current_element_valid() == false,"");
-            DLIB_CASSERT(a2.at_start() == false,"");
+            DLIB_TEST(a2.current_element_valid() == false);
+            DLIB_TEST(a2.at_start() == false);
             int b = 4;
             a2.push(b);
-            DLIB_CASSERT(a2.current_element_valid() == false,"");
-            DLIB_CASSERT(a2.at_start() == true,"");
+            DLIB_TEST(a2.current_element_valid() == false);
+            DLIB_TEST(a2.at_start() == true);
 
-            DLIB_CASSERT(a2.current() == 4,"");
+            DLIB_TEST(a2.current() == 4);
             int c = 0;
             a2.pop(c);
-            DLIB_CASSERT(c == 4,"");
+            DLIB_TEST(c == 4);
 
             // serialize the state of a2, then clear a2, then
             // load the state back into a2.
             ostringstream sout;
             serialize(a2,sout);
-            DLIB_CASSERT(a2.at_start() == true,"");
+            DLIB_TEST(a2.at_start() == true);
             istringstream sin(sout.str());
             a2.clear();
             deserialize(a2,sin);
@@ -232,10 +232,10 @@ namespace
             while (a2.size())
             {
                 int a = 0;
-                DLIB_CASSERT(a2.current() == count,"");
-                DLIB_CASSERT(const_cast<const stack&>(a2).current() == count,"");
+                DLIB_TEST(a2.current() == count);
+                DLIB_TEST(const_cast<const stack&>(a2).current() == count);
                 a2.pop(a);
-                DLIB_CASSERT(a == count--,"");
+                DLIB_TEST(a == count--);
             }
 
 
@@ -256,14 +256,14 @@ namespace
                 int a = 3;
                 a1.push(a);
             }
-            DLIB_CASSERT(go.size() == 100,"");                
+            DLIB_TEST(go.size() == 100);                
             for (int i = 0; i < 100; ++i)
             {
                 int a = 9;
                 go.remove_any(a);
-                DLIB_CASSERT(a == 3,"");
+                DLIB_TEST(a == 3);
             }
-            DLIB_CASSERT(go.size() == 0,"");
+            DLIB_TEST(go.size() == 0);
         }
 
     }

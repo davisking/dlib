@@ -61,47 +61,47 @@ namespace
             map test;
             map test2;
 
-            DLIB_CASSERT(test.size() == 0,"");
-            DLIB_CASSERT(test.at_start(),"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.move_next() == false,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.at_start() == false,"");
+            DLIB_TEST(test.size() == 0);
+            DLIB_TEST(test.at_start());
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.move_next() == false);
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.at_start() == false);
 
             swap(test,test2);
-            DLIB_CASSERT(test2.at_start() == false,"");
-            DLIB_CASSERT(test.at_start() == true,"");
+            DLIB_TEST(test2.at_start() == false);
+            DLIB_TEST(test.at_start() == true);
 
             swap(test,test2);
-            DLIB_CASSERT(test.at_start() == false,"");
+            DLIB_TEST(test.at_start() == false);
 
 
-            DLIB_CASSERT(test.size() == 0,"");
-            DLIB_CASSERT(test[1] == 0,"");
-            DLIB_CASSERT(test[2] == 0,"");
-            DLIB_CASSERT(test[3] == 0,"");
-            DLIB_CASSERT(test[0] == 0,"");
+            DLIB_TEST(test.size() == 0);
+            DLIB_TEST(test[1] == 0);
+            DLIB_TEST(test[2] == 0);
+            DLIB_TEST(test[3] == 0);
+            DLIB_TEST(test[0] == 0);
 
             test.load(treeb);
-            DLIB_CASSERT(test.at_start(),"");
-            DLIB_CASSERT(test[1] != 0,"");
-            DLIB_CASSERT(test[2] == 0,"");
-            DLIB_CASSERT(test[3] == 0,"");
-            DLIB_CASSERT(test[0] == 0,"");
+            DLIB_TEST(test.at_start());
+            DLIB_TEST(test[1] != 0);
+            DLIB_TEST(test[2] == 0);
+            DLIB_TEST(test[3] == 0);
+            DLIB_TEST(test[0] == 0);
 
             test2.clear();
             swap(test2,test);
-            DLIB_CASSERT(test2[1] != 0,"");
-            DLIB_CASSERT(test2[2] == 0,"");
-            DLIB_CASSERT(test2[3] == 0,"");
-            DLIB_CASSERT(test2[0] == 0,"");
-            DLIB_CASSERT(test[1] == 0,"");
-            DLIB_CASSERT(test[2] == 0,"");
-            DLIB_CASSERT(test[3] == 0,"");
-            DLIB_CASSERT(test[0] == 0,"");
+            DLIB_TEST(test2[1] != 0);
+            DLIB_TEST(test2[2] == 0);
+            DLIB_TEST(test2[3] == 0);
+            DLIB_TEST(test2[0] == 0);
+            DLIB_TEST(test[1] == 0);
+            DLIB_TEST(test[2] == 0);
+            DLIB_TEST(test[3] == 0);
+            DLIB_TEST(test[0] == 0);
 
 
-            DLIB_CASSERT(treeb.size() == 0,"");
+            DLIB_TEST(treeb.size() == 0);
             treeb.clear();
         }
 
@@ -145,34 +145,34 @@ namespace
         map e;
         e.load(table_4);
 
-        DLIB_CASSERT(e.size() == 0,"");
-        DLIB_CASSERT(e.at_start() == true,"");
-        DLIB_CASSERT(e.current_element_valid() == false,"");     
-        DLIB_CASSERT(e.move_next() == false,"");
-        DLIB_CASSERT(e.at_start() == false,"");
-        DLIB_CASSERT(e.current_element_valid() == false,"");            
+        DLIB_TEST(e.size() == 0);
+        DLIB_TEST(e.at_start() == true);
+        DLIB_TEST(e.current_element_valid() == false);     
+        DLIB_TEST(e.move_next() == false);
+        DLIB_TEST(e.at_start() == false);
+        DLIB_TEST(e.current_element_valid() == false);            
 
-        DLIB_CASSERT(m_4.size() == table_4b.size(),"");
-        DLIB_CASSERT(m_8.size() == table_8b.size(),"");
-        DLIB_CASSERT(m_t.size() == treeb.size(),"");
+        DLIB_TEST(m_4.size() == table_4b.size());
+        DLIB_TEST(m_8.size() == table_8b.size());
+        DLIB_TEST(m_t.size() == treeb.size());
 
-        DLIB_CASSERT(m_4.at_start() == true,"");
-        DLIB_CASSERT(m_8.at_start() == true,"");
-        DLIB_CASSERT(m_t.at_start() == true,"");
-        DLIB_CASSERT(m_4.current_element_valid() == false,"");            
-        DLIB_CASSERT(m_8.current_element_valid() == false,"");            
-        DLIB_CASSERT(m_t.current_element_valid() == false,"");     
+        DLIB_TEST(m_4.at_start() == true);
+        DLIB_TEST(m_8.at_start() == true);
+        DLIB_TEST(m_t.at_start() == true);
+        DLIB_TEST(m_4.current_element_valid() == false);            
+        DLIB_TEST(m_8.current_element_valid() == false);            
+        DLIB_TEST(m_t.current_element_valid() == false);     
 
 
-        DLIB_CASSERT(m_4.move_next() == true,"");
-        DLIB_CASSERT(m_4.at_start() == false,"");
-        DLIB_CASSERT(m_4.current_element_valid() == true,"");
-        DLIB_CASSERT(m_8.move_next() == true,"");
-        DLIB_CASSERT(m_8.at_start() == false,"");
-        DLIB_CASSERT(m_8.current_element_valid() == true,"");
-        DLIB_CASSERT(m_t.move_next() == true,"");
-        DLIB_CASSERT(m_t.at_start() == false,"");
-        DLIB_CASSERT(m_t.current_element_valid() == true,"");
+        DLIB_TEST(m_4.move_next() == true);
+        DLIB_TEST(m_4.at_start() == false);
+        DLIB_TEST(m_4.current_element_valid() == true);
+        DLIB_TEST(m_8.move_next() == true);
+        DLIB_TEST(m_8.at_start() == false);
+        DLIB_TEST(m_8.current_element_valid() == true);
+        DLIB_TEST(m_t.move_next() == true);
+        DLIB_TEST(m_t.at_start() == false);
+        DLIB_TEST(m_t.current_element_valid() == true);
 
         m_4.reset();
         m_8.reset();
@@ -180,67 +180,67 @@ namespace
 
         while (m_4.move_next())
         {
-            DLIB_CASSERT( table_4b[m_4.element().key()] != 0,"");
-            DLIB_CASSERT( *table_4b[m_4.element().key()] == m_4.element().value(),"");
+            DLIB_TEST( table_4b[m_4.element().key()] != 0);
+            DLIB_TEST( *table_4b[m_4.element().key()] == m_4.element().value());
         }
 
         // serialize the state of m_4, then clear m_4, then
         // load the state back into m_4.
         ostringstream sout;
         serialize(m_4,sout);
-        DLIB_CASSERT(m_4.at_start() == true,"");
+        DLIB_TEST(m_4.at_start() == true);
         istringstream sin(sout.str());
         m_4.clear();
         deserialize(m_4,sin);
-        DLIB_CASSERT(m_4.at_start() == true,"");
+        DLIB_TEST(m_4.at_start() == true);
 
 
 
         while (table_4b.move_next())
         {
-            DLIB_CASSERT( m_4[table_4b.element().key()] != 0,"");
-            DLIB_CASSERT( *m_4[table_4b.element().key()] == table_4b.element().value(),"");
+            DLIB_TEST( m_4[table_4b.element().key()] != 0);
+            DLIB_TEST( *m_4[table_4b.element().key()] == table_4b.element().value());
         }
 
         // serialize the state of m_8, then clear m_8, then
         // load the state back into m_8.
         sout.str("");
         serialize(m_8,sout);
-        DLIB_CASSERT(m_8.at_start() == true,"");
+        DLIB_TEST(m_8.at_start() == true);
         sin.str(sout.str());
         m_8.clear();
         deserialize(m_8,sin);
-        DLIB_CASSERT(m_8.at_start() == true,"");
+        DLIB_TEST(m_8.at_start() == true);
 
         while (m_8.move_next())
         {
-            DLIB_CASSERT( table_8b[m_8.element().key()] != 0,"");
-            DLIB_CASSERT( *table_8b[m_8.element().key()] == m_8.element().value(),"");
+            DLIB_TEST( table_8b[m_8.element().key()] != 0);
+            DLIB_TEST( *table_8b[m_8.element().key()] == m_8.element().value());
         }
 
         while (table_8b.move_next())
         {
-            DLIB_CASSERT( m_8[table_8b.element().key()] != 0,"");
-            DLIB_CASSERT( *m_8[table_8b.element().key()] == table_8b.element().value(),"");
+            DLIB_TEST( m_8[table_8b.element().key()] != 0);
+            DLIB_TEST( *m_8[table_8b.element().key()] == table_8b.element().value());
         }
 
 
         while (m_t.move_next())
         {
-            DLIB_CASSERT( treeb[m_t.element().key()] != 0,"");
-            DLIB_CASSERT( *treeb[m_t.element().key()] == m_t.element().value(),"");
+            DLIB_TEST( treeb[m_t.element().key()] != 0);
+            DLIB_TEST( *treeb[m_t.element().key()] == m_t.element().value());
         }
 
         // make sure operator[] doesn't hang
         for (int l = 1; l < 10000; ++l)
         {
-            DLIB_CASSERT(m_t[l+0xFFF] == 0,"");
+            DLIB_TEST(m_t[l+0xFFF] == 0);
         }
 
         while (treeb.move_next())
         {
-            DLIB_CASSERT( m_t[treeb.element().key()] != 0,"");
-            DLIB_CASSERT( *m_t[treeb.element().key()] == treeb.element().value(),"");
+            DLIB_TEST( m_t[treeb.element().key()] != 0);
+            DLIB_TEST( *m_t[treeb.element().key()] == treeb.element().value());
         }
 
 
@@ -252,24 +252,24 @@ namespace
         int last = 0;
         while (m_4.move_next())
         {
-            DLIB_CASSERT(last <= m_4.element().key(),"");
-            DLIB_CASSERT(m_4.element().key() + 1 == m_4.element().value(),"");
+            DLIB_TEST(last <= m_4.element().key());
+            DLIB_TEST(m_4.element().key() + 1 == m_4.element().value());
             last = m_4.element().key();
         }
 
         last = 0;
         while (m_8.move_next())
         {
-            DLIB_CASSERT(last <= m_8.element().key(),"");
-            DLIB_CASSERT(m_8.element().key() + 1 == m_8.element().value(),"");
+            DLIB_TEST(last <= m_8.element().key());
+            DLIB_TEST(m_8.element().key() + 1 == m_8.element().value());
             last = m_8.element().key();
         }
 
         last = 0;
         while (m_t.move_next())
         {
-            DLIB_CASSERT(last <= m_t.element().key(),"");
-            DLIB_CASSERT(m_t.element().key() + 1 == m_t.element().value(),"");
+            DLIB_TEST(last <= m_t.element().key());
+            DLIB_TEST(m_t.element().key() + 1 == m_t.element().value());
             last = m_t.element().key();
         }
 
@@ -284,14 +284,14 @@ namespace
         table_4b.reset();
         while (m_8.move_next())
         {
-            DLIB_CASSERT( table_4b[m_8.element().key()] != 0,"");
-            DLIB_CASSERT( *table_4b[m_8.element().key()] == m_8.element().value(),"");
+            DLIB_TEST( table_4b[m_8.element().key()] != 0);
+            DLIB_TEST( *table_4b[m_8.element().key()] == m_8.element().value());
         }
 
         while (table_4b.move_next())
         {
-            DLIB_CASSERT( m_8[table_4b.element().key()] != 0,"");
-            DLIB_CASSERT( *m_8[table_4b.element().key()] == table_4b.element().value(),"");
+            DLIB_TEST( m_8[table_4b.element().key()] != 0);
+            DLIB_TEST( *m_8[table_4b.element().key()] == table_4b.element().value());
         }
 
     }

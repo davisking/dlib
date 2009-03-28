@@ -104,33 +104,33 @@ namespace
         bint i = 0;
         bint a(5), b, c(0);
 
-        DLIB_CASSERT(5 - a == 0,"");
-        DLIB_CASSERT(a - 5 == 0,"");
+        DLIB_TEST(5 - a == 0);
+        DLIB_TEST(a - 5 == 0);
 
-        DLIB_CASSERT(0 - c == 0,"");
-        DLIB_CASSERT(c - 0 == 0,"");
+        DLIB_TEST(0 - c == 0);
+        DLIB_TEST(c - 0 == 0);
 
-        DLIB_CASSERT(0 + c == 0,"");
-        DLIB_CASSERT(c + 0 == 0,"");
+        DLIB_TEST(0 + c == 0);
+        DLIB_TEST(c + 0 == 0);
 
-        DLIB_CASSERT(0 + a == 5,"");
-        DLIB_CASSERT(a + 0 == 5,"");
+        DLIB_TEST(0 + a == 5);
+        DLIB_TEST(a + 0 == 5);
 
-        DLIB_CASSERT(0 - b == 0,"");
-        DLIB_CASSERT(b - 0 == 0,"");
+        DLIB_TEST(0 - b == 0);
+        DLIB_TEST(b - 0 == 0);
 
-        DLIB_CASSERT(0 + b == 0,"");
-        DLIB_CASSERT(b + 0 == 0,"");
+        DLIB_TEST(0 + b == 0);
+        DLIB_TEST(b + 0 == 0);
 
-        DLIB_CASSERT(i == 0,"");
-        DLIB_CASSERT(a == 5,"");
-        DLIB_CASSERT(b == 0,"");
-        DLIB_CASSERT(c == 0,"");
+        DLIB_TEST(i == 0);
+        DLIB_TEST(a == 5);
+        DLIB_TEST(b == 0);
+        DLIB_TEST(c == 0);
 
 
 
         a -= 5;
-        DLIB_CASSERT(a == 0,"");
+        DLIB_TEST(a == 0);
 
 
 
@@ -145,13 +145,13 @@ namespace
             // big int multiplication algorithm.
             c = a*b;
             // make sure a and b ended up being the same number
-            DLIB_CASSERT(a == b,
+            DLIB_TEST_MSG(a == b,
                          "k: " << k << "\n"
                          "short_fact: " << a << "\n"
                          "big_fact: " << b 
             );
             // make sure c really is the square of the factorial of k
-            DLIB_CASSERT(short_fact_squared<bint>(k) == c,"k: " << k);
+            DLIB_TEST_MSG(short_fact_squared<bint>(k) == c,"k: " << k);
             print_spinner();
         }
 
@@ -161,12 +161,12 @@ namespace
             bint a = short_fact<bint>(k);
             bint b = big_fact<bint>(k);
             bint c = a*b;
-            DLIB_CASSERT(a == b,
+            DLIB_TEST_MSG(a == b,
                          "k: " << k << "\n"
                          "short_fact: " << a << "\n"
                          "big_fact: " << b 
             );
-            DLIB_CASSERT(short_fact_squared<bint>(k) == c,"k: " << k);
+            DLIB_TEST_MSG(short_fact_squared<bint>(k) == c,"k: " << k);
             print_spinner();
         }
 
@@ -175,25 +175,25 @@ namespace
         // test the << and >> operators a little
         a = big_fact<bint>(20);
         sout << a;
-        DLIB_CASSERT( sout.str() == "2432902008176640000","was: " << a);
+        DLIB_TEST_MSG( sout.str() == "2432902008176640000","was: " << a);
 
         sin.str("684626312793279327952039475203945");
         sin >> a;
         sout.str("");
         sout << a;
-        DLIB_CASSERT(sout.str() == "684626312793279327952039475203945","");
+        DLIB_TEST(sout.str() == "684626312793279327952039475203945");
 
         print_spinner();
 
-        DLIB_CASSERT(a > 0,"");
+        DLIB_TEST(a > 0);
 
 
         // make sure that when you try to read something that isn't a number
         // into a bigint you get an error
-        DLIB_CASSERT(sin.fail() == false, "");
+        DLIB_TEST(sin.fail() == false);
         sin.str("the cat ate some cheese");
         sin >> a;
-        DLIB_CASSERT(sin.fail() == true, "");
+        DLIB_TEST(sin.fail() == true);
         sin.clear();
         sin.str("");
 
@@ -201,11 +201,11 @@ namespace
 
         sin.str("3628913");
         sin >> i;
-        DLIB_CASSERT(short_fact<bint>(10) + short_fact<bint>(5) - 7 == i,"");
+        DLIB_TEST(short_fact<bint>(10) + short_fact<bint>(5) - 7 == i);
 
         sin.str("2432902008173011193");
         sin >> i;
-        DLIB_CASSERT(short_fact<bint>(20) - short_fact<bint>(10) - 7 == i,"");
+        DLIB_TEST(short_fact<bint>(20) - short_fact<bint>(10) - 7 == i);
 
         // test the serialization stuff
         sout.str("");
@@ -214,7 +214,7 @@ namespace
         sin.str(sout.str());
         deserialize(i,sin);
 
-        DLIB_CASSERT(short_fact<bint>(20) - short_fact<bint>(10) - 7 == i,"");
+        DLIB_TEST(short_fact<bint>(20) - short_fact<bint>(10) - 7 == i);
 
 
 
@@ -228,7 +228,7 @@ namespace
         sin >> b;
         a = b;
         ++b;
-        DLIB_CASSERT ( a + 1 == b,"a==" << a << endl << "b==" << b << endl);
+        DLIB_TEST_MSG ( a + 1 == b,"a==" << a << endl << "b==" << b << endl);
 
 
 
@@ -251,7 +251,7 @@ namespace
             if ((mel&0xFFF) == 0)
                 print_spinner();
         }
-        DLIB_CASSERT(a == b*(b+1)/2, "a==" << a << endl << "b*(b+1)/2==" << b*(b+1)/2 << endl);
+        DLIB_TEST_MSG(a == b*(b+1)/2, "a==" << a << endl << "b*(b+1)/2==" << b*(b+1)/2 << endl);
 
 
 
@@ -268,8 +268,8 @@ namespace
         sin.str("100000");
         sin >> b;
         i = b;
-        DLIB_CASSERT(i == b,"");
-        DLIB_CASSERT(i > 0,"i==" << i);
+        DLIB_TEST(i == b);
+        DLIB_TEST_MSG(i > 0,"i==" << i);
         mel = 0;
         for (i = b; i > 0; --i)
         {
@@ -282,7 +282,7 @@ namespace
             if ((mel&0xFF) == 0)
                 print_spinner();
         }
-        DLIB_CASSERT(a == b*(b+1)/2, "a==" << a << endl << "b*(b+1)/2==" << b*(b+1)/2 << endl);
+        DLIB_TEST_MSG(a == b*(b+1)/2, "a==" << a << endl << "b*(b+1)/2==" << b*(b+1)/2 << endl);
 
 
 
@@ -294,22 +294,22 @@ namespace
 
 
 
-        DLIB_CASSERT(short_fact<bint>(10)/short_fact<bint>(5) == 30240,"");
-        DLIB_CASSERT(short_fact<bint>(10)/(short_fact<bint>(5)+1) == 29990,"");
+        DLIB_TEST(short_fact<bint>(10)/short_fact<bint>(5) == 30240);
+        DLIB_TEST(short_fact<bint>(10)/(short_fact<bint>(5)+1) == 29990);
 
         sin.str("221172909834240000");
         sin >> a;
-        DLIB_CASSERT(short_fact<bint>(20)/(short_fact<bint>(5)+1) == a/11,"");
+        DLIB_TEST(short_fact<bint>(20)/(short_fact<bint>(5)+1) == a/11);
 
         sin.str("670442388044");
         sin >> b;
-        DLIB_CASSERT(short_fact<bint>(20)/(short_fact<bint>(10)+1) == b,"");
+        DLIB_TEST(short_fact<bint>(20)/(short_fact<bint>(10)+1) == b);
 
         print_spinner();
 
         sin.str("1860479");
         sin >> i;
-        DLIB_CASSERT(short_fact<bint>(20)/(short_fact<bint>(15)+1) == i,short_fact<bint>(20)/(short_fact<bint>(15)+1));
+        DLIB_TEST_MSG(short_fact<bint>(20)/(short_fact<bint>(15)+1) == i,short_fact<bint>(20)/(short_fact<bint>(15)+1));
 
         // test the serialization stuff
         sout.str("");
@@ -318,7 +318,7 @@ namespace
         sin.str(sout.str());
         deserialize(i,sin);
 
-        DLIB_CASSERT(short_fact<bint>(20)/(short_fact<bint>(15)+1) == i,short_fact<bint>(20)/(short_fact<bint>(15)+1));
+        DLIB_TEST_MSG(short_fact<bint>(20)/(short_fact<bint>(15)+1) == i,short_fact<bint>(20)/(short_fact<bint>(15)+1));
 
 
         print_spinner();
@@ -330,28 +330,28 @@ namespace
         i = 1234;
         sin.str(sout.str());
         deserialize(i,sin);
-        DLIB_CASSERT(i == 0,"");
+        DLIB_TEST(i == 0);
 
 
-        DLIB_CASSERT(short_fact<bint>(10000)/short_fact<bint>(9999) == 10000,"");
+        DLIB_TEST(short_fact<bint>(10000)/short_fact<bint>(9999) == 10000);
 
 
-        DLIB_CASSERT(bint(5)%bint(1) == 0,"");
-        DLIB_CASSERT(bint(5)%bint(6) == 5,"");
-        DLIB_CASSERT(bint(25)%bint(6) == 1,"");
+        DLIB_TEST(bint(5)%bint(1) == 0);
+        DLIB_TEST(bint(5)%bint(6) == 5);
+        DLIB_TEST(bint(25)%bint(6) == 1);
         print_spinner();
-        DLIB_CASSERT(bint(354)%bint(123) == 108,"");
-        DLIB_CASSERT(bint(20)%(bint(10)) == 0,"");
-        DLIB_CASSERT(bint(20)%(bint(10)+1) == 9,"");
+        DLIB_TEST(bint(354)%bint(123) == 108);
+        DLIB_TEST(bint(20)%(bint(10)) == 0);
+        DLIB_TEST(bint(20)%(bint(10)+1) == 9);
 
-        DLIB_CASSERT(bint(20)%(bint(15)+1) == 4,"");
+        DLIB_TEST(bint(20)%(bint(15)+1) == 4);
 
 
-        DLIB_CASSERT(short_fact<bint>(10)%(short_fact<bint>(5)+2) == 32,"");
+        DLIB_TEST(short_fact<bint>(10)%(short_fact<bint>(5)+2) == 32);
 
         sin.str("2908082");
         sin >> i;
-        DLIB_CASSERT(short_fact<bint>(15)%(short_fact<bint>(10)+2) == i,"");
+        DLIB_TEST(short_fact<bint>(15)%(short_fact<bint>(10)+2) == i);
 
 
 
@@ -360,34 +360,34 @@ namespace
 
         // same as some of the above stuff but using big_fact
 
-        DLIB_CASSERT(big_fact<bint>(10)%(big_fact<bint>(5)+2) == 32,"");
+        DLIB_TEST(big_fact<bint>(10)%(big_fact<bint>(5)+2) == 32);
 
         sin.str("2908082");
         sin >> i;
-        DLIB_CASSERT(big_fact<bint>(15)%(big_fact<bint>(10)+2) == i,"");
+        DLIB_TEST(big_fact<bint>(15)%(big_fact<bint>(10)+2) == i);
 
 
         print_spinner();
 
 
-        DLIB_CASSERT(big_fact<bint>(10)/big_fact<bint>(5) == 30240,"");
-        DLIB_CASSERT(big_fact<bint>(10)/(big_fact<bint>(5)+1) == 29990,"");
+        DLIB_TEST(big_fact<bint>(10)/big_fact<bint>(5) == 30240);
+        DLIB_TEST(big_fact<bint>(10)/(big_fact<bint>(5)+1) == 29990);
 
         sin.str("221172909834240000");
         sin >> a;
-        DLIB_CASSERT(big_fact<bint>(20)/(big_fact<bint>(5)+1) == a/11,"");
+        DLIB_TEST(big_fact<bint>(20)/(big_fact<bint>(5)+1) == a/11);
 
 
         sin.str("670442388044");
         sin >> b;
-        DLIB_CASSERT(big_fact<bint>(20)/(big_fact<bint>(10)+1) == b,"");
+        DLIB_TEST(big_fact<bint>(20)/(big_fact<bint>(10)+1) == b);
 
 
         sin.str("1860479");
         sin >> i;
-        DLIB_CASSERT(big_fact<bint>(20)/(big_fact<bint>(15)+1) == i,big_fact<bint>(20)/(big_fact<bint>(15)+1));
+        DLIB_TEST_MSG(big_fact<bint>(20)/(big_fact<bint>(15)+1) == i,big_fact<bint>(20)/(big_fact<bint>(15)+1));
 
-        DLIB_CASSERT(big_fact<bint>(100)/big_fact<bint>(99) == 100,"");
+        DLIB_TEST(big_fact<bint>(100)/big_fact<bint>(99) == 100);
 
 
 
@@ -414,7 +414,7 @@ namespace
         sin.str(sout.str());
         sin >> c;
 
-        DLIB_CASSERT(a*b == c,
+        DLIB_TEST_MSG(a*b == c,
                      "a*b: " << a*b <<
                      "\nc:   " << c);
 
@@ -426,50 +426,50 @@ namespace
         unsigned long j;
         for (j = 0; i < bint(100000); ++j)
         {
-            DLIB_CASSERT(i++ == bint(j),"");
+            DLIB_TEST(i++ == bint(j));
             ++mel;
             if((mel&0xFF) == 0)
                 print_spinner();
         }
-        DLIB_CASSERT(j == 100000,"");
+        DLIB_TEST(j == 100000);
 
         i = 1234;
 
-        DLIB_CASSERT(i == 1234,"");
-        DLIB_CASSERT(i < 2345 ,"");
-        DLIB_CASSERT(i > 0    ,"");
-        DLIB_CASSERT(i > 123  ,"");
+        DLIB_TEST(i == 1234);
+        DLIB_TEST(i < 2345 );
+        DLIB_TEST(i > 0    );
+        DLIB_TEST(i > 123  );
 
-        DLIB_CASSERT(i != 1334,"");
-        DLIB_CASSERT(i <= 2345,"");
-        DLIB_CASSERT(i >= 0   ,"");
-        DLIB_CASSERT(i >= 123 ,"");
-        DLIB_CASSERT(i >= 1234,"");
-        DLIB_CASSERT(i <= 1234,"");
+        DLIB_TEST(i != 1334);
+        DLIB_TEST(i <= 2345);
+        DLIB_TEST(i >= 0   );
+        DLIB_TEST(i >= 123 );
+        DLIB_TEST(i >= 1234);
+        DLIB_TEST(i <= 1234);
 
 
-        DLIB_CASSERT(1234 == i,"");
-        DLIB_CASSERT(2345 > i,"");
-        DLIB_CASSERT(0    < i,"");
-        DLIB_CASSERT(123  < i,"");
+        DLIB_TEST(1234 == i);
+        DLIB_TEST(2345 > i);
+        DLIB_TEST(0    < i);
+        DLIB_TEST(123  < i);
 
-        DLIB_CASSERT(1334 != i,"");
-        DLIB_CASSERT(2345 >= i,"");
-        DLIB_CASSERT(0    <= i,"");
-        DLIB_CASSERT(123  <= i,"");
-        DLIB_CASSERT(1234 <= i,"");
-        DLIB_CASSERT(1234 >= i,"");
+        DLIB_TEST(1334 != i);
+        DLIB_TEST(2345 >= i);
+        DLIB_TEST(0    <= i);
+        DLIB_TEST(123  <= i);
+        DLIB_TEST(1234 <= i);
+        DLIB_TEST(1234 >= i);
 
 
         a = big_fact<bint>(200);
         b = big_fact<bint>(100);
 
-        DLIB_CASSERT(a > b, "");
-        DLIB_CASSERT(a != b, "");
-        DLIB_CASSERT(b < a, "");            
-        DLIB_CASSERT(b != a, "");
-        DLIB_CASSERT(b <= a, "");
-        DLIB_CASSERT(a >= b, "");
+        DLIB_TEST(a > b);
+        DLIB_TEST(a != b);
+        DLIB_TEST(b < a);            
+        DLIB_TEST(b != a);
+        DLIB_TEST(b <= a);
+        DLIB_TEST(a >= b);
 
 
 

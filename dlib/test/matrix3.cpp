@@ -34,15 +34,15 @@ namespace
         const U& b
     )
     {
-        DLIB_CASSERT(a.nr() == b.nr(),"");
-        DLIB_CASSERT(a.nc() == b.nc(),"");
+        DLIB_TEST(a.nr() == b.nr());
+        DLIB_TEST(a.nc() == b.nc());
         typedef typename T::type type;
         for (long r = 0; r < a.nr(); ++r)
         {
             for (long c = 0; c < a.nc(); ++c)
             {
                 type error = std::abs(a(r,c) - b(r,c));
-                DLIB_CASSERT(error < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul, "error: " << error <<
+                DLIB_TEST_MSG(error < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul, "error: " << error <<
                              "    eps: " << std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul);
             }
         }
@@ -54,15 +54,15 @@ namespace
         const U& b
     )
     {
-        DLIB_CASSERT(a.nr() == b.nr(),"");
-        DLIB_CASSERT(a.nc() == b.nc(),"");
+        DLIB_TEST(a.nr() == b.nr());
+        DLIB_TEST(a.nc() == b.nc());
         typedef typename T::type type;
         for (long r = 0; r < a.nr(); ++r)
         {
             for (long c = 0; c < a.nc(); ++c)
             {
                 typename type::value_type error = std::abs(a(r,c) - b(r,c));
-                DLIB_CASSERT(error < std::sqrt(std::numeric_limits<typename type::value_type>::epsilon())*eps_mul, "error: " << error <<
+                DLIB_TEST_MSG(error < std::sqrt(std::numeric_limits<typename type::value_type>::epsilon())*eps_mul, "error: " << error <<
                              "    eps: " << std::sqrt(std::numeric_limits<typename type::value_type>::epsilon())*eps_mul);
             }
         }
@@ -75,8 +75,8 @@ namespace
     )
     {
         T& a = const_cast<T&>(a_);
-        DLIB_CASSERT(a.nr() == b.nr(),"");
-        DLIB_CASSERT(a.nc() == b.nc(),"");
+        DLIB_TEST(a.nr() == b.nr());
+        DLIB_TEST(a.nc() == b.nc());
         for (long r = 0; r < a.nr(); ++r)
         {
             for (long c = 0; c < a.nc(); ++c)
@@ -470,8 +470,8 @@ namespace
             c_check_equal( tmp(c_temp + conj(c_rv4)*c_cv4), c_temp + conj(c_rv4)*c_cv4);
             c_check_equal( tmp(c_temp + trans(conj(c_cv4))*trans(c_rv4)), c_temp + trans(conj(c_cv4))*trans(c_rv4));
 
-            DLIB_CASSERT(abs((static_cast<complex<type> >(c_rv4*c_cv4) + i) - ((c_rv4*c_cv4)(0) + i)) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul ,"");
-            DLIB_CASSERT(abs((rv4*cv4 + 1.0) - ((rv4*cv4)(0) + 1.0)) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul,"");
+            DLIB_TEST(abs((static_cast<complex<type> >(c_rv4*c_cv4) + i) - ((c_rv4*c_cv4)(0) + i)) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul );
+            DLIB_TEST(abs((rv4*cv4 + 1.0) - ((rv4*cv4)(0) + 1.0)) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul);
 
         }
     }
@@ -498,10 +498,10 @@ namespace
             6, 7;
 
 
-            DLIB_CASSERT(subm(tensor_product(m1,m2),range(0,1), range(0,1)) == 1*m2,"");
-            DLIB_CASSERT(subm(tensor_product(m1,m2),range(0,1), range(2,3)) == 2*m2,"");
-            DLIB_CASSERT(subm(tensor_product(m1,m2),range(2,3), range(0,1)) == 3*m2,"");
-            DLIB_CASSERT(subm(tensor_product(m1,m2),range(2,3), range(2,3)) == 4*m2,"");
+            DLIB_TEST(subm(tensor_product(m1,m2),range(0,1), range(0,1)) == 1*m2);
+            DLIB_TEST(subm(tensor_product(m1,m2),range(0,1), range(2,3)) == 2*m2);
+            DLIB_TEST(subm(tensor_product(m1,m2),range(2,3), range(0,1)) == 3*m2);
+            DLIB_TEST(subm(tensor_product(m1,m2),range(2,3), range(2,3)) == 4*m2);
         }
 
         {
@@ -538,8 +538,8 @@ namespace
                  0,0,9,0;
 
 
-            DLIB_CASSERT(lowerm(m) == ml,"");
-            DLIB_CASSERT(upperm(m) == mu,"");
+            DLIB_TEST(lowerm(m) == ml);
+            DLIB_TEST(upperm(m) == mu);
 
             ml = 3,0,0,0,
                  4,3,0,0,
@@ -549,8 +549,8 @@ namespace
                  0,4,6,7,
                  0,0,4,0;
 
-            DLIB_CASSERT(lowerm(m,3) == ml,"");
-            DLIB_CASSERT(upperm(m,4) == mu,"");
+            DLIB_TEST(lowerm(m,3) == ml);
+            DLIB_TEST(upperm(m,4) == mu);
 
         }
 
@@ -563,8 +563,8 @@ namespace
             row = 4,5,6;
             col = 3,6;
 
-            DLIB_CASSERT(rowm(m, 1, 3) == row,"");
-            DLIB_CASSERT(colm(m, 2, 2) == col,"");
+            DLIB_TEST(rowm(m, 1, 3) == row);
+            DLIB_TEST(colm(m, 2, 2) == col);
 
         }
 

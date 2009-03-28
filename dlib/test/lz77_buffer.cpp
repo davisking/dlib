@@ -37,10 +37,10 @@ namespace
         buf test(8,20);
         srand(static_cast<unsigned int>(time(0)));
 
-        DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,"");
-        DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
-        DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,test.get_history_buffer_limit());
-        DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,"");
+        DLIB_TEST(test.get_lookahead_buffer_size() == 0);
+        DLIB_TEST(test.get_history_buffer_size() == 0);
+        DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,test.get_history_buffer_limit());
+        DLIB_TEST(test.get_lookahead_buffer_limit() == 20);
 
 
         for (int g = 0; g < 2; ++g)
@@ -51,12 +51,12 @@ namespace
             {
                 test.add('a');
             }
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 20,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == 20);
 
 
             test.shift_buffers(5);
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 15,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == 15);
 
 
 
@@ -65,10 +65,10 @@ namespace
             test.find_match(index,length,5);
 
 
-            DLIB_CASSERT(length <= temp,
+            DLIB_TEST_MSG(length <= temp,
                          "length: " << length <<
                          "\ntemp: " << temp);
-            DLIB_CASSERT(test.get_lookahead_buffer_size() <= 15,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() <= 15);
 
 
         }
@@ -83,35 +83,35 @@ namespace
 
 
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_limit() == 256-20);
+            DLIB_TEST(test.get_lookahead_buffer_limit() == 20);
 
             unsigned long a,b, temp = test.get_lookahead_buffer_size();
             test.find_match(a,b,0);
-            DLIB_CASSERT(b <= temp,"");
-            DLIB_CASSERT(b == 0,"");
+            DLIB_TEST(b <= temp);
+            DLIB_TEST(b == 0);
 
             test.find_match(a,b,5);
-            DLIB_CASSERT(b == 0,"");
+            DLIB_TEST(b == 0);
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_limit() == 256-20);
+            DLIB_TEST(test.get_lookahead_buffer_limit() == 20);
 
 
 
             ostringstream sout;
-            sout << "DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_size() == 0,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,);\n";
-            sout << "DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,);\n";
-            sout << "DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_size() == 0,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,);\n";
-            sout << "DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_size() == 0,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_lookahead_buffer_limit() == 20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_size() == 0,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_lookahead_buffer_limit() == 20,);\n";
             istringstream sin(sout.str());
 
             sout.str("");
@@ -125,29 +125,29 @@ namespace
             ch = sin.get();
             sbuffer[0] = ch; sbuffer.rotate_left(1);
             test.add(ch);
-            DLIB_CASSERT(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 1,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,"");
+            DLIB_TEST(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch);
+            DLIB_TEST(test.get_lookahead_buffer_size() == 1);
+            DLIB_TEST(test.get_history_buffer_size() == 0);
+            DLIB_TEST(test.get_lookahead_buffer_limit() == 20);
 
 
 
             ch = sin.get();
             sbuffer[0] = ch; sbuffer.rotate_left(1);
             test.add(ch);
-            DLIB_CASSERT(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 2,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,"");
+            DLIB_TEST(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch);
+            DLIB_TEST(test.get_lookahead_buffer_size() == 2);
+            DLIB_TEST(test.get_history_buffer_size() == 0);
+            DLIB_TEST(test.get_lookahead_buffer_limit() == 20);
 
 
 
             ch = sin.get();
             sbuffer[0] = ch; sbuffer.rotate_left(1);
             test.add(ch);
-            DLIB_CASSERT(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 3,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
+            DLIB_TEST(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch);
+            DLIB_TEST(test.get_lookahead_buffer_size() == 3);
+            DLIB_TEST(test.get_history_buffer_size() == 0);
 
             // add 17 chars to test so that the lookahead buffer will be full
             for (int i = 0; i < 17; ++i)
@@ -155,20 +155,20 @@ namespace
                 ch = sin.get();
                 sbuffer[0] = ch; sbuffer.rotate_left(1);
                 test.add(ch);
-                DLIB_CASSERT(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch,"");
+                DLIB_TEST(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch);
             }
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 20,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
-            DLIB_CASSERT(test.lookahead_buffer(0) == sbuffer[20],"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == 20);
+            DLIB_TEST(test.get_history_buffer_size() == 0);
+            DLIB_TEST(test.lookahead_buffer(0) == sbuffer[20]);
 
 
             ch = sin.get();
             sbuffer[0] = ch; sbuffer.rotate_left(1);
             test.add(ch);
-            DLIB_CASSERT(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 20,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 1,"");
+            DLIB_TEST(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch);
+            DLIB_TEST(test.get_lookahead_buffer_size() == 20);
+            DLIB_TEST(test.get_history_buffer_size() == 1);
 
 
 
@@ -181,9 +181,9 @@ namespace
             {
                 sbuffer[0] = ch; sbuffer.rotate_left(1);
                 test.add(ch);
-                DLIB_CASSERT(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch,"");                    
-                DLIB_CASSERT(test.history_buffer(0) == sbuffer[21],"");
-                DLIB_CASSERT(test.history_buffer(1) == sbuffer[22],"");
+                DLIB_TEST(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch);                    
+                DLIB_TEST(test.history_buffer(0) == sbuffer[21]);
+                DLIB_TEST(test.history_buffer(1) == sbuffer[22]);
 
                 ch = sin.get();
             }
@@ -195,11 +195,11 @@ namespace
             sbuffer.rotate_right(1);
             for (unsigned int i = 0; i < test.get_history_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i));
             }
             for (unsigned int i = 0; i < test.get_lookahead_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i));
             }
             sbuffer.rotate_left(1);
 
@@ -217,13 +217,13 @@ namespace
             unsigned long match_index, match_length;
             unsigned long ltemp = test.get_lookahead_buffer_size();
             test.find_match(match_index,match_length,0);
-            DLIB_CASSERT(match_length <= ltemp,"");
+            DLIB_TEST(match_length <= ltemp);
 
 
             // verify the match with sbuffer
             for (unsigned int i = 0; i < match_length; ++i)
             {
-                DLIB_CASSERT(sbuffer[19-i] == sbuffer[match_index+20-i],i);
+                DLIB_TEST_MSG(sbuffer[19-i] == sbuffer[match_index+20-i],i);
             }
 
 
@@ -238,27 +238,27 @@ namespace
             test.clear();
 
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_limit() == 256-20);
+            DLIB_TEST(test.get_lookahead_buffer_limit() == 20);
 
 
             sbuf sbuffer;
             sbuffer.set_size(8);
 
             ostringstream sout;
-            sout << "DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_size() == 0,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,);\n";
-            sout << "DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,);\n";
-            sout << "DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,);\n";
-            sout << "DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,);\n";
-            sout << "DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,);\n";
-            sout << "DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_size() == 0,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_lookahead_buffer_limit() == 20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_lookahead_buffer_limit() == 20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_lookahead_buffer_size() == 0,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n";
+            sout << "DLIB_TEST_MSG(test.get_history_buffer_limit() == 256-20,);\n";
             istringstream sin(sout.str());
 
             unsigned char ch;
@@ -274,11 +274,11 @@ namespace
             sbuffer.rotate_right(1);
             for (unsigned int i = 0; i < test.get_history_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i));
             }
             for (unsigned int i = 0; i < test.get_lookahead_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i));
             }
             sbuffer.rotate_left(1);
 
@@ -288,15 +288,15 @@ namespace
             unsigned long match_index, match_length;
             unsigned long ltemp = test.get_lookahead_buffer_size();
             test.find_match(match_index,match_length,0);
-            DLIB_CASSERT(match_length <= ltemp,"");
+            DLIB_TEST(match_length <= ltemp);
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 20-match_length,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == 20-match_length);
 
             sbuffer.rotate_right(1);  // do this because we never put anything in sbuffer[0]
             // verify the match with sbuffer
             for (unsigned int i = 0; i < match_length; ++i)
             {
-                DLIB_CASSERT(sbuffer[i+20-match_length] == sbuffer[i+1+match_index+20-match_length],"");
+                DLIB_TEST(sbuffer[i+20-match_length] == sbuffer[i+1+match_index+20-match_length]);
             }
             sbuffer.rotate_left(1);  // free up sbuffer[0] for new data
 
@@ -342,11 +342,11 @@ namespace
             sbuffer.rotate_right(1);
             for (unsigned int i = 0; i < test.get_history_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i));
             }
             for (unsigned int i = 0; i < test.get_lookahead_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i));
             }
             sbuffer.rotate_left(1);
 
@@ -356,14 +356,14 @@ namespace
             test.find_match(match_index,match_length,10+g);
 
             if (match_length > 0)
-                DLIB_CASSERT(match_length >= static_cast<unsigned int>(10+g) , "");
+                DLIB_TEST(match_length >= static_cast<unsigned int>(10+g) );
 
 
             sbuffer.rotate_right(1);  // do this because we never put anything in sbuffer[0]
             // verify the match with sbuffer
             for (unsigned int i = 0; i < match_length; ++i)
             {
-                DLIB_CASSERT(sbuffer[i+20-match_length] == sbuffer[i+1+match_index+20-match_length],"");
+                DLIB_TEST(sbuffer[i+20-match_length] == sbuffer[i+1+match_index+20-match_length]);
             }
             sbuffer.rotate_left(1);  // free up sbuffer[0] for new data
 
@@ -381,10 +381,10 @@ namespace
         {
             test.clear();
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_limit() == 256-20);
+            DLIB_TEST(test.get_lookahead_buffer_limit() == 20);
 
 
             sbuf sbuffer;
@@ -417,11 +417,11 @@ namespace
 
             for (unsigned int i = 0; i < test.get_history_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i));
             }
             for (unsigned int i = 0; i < test.get_lookahead_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i));
             }
             sbuffer.rotate_left(1);
 
@@ -430,16 +430,16 @@ namespace
             unsigned long match_index, match_length;
             unsigned long lookahead_size_before = test.get_lookahead_buffer_size();
             test.find_match(match_index,match_length,0);
-            DLIB_CASSERT(match_length <= lookahead_size_before,"");
+            DLIB_TEST(match_length <= lookahead_size_before);
 
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == lookahead_size_before-match_length,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == lookahead_size_before-match_length);
 
             sbuffer.rotate_right(1);  // do this because we never put anything in sbuffer[0]
             // verify the match with sbuffer
             for (unsigned int i = 0; i < match_length; ++i)
             {
-                DLIB_CASSERT(sbuffer[19-i] == sbuffer[match_index+20-i],i);
+                DLIB_TEST_MSG(sbuffer[19-i] == sbuffer[match_index+20-i],i);
             }
             sbuffer.rotate_left(1);  // free up sbuffer[0] for new data
 
@@ -458,10 +458,10 @@ namespace
         {
             test.clear();
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_size() == 0,"");
-            DLIB_CASSERT(test.get_history_buffer_limit() == 256-20,"");
-            DLIB_CASSERT(test.get_lookahead_buffer_limit() == 20,"");
+            DLIB_TEST(test.get_lookahead_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_size() == 0);
+            DLIB_TEST(test.get_history_buffer_limit() == 256-20);
+            DLIB_TEST(test.get_lookahead_buffer_limit() == 20);
 
 
             sbuf sbuffer;
@@ -499,11 +499,11 @@ namespace
 
             for (unsigned int i = 0; i < test.get_history_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()+i] == test.history_buffer(i));
             }
             for (unsigned int i = 0; i < test.get_lookahead_buffer_size(); ++i)
             {
-                DLIB_CASSERT(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i),"");
+                DLIB_TEST(sbuffer[test.get_lookahead_buffer_limit()-1-i] == test.lookahead_buffer(i));
             }
             sbuffer.rotate_left(1);
 
@@ -516,20 +516,20 @@ namespace
 
             if (match_length != 0)
             {
-                DLIB_CASSERT(match_index < history_size_before,
+                DLIB_TEST_MSG(match_index < history_size_before,
                              "match_index: " << match_index <<
                              "\nhistory_size_before: " << history_size_before);
 
             }
 
 
-            DLIB_CASSERT(test.get_lookahead_buffer_size() == lookahead_size_before-match_length,"");            
+            DLIB_TEST(test.get_lookahead_buffer_size() == lookahead_size_before-match_length);            
 
             sbuffer.rotate_right(1);  // do this because we never put anything in sbuffer[0]
             // verify the match with sbuffer
             for (unsigned int i = 0; i < match_length; ++i)
             {
-                DLIB_CASSERT(sbuffer[19-i] == sbuffer[match_index+20-i],i);
+                DLIB_TEST_MSG(sbuffer[19-i] == sbuffer[match_index+20-i],i);
             }
             sbuffer.rotate_left(1);  // free up sbuffer[0] for new data
 

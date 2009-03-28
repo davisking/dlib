@@ -35,110 +35,110 @@ namespace
 
         dlog << LTRACE << 1;
 
-        DLIB_CASSERT(string_cast<int>("5") == 5,string_cast<int>("5"));
-        DLIB_CASSERT(string_cast<int>("0x5") == 5,string_cast<int>("0x5"));
-        DLIB_CASSERT(string_cast<int>("0xA") == 10,string_cast<int>("0xA"));
-        DLIB_CASSERT(string_cast<float>("0.5") == 0.5,"");
-        DLIB_CASSERT(string_cast<std::string>("0.5 !") == "0.5 !","");
-        DLIB_CASSERT(string_cast<bool>("true") == true,"");
-        DLIB_CASSERT(string_cast<bool>("false") == false,"");
-        DLIB_CASSERT(string_cast<bool>("TRUE") == true,"");
-        DLIB_CASSERT(string_cast<bool>("FALSE") == false,"");
+        DLIB_TEST_MSG(string_cast<int>("5") == 5,string_cast<int>("5"));
+        DLIB_TEST_MSG(string_cast<int>("0x5") == 5,string_cast<int>("0x5"));
+        DLIB_TEST_MSG(string_cast<int>("0xA") == 10,string_cast<int>("0xA"));
+        DLIB_TEST(string_cast<float>("0.5") == 0.5);
+        DLIB_TEST(string_cast<std::string>("0.5 !") == "0.5 !");
+        DLIB_TEST(string_cast<bool>("true") == true);
+        DLIB_TEST(string_cast<bool>("false") == false);
+        DLIB_TEST(string_cast<bool>("TRUE") == true);
+        DLIB_TEST(string_cast<bool>("FALSE") == false);
 
         dlog << LTRACE << 2;
 
-        DLIB_CASSERT(string_cast<int>(L"5") == 5,string_cast<int>("5"));
+        DLIB_TEST_MSG(string_cast<int>(L"5") == 5,string_cast<int>("5"));
         dlog << LTRACE << 2.1;
-        DLIB_CASSERT(string_cast<int>(L"0x5") == 5,string_cast<int>("0x5"));
-        DLIB_CASSERT(string_cast<int>(L"0xA") == 10,string_cast<int>("0xA"));
-        DLIB_CASSERT(string_cast<float>(L"0.5") == 0.5,"");
-        DLIB_CASSERT(string_cast<std::string>(L"0.5 !") == "0.5 !","");
-        DLIB_CASSERT(string_cast<bool>(L"true") == true,"");
-        DLIB_CASSERT(string_cast<bool>(L"false") == false,"");
-        DLIB_CASSERT(string_cast<bool>(L"TRUE") == true,"");
-        DLIB_CASSERT(string_cast<bool>(L"FALSE") == false,"");
+        DLIB_TEST_MSG(string_cast<int>(L"0x5") == 5,string_cast<int>("0x5"));
+        DLIB_TEST_MSG(string_cast<int>(L"0xA") == 10,string_cast<int>("0xA"));
+        DLIB_TEST(string_cast<float>(L"0.5") == 0.5);
+        DLIB_TEST(string_cast<std::string>(L"0.5 !") == "0.5 !");
+        DLIB_TEST(string_cast<bool>(L"true") == true);
+        DLIB_TEST(string_cast<bool>(L"false") == false);
+        DLIB_TEST(string_cast<bool>(L"TRUE") == true);
+        DLIB_TEST(string_cast<bool>(L"FALSE") == false);
 
         dlog << LTRACE << 3;
 
-        DLIB_CASSERT(cast_to_string(5) == "5","");
-        DLIB_CASSERT(cast_to_string(5.5) == "5.5","");
+        DLIB_TEST(cast_to_string(5) == "5");
+        DLIB_TEST(cast_to_string(5.5) == "5.5");
 
         dlog << LTRACE << 4;
-        DLIB_CASSERT(cast_to_wstring(5) == L"5","");
-        DLIB_CASSERT(cast_to_wstring(5.5) == L"5.5","");
+        DLIB_TEST(cast_to_wstring(5) == L"5");
+        DLIB_TEST(cast_to_wstring(5.5) == L"5.5");
         dlog << LTRACE << 5;
-        DLIB_CASSERT(toupper(a) == A,"");
-        DLIB_CASSERT(toupper(A) == A,"");
-        DLIB_CASSERT(tolower(a) == a,"");
-        DLIB_CASSERT(tolower(A) == a,"");
-        DLIB_CASSERT(trim(a) == "davis","");
-        DLIB_CASSERT(ltrim(a) == "davis  ","");
-        DLIB_CASSERT(rtrim(a) == "  davis","");
-        DLIB_CASSERT(trim(string_cast<wstring>(a)) == L"davis","");
-        DLIB_CASSERT(ltrim(string_cast<wstring>(a)) == L"davis  ","");
-        DLIB_CASSERT(rtrim(string_cast<wstring>(a)) == L"  davis","");
-        DLIB_CASSERT(trim(a, " ") == "davis","");
-        DLIB_CASSERT(ltrim(a, " ") == "davis  ","");
-        DLIB_CASSERT(rtrim(a, " ") == "  davis","");
-        DLIB_CASSERT(trim(empty) == "","");
-        DLIB_CASSERT(ltrim(empty) == "","");
-        DLIB_CASSERT(rtrim(empty) == "","");
-        DLIB_CASSERT(trim(string_cast<wstring>(empty)) == L"","");
-        DLIB_CASSERT(ltrim(string_cast<wstring>(empty)) == L"","");
-        DLIB_CASSERT(rtrim(string_cast<wstring>(empty)) == L"","");
-        DLIB_CASSERT(trim(empty, " ") == "","");
-        DLIB_CASSERT(ltrim(empty, " ") == "","");
-        DLIB_CASSERT(rtrim(empty, " ") == "","");
+        DLIB_TEST(toupper(a) == A);
+        DLIB_TEST(toupper(A) == A);
+        DLIB_TEST(tolower(a) == a);
+        DLIB_TEST(tolower(A) == a);
+        DLIB_TEST(trim(a) == "davis");
+        DLIB_TEST(ltrim(a) == "davis  ");
+        DLIB_TEST(rtrim(a) == "  davis");
+        DLIB_TEST(trim(string_cast<wstring>(a)) == L"davis");
+        DLIB_TEST(ltrim(string_cast<wstring>(a)) == L"davis  ");
+        DLIB_TEST(rtrim(string_cast<wstring>(a)) == L"  davis");
+        DLIB_TEST(trim(a, " ") == "davis");
+        DLIB_TEST(ltrim(a, " ") == "davis  ");
+        DLIB_TEST(rtrim(a, " ") == "  davis");
+        DLIB_TEST(trim(empty) == "");
+        DLIB_TEST(ltrim(empty) == "");
+        DLIB_TEST(rtrim(empty) == "");
+        DLIB_TEST(trim(string_cast<wstring>(empty)) == L"");
+        DLIB_TEST(ltrim(string_cast<wstring>(empty)) == L"");
+        DLIB_TEST(rtrim(string_cast<wstring>(empty)) == L"");
+        DLIB_TEST(trim(empty, " ") == "");
+        DLIB_TEST(ltrim(empty, " ") == "");
+        DLIB_TEST(rtrim(empty, " ") == "");
 
 
         dlog << LTRACE << 6;
-        DLIB_CASSERT( (lpad(wstring(L"davis"), 10) == L"     davis"), ""); 
-        DLIB_CASSERT( (rpad(wstring(L"davis"), 10) == L"davis     "), ""); 
-        DLIB_CASSERT( (pad(wstring(L"davis"), 10) ==  L"  davis   "), ""); 
+        DLIB_TEST( (lpad(wstring(L"davis"), 10) == L"     davis")); 
+        DLIB_TEST( (rpad(wstring(L"davis"), 10) == L"davis     ")); 
+        DLIB_TEST( (pad(wstring(L"davis"), 10) ==  L"  davis   ")); 
 
-        DLIB_CASSERT( (lpad(string("davis"), -10) == "davis"), ""); 
-        DLIB_CASSERT( (rpad(string("davis"), -10) == "davis"), ""); 
-        DLIB_CASSERT( (pad(string("davis"), -10) == "davis"), ""); 
-        DLIB_CASSERT( (lpad(string("davis"), 10) == "     davis"), ""); 
-        DLIB_CASSERT( (rpad(string("davis"), 10) == "davis     "), ""); 
-        DLIB_CASSERT( (pad(string("davis"), 10) ==  "  davis   "), ""); 
-        DLIB_CASSERT( (lpad(string("davis"), 10, string("*")) == "*****davis"), ""); 
-        DLIB_CASSERT( (rpad(string("davis"), 10, string("*")) == "davis*****"), ""); 
-        DLIB_CASSERT( (pad(string("davis"), 10, string("*")) == "**davis***"), ""); 
-        DLIB_CASSERT( (lpad(string("davis"), 10, string("_-")) == "_-_-_davis"), ""); 
-        DLIB_CASSERT( (rpad(string("davis"), 10, string("_-")) == "davis_-_-_"), ""); 
-        DLIB_CASSERT( (pad(string("davis"), 10, string("_-")) == "_-davis_-_"), ""); 
-        DLIB_CASSERT( (lpad(string("davis"), 10, string("willy wanka")) == "willydavis"), ""); 
-        DLIB_CASSERT( (rpad(string("davis"), 10, string("willy wanka")) == "daviswilly"), ""); 
-        DLIB_CASSERT( (pad(string("davis"), 10, string("willy wanka")) == "widaviswil"), ""); 
-        DLIB_CASSERT( (lpad(string("davis"), 10, "*")) == "*****davis", ""); 
-        DLIB_CASSERT( (rpad(string("davis"), 10, "*") == "davis*****"), ""); 
-        DLIB_CASSERT( (pad(string("davis"), 10, "*") == "**davis***"), ""); 
-        DLIB_CASSERT( (lpad(string("davis"), 10, "_-") == "_-_-_davis"), ""); 
-        DLIB_CASSERT( (rpad(string("davis"), 10, "_-") == "davis_-_-_"), ""); 
-        DLIB_CASSERT( (pad(string("davis"), 10, "_-") == "_-davis_-_"), ""); 
-        DLIB_CASSERT( (lpad(string("davis"), 10, "willy wanka") == "willydavis"), ""); 
-        DLIB_CASSERT( (rpad(string("davis"), 10, "willy wanka") == "daviswilly"), ""); 
-        DLIB_CASSERT( (pad(string("davis"), 10, "willy wanka") == "widaviswil"), ""); 
+        DLIB_TEST( (lpad(string("davis"), -10) == "davis")); 
+        DLIB_TEST( (rpad(string("davis"), -10) == "davis")); 
+        DLIB_TEST( (pad(string("davis"), -10) == "davis")); 
+        DLIB_TEST( (lpad(string("davis"), 10) == "     davis")); 
+        DLIB_TEST( (rpad(string("davis"), 10) == "davis     ")); 
+        DLIB_TEST( (pad(string("davis"), 10) ==  "  davis   ")); 
+        DLIB_TEST( (lpad(string("davis"), 10, string("*")) == "*****davis")); 
+        DLIB_TEST( (rpad(string("davis"), 10, string("*")) == "davis*****")); 
+        DLIB_TEST( (pad(string("davis"), 10, string("*")) == "**davis***")); 
+        DLIB_TEST( (lpad(string("davis"), 10, string("_-")) == "_-_-_davis")); 
+        DLIB_TEST( (rpad(string("davis"), 10, string("_-")) == "davis_-_-_")); 
+        DLIB_TEST( (pad(string("davis"), 10, string("_-")) == "_-davis_-_")); 
+        DLIB_TEST( (lpad(string("davis"), 10, string("willy wanka")) == "willydavis")); 
+        DLIB_TEST( (rpad(string("davis"), 10, string("willy wanka")) == "daviswilly")); 
+        DLIB_TEST( (pad(string("davis"), 10, string("willy wanka")) == "widaviswil")); 
+        DLIB_TEST( (lpad(string("davis"), 10, "*")) == "*****davis"); 
+        DLIB_TEST( (rpad(string("davis"), 10, "*") == "davis*****")); 
+        DLIB_TEST( (pad(string("davis"), 10, "*") == "**davis***")); 
+        DLIB_TEST( (lpad(string("davis"), 10, "_-") == "_-_-_davis")); 
+        DLIB_TEST( (rpad(string("davis"), 10, "_-") == "davis_-_-_")); 
+        DLIB_TEST( (pad(string("davis"), 10, "_-") == "_-davis_-_")); 
+        DLIB_TEST( (lpad(string("davis"), 10, "willy wanka") == "willydavis")); 
+        DLIB_TEST( (rpad(string("davis"), 10, "willy wanka") == "daviswilly")); 
+        DLIB_TEST( (pad(string("davis"), 10, "willy wanka") == "widaviswil")); 
         dlog << LTRACE << 7;
 
         a = "file.txt";
-        DLIB_CASSERT( (left_substr(a,string(".")) == "file"), "");
-        DLIB_CASSERT( (left_substr(a,".") == "file"), "");
-        DLIB_CASSERT( (right_substr(a,string(".")) == "txt"), "");
-        DLIB_CASSERT( (right_substr(a,".") == "txt"), "");
+        DLIB_TEST( (left_substr(a,string(".")) == "file"));
+        DLIB_TEST( (left_substr(a,".") == "file"));
+        DLIB_TEST( (right_substr(a,string(".")) == "txt"));
+        DLIB_TEST( (right_substr(a,".") == "txt"));
 
-        DLIB_CASSERT( (left_substr(a," ") == "file.txt"), "");
-        DLIB_CASSERT( (right_substr(a," ") == ""), "");
+        DLIB_TEST( (left_substr(a," ") == "file.txt"));
+        DLIB_TEST( (right_substr(a," ") == ""));
 
-        DLIB_CASSERT( (left_substr(a,"") == "file.txt"), "");
-        DLIB_CASSERT( (right_substr(a,"") == ""), "");
+        DLIB_TEST( (left_substr(a,"") == "file.txt"));
+        DLIB_TEST( (right_substr(a,"") == ""));
 
         wstring ws = L"file.txt";
-        DLIB_CASSERT( (left_substr(ws,wstring(L".")) == L"file"), "");
-        DLIB_CASSERT( (left_substr(ws,L".") == L"file"), L"");
-        DLIB_CASSERT( (right_substr(ws,wstring(L".")) == L"txt"), "");
-        DLIB_CASSERT( (right_substr(ws,L".") == L"txt"), L"");
+        DLIB_TEST( (left_substr(ws,wstring(L".")) == L"file"));
+        DLIB_TEST_MSG( (left_substr(ws,L".") == L"file"), L"");
+        DLIB_TEST( (right_substr(ws,wstring(L".")) == L"txt"));
+        DLIB_TEST_MSG( (right_substr(ws,L".") == L"txt"), L"");
 
 
         dlog << LTRACE << 8;
@@ -158,12 +158,12 @@ namespace
             c = 0;
             deserialize(w,sin);
             deserialize(c,sin);
-            DLIB_CASSERT(w == 85,"");
-            DLIB_CASSERT(c == 4,"");
+            DLIB_TEST(w == 85);
+            DLIB_TEST(c == 4);
             deserialize(w,sin);
             deserialize(c,sin);
-            DLIB_CASSERT(w == static_cast<wchar_t>(-1),"");
-            DLIB_CASSERT(c == static_cast<char>(-1),"");
+            DLIB_TEST(w == static_cast<wchar_t>(-1));
+            DLIB_TEST(c == static_cast<char>(-1));
 
             wstring str = L"test string";
 
@@ -173,7 +173,7 @@ namespace
             sin.str(sout.str());
             str = L"something else";
             deserialize(str,sin);
-            DLIB_CASSERT(str == L"test string","");
+            DLIB_TEST(str == L"test string");
         }
     }
 

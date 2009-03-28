@@ -59,12 +59,12 @@ namespace
 
          
 
-            DLIB_CASSERT(e.stream_is_set() == false,"");
+            DLIB_TEST(e.stream_is_set() == false);
 
             e.set_stream(sout);
 
-            DLIB_CASSERT(e.stream_is_set() == true,"");
-            DLIB_CASSERT(&e.get_stream() == &sout,"");
+            DLIB_TEST(e.stream_is_set() == true);
+            DLIB_TEST(&e.get_stream() == &sout);
 
             unsigned char ch;
             
@@ -98,14 +98,14 @@ namespace
                 counts[ch] += 1;
             }
 
-            DLIB_CASSERT(e.stream_is_set() == true,"");
-            DLIB_CASSERT(&e.get_stream() == &sout,"");
+            DLIB_TEST(e.stream_is_set() == true);
+            DLIB_TEST(&e.get_stream() == &sout);
             
 
 
             e.clear();
 
-            DLIB_CASSERT(e.stream_is_set() == false,"");
+            DLIB_TEST(e.stream_is_set() == false);
 
 
             // *****************************************
@@ -114,18 +114,18 @@ namespace
             decoder d;
 
 
-            DLIB_CASSERT(d.stream_is_set() == false,"");
-            DLIB_CASSERT(d.get_target_called() == false,"");
+            DLIB_TEST(d.stream_is_set() == false);
+            DLIB_TEST(d.get_target_called() == false);
 
             sin.str(sout.str());
             sout.str("");
 
             d.set_stream(sin);
 
-            DLIB_CASSERT(d.get_target_called() == false,"");
+            DLIB_TEST(d.get_target_called() == false);
 
-            DLIB_CASSERT(d.stream_is_set() == true,"");
-            DLIB_CASSERT(&d.get_stream() == &sin,"");
+            DLIB_TEST(d.stream_is_set() == true);
+            DLIB_TEST(&d.get_stream() == &sin);
 
             for (int i = 0; i < 256; ++i)
             {
@@ -149,13 +149,13 @@ namespace
                     }
                 }
 
-                DLIB_CASSERT(d.get_target_called() == false,"");
+                DLIB_TEST(d.get_target_called() == false);
 
                 unsigned long target = d.get_target(total);
 
-                DLIB_CASSERT(target < total,"");
+                DLIB_TEST(target < total);
 
-                DLIB_CASSERT(d.get_target_called() == true,"");
+                DLIB_TEST(d.get_target_called() == true);
 
 
                 unsigned long low_count;
@@ -178,19 +178,19 @@ namespace
 
 
                 d.decode(low_count,high_count);
-                DLIB_CASSERT(d.get_target_called() == false,"");
+                DLIB_TEST(d.get_target_called() == false);
                 ++total;
                 counts[ch] += 1;
 
             }
 
-            DLIB_CASSERT(d.stream_is_set() == true,"");
-            DLIB_CASSERT(&d.get_stream() == &sin,"");
+            DLIB_TEST(d.stream_is_set() == true);
+            DLIB_TEST(&d.get_stream() == &sin);
 
             d.clear();
 
-            DLIB_CASSERT(d.stream_is_set() == false,"");
-            DLIB_CASSERT(sout.str().size() == input.size(),"the test script is buggy");
+            DLIB_TEST(d.stream_is_set() == false);
+            DLIB_TEST_MSG(sout.str().size() == input.size(),"the test script is buggy");
             
 
             if (sout.str() == input)
@@ -264,7 +264,7 @@ namespace
             for (int i = 0; i < num; ++i)
             {
                 unsigned long N = d.get_target(total[i]);                
-                DLIB_CASSERT(low_count[i] <= N && N < high_count[i],"");
+                DLIB_TEST(low_count[i] <= N && N < high_count[i]);
                 d.decode(low_count[i],high_count[i]);
             }
 
@@ -273,13 +273,13 @@ namespace
 
 
 
-            DLIB_CASSERT(sin.rdbuf()->sgetc() != EOF,"num: " << num);
-            DLIB_CASSERT(sin.rdbuf()->sgetc() == 'a',
+            DLIB_TEST_MSG(sin.rdbuf()->sgetc() != EOF,"num: " << num);
+            DLIB_TEST_MSG(sin.rdbuf()->sgetc() == 'a',
                          "sin.rdbuf()->sgetc() == " << (char)sin.rdbuf()->sgetc() <<
                          "\nnum: " << num
             );
-            DLIB_CASSERT(sin.rdbuf()->sbumpc() == 'a',"");
-            DLIB_CASSERT(sin.rdbuf()->sgetc() == EOF,"");
+            DLIB_TEST(sin.rdbuf()->sbumpc() == 'a');
+            DLIB_TEST(sin.rdbuf()->sgetc() == EOF);
 
         } // for (int k = 0; k < 10000; ++k)
 
@@ -298,7 +298,7 @@ namespace
             d.set_stream(sin);
             unsigned long total = ::rand()%256 + 20;
             unsigned long target = d.get_target(total);
-            DLIB_CASSERT(target<total,"");
+            DLIB_TEST(target<total);
 
             for (int i = 0; i < 30; ++i)
             {
@@ -311,7 +311,7 @@ namespace
 
                 d.decode(low_count,high_count);
                 target = d.get_target(total);
-                DLIB_CASSERT(target<total,"target: " << target << "    total: " << total);
+                DLIB_TEST_MSG(target<total,"target: " << target << "    total: " << total);
             }
         }
 
@@ -365,12 +365,12 @@ namespace
                 {
 
                     int k = 0;
-                    DLIB_CASSERT(temp != temp2,"");
+                    DLIB_TEST(temp != temp2);
                     while (temp[k] == temp2[k])++k;
                 }
 
 
-                DLIB_CASSERT(temp2 == "","")  
+                DLIB_TEST_MSG(temp2 == "","")  
             }
         }
 
@@ -395,7 +395,7 @@ namespace
             string::size_type pos = temp.find_first_not_of("e");
             temp = temp.substr(pos);
         }
-        DLIB_CASSERT(temp == "","decoded string: \"" << temp << "\"") /**/
+        DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"") /**/
 
 
             dlog << LTRACE << 5;
@@ -403,16 +403,16 @@ namespace
         print_spinner();
 
         temp = "davis";
-        temp = test<encoder,decoder>(temp);  DLIB_CASSERT(temp == "","decoded string: \"" << temp << "\"")
+        temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")
 
             temp = "";
-        temp = test<encoder,decoder>(temp);  DLIB_CASSERT(temp == "","decoded string: \"" << temp << "\"")
+        temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")
 
             // test for each single character
             for ( int i = 0; i <= 255; ++i)
             {
                 temp = (unsigned char)i;
-                temp = test<encoder,decoder>(temp);  DLIB_CASSERT(temp == "","decoded string: \"" << temp << "\"")                  
+                temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")                  
             } 
 
         dlog << LTRACE << 6;
@@ -423,7 +423,7 @@ namespace
         {
             temp = temp + temp;
         }
-        temp = test<encoder,decoder>(temp);  DLIB_CASSERT(temp == "","decoded string: \"" << temp << "\"")
+        temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")
 
             dlog << LTRACE << 7;
 
@@ -437,7 +437,7 @@ namespace
                 int a = ::rand()%256;
                 temp += (unsigned char)a;                
             } 
-            temp = test<encoder,decoder>(temp);  DLIB_CASSERT(temp == "","decoded string: \"" << temp << "\"")                    
+            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")                    
         }
 
 
@@ -457,7 +457,7 @@ namespace
                 int a = ::rand()%256;
                 temp += (unsigned char)a;                
             }               
-            temp = test<encoder,decoder>(temp);  DLIB_CASSERT(temp == "","seed: " << seed)  
+            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","seed: " << seed)  
         }
 
 
@@ -478,7 +478,7 @@ namespace
             string::size_type pos = temp.find_first_not_of(" ");
             temp = temp.substr(pos);
         }
-        DLIB_CASSERT(temp == "","decoded string: \"" << temp << "\"")/**/
+        DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")/**/
 
 
 
@@ -504,7 +504,7 @@ namespace
         temp += temp2;
         print_spinner();
         temp = test<encoder,decoder>(temp); 
-        DLIB_CASSERT(temp == "","");
+        DLIB_TEST(temp == "");
 
 
 

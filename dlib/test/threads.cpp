@@ -65,7 +65,7 @@ namespace
                 sm.wait();
 
 
-            DLIB_CASSERT(!failure,"");
+            DLIB_TEST(!failure);
         }
 
         void thread_end_handler (

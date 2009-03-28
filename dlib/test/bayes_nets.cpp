@@ -75,10 +75,10 @@ namespace
         ostringstream sout;
         serialize(bn, sout);
         bn.clear();
-        DLIB_CASSERT(bn.number_of_nodes() == 0,"");
+        DLIB_TEST(bn.number_of_nodes() == 0);
         istringstream sin(sout.str());
         deserialize(bn, sin);
-        DLIB_CASSERT(bn.number_of_nodes() == 3,"");
+        DLIB_TEST(bn.number_of_nodes() == 3);
     }
 
 
@@ -209,10 +209,10 @@ namespace
         ostringstream sout;
         serialize(bn, sout);
         bn.clear();
-        DLIB_CASSERT(bn.number_of_nodes() == 0,"");
+        DLIB_TEST(bn.number_of_nodes() == 0);
         istringstream sin(sout.str());
         deserialize(bn, sin);
-        DLIB_CASSERT(bn.number_of_nodes() == 8,"");
+        DLIB_TEST(bn.number_of_nodes() == 8);
     }
 
 
@@ -242,36 +242,36 @@ namespace
         matrix<double,1,2> dist;
 
         dist = solution.probability(A);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.01 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.01 ) < 1e-5);
 
         dist = solution.probability(T);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.0104) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.0104) < 1e-5);
 
         dist = solution.probability(O);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.064828) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.064828) < 1e-5);
 
         dist = solution.probability(X);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.11029004) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.11029004) < 1e-5);
 
         dist = solution.probability(L);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.055) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.055) < 1e-5);
 
         dist = solution.probability(S);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.5) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.5) < 1e-5);
 
         dist = solution.probability(B);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.4499999) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.4499999) < 1e-5);
 
         dist = solution.probability(D);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.4359706 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.4359706 ) < 1e-5);
 
         // now lets modify the probabilities of the bayesian network by making O 
         // not a deterministic node anymore but otherwise leave the network alone
@@ -287,39 +287,39 @@ namespace
 
         // reload the solution now that we have changed the probabilities of node O
         bayesian_network_join_tree(bn, join_tree).swap(solution);
-        DLIB_CASSERT(solution.number_of_nodes() == bn.number_of_nodes(),"");
+        DLIB_TEST(solution.number_of_nodes() == bn.number_of_nodes());
 
         dist = solution.probability(A);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 1.0 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 1.0 ) < 1e-5);
 
         dist = solution.probability(T);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.253508694039 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.253508694039 ) < 1e-5);
 
         dist = solution.probability(O);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.77856184024 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.77856184024 ) < 1e-5);
 
         dist = solution.probability(X);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 1.0 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 1.0 ) < 1e-5);
 
         dist = solution.probability(L);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.5070173880 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.5070173880 ) < 1e-5);
 
         dist = solution.probability(S);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 1.0 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 1.0 ) < 1e-5);
 
         dist = solution.probability(B);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.6  ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.6  ) < 1e-5);
 
         dist = solution.probability(D);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.7535685520 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.7535685520 ) < 1e-5);
 
 
         // now lets test the bayesian_network_gibbs_sampler 
@@ -354,33 +354,33 @@ namespace
 
         counts /= rounds;
 
-        DLIB_CASSERT(abs(counts(A) - 1.0 ) < 1e-2,"");
-        DLIB_CASSERT(abs(counts(T) - 0.253508694039 ) < 1e-2,"");
-        DLIB_CASSERT(abs(counts(O) - 0.77856184024 ) < 1e-2,abs(counts(O) - 0.77856184024 ) );
-        DLIB_CASSERT(abs(counts(X) - 1.0 ) < 1e-2,"");
-        DLIB_CASSERT(abs(counts(L) - 0.5070173880 ) < 1e-2,"");
-        DLIB_CASSERT(abs(counts(S) - 1.0 ) < 1e-2,"");
-        DLIB_CASSERT(abs(counts(B) - 0.6  ) < 1e-2,"");
-        DLIB_CASSERT(abs(counts(D) - 0.7535685520 ) < 1e-2,"");
+        DLIB_TEST(abs(counts(A) - 1.0 ) < 1e-2);
+        DLIB_TEST(abs(counts(T) - 0.253508694039 ) < 1e-2);
+        DLIB_TEST_MSG(abs(counts(O) - 0.77856184024 ) < 1e-2,abs(counts(O) - 0.77856184024 ) );
+        DLIB_TEST(abs(counts(X) - 1.0 ) < 1e-2);
+        DLIB_TEST(abs(counts(L) - 0.5070173880 ) < 1e-2);
+        DLIB_TEST(abs(counts(S) - 1.0 ) < 1e-2);
+        DLIB_TEST(abs(counts(B) - 0.6  ) < 1e-2);
+        DLIB_TEST(abs(counts(D) - 0.7535685520 ) < 1e-2);
 
 
         setup_simple_network(bn);
         create_moral_graph(bn, join_tree);
         create_join_tree(join_tree, join_tree);
         bayesian_network_join_tree(bn, join_tree).swap(solution);
-        DLIB_CASSERT(solution.number_of_nodes() == bn.number_of_nodes(),"");
+        DLIB_TEST(solution.number_of_nodes() == bn.number_of_nodes());
 
         dist = solution.probability(A);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.1 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.1 ) < 1e-5);
 
         dist = solution.probability(T);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.5 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.5 ) < 1e-5);
 
         dist = solution.probability(S);
-        DLIB_CASSERT(abs(sum(dist) - 1.0) < 1e-5,"");
-        DLIB_CASSERT(abs(dist(1) - 0.5 ) < 1e-5,"");
+        DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
+        DLIB_TEST(abs(dist(1) - 0.5 ) < 1e-5);
 
 
     }

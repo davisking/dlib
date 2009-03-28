@@ -59,7 +59,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
 
             sin.str(wiki_encoded);
             test.decode(sin,sout);
-            DLIB_CASSERT(sout.str() == wiki_normal,
+            DLIB_TEST_MSG(sout.str() == wiki_normal,
                    "sout.str(): " << sout.str() <<
                    "\nwiki_normal: " << wiki_normal);
 
@@ -91,7 +91,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
             }
             sin.clear();
 
-            DLIB_CASSERT(a == b,
+            DLIB_TEST_MSG(a == b,
                    "a: \n" << a <<
                    "\n\nb: \n" << b);
 
@@ -104,7 +104,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
             sin.str(sout.str());
             sout.str("");
             test.decode(sin,sout);
-            DLIB_CASSERT(sout.str() == "","");
+            DLIB_TEST(sout.str() == "");
 
             sin.clear();
             sin.str("a");
@@ -113,7 +113,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
             sin.str(sout.str());
             sout.str("");
             test.decode(sin,sout);
-            DLIB_CASSERT(sout.str() == "a","");
+            DLIB_TEST(sout.str() == "a");
 
             sin.clear();
             sin.str("da");
@@ -122,7 +122,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
             sin.str(sout.str());
             sout.str("");
             test.decode(sin,sout);
-            DLIB_CASSERT(sout.str() == "da","");
+            DLIB_TEST(sout.str() == "da");
 
             sin.clear();
             sin.str("dav");
@@ -131,7 +131,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
             sin.str(sout.str());
             sout.str("");
             test.decode(sin,sout);
-            DLIB_CASSERT(sout.str() == "dav","");
+            DLIB_TEST(sout.str() == "dav");
 
             sin.clear();
             sin.str("davi");
@@ -140,7 +140,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
             sin.str(sout.str());
             sout.str("");
             test.decode(sin,sout);
-            DLIB_CASSERT(sout.str() == "davi","");
+            DLIB_TEST(sout.str() == "davi");
 
 
             for (int i = 0; i < 1000; ++i)
@@ -165,7 +165,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
                 sout.str("");
                 test.decode(sin,sout);
 
-                DLIB_CASSERT(str == sout.str(),"");
+                DLIB_TEST(str == sout.str());
 
 
             }
@@ -176,7 +176,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
         }
         catch (typename base64::decode_error& e)
         {
-            DLIB_CASSERT(false, 
+            DLIB_TEST_MSG(false, 
                 "decode_error thrown when it shouldn't have been (" << seed << "):\n " 
                  << e.info);
         }

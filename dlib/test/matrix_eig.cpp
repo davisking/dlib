@@ -76,20 +76,20 @@ namespace
 
         eigenvalue_decomposition<matrix_type> test(m);
 
-        DLIB_CASSERT(test.dim() == m.nr(), "");
+        DLIB_TEST(test.dim() == m.nr());
 
         // make sure all the various ways of asking for the eigenvalues are actually returning a
         // consistent set of eigenvalues.
-        DLIB_CASSERT(equal(real(test.get_eigenvalues()), test.get_real_eigenvalues(), eps), ""); 
-        DLIB_CASSERT(equal(imag(test.get_eigenvalues()), test.get_imag_eigenvalues(), eps), ""); 
-        DLIB_CASSERT(equal(real(diag(test.get_d())), test.get_real_eigenvalues(), eps), ""); 
-        DLIB_CASSERT(equal(imag(diag(test.get_d())), test.get_imag_eigenvalues(), eps), ""); 
+        DLIB_TEST(equal(real(test.get_eigenvalues()), test.get_real_eigenvalues(), eps)); 
+        DLIB_TEST(equal(imag(test.get_eigenvalues()), test.get_imag_eigenvalues(), eps)); 
+        DLIB_TEST(equal(real(diag(test.get_d())), test.get_real_eigenvalues(), eps)); 
+        DLIB_TEST(equal(imag(diag(test.get_d())), test.get_imag_eigenvalues(), eps)); 
 
         matrix<type> eig1 ( real_eigenvalues(m));
         matrix<type> eig2 ( test.get_real_eigenvalues());
         sort(&eig1(0), &eig1(0) + eig1.size());
         sort(&eig2(0), &eig2(0) + eig2.size());
-        DLIB_CASSERT(max(abs(eig1 - eig2)) < eps, "");
+        DLIB_TEST(max(abs(eig1 - eig2)) < eps);
 
         const matrix<type> V = test.get_pseudo_v();
         const matrix<type> D = test.get_pseudo_d();
@@ -97,34 +97,34 @@ namespace
         const matrix<complex<type> > CD = test.get_d();
         const matrix<complex<type> > CM = complex_matrix(m, uniform_matrix<type>(m.nr(),m.nc(),0));
 
-        DLIB_CASSERT(V.nr() == test.dim(),"");
-        DLIB_CASSERT(V.nc() == test.dim(),"");
-        DLIB_CASSERT(D.nr() == test.dim(),"");
-        DLIB_CASSERT(D.nc() == test.dim(),"");
+        DLIB_TEST(V.nr() == test.dim());
+        DLIB_TEST(V.nc() == test.dim());
+        DLIB_TEST(D.nr() == test.dim());
+        DLIB_TEST(D.nc() == test.dim());
 
         // CD is a diagonal matrix
-        DLIB_CASSERT(diagm(diag(CD)) == CD,"");
+        DLIB_TEST(diagm(diag(CD)) == CD);
 
         // verify that these things are actually eigenvalues and eigenvectors of m
-        DLIB_CASSERT(max(abs(m*V - V*D)) < eps, "");
-        DLIB_CASSERT(max(norm(CM*CV - CV*CD)) < eps, "");
+        DLIB_TEST(max(abs(m*V - V*D)) < eps);
+        DLIB_TEST(max(norm(CM*CV - CV*CD)) < eps);
 
         // if m is a symmetric matrix
         if (max(abs(m-trans(m))) < 1e-5)
         {
             dlog << LTRACE << "m is symmetric";
             // there aren't any imaginary eigenvalues 
-            DLIB_CASSERT(max(abs(test.get_imag_eigenvalues())) < eps, ""); 
-            DLIB_CASSERT(diagm(diag(D)) == D,"");
+            DLIB_TEST(max(abs(test.get_imag_eigenvalues())) < eps); 
+            DLIB_TEST(diagm(diag(D)) == D);
 
             // V is orthogonal
-            DLIB_CASSERT(equal(V*trans(V), identity_matrix<type>(test.dim()), eps), "");
-            DLIB_CASSERT(equal(m , V*D*trans(V), eps), "");
+            DLIB_TEST(equal(V*trans(V), identity_matrix<type>(test.dim()), eps));
+            DLIB_TEST(equal(m , V*D*trans(V), eps));
         }
         else
         {
             dlog << LTRACE << "m is NOT symmetric";
-            DLIB_CASSERT(equal(m , V*D*inv(V), eps), max(abs(m - V*D*inv(V))));
+            DLIB_TEST_MSG(equal(m , V*D*inv(V), eps), max(abs(m - V*D*inv(V))));
         }
     }
 

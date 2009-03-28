@@ -128,289 +128,289 @@ namespace
         mfpkc<mfp<int,int,int> > a3c, b3c;
         mfpkc<mfp<int,int,int,int> > a4c, b4c;
 
-        DLIB_CASSERT(a0c == b0c, "");
-        DLIB_CASSERT(a1c == b1c, "");
-        DLIB_CASSERT(a2c == b2c, "");
-        DLIB_CASSERT(a3c == b3c, "");
-        DLIB_CASSERT(a4c == b4c, "");
-        DLIB_CASSERT((a0c != b0c) == false, "");
-        DLIB_CASSERT((a1c != b1c) == false, "");
-        DLIB_CASSERT((a2c != b2c) == false, "");
-        DLIB_CASSERT((a3c != b3c) == false, "");
-        DLIB_CASSERT((a4c != b4c) == false, "");
+        DLIB_TEST(a0c == b0c);
+        DLIB_TEST(a1c == b1c);
+        DLIB_TEST(a2c == b2c);
+        DLIB_TEST(a3c == b3c);
+        DLIB_TEST(a4c == b4c);
+        DLIB_TEST((a0c != b0c) == false);
+        DLIB_TEST((a1c != b1c) == false);
+        DLIB_TEST((a2c != b2c) == false);
+        DLIB_TEST((a3c != b3c) == false);
+        DLIB_TEST((a4c != b4c) == false);
 
-        DLIB_CASSERT(a0.is_set() == false,"");
-        DLIB_CASSERT(b0.is_set() == false,"");
-        DLIB_CASSERT(a0c.is_set() == false,"");
-        DLIB_CASSERT(b0c.is_set() == false,"");
+        DLIB_TEST(a0.is_set() == false);
+        DLIB_TEST(b0.is_set() == false);
+        DLIB_TEST(a0c.is_set() == false);
+        DLIB_TEST(b0c.is_set() == false);
 
-        DLIB_CASSERT(!a0 ,"");
-        DLIB_CASSERT(!b0 ,"");
-        DLIB_CASSERT(!a0c,"");
-        DLIB_CASSERT(!b0c,"");
+        DLIB_TEST(!a0 );
+        DLIB_TEST(!b0 );
+        DLIB_TEST(!a0c);
+        DLIB_TEST(!b0c);
 
-        DLIB_CASSERT(a1.is_set() == false,"");
-        DLIB_CASSERT(b1.is_set() == false,"");
-        DLIB_CASSERT(a1c.is_set() == false,"");
-        DLIB_CASSERT(b1c.is_set() == false,"");
+        DLIB_TEST(a1.is_set() == false);
+        DLIB_TEST(b1.is_set() == false);
+        DLIB_TEST(a1c.is_set() == false);
+        DLIB_TEST(b1c.is_set() == false);
 
-        DLIB_CASSERT(!a1 ,"");
-        DLIB_CASSERT(!b1 ,"");
-        DLIB_CASSERT(!a1c,"");
-        DLIB_CASSERT(!b1c,"");
+        DLIB_TEST(!a1 );
+        DLIB_TEST(!b1 );
+        DLIB_TEST(!a1c);
+        DLIB_TEST(!b1c);
 
 
-        DLIB_CASSERT(a2.is_set() == false,"");
-        DLIB_CASSERT(b2.is_set() == false,"");
-        DLIB_CASSERT(a2c.is_set() == false,"");
-        DLIB_CASSERT(b2c.is_set() == false,"");
+        DLIB_TEST(a2.is_set() == false);
+        DLIB_TEST(b2.is_set() == false);
+        DLIB_TEST(a2c.is_set() == false);
+        DLIB_TEST(b2c.is_set() == false);
 
-        DLIB_CASSERT(!a2,"");
-        DLIB_CASSERT(!b2,"");
-        DLIB_CASSERT(!a2c,"");
-        DLIB_CASSERT(!b2c,"");
+        DLIB_TEST(!a2);
+        DLIB_TEST(!b2);
+        DLIB_TEST(!a2c);
+        DLIB_TEST(!b2c);
 
-        DLIB_CASSERT(a3.is_set() == false,"");
-        DLIB_CASSERT(b3.is_set() == false,"");
-        DLIB_CASSERT(a3c.is_set() == false,"");
-        DLIB_CASSERT(b3c.is_set() == false,"");
+        DLIB_TEST(a3.is_set() == false);
+        DLIB_TEST(b3.is_set() == false);
+        DLIB_TEST(a3c.is_set() == false);
+        DLIB_TEST(b3c.is_set() == false);
 
-        DLIB_CASSERT(!a3,"");
-        DLIB_CASSERT(!b3,"");
-        DLIB_CASSERT(!a3c,"");
-        DLIB_CASSERT(!b3c,"");
+        DLIB_TEST(!a3);
+        DLIB_TEST(!b3);
+        DLIB_TEST(!a3c);
+        DLIB_TEST(!b3c);
 
-        DLIB_CASSERT(a4.is_set() == false,"");
-        DLIB_CASSERT(b4.is_set() == false,"");
-        DLIB_CASSERT(a4c.is_set() == false,"");
-        DLIB_CASSERT(b4c.is_set() == false,"");
+        DLIB_TEST(a4.is_set() == false);
+        DLIB_TEST(b4.is_set() == false);
+        DLIB_TEST(a4c.is_set() == false);
+        DLIB_TEST(b4c.is_set() == false);
 
-        DLIB_CASSERT(!a4,"");
-        DLIB_CASSERT(!b4,"");
-        DLIB_CASSERT(!a4c,"");
-        DLIB_CASSERT(!b4c,"");
+        DLIB_TEST(!a4);
+        DLIB_TEST(!b4);
+        DLIB_TEST(!a4c);
+        DLIB_TEST(!b4c);
 
         a0.set(helper,&test_helper::go0);
         a0c.set(helper,&test_helper::go0);
-        DLIB_CASSERT(a0.is_set() == true,"");
-        DLIB_CASSERT(a0c.is_set() == true,"");
-        DLIB_CASSERT(b0.is_set() == false,"");
-        DLIB_CASSERT(b0c.is_set() == false,"");
+        DLIB_TEST(a0.is_set() == true);
+        DLIB_TEST(a0c.is_set() == true);
+        DLIB_TEST(b0.is_set() == false);
+        DLIB_TEST(b0c.is_set() == false);
 
-        DLIB_CASSERT(a0,"");
-        DLIB_CASSERT(a0c,"");
-        DLIB_CASSERT(!b0,"");
-        DLIB_CASSERT(!b0c,"");
+        DLIB_TEST(a0);
+        DLIB_TEST(a0c);
+        DLIB_TEST(!b0);
+        DLIB_TEST(!b0c);
 
         a0 = a0;
-        DLIB_CASSERT(a0 == a0, "");
-        DLIB_CASSERT(!(a0 != a0),"");
-        DLIB_CASSERT(a0.is_set() == true,"");
-        DLIB_CASSERT(a0c.is_set() == true,"");
-        DLIB_CASSERT(b0.is_set() == false,"");
-        DLIB_CASSERT(b0c.is_set() == false,"");
+        DLIB_TEST(a0 == a0);
+        DLIB_TEST(!(a0 != a0));
+        DLIB_TEST(a0.is_set() == true);
+        DLIB_TEST(a0c.is_set() == true);
+        DLIB_TEST(b0.is_set() == false);
+        DLIB_TEST(b0c.is_set() == false);
 
-        DLIB_CASSERT(a0,"");
-        DLIB_CASSERT(a0c,"");
-        DLIB_CASSERT(!b0,"");
-        DLIB_CASSERT(!b0c,"");
+        DLIB_TEST(a0);
+        DLIB_TEST(a0c);
+        DLIB_TEST(!b0);
+        DLIB_TEST(!b0c);
 
         swap(a0,b0);
         swap(a0c,b0c);
-        DLIB_CASSERT(a0.is_set() == false,"");
-        DLIB_CASSERT(a0c.is_set() == false,"");
-        DLIB_CASSERT(b0.is_set() == true,"");
-        DLIB_CASSERT(b0c.is_set() == true,"");
+        DLIB_TEST(a0.is_set() == false);
+        DLIB_TEST(a0c.is_set() == false);
+        DLIB_TEST(b0.is_set() == true);
+        DLIB_TEST(b0c.is_set() == true);
 
-        DLIB_CASSERT(!a0,"");
-        DLIB_CASSERT(!a0c,"");
-        DLIB_CASSERT(b0,"");
-        DLIB_CASSERT(b0c,"");
+        DLIB_TEST(!a0);
+        DLIB_TEST(!a0c);
+        DLIB_TEST(b0);
+        DLIB_TEST(b0c);
 
         a0 = b0;
-        DLIB_CASSERT(a0 == a0, "");
-        DLIB_CASSERT(a0 == b0, "");
-        DLIB_CASSERT(!(a0 != b0),"");
-        DLIB_CASSERT(a0.is_set() == true,"");
-        DLIB_CASSERT(a0c.is_set() == false,"");
-        DLIB_CASSERT(b0.is_set() == true,"");
-        DLIB_CASSERT(b0c.is_set() == true,"");
+        DLIB_TEST(a0 == a0);
+        DLIB_TEST(a0 == b0);
+        DLIB_TEST(!(a0 != b0));
+        DLIB_TEST(a0.is_set() == true);
+        DLIB_TEST(a0c.is_set() == false);
+        DLIB_TEST(b0.is_set() == true);
+        DLIB_TEST(b0c.is_set() == true);
 
-        DLIB_CASSERT(a0 ,"");
-        DLIB_CASSERT(!a0c,"");
-        DLIB_CASSERT(b0,"");
-        DLIB_CASSERT(b0c,"");
+        DLIB_TEST(a0 );
+        DLIB_TEST(!a0c);
+        DLIB_TEST(b0);
+        DLIB_TEST(b0c);
 
 
         a0.clear();
         a0c.clear();
         b0.clear();
         b0c.clear();
-        DLIB_CASSERT(a0.is_set() == false,"");
-        DLIB_CASSERT(a0c.is_set() == false,"");
-        DLIB_CASSERT(b0.is_set() == false,"");
-        DLIB_CASSERT(b0c.is_set() == false,"");
+        DLIB_TEST(a0.is_set() == false);
+        DLIB_TEST(a0c.is_set() == false);
+        DLIB_TEST(b0.is_set() == false);
+        DLIB_TEST(b0c.is_set() == false);
 
 
         a1.set(helper,&test_helper::go1);
         a1c.set(helper,&test_helper::go1);
-        DLIB_CASSERT(a1.is_set() == true,"");
-        DLIB_CASSERT(a1c.is_set() == true,"");
-        DLIB_CASSERT(b1.is_set() == false,"");
-        DLIB_CASSERT(b1c.is_set() == false,"");
+        DLIB_TEST(a1.is_set() == true);
+        DLIB_TEST(a1c.is_set() == true);
+        DLIB_TEST(b1.is_set() == false);
+        DLIB_TEST(b1c.is_set() == false);
         swap(a1,b1);
         swap(a1c,b1c);
-        DLIB_CASSERT(a1.is_set() == false,"");
-        DLIB_CASSERT(a1c.is_set() == false,"");
-        DLIB_CASSERT(b1.is_set() == true,"");
-        DLIB_CASSERT(b1c.is_set() == true,"");
+        DLIB_TEST(a1.is_set() == false);
+        DLIB_TEST(a1c.is_set() == false);
+        DLIB_TEST(b1.is_set() == true);
+        DLIB_TEST(b1c.is_set() == true);
 
-        DLIB_CASSERT(!a1,"");
-        DLIB_CASSERT(!a1c,"");
-        DLIB_CASSERT(b1,"");
-        DLIB_CASSERT(b1c,"");
+        DLIB_TEST(!a1);
+        DLIB_TEST(!a1c);
+        DLIB_TEST(b1);
+        DLIB_TEST(b1c);
 
 
         a1 = b1;
-        DLIB_CASSERT(a1 == a1, "");
-        DLIB_CASSERT(a1 == b1, "");
-        DLIB_CASSERT(!(a1 != b1),"");
-        DLIB_CASSERT(a1.is_set() == true,"");
-        DLIB_CASSERT(a1c.is_set() == false,"");
-        DLIB_CASSERT(b1.is_set() == true,"");
-        DLIB_CASSERT(b1c.is_set() == true,"");
+        DLIB_TEST(a1 == a1);
+        DLIB_TEST(a1 == b1);
+        DLIB_TEST(!(a1 != b1));
+        DLIB_TEST(a1.is_set() == true);
+        DLIB_TEST(a1c.is_set() == false);
+        DLIB_TEST(b1.is_set() == true);
+        DLIB_TEST(b1c.is_set() == true);
 
 
         a1.clear();
         a1c.clear();
         b1.clear();
         b1c.clear();
-        DLIB_CASSERT(a1.is_set() == false,"");
-        DLIB_CASSERT(a1c.is_set() == false,"");
-        DLIB_CASSERT(b1.is_set() == false,"");
-        DLIB_CASSERT(b1c.is_set() == false,"");
+        DLIB_TEST(a1.is_set() == false);
+        DLIB_TEST(a1c.is_set() == false);
+        DLIB_TEST(b1.is_set() == false);
+        DLIB_TEST(b1c.is_set() == false);
 
 
         a2.set(helper,&test_helper::go2);
         a2c.set(helper,&test_helper::go2);
-        DLIB_CASSERT(a2.is_set() == true,"");
-        DLIB_CASSERT(a2c.is_set() == true,"");
-        DLIB_CASSERT(b2.is_set() == false,"");
-        DLIB_CASSERT(b2c.is_set() == false,"");
+        DLIB_TEST(a2.is_set() == true);
+        DLIB_TEST(a2c.is_set() == true);
+        DLIB_TEST(b2.is_set() == false);
+        DLIB_TEST(b2c.is_set() == false);
         swap(a2,b2);
         swap(a2c,b2c);
-        DLIB_CASSERT(a2.is_set() == false,"");
-        DLIB_CASSERT(a2c.is_set() == false,"");
-        DLIB_CASSERT(b2.is_set() == true,"");
-        DLIB_CASSERT(b2c.is_set() == true,"");
+        DLIB_TEST(a2.is_set() == false);
+        DLIB_TEST(a2c.is_set() == false);
+        DLIB_TEST(b2.is_set() == true);
+        DLIB_TEST(b2c.is_set() == true);
 
-        DLIB_CASSERT(!a2,"");
-        DLIB_CASSERT(!a2c,"");
-        DLIB_CASSERT(b2,"");
-        DLIB_CASSERT(b2c,"");
+        DLIB_TEST(!a2);
+        DLIB_TEST(!a2c);
+        DLIB_TEST(b2);
+        DLIB_TEST(b2c);
         if (b2)
         {
         }
         else
         {
-            DLIB_CASSERT(false,"");
+            DLIB_TEST(false);
         }
 
         if (a2c)
         {
-            DLIB_CASSERT(false,"");
+            DLIB_TEST(false);
         }
         else
         {
-            DLIB_CASSERT(true,"");
+            DLIB_TEST(true);
         }
 
         a2 = b2;
-        DLIB_CASSERT(a2 == a2, "");
-        DLIB_CASSERT(a2 == b2, "");
-        DLIB_CASSERT(!(a2 != b2),"");
-        DLIB_CASSERT(a2.is_set() == true,"");
-        DLIB_CASSERT(a2c.is_set() == false,"");
-        DLIB_CASSERT(b2.is_set() == true,"");
-        DLIB_CASSERT(b2c.is_set() == true,"");
+        DLIB_TEST(a2 == a2);
+        DLIB_TEST(a2 == b2);
+        DLIB_TEST(!(a2 != b2));
+        DLIB_TEST(a2.is_set() == true);
+        DLIB_TEST(a2c.is_set() == false);
+        DLIB_TEST(b2.is_set() == true);
+        DLIB_TEST(b2c.is_set() == true);
 
         a2.clear();
         a2c.clear();
         b2.clear();
         b2c.clear();
-        DLIB_CASSERT(a2.is_set() == false,"");
-        DLIB_CASSERT(a2c.is_set() == false,"");
-        DLIB_CASSERT(b2.is_set() == false,"");
-        DLIB_CASSERT(b2c.is_set() == false,"");
+        DLIB_TEST(a2.is_set() == false);
+        DLIB_TEST(a2c.is_set() == false);
+        DLIB_TEST(b2.is_set() == false);
+        DLIB_TEST(b2c.is_set() == false);
 
 
         a3.set(helper,&test_helper::go3);
         a3c.set(helper,&test_helper::go3);
-        DLIB_CASSERT(a3.is_set() == true,"");
-        DLIB_CASSERT(a3c.is_set() == true,"");
-        DLIB_CASSERT(b3.is_set() == false,"");
-        DLIB_CASSERT(b3c.is_set() == false,"");
+        DLIB_TEST(a3.is_set() == true);
+        DLIB_TEST(a3c.is_set() == true);
+        DLIB_TEST(b3.is_set() == false);
+        DLIB_TEST(b3c.is_set() == false);
         swap(a3,b3);
         swap(a3c,b3c);
-        DLIB_CASSERT(a3.is_set() == false,"");
-        DLIB_CASSERT(a3c.is_set() == false,"");
-        DLIB_CASSERT(b3.is_set() == true,"");
-        DLIB_CASSERT(b3c.is_set() == true,"");
+        DLIB_TEST(a3.is_set() == false);
+        DLIB_TEST(a3c.is_set() == false);
+        DLIB_TEST(b3.is_set() == true);
+        DLIB_TEST(b3c.is_set() == true);
 
         a3 = b3;
-        DLIB_CASSERT(a3 == a3, "");
-        DLIB_CASSERT(a3 == b3, "");
-        DLIB_CASSERT(!(a3 != b3),"");
-        DLIB_CASSERT(a3.is_set() == true,"");
-        DLIB_CASSERT(a3c.is_set() == false,"");
-        DLIB_CASSERT(b3.is_set() == true,"");
-        DLIB_CASSERT(b3c.is_set() == true,"");
+        DLIB_TEST(a3 == a3);
+        DLIB_TEST(a3 == b3);
+        DLIB_TEST(!(a3 != b3));
+        DLIB_TEST(a3.is_set() == true);
+        DLIB_TEST(a3c.is_set() == false);
+        DLIB_TEST(b3.is_set() == true);
+        DLIB_TEST(b3c.is_set() == true);
 
 
         a3.clear();
         a3c.clear();
         b3.clear();
         b3c.clear();
-        DLIB_CASSERT(a3.is_set() == false,"");
-        DLIB_CASSERT(a3c.is_set() == false,"");
-        DLIB_CASSERT(b3.is_set() == false,"");
-        DLIB_CASSERT(b3c.is_set() == false,"");
+        DLIB_TEST(a3.is_set() == false);
+        DLIB_TEST(a3c.is_set() == false);
+        DLIB_TEST(b3.is_set() == false);
+        DLIB_TEST(b3c.is_set() == false);
 
 
         a4.set(helper,&test_helper::go4);
         a4c.set(helper,&test_helper::go4);
-        DLIB_CASSERT(a4.is_set() == true,"");
-        DLIB_CASSERT(a4c.is_set() == true,"");
-        DLIB_CASSERT(b4.is_set() == false,"");
-        DLIB_CASSERT(b4c.is_set() == false,"");
+        DLIB_TEST(a4.is_set() == true);
+        DLIB_TEST(a4c.is_set() == true);
+        DLIB_TEST(b4.is_set() == false);
+        DLIB_TEST(b4c.is_set() == false);
         swap(a4,b4);
         swap(a4c,b4c);
-        DLIB_CASSERT(a4.is_set() == false,"");
-        DLIB_CASSERT(a4c.is_set() == false,"");
-        DLIB_CASSERT(b4.is_set() == true,"");
-        DLIB_CASSERT(b4c.is_set() == true,"");
+        DLIB_TEST(a4.is_set() == false);
+        DLIB_TEST(a4c.is_set() == false);
+        DLIB_TEST(b4.is_set() == true);
+        DLIB_TEST(b4c.is_set() == true);
 
         a4 = b4;
         a4 = b4;
         a4 = b4;
         a4 = b4;
-        DLIB_CASSERT(a4 == a4, "");
-        DLIB_CASSERT(a4 == b4, "");
-        DLIB_CASSERT(!(a4 != b4),"");
-        DLIB_CASSERT(a4.is_set() == true,"");
-        DLIB_CASSERT(a4c.is_set() == false,"");
-        DLIB_CASSERT(b4.is_set() == true,"");
-        DLIB_CASSERT(b4c.is_set() == true,"");
+        DLIB_TEST(a4 == a4);
+        DLIB_TEST(a4 == b4);
+        DLIB_TEST(!(a4 != b4));
+        DLIB_TEST(a4.is_set() == true);
+        DLIB_TEST(a4c.is_set() == false);
+        DLIB_TEST(b4.is_set() == true);
+        DLIB_TEST(b4c.is_set() == true);
 
 
         a4.clear();
         a4c.clear();
         b4.clear();
         b4c.clear();
-        DLIB_CASSERT(a4.is_set() == false,"");
-        DLIB_CASSERT(a4c.is_set() == false,"");
-        DLIB_CASSERT(b4.is_set() == false,"");
-        DLIB_CASSERT(b4c.is_set() == false,"");
+        DLIB_TEST(a4.is_set() == false);
+        DLIB_TEST(a4c.is_set() == false);
+        DLIB_TEST(b4.is_set() == false);
+        DLIB_TEST(b4c.is_set() == false);
 
 
         a0.set(helper,&test_helper::go0);
@@ -419,16 +419,16 @@ namespace
         b0c = a0c;
         helper.i = -1; 
         a0();
-        DLIB_CASSERT(helper.i == 0,"");
+        DLIB_TEST(helper.i == 0);
         helper.i = -1; 
         b0();
-        DLIB_CASSERT(helper.i == 0,"");
+        DLIB_TEST(helper.i == 0);
         helper.i = -1; 
         a0c();
-        DLIB_CASSERT(helper.i == 0,"");
+        DLIB_TEST(helper.i == 0);
         helper.i = -1; 
         b0c();
-        DLIB_CASSERT(helper.i == 0,"");
+        DLIB_TEST(helper.i == 0);
 
 
         a1.set(helper,&test_helper::go1);
@@ -437,16 +437,16 @@ namespace
         b1c = a1c;
         helper.i = -1; 
         a1(1);
-        DLIB_CASSERT(helper.i == 1,"");
+        DLIB_TEST(helper.i == 1);
         helper.i = -1; 
         b1(10);
-        DLIB_CASSERT(helper.i == 1*10,"");
+        DLIB_TEST(helper.i == 1*10);
         helper.i = -1; 
         a1c(20);
-        DLIB_CASSERT(helper.i == 1*20,"");
+        DLIB_TEST(helper.i == 1*20);
         helper.i = -1; 
         b1c(30);
-        DLIB_CASSERT(helper.i == 1*30,"");
+        DLIB_TEST(helper.i == 1*30);
 
 
         a2.set(helper,&test_helper::go2);
@@ -455,16 +455,16 @@ namespace
         b2c = a2c;
         helper.i = -1; 
         a2(1,2);
-        DLIB_CASSERT(helper.i == 2*1*2,"");
+        DLIB_TEST(helper.i == 2*1*2);
         helper.i = -1; 
         b2(3,4);
-        DLIB_CASSERT(helper.i == 2*3*4,"");
+        DLIB_TEST(helper.i == 2*3*4);
         helper.i = -1; 
         a2c(5,6);
-        DLIB_CASSERT(helper.i == 2*5*6,"");
+        DLIB_TEST(helper.i == 2*5*6);
         helper.i = -1; 
         b2c(7,8);
-        DLIB_CASSERT(helper.i == 2*7*8,"");
+        DLIB_TEST(helper.i == 2*7*8);
 
 
         a3.set(helper,&test_helper::go3);
@@ -473,57 +473,57 @@ namespace
         b3c = a3c;
         helper.i = -1; 
         a3(1,2,3);
-        DLIB_CASSERT(helper.i == 3*1*2*3,"");
+        DLIB_TEST(helper.i == 3*1*2*3);
         helper.i = -1; 
         b3(4,5,6);
-        DLIB_CASSERT(helper.i == 3*4*5*6,"");
+        DLIB_TEST(helper.i == 3*4*5*6);
         helper.i = -1; 
         a3c(7,8,9);
-        DLIB_CASSERT(helper.i == 3*7*8*9,"");
+        DLIB_TEST(helper.i == 3*7*8*9);
         helper.i = -1; 
         b3c(1,2,3);
-        DLIB_CASSERT(helper.i == 3*1*2*3,"");
+        DLIB_TEST(helper.i == 3*1*2*3);
 
 
         a4.set(helper,&test_helper::go4);
         a4c.set(helper,&test_helper::go4);
-        DLIB_CASSERT(a4 == a4c,"");
+        DLIB_TEST(a4 == a4c);
         b4 = a4;
         b4c = a4c;
         helper.i = -1; 
         a4(1,2,3,4);
-        DLIB_CASSERT(helper.i == 4*1*2*3*4,"");
+        DLIB_TEST(helper.i == 4*1*2*3*4);
         helper.i = -1; 
         b4(5,6,7,8);
-        DLIB_CASSERT(helper.i == 4*5*6*7*8,"");
+        DLIB_TEST(helper.i == 4*5*6*7*8);
         helper.i = -1; 
         a4c(9,1,2,3);
-        DLIB_CASSERT(helper.i == 4*9*1*2*3,"");
+        DLIB_TEST(helper.i == 4*9*1*2*3);
         helper.i = -1; 
         b4c(4,5,6,7);
-        DLIB_CASSERT(helper.i == 4*4*5*6*7,"");
+        DLIB_TEST(helper.i == 4*4*5*6*7);
 
-        DLIB_CASSERT(a4 == b4,"");
-        DLIB_CASSERT(a4,"");
-        DLIB_CASSERT(a4 == b4,"");
+        DLIB_TEST(a4 == b4);
+        DLIB_TEST(a4);
+        DLIB_TEST(a4 == b4);
         a4.clear();
-        DLIB_CASSERT(a4 != b4,"");
-        DLIB_CASSERT(!a4,"");
-        DLIB_CASSERT(a4 == 0,"");
-        DLIB_CASSERT(a4 == a4,"");
+        DLIB_TEST(a4 != b4);
+        DLIB_TEST(!a4);
+        DLIB_TEST(a4 == 0);
+        DLIB_TEST(a4 == a4);
         a4 = a4;
-        DLIB_CASSERT(a4 != b4,"");
-        DLIB_CASSERT(!a4,"");
-        DLIB_CASSERT(a4 == a4,"");
+        DLIB_TEST(a4 != b4);
+        DLIB_TEST(!a4);
+        DLIB_TEST(a4 == a4);
         mfp_test_helper_other other;
         a4.set(other,&mfp_test_helper_other::go4);
-        DLIB_CASSERT(a4 != b4,"");
-        DLIB_CASSERT(a4,"");
-        DLIB_CASSERT(a4 == a4,"");
+        DLIB_TEST(a4 != b4);
+        DLIB_TEST(a4);
+        DLIB_TEST(a4 == a4);
         a4.set(helper,&test_helper::go4);
-        DLIB_CASSERT(a4 == b4,"");
-        DLIB_CASSERT(a4,"");
-        DLIB_CASSERT(a4 == a4,"");
+        DLIB_TEST(a4 == b4);
+        DLIB_TEST(a4);
+        DLIB_TEST(a4 == a4);
 
 
 

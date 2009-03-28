@@ -65,38 +65,38 @@ namespace
             timer_t t2(h,&timer_test_helper::add);
             timer_t t3(h,&timer_test_helper::add);
 
-            DLIB_CASSERT(t1.delay_time() == 1000,"");
-            DLIB_CASSERT(t2.delay_time() == 1000,"");
-            DLIB_CASSERT(t3.delay_time() == 1000,"");
-            DLIB_CASSERT(t1.is_running() == false,"");
-            DLIB_CASSERT(t2.is_running() == false,"");
-            DLIB_CASSERT(t3.is_running() == false,"");
-            DLIB_CASSERT(t1.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t2.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t3.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(&t1.action_object() == &h,"");
-            DLIB_CASSERT(&t2.action_object() == &h,"");
-            DLIB_CASSERT(&t3.action_object() == &h,"");
+            DLIB_TEST(t1.delay_time() == 1000);
+            DLIB_TEST(t2.delay_time() == 1000);
+            DLIB_TEST(t3.delay_time() == 1000);
+            DLIB_TEST(t1.is_running() == false);
+            DLIB_TEST(t2.is_running() == false);
+            DLIB_TEST(t3.is_running() == false);
+            DLIB_TEST(t1.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t2.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t3.action_function() == &timer_test_helper::add);
+            DLIB_TEST(&t1.action_object() == &h);
+            DLIB_TEST(&t2.action_object() == &h);
+            DLIB_TEST(&t3.action_object() == &h);
 
             t1.set_delay_time(1000);
             t2.set_delay_time(500);
             t3.set_delay_time(200);
 
-            DLIB_CASSERT(t1.delay_time() == 1000,"");
-            DLIB_CASSERT(t2.delay_time() == 500,"");
-            DLIB_CASSERT(t3.delay_time() == 200,"");
-            DLIB_CASSERT(t1.is_running() == false,"");
-            DLIB_CASSERT(t2.is_running() == false,"");
-            DLIB_CASSERT(t3.is_running() == false,"");
-            DLIB_CASSERT(t1.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t2.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t3.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(&t1.action_object() == &h,"");
-            DLIB_CASSERT(&t2.action_object() == &h,"");
-            DLIB_CASSERT(&t3.action_object() == &h,"");
+            DLIB_TEST(t1.delay_time() == 1000);
+            DLIB_TEST(t2.delay_time() == 500);
+            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST(t1.is_running() == false);
+            DLIB_TEST(t2.is_running() == false);
+            DLIB_TEST(t3.is_running() == false);
+            DLIB_TEST(t1.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t2.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t3.action_function() == &timer_test_helper::add);
+            DLIB_TEST(&t1.action_object() == &h);
+            DLIB_TEST(&t2.action_object() == &h);
+            DLIB_TEST(&t3.action_object() == &h);
             dlib::sleep(1100);
             print_spinner();
-            DLIB_CASSERT(h.count == 0,"");
+            DLIB_TEST(h.count == 0);
 
             t1.stop_and_wait();
             t2.stop_and_wait();
@@ -104,58 +104,58 @@ namespace
 
             dlib::sleep(1100);
             print_spinner();
-            DLIB_CASSERT(h.count == 0,"");
-            DLIB_CASSERT(t1.delay_time() == 1000,"");
-            DLIB_CASSERT(t2.delay_time() == 500,"");
-            DLIB_CASSERT(t3.delay_time() == 200,"");
-            DLIB_CASSERT(t1.is_running() == false,"");
-            DLIB_CASSERT(t2.is_running() == false,"");
-            DLIB_CASSERT(t3.is_running() == false,"");
-            DLIB_CASSERT(t1.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t2.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t3.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(&t1.action_object() == &h,"");
-            DLIB_CASSERT(&t2.action_object() == &h,"");
-            DLIB_CASSERT(&t3.action_object() == &h,"");
+            DLIB_TEST(h.count == 0);
+            DLIB_TEST(t1.delay_time() == 1000);
+            DLIB_TEST(t2.delay_time() == 500);
+            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST(t1.is_running() == false);
+            DLIB_TEST(t2.is_running() == false);
+            DLIB_TEST(t3.is_running() == false);
+            DLIB_TEST(t1.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t2.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t3.action_function() == &timer_test_helper::add);
+            DLIB_TEST(&t1.action_object() == &h);
+            DLIB_TEST(&t2.action_object() == &h);
+            DLIB_TEST(&t3.action_object() == &h);
 
             t1.start();
             t2.start();
             t3.start();
 
-            DLIB_CASSERT(t1.delay_time() == 1000,"");
-            DLIB_CASSERT(t2.delay_time() == 500,"");
-            DLIB_CASSERT(t3.delay_time() == 200,"");
-            DLIB_CASSERT(t1.is_running() == true,"");
-            DLIB_CASSERT(t2.is_running() == true,"");
-            DLIB_CASSERT(t3.is_running() == true,"");
-            DLIB_CASSERT(t1.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t2.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t3.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(&t1.action_object() == &h,"");
-            DLIB_CASSERT(&t2.action_object() == &h,"");
-            DLIB_CASSERT(&t3.action_object() == &h,"");
+            DLIB_TEST(t1.delay_time() == 1000);
+            DLIB_TEST(t2.delay_time() == 500);
+            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST(t1.is_running() == true);
+            DLIB_TEST(t2.is_running() == true);
+            DLIB_TEST(t3.is_running() == true);
+            DLIB_TEST(t1.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t2.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t3.action_function() == &timer_test_helper::add);
+            DLIB_TEST(&t1.action_object() == &h);
+            DLIB_TEST(&t2.action_object() == &h);
+            DLIB_TEST(&t3.action_object() == &h);
 
             t1.stop();
             t2.stop();
             t3.stop();
 
-            DLIB_CASSERT(t1.delay_time() == 1000,"");
-            DLIB_CASSERT(t2.delay_time() == 500,"");
-            DLIB_CASSERT(t3.delay_time() == 200,"");
-            DLIB_CASSERT(t1.is_running() == false,"");
-            DLIB_CASSERT(t2.is_running() == false,"");
-            DLIB_CASSERT(t3.is_running() == false,"");
-            DLIB_CASSERT(t1.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t2.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(t3.action_function() == &timer_test_helper::add,"");
-            DLIB_CASSERT(&t1.action_object() == &h,"");
-            DLIB_CASSERT(&t2.action_object() == &h,"");
-            DLIB_CASSERT(&t3.action_object() == &h,"");
+            DLIB_TEST(t1.delay_time() == 1000);
+            DLIB_TEST(t2.delay_time() == 500);
+            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST(t1.is_running() == false);
+            DLIB_TEST(t2.is_running() == false);
+            DLIB_TEST(t3.is_running() == false);
+            DLIB_TEST(t1.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t2.action_function() == &timer_test_helper::add);
+            DLIB_TEST(t3.action_function() == &timer_test_helper::add);
+            DLIB_TEST(&t1.action_object() == &h);
+            DLIB_TEST(&t2.action_object() == &h);
+            DLIB_TEST(&t3.action_object() == &h);
 
-            DLIB_CASSERT(h.count == 0,"");
+            DLIB_TEST(h.count == 0);
             dlib::sleep(1100);
             print_spinner();
-            DLIB_CASSERT(h.count == 0,"");
+            DLIB_TEST(h.count == 0);
 
             for (int i = 1; i <= 3; ++i)
             {
@@ -163,9 +163,9 @@ namespace
                 t2.start();
                 t3.start();
 
-                DLIB_CASSERT(t1.is_running() == true,"");
-                DLIB_CASSERT(t2.is_running() == true,"");
-                DLIB_CASSERT(t3.is_running() == true,"");
+                DLIB_TEST(t1.is_running() == true);
+                DLIB_TEST(t2.is_running() == true);
+                DLIB_TEST(t3.is_running() == true);
 
                 dlib::sleep(1100);
                 // this should allow the timers to trigger 8 times
@@ -173,42 +173,42 @@ namespace
                 t2.stop();
                 t3.stop();
 
-                DLIB_CASSERT(h.count == 8*i,"h.count: " << h.count << " i: " << i);
+                DLIB_TEST_MSG(h.count == 8*i,"h.count: " << h.count << " i: " << i);
                 dlib::sleep(1100);
-                DLIB_CASSERT(h.count == 8*i,"h.count: " << h.count << " i: " << i);
+                DLIB_TEST_MSG(h.count == 8*i,"h.count: " << h.count << " i: " << i);
             }
 
 
             h.count = 0;
             t1.start();
             dlib::sleep(300);
-            DLIB_CASSERT(h.count == 0,h.count);
+            DLIB_TEST_MSG(h.count == 0,h.count);
             t1.set_delay_time(400);
             dlib::sleep(200);
-            DLIB_CASSERT(h.count == 1,h.count);
+            DLIB_TEST_MSG(h.count == 1,h.count);
             dlib::sleep(250);
-            DLIB_CASSERT(h.count == 1,h.count);
+            DLIB_TEST_MSG(h.count == 1,h.count);
             dlib::sleep(100);
-            DLIB_CASSERT(h.count == 2,h.count);
+            DLIB_TEST_MSG(h.count == 2,h.count);
             t1.set_delay_time(2000);
-            DLIB_CASSERT(h.count == 2,h.count);
+            DLIB_TEST_MSG(h.count == 2,h.count);
             dlib::sleep(1000);
-            DLIB_CASSERT(h.count == 2,h.count);
+            DLIB_TEST_MSG(h.count == 2,h.count);
             t1.clear();
 
             h.count = 0;
             t3.start();
-            DLIB_CASSERT(t3.is_running() == true,"");
-            DLIB_CASSERT(t3.delay_time() == 200,"");
-            DLIB_CASSERT(h.count == 0,h.count);
+            DLIB_TEST(t3.is_running() == true);
+            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST_MSG(h.count == 0,h.count);
             t3.clear();
-            DLIB_CASSERT(t3.is_running() == false,"");
-            DLIB_CASSERT(t3.delay_time() == 1000,"");
-            DLIB_CASSERT(h.count == 0,h.count);
+            DLIB_TEST(t3.is_running() == false);
+            DLIB_TEST(t3.delay_time() == 1000);
+            DLIB_TEST_MSG(h.count == 0,h.count);
             dlib::sleep(200);
-            DLIB_CASSERT(t3.is_running() == false,"");
-            DLIB_CASSERT(t3.delay_time() == 1000,"");
-            DLIB_CASSERT(h.count == 0,h.count);
+            DLIB_TEST(t3.is_running() == false);
+            DLIB_TEST(t3.delay_time() == 1000);
+            DLIB_TEST_MSG(h.count == 0,h.count);
 
 
             {
@@ -216,12 +216,12 @@ namespace
                 timer_t t4(h,&timer_test_helper::delayed_add);
                 t4.set_delay_time(100);
                 t4.start();
-                DLIB_CASSERT(h.count == 0,h.count);
+                DLIB_TEST_MSG(h.count == 0,h.count);
                 dlib::sleep(400);
-                DLIB_CASSERT(h.count == 0,h.count);
+                DLIB_TEST_MSG(h.count == 0,h.count);
                 t4.stop_and_wait();
-                DLIB_CASSERT(h.count == 1,h.count);
-                DLIB_CASSERT(t4.is_running() == false,"");
+                DLIB_TEST_MSG(h.count == 1,h.count);
+                DLIB_TEST(t4.is_running() == false);
             }
 
             {
@@ -229,15 +229,15 @@ namespace
                 timer_t t4(h,&timer_test_helper::delayed_add);
                 t4.set_delay_time(100);
                 t4.start();
-                DLIB_CASSERT(h.count == 0,h.count);
+                DLIB_TEST_MSG(h.count == 0,h.count);
                 dlib::sleep(400);
-                DLIB_CASSERT(h.count == 0,h.count);
+                DLIB_TEST_MSG(h.count == 0,h.count);
                 t4.clear();
-                DLIB_CASSERT(t4.is_running() == false,"");
-                DLIB_CASSERT(h.count == 0,h.count);
+                DLIB_TEST(t4.is_running() == false);
+                DLIB_TEST_MSG(h.count == 0,h.count);
                 t4.stop_and_wait();
-                DLIB_CASSERT(h.count == 1,h.count);
-                DLIB_CASSERT(t4.is_running() == false,"");
+                DLIB_TEST_MSG(h.count == 1,h.count);
+                DLIB_TEST(t4.is_running() == false);
             }
 
             {
@@ -245,11 +245,11 @@ namespace
                 timer_t t5(h,&timer_test_helper::delayed_add);
                 t5.set_delay_time(100);
                 t5.start();
-                DLIB_CASSERT(h.count == 0,h.count);
+                DLIB_TEST_MSG(h.count == 0,h.count);
                 dlib::sleep(400);
-                DLIB_CASSERT(h.count == 0,h.count);
+                DLIB_TEST_MSG(h.count == 0,h.count);
             }
-            DLIB_CASSERT(h.count == 1,h.count);
+            DLIB_TEST_MSG(h.count == 1,h.count);
 
         }
 

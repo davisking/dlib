@@ -129,37 +129,37 @@ namespace
         total_count = 0;
         x = p;
         find_min_quasi_newton(wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_quasi_newton got apq in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient(wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got apq in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_quasi_newton(wrap_function(apq<T>), derivative(wrap_function(apq<T>)), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_quasi_newton got apq/noder in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient(wrap_function(apq<T>), derivative(wrap_function(apq<T>)), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got apq/noder in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_quasi_newton2(wrap_function(apq<T>), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_quasi_newton got apq/noder2 in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient2(wrap_function(apq<T>), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got apq/noder2 in " << total_count;
     }
 
@@ -181,26 +181,26 @@ namespace
         total_count = 0;
         x = p;
         find_min_quasi_newton(&powell, derivative(&powell,1e-8), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-2),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-2),opt-x);
         dlog << LINFO << "find_min_quasi_newton got powell/noder in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient(&powell, derivative(&powell,1e-9), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-2),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-2),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got powell/noder in " << total_count;
         */
 
         total_count = 0;
         x = p;
         find_min_quasi_newton2(&powell, x, minf, eps, 1e-10);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-1),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
         dlog << LINFO << "find_min_quasi_newton got powell/noder2 in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient2(&powell, x, minf, eps, 1e-10);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-1),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got powell/noder2 in " << total_count;
     }
 
@@ -221,37 +221,37 @@ namespace
         total_count = 0;
         x = p;
         find_min_quasi_newton(&simple, &der_simple, x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_quasi_newton got simple in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient(&simple, &der_simple, x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got simple in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_quasi_newton(&simple, derivative(&simple), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_quasi_newton got simple/noder in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient(&simple, derivative(&simple), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got simple/noder in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_quasi_newton2(&simple, x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_quasi_newton got simple/noder2 in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient2(&simple, x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got simple/noder2 in " << total_count;
     }
 
@@ -271,39 +271,39 @@ namespace
         total_count = 0;
         x = p;
         find_min_quasi_newton(&rosen, &der_rosen, x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
         dlog << LINFO << "find_min_quasi_newton got rosen in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient(&rosen, &der_rosen, x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got rosen in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_quasi_newton(&rosen, derivative(&rosen), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-4),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
         dlog << LINFO << "find_min_quasi_newton got rosen/noder in " << total_count;
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient(&rosen, derivative(&rosen), x, minf, eps);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-4),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got rosen/noder in " << total_count;
 
         /* This test fails
         total_count = 0;
         x = p;
         find_min_quasi_newton2(&rosen, x, minf, eps, 1e-13);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-2),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-2),opt-x);
         dlog << LINFO << "find_min_quasi_newton got rosen/noder2 in " << total_count;
         */
 
         total_count = 0;
         x = p;
         find_min_conjugate_gradient2(&rosen, x, minf, eps, 1e-11);
-        DLIB_CASSERT(dlib::equal(x,opt, 1e-4),opt-x);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
         dlog << LINFO << "find_min_conjugate_gradient got rosen/noder2 in " << total_count;
     }
 
@@ -404,32 +404,32 @@ namespace
             matrix<double,2,1> m;
             m(0) = -0.43;
             m(1) = 0.919;
-            DLIB_CASSERT(dlib::equal(der_rosen(m) , derivative(&rosen)(m),1e-5),"");
+            DLIB_TEST(dlib::equal(der_rosen(m) , derivative(&rosen)(m),1e-5));
 
-            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
+            DLIB_TEST_MSG(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
                                   make_line_search_function(derivative(&rosen),m,m)(0)) < 1e-5,"");
-            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
+            DLIB_TEST_MSG(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
                                   make_line_search_function(derivative(&rosen),m,m)(1)) < 1e-5,"");
 
-            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
+            DLIB_TEST_MSG(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
                                   make_line_search_function(&der_rosen,m,m)(0)) < 1e-5,"");
-            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
+            DLIB_TEST_MSG(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
                                   make_line_search_function(&der_rosen,m,m)(1)) < 1e-5,"");
         }
         {
             matrix<double,2,1> m;
             m(0) = 1;
             m(1) = 2;
-            DLIB_CASSERT(dlib::equal(der_rosen(m) , derivative(&rosen)(m),1e-5),"");
+            DLIB_TEST(dlib::equal(der_rosen(m) , derivative(&rosen)(m),1e-5));
 
-            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
+            DLIB_TEST_MSG(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
                                   make_line_search_function(derivative(&rosen),m,m)(0)) < 1e-5,"");
-            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
+            DLIB_TEST_MSG(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
                                   make_line_search_function(derivative(&rosen),m,m)(1)) < 1e-5,"");
 
-            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
+            DLIB_TEST_MSG(std::abs(derivative(make_line_search_function(&rosen,m,m))(0) - 
                                   make_line_search_function(&der_rosen,m,m)(0)) < 1e-5,"");
-            DLIB_CASSERT(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
+            DLIB_TEST_MSG(std::abs(derivative(make_line_search_function(&rosen,m,m))(1) - 
                                   make_line_search_function(&der_rosen,m,m)(1)) < 1e-5,"");
         }
 

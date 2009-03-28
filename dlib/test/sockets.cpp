@@ -218,8 +218,8 @@ namespace  {
         srv.clear();
 
         dlog << LTRACE << "ending successful test";
-        DLIB_CASSERT( !srv.error_occurred,""); 
-        DLIB_CASSERT( srv.got_connections,""); 
+        DLIB_TEST( !srv.error_occurred); 
+        DLIB_TEST( srv.got_connections); 
     }
 
 // ----------------------------------------------------------------------------------------

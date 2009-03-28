@@ -84,18 +84,18 @@ namespace
                     res = 4;
 
 
-                    DLIB_CASSERT(a==a,"");
-                    DLIB_CASSERT(a!=b,"");
-                    DLIB_CASSERT(a==1,"");
+                    DLIB_TEST(a==a);
+                    DLIB_TEST(a!=b);
+                    DLIB_TEST(a==1);
 
                     tp.add_task(gset_to_zero, a);
                     tp.add_task(gset_to_zero, b);
                     tp.add_task(*this, &thread_pool_tester::set_to_zero, c);
                     tp.add_task(gset_to_zero, res);
-                    DLIB_CASSERT(a == 0,"");
-                    DLIB_CASSERT(b == 0,"");
-                    DLIB_CASSERT(c == 0,"");
-                    DLIB_CASSERT(res == 0,"");
+                    DLIB_TEST(a == 0);
+                    DLIB_TEST(b == 0);
+                    DLIB_TEST(c == 0);
+                    DLIB_TEST(res == 0);
 
 
                     tp.add_task(gincrement, a);
@@ -103,10 +103,10 @@ namespace
                     tp.add_task(*this, &thread_pool_tester::increment, c);
                     tp.add_task(gincrement, res);
 
-                    DLIB_CASSERT(a == 1,"");
-                    DLIB_CASSERT(b == 1,"");
-                    DLIB_CASSERT(c == 1,"");
-                    DLIB_CASSERT(res == 1,"");
+                    DLIB_TEST(a == 1);
+                    DLIB_TEST(b == 1);
+                    DLIB_TEST(c == 1);
+                    DLIB_TEST(res == 1);
 
                     tp.add_task(&gincrement, a);
                     tp.add_task(*this, &thread_pool_tester::increment, b);
@@ -117,124 +117,124 @@ namespace
                     tp.add_task(*this, &thread_pool_tester::increment, c);
                     tp.add_task(gincrement, res);
 
-                    DLIB_CASSERT(a == 3,"");
-                    DLIB_CASSERT(b == 3,"");
-                    DLIB_CASSERT(c == 3,"");
-                    DLIB_CASSERT(res == 3,"");
+                    DLIB_TEST(a == 3);
+                    DLIB_TEST(b == 3);
+                    DLIB_TEST(c == 3);
+                    DLIB_TEST(res == 3);
 
                     tp.add_task(*this, &thread_pool_tester::increment, c);
                     tp.add_task(gincrement, res);
-                    DLIB_CASSERT(c == 4,"");
-                    DLIB_CASSERT(res == 4,"");
+                    DLIB_TEST(c == 4);
+                    DLIB_TEST(res == 4);
 
 
                     tp.add_task(gadd, a, b, res);
-                    DLIB_CASSERT(res == a+b,"");
-                    DLIB_CASSERT(res == 6,"");
+                    DLIB_TEST(res == a+b);
+                    DLIB_TEST(res == 6);
                     a = 3;
                     b = 4;
                     res = 99;
-                    DLIB_CASSERT(res == 99,"");
+                    DLIB_TEST(res == 99);
                     tp.add_task(*this, &thread_pool_tester::add, a, b, res);
-                    DLIB_CASSERT(res == a+b,"");
-                    DLIB_CASSERT(res == 7,"");
+                    DLIB_TEST(res == a+b);
+                    DLIB_TEST(res == 7);
 
                     a = 1;
                     b = 2;
                     c = 3;
                     res = 88;
-                    DLIB_CASSERT(res == 88,"");
-                    DLIB_CASSERT(a == 1,"");
-                    DLIB_CASSERT(b == 2,"");
-                    DLIB_CASSERT(c == 3,"");
+                    DLIB_TEST(res == 88);
+                    DLIB_TEST(a == 1);
+                    DLIB_TEST(b == 2);
+                    DLIB_TEST(c == 3);
 
                     tp.add_task(gadd2, a, b, c, res);
-                    DLIB_CASSERT(res == 6,"");
-                    DLIB_CASSERT(a == 1,"");
-                    DLIB_CASSERT(b == 2,"");
-                    DLIB_CASSERT(c == 3,"");
+                    DLIB_TEST(res == 6);
+                    DLIB_TEST(a == 1);
+                    DLIB_TEST(b == 2);
+                    DLIB_TEST(c == 3);
 
                     a = 1;
                     b = 2;
                     c = 3;
                     res = 88;
-                    DLIB_CASSERT(res == 88,"");
-                    DLIB_CASSERT(a == 1,"");
-                    DLIB_CASSERT(b == 2,"");
-                    DLIB_CASSERT(c == 3,"");
+                    DLIB_TEST(res == 88);
+                    DLIB_TEST(a == 1);
+                    DLIB_TEST(b == 2);
+                    DLIB_TEST(c == 3);
                     tp.add_task(*this, &thread_pool_tester::add2, a, b, c, res);
-                    DLIB_CASSERT(res == 6,"");
-                    DLIB_CASSERT(a == 1,"");
-                    DLIB_CASSERT(b == 2,"");
-                    DLIB_CASSERT(c == 3,"");
+                    DLIB_TEST(res == 6);
+                    DLIB_TEST(a == 1);
+                    DLIB_TEST(b == 2);
+                    DLIB_TEST(c == 3);
 
                     a = 1;
                     b = 2;
                     c = 3;
                     res = 88;
                     tp.add_task(gadd1, a, b);
-                    DLIB_CASSERT(a == 1,"");
-                    DLIB_CASSERT(b == 3,"");
+                    DLIB_TEST(a == 1);
+                    DLIB_TEST(b == 3);
                     a = 2;
                     tp.add_task(*this, &thread_pool_tester::add1, a, b);
-                    DLIB_CASSERT(a == 2,"");
-                    DLIB_CASSERT(b == 5,"");
+                    DLIB_TEST(a == 2);
+                    DLIB_TEST(b == 5);
 
 
                     val = 4;
                     uint64 id = tp.add_task(*this, &thread_pool_tester::zero_val);
                     tp.wait_for_task(id);
-                    DLIB_CASSERT(val == 0,"");
+                    DLIB_TEST(val == 0);
                     id = tp.add_task(*this, &thread_pool_tester::accum2, 1,2);
                     tp.wait_for_all_tasks();
-                    DLIB_CASSERT(val == 3,"");
+                    DLIB_TEST(val == 3);
                     id = tp.add_task(*this, &thread_pool_tester::accum1, 3);
                     tp.wait_for_task(id);
-                    DLIB_CASSERT(val == 6,"");
+                    DLIB_TEST(val == 6);
 
 
                     obj.get().val = 8;
-                    DLIB_CASSERT(obj.get().val == 8,"");
+                    DLIB_TEST(obj.get().val == 8);
                     tp.add_task(gset_struct_to_zero, obj);
-                    DLIB_CASSERT(obj.get().val == 0,"");
+                    DLIB_TEST(obj.get().val == 0);
                     obj.get().val = 8;
-                    DLIB_CASSERT(obj.get().val == 8,"");
+                    DLIB_TEST(obj.get().val == 8);
                     tp.add_task(*this,&thread_pool_tester::set_struct_to_zero, obj);
-                    DLIB_CASSERT(obj.get().val == 0,"");
+                    DLIB_TEST(obj.get().val == 0);
 
                     a = 1;
                     b = 2;
                     res = 0;
                     add_functor f;
                     tp.add_task(f, a, b, res);
-                    DLIB_CASSERT(a == 1,"");
-                    DLIB_CASSERT(b == 2,"");
-                    DLIB_CASSERT(res == 3,"");
+                    DLIB_TEST(a == 1);
+                    DLIB_TEST(b == 2);
+                    DLIB_TEST(res == 3);
 
                     global_var = 0;
-                    DLIB_CASSERT(global_var == 0,"");
+                    DLIB_TEST(global_var == 0);
                     id = tp.add_task(&set_global_var);
                     tp.wait_for_task(id);
-                    DLIB_CASSERT(global_var == 9,"");
+                    DLIB_TEST(global_var == 9);
 
                     global_var = 0;
-                    DLIB_CASSERT(global_var == 0,"");
+                    DLIB_TEST(global_var == 0);
                     id = tp.add_task(f);
                     tp.wait_for_task(id);
-                    DLIB_CASSERT(global_var == 9,"");
+                    DLIB_TEST(global_var == 9);
 
                     global_var = 0;
-                    DLIB_CASSERT(global_var == 0,"");
+                    DLIB_TEST(global_var == 0);
                     id = tp.add_task(f, &add_functor::set_global_var);
                     tp.wait_for_task(id);
-                    DLIB_CASSERT(global_var == 9,"");
+                    DLIB_TEST(global_var == 9);
 
 
                     global_var = 0;
-                    DLIB_CASSERT(global_var == 0,"");
+                    DLIB_TEST(global_var == 0);
                     id = tp.add_task(f, &add_functor::set_global_var_const);
                     tp.wait_for_task(id);
-                    DLIB_CASSERT(global_var == 9,"");
+                    DLIB_TEST(global_var == 9);
 
 
 

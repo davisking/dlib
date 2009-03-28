@@ -48,27 +48,27 @@ namespace
 
 
 
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.at_start(),"");
-            DLIB_CASSERT(test.move_next() == false,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.at_start());
+            DLIB_TEST(test.move_next() == false);
+            DLIB_TEST(test.current_element_valid() == false);
 
 
 
-            DLIB_CASSERT(test.parsed_line() == false,"");
-            DLIB_CASSERT(test.option_is_defined(_dT(ct,"a")) == false,"");
-            DLIB_CASSERT(test.option_is_defined(_dT(ct,"a")) == false,"");
-            DLIB_CASSERT(test.option_is_defined(_dT(ct,"a")) == false,"");
+            DLIB_TEST(test.parsed_line() == false);
+            DLIB_TEST(test.option_is_defined(_dT(ct,"a")) == false);
+            DLIB_TEST(test.option_is_defined(_dT(ct,"a")) == false);
+            DLIB_TEST(test.option_is_defined(_dT(ct,"a")) == false);
 
-            DLIB_CASSERT(test.parsed_line() == false,"");
-            DLIB_CASSERT(test.option_is_defined(_dT(ct,"a")) == false,"");
-            DLIB_CASSERT(test.option_is_defined(_dT(ct,"b")) == false,"");
-            DLIB_CASSERT(test.option_is_defined(_dT(ct,"\0")) == false,"");
+            DLIB_TEST(test.parsed_line() == false);
+            DLIB_TEST(test.option_is_defined(_dT(ct,"a")) == false);
+            DLIB_TEST(test.option_is_defined(_dT(ct,"b")) == false);
+            DLIB_TEST(test.option_is_defined(_dT(ct,"\0")) == false);
 
-            DLIB_CASSERT(test.current_element_valid() == false,"");
-            DLIB_CASSERT(test.at_start() == false,"");
-            DLIB_CASSERT(test.move_next() == false,"");
-            DLIB_CASSERT(test.current_element_valid() == false,"");
+            DLIB_TEST(test.current_element_valid() == false);
+            DLIB_TEST(test.at_start() == false);
+            DLIB_TEST(test.move_next() == false);
+            DLIB_TEST(test.current_element_valid() == false);
 
 
 
@@ -94,24 +94,24 @@ namespace
                 try { test.parse(argc,argv); }
                 catch (error& e)
                 {
-                    DLIB_CASSERT(false,e.info);
+                    DLIB_TEST_MSG(false,e.info);
                 }
 
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).name() == _dT(ct,"c"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).number_of_arguments() == 0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).number_of_arguments() == 0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test.number_of_arguments() == 2,"");
-                DLIB_CASSERT(test[0] == _dT(ct,"arg1"),"");
-                DLIB_CASSERT(test[1] == _dT(ct,"arg2"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"d")).count()==0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).count()==1,test.option(_dT(ct,"c")).count());
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"),"");
+                DLIB_TEST(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"));
+                DLIB_TEST(test.option(_dT(ct,"c")).name() == _dT(ct,"c"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"));
+                DLIB_TEST(test.option(_dT(ct,"davis")).number_of_arguments() == 0);
+                DLIB_TEST(test.option(_dT(ct,"c")).number_of_arguments() == 0);
+                DLIB_TEST(test.option(_dT(ct,"Z")).number_of_arguments() == 2);
+                DLIB_TEST(test.number_of_arguments() == 2);
+                DLIB_TEST(test[0] == _dT(ct,"arg1"));
+                DLIB_TEST(test[1] == _dT(ct,"arg2"));
+                DLIB_TEST(test.option(_dT(ct,"d")).count()==0);
+                DLIB_TEST(test.option(_dT(ct,"davis")).count()==1);
+                DLIB_TEST_MSG(test.option(_dT(ct,"c")).count()==1,test.option(_dT(ct,"c")).count());
+                DLIB_TEST(test.option(_dT(ct,"Z")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"));
 
             }
 
@@ -142,24 +142,24 @@ namespace
                 try { test2.parse(argc,argv); }
                 catch (error& e)
                 {
-                    DLIB_CASSERT(false,e.info);
+                    DLIB_TEST_MSG(false,e.info);
                 }
 
-                DLIB_CASSERT(test2.option(_dT(ct,"davis")).name() == _dT(ct,"davis"),"");
-                DLIB_CASSERT(test2.option(_dT(ct,"c")).name() == _dT(ct,"c"),"");
-                DLIB_CASSERT(test2.option(_dT(ct,"Z")).name() == _dT(ct,"Z"),"");
-                DLIB_CASSERT(test2.option(_dT(ct,"davis")).number_of_arguments() == 0,"");
-                DLIB_CASSERT(test2.option(_dT(ct,"c")).number_of_arguments() == 0,"");
-                DLIB_CASSERT(test2.option(_dT(ct,"Z")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test2.number_of_arguments() == 2,"");
-                DLIB_CASSERT(test2[0] == _dT(ct,"arg1"),"");
-                DLIB_CASSERT(test2[1] == _dT(ct,"arg2"),"");
-                DLIB_CASSERT(test2.option(_dT(ct,"d")).count()==0,"");
-                DLIB_CASSERT(test2.option(_dT(ct,"davis")).count()==1,"");
-                DLIB_CASSERT(test2.option(_dT(ct,"c")).count()==1,"");
-                DLIB_CASSERT(test2.option(_dT(ct,"Z")).count()==1,"");
-                DLIB_CASSERT(test2.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"),"");
-                DLIB_CASSERT(test2.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"),
+                DLIB_TEST(test2.option(_dT(ct,"davis")).name() == _dT(ct,"davis"));
+                DLIB_TEST(test2.option(_dT(ct,"c")).name() == _dT(ct,"c"));
+                DLIB_TEST(test2.option(_dT(ct,"Z")).name() == _dT(ct,"Z"));
+                DLIB_TEST(test2.option(_dT(ct,"davis")).number_of_arguments() == 0);
+                DLIB_TEST(test2.option(_dT(ct,"c")).number_of_arguments() == 0);
+                DLIB_TEST(test2.option(_dT(ct,"Z")).number_of_arguments() == 2);
+                DLIB_TEST(test2.number_of_arguments() == 2);
+                DLIB_TEST(test2[0] == _dT(ct,"arg1"));
+                DLIB_TEST(test2[1] == _dT(ct,"arg2"));
+                DLIB_TEST(test2.option(_dT(ct,"d")).count()==0);
+                DLIB_TEST(test2.option(_dT(ct,"davis")).count()==1);
+                DLIB_TEST(test2.option(_dT(ct,"c")).count()==1);
+                DLIB_TEST(test2.option(_dT(ct,"Z")).count()==1);
+                DLIB_TEST(test2.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"));
+                DLIB_TEST_MSG(test2.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"),
                              narrow(_dT(ct,"*") + test2.option(_dT(ct,"Z")).argument(0,0) + _dT(ct,"*")));
 
 
@@ -193,10 +193,10 @@ namespace
                 try { test.parse(argc,argv); }
                 catch (error& e)
                 {
-                    DLIB_CASSERT(false,e.info);
+                    DLIB_TEST_MSG(false,e.info);
                 }
 
-                DLIB_CASSERT(test.parsed_line(),"");
+                DLIB_TEST(test.parsed_line());
 
                 int count = 0;
                 while (test.move_next())
@@ -204,33 +204,33 @@ namespace
                     ++count;
                     if (test.element().name() == _dT(ct,"d"))
                     {
-                        DLIB_CASSERT(test.element().count() == 0,"");
+                        DLIB_TEST(test.element().count() == 0);
                     }
                     else
                     {                            
-                        DLIB_CASSERT(test.element().count() == 1,"");
+                        DLIB_TEST(test.element().count() == 1);
                     }
 
                 }
-                DLIB_CASSERT(count == 4,count);
+                DLIB_TEST_MSG(count == 4,count);
 
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).name() == _dT(ct,"c"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).number_of_arguments() == 0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test.number_of_arguments() == 2,"");
-                DLIB_CASSERT(test[0] == _dT(ct,"arg1"),"");
-                DLIB_CASSERT(test[1] == _dT(ct,"arg2"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"d")).count()==0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).argument(0,0) == _dT(ct,"darg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).argument(1,0) == _dT(ct,"darg2"),
+                DLIB_TEST(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"));
+                DLIB_TEST(test.option(_dT(ct,"c")).name() == _dT(ct,"c"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"));
+                DLIB_TEST(test.option(_dT(ct,"davis")).number_of_arguments() == 2);
+                DLIB_TEST(test.option(_dT(ct,"c")).number_of_arguments() == 0);
+                DLIB_TEST(test.option(_dT(ct,"Z")).number_of_arguments() == 2);
+                DLIB_TEST(test.number_of_arguments() == 2);
+                DLIB_TEST(test[0] == _dT(ct,"arg1"));
+                DLIB_TEST(test[1] == _dT(ct,"arg2"));
+                DLIB_TEST(test.option(_dT(ct,"d")).count()==0);
+                DLIB_TEST(test.option(_dT(ct,"davis")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"c")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"));
+                DLIB_TEST(test.option(_dT(ct,"davis")).argument(0,0) == _dT(ct,"darg"));
+                DLIB_TEST_MSG(test.option(_dT(ct,"davis")).argument(1,0) == _dT(ct,"darg2"),
                              narrow(test.option(_dT(ct,"davis")).argument(1,0)));
             }
 
@@ -274,10 +274,10 @@ namespace
                 try { test.parse(argc,argv); }
                 catch (error& e)
                 {
-                    DLIB_CASSERT(false,e.info);
+                    DLIB_TEST_MSG(false,e.info);
                 }
 
-                DLIB_CASSERT(test.parsed_line(),"");
+                DLIB_TEST(test.parsed_line());
 
                 int count = 0;
                 while (test.move_next())
@@ -285,33 +285,33 @@ namespace
                     ++count;
                     if (test.element().name() == _dT(ct,"d"))
                     {
-                        DLIB_CASSERT(test.element().count() == 0,"");
+                        DLIB_TEST(test.element().count() == 0);
                     }
                     else
                     {                            
-                        DLIB_CASSERT(test.element().count() == 1,"");
+                        DLIB_TEST(test.element().count() == 1);
                     }
 
                 }
-                DLIB_CASSERT(count == 4,count);
+                DLIB_TEST_MSG(count == 4,count);
 
-                DLIB_CASSERT(test.option(_dT(ct,"dav-is")).name() == _dT(ct,"dav-is"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).name() == _dT(ct,"c"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"dav-is")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).number_of_arguments() == 0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test.number_of_arguments() == 2,"");
-                DLIB_CASSERT(test[0] == _dT(ct,"arg1"),"");
-                DLIB_CASSERT(test[1] == _dT(ct,"arg2"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"d")).count()==0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"dav-is")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"dav-is")).argument(0,0) == _dT(ct,"darg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"dav-is")).argument(1,0) == _dT(ct,"darg2"),
+                DLIB_TEST(test.option(_dT(ct,"dav-is")).name() == _dT(ct,"dav-is"));
+                DLIB_TEST(test.option(_dT(ct,"c")).name() == _dT(ct,"c"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"));
+                DLIB_TEST(test.option(_dT(ct,"dav-is")).number_of_arguments() == 2);
+                DLIB_TEST(test.option(_dT(ct,"c")).number_of_arguments() == 0);
+                DLIB_TEST(test.option(_dT(ct,"Z")).number_of_arguments() == 2);
+                DLIB_TEST(test.number_of_arguments() == 2);
+                DLIB_TEST(test[0] == _dT(ct,"arg1"));
+                DLIB_TEST(test[1] == _dT(ct,"arg2"));
+                DLIB_TEST(test.option(_dT(ct,"d")).count()==0);
+                DLIB_TEST(test.option(_dT(ct,"dav-is")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"c")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"));
+                DLIB_TEST(test.option(_dT(ct,"dav-is")).argument(0,0) == _dT(ct,"darg"));
+                DLIB_TEST_MSG(test.option(_dT(ct,"dav-is")).argument(1,0) == _dT(ct,"darg2"),
                              narrow(test.option(_dT(ct,"dav-is")).argument(1,0)));
             }
 
@@ -354,10 +354,10 @@ namespace
                 try { test.parse(argc,argv); }
                 catch (error& e)
                 {
-                    DLIB_CASSERT(false,e.info);
+                    DLIB_TEST_MSG(false,e.info);
                 }
 
-                DLIB_CASSERT(test.parsed_line(),"");
+                DLIB_TEST(test.parsed_line());
 
                 int count = 0;
                 while (test.move_next())
@@ -365,33 +365,33 @@ namespace
                     ++count;
                     if (test.element().name() == _dT(ct,"d"))
                     {
-                        DLIB_CASSERT(test.element().count() == 0,"");
+                        DLIB_TEST(test.element().count() == 0);
                     }
                     else
                     {                            
-                        DLIB_CASSERT(test.element().count() == 1,"");
+                        DLIB_TEST(test.element().count() == 1);
                     }
 
                 }
-                DLIB_CASSERT(count == 4,count);
+                DLIB_TEST_MSG(count == 4,count);
 
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).name() == _dT(ct,"c"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).number_of_arguments() == 0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test.number_of_arguments() == 2,"");
-                DLIB_CASSERT(test[0] == _dT(ct,"arg1"),"");
-                DLIB_CASSERT(test[1] == _dT(ct,"arg2"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"d")).count()==0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).argument(0,0) == _dT(ct,"darg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).argument(1,0) == _dT(ct,"darg2"),
+                DLIB_TEST(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"));
+                DLIB_TEST(test.option(_dT(ct,"c")).name() == _dT(ct,"c"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"));
+                DLIB_TEST(test.option(_dT(ct,"davis")).number_of_arguments() == 2);
+                DLIB_TEST(test.option(_dT(ct,"c")).number_of_arguments() == 0);
+                DLIB_TEST(test.option(_dT(ct,"Z")).number_of_arguments() == 2);
+                DLIB_TEST(test.number_of_arguments() == 2);
+                DLIB_TEST(test[0] == _dT(ct,"arg1"));
+                DLIB_TEST(test[1] == _dT(ct,"arg2"));
+                DLIB_TEST(test.option(_dT(ct,"d")).count()==0);
+                DLIB_TEST(test.option(_dT(ct,"davis")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"c")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"));
+                DLIB_TEST(test.option(_dT(ct,"davis")).argument(0,0) == _dT(ct,"darg"));
+                DLIB_TEST_MSG(test.option(_dT(ct,"davis")).argument(1,0) == _dT(ct,"darg2"),
                              narrow(test.option(_dT(ct,"davis")).argument(1,0)));
             }
 
@@ -433,10 +433,10 @@ namespace
                 try { test.parse(argc,argv); }
                 catch (error& e)
                 {
-                    DLIB_CASSERT(false,e.info);
+                    DLIB_TEST_MSG(false,e.info);
                 }
 
-                DLIB_CASSERT(test.parsed_line(),"");
+                DLIB_TEST(test.parsed_line());
 
                 int count = 0;
                 while (test.move_next())
@@ -444,32 +444,32 @@ namespace
                     ++count;
                     if (test.element().name() == _dT(ct,"d"))
                     {
-                        DLIB_CASSERT(test.element().count() == 0,"");
+                        DLIB_TEST(test.element().count() == 0);
                     }
                     else
                     {                            
-                        DLIB_CASSERT(test.element().count() == 1,"");
+                        DLIB_TEST(test.element().count() == 1);
                     }
 
                 }
-                DLIB_CASSERT(count == 4,count);
+                DLIB_TEST_MSG(count == 4,count);
 
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).name() == _dT(ct,"c"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).number_of_arguments() == 1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).number_of_arguments() == 0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test.number_of_arguments() == 2,"");
-                DLIB_CASSERT(test[0] == _dT(ct,"arg1"),"");
-                DLIB_CASSERT(test[1] == _dT(ct,"arg2"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"d")).count()==0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).argument(0,0) == _dT(ct,"darg"),"");
+                DLIB_TEST(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"));
+                DLIB_TEST(test.option(_dT(ct,"c")).name() == _dT(ct,"c"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"));
+                DLIB_TEST(test.option(_dT(ct,"davis")).number_of_arguments() == 1);
+                DLIB_TEST(test.option(_dT(ct,"c")).number_of_arguments() == 0);
+                DLIB_TEST(test.option(_dT(ct,"Z")).number_of_arguments() == 2);
+                DLIB_TEST(test.number_of_arguments() == 2);
+                DLIB_TEST(test[0] == _dT(ct,"arg1"));
+                DLIB_TEST(test[1] == _dT(ct,"arg2"));
+                DLIB_TEST(test.option(_dT(ct,"d")).count()==0);
+                DLIB_TEST(test.option(_dT(ct,"davis")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"c")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(1,0) == _dT(ct,"asdf"));
+                DLIB_TEST(test.option(_dT(ct,"davis")).argument(0,0) == _dT(ct,"darg"));
             }
 
 
@@ -510,10 +510,10 @@ namespace
                 try { test.parse(argc,argv); }
                 catch (error& e)
                 {
-                    DLIB_CASSERT(false,e.info);
+                    DLIB_TEST_MSG(false,e.info);
                 }
 
-                DLIB_CASSERT(test.parsed_line(),"");
+                DLIB_TEST(test.parsed_line());
 
                 int count = 0;
                 while (test.move_next())
@@ -521,32 +521,32 @@ namespace
                     ++count;
                     if (test.element().name() == _dT(ct,"d"))
                     {
-                        DLIB_CASSERT(test.element().count() == 0,"");
+                        DLIB_TEST(test.element().count() == 0);
                     }
                     else
                     {                            
-                        DLIB_CASSERT(test.element().count() == 1,"");
+                        DLIB_TEST(test.element().count() == 1);
                     }
 
                 }
-                DLIB_CASSERT(count == 4,count);
+                DLIB_TEST_MSG(count == 4,count);
 
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).name() == _dT(ct,"c"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).number_of_arguments() == 1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).number_of_arguments() == 0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).number_of_arguments() == 2,"");
-                DLIB_CASSERT(test.number_of_arguments() == 2,"");
-                DLIB_CASSERT(test[0] == _dT(ct,"arg1"),"");
-                DLIB_CASSERT(test[1] == _dT(ct,"arg2"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"d")).count()==0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(1) == _dT(ct,"asdf"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).argument(0,0) == _dT(ct,"darg"),"");
+                DLIB_TEST(test.option(_dT(ct,"davis")).name() == _dT(ct,"davis"));
+                DLIB_TEST(test.option(_dT(ct,"c")).name() == _dT(ct,"c"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).name() == _dT(ct,"Z"));
+                DLIB_TEST(test.option(_dT(ct,"davis")).number_of_arguments() == 1);
+                DLIB_TEST(test.option(_dT(ct,"c")).number_of_arguments() == 0);
+                DLIB_TEST(test.option(_dT(ct,"Z")).number_of_arguments() == 2);
+                DLIB_TEST(test.number_of_arguments() == 2);
+                DLIB_TEST(test[0] == _dT(ct,"arg1"));
+                DLIB_TEST(test[1] == _dT(ct,"arg2"));
+                DLIB_TEST(test.option(_dT(ct,"d")).count()==0);
+                DLIB_TEST(test.option(_dT(ct,"davis")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"c")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"zarg"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(1) == _dT(ct,"asdf"));
+                DLIB_TEST(test.option(_dT(ct,"davis")).argument(0,0) == _dT(ct,"darg"));
             }
 
 
@@ -584,11 +584,11 @@ namespace
                 try { test.parse(argc,argv); }
                 catch (typename clp::cmd_line_parse_error& e)
                 {
-                    DLIB_CASSERT(e.type == EINVALID_OPTION,"");
-                    DLIB_CASSERT(e.item == _dT(ct,"avis"),"");
+                    DLIB_TEST(e.type == EINVALID_OPTION);
+                    DLIB_TEST(e.item == _dT(ct,"avis"));
                     ok = true;
                 }
-                DLIB_CASSERT(ok,"");
+                DLIB_TEST(ok);
 
 
             }
@@ -630,7 +630,7 @@ namespace
                 ok = false;
                 test.parse(argc,argv); 
 
-                DLIB_CASSERT(test.option(_dT(ct,"c")).count()==2,"");
+                DLIB_TEST(test.option(_dT(ct,"c")).count()==2);
 
             }
 
@@ -669,10 +669,10 @@ namespace
             test.add_option(_dT(ct,"Z"),_dT(ct,"Z option"),2);
 
 
-            DLIB_CASSERT(test.option(_dT(ct,"davis")).description() == _dT(ct,"davis option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"b")).description() == _dT(ct,"b option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"d")).description() == _dT(ct,"d option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"Z")).description() == _dT(ct,"Z option"),"");
+            DLIB_TEST(test.option(_dT(ct,"davis")).description() == _dT(ct,"davis option"));
+            DLIB_TEST(test.option(_dT(ct,"b")).description() == _dT(ct,"b option"));
+            DLIB_TEST(test.option(_dT(ct,"d")).description() == _dT(ct,"d option"));
+            DLIB_TEST(test.option(_dT(ct,"Z")).description() == _dT(ct,"Z option"));
 
             for (int k = 0; k < 5; ++k)
             {
@@ -681,12 +681,12 @@ namespace
                 try { test.parse(argc,argv); }
                 catch (typename clp::cmd_line_parse_error& e)
                 {
-                    DLIB_CASSERT(e.type == ETOO_FEW_ARGS,"");
-                    DLIB_CASSERT(e.num == 2,"");
-                    DLIB_CASSERT(e.item == _dT(ct,"davis"),"");
+                    DLIB_TEST(e.type == ETOO_FEW_ARGS);
+                    DLIB_TEST(e.num == 2);
+                    DLIB_TEST(e.item == _dT(ct,"davis"));
                     ok = true;
                 }
-                DLIB_CASSERT(ok,"");
+                DLIB_TEST(ok);
 
 
 
@@ -694,10 +694,10 @@ namespace
                 while (test.move_next())
                 {
                     ++count;
-                    DLIB_CASSERT(test.element().count() == 0,"");
-                    DLIB_CASSERT(test.option_is_defined(test.element().name()),"");
+                    DLIB_TEST(test.element().count() == 0);
+                    DLIB_TEST(test.option_is_defined(test.element().name()));
                 }
-                DLIB_CASSERT(count == 4,count);
+                DLIB_TEST_MSG(count == 4,count);
 
 
             }
@@ -740,10 +740,10 @@ namespace
             test.add_option(_dT(ct,"Z"),_dT(ct,"Z option"),2);
 
 
-            DLIB_CASSERT(test.option(_dT(ct,"mavis")).description() == _dT(ct,"mavis option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"b")).description() == _dT(ct,"b option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"d")).description() == _dT(ct,"d option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"Z")).description() == _dT(ct,"Z option"),"");
+            DLIB_TEST(test.option(_dT(ct,"mavis")).description() == _dT(ct,"mavis option"));
+            DLIB_TEST(test.option(_dT(ct,"b")).description() == _dT(ct,"b option"));
+            DLIB_TEST(test.option(_dT(ct,"d")).description() == _dT(ct,"d option"));
+            DLIB_TEST(test.option(_dT(ct,"Z")).description() == _dT(ct,"Z option"));
 
             for (int k = 0; k < 5; ++k)
             {
@@ -752,11 +752,11 @@ namespace
                 try { test.parse(argc,argv); }
                 catch (typename clp::cmd_line_parse_error& e)
                 {
-                    DLIB_CASSERT(e.type == EINVALID_OPTION,"");
-                    DLIB_CASSERT(e.item == _dT(ct,"davis"),"");
+                    DLIB_TEST(e.type == EINVALID_OPTION);
+                    DLIB_TEST(e.item == _dT(ct,"davis"));
                     ok = true;
                 }
-                DLIB_CASSERT(ok,"");
+                DLIB_TEST(ok);
 
 
 
@@ -764,10 +764,10 @@ namespace
                 while (test.move_next())
                 {
                     ++count;
-                    DLIB_CASSERT(test.element().count() == 0,"");
-                    DLIB_CASSERT(test.option_is_defined(test.element().name()),"");
+                    DLIB_TEST(test.element().count() == 0);
+                    DLIB_TEST(test.option_is_defined(test.element().name()));
                 }
-                DLIB_CASSERT(count == 4,count);
+                DLIB_TEST_MSG(count == 4,count);
 
 
             }
@@ -799,10 +799,10 @@ namespace
             test.add_option(_dT(ct,"Z"),_dT(ct,"Z option"),2);
 
 
-            DLIB_CASSERT(test.option(_dT(ct,"davis")).description() == _dT(ct,"davis option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"c")).description() == _dT(ct,"c option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"d")).description() == _dT(ct,"d option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"Z")).description() == _dT(ct,"Z option"),"");
+            DLIB_TEST(test.option(_dT(ct,"davis")).description() == _dT(ct,"davis option"));
+            DLIB_TEST(test.option(_dT(ct,"c")).description() == _dT(ct,"c option"));
+            DLIB_TEST(test.option(_dT(ct,"d")).description() == _dT(ct,"d option"));
+            DLIB_TEST(test.option(_dT(ct,"Z")).description() == _dT(ct,"Z option"));
 
             for (int k = 0; k < 5; ++k)
             {
@@ -810,16 +810,16 @@ namespace
                 test.parse(argc,argv); 
 
 
-                DLIB_CASSERT(test.number_of_arguments() == 0,"");
+                DLIB_TEST(test.number_of_arguments() == 0);
 
                 int count = 0;
                 while (test.move_next())
                 {
                     ++count;
-                    DLIB_CASSERT(test.element().count() == 0,"");
-                    DLIB_CASSERT(test.option_is_defined(test.element().name()),"");
+                    DLIB_TEST(test.element().count() == 0);
+                    DLIB_TEST(test.option_is_defined(test.element().name()));
                 }
-                DLIB_CASSERT(count == 4,count);
+                DLIB_TEST_MSG(count == 4,count);
 
 
             }
@@ -860,31 +860,31 @@ namespace
             test.add_option(_dT(ct,"Z"),_dT(ct,"Z option"),1);
 
 
-            DLIB_CASSERT(test.option(_dT(ct,"davis")).description() == _dT(ct,"davis option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"c")).description() == _dT(ct,"c option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"d")).description() == _dT(ct,"d option"),"");
-            DLIB_CASSERT(test.option(_dT(ct,"Z")).description() == _dT(ct,"Z option"),"");
+            DLIB_TEST(test.option(_dT(ct,"davis")).description() == _dT(ct,"davis option"));
+            DLIB_TEST(test.option(_dT(ct,"c")).description() == _dT(ct,"c option"));
+            DLIB_TEST(test.option(_dT(ct,"d")).description() == _dT(ct,"d option"));
+            DLIB_TEST(test.option(_dT(ct,"Z")).description() == _dT(ct,"Z option"));
 
             for (int k = 0; k < 5; ++k)
             {
 
                 test.parse(argc,argv);
 
-                DLIB_CASSERT(test.number_of_arguments() == 4,test.number_of_arguments());
-                DLIB_CASSERT(test[0] == _dT(ct,"arg1"),"");
-                DLIB_CASSERT(test[1] == _dT(ct,"arg2"),"");
-                DLIB_CASSERT(test[2] == _dT(ct,"-c"),"");
-                DLIB_CASSERT(test[3] == _dT(ct,"asdf"),"");
+                DLIB_TEST_MSG(test.number_of_arguments() == 4,test.number_of_arguments());
+                DLIB_TEST(test[0] == _dT(ct,"arg1"));
+                DLIB_TEST(test[1] == _dT(ct,"arg2"));
+                DLIB_TEST(test[2] == _dT(ct,"-c"));
+                DLIB_TEST(test[3] == _dT(ct,"asdf"));
 
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).count()==1,"");
-                DLIB_CASSERT(test.option(_dT(ct,"davis")).argument() == _dT(ct,"-darg"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"c")).count()==0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"d")).count()==0,"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).count()==3,"");
+                DLIB_TEST(test.option(_dT(ct,"davis")).count()==1);
+                DLIB_TEST(test.option(_dT(ct,"davis")).argument() == _dT(ct,"-darg"));
+                DLIB_TEST(test.option(_dT(ct,"c")).count()==0);
+                DLIB_TEST(test.option(_dT(ct,"d")).count()==0);
+                DLIB_TEST(test.option(_dT(ct,"Z")).count()==3);
 
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"eat"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(0,1) == _dT(ct,"at"),"");
-                DLIB_CASSERT(test.option(_dT(ct,"Z")).argument(0,2) == _dT(ct,"joe's"),"");
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(0,0) == _dT(ct,"eat"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(0,1) == _dT(ct,"at"));
+                DLIB_TEST(test.option(_dT(ct,"Z")).argument(0,2) == _dT(ct,"joe's"));
 
 
             }

@@ -46,42 +46,42 @@ namespace
 
         enumerable<int>& e = q;
 
-        // I will use these DLIB_CASSERT macros to assert that conditions are true.  If they are
+        // I will use these DLIB_TEST_MSG macros to assert that conditions are true.  If they are
         // false then it means we have detected an error in the queue object.  CASSERT
         // will then throw an exception which we will catch at the end of this function and
         // report as an error/failed test.
-        DLIB_CASSERT(e.at_start() == true,"");
+        DLIB_TEST(e.at_start() == true);
 
         int a = 0;
 
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q.at_start() == true,"");
-        DLIB_CASSERT(q.current_element_valid() == false, "");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q.at_start() == true);
+        DLIB_TEST(q.current_element_valid() == false);
 
         q.sort();
 
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q.at_start() == true,"");
-        DLIB_CASSERT(q.current_element_valid() == false, "");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q.at_start() == true);
+        DLIB_TEST(q.current_element_valid() == false);
 
-        DLIB_CASSERT (q.move_next() == false,"");
-        DLIB_CASSERT (q.move_next() == false,"");
-        DLIB_CASSERT (q.move_next() == false,"");
-        DLIB_CASSERT (q.move_next() == false,"");
-        DLIB_CASSERT (q.move_next() == false,"");
-        DLIB_CASSERT (q.move_next() == false,"");
+        DLIB_TEST (q.move_next() == false);
+        DLIB_TEST (q.move_next() == false);
+        DLIB_TEST (q.move_next() == false);
+        DLIB_TEST (q.move_next() == false);
+        DLIB_TEST (q.move_next() == false);
+        DLIB_TEST (q.move_next() == false);
 
 
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q.at_start() == false,"");
-        DLIB_CASSERT(q.current_element_valid() == false, "");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q.at_start() == false);
+        DLIB_TEST(q.current_element_valid() == false);
 
 
         q.reset();
 
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q.at_start() == true,"");
-        DLIB_CASSERT(q.current_element_valid() == false, "");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q.at_start() == true);
+        DLIB_TEST(q.current_element_valid() == false);
 
 
 
@@ -95,8 +95,8 @@ namespace
 
         q.clear();
         q2.clear();
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q2.size() == 0,"");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q2.size() == 0);
 
         for (int i = 0; i < 10000; ++i)
         {
@@ -106,13 +106,13 @@ namespace
 
         q2.cat(q);
 
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q2.size() == 10000,"");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q2.size() == 10000);
 
         int g = 0;
         while (q2.move_next())
         {
-            DLIB_CASSERT(q2.element() == g,g);
+            DLIB_TEST_MSG(q2.element() == g,g);
             ++g;
         }
 
@@ -120,11 +120,11 @@ namespace
         {
             int a = 0;
             q2.dequeue(a);
-            DLIB_CASSERT(a == i,"");
+            DLIB_TEST(a == i);
         }
 
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q2.size() == 0,"");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q2.size() == 0);
         q.clear();
         q2.clear();
 
@@ -136,7 +136,7 @@ namespace
 
         dlog << LTRACE << "creating big pre-sorted queue";
         q.clear();
-        DLIB_CASSERT(q.size() == 0,"");
+        DLIB_TEST(q.size() == 0);
 
         for (int i = 0; i < 10000; ++i)
         {
@@ -152,7 +152,7 @@ namespace
         for (int i = 0; i < 10000; ++i)
         {
             q.dequeue(a);
-            DLIB_CASSERT(a == i,"");
+            DLIB_TEST(a == i);
         }
 
 
@@ -175,8 +175,8 @@ namespace
 
         q.clear();
         q2.clear();
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q2.size() == 0,"");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q2.size() == 0);
 
         for (int i = 0; i < 1; ++i)
         {
@@ -186,15 +186,15 @@ namespace
 
         q2.cat(q);
 
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q2.size() == 1,"");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q2.size() == 1);
 
 
 
         g = 0;
         while (q2.move_next())
         {
-            DLIB_CASSERT(q2.element() == g,g);
+            DLIB_TEST_MSG(q2.element() == g,g);
             ++g;
         }
 
@@ -202,11 +202,11 @@ namespace
         {
             int a = 0;
             q2.dequeue(a);
-            DLIB_CASSERT(a == i,"");
+            DLIB_TEST(a == i);
         }
 
-        DLIB_CASSERT(q.size() == 0,"");
-        DLIB_CASSERT(q2.size() == 0,"");
+        DLIB_TEST(q.size() == 0);
+        DLIB_TEST(q2.size() == 0);
         q.clear();
         q2.clear();
 
@@ -238,64 +238,64 @@ namespace
 
             while (q.move_next());
 
-            DLIB_CASSERT(q.at_start() == false,"");
+            DLIB_TEST(q.at_start() == false);
 
             q.sort();
 
-            DLIB_CASSERT(q.at_start() == true,"");
+            DLIB_TEST(q.at_start() == true);
 
             // serialize the state of q, then clear q, then
             // load the state back into q.
             ostringstream sout;
             serialize(q,sout);
-            DLIB_CASSERT(q.at_start() == true,"");
+            DLIB_TEST(q.at_start() == true);
             istringstream sin(sout.str());
             q.clear();
             deserialize(q,sin);
 
 
-            DLIB_CASSERT(q.at_start() == true,"");
+            DLIB_TEST(q.at_start() == true);
 
             a = 0;
             int last = 0;
             while (q.move_next())
             {
                 ++a;
-                DLIB_CASSERT(last <= q.element(),"items weren't actually sorted");
+                DLIB_TEST_MSG(last <= q.element(),"items weren't actually sorted");
                 last = q.element();
-                DLIB_CASSERT(q.current_element_valid() == true,"");
-                DLIB_CASSERT(q.at_start() == false,"");
-                DLIB_CASSERT(q.current_element_valid() == true,"");
+                DLIB_TEST(q.current_element_valid() == true);
+                DLIB_TEST(q.at_start() == false);
+                DLIB_TEST(q.current_element_valid() == true);
 
 
             }
-            DLIB_CASSERT(a == 10000,"some items were lost between the sorting and iterating");
+            DLIB_TEST_MSG(a == 10000,"some items were lost between the sorting and iterating");
 
 
-            DLIB_CASSERT(q.size() == 10000,"");
+            DLIB_TEST(q.size() == 10000);
             swap(q,q2);
-            DLIB_CASSERT(q2.at_start() == false,"");
-            DLIB_CASSERT(q2.current_element_valid() == false, "");
+            DLIB_TEST(q2.at_start() == false);
+            DLIB_TEST(q2.current_element_valid() == false);
 
-            DLIB_CASSERT (q2.move_next() == false,"");
-            DLIB_CASSERT (q2.move_next() == false,"");
-            DLIB_CASSERT (q2.move_next() == false,"");
-            DLIB_CASSERT (q2.move_next() == false,"");
-            DLIB_CASSERT (q2.move_next() == false,"");
-            DLIB_CASSERT (q2.move_next() == false,"");
+            DLIB_TEST (q2.move_next() == false);
+            DLIB_TEST (q2.move_next() == false);
+            DLIB_TEST (q2.move_next() == false);
+            DLIB_TEST (q2.move_next() == false);
+            DLIB_TEST (q2.move_next() == false);
+            DLIB_TEST (q2.move_next() == false);
 
 
-            DLIB_CASSERT(q2.size() == 10000,"");
-            DLIB_CASSERT(q2.at_start() == false,"");
-            DLIB_CASSERT(q2.current_element_valid() == false, "");
+            DLIB_TEST(q2.size() == 10000);
+            DLIB_TEST(q2.at_start() == false);
+            DLIB_TEST(q2.current_element_valid() == false);
 
             q2.clear();
 
             q.swap(q2);
 
-            DLIB_CASSERT(q.size() == 0,"");
-            DLIB_CASSERT(q.at_start() == true,"");
-            DLIB_CASSERT(q.current_element_valid() == false, "");
+            DLIB_TEST(q.size() == 0);
+            DLIB_TEST(q.at_start() == true);
+            DLIB_TEST(q.current_element_valid() == false);
         }
 
 
@@ -321,22 +321,22 @@ namespace
             while (q.move_next())
             {
                 ++a;
-                DLIB_CASSERT(last <= q.element(),"items weren't actually sorted");
-                DLIB_CASSERT(q.current_element_valid() == true,"");
+                DLIB_TEST_MSG(last <= q.element(),"items weren't actually sorted");
+                DLIB_TEST(q.current_element_valid() == true);
 
             }
-            DLIB_CASSERT(a == 1,"some items were lost between the sorting and iterating");
+            DLIB_TEST_MSG(a == 1,"some items were lost between the sorting and iterating");
 
 
-            DLIB_CASSERT(q.size() == 1,"");
-            DLIB_CASSERT(q.at_start() == false,"");
-            DLIB_CASSERT(q.current_element_valid() == false, "");
+            DLIB_TEST(q.size() == 1);
+            DLIB_TEST(q.at_start() == false);
+            DLIB_TEST(q.current_element_valid() == false);
 
             q.clear();
 
-            DLIB_CASSERT(q.size() == 0,"");
-            DLIB_CASSERT(q.at_start() == true,"");
-            DLIB_CASSERT(q.current_element_valid() == false, "");
+            DLIB_TEST(q.size() == 0);
+            DLIB_TEST(q.at_start() == true);
+            DLIB_TEST(q.current_element_valid() == false);
         }
 
 
@@ -350,14 +350,14 @@ namespace
                 int a = 3;
                 q.enqueue(a);
             }
-            DLIB_CASSERT(go.size() == 100,"");                
+            DLIB_TEST(go.size() == 100);                
             for (int i = 0; i < 100; ++i)
             {
                 int a = 9;
                 go.remove_any(a);
-                DLIB_CASSERT(a == 3,"");
+                DLIB_TEST(a == 3);
             }
-            DLIB_CASSERT(go.size() == 0,"");
+            DLIB_TEST(go.size() == 0);
         }
 
     }

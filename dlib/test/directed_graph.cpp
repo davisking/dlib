@@ -46,29 +46,29 @@ namespace
         directed_graph a, b;
         set<unsigned long>::compare_1b_c s;
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
-        DLIB_CASSERT(graph_contains_undirected_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
+        DLIB_TEST(graph_contains_undirected_cycle(a) == false);
 
-        DLIB_CASSERT(a.number_of_nodes() == 0,"");
+        DLIB_TEST(a.number_of_nodes() == 0);
 
-        DLIB_CASSERT(graph_contains_length_one_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_length_one_cycle(a) == false);
 
         a.set_number_of_nodes(5);
-        DLIB_CASSERT(graph_contains_length_one_cycle(a) == false,"");
-        DLIB_CASSERT(graph_is_connected(a) == false,"");
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
-        DLIB_CASSERT(graph_contains_undirected_cycle(a) == false,"");
-        DLIB_CASSERT(a.number_of_nodes() == 5,"");
+        DLIB_TEST(graph_contains_length_one_cycle(a) == false);
+        DLIB_TEST(graph_is_connected(a) == false);
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
+        DLIB_TEST(graph_contains_undirected_cycle(a) == false);
+        DLIB_TEST(a.number_of_nodes() == 5);
 
         for (int i = 0; i < 5; ++i)
         {
             a.node(i).data = i;
-            DLIB_CASSERT(a.node(i).index() == (unsigned int)i,"");
+            DLIB_TEST(a.node(i).index() == (unsigned int)i);
         }
 
         a.remove_node(1);
 
-        DLIB_CASSERT(a.number_of_nodes() == 4,"");
+        DLIB_TEST(a.number_of_nodes() == 4);
 
 
         // make sure that only the number with data == 1 was remove
@@ -76,181 +76,181 @@ namespace
         for (int i = 0; i < 4; ++i)
         {
             count += a.node(i).data;
-            DLIB_CASSERT(a.node(i).number_of_children() == 0,"");
-            DLIB_CASSERT(a.node(i).number_of_parents() == 0,"");
-            DLIB_CASSERT(a.node(i).index() == (unsigned int)i,"");
+            DLIB_TEST(a.node(i).number_of_children() == 0);
+            DLIB_TEST(a.node(i).number_of_parents() == 0);
+            DLIB_TEST(a.node(i).index() == (unsigned int)i);
         }
 
-        DLIB_CASSERT(count == 9,"");
+        DLIB_TEST(count == 9);
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
 
         a.add_edge(1,1);
-        DLIB_CASSERT(graph_contains_length_one_cycle(a) == true,"");
-        DLIB_CASSERT(graph_contains_undirected_cycle(a) == true,"");
+        DLIB_TEST(graph_contains_length_one_cycle(a) == true);
+        DLIB_TEST(graph_contains_undirected_cycle(a) == true);
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == true,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == true);
 
         a.add_edge(1,2);
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == true,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == true);
 
-        DLIB_CASSERT(a.node(1).number_of_children() == 2,"");
-        DLIB_CASSERT(a.node(1).number_of_parents() == 1,"");
-        DLIB_CASSERT(a.node(1).parent(0).index() == 1,"")
+        DLIB_TEST(a.node(1).number_of_children() == 2);
+        DLIB_TEST(a.node(1).number_of_parents() == 1);
+        DLIB_TEST_MSG(a.node(1).parent(0).index() == 1,"")
 
-            DLIB_CASSERT(a.node(1).child(0).index() + a.node(1).child(1).index() == 3,"")
-            DLIB_CASSERT(a.node(2).number_of_children() == 0,"");
-        DLIB_CASSERT(a.node(2).number_of_parents() == 1,"");
-        DLIB_CASSERT(a.node(2).index() == 2,"");
+            DLIB_TEST_MSG(a.node(1).child(0).index() + a.node(1).child(1).index() == 3,"")
+            DLIB_TEST(a.node(2).number_of_children() == 0);
+        DLIB_TEST(a.node(2).number_of_parents() == 1);
+        DLIB_TEST(a.node(2).index() == 2);
 
         int val = a.node(1).data;
         a.remove_node(1);
-        DLIB_CASSERT(graph_contains_length_one_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_length_one_cycle(a) == false);
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
-        DLIB_CASSERT(graph_contains_undirected_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
+        DLIB_TEST(graph_contains_undirected_cycle(a) == false);
 
 
-        DLIB_CASSERT(a.number_of_nodes() == 3,"");
+        DLIB_TEST(a.number_of_nodes() == 3);
 
         count = 0;
         for (int i = 0; i < 3; ++i)
         {
             count += a.node(i).data;
-            DLIB_CASSERT(a.node(i).number_of_children() == 0,"");
-            DLIB_CASSERT(a.node(i).number_of_parents() == 0,"");
-            DLIB_CASSERT(a.node(i).index() == (unsigned int)i,"");
+            DLIB_TEST(a.node(i).number_of_children() == 0);
+            DLIB_TEST(a.node(i).number_of_parents() == 0);
+            DLIB_TEST(a.node(i).index() == (unsigned int)i);
         }
-        DLIB_CASSERT(count == 9-val,"");
+        DLIB_TEST(count == 9-val);
 
 
         val = a.add_node();
-        DLIB_CASSERT(val == 3,"");
-        DLIB_CASSERT(a.number_of_nodes() == 4,"");
+        DLIB_TEST(val == 3);
+        DLIB_TEST(a.number_of_nodes() == 4);
 
         for (int i = 0; i < 4; ++i)
         {
             a.node(i).data = i;
-            DLIB_CASSERT(a.node(i).index() == (unsigned int)i,"");
+            DLIB_TEST(a.node(i).index() == (unsigned int)i);
         }
 
         for (int i = 0; i < 4; ++i)
         {
-            DLIB_CASSERT(a.node(i).data == i,"");
-            DLIB_CASSERT(a.node(i).index() == (unsigned int)i,"");
+            DLIB_TEST(a.node(i).data == i);
+            DLIB_TEST(a.node(i).index() == (unsigned int)i);
         }
 
         a.add_edge(0, 1);
         a.add_edge(0, 2);
-        DLIB_CASSERT(graph_is_connected(a) == false,"");
+        DLIB_TEST(graph_is_connected(a) == false);
         a.add_edge(1, 3);
-        DLIB_CASSERT(graph_is_connected(a) == true,"");
+        DLIB_TEST(graph_is_connected(a) == true);
         a.add_edge(2, 3);
-        DLIB_CASSERT(graph_is_connected(a) == true,"");
-        DLIB_CASSERT(graph_contains_length_one_cycle(a) == false,"");
+        DLIB_TEST(graph_is_connected(a) == true);
+        DLIB_TEST(graph_contains_length_one_cycle(a) == false);
 
-        DLIB_CASSERT(a.has_edge(0, 1),"");
-        DLIB_CASSERT(a.has_edge(0, 2),"");
-        DLIB_CASSERT(a.has_edge(1, 3),"");
-        DLIB_CASSERT(a.has_edge(2, 3),"");
+        DLIB_TEST(a.has_edge(0, 1));
+        DLIB_TEST(a.has_edge(0, 2));
+        DLIB_TEST(a.has_edge(1, 3));
+        DLIB_TEST(a.has_edge(2, 3));
 
-        DLIB_CASSERT(!a.has_edge(1, 0),"");
-        DLIB_CASSERT(!a.has_edge(2, 0),"");
-        DLIB_CASSERT(!a.has_edge(3, 1),"");
-        DLIB_CASSERT(!a.has_edge(3, 2),"");
+        DLIB_TEST(!a.has_edge(1, 0));
+        DLIB_TEST(!a.has_edge(2, 0));
+        DLIB_TEST(!a.has_edge(3, 1));
+        DLIB_TEST(!a.has_edge(3, 2));
 
-        DLIB_CASSERT(a.node(0).number_of_parents() == 0,"");
-        DLIB_CASSERT(a.node(0).number_of_children() == 2,"");
+        DLIB_TEST(a.node(0).number_of_parents() == 0);
+        DLIB_TEST(a.node(0).number_of_children() == 2);
 
-        DLIB_CASSERT(a.node(1).number_of_parents() == 1,"");
-        DLIB_CASSERT(a.node(1).number_of_children() == 1,"");
-        DLIB_CASSERT(a.node(1).child(0).index() == 3,"");
-        DLIB_CASSERT(a.node(1).parent(0).index() == 0,"");
+        DLIB_TEST(a.node(1).number_of_parents() == 1);
+        DLIB_TEST(a.node(1).number_of_children() == 1);
+        DLIB_TEST(a.node(1).child(0).index() == 3);
+        DLIB_TEST(a.node(1).parent(0).index() == 0);
 
-        DLIB_CASSERT(a.node(2).number_of_parents() == 1,"");
-        DLIB_CASSERT(a.node(2).number_of_children() == 1,"");
-        DLIB_CASSERT(a.node(2).child(0).index() == 3,"");
-        DLIB_CASSERT(a.node(2).parent(0).index() == 0,"");
+        DLIB_TEST(a.node(2).number_of_parents() == 1);
+        DLIB_TEST(a.node(2).number_of_children() == 1);
+        DLIB_TEST(a.node(2).child(0).index() == 3);
+        DLIB_TEST(a.node(2).parent(0).index() == 0);
 
-        DLIB_CASSERT(a.node(3).number_of_parents() == 2,"");
-        DLIB_CASSERT(a.node(3).number_of_children() == 0,"");
+        DLIB_TEST(a.node(3).number_of_parents() == 2);
+        DLIB_TEST(a.node(3).number_of_children() == 0);
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
-        DLIB_CASSERT(graph_contains_undirected_cycle(a) == true,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
+        DLIB_TEST(graph_contains_undirected_cycle(a) == true);
 
         a.remove_edge(0,1);
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
 
-        DLIB_CASSERT(!a.has_edge(0, 1),"");
-        DLIB_CASSERT(a.has_edge(0, 2),"");
-        DLIB_CASSERT(a.has_edge(1, 3),"");
-        DLIB_CASSERT(a.has_edge(2, 3),"");
+        DLIB_TEST(!a.has_edge(0, 1));
+        DLIB_TEST(a.has_edge(0, 2));
+        DLIB_TEST(a.has_edge(1, 3));
+        DLIB_TEST(a.has_edge(2, 3));
 
-        DLIB_CASSERT(!a.has_edge(1, 0),"");
-        DLIB_CASSERT(!a.has_edge(2, 0),"");
-        DLIB_CASSERT(!a.has_edge(3, 1),"");
-        DLIB_CASSERT(!a.has_edge(3, 2),"");
+        DLIB_TEST(!a.has_edge(1, 0));
+        DLIB_TEST(!a.has_edge(2, 0));
+        DLIB_TEST(!a.has_edge(3, 1));
+        DLIB_TEST(!a.has_edge(3, 2));
 
 
-        DLIB_CASSERT(a.node(0).number_of_parents() == 0,"");
-        DLIB_CASSERT(a.node(0).number_of_children() == 1,"");
+        DLIB_TEST(a.node(0).number_of_parents() == 0);
+        DLIB_TEST(a.node(0).number_of_children() == 1);
 
-        DLIB_CASSERT(a.node(1).number_of_parents() == 0,"");
-        DLIB_CASSERT(a.node(1).number_of_children() == 1,"");
-        DLIB_CASSERT(a.node(1).child(0).index() == 3,"");
+        DLIB_TEST(a.node(1).number_of_parents() == 0);
+        DLIB_TEST(a.node(1).number_of_children() == 1);
+        DLIB_TEST(a.node(1).child(0).index() == 3);
 
-        DLIB_CASSERT(a.node(2).number_of_parents() == 1,"");
-        DLIB_CASSERT(a.node(2).number_of_children() == 1,"");
-        DLIB_CASSERT(a.node(2).child(0).index() == 3,"");
-        DLIB_CASSERT(a.node(2).parent(0).index() == 0,"");
+        DLIB_TEST(a.node(2).number_of_parents() == 1);
+        DLIB_TEST(a.node(2).number_of_children() == 1);
+        DLIB_TEST(a.node(2).child(0).index() == 3);
+        DLIB_TEST(a.node(2).parent(0).index() == 0);
 
-        DLIB_CASSERT(a.node(3).number_of_parents() == 2,"");
-        DLIB_CASSERT(a.node(3).number_of_children() == 0,"");
+        DLIB_TEST(a.node(3).number_of_parents() == 2);
+        DLIB_TEST(a.node(3).number_of_children() == 0);
 
         for (int i = 0; i < 4; ++i)
         {
-            DLIB_CASSERT(a.node(i).data == i,"");
-            DLIB_CASSERT(a.node(i).index() == (unsigned int)i,"");
+            DLIB_TEST(a.node(i).data == i);
+            DLIB_TEST(a.node(i).index() == (unsigned int)i);
         }
 
 
 
         swap(a,b);
 
-        DLIB_CASSERT(a.number_of_nodes() == 0, "");
-        DLIB_CASSERT(b.number_of_nodes() == 4, "");
-        DLIB_CASSERT(b.node(0).number_of_parents() == 0,"");
-        DLIB_CASSERT(b.node(0).number_of_children() == 1,"");
+        DLIB_TEST(a.number_of_nodes() == 0);
+        DLIB_TEST(b.number_of_nodes() == 4);
+        DLIB_TEST(b.node(0).number_of_parents() == 0);
+        DLIB_TEST(b.node(0).number_of_children() == 1);
 
-        DLIB_CASSERT(b.node(1).number_of_parents() == 0,"");
-        DLIB_CASSERT(b.node(1).number_of_children() == 1,"");
-        DLIB_CASSERT(b.node(1).child(0).index() == 3,"");
+        DLIB_TEST(b.node(1).number_of_parents() == 0);
+        DLIB_TEST(b.node(1).number_of_children() == 1);
+        DLIB_TEST(b.node(1).child(0).index() == 3);
 
-        DLIB_CASSERT(b.node(2).number_of_parents() == 1,"");
-        DLIB_CASSERT(b.node(2).number_of_children() == 1,"");
-        DLIB_CASSERT(b.node(2).child(0).index() == 3,"");
-        DLIB_CASSERT(b.node(2).parent(0).index() == 0,"");
+        DLIB_TEST(b.node(2).number_of_parents() == 1);
+        DLIB_TEST(b.node(2).number_of_children() == 1);
+        DLIB_TEST(b.node(2).child(0).index() == 3);
+        DLIB_TEST(b.node(2).parent(0).index() == 0);
 
-        DLIB_CASSERT(b.node(3).number_of_parents() == 2,"");
-        DLIB_CASSERT(b.node(3).number_of_children() == 0,"");
+        DLIB_TEST(b.node(3).number_of_parents() == 2);
+        DLIB_TEST(b.node(3).number_of_children() == 0);
         b.node(0).child_edge(0) = static_cast<unsigned short>(b.node(0).child(0).index()+1);
         b.node(1).child_edge(0) = static_cast<unsigned short>(b.node(1).child(0).index()+1);
         b.node(2).child_edge(0) = static_cast<unsigned short>(b.node(2).child(0).index()+1);
 
-        DLIB_CASSERT(b.node(0).child_edge(0) == b.node(0).child(0).index()+1,
+        DLIB_TEST_MSG(b.node(0).child_edge(0) == b.node(0).child(0).index()+1,
                      b.node(0).child_edge(0) << "  " << b.node(0).child(0).index()+1);
-        DLIB_CASSERT(b.node(1).child_edge(0) == b.node(1).child(0).index()+1,
+        DLIB_TEST_MSG(b.node(1).child_edge(0) == b.node(1).child(0).index()+1,
                      b.node(1).child_edge(0) << "  " << b.node(1).child(0).index()+1);
-        DLIB_CASSERT(b.node(2).child_edge(0) == b.node(2).child(0).index()+1,
+        DLIB_TEST_MSG(b.node(2).child_edge(0) == b.node(2).child(0).index()+1,
                      b.node(2).child_edge(0) << "  " << b.node(2).child(0).index()+1);
 
-        DLIB_CASSERT(b.node(2).parent_edge(0) == 2+1,
+        DLIB_TEST_MSG(b.node(2).parent_edge(0) == 2+1,
                      b.node(2).parent_edge(0) << "  " << 2+1);
-        DLIB_CASSERT(b.node(3).parent_edge(0) == 3+1,
+        DLIB_TEST_MSG(b.node(3).parent_edge(0) == 3+1,
                      b.node(3).parent_edge(0) << "  " << 3+1);
-        DLIB_CASSERT(b.node(3).parent_edge(1) == 3+1,
+        DLIB_TEST_MSG(b.node(3).parent_edge(1) == 3+1,
                      b.node(3).parent_edge(1) << "  " << 3+1);
 
         ostringstream sout;
@@ -260,87 +260,87 @@ namespace
         istringstream sin(sout.str());
 
         a.set_number_of_nodes(20);
-        DLIB_CASSERT(a.number_of_nodes() == 20,"");
+        DLIB_TEST(a.number_of_nodes() == 20);
         deserialize(a, sin);
-        DLIB_CASSERT(a.number_of_nodes() == 4,"");
+        DLIB_TEST(a.number_of_nodes() == 4);
 
-        DLIB_CASSERT(!a.has_edge(0, 1),"");
-        DLIB_CASSERT(a.has_edge(0, 2),"");
-        DLIB_CASSERT(a.has_edge(1, 3),"");
-        DLIB_CASSERT(a.has_edge(2, 3),"");
+        DLIB_TEST(!a.has_edge(0, 1));
+        DLIB_TEST(a.has_edge(0, 2));
+        DLIB_TEST(a.has_edge(1, 3));
+        DLIB_TEST(a.has_edge(2, 3));
 
-        DLIB_CASSERT(!a.has_edge(1, 0),"");
-        DLIB_CASSERT(!a.has_edge(2, 0),"");
-        DLIB_CASSERT(!a.has_edge(3, 1),"");
-        DLIB_CASSERT(!a.has_edge(3, 2),"");
+        DLIB_TEST(!a.has_edge(1, 0));
+        DLIB_TEST(!a.has_edge(2, 0));
+        DLIB_TEST(!a.has_edge(3, 1));
+        DLIB_TEST(!a.has_edge(3, 2));
 
-        DLIB_CASSERT(a.node(0).child_edge(0) == a.node(0).child(0).index()+1,
+        DLIB_TEST_MSG(a.node(0).child_edge(0) == a.node(0).child(0).index()+1,
                      a.node(0).child_edge(0) << "  " << a.node(0).child(0).index()+1);
-        DLIB_CASSERT(a.node(1).child_edge(0) == a.node(1).child(0).index()+1,
+        DLIB_TEST_MSG(a.node(1).child_edge(0) == a.node(1).child(0).index()+1,
                      a.node(1).child_edge(0) << "  " << a.node(1).child(0).index()+1);
-        DLIB_CASSERT(a.node(2).child_edge(0) == a.node(2).child(0).index()+1,
+        DLIB_TEST_MSG(a.node(2).child_edge(0) == a.node(2).child(0).index()+1,
                      a.node(2).child_edge(0) << "  " << a.node(2).child(0).index()+1);
-        DLIB_CASSERT(a.node(2).parent_edge(0) == 2+1,
+        DLIB_TEST_MSG(a.node(2).parent_edge(0) == 2+1,
                      a.node(2).parent_edge(0) << "  " << 2+1);
-        DLIB_CASSERT(a.node(3).parent_edge(0) == 3+1,
+        DLIB_TEST_MSG(a.node(3).parent_edge(0) == 3+1,
                      a.node(3).parent_edge(0) << "  " << 3+1);
-        DLIB_CASSERT(a.node(3).parent_edge(1) == 3+1,
+        DLIB_TEST_MSG(a.node(3).parent_edge(1) == 3+1,
                      a.node(3).parent_edge(1) << "  " << 3+1);
 
 
 
         for (int i = 0; i < 4; ++i)
         {
-            DLIB_CASSERT(a.node(i).data == i,"");
-            DLIB_CASSERT(a.node(i).index() == (unsigned int)i,"");
+            DLIB_TEST(a.node(i).data == i);
+            DLIB_TEST(a.node(i).index() == (unsigned int)i);
         }
 
 
-        DLIB_CASSERT(graph_contains_undirected_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_undirected_cycle(a) == false);
 
-        DLIB_CASSERT(b.number_of_nodes() == 4, "");
-        DLIB_CASSERT(b.node(0).number_of_parents() == 0,"");
-        DLIB_CASSERT(b.node(0).number_of_children() == 1,"");
+        DLIB_TEST(b.number_of_nodes() == 4);
+        DLIB_TEST(b.node(0).number_of_parents() == 0);
+        DLIB_TEST(b.node(0).number_of_children() == 1);
 
-        DLIB_CASSERT(b.node(1).number_of_parents() == 0,"");
-        DLIB_CASSERT(b.node(1).number_of_children() == 1,"");
-        DLIB_CASSERT(b.node(1).child(0).index() == 3,"");
+        DLIB_TEST(b.node(1).number_of_parents() == 0);
+        DLIB_TEST(b.node(1).number_of_children() == 1);
+        DLIB_TEST(b.node(1).child(0).index() == 3);
 
-        DLIB_CASSERT(b.node(2).number_of_parents() == 1,"");
-        DLIB_CASSERT(b.node(2).number_of_children() == 1,"");
-        DLIB_CASSERT(b.node(2).child(0).index() == 3,"");
-        DLIB_CASSERT(b.node(2).parent(0).index() == 0,"");
+        DLIB_TEST(b.node(2).number_of_parents() == 1);
+        DLIB_TEST(b.node(2).number_of_children() == 1);
+        DLIB_TEST(b.node(2).child(0).index() == 3);
+        DLIB_TEST(b.node(2).parent(0).index() == 0);
 
-        DLIB_CASSERT(b.node(3).number_of_parents() == 2,"");
-        DLIB_CASSERT(b.node(3).number_of_children() == 0,"");
+        DLIB_TEST(b.node(3).number_of_parents() == 2);
+        DLIB_TEST(b.node(3).number_of_children() == 0);
 
 
-        DLIB_CASSERT(a.number_of_nodes() == 4, "");
-        DLIB_CASSERT(a.node(0).number_of_parents() == 0,"");
-        DLIB_CASSERT(a.node(0).number_of_children() == 1,"");
+        DLIB_TEST(a.number_of_nodes() == 4);
+        DLIB_TEST(a.node(0).number_of_parents() == 0);
+        DLIB_TEST(a.node(0).number_of_children() == 1);
 
-        DLIB_CASSERT(a.node(1).number_of_parents() == 0,"");
-        DLIB_CASSERT(a.node(1).number_of_children() == 1,"");
-        DLIB_CASSERT(a.node(1).child(0).index() == 3,"");
+        DLIB_TEST(a.node(1).number_of_parents() == 0);
+        DLIB_TEST(a.node(1).number_of_children() == 1);
+        DLIB_TEST(a.node(1).child(0).index() == 3);
 
-        DLIB_CASSERT(a.node(2).number_of_parents() == 1,"");
-        DLIB_CASSERT(a.node(2).number_of_children() == 1,"");
-        DLIB_CASSERT(a.node(2).child(0).index() == 3,"");
-        DLIB_CASSERT(a.node(2).parent(0).index() == 0,"");
+        DLIB_TEST(a.node(2).number_of_parents() == 1);
+        DLIB_TEST(a.node(2).number_of_children() == 1);
+        DLIB_TEST(a.node(2).child(0).index() == 3);
+        DLIB_TEST(a.node(2).parent(0).index() == 0);
 
-        DLIB_CASSERT(a.node(3).number_of_parents() == 2,"");
-        DLIB_CASSERT(a.node(3).number_of_children() == 0,"");
+        DLIB_TEST(a.node(3).number_of_parents() == 2);
+        DLIB_TEST(a.node(3).number_of_children() == 0);
 
-        DLIB_CASSERT(a.number_of_nodes() == 4, "");
+        DLIB_TEST(a.number_of_nodes() == 4);
         a.clear();
-        DLIB_CASSERT(a.number_of_nodes() == 0, "");
+        DLIB_TEST(a.number_of_nodes() == 0);
 
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
 
         a.set_number_of_nodes(10);
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
 
         a.add_edge(0,1);
         a.add_edge(1,2);
@@ -350,18 +350,18 @@ namespace
         a.add_edge(4,5);
         a.add_edge(5,1);
 
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == true,"");
-        DLIB_CASSERT(graph_contains_undirected_cycle(a) == true,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == true);
+        DLIB_TEST(graph_contains_undirected_cycle(a) == true);
 
         a.remove_edge(5,1);
 
-        DLIB_CASSERT(graph_contains_undirected_cycle(a) == true,"");
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_undirected_cycle(a) == true);
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
         a.add_edge(7,8);
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == false,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == false);
         a.add_edge(8,7);
-        DLIB_CASSERT(graph_contains_directed_cycle(a) == true,"");
-        DLIB_CASSERT(graph_contains_undirected_cycle(a) == true,"");
+        DLIB_TEST(graph_contains_directed_cycle(a) == true);
+        DLIB_TEST(graph_contains_undirected_cycle(a) == true);
 
 
         a.clear();
@@ -387,60 +387,60 @@ namespace
         set<set<unsigned long>::compare_1b_c>::kernel_1b_c sos;
 
         create_join_tree(g, join_tree);
-        DLIB_CASSERT(is_join_tree(g, join_tree),"");
-        DLIB_CASSERT(join_tree.number_of_nodes() == 2,"");
-        DLIB_CASSERT(graph_contains_undirected_cycle(join_tree) == false,"");
-        DLIB_CASSERT(graph_is_connected(join_tree) == true,"");
+        DLIB_TEST(is_join_tree(g, join_tree));
+        DLIB_TEST(join_tree.number_of_nodes() == 2);
+        DLIB_TEST(graph_contains_undirected_cycle(join_tree) == false);
+        DLIB_TEST(graph_is_connected(join_tree) == true);
 
         unsigned long temp;
         triangulate_graph_and_find_cliques(g,sos);
 
         temp = 2; s.add(temp);
         temp = 3; s.add(temp);
-        DLIB_CASSERT(sos.is_member(s),"");
+        DLIB_TEST(sos.is_member(s));
         s.clear();
         temp = 0; s.add(temp);
         temp = 1; s.add(temp);
         temp = 2; s.add(temp);
-        DLIB_CASSERT(sos.is_member(s),"");
-        DLIB_CASSERT(sos.size() == 2,"");
-        DLIB_CASSERT(sos.is_member(join_tree.node(0).data), "");
-        DLIB_CASSERT(sos.is_member(join_tree.node(1).data), "");
+        DLIB_TEST(sos.is_member(s));
+        DLIB_TEST(sos.size() == 2);
+        DLIB_TEST(sos.is_member(join_tree.node(0).data));
+        DLIB_TEST(sos.is_member(join_tree.node(1).data));
 
 
         s.clear();
         temp = 0; s.add(temp);
-        DLIB_CASSERT(is_clique(g,s) == true,"");
-        DLIB_CASSERT(is_maximal_clique(g,s) == false,"");
+        DLIB_TEST(is_clique(g,s) == true);
+        DLIB_TEST(is_maximal_clique(g,s) == false);
         temp = 3; s.add(temp);
-        DLIB_CASSERT(is_clique(g,s) == false,"");
+        DLIB_TEST(is_clique(g,s) == false);
         s.destroy(3);
-        DLIB_CASSERT(is_clique(g,s) == true,"");
+        DLIB_TEST(is_clique(g,s) == true);
         temp = 2; s.add(temp);
-        DLIB_CASSERT(is_clique(g,s) == true,"");
-        DLIB_CASSERT(is_maximal_clique(g,s) == false,"");
+        DLIB_TEST(is_clique(g,s) == true);
+        DLIB_TEST(is_maximal_clique(g,s) == false);
         temp = 1; s.add(temp);
-        DLIB_CASSERT(is_clique(g,s) == true,"");
-        DLIB_CASSERT(is_maximal_clique(g,s) == true,"");
+        DLIB_TEST(is_clique(g,s) == true);
+        DLIB_TEST(is_maximal_clique(g,s) == true);
         s.clear();
-        DLIB_CASSERT(is_clique(g,s) == true,"");
+        DLIB_TEST(is_clique(g,s) == true);
         temp = 3; s.add(temp);
-        DLIB_CASSERT(is_clique(g,s) == true,"");
+        DLIB_TEST(is_clique(g,s) == true);
         temp = 2; s.add(temp);
-        DLIB_CASSERT(is_clique(g,s) == true,"");
-        DLIB_CASSERT(is_maximal_clique(g,s) == true,"");
+        DLIB_TEST(is_clique(g,s) == true);
+        DLIB_TEST(is_maximal_clique(g,s) == true);
 
 
-        DLIB_CASSERT(a.number_of_nodes() == 4,"");
-        DLIB_CASSERT(g.number_of_nodes() == 4,"");
+        DLIB_TEST(a.number_of_nodes() == 4);
+        DLIB_TEST(g.number_of_nodes() == 4);
         for (unsigned long i = 0; i < 4; ++i)
-            DLIB_CASSERT( a.node(i).data == (int)i,"");
-        DLIB_CASSERT(g.has_edge(0,1),"");
-        DLIB_CASSERT(g.has_edge(0,2),"");
-        DLIB_CASSERT(g.has_edge(1,2),"");
-        DLIB_CASSERT(g.has_edge(3,2),"");
-        DLIB_CASSERT(g.has_edge(0,3) == false,"");
-        DLIB_CASSERT(g.has_edge(1,3) == false,"");
+            DLIB_TEST( a.node(i).data == (int)i);
+        DLIB_TEST(g.has_edge(0,1));
+        DLIB_TEST(g.has_edge(0,2));
+        DLIB_TEST(g.has_edge(1,2));
+        DLIB_TEST(g.has_edge(3,2));
+        DLIB_TEST(g.has_edge(0,3) == false);
+        DLIB_TEST(g.has_edge(1,3) == false);
 
     }
 

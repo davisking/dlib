@@ -30,25 +30,25 @@ namespace
 
         void operator() (float val)
         {
-            DLIB_CASSERT(val == f_val,"");
+            DLIB_TEST(val == f_val);
             last_kind = FLOAT;
         }
 
         void operator() (double val)
         {
-            DLIB_CASSERT(val == d_val,"");
+            DLIB_TEST(val == d_val);
             last_kind = DOUBLE;
         }
 
         void operator() (char val)
         {
-            DLIB_CASSERT(val == c_val,"");
+            DLIB_TEST(val == c_val);
             last_kind = CHAR;
         }
 
         void operator()(std::string& val)
         {
-            DLIB_CASSERT(val == s_val,"");
+            DLIB_TEST(val == s_val);
             last_kind = STRING;
         }
 
@@ -68,29 +68,29 @@ namespace
     public:
         void test_stuff()
         {
-            DLIB_CASSERT(a.is_empty() == true,"");
-            DLIB_CASSERT(a.contains<char>() == false,"");
-            DLIB_CASSERT(a.contains<float>() == false,"");
-            DLIB_CASSERT(a.contains<double>() == false,"");
-            DLIB_CASSERT(a.contains<std::string>() == false,"");
-            DLIB_CASSERT(a.contains<long>() == false,"");
+            DLIB_TEST(a.is_empty() == true);
+            DLIB_TEST(a.contains<char>() == false);
+            DLIB_TEST(a.contains<float>() == false);
+            DLIB_TEST(a.contains<double>() == false);
+            DLIB_TEST(a.contains<std::string>() == false);
+            DLIB_TEST(a.contains<long>() == false);
 
 
 
             f_val = 4.345f;
             a.get<float>() = f_val;
 
-            DLIB_CASSERT(a.is_empty() == false,"");
-            DLIB_CASSERT(a.contains<char>() == false,"");
-            DLIB_CASSERT(a.contains<float>() == true,"");
-            DLIB_CASSERT(a.contains<double>() == false,"");
-            DLIB_CASSERT(a.contains<std::string>() == false,"");
-            DLIB_CASSERT(a.contains<long>() == false,"");
+            DLIB_TEST(a.is_empty() == false);
+            DLIB_TEST(a.contains<char>() == false);
+            DLIB_TEST(a.contains<float>() == true);
+            DLIB_TEST(a.contains<double>() == false);
+            DLIB_TEST(a.contains<std::string>() == false);
+            DLIB_TEST(a.contains<long>() == false);
 
 
             last_kind = NONE;
             a.apply_to_contents(*this);
-            DLIB_CASSERT(last_kind == FLOAT,"");
+            DLIB_TEST(last_kind == FLOAT);
 
         // -----------
 
@@ -98,7 +98,7 @@ namespace
             a.get<double>() = d_val;
             last_kind = NONE;
             a.apply_to_contents(*this);
-            DLIB_CASSERT(last_kind == DOUBLE,"");
+            DLIB_TEST(last_kind == DOUBLE);
 
         // -----------
 
@@ -106,7 +106,7 @@ namespace
             a.get<char>() = c_val;
             last_kind = NONE;
             a.apply_to_contents(*this);
-            DLIB_CASSERT(last_kind == CHAR,"");
+            DLIB_TEST(last_kind == CHAR);
 
         // -----------
 
@@ -114,120 +114,120 @@ namespace
             a.get<std::string>() = s_val;
             last_kind = NONE;
             a.apply_to_contents(*this);
-            DLIB_CASSERT(last_kind == STRING,"");
+            DLIB_TEST(last_kind == STRING);
 
         // -----------
-            DLIB_CASSERT(a.is_empty() == false,"");
-            DLIB_CASSERT(a.contains<char>() == false,"");
-            DLIB_CASSERT(a.contains<float>() == false,"");
-            DLIB_CASSERT(a.contains<double>() == false,"");
-            DLIB_CASSERT(a.contains<std::string>() == true,"");
-            DLIB_CASSERT(a.contains<long>() == false,"");
+            DLIB_TEST(a.is_empty() == false);
+            DLIB_TEST(a.contains<char>() == false);
+            DLIB_TEST(a.contains<float>() == false);
+            DLIB_TEST(a.contains<double>() == false);
+            DLIB_TEST(a.contains<std::string>() == true);
+            DLIB_TEST(a.contains<long>() == false);
         // -----------
 
             a.swap(b);
 
-            DLIB_CASSERT(a.is_empty() == true,"");
-            DLIB_CASSERT(a.contains<char>() == false,"");
-            DLIB_CASSERT(a.contains<float>() == false,"");
-            DLIB_CASSERT(a.contains<double>() == false,"");
-            DLIB_CASSERT(a.contains<std::string>() == false,"");
-            DLIB_CASSERT(a.contains<long>() == false,"");
+            DLIB_TEST(a.is_empty() == true);
+            DLIB_TEST(a.contains<char>() == false);
+            DLIB_TEST(a.contains<float>() == false);
+            DLIB_TEST(a.contains<double>() == false);
+            DLIB_TEST(a.contains<std::string>() == false);
+            DLIB_TEST(a.contains<long>() == false);
 
-            DLIB_CASSERT(b.is_empty() == false,"");
-            DLIB_CASSERT(b.contains<char>() == false,"");
-            DLIB_CASSERT(b.contains<float>() == false,"");
-            DLIB_CASSERT(b.contains<double>() == false,"");
-            DLIB_CASSERT(b.contains<std::string>() == true,"");
-            DLIB_CASSERT(b.contains<long>() == false,"");
+            DLIB_TEST(b.is_empty() == false);
+            DLIB_TEST(b.contains<char>() == false);
+            DLIB_TEST(b.contains<float>() == false);
+            DLIB_TEST(b.contains<double>() == false);
+            DLIB_TEST(b.contains<std::string>() == true);
+            DLIB_TEST(b.contains<long>() == false);
 
 
             last_kind = NONE;
             b.apply_to_contents(*this);
-            DLIB_CASSERT(last_kind == STRING,"");
+            DLIB_TEST(last_kind == STRING);
 
         // -----------
 
             b.swap(a);
 
-            DLIB_CASSERT(b.is_empty() == true,"");
-            DLIB_CASSERT(b.contains<char>() == false,"");
-            DLIB_CASSERT(b.contains<float>() == false,"");
-            DLIB_CASSERT(b.contains<double>() == false,"");
-            DLIB_CASSERT(b.contains<std::string>() == false,"");
-            DLIB_CASSERT(b.contains<long>() == false,"");
+            DLIB_TEST(b.is_empty() == true);
+            DLIB_TEST(b.contains<char>() == false);
+            DLIB_TEST(b.contains<float>() == false);
+            DLIB_TEST(b.contains<double>() == false);
+            DLIB_TEST(b.contains<std::string>() == false);
+            DLIB_TEST(b.contains<long>() == false);
 
-            DLIB_CASSERT(a.is_empty() == false,"");
-            DLIB_CASSERT(a.contains<char>() == false,"");
-            DLIB_CASSERT(a.contains<float>() == false,"");
-            DLIB_CASSERT(a.contains<double>() == false,"");
-            DLIB_CASSERT(a.contains<std::string>() == true,"");
-            DLIB_CASSERT(a.contains<long>() == false,"");
+            DLIB_TEST(a.is_empty() == false);
+            DLIB_TEST(a.contains<char>() == false);
+            DLIB_TEST(a.contains<float>() == false);
+            DLIB_TEST(a.contains<double>() == false);
+            DLIB_TEST(a.contains<std::string>() == true);
+            DLIB_TEST(a.contains<long>() == false);
 
 
             last_kind = NONE;
             a.apply_to_contents(*this);
-            DLIB_CASSERT(last_kind == STRING,"");
+            DLIB_TEST(last_kind == STRING);
             last_kind = NONE;
             b.apply_to_contents(*this);
-            DLIB_CASSERT(last_kind == NONE,"");
+            DLIB_TEST(last_kind == NONE);
 
 
             a.get<char>() = 'a';
             b.get<char>() = 'b';
 
-            DLIB_CASSERT(a.is_empty() == false,"");
-            DLIB_CASSERT(a.contains<char>() == true,"");
-            DLIB_CASSERT(b.is_empty() == false,"");
-            DLIB_CASSERT(b.contains<char>() == true,"");
-            DLIB_CASSERT(a.contains<float>() == false,"");
-            DLIB_CASSERT(b.contains<float>() == false,"");
+            DLIB_TEST(a.is_empty() == false);
+            DLIB_TEST(a.contains<char>() == true);
+            DLIB_TEST(b.is_empty() == false);
+            DLIB_TEST(b.contains<char>() == true);
+            DLIB_TEST(a.contains<float>() == false);
+            DLIB_TEST(b.contains<float>() == false);
 
 
-            DLIB_CASSERT(a.get<char>() == 'a',"");
-            DLIB_CASSERT(b.get<char>() == 'b',"");
+            DLIB_TEST(a.get<char>() == 'a');
+            DLIB_TEST(b.get<char>() == 'b');
 
             swap(a,b);
 
 
-            DLIB_CASSERT(a.is_empty() == false,"");
-            DLIB_CASSERT(a.contains<char>() == true,"");
-            DLIB_CASSERT(b.is_empty() == false,"");
-            DLIB_CASSERT(b.contains<char>() == true,"");
-            DLIB_CASSERT(a.contains<float>() == false,"");
-            DLIB_CASSERT(b.contains<float>() == false,"");
+            DLIB_TEST(a.is_empty() == false);
+            DLIB_TEST(a.contains<char>() == true);
+            DLIB_TEST(b.is_empty() == false);
+            DLIB_TEST(b.contains<char>() == true);
+            DLIB_TEST(a.contains<float>() == false);
+            DLIB_TEST(b.contains<float>() == false);
 
-            DLIB_CASSERT(a.get<char>() == 'b',"");
-            DLIB_CASSERT(b.get<char>() == 'a',"");
+            DLIB_TEST(a.get<char>() == 'b');
+            DLIB_TEST(b.get<char>() == 'a');
 
         // -----------
 
             a.get<char>() = 'a';
             b.get<std::string>() = "a string";
 
-            DLIB_CASSERT(a.is_empty() == false,"");
-            DLIB_CASSERT(a.contains<char>() == true,"");
-            DLIB_CASSERT(b.is_empty() == false,"");
-            DLIB_CASSERT(b.contains<char>() == false,"");
-            DLIB_CASSERT(a.contains<std::string>() == false,"");
-            DLIB_CASSERT(b.contains<std::string>() == true,"");
+            DLIB_TEST(a.is_empty() == false);
+            DLIB_TEST(a.contains<char>() == true);
+            DLIB_TEST(b.is_empty() == false);
+            DLIB_TEST(b.contains<char>() == false);
+            DLIB_TEST(a.contains<std::string>() == false);
+            DLIB_TEST(b.contains<std::string>() == true);
 
 
-            DLIB_CASSERT(a.get<char>() == 'a',"");
-            DLIB_CASSERT(b.get<std::string>() == "a string","");
+            DLIB_TEST(a.get<char>() == 'a');
+            DLIB_TEST(b.get<std::string>() == "a string");
 
             swap(a,b);
 
-            DLIB_CASSERT(b.is_empty() == false,"");
-            DLIB_CASSERT(b.contains<char>() == true,"");
-            DLIB_CASSERT(a.is_empty() == false,"");
-            DLIB_CASSERT(a.contains<char>() == false,"");
-            DLIB_CASSERT(b.contains<std::string>() == false,"");
-            DLIB_CASSERT(a.contains<std::string>() == true,"");
+            DLIB_TEST(b.is_empty() == false);
+            DLIB_TEST(b.contains<char>() == true);
+            DLIB_TEST(a.is_empty() == false);
+            DLIB_TEST(a.contains<char>() == false);
+            DLIB_TEST(b.contains<std::string>() == false);
+            DLIB_TEST(a.contains<std::string>() == true);
 
 
-            DLIB_CASSERT(b.get<char>() == 'a',"");
-            DLIB_CASSERT(a.get<std::string>() == "a string","");
+            DLIB_TEST(b.get<char>() == 'a');
+            DLIB_TEST(a.get<std::string>() == "a string");
 
 
 

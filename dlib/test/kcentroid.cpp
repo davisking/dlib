@@ -152,39 +152,39 @@ namespace
         dlog << LDEBUG << test(temp) ;
         dlog << LDEBUG << "squared_norm(): " << test.squared_norm() ;
 
-        DLIB_CASSERT(approx_equal(test(temp), 2), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 0), "");
+        DLIB_TEST(approx_equal(test(temp), 2));
+        DLIB_TEST(approx_equal(test.squared_norm(), 0));
 
         // make test store the point(2,0,0,0,0)
         test.train(temp, 0, 1);
         dlog << LDEBUG << test(temp) ;
         dlog << LDEBUG << "squared_norm(): " << test.squared_norm() ;
-        DLIB_CASSERT(approx_equal(test(temp), 0), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(temp), 0), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 4), "");
+        DLIB_TEST(approx_equal(test(temp), 0));
+        DLIB_TEST(approx_equal(test.get_distance_function()(temp), 0));
+        DLIB_TEST(approx_equal(test.squared_norm(), 4));
 
         temp = 0,2,0,0,0;
         dlog << LDEBUG << test(temp) ;
-        DLIB_CASSERT(approx_equal(test(temp), std::sqrt(2*2 + 2*2.0)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 4), "");
+        DLIB_TEST(approx_equal(test(temp), std::sqrt(2*2 + 2*2.0)));
+        DLIB_TEST(approx_equal(test.squared_norm(), 4));
 
         // make test store the point(0,2,0,0,0)
         test.train(temp, 0, 1);
 
         dlog << LDEBUG << test(temp) ;
-        DLIB_CASSERT(approx_equal(test(temp), 0), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 4), "");
+        DLIB_TEST(approx_equal(test(temp), 0));
+        DLIB_TEST(approx_equal(test.squared_norm(), 4));
 
         temp = 2,0,0,0,0;
-        DLIB_CASSERT(approx_equal(test(temp), std::sqrt(2*2 + 2*2.0)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 4), "");
+        DLIB_TEST(approx_equal(test(temp), std::sqrt(2*2 + 2*2.0)));
+        DLIB_TEST(approx_equal(test.squared_norm(), 4));
 
         // make test store the point(1,1,0,0,0)
         test.train(temp, 0.5, 0.5);
 
         temp = 0;
-        DLIB_CASSERT(approx_equal(test(temp), std::sqrt(2.0)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 2), "");
+        DLIB_TEST(approx_equal(test(temp), std::sqrt(2.0)));
+        DLIB_TEST(approx_equal(test.squared_norm(), 2));
 
         // make test store the point(1,1,0,3,0)
         temp = 0,0,0,3,0;
@@ -192,11 +192,11 @@ namespace
         test.train(temp, 1, 1);
 
         temp = 0;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
         temp = 1,2,3,4,5;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2-temp)), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(temp), length(temp2-temp)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2-temp)));
+        DLIB_TEST(approx_equal(test.get_distance_function()(temp), length(temp2-temp)));
 
         // make test store the point(0,1,0,3,-1)
         temp = 1,0,0,0,1;
@@ -204,10 +204,10 @@ namespace
         temp2 = 0,1,0,3,-1;
 
         temp = 0;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
         temp = 1,2,3,4,5;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2-temp)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2-temp)));
 
 
         // make test store the -1*point(0,1,0,3,-1)
@@ -216,10 +216,10 @@ namespace
         temp2 = -temp2;
 
         temp = 0;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
         temp = 1,2,-3,4,5;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2-temp)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2-temp)));
 
 
 
@@ -229,10 +229,10 @@ namespace
         temp2 = 0;
 
         temp = 0;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
         temp = 1,2,-3,4,5;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2-temp)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2-temp)));
 
 
 
@@ -242,13 +242,13 @@ namespace
         temp2 = 1,0,0,0,0;
 
         temp = 0;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.inner_product(test), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
+        DLIB_TEST(approx_equal(test.inner_product(test), length_squared(temp2)));
         temp = 1,2,-3,4,5;
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2-temp)), "");
-        DLIB_CASSERT(approx_equal(test(test), 0), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(test.get_distance_function()), 0), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2-temp)));
+        DLIB_TEST(approx_equal(test(test), 0));
+        DLIB_TEST(approx_equal(test.get_distance_function()(test.get_distance_function()), 0));
 
     }
 
@@ -282,9 +282,9 @@ namespace
         temp = 2,0,0,0;
         temp2 = 0;
         val = 0;
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
+        DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
+        DLIB_TEST(approx_equal(test(temp2), dist(k,temp2,val)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
 
 
         temp2 = 0;
@@ -297,25 +297,25 @@ namespace
         dlog << LDEBUG << test(temp) ;
         dlog << LDEBUG << "squared_norm(): " << test.squared_norm() ;
 
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val), 1e-6), 
+        DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
+        DLIB_TEST(approx_equal(test(temp2), dist(k,temp2,val)));
+        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val), 1e-6), 
                      test.get_distance_function()(temp2) - dist(k,temp2,val) << "  compare to: " <<
                      test(temp2) - dist(k,temp2,val)
         );
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
 
 
         // make test store the point(0,0,0,0,0)
         val = 0,0,0,0,0;
         test.train(temp2, 1,-1);
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val)), 
+        DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
+        DLIB_TEST(approx_equal(test(temp2), dist(k,temp2,val)));
+        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val)), 
                      test.get_distance_function()(temp2) - dist(k,temp2,val) << "  compare to: " <<
                      test(temp2) - dist(k,temp2,val)
         );
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
 
 
 
@@ -326,11 +326,11 @@ namespace
         test.train(temp2, 1,1);
 
         temp = 1,0,3,0;
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val), 1e-7), 
+        DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
+        DLIB_TEST_MSG(approx_equal(test(temp2), dist(k,temp2,val), 1e-7), 
                      test(temp2) - dist(k,temp2,val));
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
-        DLIB_CASSERT(approx_equal(test(test), 0, 1e-7), test(test));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
+        DLIB_TEST_MSG(approx_equal(test(test), 0, 1e-7), test(test));
 
 
         val2 =  0,1,2.6,8,b;
@@ -340,12 +340,12 @@ namespace
         test.train(temp2, 1,1);
 
         temp = 1,1,3,0;
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), test(temp2) - dist(k,temp2,val));
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
-        DLIB_CASSERT(approx_equal(test.inner_product(test), length_squared(val)), "");
-        DLIB_CASSERT(approx_equal(test(test), 0), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(test.get_distance_function()), 0, 1e-6), 
+        DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
+        DLIB_TEST_MSG(approx_equal(test(temp2), dist(k,temp2,val)), test(temp2) - dist(k,temp2,val));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
+        DLIB_TEST(approx_equal(test.inner_product(test), length_squared(val)));
+        DLIB_TEST(approx_equal(test(test), 0));
+        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(test.get_distance_function()), 0, 1e-6), 
                      test.get_distance_function()(test.get_distance_function()));
     }
 
@@ -377,44 +377,44 @@ namespace
         dlog << LDEBUG << test(temp) ;
         dlog << LDEBUG << "squared_norm(): " << test.squared_norm() ;
 
-        DLIB_CASSERT(approx_equal(test(temp), 2), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 0), "");
+        DLIB_TEST(approx_equal(test(temp), 2));
+        DLIB_TEST(approx_equal(test.squared_norm(), 0));
 
         // make test store the point(2,0,0,0,0)
         test.train(temp, 0, 1);
         dlog << LDEBUG << test(temp) ;
         dlog << LDEBUG << "squared_norm(): " << test.squared_norm() ;
-        DLIB_CASSERT(approx_equal(test(temp), 0), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 4), "");
+        DLIB_TEST(approx_equal(test(temp), 0));
+        DLIB_TEST(approx_equal(test.squared_norm(), 4));
 
         dlog << LDEBUG << "AAAA 2" ;
         temp.clear();
         temp[1] = 2;
         dlog << LDEBUG << test(temp) ;
-        DLIB_CASSERT(approx_equal(test(temp), std::sqrt(2*2 + 2*2.0)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 4), "");
+        DLIB_TEST(approx_equal(test(temp), std::sqrt(2*2 + 2*2.0)));
+        DLIB_TEST(approx_equal(test.squared_norm(), 4));
 
         // make test store the point(0,2,0,0,0)
         test.train(temp, 0, 1);
 
         dlog << LDEBUG << test(temp) ;
-        DLIB_CASSERT(approx_equal(test(temp), 0), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 4), "");
+        DLIB_TEST(approx_equal(test(temp), 0));
+        DLIB_TEST(approx_equal(test.squared_norm(), 4));
 
         temp.clear();
         temp[0] = 2;
-        DLIB_CASSERT(approx_equal(test(temp), std::sqrt(2*2 + 2*2.0)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 4), "");
+        DLIB_TEST(approx_equal(test(temp), std::sqrt(2*2 + 2*2.0)));
+        DLIB_TEST(approx_equal(test.squared_norm(), 4));
 
         // make test store the point(1,1,0,0,0)
         test.train(temp, 0.5, 0.5);
 
         dlog << LDEBUG << "AAAA 3" ;
         temp.clear();
-        DLIB_CASSERT(approx_equal(test(temp), std::sqrt(2.0)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), 2), "");
-        DLIB_CASSERT(approx_equal(test(test), 0), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(test.get_distance_function()), 0), "");
+        DLIB_TEST(approx_equal(test(temp), std::sqrt(2.0)));
+        DLIB_TEST(approx_equal(test.squared_norm(), 2));
+        DLIB_TEST(approx_equal(test(test), 0));
+        DLIB_TEST(approx_equal(test.get_distance_function()(test.get_distance_function()), 0));
 
         dlog << LDEBUG << "AAAA 3.1" ;
         // make test store the point(1,1,0,3,0)
@@ -427,8 +427,8 @@ namespace
 
         dlog << LDEBUG << "AAAA 3.2" ;
         temp.clear();
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
         dlog << LDEBUG << "AAAA 3.3" ;
         temp[0] = 1;
         temp[1] = 2;
@@ -438,7 +438,7 @@ namespace
         dlog << LDEBUG << "AAAA 3.4" ;
         double junk = sparse_vector::distance(temp2,temp);
         dlog << LDEBUG << "AAAA 3.5" ;
-        DLIB_CASSERT(approx_equal(test(temp), junk) , "");
+        DLIB_TEST(approx_equal(test(temp), junk) );
 
         dlog << LDEBUG << "AAAA 4" ;
         // make test store the point(0,1,0,3,-1)
@@ -452,14 +452,14 @@ namespace
         temp2[4] = -1;
 
         temp.clear();
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
         temp[0] = 1;
         temp[1] = 2;
         temp[2] = 3;
         temp[3] = 4;
         temp[4] = 5;
-        DLIB_CASSERT(approx_equal(test(temp), sparse_vector::distance(temp2,temp)), "");
+        DLIB_TEST(approx_equal(test(temp), sparse_vector::distance(temp2,temp)));
 
 
         // make test store the -1*point(0,1,0,3,-1)
@@ -473,14 +473,14 @@ namespace
 
         dlog << LDEBUG << "AAAA 5" ;
         temp.clear();
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
         temp[0] = 1;
         temp[1] = 2;
         temp[2] = -3;
         temp[3] = 4;
         temp[4] = 5;
-        DLIB_CASSERT(approx_equal(test(temp), sparse_vector::distance(temp2,temp)), "");
+        DLIB_TEST(approx_equal(test(temp), sparse_vector::distance(temp2,temp)));
 
 
 
@@ -490,15 +490,15 @@ namespace
         temp2.clear();
 
         temp.clear();
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
         temp[0] = 1;
         temp[1] = 2;
         temp[2] = -3;
         temp[3] = 4;
         temp[4] = 5;
-        DLIB_CASSERT(approx_equal(test(temp), sparse_vector::distance(temp2,temp)), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(temp), sparse_vector::distance(temp2,temp)), "");
+        DLIB_TEST(approx_equal(test(temp), sparse_vector::distance(temp2,temp)));
+        DLIB_TEST(approx_equal(test.get_distance_function()(temp), sparse_vector::distance(temp2,temp)));
 
 
         dlog << LDEBUG << "AAAA 6" ;
@@ -511,18 +511,18 @@ namespace
         temp2[0] = 1;
 
         temp.clear();
-        DLIB_CASSERT(approx_equal(test(temp), length(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(temp2)), "");
-        DLIB_CASSERT(approx_equal(test.inner_product(test), length_squared(temp2)), "");
+        DLIB_TEST(approx_equal(test(temp), length(temp2)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(temp2)));
+        DLIB_TEST(approx_equal(test.inner_product(test), length_squared(temp2)));
         temp[0] = 1;
         temp[1] = 2;
         temp[2] = -3;
         temp[3] = 4;
         temp[4] = 5;
-        DLIB_CASSERT(approx_equal(test(temp), sparse_vector::distance(temp2,temp)), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(temp), sparse_vector::distance(temp2,temp)), "");
-        DLIB_CASSERT(approx_equal(test(test), 0), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(test.get_distance_function()), 0), "");
+        DLIB_TEST(approx_equal(test(temp), sparse_vector::distance(temp2,temp)));
+        DLIB_TEST(approx_equal(test.get_distance_function()(temp), sparse_vector::distance(temp2,temp)));
+        DLIB_TEST(approx_equal(test(test), 0));
+        DLIB_TEST(approx_equal(test.get_distance_function()(test.get_distance_function()), 0));
 
         dlog << LDEBUG << "AAAA 7" ;
     }
@@ -559,9 +559,9 @@ namespace
         temp[0] = 2;
         temp2.clear();
         val.clear();
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
+        DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
+        DLIB_TEST(approx_equal(test(temp2), dist(k,temp2,val)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
 
 
         temp2.clear();
@@ -576,14 +576,14 @@ namespace
         dlog << LDEBUG << test(temp) ;
         dlog << LDEBUG << "squared_norm(): " << test.squared_norm() ;
 
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val), 1e-7), 
+        DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
+        DLIB_TEST(approx_equal(test(temp2), dist(k,temp2,val)));
+        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val), 1e-7), 
                      test.get_distance_function()(temp2) - dist(k,temp2,val)
         );
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
-        DLIB_CASSERT(approx_equal(test(test), 0), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(test.get_distance_function()), 0, 1e-6), "");
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
+        DLIB_TEST(approx_equal(test(test), 0));
+        DLIB_TEST(approx_equal(test.get_distance_function()(test.get_distance_function()), 0, 1e-6));
 
         // make test store the point(0,0,0,0,0)
         val.clear();
@@ -594,12 +594,12 @@ namespace
         dlog << LDEBUG << test(temp) ;
         dlog << LDEBUG << "squared_norm(): " << test.squared_norm() ;
 
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), test(temp) - dist(k,temp,val));
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val)), "");
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
-        DLIB_CASSERT(approx_equal(test(test), 0), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(test.get_distance_function()), 0), "");
+        DLIB_TEST_MSG(approx_equal(test(temp), dist(k,temp,val)), test(temp) - dist(k,temp,val));
+        DLIB_TEST(approx_equal(test(temp2), dist(k,temp2,val)));
+        DLIB_TEST(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val)));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
+        DLIB_TEST(approx_equal(test(test), 0));
+        DLIB_TEST(approx_equal(test.get_distance_function()(test.get_distance_function()), 0));
 
         val2.clear();
         val2[0] = 0;
@@ -616,10 +616,10 @@ namespace
         temp.clear();
         temp[0] = 1;
         temp[2] = 3;
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val), 1e-7), 
+        DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
+        DLIB_TEST_MSG(approx_equal(test(temp2), dist(k,temp2,val), 1e-7), 
                      test(temp2) - dist(k,temp2,val));
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
 
 
         val2.clear();
@@ -643,12 +643,12 @@ namespace
         temp[1] = 1;
         temp[2] = 3;
         temp[3] = 0;
-        DLIB_CASSERT(approx_equal(test(temp), dist(k,temp,val)), "");
-        DLIB_CASSERT(approx_equal(test(temp2), dist(k,temp2,val)), test(temp2) - dist(k,temp2,val));
-        DLIB_CASSERT(approx_equal(test.squared_norm(), length_squared(val)), "");
-        DLIB_CASSERT(approx_equal(test.inner_product(test), length_squared(val)), "");
-        DLIB_CASSERT(approx_equal(test(test), 0), "");
-        DLIB_CASSERT(approx_equal(test.get_distance_function()(test.get_distance_function()), 0), "");
+        DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
+        DLIB_TEST_MSG(approx_equal(test(temp2), dist(k,temp2,val)), test(temp2) - dist(k,temp2,val));
+        DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
+        DLIB_TEST(approx_equal(test.inner_product(test), length_squared(val)));
+        DLIB_TEST(approx_equal(test(test), 0));
+        DLIB_TEST(approx_equal(test.get_distance_function()(test.get_distance_function()), 0));
     }
 
 // ----------------------------------------------------------------------------------------

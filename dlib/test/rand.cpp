@@ -49,7 +49,7 @@ namespace
         compressed_size = sout.str().size();
         compressed_size *= 8;
         compressed_size /= str.size();
-        DLIB_CASSERT(compressed_size >= 8, "order 0 bps: " << compressed_size);
+        DLIB_TEST_MSG(compressed_size >= 8, "order 0 bps: " << compressed_size);
         dlog << LINFO << "order 0: " << compressed_size;
 
         print_spinner();
@@ -62,7 +62,7 @@ namespace
         compressed_size = sout.str().size();
         compressed_size *= 8;
         compressed_size /= str.size();
-        DLIB_CASSERT(compressed_size >= 8, "order 1 bps: " << compressed_size);
+        DLIB_TEST_MSG(compressed_size >= 8, "order 1 bps: " << compressed_size);
         dlog << LINFO << "order 1: " << compressed_size;
 
         print_spinner();
@@ -75,7 +75,7 @@ namespace
         compressed_size = sout.str().size();
         compressed_size *= 8;
         compressed_size /= str.size();
-        DLIB_CASSERT(compressed_size >= 8, "order 4 bps: " << compressed_size);
+        DLIB_TEST_MSG(compressed_size >= 8, "order 4 bps: " << compressed_size);
         dlog << LINFO << "order 4: " << compressed_size;
 
     }
@@ -101,22 +101,22 @@ namespace
 
 
         rand r, r2;
-        DLIB_CASSERT(r.get_seed() == "","");
+        DLIB_TEST(r.get_seed() == "");
         r.set_seed(seed.str());
 
-        DLIB_CASSERT(r.get_seed() == seed.str(),"");
+        DLIB_TEST(r.get_seed() == seed.str());
         r.clear();
-        DLIB_CASSERT(r.get_seed() == "","");
+        DLIB_TEST(r.get_seed() == "");
         swap(r,r2);
-        DLIB_CASSERT(r.get_seed() == "","");
+        DLIB_TEST(r.get_seed() == "");
         r.set_seed(seed.str());
-        DLIB_CASSERT(r.get_seed() == seed.str(),"");
+        DLIB_TEST(r.get_seed() == seed.str());
         swap(r,r2);
-        DLIB_CASSERT(r2.get_seed() == seed.str(),"");
-        DLIB_CASSERT(r.get_seed() == "","");
+        DLIB_TEST(r2.get_seed() == seed.str());
+        DLIB_TEST(r.get_seed() == "");
         swap(r,r2);
-        DLIB_CASSERT(r.get_seed() == seed.str(),"");
-        DLIB_CASSERT(r2.get_seed() == "","");
+        DLIB_TEST(r.get_seed() == seed.str());
+        DLIB_TEST(r2.get_seed() == "");
 
         print_spinner();
         unsigned long size = 100000;

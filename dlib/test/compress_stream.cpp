@@ -82,7 +82,7 @@ namespace
             }
             
 
-            DLIB_CASSERT(detected_error || sout.str() == old_buffer,(unsigned int)sout.str().size());
+            DLIB_TEST_MSG(detected_error || sout.str() == old_buffer,(unsigned int)sout.str().size());
 
 
 
@@ -116,7 +116,7 @@ namespace
                 sin.str(sout.str());
                 sout.str("");
                 test.decompress(sin,sout);
-                DLIB_CASSERT(sout.str() == buffer,"");                   
+                DLIB_TEST(sout.str() == buffer);                   
             }
 
             print_spinner();
@@ -153,7 +153,7 @@ namespace
                 sout.str("");
                 test.decompress(sin,sout);
                 buffer = ch;
-                DLIB_CASSERT(sout.str() == buffer,"");
+                DLIB_TEST(sout.str() == buffer);
 
 
 
@@ -161,7 +161,7 @@ namespace
                 sout.str("");
                 test.decompress(sin,sout);
                 buffer = ch2;
-                DLIB_CASSERT(sout.str() == buffer,"");
+                DLIB_TEST(sout.str() == buffer);
 
 
             }
@@ -175,7 +175,7 @@ namespace
             sin.str(sout.str());
             sout.str("");
             test.decompress(sin,sout);
-            DLIB_CASSERT(sout.str() == "",sout.str());
+            DLIB_TEST_MSG(sout.str() == "",sout.str());
 
 
 
@@ -206,7 +206,7 @@ namespace
             print_spinner();
             test.decompress(sin,sout);
 
-            DLIB_CASSERT(sout.str() == buffer,"");
+            DLIB_TEST(sout.str() == buffer);
 
             print_spinner();
         }
@@ -247,7 +247,7 @@ namespace
             print_spinner();
             test.decompress(sin,sout);
 
-            DLIB_CASSERT(sout.str() == buffer,"");
+            DLIB_TEST(sout.str() == buffer);
 
             print_spinner();
 

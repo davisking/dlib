@@ -77,23 +77,23 @@ namespace
         cholesky_decomposition<matrix_type> test(m);
 
         // none of the matrices we should be passing in to test_cholesky() should be non-spd.  
-        DLIB_CASSERT(test.is_spd() == true,  "");
+        DLIB_TEST(test.is_spd() == true);
 
         type temp;
-        DLIB_CASSERT( (temp= max(abs(test.get_l()*trans(test.get_l()) - m))) < eps,temp);
+        DLIB_TEST_MSG( (temp= max(abs(test.get_l()*trans(test.get_l()) - m))) < eps,temp);
 
 
         matrix<type> m2;
         matrix<type,0,1> col;
 
         m2 = identity_matrix<type>(m.nr());
-        DLIB_CASSERT(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
+        DLIB_TEST_MSG(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
         m2 = randmat<type>(m.nr(),5);
-        DLIB_CASSERT(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
+        DLIB_TEST_MSG(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
         m2 = randmat<type>(m.nr(),1);
-        DLIB_CASSERT(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
+        DLIB_TEST_MSG(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
         col = randmat<type>(m.nr(),1);
-        DLIB_CASSERT(equal(m*test.solve(col), col,eps),max(abs(m*test.solve(m2)- m2)));
+        DLIB_TEST_MSG(equal(m*test.solve(col), col,eps),max(abs(m*test.solve(m2)- m2)));
 
         // now make us a non-spd matrix
         if (m.nr() > 1)
@@ -102,17 +102,17 @@ namespace
             sm(1,1) = 0;
 
             cholesky_decomposition<matrix_type> test2(sm);
-            DLIB_CASSERT(test2.is_spd() == false,  test2.get_l());
+            DLIB_TEST_MSG(test2.is_spd() == false,  test2.get_l());
 
 
             cholesky_decomposition<matrix_type> test3(sm*trans(sm));
-            DLIB_CASSERT(test3.is_spd() == false,  test3.get_l());
+            DLIB_TEST_MSG(test3.is_spd() == false,  test3.get_l());
 
             sm = sm*trans(sm);
             sm(1,1) = 5;
             sm(1,0) -= 1;
             cholesky_decomposition<matrix_type> test4(sm);
-            DLIB_CASSERT(test4.is_spd() == false,  test4.get_l());
+            DLIB_TEST_MSG(test4.is_spd() == false,  test4.get_l());
         }
 
     }

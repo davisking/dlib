@@ -132,9 +132,9 @@ namespace
         // all points are correctly identified.
         for (unsigned long i = 0; i < samples.size()/3; ++i)
         {
-            DLIB_CASSERT(test(samples[i]) == class1, " ");
-            DLIB_CASSERT(test(samples[i+num]) == class2, "");
-            DLIB_CASSERT(test(samples[i+2*num]) == class3, "");
+            DLIB_TEST(test(samples[i]) == class1);
+            DLIB_TEST(test(samples[i+num]) == class2);
+            DLIB_TEST(test(samples[i+2*num]) == class3);
         }
 
         dlog << LINFO << "   end test_clutering()";
@@ -201,20 +201,20 @@ namespace
 
         // now we output the value of the sinc function for a few test points as well as the 
         // value predicted by krls object.
-        m(0) = 2.5; dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_CASSERT(abs(sinc(m(0)) - test(m)) < 0.01,"");
-        m(0) = 0.1; dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_CASSERT(abs(sinc(m(0)) - test(m)) < 0.01,"");
-        m(0) = -4;  dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_CASSERT(abs(sinc(m(0)) - test(m)) < 0.01,"");
-        m(0) = 5.0; dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_CASSERT(abs(sinc(m(0)) - test(m)) < 0.01,"");
+        m(0) = 2.5; dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_TEST(abs(sinc(m(0)) - test(m)) < 0.01);
+        m(0) = 0.1; dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_TEST(abs(sinc(m(0)) - test(m)) < 0.01);
+        m(0) = -4;  dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_TEST(abs(sinc(m(0)) - test(m)) < 0.01);
+        m(0) = 5.0; dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_TEST(abs(sinc(m(0)) - test(m)) < 0.01);
 
-        m(0) = 2.5; dlog << LDEBUG << "rvm: " << sinc(m(0)) << "   " << test2(m); DLIB_CASSERT(abs(sinc(m(0)) - test2(m)) < 0.01,"");
-        m(0) = 0.1; dlog << LDEBUG << "rvm: " << sinc(m(0)) << "   " << test2(m); DLIB_CASSERT(abs(sinc(m(0)) - test2(m)) < 0.01,"");
-        m(0) = -4;  dlog << LDEBUG << "rvm: " << sinc(m(0)) << "   " << test2(m); DLIB_CASSERT(abs(sinc(m(0)) - test2(m)) < 0.01,"");
-        m(0) = 5.0; dlog << LDEBUG << "rvm: " << sinc(m(0)) << "   " << test2(m); DLIB_CASSERT(abs(sinc(m(0)) - test2(m)) < 0.01,"");
+        m(0) = 2.5; dlog << LDEBUG << "rvm: " << sinc(m(0)) << "   " << test2(m); DLIB_TEST(abs(sinc(m(0)) - test2(m)) < 0.01);
+        m(0) = 0.1; dlog << LDEBUG << "rvm: " << sinc(m(0)) << "   " << test2(m); DLIB_TEST(abs(sinc(m(0)) - test2(m)) < 0.01);
+        m(0) = -4;  dlog << LDEBUG << "rvm: " << sinc(m(0)) << "   " << test2(m); DLIB_TEST(abs(sinc(m(0)) - test2(m)) < 0.01);
+        m(0) = 5.0; dlog << LDEBUG << "rvm: " << sinc(m(0)) << "   " << test2(m); DLIB_TEST(abs(sinc(m(0)) - test2(m)) < 0.01);
 
-        m(0) = 2.5; dlog << LDEBUG << "rbf: " << sinc(m(0)) << "   " << test3(m); DLIB_CASSERT(abs(sinc(m(0)) - test3(m)) < 0.01,"");
-        m(0) = 0.1; dlog << LDEBUG << "rbf: " << sinc(m(0)) << "   " << test3(m); DLIB_CASSERT(abs(sinc(m(0)) - test3(m)) < 0.01,"");
-        m(0) = -4;  dlog << LDEBUG << "rbf: " << sinc(m(0)) << "   " << test3(m); DLIB_CASSERT(abs(sinc(m(0)) - test3(m)) < 0.01,"");
-        m(0) = 5.0; dlog << LDEBUG << "rbf: " << sinc(m(0)) << "   " << test3(m); DLIB_CASSERT(abs(sinc(m(0)) - test3(m)) < 0.01,"");
+        m(0) = 2.5; dlog << LDEBUG << "rbf: " << sinc(m(0)) << "   " << test3(m); DLIB_TEST(abs(sinc(m(0)) - test3(m)) < 0.01);
+        m(0) = 0.1; dlog << LDEBUG << "rbf: " << sinc(m(0)) << "   " << test3(m); DLIB_TEST(abs(sinc(m(0)) - test3(m)) < 0.01);
+        m(0) = -4;  dlog << LDEBUG << "rbf: " << sinc(m(0)) << "   " << test3(m); DLIB_TEST(abs(sinc(m(0)) - test3(m)) < 0.01);
+        m(0) = 5.0; dlog << LDEBUG << "rbf: " << sinc(m(0)) << "   " << test3(m); DLIB_TEST(abs(sinc(m(0)) - test3(m)) < 0.01);
         dlog << LINFO << "   end test_regression()";
     }
 
@@ -264,13 +264,13 @@ namespace
         m(0) = -1.5; m(1) = sinc(m(0)); dlog << LDEBUG << "   " << test(m);  rs.add(test(m));
         m(0) = -0.5; m(1) = sinc(m(0)); dlog << LDEBUG << "   " << test(m);  rs.add(test(m));
 
-        m(0) = -1.5; m(1) = sinc(m(0)); DLIB_CASSERT(rs.scale(test(m)) < 2, rs.scale(test(m)));
-        m(0) = -1.5; m(1) = sinc(m(0)); DLIB_CASSERT(rs.scale(test(m)) < 2, rs.scale(test(m)));
-        m(0) = -0;   m(1) = sinc(m(0)); DLIB_CASSERT(rs.scale(test(m)) < 2, rs.scale(test(m)));
-        m(0) = -0.5; m(1) = sinc(m(0)); DLIB_CASSERT(rs.scale(test(m)) < 2, rs.scale(test(m)));
-        m(0) = -4.1; m(1) = sinc(m(0)); DLIB_CASSERT(rs.scale(test(m)) < 2, rs.scale(test(m)));
-        m(0) = -1.5; m(1) = sinc(m(0)); DLIB_CASSERT(rs.scale(test(m)) < 2, rs.scale(test(m)));
-        m(0) = -0.5; m(1) = sinc(m(0)); DLIB_CASSERT(rs.scale(test(m)) < 2, rs.scale(test(m)));
+        m(0) = -1.5; m(1) = sinc(m(0)); DLIB_TEST_MSG(rs.scale(test(m)) < 2, rs.scale(test(m)));
+        m(0) = -1.5; m(1) = sinc(m(0)); DLIB_TEST_MSG(rs.scale(test(m)) < 2, rs.scale(test(m)));
+        m(0) = -0;   m(1) = sinc(m(0)); DLIB_TEST_MSG(rs.scale(test(m)) < 2, rs.scale(test(m)));
+        m(0) = -0.5; m(1) = sinc(m(0)); DLIB_TEST_MSG(rs.scale(test(m)) < 2, rs.scale(test(m)));
+        m(0) = -4.1; m(1) = sinc(m(0)); DLIB_TEST_MSG(rs.scale(test(m)) < 2, rs.scale(test(m)));
+        m(0) = -1.5; m(1) = sinc(m(0)); DLIB_TEST_MSG(rs.scale(test(m)) < 2, rs.scale(test(m)));
+        m(0) = -0.5; m(1) = sinc(m(0)); DLIB_TEST_MSG(rs.scale(test(m)) < 2, rs.scale(test(m)));
 
         dlog << LDEBUG;
         // Lets output the distance from the centroid to some points that are NOT from the sinc function.
@@ -281,31 +281,31 @@ namespace
         dlog << LDEBUG << "Points that are NOT on the sinc function:\n";
         m(0) = -1.5; m(1) = sinc(m(0))+4;   
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
-        DLIB_CASSERT(rs.scale(test(m)) > 6, rs.scale(test(m)));
+        DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
 
         m(0) = -1.5; m(1) = sinc(m(0))+3;   
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
-        DLIB_CASSERT(rs.scale(test(m)) > 6, rs.scale(test(m)));
+        DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
 
         m(0) = -0;   m(1) = -sinc(m(0));    
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
-        DLIB_CASSERT(rs.scale(test(m)) > 6, rs.scale(test(m)));
+        DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
 
         m(0) = -0.5; m(1) = -sinc(m(0));    
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
-        DLIB_CASSERT(rs.scale(test(m)) > 6, rs.scale(test(m)));
+        DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
 
         m(0) = -4.1; m(1) = sinc(m(0))+2;   
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
-        DLIB_CASSERT(rs.scale(test(m)) > 6, rs.scale(test(m)));
+        DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
 
         m(0) = -1.5; m(1) = sinc(m(0))+0.9; 
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
-        DLIB_CASSERT(rs.scale(test(m)) > 6, rs.scale(test(m)));
+        DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
 
         m(0) = -0.5; m(1) = sinc(m(0))+1;   
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
-        DLIB_CASSERT(rs.scale(test(m)) > 6, rs.scale(test(m)));
+        DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
 
         dlog << LINFO << "   end test_anomaly_detection()";
     }
@@ -365,10 +365,10 @@ namespace
         dlog << LDEBUG << "rbf cv: " << rbf_cv;
         dlog << LDEBUG << "peg cv: " << peg_cv;
 
-        DLIB_CASSERT(mean(rvm_cv) > 0.9, rvm_cv);
-        DLIB_CASSERT(mean(svm_cv) > 0.9, svm_cv);
-        DLIB_CASSERT(mean(rbf_cv) > 0.9, rbf_cv);
-        DLIB_CASSERT(mean(peg_cv) > 0.9, rbf_cv);
+        DLIB_TEST_MSG(mean(rvm_cv) > 0.9, rvm_cv);
+        DLIB_TEST_MSG(mean(svm_cv) > 0.9, svm_cv);
+        DLIB_TEST_MSG(mean(rbf_cv) > 0.9, rbf_cv);
+        DLIB_TEST_MSG(mean(peg_cv) > 0.9, rbf_cv);
 
         const long num_sv = trainer.train(x,y).support_vectors.size();
         print_spinner();
@@ -377,8 +377,8 @@ namespace
         dlog << LDEBUG << "num sv: " << num_sv;
         dlog << LDEBUG << "num rv: " << num_rv;
 
-        DLIB_CASSERT(num_rv <= 17, "");
-        DLIB_CASSERT(num_sv <= 45, num_sv);
+        DLIB_TEST(num_rv <= 17);
+        DLIB_TEST_MSG(num_sv <= 45, num_sv);
 
         decision_function<kernel_type> df = reduced2(trainer, 19).train(x,y);
         print_spinner();
@@ -387,13 +387,13 @@ namespace
         print_spinner();
         dlog << LDEBUG << "svm reduced test error: " << svm_reduced_error;
         dlog << LDEBUG << "svm reduced num sv: " << df.support_vectors.size();
-        DLIB_CASSERT(mean(svm_reduced_error) > 0.9, "");
+        DLIB_TEST(mean(svm_reduced_error) > 0.9);
 
         svm_cv = cross_validate_trainer(reduced(trainer,30), x,y, 4);
         dlog << LDEBUG << "svm reduced cv: " << svm_cv;
-        DLIB_CASSERT(mean(svm_cv) > 0.9, svm_cv);
+        DLIB_TEST_MSG(mean(svm_cv) > 0.9, svm_cv);
 
-        DLIB_CASSERT(df.support_vectors.size() == 19,"");
+        DLIB_TEST(df.support_vectors.size() == 19);
         dlog << LINFO << "   end test_binary_classification()";
     }
 

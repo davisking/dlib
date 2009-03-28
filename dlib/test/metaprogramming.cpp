@@ -29,23 +29,23 @@ namespace
 
         print_spinner();
 
-        DLIB_CASSERT(is_signed_type<signed char>::value == true,"");
-        DLIB_CASSERT(is_signed_type<signed short>::value == true,"");
-        DLIB_CASSERT(is_signed_type<signed int>::value == true,"");
-        DLIB_CASSERT(is_signed_type<signed long>::value == true,"");
-        DLIB_CASSERT(is_unsigned_type<signed char>::value == false,"");
-        DLIB_CASSERT(is_unsigned_type<signed short>::value == false,"");
-        DLIB_CASSERT(is_unsigned_type<signed int>::value == false,"");
-        DLIB_CASSERT(is_unsigned_type<signed long>::value == false,"");
+        DLIB_TEST(is_signed_type<signed char>::value == true);
+        DLIB_TEST(is_signed_type<signed short>::value == true);
+        DLIB_TEST(is_signed_type<signed int>::value == true);
+        DLIB_TEST(is_signed_type<signed long>::value == true);
+        DLIB_TEST(is_unsigned_type<signed char>::value == false);
+        DLIB_TEST(is_unsigned_type<signed short>::value == false);
+        DLIB_TEST(is_unsigned_type<signed int>::value == false);
+        DLIB_TEST(is_unsigned_type<signed long>::value == false);
 
-        DLIB_CASSERT(is_unsigned_type<unsigned char>::value == true,"");
-        DLIB_CASSERT(is_unsigned_type<unsigned short>::value == true,"");
-        DLIB_CASSERT(is_unsigned_type<unsigned int>::value == true,"");
-        DLIB_CASSERT(is_unsigned_type<unsigned long>::value == true,"");
-        DLIB_CASSERT(is_signed_type<unsigned char>::value == false,"");
-        DLIB_CASSERT(is_signed_type<unsigned short>::value == false,"");
-        DLIB_CASSERT(is_signed_type<unsigned int>::value == false,"");
-        DLIB_CASSERT(is_signed_type<unsigned long>::value == false,"");
+        DLIB_TEST(is_unsigned_type<unsigned char>::value == true);
+        DLIB_TEST(is_unsigned_type<unsigned short>::value == true);
+        DLIB_TEST(is_unsigned_type<unsigned int>::value == true);
+        DLIB_TEST(is_unsigned_type<unsigned long>::value == true);
+        DLIB_TEST(is_signed_type<unsigned char>::value == false);
+        DLIB_TEST(is_signed_type<unsigned short>::value == false);
+        DLIB_TEST(is_signed_type<unsigned int>::value == false);
+        DLIB_TEST(is_signed_type<unsigned long>::value == false);
 
 
         COMPILE_TIME_ASSERT(is_signed_type<signed char>::value == true);

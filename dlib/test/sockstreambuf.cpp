@@ -132,14 +132,14 @@ namespace
         listener* list;
         if (create_listener(list,0))
         {
-            DLIB_CASSERT(false, "Unable to create a listener");
+            DLIB_TEST_MSG(false, "Unable to create a listener");
         }
 
         create_new_thread(&thread_proc_struct<ssb>::thread_proc,list);
 
         if (create_connection(con,list->get_listening_port(),"127.0.0.1"))
         {
-            DLIB_CASSERT(false, "Unable to create a connection");
+            DLIB_TEST_MSG(false, "Unable to create a connection");
         }
 
         // make sure con gets deleted
@@ -154,57 +154,57 @@ namespace
         {
             in >> ch;
             char c = i;
-            DLIB_CASSERT(ch == c,"ch: " << (int)ch << "  c: " << (int)c);
+            DLIB_TEST_MSG(ch == c,"ch: " << (int)ch << "  c: " << (int)c);
         }
 
         in.get();
-        DLIB_CASSERT(in.peek() == 'A', "*" << in.peek() << "*");
+        DLIB_TEST_MSG(in.peek() == 'A', "*" << in.peek() << "*");
         in.get();
 
         for (int i = 0; i < 256; ++i)
         {
             in.read(&ch,1);
             char c = i;
-            DLIB_CASSERT(ch == c,"ch: " << (int)ch << "  c: " << (int)c );
+            DLIB_TEST_MSG(ch == c,"ch: " << (int)ch << "  c: " << (int)c );
         }
 
         for (int i = -100; i < 25600; ++i)
         {
             int n = 0;
             in >> n;
-            DLIB_CASSERT(n == i,"n: " << n << "   i:" << i);
+            DLIB_TEST_MSG(n == i,"n: " << n << "   i:" << i);
         }
 
         in.get();
-        DLIB_CASSERT(in.peek() == 'A', "*" << in.peek() << "*");
+        DLIB_TEST_MSG(in.peek() == 'A', "*" << in.peek() << "*");
         in.get();
 
         for (int i = -100; i < 25600; ++i)
         {
             int n;
             in.read((char*)&n,sizeof(n));
-            DLIB_CASSERT(n == i,"n: " << n << "   i:" << i);
+            DLIB_TEST_MSG(n == i,"n: " << n << "   i:" << i);
         }
 
         in.read(bigbuf,1000000);
         for (int i = 0; i < 1000000; ++i)
         {
-            DLIB_CASSERT(bigbuf[i] == (char)(i&0xFF),"");
+            DLIB_TEST(bigbuf[i] == (char)(i&0xFF));
         }
 
-        DLIB_CASSERT(in.get() == 'd',"");
-        DLIB_CASSERT(in.get() == 'a',"");
-        DLIB_CASSERT(in.get() == 'v',"");
-        DLIB_CASSERT(in.get() == 'i',"");
+        DLIB_TEST(in.get() == 'd');
+        DLIB_TEST(in.get() == 'a');
+        DLIB_TEST(in.get() == 'v');
+        DLIB_TEST(in.get() == 'i');
 
-        DLIB_CASSERT(in.peek() == 's',"");
+        DLIB_TEST(in.peek() == 's');
 
-        DLIB_CASSERT(in.get() == 's',"");
+        DLIB_TEST(in.get() == 's');
 
         in.putback('s');
-        DLIB_CASSERT(in.peek() == 's',"");
+        DLIB_TEST(in.peek() == 's');
 
-        DLIB_CASSERT(in.get() == 's',"");
+        DLIB_TEST(in.get() == 's');
 
 
         string tstring;
@@ -214,9 +214,9 @@ namespace
         deserialize(tint,in);
         deserialize(tuint,in);
 
-        DLIB_CASSERT(tstring == "this is a test","");
-        DLIB_CASSERT(tint == -853,"");
-        DLIB_CASSERT(tuint == 89,"");
+        DLIB_TEST(tstring == "this is a test");
+        DLIB_TEST(tint == -853);
+        DLIB_TEST(tuint == 89);
 
 
 

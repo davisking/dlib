@@ -77,15 +77,15 @@ namespace
         qr_decomposition<matrix_type> test(m);
 
 
-        DLIB_CASSERT(test.nr() == m.nr(),"");
-        DLIB_CASSERT(test.nc() == m.nc(),"");
+        DLIB_TEST(test.nr() == m.nr());
+        DLIB_TEST(test.nc() == m.nc());
 
 
         type temp;
-        DLIB_CASSERT( (temp= max(abs(test.get_q()*test.get_r() - m))) < eps,temp);
+        DLIB_TEST_MSG( (temp= max(abs(test.get_q()*test.get_r() - m))) < eps,temp);
 
         // none of the matrices we should be passing in to test_qr() should be non-full rank.  
-        DLIB_CASSERT(test.is_full_rank() == true,"");
+        DLIB_TEST(test.is_full_rank() == true);
 
         if (m.nr() == m.nc())
         {
@@ -93,17 +93,17 @@ namespace
             matrix<type,0,1> col;
 
             m2 = identity_matrix<type>(m.nr());
-            DLIB_CASSERT(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
+            DLIB_TEST_MSG(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
             m2 = randmat<type>(m.nr(),5);
-            DLIB_CASSERT(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
+            DLIB_TEST_MSG(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
             m2 = randmat<type>(m.nr(),1);
-            DLIB_CASSERT(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
+            DLIB_TEST_MSG(equal(m*test.solve(m2), m2,eps),max(abs(m*test.solve(m2)- m2)));
             col = randmat<type>(m.nr(),1);
-            DLIB_CASSERT(equal(m*test.solve(col), col,eps),max(abs(m*test.solve(m2)- m2)));
+            DLIB_TEST_MSG(equal(m*test.solve(col), col,eps),max(abs(m*test.solve(m2)- m2)));
         }
         else
         {
-            DLIB_CASSERT(dlib::equal(pinv(m), test.solve(identity_matrix<type>(m.nr())), eps), 
+            DLIB_TEST_MSG(dlib::equal(pinv(m), test.solve(identity_matrix<type>(m.nr())), eps), 
                         max(abs(pinv(m) - test.solve(identity_matrix<type>(m.nr())))) );
         }
 
@@ -114,11 +114,11 @@ namespace
             set_colm(sm,0) = colm(sm,1);
 
             qr_decomposition<matrix_type> test2(sm);
-            DLIB_CASSERT( (temp= max(abs(test.get_q()*test.get_r() - m))) < eps,temp);
+            DLIB_TEST_MSG( (temp= max(abs(test.get_q()*test.get_r() - m))) < eps,temp);
 
             if (test2.nc() < 100)
             {
-                DLIB_CASSERT(test2.is_full_rank() == false,"eps: " << eps);
+                DLIB_TEST_MSG(test2.is_full_rank() == false,"eps: " << eps);
             }
 
         }
