@@ -136,7 +136,9 @@ namespace dlib
         >
     class kernel_matrix_cache
     {
-        typedef typename K::scalar_type scalar_type;
+    public:
+        typedef float scalar_type;
+        //typedef typename K::scalar_type scalar_type;
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
 
@@ -1076,6 +1078,7 @@ namespace dlib
             scalar_vector_type alpha;
 
             kernel_matrix_cache<K, in_sample_vector_type, in_scalar_vector_type> Q(x,y,kernel_function,cache_size);
+            typedef typename kernel_matrix_cache<K, in_sample_vector_type, in_scalar_vector_type>::scalar_type cache_type;
 
             alpha.set_size(x.nr());
             df.set_size(x.nr());
@@ -1090,7 +1093,7 @@ namespace dlib
             {
                 if (alpha(r) != 0)
                 {
-                    const scalar_type* Q_r = Q.col(r);
+                    const cache_type* Q_r = Q.col(r);
                     for (long c = 0; c < alpha.nr(); ++c)
                     {
                         df(c) += alpha(r)*Q_r[c];
@@ -1111,8 +1114,8 @@ namespace dlib
                 scalar_type delta_alpha_i = alpha(i) - old_alpha_i;
                 scalar_type delta_alpha_j = alpha(j) - old_alpha_j;
 
-                const scalar_type* Q_i = Q.col(i);
-                const scalar_type* Q_j = Q.col(j);
+                const cache_type* Q_i = Q.col(i);
+                const cache_type* Q_j = Q.col(j);
 
                 for(long k = 0; k < df.nr(); ++k)
                     df(k) += Q_i[k]*delta_alpha_i + Q_j[k]*delta_alpha_j;
@@ -1257,6 +1260,9 @@ namespace dlib
             long in = -1;
             long jn = -1;
 
+
+            typedef typename kernel_matrix_cache<K, sample_vector_type, scalar_vector_type2>::scalar_type cache_type;
+
             scalar_type ip_val = -numeric_limits<scalar_type>::infinity();
             scalar_type jp_val = numeric_limits<scalar_type>::infinity();
             scalar_type in_val = -numeric_limits<scalar_type>::infinity();
@@ -1297,9 +1303,9 @@ namespace dlib
             // As a speed hack, pull out pointers to the columns of the
             // kernel matrix we will be using below rather than accessing
             // them through the Q(r,c) syntax.
-            const scalar_type* Q_ip = 0;
-            const scalar_type* Q_in = 0;
-            const scalar_type* Q_diag = Q.diag();
+            const cache_type* Q_ip = 0;
+            const cache_type* Q_in = 0;
+            const cache_type* Q_diag = Q.diag();
             if (ip != -1)
                 Q_ip = Q.col(ip);
             if (in != -1)
