@@ -417,6 +417,7 @@ namespace dlib
                 - else
                     - R.width() == width
                     - R.height() == height 
+                - R.tl_corner() == point(p.x()-width/2, p.y()-height/2)
                 - The center of R is a the point p 
     !*/
 
@@ -437,6 +438,7 @@ namespace dlib
                 - else
                     - R.width() == width
                     - R.height() == height 
+                - R.tl_corner() == point(x-width/2, y-height/2)
                 - The center of R is a the point (x,y)
     !*/
 
@@ -449,14 +451,9 @@ namespace dlib
     );
     /*!
         ensures
-            - returns a rectangle R such that:
-                - if (width == 0 || height == 0)
-                    - R.width() == 0 
-                    - R.height() == 0 
-                - else
-                    - R.width() == width
-                    - R.height() == height 
-                - The center of R is at the center of rect 
+            - returns centered_rect( (rect.tl_corner() + rect.br_corner())/2, width, height)
+              (i.e. returns a rectangle centered on rect but with the given width
+              and height)
     !*/
 
 // ----------------------------------------------------------------------------------------
