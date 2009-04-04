@@ -433,6 +433,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    const dlib::vector<T,2> rotate_point (
+        const dlib::vector<T,2> center,
+        const dlib::vector<T,2> p,
+        double angle
+    );
+    /*!
+        ensures
+            - returns a point P such that:
+                - P is the point p rotated counter-clockwise around the given
+                  center point by angle radians.
+                  (Note that this is counter clockwise with respect to the normal
+                  coordinate system with positive y going up and positive x going
+                  to the right)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 namespace std

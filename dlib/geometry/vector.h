@@ -1246,6 +1246,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    const dlib::vector<T,2> rotate_point (
+        const dlib::vector<T,2>& center,
+        dlib::vector<T,2> p,
+        double angle
+    )
+    {
+        p -= center;
+        dlib::vector<double,2> temp;
+        const double cos_angle = cos(angle);
+        const double sin_angle = sin(angle);
+        temp.x() = cos_angle*p.x() - sin_angle*p.y();
+        temp.y() = sin_angle*p.x() + cos_angle*p.y();
+
+        return temp + center;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 namespace std

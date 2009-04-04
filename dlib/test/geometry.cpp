@@ -269,6 +269,22 @@ namespace
 
         }
 
+        {
+            const double pi = 3.1415926535898;
+            point p1, center;
+
+            center = point(3,4);
+            p1 = point(10,4);
+
+            DLIB_TEST(rotate_point(center, p1, pi/2) == point(3,7+4));
+
+            center = point(3,3);
+            p1 = point(10,3);
+
+            DLIB_TEST(rotate_point(center, p1, pi/4) == point(8,8));
+            DLIB_TEST(rotate_point(center, p1, -pi/4) == point(8,-2));
+        }
+
     }
 
 
