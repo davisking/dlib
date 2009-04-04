@@ -55,6 +55,7 @@
                <item>vector</item> 
                <item>point</item> 
                <item>rotate_point</item> 
+               <item>point_rotator</item> 
                <item>centered_rect</item> 
                <item>translate_rect</item> 
                <item>resize_rect</item> 
@@ -895,6 +896,19 @@
          <description>        
             This is a function that rotates a 2D <a href="#vector">vector</a> or 
             <a href="#point">point</a> object about a given point.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>point_rotator</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <description>        
+            This is an object that rotates a 2D <a href="#vector">vector</a> or 
+            <a href="#point">point</a> object about the origin.
          </description>
                                  
       </component>

@@ -410,6 +410,7 @@
          <term link="algorithms.html#vector" name="vector"/>
          <term link="algorithms.html#point" name="point"/>
          <term link="algorithms.html#rotate_point" name="rotate_point"/>
+         <term link="algorithms.html#point_rotator" name="point_rotator"/>
          <term link="algorithms.html#running_stats" name="running_stats"/>
 
 
