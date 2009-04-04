@@ -283,6 +283,11 @@ namespace
 
             DLIB_TEST(rotate_point(center, p1, pi/4) == point(8,8));
             DLIB_TEST(rotate_point(center, p1, -pi/4) == point(8,-2));
+
+            DLIB_TEST(rotate_point(center, p1, pi/4 + 10*pi) == point(8,8));
+            DLIB_TEST(rotate_point(center, p1, -pi/4 + 10*pi) == point(8,-2));
+            DLIB_TEST(rotate_point(center, p1, pi/4 - 10*pi) == point(8,8));
+            DLIB_TEST(rotate_point(center, p1, -pi/4 - 10*pi) == point(8,-2));
         }
 
     }
