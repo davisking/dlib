@@ -54,6 +54,7 @@
                <item>rectangle</item> 
                <item>vector</item> 
                <item>point</item> 
+               <item>rotate_point</item> 
                <item>centered_rect</item> 
                <item>translate_rect</item> 
                <item>resize_rect</item> 
@@ -881,6 +882,19 @@
             There are various overloads of this function but the basic idea is
             that it returns a <a href="#rectangle">rectangle</a> with a given 
             width and height and centered about a given point.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>rotate_point</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <description>        
+            This is a function that rotates a 2D <a href="#vector">vector</a> or 
+            <a href="#point">point</a> object about a given point.
          </description>
                                  
       </component>
