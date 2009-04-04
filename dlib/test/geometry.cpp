@@ -288,6 +288,10 @@ namespace
             DLIB_TEST(rotate_point(center, p1, -pi/4 + 10*pi) == point(8,-2));
             DLIB_TEST(rotate_point(center, p1, pi/4 - 10*pi) == point(8,8));
             DLIB_TEST(rotate_point(center, p1, -pi/4 - 10*pi) == point(8,-2));
+
+            point_rotator rot(pi/2);
+            DLIB_TEST(rot(point(1,0)) == point(0,1));
+            DLIB_TEST(rot(point(0,1)) == point(-1,0));
         }
 
     }

@@ -433,6 +433,39 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class point_rotator
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an object that takes 2D points or vectors and 
+                rotates them around the origin by a given angle.
+        !*/
+    public:
+        point_rotator (
+            const double& angle
+        );
+        /*!
+            ensures
+                - When (*this)(p) is invoked it will return a point P such that:
+                    - P is the point p rotated counter-clockwise around the origin 
+                      angle radians.
+                      (Note that this is counter clockwise with respect to the normal
+                      coordinate system with positive y going up and positive x going
+                      to the right)
+        !*/
+
+        template <typename T>
+        const dlib::vector<T,2> operator() (
+            const dlib::vector<T,2>& p
+        ) const;
+        /*!
+            ensures
+                - rotates p and returns the result
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     const dlib::vector<T,2> rotate_point (
         const dlib::vector<T,2> center,

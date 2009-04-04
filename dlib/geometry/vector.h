@@ -1246,21 +1246,44 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class point_rotator
+    {
+    public:
+        point_rotator (
+            const double& angle
+        )
+        {
+            sin_angle = std::sin(angle);
+            cos_angle = std::cos(angle);
+        }
+
+        template <typename T>
+        const dlib::vector<T,2> operator() (
+            const dlib::vector<T,2>& p
+        ) const
+        {
+            double x = cos_angle*p.x() - sin_angle*p.y();
+            double y = sin_angle*p.x() + cos_angle*p.y();
+
+            return dlib::vector<double,2>(x,y);
+        }
+
+    private:
+        double sin_angle;
+        double cos_angle;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     const dlib::vector<T,2> rotate_point (
         const dlib::vector<T,2>& center,
-        dlib::vector<T,2> p,
+        const dlib::vector<T,2>& p,
         double angle
     )
     {
-        p -= center;
-        dlib::vector<double,2> temp;
-        const double cos_angle = cos(angle);
-        const double sin_angle = sin(angle);
-        temp.x() = cos_angle*p.x() - sin_angle*p.y();
-        temp.y() = sin_angle*p.x() + cos_angle*p.y();
-
-        return temp + center;
+        point_rotator rot(angle);
+        return rot(p-center)+center;
     }
 
 // ----------------------------------------------------------------------------------------
