@@ -653,10 +653,10 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    class kcentroid : public tester
+    class kcentroid_tester : public tester
     {
     public:
-        kcentroid (
+        kcentroid_tester (
         ) :
             tester ("test_kcentroid",
                     "Runs tests on the kcentroid components.")
