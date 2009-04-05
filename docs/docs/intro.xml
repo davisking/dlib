@@ -22,22 +22,31 @@
 
         <h1>Overview</h1>
 
+
+
+
+         <p>
+            Dlib is a cross platform open source software library written in the C++ programming
+            language. Its design is heavily influenced by ideas from design by contract and component-based 
+            software engineering. This means it is, first and foremost, a collection of independent
+            software components, each accompanied by extensive documentation and thorough debugging modes. 
+         </p>
+
         <p>
-         This library is a collection of various C++ objects I have created and found to be useful
-         over the last few years.  Generally speaking, there is no focus on any specific domain 
-         in the library, it mostly contains general utility sorts of things.  One of the bigger 
-         and more notable features is the API abstraction layer which allows you to create portable applications
-         that make use of TCP sockets, threads, file browsing, and simple graphical user interfaces.  There
-         is, however, much more than just that.
+         Generally speaking, there is no focus on any specific domain in the library. It contains a variety 
+         of software objects for dealing with networking, threads (message passing, futures, etc...), 
+         graphical interfaces, complex data structures, linear algebra, machine learning, XML and text 
+         parsing, numerical optimization, Bayesian networks, and numerous other tasks.
         </p>
+
         <p>
-         This library also aims to be simple, portable, and modern.  Everything is developed with the 
-         Design by Contract methodology.  You can read about Design by Contract on the 
-         <a href="howto_contribute.html#1">how to contribute</a> page
+         The most persistent theme in the library is the ubiquitous application of contract programming.  
+         You can read about this on the <a href="howto_contribute.html#1">how to contribute</a> page
          for more information.  However, from the point of view of a user of this library it basically 
          means there exists complete and precise documentation for every function and class in the library   
          as well as aggressive debugging modes that can be enabled.  
         </p>
+
         <p>
          I always try to make sure everything is as portable as possible.  All platform specific code is
          confined inside the API wrappers.  Everything else is either layered on top of those wrappers
@@ -100,14 +109,16 @@
             <br/><li/> <b> requires/ensures/throws </b>
             <ul>
                 These words appear in the formal comment following function prototypes and have the following meanings.
-                <br/><u>requires</u>:   This defines a list of requirements for calling the function.  These requirements
+                <br/><br/><u>requires</u>:   This defines a list of requirements for calling the function.  These requirements
                 MUST be met or a call to the function has undefined results.   (note that when the checking/debugging modes
                 are enabled on an object then it will throw the dlib::fatal_error exception with fatal_error::type == EBROKEN_ASSERT when the requires clause is
                 broken rather than causing "undefined results")
-                <br/><u>ensures</u>:    This defines what the function does.  It is a list of conditions that will be 
+
+               <br/><br/><u>ensures</u>:    This defines what the function does.  It is a list of conditions that will be 
                 true after the function finishes executing.  Note that if an exception is thrown or the function returns 
                 indicating an error occurred then nothing in the ensures clause is guaranteed to be true.
-                <br/><u>throws</u>:     This defines what exceptions may be thrown by this function.  It generally
+
+               <br/><br/><u>throws</u>:     This defines what exceptions may be thrown by this function.  It generally
                 tells you why the exception might be thrown.  It also tells you what the function does in this event: 
                 Does it have no effect at all? Does it corrupt any objects?  etc...  
 
