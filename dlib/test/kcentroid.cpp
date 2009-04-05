@@ -144,7 +144,8 @@ namespace
         // Here we declare that our samples will be 2 dimensional column vectors.  
         typedef typename kernel_type::sample_type sample_type;
 
-        kcentroid<kernel_type> test(kernel_type(),0.001,20);
+        kernel_type default_kernel;
+        kcentroid<kernel_type> test(default_kernel,0.001,20);
 
         sample_type temp, temp2;
 
@@ -367,7 +368,8 @@ namespace
         // Here we declare that our samples will be 2 dimensional column vectors.  
         typedef typename kernel_type::sample_type sample_type;
 
-        kcentroid<kernel_type> test(kernel_type(),0.001,20);
+        kernel_type default_kernel;
+        kcentroid<kernel_type> test(default_kernel,0.001,20);
 
         dlog << LDEBUG << "AAAA 1" ;
 
