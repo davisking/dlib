@@ -8,9 +8,37 @@
 
 <release_notes>
 
+
 <!-- *******************************************************************************  -->
 
 <current>
+New Stuff:
+   - Added a set of kernels that can operate on sparse vectors.
+   - Added the image_window and image_display objects.
+   - Added the rotate_point() function and the point_rotator object.
+
+Non-Backwards Compatible Changes:
+   - Added Steven Van Ingelgem's patch to add the body of data posted 
+     back to the server into the incoming data object given to the 
+     server_http::on_request() handler.  This removes the content_length 
+     field and replaces it with a string that contains the body of content
+     data.
+
+Bug fixes:
+   - Fixed a compile time bug in the offset_kernel.
+
+Other:
+   - Added optimized overloads of the kcentroid object for various 
+     linear kernels.
+   - Changed all the tests in the dlib test suite to use a new DLIB_TEST 
+     macro instead of DLIB_CASSERT since the tests really aren't 
+     technically assertions
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.17" date="Mar 16, 2009">
 New Stuff:
    - Added the strings_equal_ignore_case() functions
 
@@ -36,7 +64,7 @@ Other:
      so that the user can supply an upper limit on the number of support 
      vectors to use.  
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
