@@ -66,6 +66,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
+                This object represents a detected SURF point.
         !*/
 
         interest_point p;
