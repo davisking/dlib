@@ -22,40 +22,64 @@
 
    <menu width="150">
     <top>
+
       <section>
-         <name>Objects</name>
+         <name>Pixels</name>
          <item>rgb_pixel</item>
          <item>rgb_alpha_pixel</item>
          <item>hsi_pixel</item>
          <item>pixel_traits</item>
-         <item>png_loader</item>
-      </section>
- 
-      <section>
-         <name>Global Functions</name>
+         <item>get_pixel_intensity</item> 
          <item>assign_pixel</item> 
          <item>assign_pixel_intensity</item> 
-         <item>get_pixel_intensity</item> 
+      </section>
+
+      <section>
+         <name>Image I/O</name>
+         <item>png_loader</item>
          <item>load_bmp</item> 
-         <item>draw_line</item> 
          <item>save_bmp</item> 
          <item>load_dng</item> 
          <item>save_dng</item> 
+      </section>
+
+      <section>
+         <name>Keypoints and Descriptors</name>
+
+         <item>integral_image</item>
+         <item>hessian_pyramid</item>
+         <item>compute_dominant_angle</item>
+         <item>compute_surf_descriptor</item>
+         <item>haar_x</item>
+         <item>haar_y</item>
+         <item>get_interest_points</item>
+         <item>get_surf_points</item>
+         <item>interest_point</item>
+         <item>surf_point</item>
+      </section>
+
+      <section>
+         <name>Edges and Thresholds</name>
+         <item>edge_orientation</item> 
+         <item>hysteresis_threshold</item> 
+         <item>sobel_edge_detector</item> 
+         <item>suppress_non_maximum_edges</item> 
+         <item>threshold_image</item>
+         <item>auto_threshold_image</item>
+      </section>
+ 
+      <section>
+         <name>Miscellaneous</name>
+
+         <item>draw_line</item> 
          <item>assign_image</item> 
          <item>assign_all_pixels</item> 
          <item>assign_border_pixels</item> 
          <item>equalize_histogram</item> 
-         <item>edge_orientation</item> 
          <item>get_histogram</item> 
          <item>spatially_filter_image</item> 
-
-         <item>hysteresis_threshold</item> 
-         <item>sobel_edge_detector</item> 
-         <item>suppress_non_maximum_edges</item> 
          <item>zero_border_pixels</item> 
 
-         <item>threshold_image</item>
-         <item>auto_threshold_image</item>
          <item>binary_dilation</item>
          <item>binary_erosion</item>
          <item>binary_open</item>
@@ -75,6 +99,126 @@
 
    <components>
    
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>integral_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/integral_image_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>haar_x</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/integral_image_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>haar_y</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/integral_image_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>compute_dominant_angle</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/surf_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>get_surf_points</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/surf_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>compute_surf_descriptor</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/surf_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>hessian_pyramid</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/hessian_pyramid_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>get_interest_points</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/hessian_pyramid_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>interest_point</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/hessian_pyramid_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>surf_point</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/surf_abstract.h</spec_file>
+         <description>
+            <!-- TODO -->
+         </description>
+                                 
+      </component>
+
    <!-- ************************************************************************* -->
       
       <component>

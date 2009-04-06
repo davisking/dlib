@@ -166,6 +166,7 @@
          <term name="get_rect">
             <term link="dlib/gui_widgets/drawable_abstract.h.html#get_rect" name="in drawable object"/>
             <term link="dlib/matrix/matrix_subexp_abstract.h.html#get_rect" name="for matrix objects"/>
+            <term link="dlib/image_transforms/integral_image_abstract.h.html#get_rect" name="for integral_image objects"/>
          </term>
 
          <term link="dlib/gui_widgets/drawable_abstract.h.html#is_enabled" name="is_enabled"/>
@@ -652,7 +653,16 @@
          <term link="imaging.html#auto_threshold_image" name="auto_threshold_image"/>
          <term link="imaging.html#png_loader" name="png_loader"/>
 
-
+         <term link="imaging.html#integral_image" name="integral_image"/>
+         <term link="imaging.html#hessian_pyramid" name="hessian_pyramid"/>
+         <term link="imaging.html#compute_dominant_angle" name="compute_dominant_angle"/>
+         <term link="imaging.html#compute_surf_descriptor" name="compute_surf_descriptor"/>
+         <term link="imaging.html#haar_x" name="haar_x"/>
+         <term link="imaging.html#haar_y" name="haar_y"/>
+         <term link="imaging.html#get_interest_points" name="get_interest_points"/>
+         <term link="imaging.html#get_surf_points" name="get_surf_points"/>
+         <term link="imaging.html#interest_point" name="interest_point"/>
+         <term link="imaging.html#surf_point" name="surf_point"/>
 
 
          <term link="metaprogramming.html#enable_if" name="enable_if"/>

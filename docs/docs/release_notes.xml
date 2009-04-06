@@ -13,6 +13,23 @@
 
 <current>
 New Stuff:
+    - Added an implementation of the SURF algorithm which includes the
+      following new objects and functions:  integral_image, hessian_pyramid, 
+      interest_point, surf_point, compute_dominant_angle(), 
+      compute_surf_descriptor(), haar_x(), haar_y(), get_interest_points(), 
+      and get_surf_points().
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+<old name="17.18" date="Apr 5, 2009">
+New Stuff:
    - Added a set of kernels that can operate on sparse vectors.
    - Added the image_window and image_display objects.
    - Added the rotate_point() function and the point_rotator object.
@@ -34,7 +51,7 @@ Other:
      macro instead of DLIB_CASSERT since the tests really aren't 
      technically assertions
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
