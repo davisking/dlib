@@ -87,6 +87,31 @@ namespace dlib
     template <
         typename image_type
         >
+    void zero_border_pixels (
+        image_type& img,
+        long x_border_size,
+        long y_border_size
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - x_border_size >= 0
+            - y_border_size >= 0
+        ensures
+            - #img.nc() == img.nc()
+            - #img.nr() == img.nr()
+              (i.e. the size of img isn't changed by this function)
+            - for all valid r such that r+y_border_size or r-y_border_size gives an invalid row
+                - for all valid c such that c+x_border_size or c-x_border_size gives an invalid column 
+                    - performs assign_pixel(#img[r][c], 0 ) 
+                      (i.e. assigns 0 to every pixel in the border of img)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
     void assign_border_pixels (
         image_type& img,
         long x_border_size,
