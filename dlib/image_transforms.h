@@ -10,6 +10,7 @@
 #include "image_transforms/thresholding.h"
 #include "image_transforms/edge_detector.h"
 #include "image_transforms/draw.h"
+#include "image_transforms/integral_image.h"
 
 #endif // DLIB_IMAGE_TRANSFORMs_
 
