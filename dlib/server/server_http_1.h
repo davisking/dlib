@@ -392,7 +392,7 @@ namespace dlib
                 // Set any new headers
                 for( typename key_value_map::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )
                 {
-                    out << ci->first << ':' << ci->second << "\r\n";
+                    out << ci->first << ": " << ci->second << "\r\n";
                 }
 
                 // set any cookies 
