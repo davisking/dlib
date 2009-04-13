@@ -90,6 +90,7 @@ namespace dlib
             key_value_map  cookies;
             key_value_map  headers;
             unsigned short http_return;
+            std::string    http_return_status;
         };
 
 
@@ -348,9 +349,14 @@ namespace dlib
                 my_fault = false;
                 key_value_map& new_cookies      = outgoing.cookies;
                 key_value_map& response_headers = outgoing.headers;
+
+                // Set some defaults
+                outgoing.http_return        = 200;
+                outgoing.http_return_status = "OK";
+
                 // if there wasn't a problem with the input stream at some point
                 // then lets trigger this request callback.
-                std::string    result;
+                std::string result;
                 if (in)
                     result = on_request(incoming, outgoing);
                 my_fault = true;
@@ -387,7 +393,7 @@ namespace dlib
                     response_headers["Content-Length"] = os.str();
                 }
 
-                out << "HTTP/1.0 " << outgoing.http_return << " OK\r\n";
+                out << "HTTP/1.0 " << outgoing.http_return << " " << outgoing.http_return_status << "\r\n";
 
                 // Set any new headers
                 for( typename key_value_map::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )

@@ -112,6 +112,7 @@ namespace dlib
             key_value_map  cookies;
             key_value_map  headers;
             unsigned short http_return;
+            std::string    http_return_status;
         };
 
     private:
@@ -151,6 +152,7 @@ namespace dlib
                     - outgoing.cookies.size() == 0
                     - outgoing.headers.size() == 0
                     - outgoing.http_return == 200
+                    - outgoing.http_return_status == "OK"
             ensures
                 - This function returns the HTML page to be displayed as the response to this request. 
                 - this function will not call clear()  
@@ -160,7 +162,8 @@ namespace dlib
                 - #outgoing.headers == a set of additional headers you wish to appear in the
                   HTTP response to this request.  (This may be empty, the minimum needed headers
                   will be added automatically if you don't set them)
-                - outgoing.http_return may be set to override the default HTTP return code of 200
+                - outgoing.http_return and outgoing.http_return_status may be set to override the 
+                  default HTTP return code of 200 OK
             throws
                 - does not throw any exceptions
         !*/
