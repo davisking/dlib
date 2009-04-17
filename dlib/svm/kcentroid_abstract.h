@@ -25,7 +25,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a weighted sum of sample points in a kernel induced
-                feature space.  It can be used to kernelized any algorithm that requires only
+                feature space.  It can be used to kernelize any algorithm that requires only
                 the ability to perform vector addition, subtraction, scalar multiplication,
                 and inner products.  
 
