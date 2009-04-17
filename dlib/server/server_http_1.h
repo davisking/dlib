@@ -249,11 +249,11 @@ namespace dlib
                     position_of_double_point = line.find_first_of(':');
                     if ( position_of_double_point != string::npos )
                     {
-                        first_part_of_header = line.substr(0, position_of_double_point);
+                        first_part_of_header = dlib::trim(line.substr(0, position_of_double_point));
 
                         if ( !incoming_headers[first_part_of_header].empty() )
                             incoming_headers[ first_part_of_header ] += " ";
-                        incoming_headers[first_part_of_header] += line.substr(position_of_double_point+1);
+                        incoming_headers[first_part_of_header] += dlib::trim(line.substr(position_of_double_point+1));
 
                         // look for Content-Type:
                         if (line.size() > 14 && strings_equal_ignore_case(line, "Content-Type:", 13))
