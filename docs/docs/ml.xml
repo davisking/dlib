@@ -723,6 +723,9 @@
             This is a convenience function for creating 
             <a href="#batch_trainer">batch_trainer</a> objects.
          </description>
+         <examples>
+            <example>svm_pegasos_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -738,6 +741,9 @@
             generates a batch_trainer that will print status messages to standard
             output so that you can observe the progress of a training algorithm.
          </description>
+         <examples>
+            <example>svm_pegasos_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
