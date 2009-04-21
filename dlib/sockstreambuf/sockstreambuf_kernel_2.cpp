@@ -3,6 +3,7 @@
 #ifndef DLIB_SOCKSTREAMBUF_KERNEL_2_CPp_
 #define DLIB_SOCKSTREAMBUF_KERNEL_2_CPp_
 #include "sockstreambuf_kernel_2.h"
+#include "../assert.h"
 
 #include <cstring>
 
@@ -39,7 +40,15 @@ namespace dlib
         std::streamsize num
     )
     {
-        int space_left = static_cast<int>(epptr()-pptr());
+        // Add a sanity check here 
+        DLIB_ASSERT(num >= 0,
+            "\tstd::streamsize sockstreambuf::xsputn"
+            << "\n\tThe number of bytes to write can't be negative"
+            << "\n\tnum:  " << num 
+            << "\n\tthis: " << this
+            );
+
+        std::streamsize space_left = static_cast<std::streamsize>(epptr()-pptr());
         if (num <= space_left)
         {
             std::memcpy(pptr(),s,static_cast<size_t>(num));
@@ -48,10 +57,10 @@ namespace dlib
         }
         else
         {
-            std::memcpy(pptr(),s,space_left);
+            std::memcpy(pptr(),s,static_cast<size_t>(space_left));
             s += space_left;
             pbump(space_left);
-            int num_left = static_cast<int>(num) - space_left;
+            std::streamsize num_left = num - space_left;
 
             if (flush_out_buffer() == EOF)
             {
@@ -61,7 +70,7 @@ namespace dlib
 
             if (num_left < out_buffer_size)
             {
-                std::memcpy(pptr(),s,num_left);
+                std::memcpy(pptr(),s,static_cast<size_t>(num_left));
                 pbump(num_left);
                 return num;
             }
