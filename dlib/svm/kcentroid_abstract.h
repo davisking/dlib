@@ -53,6 +53,16 @@ namespace dlib
         typedef typename kernel_type::sample_type sample_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
+        kcentroid (
+        );
+        /*!
+            ensures
+                - this object is properly initialized
+                - #tolerance() == 0.001 
+                - #get_kernel() == kernel_type() (i.e. whatever the kernel's default value is) 
+                - #max_dictionary_size() == 1000000
+                - #remove_oldest_first() == false 
+        !*/
 
         explicit kcentroid (
             const kernel_type& kernel_, 
