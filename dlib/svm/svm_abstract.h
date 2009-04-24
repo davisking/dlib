@@ -59,7 +59,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool template <
+    template <
         typename T,
         typename U
         >
