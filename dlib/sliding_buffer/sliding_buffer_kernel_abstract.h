@@ -83,9 +83,9 @@ namespace dlib
         );
         /*!
             requires
-                - 0 < expsize < 32
+                - 0 < exp_size < 32
             ensures
-                - #size() == 2^expsize
+                - #size() == 2^exp_size
                 - the value of all elements in the buffer are undefined
                 - #at_start() == true
             throws
