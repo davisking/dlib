@@ -319,9 +319,14 @@ namespace dlib
     {
         const long old_num = num;
         long status;
+        const long max_send_length = 1024*1024*100;
         while (num > 0)
         {
-            if ( (status = ::send(connection_socket,buf,num,0)) <=0)
+            // Make sure to cap the max value num can take on so that if it is 
+            // really large (it might be big on 64bit platforms) so that the OS
+            // can't possibly get upset about it being large.
+            const long length = std::min(max_send_length, num);
+            if ( (status = ::send(connection_socket,buf,length,0)) <=0)
             {
                 // if send was interupted by a signal then restart it
                 if (errno == EINTR)
@@ -352,9 +357,14 @@ namespace dlib
     )
     {
         long status;
+        const long max_recv_length = 1024*1024*100;
         while (true)
         {
-            status = recv(connection_socket,buf,num,0);
+            // Make sure to cap the max value num can take on so that if it is 
+            // really large (it might be big on 64bit platforms) so that the OS
+            // can't possibly get upset about it being large.
+            const long length = std::min(max_recv_length, num);
+            status = recv(connection_socket,buf,length,0);
             if (status == -1)
             {
                 // if recv was interupted then try again

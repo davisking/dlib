@@ -276,9 +276,14 @@ namespace dlib
     {
         const long old_num = num;
         long status;
+        const long max_send_length = 1024*1024*100;
         while (num > 0)
         {
-            if ( (status = send(connection_socket,buf,num,0)) == SOCKET_ERROR)
+            // Make sure to cap the max value num can take on so that if it is 
+            // really large (it might be big on 64bit platforms) so that the OS
+            // can't possibly get upset about it being large.
+            const long length = std::min(max_send_length, num);
+            if ( (status = send(connection_socket,buf,length,0)) == SOCKET_ERROR)
             {
                 if (sdo_called())
                     return SHUTDOWN;
@@ -299,7 +304,12 @@ namespace dlib
         long num
     )
     {
-        long status = recv(connection_socket,buf,num,0);
+        const long max_recv_length = 1024*1024*100;
+        // Make sure to cap the max value num can take on so that if it is 
+        // really large (it might be big on 64bit platforms) so that the OS
+        // can't possibly get upset about it being large.
+        const long length = std::min(max_recv_length, num);
+        long status = recv(connection_socket,buf,length,0);
         if (status == SOCKET_ERROR)
         {
             // if this error is the result of a shutdown call then return SHUTDOWN
