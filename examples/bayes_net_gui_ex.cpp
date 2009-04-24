@@ -959,7 +959,7 @@ on_evidence_toggled (
 
 // This event is called when the user causes no node to be selected 
 void main_window::
-on_node_deselected ( unsigned long n )
+on_node_deselected ( unsigned long  )
 {
     no_node_selected();
 }
