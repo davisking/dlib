@@ -79,7 +79,7 @@ namespace dlib
         //allocate but don't initialize num elements of type T
         pointer allocate (
             size_type num,
-            typename std_allocator<void,M>::const_pointer hint = 0
+            typename std_allocator<void,M>::const_pointer  = 0
         ) 
         {
             return (pointer) pool.allocate_array(num*sizeof(T));
@@ -101,7 +101,7 @@ namespace dlib
         }
 
         //deallocate storage p of deleted elements
-        void deallocate (pointer p, size_type num) 
+        void deallocate (pointer p, size_type ) 
         {
             pool.deallocate_array((char*)p);
         }

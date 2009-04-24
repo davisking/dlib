@@ -721,13 +721,13 @@ namespace dlib
             typedef typename EXP::type type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static type apply ( const M& m, long r, long c)
+            static type apply ( const M& m, long r, long )
             { return m(r,r); }
 
             template <typename M>
             static long nr (const M& m) { return std::min(m.nc(),m.nr()); }
             template <typename M>
-            static long nc (const M& m) { return 1; }
+            static long nc (const M& ) { return 1; }
         };
     };
 
@@ -1035,7 +1035,7 @@ namespace dlib
         const static long NC = 0;
         typedef typename memory_manager<char>::kernel_1a mem_manager_type;
         typedef T type;
-        static type apply (const T& val, long r, long c)
+        static type apply (const T& val, long , long )
         { return val; }
     };
 
@@ -1072,7 +1072,7 @@ namespace dlib
         const static long NC = NC_;
         typedef typename memory_manager<char>::kernel_1a mem_manager_type;
         typedef T type;
-        static type apply (const T& val, long r, long c)
+        static type apply (const T& val, long , long )
         { return val; }
     };
 
@@ -1106,7 +1106,7 @@ namespace dlib
         const static long NC = NC_;
         typedef typename memory_manager<char>::kernel_1a mem_manager_type;
         typedef T type;
-        static type apply ( long r, long c)
+        static type apply ( long , long )
         { return val; }
     };
 

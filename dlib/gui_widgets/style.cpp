@@ -19,8 +19,8 @@ namespace dlib
         const rectangle& rect,
         const bool enabled,
         const font& mfont,
-        const long lastx,
-        const long lasty,
+        const long ,
+        const long ,
         const ustring& name,
         const bool is_depressed
     ) const
@@ -214,10 +214,10 @@ namespace dlib
         const canvas& c,
         const rectangle& rect,
         const bool enabled,
-        const font& mfont,
+        const font& ,
         const long lastx,
         const long lasty,
-        const ustring& name,
+        const ustring& ,
         const bool is_depressed
     ) const
     {
@@ -274,8 +274,8 @@ namespace dlib
 
     rectangle button_style_toolbar_icon1::
     get_min_size (
-        const ustring& name,
-        const font& mfont 
+        const ustring& ,
+        const font&  
     ) const 
     {
         return rectangle(img_normal.nc()+2*padding, img_normal.nr()+2*padding);
@@ -290,10 +290,10 @@ namespace dlib
         const canvas& c,
         const rectangle& rect,
         const bool enabled,
-        const font& mfont,
-        const long lastx,
-        const long lasty,
-        const ustring& name,
+        const font& ,
+        const long ,
+        const long ,
+        const ustring& ,
         const bool is_depressed
     ) const
     {
@@ -411,8 +411,8 @@ namespace dlib
         const rectangle& rect,
         const bool enabled,
         const font& mfont,
-        const long lastx,
-        const long lasty,
+        const long ,
+        const long ,
         const ustring& name,
         const bool is_depressed,
         const bool is_checked
@@ -501,8 +501,8 @@ namespace dlib
         const rectangle& rect,
         const bool enabled,
         const font& mfont,
-        const long lastx,
-        const long lasty,
+        const long ,
+        const long ,
         const ustring& name,
         const bool is_depressed,
         const bool is_checked
@@ -593,8 +593,8 @@ namespace dlib
         const rectangle& rect,
         const bool enabled,
         const font& mfont,
-        const long lastx,
-        const long lasty,
+        const long ,
+        const long ,
         const ustring& name,
         const bool is_depressed,
         const bool is_checked
@@ -745,7 +745,7 @@ namespace dlib
     long scroll_bar_style_default::
     get_button_length (
         long total_length,
-        long max_pos
+        long 
     ) const
     {
         // if the length is too small then we have to smash up the arrow buttons
@@ -766,9 +766,9 @@ namespace dlib
     draw_scroll_bar_background (
         const canvas& c,
         const rectangle& rect,
-        const bool enabled,
-        const long lastx,
-        const long lasty,
+        const bool ,
+        const long ,
+        const long ,
         const bool is_depressed
     ) const
     {
@@ -784,10 +784,10 @@ namespace dlib
     draw_scroll_bar_slider (
         const canvas& c,
         const rectangle& rect,
-        const bool enabled,
-        const long lastx,
-        const long lasty,
-        const bool is_being_dragged
+        const bool ,
+        const long ,
+        const long ,
+        const bool 
     ) const
     {
         fill_rect(c, rect, rgb_pixel(212,208,200));

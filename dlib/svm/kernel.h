@@ -336,7 +336,7 @@ namespace dlib
         }
 
         bool operator== (
-            const linear_kernel& k
+            const linear_kernel& 
         ) const
         {
             return true;

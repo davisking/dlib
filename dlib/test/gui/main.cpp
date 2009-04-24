@@ -263,7 +263,7 @@ class win : public drawable_window
 
     void tab_change (
         unsigned long new_idx,
-        unsigned long old_idx
+        unsigned long 
     )
     {
         tab_label.set_text(tabs.tab_name(new_idx));
@@ -298,7 +298,7 @@ class win : public drawable_window
     }
 
     void lb_double_click (
-        unsigned long idx
+        unsigned long 
     )
     {
         dlib::queue<unsigned long>::kernel_2a_c sel;
@@ -335,7 +335,7 @@ class win : public drawable_window
     }
 
 	static void try_this_junk2 (
-		void* param
+		void* 
 		)
 	{
 

@@ -328,10 +328,10 @@ namespace dlib
 
     void draggable::
     on_mouse_up (
-        unsigned long btn,
+        unsigned long ,
         unsigned long state,
-        long x,
-        long y
+        long ,
+        long 
     )
     {
         if (drag && (state & base_window::LEFT) == 0)
@@ -385,7 +385,7 @@ namespace dlib
 
     void mouse_over_event::
     on_mouse_move (
-        unsigned long state,
+        unsigned long ,
         long x,
         long y
     )
@@ -1826,7 +1826,7 @@ namespace dlib
 
     void popup_menu::
     on_mouse_move (
-        unsigned long state,
+        unsigned long ,
         long x,
         long y
     )
@@ -2259,7 +2259,7 @@ namespace dlib
 
     void zoomable_region::
     on_wheel_down (
-        unsigned long state
+        unsigned long 
     )
     {
         // zoom out
@@ -2279,7 +2279,7 @@ namespace dlib
 
     void zoomable_region::
     on_wheel_up (
-        unsigned long state
+        unsigned long 
     )
     {
         // zoom in 
@@ -2321,10 +2321,10 @@ namespace dlib
 
     void zoomable_region::
     on_mouse_up (
-        unsigned long btn,
-        unsigned long state,
-        long x,
-        long y
+        unsigned long ,
+        unsigned long ,
+        long ,
+        long 
     )
     {
         mouse_drag_screen = false;
@@ -2335,10 +2335,10 @@ namespace dlib
     void zoomable_region::
     on_mouse_down (
         unsigned long btn,
-        unsigned long state,
+        unsigned long ,
         long x,
         long y,
-        bool is_double_click
+        bool 
     )
     {
         if (enabled && !hidden && display_rect_.contains(x,y) && btn == base_window::LEFT)
@@ -2919,7 +2919,7 @@ namespace dlib
 
     void scrollable_region::
     on_wheel_down (
-        unsigned long state
+        unsigned long 
     )
     {
         if (rect.contains(lastx,lasty) && enabled && !hidden)
@@ -2966,10 +2966,10 @@ namespace dlib
     void scrollable_region::
     on_mouse_down (
         unsigned long btn,
-        unsigned long state,
+        unsigned long ,
         long x,
         long y,
-        bool is_double_click
+        bool 
     )
     {
         if (mouse_drag_enabled_ && enabled && !hidden && display_rect().contains(x,y) && (btn==base_window::LEFT))
@@ -2987,10 +2987,10 @@ namespace dlib
 
     void scrollable_region::
     on_mouse_up   (
-        unsigned long btn,
-        unsigned long state,
-        long x,
-        long y
+        unsigned long ,
+        unsigned long ,
+        long ,
+        long 
     )
     {
         user_is_dragging_mouse = false;
@@ -3000,7 +3000,7 @@ namespace dlib
 
     void scrollable_region::
     on_wheel_up (
-        unsigned long state
+        unsigned long 
     )
     {
         if (rect.contains(lastx,lasty) && enabled && !hidden)
@@ -3256,10 +3256,10 @@ namespace dlib
     void popup_menu_region::
     on_mouse_down (
         unsigned long btn,
-        unsigned long state,
+        unsigned long ,
         long x,
         long y,
-        bool is_double_click
+        bool 
     )
     {
         if (enabled && !hidden && rect.contains(x,y) && btn == base_window::RIGHT)

@@ -459,7 +459,7 @@ namespace nativefont
             };
 
             struct image_size_setter{
-                void operator()(int &width, int &height){
+                void operator()(int&, int&){
                 }
             };
 

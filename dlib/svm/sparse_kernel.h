@@ -288,7 +288,7 @@ namespace dlib
         }
 
         bool operator== (
-            const sparse_linear_kernel& k
+            const sparse_linear_kernel& 
         ) const
         {
             return true;

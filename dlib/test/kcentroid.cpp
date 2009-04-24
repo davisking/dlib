@@ -46,7 +46,7 @@ namespace
         }
 
         bool operator== (
-            const unopt_sparse_linear_kernel& k
+            const unopt_sparse_linear_kernel& 
         ) const
         {
             return true;
@@ -69,7 +69,7 @@ namespace
         }
 
         bool operator== (
-            const unopt_linear_kernel& k
+            const unopt_linear_kernel& 
         ) const
         {
             return true;

@@ -1475,7 +1475,7 @@ namespace dlib
             typename scalar_type
             >
         inline void optimize_working_pair (
-            const scalar_vector_type2& y,
+            const scalar_vector_type2& ,
             scalar_vector_type& alpha,
             const kernel_matrix_cache<K, sample_vector_type, scalar_vector_type2>& Q,
             const scalar_vector_type& df,

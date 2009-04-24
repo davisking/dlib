@@ -146,8 +146,8 @@ namespace dlib
         struct helper<cr_type,false>
         {
             static void check_block_precondition (const cr_type&,  const std::string& ) {}
-            static void check_current_block_name_precondition (const cr_type& cr) {} 
-            static void check_element_precondition (const cr_type& cr) {}
+            static void check_current_block_name_precondition (const cr_type& ) {} 
+            static void check_element_precondition (const cr_type& ) {}
         };
 
         template <typename cr_type>

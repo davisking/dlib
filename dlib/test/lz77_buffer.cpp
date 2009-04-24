@@ -509,7 +509,7 @@ namespace
 
 
 
-            unsigned long match_index, match_length;
+            unsigned long match_index = 0, match_length = 0;
             unsigned long lookahead_size_before = test.get_lookahead_buffer_size();
             unsigned long history_size_before = test.get_history_buffer_size();
             test.find_match(match_index,match_length,2);

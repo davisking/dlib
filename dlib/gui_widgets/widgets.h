@@ -2352,8 +2352,8 @@ namespace dlib
 
         void on_keydown (
             unsigned long key,          
-            bool is_printable,
-            unsigned long state
+            bool ,
+            unsigned long 
         )
         {
             // ignore all keyboard input if the last thing the user clicked on 

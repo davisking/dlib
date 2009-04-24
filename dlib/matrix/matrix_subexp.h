@@ -176,7 +176,7 @@ namespace dlib
             { return m(row,c); }
 
             template <typename M>
-            static long nr (const M& m) { return 1; }
+            static long nr (const M& ) { return 1; }
             template <typename M>
             static long nc (const M& m) { return m.nc(); }
         };
@@ -215,13 +215,13 @@ namespace dlib
             typedef typename EXP::type type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static type apply ( const M& m, long row, long length, long r, long c)
+            static type apply ( const M& m, long row, long , long , long c)
             { return m(row,c); }
 
             template <typename M>
-            static long nr (const M& m, long, long) { return 1; }
+            static long nr (const M& , long, long) { return 1; }
             template <typename M>
-            static long nc (const M& m, long, long length) { return length; }
+            static long nc (const M& , long, long length) { return length; }
         };
     };
 
@@ -266,7 +266,7 @@ namespace dlib
             { return m1(rows(r),c); }
 
             template <typename M1, typename M2>
-            static long nr (const M1& m1, const M2& rows ) { return rows.size(); }
+            static long nr (const M1& , const M2& rows ) { return rows.size(); }
             template <typename M1, typename M2>
             static long nc (const M1& m1, const M2& ) { return m1.nc(); }
         };
@@ -318,7 +318,7 @@ namespace dlib
             template <typename M>
             static long nr (const M& m) { return m.nr(); }
             template <typename M>
-            static long nc (const M& m) { return 1; }
+            static long nc (const M& ) { return 1; }
         };
     };
 
@@ -355,13 +355,13 @@ namespace dlib
             typedef typename EXP::type type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static type apply ( const M& m, long col, long length, long r, long c)
+            static type apply ( const M& m, long col, long , long r, long )
             { return m(r,col); }
 
             template <typename M>
-            static long nr (const M& m, long, long length) { return length; }
+            static long nr (const M&, long, long length) { return length; }
             template <typename M>
-            static long nc (const M& m, long, long) { return 1; }
+            static long nc (const M&, long, long) { return 1; }
         };
     };
 
@@ -406,9 +406,9 @@ namespace dlib
             { return m1(r,cols(c)); }
 
             template <typename M1, typename M2>
-            static long nr (const M1& m1, const M2& cols ) { return m1.nr(); }
+            static long nr (const M1& m1, const M2&  ) { return m1.nr(); }
             template <typename M1, typename M2>
-            static long nc (const M1& m1, const M2& cols ) { return cols.size(); }
+            static long nc (const M1& , const M2& cols ) { return cols.size(); }
         };
     };
 
@@ -733,7 +733,7 @@ namespace dlib
 
         T& operator() (
             long r,
-            long c
+            long 
         )
         {
             return m(r,col);
@@ -741,7 +741,7 @@ namespace dlib
 
         const T& operator() (
             long r,
-            long c
+            long 
         ) const
         {
             return m(r,col);
@@ -831,7 +831,7 @@ namespace dlib
 
 
         T& operator() (
-            long r,
+            long ,
             long c
         )
         {
@@ -839,7 +839,7 @@ namespace dlib
         }
 
         const T& operator() (
-            long r,
+            long ,
             long c
         ) const
         {

@@ -1521,12 +1521,12 @@ namespace dlib
 
         template <typename U, long iNR, long iNC, typename mm, typename l >
         bool aliases (
-            const matrix<U,iNR,iNC,mm,l>& item
+            const matrix<U,iNR,iNC,mm,l>& 
         ) const  { return false; }
 
         template <typename U, long iNR, long iNC, typename mm, typename l>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm,l>& item
+            const matrix<U,iNR,iNC,mm,l>& 
         ) const { return false; }
 
         bool aliases (

@@ -230,7 +230,7 @@ namespace dlib
         ){}
 
         virtual void on_button_up (
-            bool mouse_over
+            bool 
         ){}
 
         void on_mouse_not_over (
@@ -358,7 +358,7 @@ namespace dlib
 
         // this object doesn't draw anything but also isn't abstract
         void draw (
-            const canvas& c
+            const canvas& 
         ) const {}
 
     private:
@@ -1389,31 +1389,31 @@ namespace dlib
         ) const { return 0; }
 
         virtual void draw_background (
-            const canvas& c,
-            const rectangle& rect,
-            const bool enabled,
-            const bool is_selected
+            const canvas& ,
+            const rectangle& ,
+            const bool ,
+            const bool 
         ) const {}
 
         virtual void draw_left (
-            const canvas& c,
-            const rectangle& rect,
-            const bool enabled,
-            const bool is_selected
+            const canvas& ,
+            const rectangle& ,
+            const bool ,
+            const bool 
         ) const {}
 
         virtual void draw_middle (
-            const canvas& c,
-            const rectangle& rect,
-            const bool enabled,
-            const bool is_selected
+            const canvas& ,
+            const rectangle& ,
+            const bool ,
+            const bool 
         ) const = 0;
 
         virtual void draw_right (
-            const canvas& c,
-            const rectangle& rect,
-            const bool enabled,
-            const bool is_selected
+            const canvas& ,
+            const rectangle& ,
+            const bool ,
+            const bool 
         ) const {}
 
         virtual void on_click (
@@ -1521,7 +1521,7 @@ namespace dlib
             const canvas& c,
             const rectangle& rect,
             const bool enabled,
-            const bool is_selected
+            const bool 
         ) const 
         {
             if (c.intersect(rect).is_empty())
@@ -1544,7 +1544,7 @@ namespace dlib
             const canvas& c,
             const rectangle& rect,
             const bool enabled,
-            const bool is_selected
+            const bool 
         ) const 
         {
             if (c.intersect(rect).is_empty())
@@ -1681,7 +1681,7 @@ namespace dlib
             const canvas& c,
             const rectangle& rect,
             const bool enabled,
-            const bool is_selected
+            const bool 
         ) const 
         {
             if (c.intersect(rect).is_empty())
@@ -1733,8 +1733,8 @@ namespace dlib
         virtual void draw_background (
             const canvas& c,
             const rectangle& rect,
-            const bool enabled,
-            const bool is_selected
+            const bool ,
+            const bool 
         ) const 
         {
             if (c.intersect(rect).is_empty())
@@ -1750,10 +1750,10 @@ namespace dlib
         }
 
         virtual void draw_middle (
-            const canvas& c,
-            const rectangle& rect,
-            const bool enabled,
-            const bool is_selected
+            const canvas& ,
+            const rectangle& ,
+            const bool ,
+            const bool 
         ) const 
         {
         }

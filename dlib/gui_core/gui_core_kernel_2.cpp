@@ -328,7 +328,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
         Bool XCheckIfEventPredicate (
-            Display* disp,
+            Display* ,
             XEvent* event,
             XPointer arg
         )
@@ -356,8 +356,8 @@ namespace dlib
     
         static bool map_keys (
             KeySym keycode,
-            bool shift,
-            bool caps,
+            bool ,
+            bool ,
             unsigned long& result,
             bool& is_printable
         )
@@ -1359,9 +1359,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     Bool clip_peek_helper (
-        Display *display,
-        XEvent *event,
-        XPointer arg
+        Display*,
+        XEvent* event,
+        XPointer 
     )
     {
         if ( event->type == SelectionNotify)

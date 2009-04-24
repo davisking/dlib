@@ -149,7 +149,7 @@ namespace
             for (unsigned long i = 0; i < alphabet_size-1; ++i)
             {
                 test.increment_count(i);
-                unsigned long low_count, high_count, total_count;
+                unsigned long low_count = 0, high_count = 0, total_count = 0;
                 DLIB_TEST(test.get_range(i,low_count,high_count,total_count) == 1);
 
                 DLIB_TEST(high_count == low_count+1);
@@ -546,7 +546,7 @@ namespace
             {
                 if(!test.increment_count(i))
                     oom = true;
-                unsigned long low_count, high_count, total_count;
+                unsigned long low_count = 0, high_count = 0, total_count = 0;
 
                 if (!oom)
                 {

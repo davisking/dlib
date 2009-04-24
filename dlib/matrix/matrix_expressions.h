@@ -827,12 +827,12 @@ namespace dlib
 
         template <typename U, long iNR, long iNC, typename MM, typename L >
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         long nr (
@@ -908,12 +908,12 @@ namespace dlib
 
         template <typename U, long iNR, long iNC, typename MM, typename L >
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         template <typename U, long iNR, long iNC, typename MM, typename L >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         long nr (
@@ -957,7 +957,7 @@ namespace dlib
         typedef typename matrix_traits<matrix_zeroary_exp>::layout_type layout_type;
 
         matrix_zeroary_exp (
-            const matrix_zeroary_exp& item
+            const matrix_zeroary_exp& 
         ) :
             matrix_exp<matrix_zeroary_exp>(*this)
         {}
@@ -1155,12 +1155,12 @@ namespace dlib
 
         template <typename U, long iNR, long iNC, typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         long nr (
@@ -1321,12 +1321,12 @@ namespace dlib
 
         template <typename U, long iNR, long iNC, typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         template <typename U, long iNR, long iNC , typename MM, typename L>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         long nr (
@@ -1531,12 +1531,12 @@ namespace dlib
 
         template <typename U, long iNR, long iNC , typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         template <typename U, long iNR, long iNC, typename MM, typename L >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         long nr (
@@ -1618,12 +1618,12 @@ namespace dlib
 
         template <typename U, long iNR, long iNC , typename MM, typename L>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         template <typename U, long iNR, long iNC, typename MM, typename L >
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix<U,iNR,iNC,MM,L>& 
         ) const { return false; }
 
         long nr (
@@ -1667,7 +1667,7 @@ namespace dlib
         const static long inc = (start <= end)?inc_:-inc_;
 
         matrix_range_static_exp (
-            const matrix_range_static_exp& item
+            const matrix_range_static_exp& 
         ) :
             matrix_exp<matrix_range_static_exp>(*this)
         {}
@@ -1678,7 +1678,7 @@ namespace dlib
         {}
 
         long operator() (
-            long r, 
+            long , 
             long c
         ) const { return start + c*inc;  }
 

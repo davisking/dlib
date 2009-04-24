@@ -49,7 +49,7 @@ namespace dlib
 
     template <int N> void wstr2ustring_t(const wchar_t *src, size_t src_len, ustring &dest);
 
-    template <> void wstr2ustring_t<4>(const wchar_t *src, size_t src_len, ustring &dest)
+    template <> void wstr2ustring_t<4>(const wchar_t *src, size_t , ustring &dest)
     {
         dest.assign((const unichar *)(src));
     }

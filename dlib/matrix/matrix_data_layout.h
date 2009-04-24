@@ -168,8 +168,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long nr,
-                long nc
+                long ,
+                long 
             )
             {
             }
@@ -231,8 +231,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long nr,
-                long nc
+                long ,
+                long 
             )
             {
             }
@@ -581,8 +581,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long nr,
-                long nc
+                long,
+                long 
             )
             {
             }
@@ -644,8 +644,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long nr,
-                long nc
+                long ,
+                long 
             )
             {
             }

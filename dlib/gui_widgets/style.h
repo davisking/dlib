@@ -152,7 +152,7 @@ namespace dlib
             make_images();  
         }
 
-        button_style_toolbar_icon1( const button_style_toolbar_icon1& item): padding(item.padding) 
+        button_style_toolbar_icon1( const button_style_toolbar_icon1& item): button_style(item), padding(item.padding) 
         {
             assign_image(img_mouseover, item.img_mouseover);
             assign_image(img_normal, item.img_normal);
@@ -258,8 +258,8 @@ namespace dlib
         ) const;
 
         virtual rectangle get_min_size (
-            const ustring& name,
-            const font& mfont 
+            const ustring& ,
+            const font&  
         ) const { return rectangle(); }
 
     private:
@@ -523,7 +523,7 @@ namespace dlib
         virtual void draw_scrollable_region_border (
             const canvas& c,
             const rectangle& rect,
-            const bool enabled
+            const bool 
         ) const  { draw_sunken_rectangle(c,rect); }
 
     };
@@ -716,7 +716,7 @@ namespace dlib
         {}
 
         virtual unsigned long get_padding (
-            const font& mfont 
+            const font&  
         ) const { return 1; }
 
         virtual void draw_text_box (

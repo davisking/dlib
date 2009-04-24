@@ -240,11 +240,8 @@ namespace dlib
 
         vector (
             const vector& item
-        )
+        ) : matrix<T,3,1>(item)
         {
-            x() = item.x();
-            y() = item.y();
-            z() = item.z();
         }
 
         // ---------------------------------------
@@ -652,10 +649,8 @@ namespace dlib
 
         vector (
             const vector& item
-        )
+        ) : matrix<T,2,1>(item)
         {
-            x() = item.x();
-            y() = item.y();
         }
 
         // ---------------------------------------
