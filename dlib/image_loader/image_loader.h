@@ -43,8 +43,8 @@ namespace dlib
             unsigned long biWidth;
             unsigned long biHeight;
             unsigned short biBitCount;
-            /*
             unsigned long biCompression;
+            /*
             unsigned long biSizeImage;
             unsigned long biClrUsed;
             unsigned long biClrImportant;
@@ -112,11 +112,11 @@ namespace dlib
             a = buf[i]; b = buf[i+1];
             biBitCount = static_cast<unsigned short>(a | (b<<8));
 
-            /*
             i += 2;
             a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
             biCompression = a | (b<<8) | (c<<16) | (d<<24);
 
+            /*
             i += 4;
             a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
             biSizeImage = a | (b<<8) | (c<<16) | (d<<24);
@@ -193,7 +193,7 @@ namespace dlib
                             {
                                 if (in.sgetn(reinterpret_cast<char*>(buf),1) != 1)
                                 {
-                                    throw image_load_error("bmp load error 21: file too short");
+                                    throw image_load_error("bmp load error 21.6: file too short");
                                 }
 
                                 unsigned char pixels[8];
@@ -268,7 +268,7 @@ namespace dlib
                             {
                                 if (in.sgetn(reinterpret_cast<char*>(buf),1) != 1)
                                 {
-                                    throw image_load_error("bmp load error 21: file too short");
+                                    throw image_load_error("bmp load error 21.7: file too short");
                                 }
 
                                 const unsigned char pixel1 = (buf[0]>>4);
@@ -338,24 +338,125 @@ namespace dlib
                             bytes_read_so_far += to_read;
                         }
 
-                        // load the image data
-                        for (long row = biHeight-1; row >= 0; --row)
+                        // Next we load the image data.
+
+                        // if there is no RLE compression
+                        if (biCompression == 0)
                         {
-                            for (unsigned long col = 0; col < biWidth; ++col)
+                            for (long row = biHeight-1; row >= 0; --row)
                             {
-                                if (in.sgetn(reinterpret_cast<char*>(buf),1) != 1)
+                                for (unsigned long col = 0; col < biWidth; ++col)
                                 {
-                                    throw image_load_error("bmp load error 21: file too short");
+                                    if (in.sgetn(reinterpret_cast<char*>(buf),1) != 1)
+                                    {
+                                        throw image_load_error("bmp load error 21.8: file too short");
+                                    }
+
+                                    rgb_pixel p;
+                                    p.red   = red[buf[0]];
+                                    p.green = green[buf[0]];
+                                    p.blue  = blue[buf[0]];
+                                    assign_pixel(image[row][col],p);
+                                }
+                                if (in.sgetn(reinterpret_cast<char*>(buf),padding) != padding)
+                                    throw image_load_error("bmp load error 9: file too short");
+                            }
+                        }
+                        else
+                        {
+                            // Here we deal with the psychotic RLE used by BMP files.
+
+                            // First zero the image since the RLE sometimes jumps over
+                            // pixels and assumes the image has been zero initialized.
+                            assign_all_pixels(image, 0);
+
+                            long row = biHeight-1;
+                            long col = 0;
+                            while (true)
+                            {
+                                if (in.sgetn(reinterpret_cast<char*>(buf),2) != 2)
+                                {
+                                    throw image_load_error("bmp load error 21.9: file too short");
+                                }
+
+                                const unsigned char count = buf[0];
+                                const unsigned char command = buf[1];
+
+                                if (count == 0 && command == 0)
+                                {
+                                    // This is an escape code that means go to the next row
+                                    // of the image
+                                    --row;
+                                    col = 0;
+                                    continue;
+                                }
+                                else if (count == 0 && command == 1)
+                                {
+                                    // This is the end of the image.  So quit this loop.
+                                    break;
+                                }
+                                else if (count == 0 && command == 2)
+                                {
+                                    // This is the escape code for the command to jump to
+                                    // a new part of the image relative to where we are now.
+                                    if (in.sgetn(reinterpret_cast<char*>(buf),2) != 2)
+                                    {
+                                        throw image_load_error("bmp load error 21.1: file too short");
+                                    }
+                                    col += buf[0];
+                                    row -= buf[1];
+                                    continue;
+                                }
+                                else if (count == 0)
+                                {
+                                    // This is the escape code for a run of uncompressed bytes
+
+                                    if (row < 0 || col + command > image.nc())
+                                        throw image_load_error("bmp load error 21.2: file data corrupt");
+
+                                    // put the bytes into the image
+                                    for (unsigned int i = 0; i < command; ++i)
+                                    {
+                                        if (in.sgetn(reinterpret_cast<char*>(buf),1) != 1)
+                                        {
+                                            throw image_load_error("bmp load error 21.3: file too short");
+                                        }
+                                        rgb_pixel p;
+                                        p.red   = red[buf[0]];
+                                        p.green = green[buf[0]];
+                                        p.blue  = blue[buf[0]];
+                                        assign_pixel(image[row][col],p);
+
+                                        ++col;
+                                    }
+
+                                    // if we read an uneven number of bytes then we need to read and
+                                    // discard the next byte.
+                                    if ((command&1) != 1)
+                                    {
+                                        if (in.sgetn(reinterpret_cast<char*>(buf),1) != 1)
+                                        {
+                                            throw image_load_error("bmp load error 21.4: file too short");
+                                        }
+                                    }
                                 }
 
                                 rgb_pixel p;
-                                p.red   = red[buf[0]];
-                                p.green = green[buf[0]];
-                                p.blue  = blue[buf[0]];
-                                assign_pixel(image[row][col],p);
+
+                                if (row < 0 || col + count > image.nc())
+                                    throw image_load_error("bmp load error 21.5: file data corrupt");
+
+                                // put the bytes into the image
+                                for (unsigned int i = 0; i < count; ++i)
+                                {
+                                    p.red   = red[command];
+                                    p.green = green[command];
+                                    p.blue  = blue[command];
+                                    assign_pixel(image[row][col],p);
+
+                                    ++col;
+                                }
                             }
-                            if (in.sgetn(reinterpret_cast<char*>(buf),padding) != padding)
-                                throw image_load_error("bmp load error 9: file too short");
                         }
 
 
