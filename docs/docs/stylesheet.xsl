@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
+   
+<!--
+   To the extent possible under law, Davis E King  has waived all copyright and 
+   related or neighboring rights to dlib documentation (XML, HTML, and XSLT files).
+   This work is published from United States. 
+-->
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes' />
    

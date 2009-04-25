@@ -53,3 +53,15 @@ There are four scripts in the docs folder.
 	     generate the chm help files.  Note that you will need to run
 	     docs/chm/htmlhelp/setup_htmlhelp.sh before it will work in wine.
 
+
+======================== License for documentation files ========================
+
+To the extent possible under law, Davis E King  has waived all copyright and 
+related or neighboring rights to dlib documentation (XML, HTML, and XSLT files).
+This work is published from United States. 
+
+That is, I (Davis the author) don't care what you do with this.  So do
+whatever you want :)
+
+
+
