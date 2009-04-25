@@ -1002,6 +1002,20 @@ namespace
         }
 
         {
+            DLIB_TEST((uniform_matrix<double>(4,5,1) == ones_matrix<double>(4,5)));
+            DLIB_TEST((uniform_matrix<double>(4,5,0) == zeros_matrix<double>(4,5)));
+            DLIB_TEST((uniform_matrix<float>(4,5,1) == ones_matrix<float>(4,5)));
+            DLIB_TEST((uniform_matrix<float>(4,5,0) == zeros_matrix<float>(4,5)));
+            DLIB_TEST((uniform_matrix<complex<double> >(4,5,1) == ones_matrix<complex<double> >(4,5)));
+            DLIB_TEST((uniform_matrix<complex<double> >(4,5,0) == zeros_matrix<complex<double> >(4,5)));
+            DLIB_TEST((uniform_matrix<complex<float> >(4,5,1) == ones_matrix<complex<float> >(4,5)));
+            DLIB_TEST((uniform_matrix<complex<float> >(4,5,0) == zeros_matrix<complex<float> >(4,5)));
+            DLIB_TEST((complex_matrix(ones_matrix<double>(3,3), zeros_matrix<double>(3,3)) == complex_matrix(ones_matrix<double>(3,3))));
+            DLIB_TEST((pointwise_multiply(complex_matrix(ones_matrix<double>(3,3)), ones_matrix<double>(3,3)*2) ==
+                       complex_matrix(2*ones_matrix<double>(3,3))));
+        }
+
+        {
             DLIB_TEST(( uniform_matrix<double>(303,303, 3)*identity_matrix<double>(303) == uniform_matrix<double,303,303>(3) ) );
             DLIB_TEST(( uniform_matrix<double,303,303>(3)*identity_matrix<double,303>() == uniform_matrix<double,303,303>(3) ));
         }

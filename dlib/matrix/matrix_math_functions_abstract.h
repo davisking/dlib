@@ -372,6 +372,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     const matrix_exp complex_matrix (
+        const matrix_exp& real_part
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == std::complex<T> where T is whatever type real_part used.
+                - R has the same dimensions as real_part. 
+                - for all valid r and c:
+                  R(r,c) == std::complex(real_part(r,c), 0)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp complex_matrix (
         const matrix_exp& real_part,
         const matrix_exp& imag_part
     );

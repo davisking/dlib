@@ -183,6 +183,38 @@ namespace dlib
     template <
         typename T
         >
+    const matrix_exp ones_matrix (
+        long nr,
+        long nc
+    );
+    /*!
+        requires
+            - nr > 0 && nc > 0
+        ensures
+            - returns uniform_matrix<T>(nr, nc, 1)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const matrix_exp zeros_matrix (
+        long nr,
+        long nc
+    );
+    /*!
+        requires
+            - nr > 0 && nc > 0
+        ensures
+            - returns uniform_matrix<T>(nr, nc, 0)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
     const matrix_exp identity_matrix (
         long N
     );
@@ -493,7 +525,9 @@ namespace dlib
         requires
             - a.nr() == b.nr()
             - a.nc() == b.nc()
-            - a and b both contain the same type of element
+            - a and b both contain the same type of element (one or both
+              can also be of type std::complex so long as the underlying type
+              in them is the same)
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in a and b.

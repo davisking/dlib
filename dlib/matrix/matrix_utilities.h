@@ -1049,13 +1049,53 @@ namespace dlib
     )
     {
         DLIB_ASSERT(nr > 0 && nc > 0, 
-            "\tconst matrix_exp uniform_matrix<T>(nr, nc)"
+            "\tconst matrix_exp uniform_matrix<T>(nr, nc, val)"
             << "\n\tnr and nc have to be bigger than 0"
             << "\n\tnr: " << nr
             << "\n\tnc: " << nc
             );
         typedef dynamic_matrix_scalar_unary_exp<T,op_uniform_matrix_3<T> > exp;
         return exp(nr,nc,val);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const dynamic_matrix_scalar_unary_exp<T,op_uniform_matrix_3<T> > zeros_matrix (
+        long nr,
+        long nc
+    )
+    {
+        DLIB_ASSERT(nr > 0 && nc > 0, 
+            "\tconst matrix_exp zeros_matrix<T>(nr, nc)"
+            << "\n\tnr and nc have to be bigger than 0"
+            << "\n\tnr: " << nr
+            << "\n\tnc: " << nc
+            );
+        typedef dynamic_matrix_scalar_unary_exp<T,op_uniform_matrix_3<T> > exp;
+        return exp(nr,nc,0);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const dynamic_matrix_scalar_unary_exp<T,op_uniform_matrix_3<T> > ones_matrix (
+        long nr,
+        long nc
+    )
+    {
+        DLIB_ASSERT(nr > 0 && nc > 0, 
+            "\tconst matrix_exp ones_matrix<T>(nr, nc)"
+            << "\n\tnr and nc have to be bigger than 0"
+            << "\n\tnr: " << nr
+            << "\n\tnc: " << nc
+            );
+        typedef dynamic_matrix_scalar_unary_exp<T,op_uniform_matrix_3<T> > exp;
+        return exp(nr,nc,1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1224,12 +1264,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+
     struct op_pointwise_multiply
     {
+        // A template to tell me if two types can be multiplied together in a sensible way.  Here
+        // I'm saying it is ok if they are both the same type or one is the complex version of the other.
+        template <typename T, typename U> struct compatible { static const bool value = false;  typedef T type; };
+        template <typename T>             struct compatible<T,T> { static const bool value = true; typedef T type; };
+        template <typename T>             struct compatible<std::complex<T>,T> { static const bool value = true; typedef std::complex<T> type;  };
+        template <typename T>             struct compatible<T,std::complex<T> > { static const bool value = true; typedef std::complex<T> type; };
+
         template <typename EXP1, typename EXP2>
         struct op : public has_nondestructive_aliasing, public preserves_dimensions<EXP1,EXP2>
         {
-            typedef typename EXP1::type type;
+            typedef typename compatible<typename EXP1::type, typename EXP2::type>::type type;
             const static long cost = EXP1::cost + EXP2::cost + 1;
 
             template <typename M1, typename M2>
@@ -1247,7 +1295,7 @@ namespace dlib
         const matrix_exp<EXP2>& b 
     )
     {
-        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+        COMPILE_TIME_ASSERT((op_pointwise_multiply::compatible<typename EXP1::type,typename EXP2::type>::value == true));
         COMPILE_TIME_ASSERT(EXP1::NR == EXP2::NR || EXP1::NR == 0 || EXP2::NR == 0);
         COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || EXP1::NC == 0 || EXP2::NC == 0);
         DLIB_ASSERT(a.nr() == b.nr() &&

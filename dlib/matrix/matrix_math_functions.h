@@ -416,7 +416,34 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
 
 // ----------------------------------------------------------------------------------------
 
-    struct op_complex_matrix
+    struct op_complex_matrix 
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+1;
+            typedef std::complex<typename EXP::type> type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                return type(m(r,c));
+            }
+        };
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_unary_exp<EXP,op_complex_matrix> complex_matrix (
+        const matrix_exp<EXP>& m
+    )
+    {
+        return matrix_unary_exp<EXP,op_complex_matrix>(m.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_complex_matrix2
     {
         template <typename EXP1, typename EXP2>
         struct op : has_nondestructive_aliasing, preserves_dimensions<EXP1,EXP2>
@@ -434,7 +461,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         typename EXP1,
         typename EXP2
         >
-    const matrix_binary_exp<EXP1,EXP2,op_complex_matrix> complex_matrix (
+    const matrix_binary_exp<EXP1,EXP2,op_complex_matrix2> complex_matrix (
         const matrix_exp<EXP1>& real_part,
         const matrix_exp<EXP2>& imag_part 
     )
@@ -452,7 +479,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
             << "\n\timag_part.nr(): " << imag_part.nr()
             << "\n\timag_part.nc(): " << imag_part.nc() 
             );
-        typedef matrix_binary_exp<EXP1,EXP2,op_complex_matrix> exp;
+        typedef matrix_binary_exp<EXP1,EXP2,op_complex_matrix2> exp;
         return exp(real_part.ref(),imag_part.ref());
     }
 
