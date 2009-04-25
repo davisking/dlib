@@ -368,6 +368,14 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#upperm</link>
                      </item>
                      <item>
+                        <name>ones_matrix</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#ones_matrix</link>
+                     </item>
+                     <item>
+                        <name>zeros_matrix</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#zeros_matrix</link>
+                     </item>
+                     <item>
                         <name>uniform_matrix</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#uniform_matrix</link>
                      </item>

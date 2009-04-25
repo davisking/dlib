@@ -516,6 +516,8 @@
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#trans" name="trans"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#lowerm" name="lowerm"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#upperm" name="upperm"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#zeros_matrix" name="zeros_matrix"/>
+         <term link="dlib/matrix/matrix_utilities_abstract.h.html#ones_matrix" name="ones_matrix"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#uniform_matrix" name="uniform_matrix"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#identity_matrix" name="identity_matrix"/>
          <term link="dlib/matrix/matrix_utilities_abstract.h.html#rotate" name="rotate"/>
