@@ -231,6 +231,57 @@ namespace
 
 
 
+
+            {
+                type_safe_union<char, float, std::string> a, b, empty_union;
+
+                ostringstream sout;
+                istringstream sin;
+
+                a.get<char>() = 'd';
+
+                serialize(a, sout);
+
+                sin.str(sout.str());
+                deserialize(b, sin);
+
+                DLIB_TEST(b.contains<int>() == false);
+                DLIB_TEST(b.contains<float>() == false);
+                DLIB_TEST(b.contains<char>() == true);
+                DLIB_TEST(b.get<char>() == 'd');
+
+                DLIB_TEST(a.contains<int>() == false);
+                DLIB_TEST(a.contains<float>() == false);
+                DLIB_TEST(a.contains<char>() == true);
+                DLIB_TEST(a.get<char>() == 'd');
+
+                sin.clear();
+                sout.clear();
+                sout.str("");
+
+                a.get<std::string>() = "davis";
+
+                serialize(a, sout);
+                sin.str(sout.str());
+                deserialize(b, sin);
+
+
+                DLIB_TEST(b.contains<int>() == false);
+                DLIB_TEST(b.contains<float>() == false);
+                DLIB_TEST(b.contains<std::string>() == true);
+                DLIB_TEST(b.get<std::string>() == "davis");
+
+                sin.clear();
+                sout.clear();
+                sout.str("");
+
+                serialize(empty_union, sout);
+                sin.str(sout.str());
+                deserialize(b, sin);
+
+                DLIB_TEST(b.is_empty() == true);
+
+            }
         }
 
     };
