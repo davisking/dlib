@@ -1033,6 +1033,9 @@
                   <a href="dlib/threads/auto_mutex_extension.h.html">here</a>.
                </description> 
 
+               <examples>
+                  <example>threads_ex.cpp.html</example>
+               </examples>
                
             </extension>
             <extension>
