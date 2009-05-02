@@ -1145,12 +1145,12 @@ namespace dlib
         {
         }
 
-        const typename M::value_type operator() (
+        const typename M::value_type& operator() (
             long r, 
             long 
         ) const { return m[r]; }
 
-        const typename M::value_type operator() ( long i ) const 
+        const typename M::value_type& operator() ( long i ) const 
         { return m[i]; }
 
         template <typename U, long iNR, long iNC, typename MM, typename L>
@@ -1228,12 +1228,12 @@ namespace dlib
         {
         }
 
-        const typename M::type operator() (
+        const typename M::type& operator() (
             long r, 
             long 
         ) const { return m[r]; }
 
-        const typename M::type operator() ( long i ) const 
+        const typename M::type& operator() ( long i ) const 
         { return m[i]; }
 
         template <typename U, long iNR, long iNC, typename MM, typename L>
@@ -1311,7 +1311,7 @@ namespace dlib
         {
         }
 
-        const typename M::type operator() (
+        const typename M::type& operator() (
             long r, 
             long c
         ) const { return m[r][c]; }
