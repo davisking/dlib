@@ -12,6 +12,7 @@
 #include "../entropy_decoder_model.h"
 #include "../entropy_decoder.h"
 #include "../uintn.h"
+#include "../image_transforms/assign_image.h"
 #include <algorithm>
 
 namespace dlib
@@ -412,7 +413,13 @@ namespace dlib
                                     // This is the escape code for a run of uncompressed bytes
 
                                     if (row < 0 || col + command > image.nc())
+                                    {
+                                        // If this is just some padding bytes at the end then ignore them
+                                        if (row >= 0 && col + count <= image.nc() + padding)
+                                            continue;
+
                                         throw image_load_error("bmp load error 21.2: file data corrupt");
+                                    }
 
                                     // put the bytes into the image
                                     for (unsigned int i = 0; i < command; ++i)
@@ -439,12 +446,20 @@ namespace dlib
                                             throw image_load_error("bmp load error 21.4: file too short");
                                         }
                                     }
+
+                                    continue;
                                 }
 
                                 rgb_pixel p;
 
                                 if (row < 0 || col + count > image.nc())
+                                {
+                                    // If this is just some padding bytes at the end then ignore them
+                                    if (row >= 0 && col + count <= image.nc() + padding)
+                                        continue;
+
                                     throw image_load_error("bmp load error 21.5: file data corrupt");
+                                }
 
                                 // put the bytes into the image
                                 for (unsigned int i = 0; i < count; ++i)
