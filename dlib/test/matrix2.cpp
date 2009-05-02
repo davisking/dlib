@@ -852,6 +852,23 @@ namespace
         }
 
         {
+            matrix<complex<double> > m(2,2), m2(2,2);
+            complex<double> val1(1,2), val2(1.0/complex<double>(1,2));
+            m = val1;
+            m2 = val2;
+
+            DLIB_TEST(reciprocal(m) == m2);
+        }
+        {
+            matrix<complex<float> > m(2,2), m2(2,2);
+            complex<float> val1(1,2), val2(1.0f/complex<float>(1,2));
+            m = val1;
+            m2 = val2;
+
+            DLIB_TEST(reciprocal(m) == m2);
+        }
+
+        {
             matrix<float,3,1> m1, m2;
             set_all_elements(m1,2.0);
             set_all_elements(m2,1.0/2.0);

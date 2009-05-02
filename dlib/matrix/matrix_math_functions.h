@@ -266,7 +266,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
             { 
                 const type temp = m(r,c);
                 if (temp != static_cast<type>(0))
-                    return static_cast<type>(1.0/temp);
+                    return static_cast<type>((type)1.0/temp);
                 else
                     return 0;
             }
