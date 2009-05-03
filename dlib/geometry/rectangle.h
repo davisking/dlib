@@ -397,6 +397,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline const rectangle shrink_rect (
+        const rectangle& rect,
+        long num 
+    )
+    {
+        return rectangle(rect.left()+num, rect.top()+num, rect.right()-num, rect.bottom()-num);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline const rectangle grow_rect (
+        const rectangle& rect,
+        long num 
+    )
+    {
+        return shrink_rect(rect, -num);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline const rectangle translate_rect (
         const rectangle& rect,
         const point& p

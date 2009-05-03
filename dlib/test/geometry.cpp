@@ -294,6 +294,37 @@ namespace
             DLIB_TEST(rot(point(0,1)) == point(-1,0));
         }
 
+        {
+            rectangle rect;
+
+            rect = grow_rect(rect,1);
+            DLIB_TEST(rect.width() == 2);
+            DLIB_TEST(rect.height() == 2);
+            DLIB_TEST(rect.left() == -1);
+            DLIB_TEST(rect.top() == -1);
+            DLIB_TEST(rect.right() == 0);
+            DLIB_TEST(rect.bottom() == 0);
+        }
+        {
+            rectangle rect;
+
+            rect = grow_rect(rect,2);
+            DLIB_TEST(rect.width() == 4);
+            DLIB_TEST(rect.height() == 4);
+            DLIB_TEST(rect.left() == -2);
+            DLIB_TEST(rect.top() == -2);
+            DLIB_TEST(rect.right() == 1);
+            DLIB_TEST(rect.bottom() == 1);
+
+            rect = shrink_rect(rect,1);
+            DLIB_TEST(rect.width() == 2);
+            DLIB_TEST(rect.height() == 2);
+            DLIB_TEST(rect.left() == -1);
+            DLIB_TEST(rect.top() == -1);
+            DLIB_TEST(rect.right() == 0);
+            DLIB_TEST(rect.bottom() == 0);
+        }
+
     }
 
 
