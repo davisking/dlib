@@ -57,6 +57,8 @@
                <item>rotate_point</item> 
                <item>point_rotator</item> 
                <item>centered_rect</item> 
+               <item>shrink_rect</item> 
+               <item>grow_rect</item> 
                <item>translate_rect</item> 
                <item>resize_rect</item> 
                <item>resize_rect_width</item> 
@@ -883,6 +885,32 @@
             There are various overloads of this function but the basic idea is
             that it returns a <a href="#rectangle">rectangle</a> with a given 
             width and height and centered about a given point.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>shrink_rect</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> object, 
+            shrinks its borders by a given amount, and returns the result.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>grow_rect</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> object, 
+            grows its borders by a given amount, and returns the result.
          </description>
                                  
       </component>
