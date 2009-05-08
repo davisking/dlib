@@ -121,7 +121,6 @@ namespace
             DLIB_TEST((equal(round_zeros(mi*m,0.000001) , identity_matrix<double,5>())));
         }
 
-
         {
             matrix<double,5,2,MM,column_major_layout> m;
 
@@ -157,6 +156,46 @@ namespace
 
 
             matrix<double> mi = pinv(m ); 
+            DLIB_TEST(mi.nr() == m.nc());
+            DLIB_TEST(mi.nc() == m.nr());
+            DLIB_TEST((equal(round_zeros(mi*m,0.000001) , identity_matrix<double,2>())));
+        }
+
+        {
+            matrix<double,5,2,MM,column_major_layout> m;
+
+            for (long r = 0; r < m.nr(); ++r)
+            {
+                for (long c = 0; c < m.nc(); ++c)
+                {
+                    m(r,c) = r*c; 
+                }
+            }
+
+            m = cos(exp(m));
+
+
+            matrix<double> mi = trans(pinv(trans(m) )); 
+            DLIB_TEST(mi.nr() == m.nc());
+            DLIB_TEST(mi.nc() == m.nr());
+            DLIB_TEST((equal(round_zeros(mi*m,0.000001) , identity_matrix<double,2>())));
+        }
+
+        {
+            matrix<double> m(5,2);
+
+            for (long r = 0; r < m.nr(); ++r)
+            {
+                for (long c = 0; c < m.nc(); ++c)
+                {
+                    m(r,c) = r*c; 
+                }
+            }
+
+            m = cos(exp(m));
+
+
+            matrix<double> mi = trans(pinv(trans(m) )); 
             DLIB_TEST(mi.nr() == m.nc());
             DLIB_TEST(mi.nc() == m.nr());
             DLIB_TEST((equal(round_zeros(mi*m,0.000001) , identity_matrix<double,2>())));
