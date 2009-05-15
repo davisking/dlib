@@ -25,6 +25,7 @@
 
 #include "../dir_nav/dir_nav_kernel_1.cpp"
 #include "../dir_nav/dir_nav_kernel_2.cpp"
+#include "../dir_nav/dir_nav_extensions.cpp"
 #include "../linker/linker_kernel_1.cpp"
 #include "../logger/extra_logger_headers.cpp"
 #include "../logger/logger_kernel_1.cpp"

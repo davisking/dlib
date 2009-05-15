@@ -15,6 +15,7 @@
 #include "dir_nav/posix.h"
 #endif
 
+#include "dir_nav/dir_nav_extensions.h"
 
 #endif // DLIB_DIR_NAv_
 
