@@ -24,7 +24,7 @@ namespace dlib
                 bool add_file (file f);
         ensures
             - performs a recursive search through the directory top_of_tree and all
-              its sub-directories (up do the given max depth).  All files in these
+              its sub-directories (up to the given max depth).  All files in these
               directories are examined by passing them to add_file() and if it 
               returns true then they will be included in the returned std::vector<file>
               object.
