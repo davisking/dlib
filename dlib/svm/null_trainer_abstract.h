@@ -17,13 +17,17 @@ namespace dlib
     class null_trainer_type
     {
         /*!
+            REQUIREMENTS ON dec_funct_type
+                dec_funct_type can be any copyable type that provides the needed 
+                typedefs used below (e.g. kernel_type, scalar_type, etc...).
+
             WHAT THIS OBJECT REPRESENTS
                 This object is a simple tool for turning a decision function 
                 into a trainer object that always returns the original decision
                 function when you try to train with it.  
 
                 dlib contains a few "training post processing" algorithms (e.g. 
-                reduced and reduced2()).  These tools take in a trainer object,
+                reduced() and reduced2()).  These tools take in a trainer object,
                 tell it to perform training, and then they take the output decision
                 function and do some kind of post processing to it.  The null_trainer_type 
                 object is useful because you can use it to run an already
