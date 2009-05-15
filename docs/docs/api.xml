@@ -572,6 +572,10 @@
                   <name>directory</name>
                   <link>dlib/dir_nav/dir_nav_kernel_abstract.h.html#directory</link>
                </item>
+               <item>
+                  <name>get_files_in_directory_tree</name>
+                  <link>dlib/dir_nav/dir_nav_extensions_abstract.h.html#get_files_in_directory_tree</link>
+               </item>
             </sub>
          </item>
          <item>
@@ -778,6 +782,19 @@
             </implementation>          
          </implementations>
          
+         <extensions>
+            <extension>
+               <name>dir_nav_extensions</name>
+               <spec_file>dlib/dir_nav/dir_nav_extensions_abstract.h</spec_file>
+               <description> 
+                   <p>
+                     This is just some miscellaneous extensions to the dir_nav component. 
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/dir_nav/dir_nav_extensions.h.html">here</a>.
+               </description> 
+            </extension>
+         </extensions>
                
       </component>
          

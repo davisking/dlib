@@ -56,6 +56,10 @@
          <term link="dlib/dir_nav/dir_nav_kernel_abstract.h.html#directory" name="directory"/>
          <term link="dlib/dir_nav/dir_nav_kernel_abstract.h.html#dir_not_found" name="dir_not_found"/>
          <term link="dlib/dir_nav/dir_nav_kernel_abstract.h.html#listing_error" name="listing_error"/>
+         <term link="dlib/dir_nav/dir_nav_extensions_abstract.h.html#get_files_in_directory_tree" 
+            name="get_files_in_directory_tree"/>
+         <term link="dlib/dir_nav/dir_nav_extensions_abstract.h.html#match_ending" name="match_ending"/>
+         <term link="dlib/dir_nav/dir_nav_extensions_abstract.h.html#match_all" name="match_all"/>
 
 
          <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#wait_until_closed" name="wait_until_closed"/>
