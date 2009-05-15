@@ -455,6 +455,9 @@
          <term file="ml.html" name="rank_features"/>
          <term file="dlib/svm/svm_abstract.h.html" name="maximum_nu"/>
 
+         <term file="ml.html" name="null_trainer"/>
+         <term file="ml.html" name="null_trainer_type"/>
+
          <term file="ml.html" name="decision_function"/>
          <term file="ml.html" name="normalized_function"/>
          <term file="ml.html" name="distance_function"/>

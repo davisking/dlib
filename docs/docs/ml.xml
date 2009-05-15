@@ -67,6 +67,8 @@
          <item>batch</item> 
          <item>verbose_batch</item> 
          <item>batch_trainer</item> 
+         <item>null_trainer_type</item> 
+         <item>null_trainer</item> 
       </section>
 
       <section>
@@ -767,12 +769,39 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>reduced</name>
+         <name>null_trainer_type</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/reduced_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/null_trainer_abstract.h</spec_file>
+         <description>
+                This object is a simple tool for turning a <a href="#decision_function">decision_function</a> 
+                (or any object with an interface compatible with decision_function)
+                into a trainer object that always returns the original decision
+                function when you try to train with it.  
+
+               <p>
+                dlib contains a few "training post processing" algorithms (e.g. 
+                <a href="#reduced">reduced</a> and <a href="#reduced2">reduced2</a>).  These tools 
+                take in a trainer object,
+                tell it to perform training, and then they take the output decision
+                function and do some kind of post processing to it.  The null_trainer_type 
+                object is useful because you can use it to run an already
+                learned decision function through the training post processing
+                algorithms by turning a decision function into a null_trainer_type
+                and then giving it to a post processor.  
+               </p>
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>null_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/null_trainer_abstract.h</spec_file>
          <description>
             This is a convenience function for creating 
-            <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
+            <a href="#null_trainer_type">null_trainer_type</a>
             objects.
          </description>
                                  
@@ -796,6 +825,20 @@
       
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>reduced</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/reduced_abstract.h</spec_file>
+         <description>
+            This is a convenience function for creating 
+            <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
+            objects.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
       <component>
          <name>reduced2</name>
          <file>dlib/svm.h</file>
