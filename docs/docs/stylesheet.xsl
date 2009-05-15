@@ -750,6 +750,9 @@
                   <xsl:when test="@link">
                      <li><a href="{@link}"><xsl:value-of select="@name"/></a></li>
                   </xsl:when>
+                  <xsl:when test="@file">
+                     <li><a href="{@file}#{@name}"><xsl:value-of select="@name"/></a></li>
+                  </xsl:when>
                   <xsl:otherwise>
                      <li> <xsl:value-of select="@name"/>
                         <ul>

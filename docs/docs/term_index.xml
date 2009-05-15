@@ -9,70 +9,70 @@
    <body>
       <term_list>
          <term link="api.html#gui_core" name="gui"/>
-         <term link="api.html#gui_core" name="gui_core"/>
-         <term link="api.html#gui_widgets" name="gui_widgets"/>
-         <term link="api.html#misc_api" name="misc_api"/>
-         <term link="api.html#dir_nav" name="dir_nav"/>
-         <term link="api.html#sockets" name="sockets"/>
-         <term link="api.html#threads" name="threads"/>
-         <term link="api.html#auto_mutex" name="auto_mutex"/>
-         <term link="api.html#auto_unlock" name="auto_unlock"/>
+         <term file="api.html" name="gui_core"/>
+         <term file="api.html" name="gui_widgets"/>
+         <term file="api.html" name="misc_api"/>
+         <term file="api.html" name="dir_nav"/>
+         <term file="api.html" name="sockets"/>
+         <term file="api.html" name="threads"/>
+         <term file="api.html" name="auto_mutex"/>
+         <term file="api.html" name="auto_unlock"/>
          <term link="api.html#create_new_thread%20extension" name="create_new_thread extension"/> 
-         <term link="api.html#multithreaded_object" name="multithreaded_object"/>
-         <term link="api.html#rmutex" name="rmutex"/>
-         <term link="api.html#rsignaler" name="rsignaler"/>
-         <term link="api.html#thread_function" name="thread_function"/>
-         <term link="api.html#thread_specific_data" name="thread_specific_data"/>
-         <term link="api.html#threaded_object" name="threaded_object"/>
-         <term link="api.html#thread_pool" name="thread_pool"/>
+         <term file="api.html" name="multithreaded_object"/>
+         <term file="api.html" name="rmutex"/>
+         <term file="api.html" name="rsignaler"/>
+         <term file="api.html" name="thread_function"/>
+         <term file="api.html" name="thread_specific_data"/>
+         <term file="api.html" name="threaded_object"/>
+         <term file="api.html" name="thread_pool"/>
          <term link="api.html#thread_pool" name="futures"/>
 
 
 
-         <term link="compile.html#DLIB_ISO_CPP_ONLY" name="DLIB_ISO_CPP_ONLY"/>
-         <term link="compile.html#DLIB_NO_GUI_SUPPORT" name="DLIB_NO_GUI_SUPPORT"/>
-         <term link="compile.html#NO_MAKEFILE" name="NO_MAKEFILE"/>
-         <term link="compile.html#DLIB_THREAD_POOL_TIMEOUT" name="DLIB_THREAD_POOL_TIMEOUT"/>
+         <term file="compile.html" name="DLIB_ISO_CPP_ONLY"/>
+         <term file="compile.html" name="DLIB_NO_GUI_SUPPORT"/>
+         <term file="compile.html" name="NO_MAKEFILE"/>
+         <term file="compile.html" name="DLIB_THREAD_POOL_TIMEOUT"/>
 
-         <term link="dlib/threads/threads_kernel_abstract.h.html#get_thread_id" name="get_thread_id"/>
-         <term link="dlib/threads/threads_kernel_abstract.h.html#is_dlib_thread" name="is_dlib_thread"/>
-         <term link="dlib/threads/threads_kernel_abstract.h.html#register_thread_end_handler" name="register_thread_end_handler"/>
-         <term link="dlib/threads/threads_kernel_abstract.h.html#unregister_thread_end_handler" name="unregister_thread_end_handler"/>
-         <term link="dlib/threads/threads_kernel_abstract.h.html#create_new_thread" name="create_new_thread"/>
-         <term link="dlib/threads/threads_kernel_abstract.h.html#mutex" name="mutex"/>
-         <term link="dlib/threads/threads_kernel_abstract.h.html#signaler" name="signaler"/>
+         <term file="dlib/threads/threads_kernel_abstract.h.html" name="get_thread_id"/>
+         <term file="dlib/threads/threads_kernel_abstract.h.html" name="is_dlib_thread"/>
+         <term file="dlib/threads/threads_kernel_abstract.h.html" name="register_thread_end_handler"/>
+         <term file="dlib/threads/threads_kernel_abstract.h.html" name="unregister_thread_end_handler"/>
+         <term file="dlib/threads/threads_kernel_abstract.h.html" name="create_new_thread"/>
+         <term file="dlib/threads/threads_kernel_abstract.h.html" name="mutex"/>
+         <term file="dlib/threads/threads_kernel_abstract.h.html" name="signaler"/>
 
-         <term link="dlib/misc_api/misc_api_kernel_abstract.h.html#sleep" name="sleep"/>
-         <term link="dlib/misc_api/misc_api_kernel_abstract.h.html#get_current_dir" name="get_current_dir"/>
-         <term link="dlib/misc_api/misc_api_kernel_abstract.h.html#dir_create_error" name="dir_create_error"/>
-         <term link="dlib/misc_api/misc_api_kernel_abstract.h.html#create_directory" name="create_directory"/>
-         <term link="dlib/misc_api/misc_api_kernel_abstract.h.html#timestamper" name="timestamper"/>
-         <term link="dlib/misc_api/misc_api_kernel_abstract.h.html#get_timestamp" name="get_timestamp"/>
+         <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="sleep"/>
+         <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="get_current_dir"/>
+         <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="dir_create_error"/>
+         <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="create_directory"/>
+         <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="timestamper"/>
+         <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="get_timestamp"/>
 
 
-         <term link="dlib/dir_nav/dir_nav_kernel_abstract.h.html#get_filesystem_roots" name="get_filesystem_roots"/>
-         <term link="dlib/dir_nav/dir_nav_kernel_abstract.h.html#file" name="file"/>
-         <term link="dlib/dir_nav/dir_nav_kernel_abstract.h.html#file_not_found" name="file_not_found"/>
-         <term link="dlib/dir_nav/dir_nav_kernel_abstract.h.html#directory" name="directory"/>
-         <term link="dlib/dir_nav/dir_nav_kernel_abstract.h.html#dir_not_found" name="dir_not_found"/>
-         <term link="dlib/dir_nav/dir_nav_kernel_abstract.h.html#listing_error" name="listing_error"/>
+         <term file="dlib/dir_nav/dir_nav_kernel_abstract.h.html" name="get_filesystem_roots"/>
+         <term file="dlib/dir_nav/dir_nav_kernel_abstract.h.html" name="file"/>
+         <term file="dlib/dir_nav/dir_nav_kernel_abstract.h.html" name="file_not_found"/>
+         <term file="dlib/dir_nav/dir_nav_kernel_abstract.h.html" name="directory"/>
+         <term file="dlib/dir_nav/dir_nav_kernel_abstract.h.html" name="dir_not_found"/>
+         <term file="dlib/dir_nav/dir_nav_kernel_abstract.h.html" name="listing_error"/>
          <term link="dlib/dir_nav/dir_nav_extensions_abstract.h.html#get_files_in_directory_tree" 
             name="get_files_in_directory_tree"/>
-         <term link="dlib/dir_nav/dir_nav_extensions_abstract.h.html#match_ending" name="match_ending"/>
-         <term link="dlib/dir_nav/dir_nav_extensions_abstract.h.html#match_all" name="match_all"/>
+         <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_ending"/>
+         <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_all"/>
 
 
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#wait_until_closed" name="wait_until_closed"/>
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#put_on_clipboard" name="put_on_clipboard"/>
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#get_from_clipboard" name="get_from_clipboard"/>
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#canvas" name="canvas"/>
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#base_window" name="base_window"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="wait_until_closed"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="put_on_clipboard"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="get_from_clipboard"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="canvas"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="base_window"/>
 
 
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#trigger_user_event" name="trigger_user_event"/>
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#invalidate_rectangle" name="invalidate_rectangle"/>
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#close_window" name="close_window"/>
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#is_closed" name="is_closed"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="trigger_user_event"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="invalidate_rectangle"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="close_window"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="is_closed"/>
          <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#is_closed" name="set_title"/>
 
          <term name="set_pos">
@@ -80,11 +80,11 @@
             <term link="dlib/gui_widgets/drawable_abstract.h.html#set_pos" name="in drawable object"/>
          </term>
 
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#get_pos" name="get_pos"/>
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#get_size" name="get_size"/>
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#get_display_size" name="get_display_size"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="get_pos"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="get_size"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="get_display_size"/>
 
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#on_window_close" name="on_window_close"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="on_window_close"/>
 
          <term name="on_user_event">
             <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#on_user_event" name="in base_window object"/>
@@ -157,15 +157,15 @@
          </term>
 
 
-         <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#paint" name="paint"/>
+         <term file="dlib/gui_core/gui_core_kernel_abstract.h.html" name="paint"/>
 
 
 
 
 
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#set_background_color" name="set_background_color"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#z_order" name="z_order"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#set_z_order" name="set_z_order"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="set_background_color"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="z_order"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="set_z_order"/>
 
          <term name="get_rect">
             <term link="dlib/gui_widgets/drawable_abstract.h.html#get_rect" name="in drawable object"/>
@@ -173,12 +173,12 @@
             <term link="dlib/image_transforms/integral_image_abstract.h.html#get_rect" name="for integral_image objects"/>
          </term>
 
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#is_enabled" name="is_enabled"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#enable" name="enable"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#disable" name="disable"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#is_hidden" name="is_hidden"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#drawable_window" name="drawable_window"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#drawable" name="drawable"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="is_enabled"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="enable"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="disable"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="is_hidden"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="drawable_window"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="drawable"/>
 
          <term name="show">
             <term link="dlib/gui_core/gui_core_kernel_abstract.h.html#show" name="in base_window object"/>
@@ -190,7 +190,7 @@
          </term>
 
 
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#parent_window" name="parent_window"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="parent_window"/>
 
          <term link="dlib/gui_widgets/drawable_abstract.h.html#drawable_protected_variables" name="rect"/>
          <term link="dlib/gui_widgets/drawable_abstract.h.html#drawable_protected_variables" name="m"/>
@@ -200,9 +200,9 @@
          <term link="dlib/gui_widgets/drawable_abstract.h.html#drawable_protected_variables" name="lastx"/>
          <term link="dlib/gui_widgets/drawable_abstract.h.html#drawable_protected_variables" name="lasty"/>
 
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#enable_events" name="enable_events"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#disable_events" name="disable_events"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#events_are_enabled" name="events_are_enabled"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="enable_events"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="disable_events"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="events_are_enabled"/>
 
          <term name="draw_line">
             <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_line" name="in the drawable GUI object"/>
@@ -210,51 +210,51 @@
          </term>
 
 
-         <term link="dlib/gui_widgets/style_abstract.h.html#button_style" name="button_style"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_default" name="button_style_default"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_toolbar1" name="button_style_toolbar1"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_toolbar_icon1" name="button_style_toolbar_icon1"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#button_style_arrow" name="button_style_arrow"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="button_style"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="button_style_default"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="button_style_toolbar1"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="button_style_toolbar_icon1"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="button_style_arrow"/>
 
-         <term link="dlib/gui_widgets/style_abstract.h.html#list_box_style" name="list_box_style"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#list_box_style_default" name="list_box_style_default"/>
-
-
-         <term link="dlib/gui_widgets/style_abstract.h.html#text_field_style" name="text_field_style"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#text_field_style_default" name="text_field_style_default"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#text_box_style" name="text_box_style"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#text_box_style_default" name="text_box_style_default"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="list_box_style"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="list_box_style_default"/>
 
 
-         <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style" name="toggle_button_style"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_default" name="toggle_button_style_default"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_check_box" name="toggle_button_style_check_box"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#toggle_button_style_radio_button" name="toggle_button_style_radio_button"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="text_field_style"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="text_field_style_default"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="text_box_style"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="text_box_style_default"/>
 
 
-         <term link="dlib/gui_widgets/style_abstract.h.html#scrollable_region_style" name="scrollable_region_style"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#scrollable_region_style_default" name="scrollable_region_style_default"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="toggle_button_style"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="toggle_button_style_default"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="toggle_button_style_check_box"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="toggle_button_style_radio_button"/>
 
-         <term link="dlib/gui_widgets/style_abstract.h.html#scroll_bar_style" name="scroll_bar_style"/>
-         <term link="dlib/gui_widgets/style_abstract.h.html#scroll_bar_style_default" name="scroll_bar_style_default"/>
 
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_rectangle" name="draw_rectangle"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_circle" name="draw_circle"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_pixel" name="draw_pixel"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_solid_circle" name="draw_solid_circle"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_button_down" name="draw_button_down"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_sunken_rectangle" name="draw_sunken_rectangle"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_button_up" name="draw_button_up"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_checkered" name="draw_checkered"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_image" name="draw_image"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#fill_rect" name="fill_rect"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#fill_rect_with_vertical_gradient" name="fill_rect_with_vertical_gradient"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#fill_gradient_rounded" name="fill_gradient_rounded"/>
-         <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_rounded_rectangle" name="draw_rounded_rectangle"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="scrollable_region_style"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="scrollable_region_style_default"/>
 
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#draw" name="draw"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#set_main_font" name="set_main_font"/>
-         <term link="dlib/gui_widgets/drawable_abstract.h.html#main_font" name="main_font"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="scroll_bar_style"/>
+         <term file="dlib/gui_widgets/style_abstract.h.html" name="scroll_bar_style_default"/>
+
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_rectangle"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_circle"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_pixel"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_solid_circle"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_button_down"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_sunken_rectangle"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_button_up"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_checkered"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_image"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="fill_rect"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="fill_rect_with_vertical_gradient"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="fill_gradient_rounded"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_rounded_rectangle"/>
+
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="draw"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="set_main_font"/>
+         <term file="dlib/gui_widgets/drawable_abstract.h.html" name="main_font"/>
 
          <term name="bottom">
             <term link="dlib/gui_widgets/drawable_abstract.h.html#bottom" name="in drawable object"/>
@@ -278,303 +278,305 @@
          </term>
 
 
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#open_file_box" name="open_file_box"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#open_existing_file_box" name="open_existing_file_box"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#save_file_box" name="save_file_box"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#message_box" name="message_box"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#message_box_blocking" name="message_box_blocking"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#label" name="label"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#toggle_button" name="toggle_button"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#text_grid" name="text_grid"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#directed_graph_drawer" name="directed_graph_drawer"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#text_field" name="text_field"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#text_box" name="text_box"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#check_box" name="check_box"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#radio_button" name="radio_button"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#tabbed_display" name="tabbed_display"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#named_rectangle" name="named_rectangle"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#mouse_tracker" name="mouse_tracker"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#list_box" name="list_box"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#menu_bar" name="menu_bar"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#image_display" name="image_display"/>
-         <term link="dlib/gui_widgets/widgets_abstract.h.html#image_window" name="image_window"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="open_file_box"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="open_existing_file_box"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="save_file_box"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="message_box"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="message_box_blocking"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="label"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="toggle_button"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="text_grid"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="directed_graph_drawer"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="text_field"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="text_box"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="check_box"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="radio_button"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="tabbed_display"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="named_rectangle"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="mouse_tracker"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="list_box"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="menu_bar"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="image_display"/>
+         <term file="dlib/gui_widgets/widgets_abstract.h.html" name="image_window"/>
 
-         <term link="dlib/gui_widgets/fonts_abstract.h.html#letter" name="letter"/>
-         <term link="dlib/gui_widgets/fonts_abstract.h.html#font" name="font"/>
-         <term link="dlib/gui_widgets/fonts_abstract.h.html#default_font" name="default_font"/>
-         <term link="dlib/gui_widgets/fonts_abstract.h.html#get_native_font" name="get_native_font"/>
-         <term link="dlib/gui_widgets/fonts_abstract.h.html#bdf_font" name="bdf_font"/>
-
-
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#button" name="button"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#draggable" name="draggable"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#button_action" name="button_action"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#zoomable_region" name="zoomable_region"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#scrollable_region" name="scrollable_region"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#mouse_over_event" name="mouse_over_event"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#tooltip" name="tooltip"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#popup_menu_region" name="popup_menu_region"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#scroll_bar" name="scroll_bar"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#widget_group" name="widget_group"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#image_widget" name="image_widget"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#popup_menu" name="popup_menu"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#menu_item" name="menu_item"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#menu_item_text" name="menu_item_text"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#menu_item_separator" name="menu_item_separator"/>
-         <term link="dlib/gui_widgets/base_widgets_abstract.h.html#menu_item_submenu" name="menu_item_submenu"/>
+         <term file="dlib/gui_widgets/fonts_abstract.h.html" name="letter"/>
+         <term file="dlib/gui_widgets/fonts_abstract.h.html" name="font"/>
+         <term file="dlib/gui_widgets/fonts_abstract.h.html" name="default_font"/>
+         <term file="dlib/gui_widgets/fonts_abstract.h.html" name="get_native_font"/>
+         <term file="dlib/gui_widgets/fonts_abstract.h.html" name="bdf_font"/>
 
 
-         <term link="dlib/sockets/sockets_kernel_abstract.h.html#get_local_hostname" name="get_local_hostname"/>
-         <term link="dlib/sockets/sockets_kernel_abstract.h.html#hostname_to_ip" name="hostname_to_ip"/>
-         <term link="dlib/sockets/sockets_kernel_abstract.h.html#ip_to_hostname" name="ip_to_hostname"/>
-         <term link="dlib/sockets/sockets_kernel_abstract.h.html#create_listener" name="create_listener"/>
-         <term link="dlib/sockets/sockets_kernel_abstract.h.html#create_connection" name="create_connection"/>
-         <term link="dlib/sockets/sockets_kernel_abstract.h.html#connection" name="connection"/>
-         <term link="dlib/sockets/sockets_kernel_abstract.h.html#listener" name="listener"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="button"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="draggable"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="button_action"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="zoomable_region"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="scrollable_region"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="mouse_over_event"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="tooltip"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="popup_menu_region"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="scroll_bar"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="widget_group"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="image_widget"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="popup_menu"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="menu_item"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="menu_item_text"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="menu_item_separator"/>
+         <term file="dlib/gui_widgets/base_widgets_abstract.h.html" name="menu_item_submenu"/>
 
 
-         <term link="dlib/sockets/sockets_extensions_abstract.h.html#connect" name="connect"/>
-         <term link="dlib/sockets/sockets_extensions_abstract.h.html#is_ip_address" name="is_ip_address"/>
-         <term link="dlib/sockets/sockets_extensions_abstract.h.html#close_gracefully" name="close_gracefully"/>
+         <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="get_local_hostname"/>
+         <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="hostname_to_ip"/>
+         <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="ip_to_hostname"/>
+         <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="create_listener"/>
+         <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="create_connection"/>
+         <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="connection"/>
+         <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="listener"/>
 
 
-         <term link="dlib/rand/rand_float_abstract.h.html#get_random_float" name="get_random_float"/>
+         <term file="dlib/sockets/sockets_extensions_abstract.h.html" name="connect"/>
+         <term file="dlib/sockets/sockets_extensions_abstract.h.html" name="is_ip_address"/>
+         <term file="dlib/sockets/sockets_extensions_abstract.h.html" name="close_gracefully"/>
 
 
-         <term link="dlib/geometry/rectangle_abstract.h.html#move_rect" name="move_rect"/>
-         <term link="dlib/geometry/rectangle_abstract.h.html#translate_rect" name="translate_rect"/>
-         <term link="dlib/geometry/rectangle_abstract.h.html#resize_rect" name="resize_rect"/>
-         <term link="dlib/geometry/rectangle_abstract.h.html#resize_rect_width" name="resize_rect_width"/>
-         <term link="dlib/geometry/rectangle_abstract.h.html#resize_rect_height" name="resize_rect_height"/>
-         <term link="dlib/geometry/rectangle_abstract.h.html#centered_rect" name="centered_rect"/>
-         <term link="dlib/geometry/rectangle_abstract.h.html#nearest_point" name="nearest_point"/>
-         <term link="dlib/geometry/rectangle_abstract.h.html#shrink_rect" name="shrink_rect"/>
-         <term link="dlib/geometry/rectangle_abstract.h.html#grow_rect" name="grow_rect"/>
+         <term file="dlib/rand/rand_float_abstract.h.html" name="get_random_float"/>
 
 
-         <term link="dlib/optimization/optimization_abstract.h.html#central_differences" name="central_differences"/>
-         <term link="dlib/optimization/optimization_abstract.h.html#line_search_funct" name="line_search_funct"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="move_rect"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="translate_rect"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="resize_rect"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="resize_rect_width"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="resize_rect_height"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="centered_rect"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="nearest_point"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="shrink_rect"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="grow_rect"/>
 
-         <term link="algorithms.html#derivative" name="derivative"/>
-         <term link="algorithms.html#make_line_search_function" name="make_line_search_function"/>
-         <term link="algorithms.html#poly_min_extrap" name="poly_min_extrap"/>
-         <term link="algorithms.html#line_search" name="line_search"/>
-         <term link="algorithms.html#find_min_quasi_newton" name="find_min_quasi_newton"/>
-         <term link="algorithms.html#find_min_conjugate_gradient" name="find_min_conjugate_gradient"/>
-         <term link="algorithms.html#find_min_quasi_newton2" name="find_min_quasi_newton2"/>
-         <term link="algorithms.html#find_min_conjugate_gradient2" name="find_min_conjugate_gradient2"/>
 
-         <term link="bayes.html#set_node_value" name="set_node_value"/>
-         <term link="bayes.html#node_value" name="node_value"/>
-         <term link="bayes.html#node_is_evidence" name="node_is_evidence"/>
-         <term link="bayes.html#set_node_as_evidence" name="set_node_as_evidence"/>
-         <term link="bayes.html#set_node_as_nonevidence" name="set_node_as_nonevidence"/>
-         <term link="bayes.html#set_node_num_values" name="set_node_num_values"/>
-         <term link="bayes.html#node_num_values" name="node_num_values"/>
-         <term link="bayes.html#node_probability" name="node_probability"/>
-         <term link="bayes.html#set_node_probability" name="set_node_probability"/>
-         <term link="bayes.html#assignment" name="assignment"/>
-         <term link="bayes.html#joint_probability_table" name="joint_probability_table"/>
-         <term link="bayes.html#conditional_probability_table" name="conditional_probability_table"/>
-         <term link="bayes.html#bayes_node" name="bayes_node"/>
-         <term link="bayes.html#bayesian_network_gibbs_sampler" name="bayesian_network_gibbs_sampler"/>
-         <term link="bayes.html#bayesian_network_join_tree" name="bayesian_network_join_tree"/>
-         <term link="bayes.html#node_first_parent_assignment" name="node_first_parent_assignment"/>
-         <term link="bayes.html#node_next_parent_assignment" name="node_next_parent_assignment"/>
-         <term link="bayes.html#node_cpt_filled_out" name="node_cpt_filled_out"/>
+         <term file="dlib/optimization/optimization_abstract.h.html" name="central_differences"/>
+         <term file="dlib/optimization/optimization_abstract.h.html" name="line_search_funct"/>
 
-         <term link="algorithms.html#rectangle" name="rectangle"/>
+         <term file="algorithms.html" name="derivative"/>
+         <term file="algorithms.html" name="make_line_search_function"/>
+         <term file="algorithms.html" name="poly_min_extrap"/>
+         <term file="algorithms.html" name="line_search"/>
+         <term file="algorithms.html" name="find_min_quasi_newton"/>
+         <term file="algorithms.html" name="find_min_conjugate_gradient"/>
+         <term file="algorithms.html" name="find_min_quasi_newton2"/>
+         <term file="algorithms.html" name="find_min_conjugate_gradient2"/>
 
-         <term link="algorithms.html#edge" name="edge"/>
-         <term link="algorithms.html#is_join_tree" name="is_join_tree"/>
-         <term link="algorithms.html#create_join_tree" name="create_join_tree"/>
-         <term link="algorithms.html#set_intersection_size" name="set_intersection_size"/>
-         <term link="algorithms.html#set_intersection" name="set_intersection"/>
-         <term link="algorithms.html#set_union" name="set_union"/>
-         <term link="algorithms.html#set_difference" name="set_difference"/>
-         <term link="algorithms.html#bigint" name="bigint"/>
-         <term link="algorithms.html#crc32" name="crc32"/>
-         <term link="algorithms.html#hsort_array" name="hsort_array"/>
-         <term link="algorithms.html#put_in_range" name="put_in_range"/>
-         <term link="algorithms.html#isort_array" name="isort_array"/>
-         <term link="algorithms.html#md5" name="md5"/>
-         <term link="algorithms.html#median" name="median"/>
-         <term link="algorithms.html#qsort_array" name="qsort_array"/>
-         <term link="algorithms.html#rand" name="rand"/>
+         <term file="bayes.html" name="set_node_value"/>
+         <term file="bayes.html" name="node_value"/>
+         <term file="bayes.html" name="node_is_evidence"/>
+         <term file="bayes.html" name="set_node_as_evidence"/>
+         <term file="bayes.html" name="set_node_as_nonevidence"/>
+         <term file="bayes.html" name="set_node_num_values"/>
+         <term file="bayes.html" name="node_num_values"/>
+         <term file="bayes.html" name="node_probability"/>
+         <term file="bayes.html" name="set_node_probability"/>
+         <term file="bayes.html" name="assignment"/>
+         <term file="bayes.html" name="joint_probability_table"/>
+         <term file="bayes.html" name="conditional_probability_table"/>
+         <term file="bayes.html" name="bayes_node"/>
+         <term file="bayes.html" name="bayesian_network_gibbs_sampler"/>
+         <term file="bayes.html" name="bayesian_network_join_tree"/>
+         <term file="bayes.html" name="node_first_parent_assignment"/>
+         <term file="bayes.html" name="node_next_parent_assignment"/>
+         <term file="bayes.html" name="node_cpt_filled_out"/>
+
+         <term file="algorithms.html" name="rectangle"/>
+
+         <term file="algorithms.html" name="edge"/>
+         <term file="algorithms.html" name="is_join_tree"/>
+         <term file="algorithms.html" name="create_join_tree"/>
+         <term file="algorithms.html" name="set_intersection_size"/>
+         <term file="algorithms.html" name="set_intersection"/>
+         <term file="algorithms.html" name="set_union"/>
+         <term file="algorithms.html" name="set_difference"/>
+         <term file="algorithms.html" name="bigint"/>
+         <term file="algorithms.html" name="crc32"/>
+         <term file="algorithms.html" name="hsort_array"/>
+         <term file="algorithms.html" name="put_in_range"/>
+         <term file="algorithms.html" name="isort_array"/>
+         <term file="algorithms.html" name="md5"/>
+         <term file="algorithms.html" name="median"/>
+         <term file="algorithms.html" name="qsort_array"/>
+         <term file="algorithms.html" name="rand"/>
          <term link="algorithms.html#rand" name="Mersenne Twister"/>
-         <term link="algorithms.html#graph_contains_undirected_cycle" name="graph_contains_undirected_cycle"/>
-         <term link="algorithms.html#graph_contains_directed_cycle" name="graph_contains_directed_cycle"/>
-         <term link="algorithms.html#copy_graph_structure" name="copy_graph_structure"/>
+         <term file="algorithms.html" name="graph_contains_undirected_cycle"/>
+         <term file="algorithms.html" name="graph_contains_directed_cycle"/>
+         <term file="algorithms.html" name="copy_graph_structure"/>
 
-         <term link="algorithms.html#create_moral_graph" name="create_moral_graph"/>
-         <term link="algorithms.html#triangulate_graph_and_find_cliques" name="triangulate_graph_and_find_cliques"/>
-         <term link="algorithms.html#graph_contains_length_one_cycle" name="graph_contains_length_one_cycle"/>
-         <term link="algorithms.html#find_connected_nodes" name="find_connected_nodes"/>
-         <term link="algorithms.html#graph_is_connected" name="graph_is_connected"/>
-         <term link="algorithms.html#is_clique" name="is_clique"/>
-         <term link="algorithms.html#is_maximal_clique" name="is_maximal_clique"/>
-         <term link="algorithms.html#square_root" name="square_root"/>
-         <term link="algorithms.html#vector" name="vector"/>
-         <term link="algorithms.html#point" name="point"/>
-         <term link="algorithms.html#rotate_point" name="rotate_point"/>
-         <term link="algorithms.html#point_rotator" name="point_rotator"/>
-         <term link="algorithms.html#running_stats" name="running_stats"/>
-
-
+         <term file="algorithms.html" name="create_moral_graph"/>
+         <term file="algorithms.html" name="triangulate_graph_and_find_cliques"/>
+         <term file="algorithms.html" name="graph_contains_length_one_cycle"/>
+         <term file="algorithms.html" name="find_connected_nodes"/>
+         <term file="algorithms.html" name="graph_is_connected"/>
+         <term file="algorithms.html" name="is_clique"/>
+         <term file="algorithms.html" name="is_maximal_clique"/>
+         <term file="algorithms.html" name="square_root"/>
+         <term file="algorithms.html" name="vector"/>
+         <term file="algorithms.html" name="point"/>
+         <term file="algorithms.html" name="rotate_point"/>
+         <term file="algorithms.html" name="point_rotator"/>
+         <term file="algorithms.html" name="running_stats"/>
 
 
-         <term link="ml.html#mlp" name="mlp"/>
+
+
+         <term file="ml.html" name="mlp"/>
          <term link="ml.html#mlp" name="multi-layer perceptron"/>
          <term link="ml.html#mlp" name="neural network"/>
-         <term link="ml.html#svm_pegasos" name="svm_pegasos"/>
-         <term link="ml.html#batch" name="batch"/>
-         <term link="ml.html#verbose_batch" name="verbose_batch"/>
-         <term link="ml.html#batch_trainer" name="batch_trainer"/>
-         <term link="ml.html#randomize_samples" name="randomize_samples"/>
-         <term link="ml.html#is_binary_classification_problem" name="is_binary_classification_problem"/>
-         <term link="ml.html#svm_nu_trainer" name="svm_nu_trainer"/>
-         <term link="ml.html#rvm_trainer" name="rvm_trainer"/>
-         <term link="ml.html#rvm_regression_trainer" name="rvm_regression_trainer"/>
-         <term link="ml.html#rbf_network_trainer" name="rbf_network_trainer"/>
-         <term link="ml.html#reduced" name="reduced"/>
-         <term link="ml.html#reduced_decision_function_trainer" name="reduced_decision_function_trainer"/>
-         <term link="ml.html#reduced2" name="reduced2"/>
-         <term link="ml.html#reduced_decision_function_trainer2" name="reduced_decision_function_trainer2"/>
-         <term link="ml.html#train_probabilistic_decision_function" name="train_probabilistic_decision_function"/>
-         <term link="ml.html#cross_validate_trainer" name="cross_validate_trainer"/>
-         <term link="ml.html#cross_validate_trainer_threaded" name="cross_validate_trainer_threaded"/>
-         <term link="ml.html#test_binary_decision_function" name="test_binary_decision_function"/>
+         <term file="ml.html" name="svm_pegasos"/>
+         <term file="ml.html" name="batch"/>
+         <term file="ml.html" name="verbose_batch"/>
+         <term file="ml.html" name="batch_trainer"/>
+         <term file="ml.html" name="randomize_samples"/>
+         <term file="ml.html" name="is_binary_classification_problem"/>
+         <term file="ml.html" name="svm_nu_trainer"/>
+         <term file="ml.html" name="rvm_trainer"/>
+         <term file="ml.html" name="rvm_regression_trainer"/>
+         <term file="ml.html" name="rbf_network_trainer"/>
+         <term file="ml.html" name="reduced"/>
+         <term file="ml.html" name="reduced_decision_function_trainer"/>
+         <term file="ml.html" name="reduced2"/>
+         <term file="ml.html" name="reduced_decision_function_trainer2"/>
+         <term file="ml.html" name="train_probabilistic_decision_function"/>
+         <term file="ml.html" name="cross_validate_trainer"/>
+         <term file="ml.html" name="cross_validate_trainer_threaded"/>
+         <term file="ml.html" name="test_binary_decision_function"/>
          <term link="ml.html#svm_nu_trainer" name="support vector machine"/>
          <term link="ml.html#rvm_trainer" name="relevance vector machine"/>
-         <term link="ml.html#krls" name="krls"/>
-         <term link="ml.html#kcentroid" name="kcentroid"/>
-         <term link="ml.html#linearly_independent_subset_finder" name="linearly_independent_subset_finder"/>
-         <term link="ml.html#vector_normalizer" name="vector_normalizer"/>
-         <term link="ml.html#kkmeans" name="kkmeans"/>
-         <term link="ml.html#pick_initial_centers" name="pick_initial_centers"/>
-         <term link="ml.html#rank_features" name="rank_features"/>
-         <term link="dlib/svm/svm_abstract.h.html#maximum_nu" name="maximum_nu"/>
+         <term file="ml.html" name="krls"/>
+         <term file="ml.html" name="kcentroid"/>
+         <term file="ml.html" name="linearly_independent_subset_finder"/>
+         <term file="ml.html" name="vector_normalizer"/>
+         <term file="ml.html" name="kkmeans"/>
+         <term file="ml.html" name="pick_initial_centers"/>
+         <term file="ml.html" name="rank_features"/>
+         <term file="dlib/svm/svm_abstract.h.html" name="maximum_nu"/>
 
-         <term link="ml.html#decision_function" name="decision_function"/>
-         <term link="ml.html#normalized_function" name="normalized_function"/>
-         <term link="ml.html#distance_function" name="distance_function"/>
-         <term link="ml.html#probabilistic_decision_function" name="probabilistic_decision_function"/>
-         <term link="ml.html#linear_kernel" name="linear_kernel"/>
-         <term link="ml.html#offset_kernel" name="offset_kernel"/>
-         <term link="ml.html#polynomial_kernel" name="polynomial_kernel"/>
-         <term link="ml.html#sigmoid_kernel" name="sigmoid_kernel"/>
-         <term link="ml.html#radial_basis_kernel" name="radial_basis_kernel"/>
+         <term file="ml.html" name="decision_function"/>
+         <term file="ml.html" name="normalized_function"/>
+         <term file="ml.html" name="distance_function"/>
+         <term file="ml.html" name="probabilistic_decision_function"/>
+         <term file="ml.html" name="linear_kernel"/>
+         <term file="ml.html" name="offset_kernel"/>
+         <term file="ml.html" name="polynomial_kernel"/>
+         <term file="ml.html" name="sigmoid_kernel"/>
+         <term file="ml.html" name="radial_basis_kernel"/>
 
-         <term link="ml.html#sparse_linear_kernel" name="sparse_linear_kernel"/>
-         <term link="ml.html#sparse_polynomial_kernel" name="sparse_polynomial_kernel"/>
-         <term link="ml.html#sparse_sigmoid_kernel" name="sparse_sigmoid_kernel"/>
-         <term link="ml.html#sparse_radial_basis_kernel" name="sparse_radial_basis_kernel"/>
+         <term file="ml.html" name="sparse_linear_kernel"/>
+         <term file="ml.html" name="sparse_polynomial_kernel"/>
+         <term file="ml.html" name="sparse_sigmoid_kernel"/>
+         <term file="ml.html" name="sparse_radial_basis_kernel"/>
 
          <term link="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects" name="Kernel Function Objects"/>
-         <term link="dlib/svm/kernel_abstract.h.html#kernel_derivative" name="kernel_derivative"/>
+         <term file="dlib/svm/kernel_abstract.h.html" name="kernel_derivative"/>
 
 
 
-         <term link="compression.html#compress_stream" name="compress_stream"/>
-         <term link="compression.html#conditioning_class" name="conditioning_class"/>
-         <term link="compression.html#entropy_decoder" name="entropy_decoder"/>
-         <term link="compression.html#entropy_decoder_model" name="entropy_decoder_model"/>
-         <term link="compression.html#entropy_encoder" name="entropy_encoder"/>
-         <term link="compression.html#entropy_encoder_model" name="entropy_encoder_model"/>
-         <term link="compression.html#lz77_buffer" name="lz77_buffer"/>
-         <term link="compression.html#lzp_buffer" name="lzp_buffer"/>
+         <term file="compression.html" name="compress_stream"/>
+         <term file="compression.html" name="conditioning_class"/>
+         <term file="compression.html" name="entropy_decoder"/>
+         <term file="compression.html" name="entropy_decoder_model"/>
+         <term file="compression.html" name="entropy_encoder"/>
+         <term file="compression.html" name="entropy_encoder_model"/>
+         <term file="compression.html" name="lz77_buffer"/>
+         <term file="compression.html" name="lzp_buffer"/>
 
 
-         <term link="containers.html#std_vector_c" name="std_vector_c"/>
-         <term link="containers.html#graph" name="graph"/>
-         <term link="containers.html#directed_graph" name="directed_graph"/>
-         <term link="containers.html#tuple" name="tuple"/>
-         <term link="containers.html#type_safe_union" name="type_safe_union"/>
-         <term link="containers.html#array" name="array"/>
-         <term link="containers.html#array2d" name="array2d"/>
-         <term link="containers.html#binary_search_tree" name="binary_search_tree"/>
-         <term link="containers.html#enumerable" name="enumerable"/>
-         <term link="containers.html#hash_map" name="hash_map"/>
-         <term link="containers.html#hash_set" name="hash_set"/>
-         <term link="containers.html#hash_table" name="hash_table"/>
-         <term link="containers.html#map" name="map"/>
-         <term link="containers.html#map_pair" name="map_pair"/>
-         <term link="containers.html#matrix" name="matrix"/>
+         <term file="containers.html" name="std_vector_c"/>
+         <term file="containers.html" name="graph"/>
+         <term file="containers.html" name="directed_graph"/>
+         <term file="containers.html" name="tuple"/>
+         <term file="containers.html" name="type_safe_union"/>
+         <term file="containers.html" name="array"/>
 
-         <term link="dlib/matrix/matrix_abstract.h.html#matrix_exp" name="matrix_exp"/>
-         <term link="dlib/matrix/matrix_abstract.h.html#const_temp_matrix" name="const_temp_matrix"/>
+         <term file="containers.html" name="array2d"/>
 
-         <term link="dlib/matrix/matrix_math_functions_abstract.h.html#sigmoid" name="sigmoid"/>
-         <term link="dlib/matrix/matrix_math_functions_abstract.h.html#reciprocal" name="reciprocal"/>
-         <term link="dlib/matrix/matrix_math_functions_abstract.h.html#round" name="round"/>
-         <term link="dlib/matrix/matrix_math_functions_abstract.h.html#round_zeros" name="round_zeros"/>
-         <term link="dlib/matrix/matrix_math_functions_abstract.h.html#complex_matrix" name="complex_matrix"/>
-         <term link="dlib/matrix/matrix_math_functions_abstract.h.html#normalize" name="normalize"/>
+         <term file="containers.html" name="binary_search_tree"/>
+         <term file="containers.html" name="enumerable"/>
+         <term file="containers.html" name="hash_map"/>
+         <term file="containers.html" name="hash_set"/>
+         <term file="containers.html" name="hash_table"/>
+         <term file="containers.html" name="map"/>
+         <term file="containers.html" name="map_pair"/>
+         <term file="containers.html" name="matrix"/>
 
+         <term file="dlib/matrix/matrix_abstract.h.html" name="matrix_exp"/>
+         <term file="dlib/matrix/matrix_abstract.h.html" name="const_temp_matrix"/>
 
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#linspace" name="linspace"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#logspace" name="logspace"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#cartesian_product" name="cartesian_product"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#randm" name="randm"/>
-
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#diag" name="diag"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#diagm" name="diagm"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#trans" name="trans"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#lowerm" name="lowerm"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#upperm" name="upperm"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#zeros_matrix" name="zeros_matrix"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#ones_matrix" name="ones_matrix"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#uniform_matrix" name="uniform_matrix"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#identity_matrix" name="identity_matrix"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#rotate" name="rotate"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#removerc" name="removerc"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#remove_row" name="remove_row"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#remove_col" name="remove_col"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#matrix_cast" name="matrix_cast"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#set_all_elements" name="set_all_elements"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#tmp" name="tmp"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#array_to_matrix" name="array_to_matrix"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#vector_to_matrix" name="vector_to_matrix"/>
-         <term link="dlib/matrix/matrix_math_functions_abstract.h.html#squared" name="squared"/>
-         <term link="dlib/matrix/matrix_math_functions_abstract.h.html#cubed" name="cubed"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="sigmoid"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="reciprocal"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="round"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="round_zeros"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="complex_matrix"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="normalize"/>
 
 
-         <term link="dlib/matrix/matrix_la_abstract.h.html#lu_decomposition" name="lu_decomposition"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#qr_decomposition" name="qr_decomposition"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#cholesky_decomposition" name="cholesky_decomposition"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#eigenvalue_decomposition" name="eigenvalue_decomposition"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#inv" name="inv"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#inv_lower_triangular" name="inv_lower_triangular"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#inv_upper_triangular" name="inv_upper_triangular"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#pinv" name="pinv"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#real_eigenvalues" name="real_eigenvalues"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#svd" name="svd"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="linspace"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="logspace"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="cartesian_product"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="randm"/>
+
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diagm"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="trans"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="lowerm"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="upperm"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="zeros_matrix"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="ones_matrix"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="uniform_matrix"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="identity_matrix"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="rotate"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="removerc"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="remove_row"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="remove_col"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="matrix_cast"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="set_all_elements"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="tmp"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="array_to_matrix"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="vector_to_matrix"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="squared"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="cubed"/>
+
+
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="lu_decomposition"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="qr_decomposition"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="cholesky_decomposition"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="eigenvalue_decomposition"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="inv"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="inv_lower_triangular"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="inv_upper_triangular"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="pinv"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="real_eigenvalues"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="svd"/>
          <term link="dlib/matrix/matrix_la_abstract.h.html#svd" name="singular value decomposition"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#svd2" name="svd2"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#svd3" name="svd3"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#det" name="det"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#trace" name="trace"/>
-         <term link="dlib/matrix/matrix_la_abstract.h.html#chol" name="chol"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="svd2"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="svd3"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="det"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="trace"/>
+         <term file="dlib/matrix/matrix_la_abstract.h.html" name="chol"/>
 
 
 
-         <term link="dlib/matrix/matrix_subexp_abstract.h.html#rowm" name="rowm"/>
-         <term link="dlib/matrix/matrix_subexp_abstract.h.html#colm" name="colm"/>
-         <term link="dlib/matrix/matrix_subexp_abstract.h.html#subm" name="subm"/>
-         <term link="dlib/matrix/matrix_subexp_abstract.h.html#range" name="range"/>
-         <term link="dlib/matrix/matrix_subexp_abstract.h.html#set_rowm" name="set_rowm"/>
-         <term link="dlib/matrix/matrix_subexp_abstract.h.html#set_colm" name="set_colm"/>
-         <term link="dlib/matrix/matrix_subexp_abstract.h.html#set_subm" name="set_subm"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="rowm"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="colm"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="subm"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="range"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_rowm"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_colm"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_subm"/>
 
 
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#pointwise_multiply" name="pointwise_multiply"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#equal" name="equal"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointwise_multiply"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="equal"/>
 
 
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#scale_columns" name="scale_columns"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#sort_columns" name="sort_columns"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#rsort_columns" name="rsort_columns"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#tensor_product" name="tensor_product"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="scale_columns"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="sort_columns"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="rsort_columns"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="tensor_product"/>
 
          <term name="length">
             <term link="dlib/matrix/matrix_utilities_abstract.h.html#length" name="for matrix objects"/>
@@ -586,39 +588,39 @@
             <term link="dlib/svm/sparse_vector_abstract.h.html#length_squared" name="for sparse vectors"/>
          </term>
 
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#min" name="min"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#find_min_and_max" name="find_min_and_max"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#index_of_max" name="index_of_max"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#index_of_min" name="index_of_min"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#max" name="max"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#sum" name="sum"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#prod" name="prod"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#mean" name="mean"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#variance" name="variance"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#covariance" name="covariance"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#pixel_to_vector" name="pixel_to_vector"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#vector_to_pixel" name="vector_to_pixel"/>
-         <term link="dlib/matrix/matrix_utilities_abstract.h.html#clamp" name="clamp"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="min"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="find_min_and_max"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="index_of_max"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="index_of_min"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="max"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="sum"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="prod"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="mean"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="variance"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="covariance"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pixel_to_vector"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="vector_to_pixel"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="clamp"/>
 
 
-         <term link="dlib/svm/sparse_vector_abstract.h.html#scale_by" name="scale_by"/>
-         <term link="dlib/svm/sparse_vector_abstract.h.html#dot_product" name="dot_product"/>
-         <term link="dlib/svm/sparse_vector_abstract.h.html#distance_squared" name="distance_squared"/>
-         <term link="dlib/svm/sparse_vector_abstract.h.html#distance" name="distance"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="scale_by"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="dot_product"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="distance_squared"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="distance"/>
 
-         <term link="containers.html#queue" name="queue"/>
-         <term link="containers.html#reference_counter" name="reference_counter"/>
-         <term link="containers.html#remover" name="remover"/>
-         <term link="containers.html#scoped_ptr" name="scoped_ptr"/>
-         <term link="containers.html#sequence" name="sequence"/>
-         <term link="containers.html#set" name="set"/>
-         <term link="containers.html#shared_ptr" name="shared_ptr"/>
-         <term link="containers.html#shared_ptr_thread_safe" name="shared_ptr_thread_safe"/>
-         <term link="containers.html#sliding_buffer" name="sliding_buffer"/>
-         <term link="containers.html#stack" name="stack"/>
-         <term link="containers.html#static_map" name="static_map"/>
-         <term link="containers.html#static_set" name="static_set"/>
-         <term link="containers.html#weak_ptr" name="weak_ptr"/>
+         <term file="containers.html" name="queue"/>
+         <term file="containers.html" name="reference_counter"/>
+         <term file="containers.html" name="remover"/>
+         <term file="containers.html" name="scoped_ptr"/>
+         <term file="containers.html" name="sequence"/>
+         <term file="containers.html" name="set"/>
+         <term file="containers.html" name="shared_ptr"/>
+         <term file="containers.html" name="shared_ptr_thread_safe"/>
+         <term file="containers.html" name="sliding_buffer"/>
+         <term file="containers.html" name="stack"/>
+         <term file="containers.html" name="static_map"/>
+         <term file="containers.html" name="static_set"/>
+         <term file="containers.html" name="weak_ptr"/>
 
 
 
@@ -626,94 +628,94 @@
          <term link="dlib/image_transforms/thresholding_abstract.h.html" name="off_pixel"/>
     
 
-         <term link="imaging.html#assign_image" name="assign_image"/>
-         <term link="imaging.html#assign_all_pixels" name="assign_all_pixels"/>
-         <term link="imaging.html#assign_border_pixels" name="assign_border_pixels"/>
-         <term link="imaging.html#assign_pixel" name="assign_pixel"/>
-         <term link="imaging.html#assign_pixel_intensity" name="assign_pixel_intensity"/>
-         <term link="imaging.html#get_pixel_intensity" name="get_pixel_intensity"/>
-         <term link="imaging.html#hysteresis_threshold" name="hysteresis_threshold"/>
-         <term link="imaging.html#sobel_edge_detector" name="sobel_edge_detector"/>
-         <term link="imaging.html#suppress_non_maximum_edges" name="suppress_non_maximum_edges"/>
-         <term link="imaging.html#zero_border_pixels" name="zero_border_pixels"/>
-         <term link="imaging.html#binary_close" name="binary_close"/>
-         <term link="imaging.html#edge_orientation" name="edge_orientation"/>
-         <term link="imaging.html#binary_union" name="binary_union"/>
-         <term link="imaging.html#binary_complement" name="binary_complement"/>
-         <term link="imaging.html#binary_difference" name="binary_difference"/>
-         <term link="imaging.html#binary_dilation" name="binary_dilation"/>
-         <term link="imaging.html#binary_erosion" name="binary_erosion"/>
-         <term link="imaging.html#binary_intersection" name="binary_intersection"/>
-         <term link="imaging.html#binary_open" name="binary_open"/>
-         <term link="imaging.html#equalize_histogram" name="equalize_histogram"/>
-         <term link="imaging.html#get_histogram" name="get_histogram"/>
-         <term link="imaging.html#hsi_pixel" name="hsi_pixel"/>
-         <term link="imaging.html#load_bmp" name="load_bmp"/>
-         <term link="imaging.html#load_dng" name="load_dng"/>
-         <term link="imaging.html#pixel_traits" name="pixel_traits"/>
-         <term link="imaging.html#rgb_pixel" name="rgb_pixel"/>
-         <term link="imaging.html#rgb_alpha_pixel" name="rgb_alpha_pixel"/>
+         <term file="imaging.html" name="assign_image"/>
+         <term file="imaging.html" name="assign_all_pixels"/>
+         <term file="imaging.html" name="assign_border_pixels"/>
+         <term file="imaging.html" name="assign_pixel"/>
+         <term file="imaging.html" name="assign_pixel_intensity"/>
+         <term file="imaging.html" name="get_pixel_intensity"/>
+         <term file="imaging.html" name="hysteresis_threshold"/>
+         <term file="imaging.html" name="sobel_edge_detector"/>
+         <term file="imaging.html" name="suppress_non_maximum_edges"/>
+         <term file="imaging.html" name="zero_border_pixels"/>
+         <term file="imaging.html" name="binary_close"/>
+         <term file="imaging.html" name="edge_orientation"/>
+         <term file="imaging.html" name="binary_union"/>
+         <term file="imaging.html" name="binary_complement"/>
+         <term file="imaging.html" name="binary_difference"/>
+         <term file="imaging.html" name="binary_dilation"/>
+         <term file="imaging.html" name="binary_erosion"/>
+         <term file="imaging.html" name="binary_intersection"/>
+         <term file="imaging.html" name="binary_open"/>
+         <term file="imaging.html" name="equalize_histogram"/>
+         <term file="imaging.html" name="get_histogram"/>
+         <term file="imaging.html" name="hsi_pixel"/>
+         <term file="imaging.html" name="load_bmp"/>
+         <term file="imaging.html" name="load_dng"/>
+         <term file="imaging.html" name="pixel_traits"/>
+         <term file="imaging.html" name="rgb_pixel"/>
+         <term file="imaging.html" name="rgb_alpha_pixel"/>
          <term link="imaging.html#rgb_alpha_pixel" name="alpha"/>
-         <term link="imaging.html#save_bmp" name="save_bmp"/>
-         <term link="imaging.html#save_dng" name="save_dng"/>
-         <term link="imaging.html#spatially_filter_image" name="spatially_filter_image"/>
-         <term link="imaging.html#threshold_image" name="threshold_image"/>
-         <term link="imaging.html#auto_threshold_image" name="auto_threshold_image"/>
-         <term link="imaging.html#png_loader" name="png_loader"/>
+         <term file="imaging.html" name="save_bmp"/>
+         <term file="imaging.html" name="save_dng"/>
+         <term file="imaging.html" name="spatially_filter_image"/>
+         <term file="imaging.html" name="threshold_image"/>
+         <term file="imaging.html" name="auto_threshold_image"/>
+         <term file="imaging.html" name="png_loader"/>
 
-         <term link="imaging.html#integral_image" name="integral_image"/>
-         <term link="imaging.html#hessian_pyramid" name="hessian_pyramid"/>
-         <term link="imaging.html#compute_dominant_angle" name="compute_dominant_angle"/>
-         <term link="imaging.html#compute_surf_descriptor" name="compute_surf_descriptor"/>
-         <term link="imaging.html#haar_x" name="haar_x"/>
-         <term link="imaging.html#haar_y" name="haar_y"/>
-         <term link="imaging.html#get_interest_points" name="get_interest_points"/>
-         <term link="imaging.html#get_surf_points" name="get_surf_points"/>
-         <term link="imaging.html#interest_point" name="interest_point"/>
-         <term link="imaging.html#surf_point" name="surf_point"/>
+         <term file="imaging.html" name="integral_image"/>
+         <term file="imaging.html" name="hessian_pyramid"/>
+         <term file="imaging.html" name="compute_dominant_angle"/>
+         <term file="imaging.html" name="compute_surf_descriptor"/>
+         <term file="imaging.html" name="haar_x"/>
+         <term file="imaging.html" name="haar_y"/>
+         <term file="imaging.html" name="get_interest_points"/>
+         <term file="imaging.html" name="get_surf_points"/>
+         <term file="imaging.html" name="interest_point"/>
+         <term file="imaging.html" name="surf_point"/>
 
 
-         <term link="metaprogramming.html#enable_if" name="enable_if"/>
-         <term link="metaprogramming.html#disable_if" name="disable_if"/>
+         <term file="metaprogramming.html" name="enable_if"/>
+         <term file="metaprogramming.html" name="disable_if"/>
          <term link="metaprogramming.html#DLIB_STACK_TRACE" name="DLIB_ENABLE_STACK_TRACE"/>
-         <term link="metaprogramming.html#DLIB_STACK_TRACE" name="DLIB_STACK_TRACE"/>
+         <term file="metaprogramming.html" name="DLIB_STACK_TRACE"/>
          <term link="metaprogramming.html#DLIB_STACK_TRACE" name="Stack Trace"/>
-         <term link="metaprogramming.html#DLIB_STACK_TRACE_NAMED" name="DLIB_STACK_TRACE_NAMED"/>
-         <term link="metaprogramming.html#get_stack_trace" name="get_stack_trace"/>
+         <term file="metaprogramming.html" name="DLIB_STACK_TRACE_NAMED"/>
+         <term file="metaprogramming.html" name="get_stack_trace"/>
 
 
-         <term link="metaprogramming.html#tmin" name="tmin"/>
-         <term link="metaprogramming.html#tmax" name="tmax"/>
-         <term link="metaprogramming.html#tabs" name="tabs"/>
+         <term file="metaprogramming.html" name="tmin"/>
+         <term file="metaprogramming.html" name="tmax"/>
+         <term file="metaprogramming.html" name="tabs"/>
 
-         <term link="metaprogramming.html#unsigned_type" name="unsigned_type"/>
-         <term link="metaprogramming.html#DLIB_ASSERT" name="DLIB_ASSERT"/>
+         <term file="metaprogramming.html" name="unsigned_type"/>
+         <term file="metaprogramming.html" name="DLIB_ASSERT"/>
          <term link="metaprogramming.html#DLIB_ASSERT" name="ENABLE_ASSERTS"/>
          <term link="metaprogramming.html#DLIB_ASSERT" name="dlib_assert_breakpoint"/>
-         <term link="metaprogramming.html#ASSERT_ARE_NOT_SAME_TYPE" name="ASSERT_ARE_NOT_SAME_TYPE"/>
-         <term link="metaprogramming.html#ASSERT_ARE_SAME_TYPE" name="ASSERT_ARE_SAME_TYPE"/>
-         <term link="metaprogramming.html#DLIB_CASSERT" name="DLIB_CASSERT"/>
-         <term link="metaprogramming.html#COMPILE_TIME_ASSERT" name="COMPILE_TIME_ASSERT"/>
-         <term link="metaprogramming.html#TIME_THIS" name="TIME_THIS"/>
+         <term file="metaprogramming.html" name="ASSERT_ARE_NOT_SAME_TYPE"/>
+         <term file="metaprogramming.html" name="ASSERT_ARE_SAME_TYPE"/>
+         <term file="metaprogramming.html" name="DLIB_CASSERT"/>
+         <term file="metaprogramming.html" name="COMPILE_TIME_ASSERT"/>
+         <term file="metaprogramming.html" name="TIME_THIS"/>
          <term link="metaprogramming.html#TIME_THIS" name="TIME_THIS_TO"/>
-         <term link="metaprogramming.html#_dT" name="_dT"/>
-         <term link="metaprogramming.html#is_pointer_type" name="is_pointer_type"/>
-         <term link="metaprogramming.html#is_const_type" name="is_const_type"/>
-         <term link="metaprogramming.html#is_same_type" name="is_same_type"/>
-         <term link="metaprogramming.html#is_convertible" name="is_convertible"/>
-         <term link="metaprogramming.html#is_function" name="is_function"/>
-         <term link="metaprogramming.html#wrap_function" name="wrap_function"/>
-         <term link="metaprogramming.html#is_signed_type" name="is_signed_type"/>
-         <term link="metaprogramming.html#is_unsigned_type" name="is_unsigned_type"/>
-         <term link="metaprogramming.html#noncopyable" name="noncopyable"/>
+         <term file="metaprogramming.html" name="_dT"/>
+         <term file="metaprogramming.html" name="is_pointer_type"/>
+         <term file="metaprogramming.html" name="is_const_type"/>
+         <term file="metaprogramming.html" name="is_same_type"/>
+         <term file="metaprogramming.html" name="is_convertible"/>
+         <term file="metaprogramming.html" name="is_function"/>
+         <term file="metaprogramming.html" name="wrap_function"/>
+         <term file="metaprogramming.html" name="is_signed_type"/>
+         <term file="metaprogramming.html" name="is_unsigned_type"/>
+         <term file="metaprogramming.html" name="noncopyable"/>
          <term link="metaprogramming.html#portability_macros" name="portability macros"/>
-         <term link="metaprogramming.html#static_switch" name="static_switch"/>
-         <term link="metaprogramming.html#is_graph" name="is_graph"/>
-         <term link="metaprogramming.html#is_matrix" name="is_matrix"/>
-         <term link="metaprogramming.html#is_std_vector" name="is_std_vector"/>
-         <term link="metaprogramming.html#is_directed_graph" name="is_directed_graph"/>
-         <term link="metaprogramming.html#is_built_in_scalar_type" name="is_built_in_scalar_type"/>
-         <term link="metaprogramming.html#assign_zero_if_built_in_scalar_type" name="assign_zero_if_built_in_scalar_type"/>
+         <term file="metaprogramming.html" name="static_switch"/>
+         <term file="metaprogramming.html" name="is_graph"/>
+         <term file="metaprogramming.html" name="is_matrix"/>
+         <term file="metaprogramming.html" name="is_std_vector"/>
+         <term file="metaprogramming.html" name="is_directed_graph"/>
+         <term file="metaprogramming.html" name="is_built_in_scalar_type"/>
+         <term file="metaprogramming.html" name="assign_zero_if_built_in_scalar_type"/>
 
 
          <term link="dlib/platform.h.html" name="POSIX"/>
@@ -726,83 +728,83 @@
 
 
 
-         <term link="other.html#std_allocator" name="std_allocator"/>
+         <term file="other.html" name="std_allocator"/>
          <term link="other.html#std_allocator" name="allocator"/>
 
-         <term link="other.html#bit_stream" name="bit_stream"/>
-         <term link="other.html#byte_orderer" name="byte_orderer"/>
+         <term file="other.html" name="bit_stream"/>
+         <term file="other.html" name="byte_orderer"/>
 
-         <term link="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html#host_is_big_endian" name="host_is_big_endian"/>
-         <term link="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html#host_is_little_endian" name="host_is_little_endian"/>
-         <term link="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html#host_to_network" name="host_to_network"/>
-         <term link="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html#network_to_host" name="network_to_host"/>
-         <term link="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html#host_to_big" name="host_to_big"/>
-         <term link="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html#big_to_host" name="big_to_host"/>
-         <term link="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html#host_to_little" name="host_to_little"/>
-         <term link="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html#little_to_host" name="little_to_host"/>
+         <term file="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html" name="host_is_big_endian"/>
+         <term file="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html" name="host_is_little_endian"/>
+         <term file="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html" name="host_to_network"/>
+         <term file="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html" name="network_to_host"/>
+         <term file="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html" name="host_to_big"/>
+         <term file="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html" name="big_to_host"/>
+         <term file="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html" name="host_to_little"/>
+         <term file="dlib/byte_orderer/byte_orderer_kernel_abstract.h.html" name="little_to_host"/>
 
-         <term link="other.html#copy_functor" name="copy_functor"/>
-         <term link="other.html#deserialize" name="deserialize"/>
+         <term file="other.html" name="copy_functor"/>
+         <term file="other.html" name="deserialize"/>
          <term link="other.html#dlib_testing_suite" name="testing"/>
          <term link="other.html#dlib_testing_suite" name="unit testing"/>
-         <term link="other.html#error" name="error"/>
-         <term link="other.html#logger" name="logger"/>
-         <term link="other.html#member_function_pointer" name="member_function_pointer"/>
-         <term link="other.html#bound_function_pointer" name="bound_function_pointer"/>
-         <term link="other.html#memory_manager" name="memory_manager"/>
-         <term link="other.html#memory_manager_global" name="memory_manager_global"/>
-         <term link="other.html#memory_manager_stateless" name="memory_manager_stateless"/>
-         <term link="other.html#pipe" name="pipe"/>
-         <term link="other.html#serialize" name="serialize"/>
-         <term link="other.html#sync_extension" name="sync_extension"/>
-         <term link="other.html#timeout" name="timeout"/>
-         <term link="other.html#timer" name="timer"/>
-         <term link="other.html#uint8" name="uint8"/>
-         <term link="other.html#uint16" name="uint16"/>
-         <term link="other.html#uint32" name="uint32"/>
-         <term link="other.html#uint64" name="uint64"/>
-         <term link="other.html#zero_extend_cast" name="zero_extend_cast"/>
+         <term file="other.html" name="error"/>
+         <term file="other.html" name="logger"/>
+         <term file="other.html" name="member_function_pointer"/>
+         <term file="other.html" name="bound_function_pointer"/>
+         <term file="other.html" name="memory_manager"/>
+         <term file="other.html" name="memory_manager_global"/>
+         <term file="other.html" name="memory_manager_stateless"/>
+         <term file="other.html" name="pipe"/>
+         <term file="other.html" name="serialize"/>
+         <term file="other.html" name="sync_extension"/>
+         <term file="other.html" name="timeout"/>
+         <term file="other.html" name="timer"/>
+         <term file="other.html" name="uint8"/>
+         <term file="other.html" name="uint16"/>
+         <term file="other.html" name="uint32"/>
+         <term file="other.html" name="uint64"/>
+         <term file="other.html" name="zero_extend_cast"/>
 
 
-         <term link="network.html#linker" name="linker"/>
-         <term link="network.html#server" name="server"/>
+         <term file="network.html" name="linker"/>
+         <term file="network.html" name="server"/>
          <term link="network.html#http" name="HTTP server"/>
-         <term link="network.html#sockstreambuf" name="sockstreambuf"/>
+         <term file="network.html" name="sockstreambuf"/>
 
 
 
-         <term link="parsing.html#basic_utf8_ifstream" name="basic_utf8_ifstream"/>
+         <term file="parsing.html" name="basic_utf8_ifstream"/>
          <term link="parsing.html#utf8_wifstream" name="basic_utf8_ifstream"/>
          <term link="parsing.html#utf8_uifstream" name="basic_utf8_ifstream"/>
-         <term link="parsing.html#base64" name="base64"/>
-         <term link="parsing.html#cmd_line_parser" name="cmd_line_parser"/>
+         <term file="parsing.html" name="base64"/>
+         <term file="parsing.html" name="cmd_line_parser"/>
          <term link="parsing.html#cmd_line_parser" name="command line parsing"/>
-         <term link="parsing.html#config_reader" name="config_reader"/>
+         <term file="parsing.html" name="config_reader"/>
          <term link="parsing.html#config_reader" name="config file parser"/>
-         <term link="parsing.html#cpp_pretty_printer" name="cpp_pretty_printer"/>
-         <term link="parsing.html#cpp_tokenizer" name="cpp_tokenizer"/>
-         <term link="parsing.html#narrow" name="narrow"/>
-         <term link="parsing.html#string_cast" name="string_cast"/>
-         <term link="parsing.html#tokenizer" name="tokenizer"/>
-         <term link="parsing.html#wrap_string" name="wrap_string"/>
-         <term link="parsing.html#xml_parser" name="xml_parser"/>
-         <term link="parsing.html#cast_to_string" name="cast_to_string"/>
-         <term link="parsing.html#toupper" name="toupper"/>
-         <term link="parsing.html#tolower" name="tolower"/>
-         <term link="parsing.html#trim" name="trim"/>
-         <term link="parsing.html#ltrim" name="ltrim"/>
-         <term link="parsing.html#rtrim" name="rtrim"/>
-         <term link="parsing.html#pad" name="pad"/>
-         <term link="parsing.html#lpad" name="lpad"/>
-         <term link="parsing.html#rpad" name="rpad"/>
-         <term link="parsing.html#left_substr" name="left_substr"/>
-         <term link="parsing.html#right_substr" name="right_substr"/>
-         <term link="parsing.html#unichar" name="unichar"/>
-         <term link="parsing.html#ustring" name="ustring"/>
-         <term link="parsing.html#convert_utf8_to_utf32" name="convert_utf8_to_utf32"/>
-         <term link="parsing.html#is_combining_char" name="is_combining_char"/>
-         <term link="parsing.html#strings_equal_ignore_case" name="strings_equal_ignore_case"/>
-         <term link="dlib/unicode/unicode_abstract.h.html#invalid_utf8_error" name="invalid_utf8_error"/>
+         <term file="parsing.html" name="cpp_pretty_printer"/>
+         <term file="parsing.html" name="cpp_tokenizer"/>
+         <term file="parsing.html" name="narrow"/>
+         <term file="parsing.html" name="string_cast"/>
+         <term file="parsing.html" name="tokenizer"/>
+         <term file="parsing.html" name="wrap_string"/>
+         <term file="parsing.html" name="xml_parser"/>
+         <term file="parsing.html" name="cast_to_string"/>
+         <term file="parsing.html" name="toupper"/>
+         <term file="parsing.html" name="tolower"/>
+         <term file="parsing.html" name="trim"/>
+         <term file="parsing.html" name="ltrim"/>
+         <term file="parsing.html" name="rtrim"/>
+         <term file="parsing.html" name="pad"/>
+         <term file="parsing.html" name="lpad"/>
+         <term file="parsing.html" name="rpad"/>
+         <term file="parsing.html" name="left_substr"/>
+         <term file="parsing.html" name="right_substr"/>
+         <term file="parsing.html" name="unichar"/>
+         <term file="parsing.html" name="ustring"/>
+         <term file="parsing.html" name="convert_utf8_to_utf32"/>
+         <term file="parsing.html" name="is_combining_char"/>
+         <term file="parsing.html" name="strings_equal_ignore_case"/>
+         <term file="dlib/unicode/unicode_abstract.h.html" name="invalid_utf8_error"/>
 
 
 
@@ -817,42 +819,42 @@
          <term link="intro.html#Notation" name="ensures"/>
          <term link="intro.html#Notation" name="throws"/>
          <term link="intro.html#meaning_of_hash" name="# symbol in comments"/>
-         <term link="intro.html#CONVENTION" name="CONVENTION"/>
+         <term file="intro.html" name="CONVENTION"/>
 
 
          <term link="intro.html#Creating Objects" name="debugging modes: enable/disable"/>
 
-         <term link="dlib/logger/logger_config_file.h.html#configure_loggers_from_file" name="configure_loggers_from_file"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#log_level" name="log_level"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#LALL" name="LALL"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#LNONE" name="LNONE"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#LTRACE" name="LTRACE"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#LDEBUG" name="LDEBUG"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#LINFO" name="LINFO"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#LWARN" name="LWARN"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#LERROR" name="LERROR"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#LFATAL" name="LFATAL"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#set_all_logging_output_streams" name="set_all_logging_output_streams"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#set_all_logging_levels" name="set_all_logging_levels"/>
-         <term link="dlib/logger/logger_kernel_abstract.h.html#print_default_logger_header" name="print_default_logger_header"/>
-         <term link="dlib/logger/extra_logger_headers.h.html#print_datetime_logger_header" name="print_datetime_logger_header"/>
+         <term file="dlib/logger/logger_config_file.h.html" name="configure_loggers_from_file"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="log_level"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="LALL"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="LNONE"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="LTRACE"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="LDEBUG"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="LINFO"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="LWARN"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="LERROR"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="LFATAL"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_output_streams"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_levels"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="print_default_logger_header"/>
+         <term file="dlib/logger/extra_logger_headers.h.html" name="print_datetime_logger_header"/>
 
 
 
 
 
 
-         <term link="algorithms.html#quantum_register" name="quantum_register"/>
-         <term link="algorithms.html#gate" name="gate"/>
+         <term file="algorithms.html" name="quantum_register"/>
+         <term file="algorithms.html" name="gate"/>
 
-         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#gate_exp" name="gate_exp"/>
-         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#composite_gate" name="composite_gate"/>
-         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#x" name="x"/>
-         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#y" name="y"/>
-         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#z" name="z"/>
-         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#noop" name="noop"/>
-         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#cnot" name="cnot"/>
-         <term link="dlib/quantum_computing/quantum_computing_abstract.h.html#toffoli" name="toffoli"/>
+         <term file="dlib/quantum_computing/quantum_computing_abstract.h.html" name="gate_exp"/>
+         <term file="dlib/quantum_computing/quantum_computing_abstract.h.html" name="composite_gate"/>
+         <term file="dlib/quantum_computing/quantum_computing_abstract.h.html" name="x"/>
+         <term file="dlib/quantum_computing/quantum_computing_abstract.h.html" name="y"/>
+         <term file="dlib/quantum_computing/quantum_computing_abstract.h.html" name="z"/>
+         <term file="dlib/quantum_computing/quantum_computing_abstract.h.html" name="noop"/>
+         <term file="dlib/quantum_computing/quantum_computing_abstract.h.html" name="cnot"/>
+         <term file="dlib/quantum_computing/quantum_computing_abstract.h.html" name="toffoli"/>
 
 
 
