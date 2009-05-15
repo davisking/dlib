@@ -225,7 +225,7 @@ namespace dlib
 
             char junk[100];
             // wait for the other end to close their side
-            while (con->read(junk,sizeof(junk)) > 0);
+            while (con->read(junk,sizeof(junk)) > 0) ;
         }
         catch (...)
         {

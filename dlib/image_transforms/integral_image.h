@@ -30,8 +30,8 @@ namespace dlib
     public:
         typedef long value_type;
 
-        const long nr() const { return int_img.nr(); }
-        const long nc() const { return int_img.nc(); }
+        long nr() const { return int_img.nr(); }
+        long nc() const { return int_img.nc(); }
 
         template <typename image_type>
         void load (
