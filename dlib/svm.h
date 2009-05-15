@@ -15,6 +15,7 @@
 #include "svm/rvm.h"
 #include "svm/pegasos.h"
 #include "svm/sparse_kernel.h"
+#include "svm/null_trainer.h"
 
 #endif // DLIB_SVm_HEADER
 
