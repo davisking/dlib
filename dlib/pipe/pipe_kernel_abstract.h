@@ -165,8 +165,8 @@ namespace dlib
                 - if (size() == max_size()) then
                     - this call to enqueue() blocks until one of the following is the case:
                         - there is room in the pipe for another item
-                        - another thread is trying to dequeue from this pipe and we can pass 
-                          our item object directly to that thread.
+                        - max_size() == 0 and another thread is trying to dequeue from this 
+                          pipe and we can pass our item object directly to that thread.
                         - someone calls disable() 
                         - someone calls disable_enqueue()
                 - else
@@ -192,10 +192,10 @@ namespace dlib
         /*!
             ensures
                 - if (size() == max_size() && timeout > 0) then
-                    - this call to enqueue() blocks until one of the following is the case:
+                    - this call to enqueue_or_timeout() blocks until one of the following is the case:
                         - there is room in the pipe to add another item
-                        - another thread is trying to dequeue from this pipe and we can pass 
-                          our item object directly to that thread.
+                        - max_size() == 0 and another thread is trying to dequeue from this pipe 
+                          and we can pass our item object directly to that thread.
                         - someone calls disable() 
                         - someone calls disable_enqueue() 
                         - timeout milliseconds passes
@@ -223,8 +223,8 @@ namespace dlib
                 - if (size() == 0) then
                     - this call to dequeue() blocks until one of the following is the case:
                         - there is something in the pipe we can dequeue
-                        - another thread is trying to enqueue an item onto this pipe
-                          and we can receive our item directly from that thread.  
+                        - max_size() == 0 and another thread is trying to enqueue an item 
+                          onto this pipe and we can receive our item directly from that thread.  
                         - someone calls disable()
                 - else
                     - this call does not block.
@@ -244,10 +244,10 @@ namespace dlib
         /*!
             ensures
                 - if (size() == 0 && timeout > 0) then
-                    - this call to dequeue() blocks until one of the following is the case:
+                    - this call to dequeue_or_timeout() blocks until one of the following is the case:
                         - there is something in the pipe we can dequeue 
-                        - another thread is trying to enqueue an item onto this pipe
-                          and we can receive our item directly from that thread.  
+                        - max_size() == 0 and another thread is trying to enqueue an item onto this 
+                          pipe and we can receive our item directly from that thread.  
                         - someone calls disable() 
                         - timeout milliseconds passes
                 - else
