@@ -295,12 +295,6 @@ namespace dlib
             );
         }
 
-        const kernel_type get_kernel (
-        ) const
-        {
-            return trainer.get_kernel();
-        }
-
         const scalar_type get_min_learning_rate (
         ) const 
         {

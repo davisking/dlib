@@ -319,7 +319,6 @@ namespace dlib
             ensures
                 - returns a batch trainer object that uses the given online_trainer object
                   to train a decision function.
-                - #get_kernel() == trainer.get_kernel()
                 - #get_min_learning_rate() == min_learning_rate_
                 - if (verbose_ == true) then
                     - this object will output status messages to standard out while
@@ -332,13 +331,6 @@ namespace dlib
             ensures
                 - returns the min learning rate that the online trainer must reach
                   before this object considers training to be complete.
-        !*/
-
-        const kernel_type get_kernel (
-        ) const;
-        /*!
-            ensures
-                - returns the kernel used by this trainer object
         !*/
 
         template <

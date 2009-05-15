@@ -31,6 +31,7 @@ namespace dlib
                 learned by a kernel based learning algorithm.  
         !*/
 
+        typedef K kernel_type;
         typedef typename K::scalar_type scalar_type;
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
@@ -137,6 +138,7 @@ namespace dlib
                 estimate of the probability that a given sample is in the +1 class.
         !*/
 
+        typedef K kernel_type;
         typedef typename K::scalar_type scalar_type;
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
@@ -242,6 +244,7 @@ namespace dlib
                 represents to points in input space.
         !*/
 
+        typedef K kernel_type;
         typedef typename K::scalar_type scalar_type;
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
@@ -381,6 +384,7 @@ namespace dlib
                 off to the contained function object.
         !*/
 
+        typedef typename function_type::kernel_type kernel_type;
         typedef typename function_type::scalar_type scalar_type;
         typedef typename function_type::sample_type sample_type;
         typedef typename function_type::mem_manager_type mem_manager_type;

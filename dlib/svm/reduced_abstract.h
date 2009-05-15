@@ -63,14 +63,6 @@ namespace dlib
                   decision_function objects with fewer support vectors.
                 - The reduced decision functions that are output will have at most
                   num_sv support vectors.
-                - #get_kernel() == trainer.get_kernel()
-        !*/
-
-        const kernel_type& get_kernel (
-        ) const;
-        /*!
-            ensures
-                - returns the kernel used by this trainer object
         !*/
 
         template <
@@ -176,14 +168,6 @@ namespace dlib
                 - the gradient based optimization will continue until the change in the
                   objective function is less than eps.  So smaller values of eps will
                   give better results but take longer to compute.
-                - #get_kernel() == trainer.get_kernel()
-        !*/
-
-        const kernel_type& get_kernel (
-        ) const;
-        /*!
-            ensures
-                - returns the kernel used by this trainer object
         !*/
 
         template <

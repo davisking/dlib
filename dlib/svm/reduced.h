@@ -49,12 +49,6 @@ namespace dlib
             );
         }
 
-        const kernel_type& get_kernel (
-        ) const
-        {
-            return trainer.get_kernel();
-        }
-
         template <
             typename in_sample_vector_type,
             typename in_scalar_vector_type
@@ -89,7 +83,7 @@ namespace dlib
             const decision_function<kernel_type> dec_funct = trainer.train(x,y);
             
             // now find a linearly independent subset of the training points of num_sv points.
-            linearly_independent_subset_finder<kernel_type> lisf(trainer.get_kernel(), num_sv);
+            linearly_independent_subset_finder<kernel_type> lisf(dec_funct.kernel_function, num_sv);
             for (long i = 0; i < x.nr(); ++i)
             {
                 lisf.add(x(i));
@@ -107,7 +101,7 @@ namespace dlib
             matrix<scalar_type, 0, 0, mem_manager_type> K_inv(num, num); 
             matrix<scalar_type, 0, 0, mem_manager_type> K(num, dec_funct.alpha.size()); 
 
-            const kernel_type kernel(trainer.get_kernel());
+            const kernel_type kernel(dec_funct.kernel_function);
 
             for (long r = 0; r < K_inv.nr(); ++r)
             {
@@ -208,12 +202,6 @@ namespace dlib
                         << "\n\t num_sv: " << num_sv 
                         << "\n\t eps:    " << eps 
             );
-        }
-
-        const kernel_type& get_kernel (
-        ) const
-        {
-            return trainer.get_kernel();
         }
 
         template <
@@ -507,7 +495,7 @@ namespace dlib
             const decision_function<kernel_type> dec_funct = trainer.train(x,y);
             
             // now find a linearly independent subset of the training points of num_sv points.
-            linearly_independent_subset_finder<kernel_type> lisf(trainer.get_kernel(), num_sv);
+            linearly_independent_subset_finder<kernel_type> lisf(dec_funct.kernel_function, num_sv);
             for (long i = 0; i < x.nr(); ++i)
             {
                 lisf.add(x(i));
@@ -525,7 +513,7 @@ namespace dlib
             matrix<scalar_type, 0, 0, mem_manager_type> K_inv(num, num); 
             matrix<scalar_type, 0, 0, mem_manager_type> K(num, dec_funct.alpha.size()); 
 
-            const kernel_type kernel(trainer.get_kernel());
+            const kernel_type kernel(dec_funct.kernel_function);
 
             for (long r = 0; r < K_inv.nr(); ++r)
             {
