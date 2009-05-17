@@ -236,7 +236,7 @@ namespace
                 q.enqueue(a);
             }
 
-            while (q.move_next());
+            while (q.move_next()) ;
 
             DLIB_TEST(q.at_start() == false);
 

@@ -376,11 +376,13 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix object that contains a swappable type
-            - U == a matrix object that contains a swappable type
-            - samples.nc() == 1
-            - labels.nc() == 1
-            - samples.nr() == labels.nr()
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - U == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if samples or labels are matrix objects then is_vector(samples) == true and
+              is_vector(labels) == true
+            - samples.size() == labels.size()
         ensures
             - randomizes the order of the samples and labels but preserves
               the pairing between each sample and its label
@@ -399,46 +401,9 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix object that contains a swappable type
-            - samples.nc() == 1
-        ensures
-            - randomizes the order of the elements inside samples 
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        typename U
-        >
-    void randomize_samples (
-        T& samples,
-        U& labels 
-    );
-    /*!
-        requires
-            - T == an object compatible with std::vector that contains a swappable type 
-            - U == an object compatible with std::vector that contains a swappable type 
-            - samples.size() == labels.size()
-        ensures
-            - randomizes the order of the samples and labels but preserves
-              the pairing between each sample and its label
-            - for all valid i:
-                - let r == the random index samples[i] was moved to.  then:
-                    - #labels[r] == labels[i]
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T
-        >
-    void randomize_samples (
-        T& samples
-    );
-    /*!
-        requires
-            - T == an object compatible with std::vector that contains a swappable type 
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if samples is a matrix then is_vector(samples) == true 
         ensures
             - randomizes the order of the elements inside samples 
     !*/

@@ -34,7 +34,8 @@ namespace dlib
     );
     /*!
         requires
-            - m is a row or column matrix
+            - is_vector(m) == true
+              (i.e. m is a row or column matrix)
         ensures
             - returns a square matrix M such that:
                 - diag(M) == m
@@ -253,8 +254,8 @@ namespace dlib
         ensures
             - returns a matrix M such that:
                 - M::type == double 
-                - M.nr() == 1
-                - M.nc() == num
+                - is_row_vector(M) == true
+                - M.size() == num
                 - M == a row vector with num linearly spaced values beginning with start
                   and stopping with end.  
                 - M(num-1) == end 
@@ -275,8 +276,8 @@ namespace dlib
         ensures
             - returns a matrix M such that:
                 - M::type == double 
-                - M.nr() == 1
-                - M.nc() == num
+                - is_row_vector(M) == true
+                - M.size() == num
                 - M == a row vector with num logarithmically spaced values beginning with 
                   10^start and stopping with 10^end.  
                   (i.e. M == pow(10, linspace(start, end, num)))
@@ -318,8 +319,8 @@ namespace dlib
                 - returns a reference to vector
             - else
                 - returns a matrix R such that:
-                    - R.nr() == vector.size() 
-                    - R.nc() == 1 
+                    - is_col_vector(R) == true 
+                    - R.size() == vector.size()
                     - for all valid r:
                       R(r) == vector[r]
     !*/
@@ -610,8 +611,8 @@ namespace dlib
     );
     /*!
         requires
-            - v.nc() == 1 (i.e. v is a column vector)
-            - v.nr() == m.nc()
+            - is_col_vector(v) == true
+            - v.size() == m.nc()
             - m and v both contain the same type of element
         ensures
             - returns a matrix R such that:
@@ -632,8 +633,8 @@ namespace dlib
     );
     /*!
         requires
-            - v.nc() == 1 (i.e. v is a column vector)
-            - v.nr() == m.nc()
+            - is_col_vector(v) == true
+            - v.size() == m.nc()
             - m and v both contain the same type of element
         ensures
             - the dimensions for m and v are not changed
@@ -654,8 +655,8 @@ namespace dlib
     );
     /*!
         requires
-            - v.nc() == 1 (i.e. v is a column vector)
-            - v.nr() == m.nc()
+            - is_col_vector(v) == true
+            - v.size() == m.nc()
             - m and v both contain the same type of element
         ensures
             - the dimensions for m and v are not changed
@@ -674,8 +675,7 @@ namespace dlib
     );
     /*!
         requires
-            - m.nr() == 1 || m.nc() == 1
-              (i.e. m must be a vector)
+            - is_vector(m) == true
         ensures
             - returns sum(squared(m))
               (i.e. returns the square of the length of the vector m)
@@ -688,11 +688,45 @@ namespace dlib
     );
     /*!
         requires
-            - m.nr() == 1 || m.nc() == 1
-              (i.e. m must be a vector)
+            - is_vector(m) == true
         ensures
             - returns sqrt(sum(squared(m)))
               (i.e. returns the length of the vector m)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    bool is_row_vector (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - if (m.nr() == 1) then
+                - return true
+            - else
+                - returns false
+    !*/
+
+    bool is_col_vector (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - if (m.nc() == 1) then
+                - return true
+            - else
+                - returns false
+    !*/
+
+    bool is_vector (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - if (is_row_vector(m) || is_col_vector(m)) then
+                - return true
+            - else
+                - returns false
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -747,7 +781,7 @@ namespace dlib
     );
     /*!
         requires
-            - m.nr() == 1 || m.nc() == 1 (i.e. m must be a row or column vector)
+            - is_vector(m) == true
             - m.size() > 0 
         ensures
             - returns the index of the largest element in m.  
@@ -761,7 +795,7 @@ namespace dlib
     );
     /*!
         requires
-            - m.nr() == 1 || m.nc() == 1 (i.e. m must be a row or column vector)
+            - is_vector(m) == true
             - m.size() > 0 
         ensures
             - returns the index of the smallest element in m.  
@@ -818,12 +852,12 @@ namespace dlib
     /*!
         requires
             - matrix_exp::type == a dlib::matrix object
-            - m.nr() > 1
-            - m.nc() == 1 (i.e. m is a column vector)
+            - is_col_vector(m) == true
+            - m.size() > 1
             - for all valid i, j:
-                - m(i).nr() > 0
-                - m(i).nc() == 1
-                - m(i).nr() == m(j).nr() 
+                - is_col_vector(m(i)) == true 
+                - m(i).size() > 0
+                - m(i).size() == m(j).size() 
                 - i.e. m contains only column vectors and all the column vectors
                   have the same non-zero length
         ensures

@@ -483,10 +483,7 @@ namespace dlib
         /*!
             requires
                 - nc() == 1 || nr() == 1 (i.e. this must be a column or row vector)
-                - if (nc() == 1) then
-                    - 0 <= i < nr()
-                - else
-                    - 0 <= i < nc()
+                - 0 <= i < size()
             ensures
                 - if (nc() == 1) then
                     - returns a reference to (*this)(i,0)
@@ -500,10 +497,7 @@ namespace dlib
         /*!
             requires
                 - nc() == 1 || nr() == 1 (i.e. this must be a column or row vector)
-                - if (nc() == 1) then
-                    - 0 <= i < nr()
-                - else
-                    - 0 <= i < nc()
+                - 0 <= i < size()
             ensures
                 - if (nc() == 1) then
                     - returns a reference to (*this)(i,0)

@@ -1191,13 +1191,12 @@ namespace dlib
                 << "\n\tnc(): " << nc()
                 << "\n\tthis: " << this
                 );
-            DLIB_ASSERT( ((nc() == 1 && i < nr()) || (nr() == 1 && i < nc())) && i >= 0, 
+            DLIB_ASSERT( 0 <= i && i < size(), 
                 "\tconst type matrix::operator(i)"
                 << "\n\tYou must give a valid row/column number"
-                << "\n\ti:    " << i
-                << "\n\tnr(): " << nr()
-                << "\n\tnc(): " << nc()
-                << "\n\tthis: " << this
+                << "\n\ti:      " << i
+                << "\n\tsize(): " << size()
+                << "\n\tthis:   " << this
                 );
             return data(i);
         }
@@ -1216,13 +1215,12 @@ namespace dlib
                 << "\n\tnc(): " << nc()
                 << "\n\tthis: " << this
                 );
-            DLIB_ASSERT( ((nc() == 1 && i < nr()) || (nr() == 1 && i < nc())) && i >= 0, 
+            DLIB_ASSERT( 0 <= i && i < size(), 
                 "\tconst type matrix::operator(i)"
                 << "\n\tYou must give a valid row/column number"
-                << "\n\ti:    " << i
-                << "\n\tnr(): " << nr()
-                << "\n\tnc(): " << nc()
-                << "\n\tthis: " << this
+                << "\n\ti:      " << i
+                << "\n\tsize(): " << size()
+                << "\n\tthis:   " << this
                 );
             return data(i);
         }

@@ -808,9 +808,19 @@ namespace dlib
         U& u
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_vector(t) && is_vector(u) && u.size() == t.size(),
+            "\t randomize_samples(t,u)"
+            << "\n\t invalid inputs were given to this function"
+            << "\n\t t.size(): " << t.size()
+            << "\n\t u.size(): " << u.size()
+            << "\n\t is_vector(t): " << (is_vector(t)? "true" : "false")
+            << "\n\t is_vector(u): " << (is_vector(u)? "true" : "false")
+            );
+
         rand::kernel_1a r;
 
-        long n = t.nr()-1;
+        long n = t.size()-1;
         while (n > 0)
         {
             // put a random integer into idx
@@ -838,6 +848,14 @@ namespace dlib
         U& u
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(u.size() == t.size(),
+            "\t randomize_samples(t,u)"
+            << "\n\t invalid inputs were given to this function"
+            << "\n\t t.size(): " << t.size()
+            << "\n\t u.size(): " << u.size()
+            );
+
         rand::kernel_1a r;
 
         long n = t.size()-1;
@@ -866,9 +884,16 @@ namespace dlib
         T& t
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_vector(t),
+            "\t randomize_samples(t)"
+            << "\n\t invalid inputs were given to this function"
+            << "\n\t is_vector(t): " << (is_vector(t)? "true" : "false")
+            );
+
         rand::kernel_1a r;
 
-        long n = t.nr()-1;
+        long n = t.size()-1;
         while (n > 0)
         {
             // put a random integer into idx

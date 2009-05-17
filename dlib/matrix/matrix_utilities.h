@@ -22,6 +22,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP>
+    inline bool is_row_vector (
+        const matrix_exp<EXP>& m
+    ) { return m.nr() == 1; }
+
+    template <typename EXP>
+    inline bool is_col_vector (
+        const matrix_exp<EXP>& m
+    ) { return m.nc() == 1; }
+
+    template <typename EXP>
+    inline bool is_vector (
+        const matrix_exp<EXP>& m
+    ) { return is_row_vector(m) || is_col_vector(m); }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename EXP
         >
@@ -62,7 +79,7 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0 && (m.nr() == 1 || m.nc() == 1), 
+        DLIB_ASSERT(m.size() > 0 && is_vector(m) == true, 
             "\tlong index_of_max(const matrix_exp& m)"
             << "\n\tm must be a row or column matrix"
             << "\n\tm.size():   " << m.size() 
@@ -94,7 +111,7 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0 && (m.nr() == 1 || m.nc() == 1), 
+        DLIB_ASSERT(m.size() > 0 && is_vector(m), 
             "\tlong index_of_min(const matrix_exp& m)"
             << "\n\tm must be a row or column matrix"
             << "\n\tm.size():   " << m.size() 
@@ -184,7 +201,7 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.nr() == 1 || m.nc() == 1, 
+        DLIB_ASSERT(is_vector(m) == true, 
             "\ttype length(const matrix_exp& m)"
             << "\n\tm must be a row or column vector"
             << "\n\tm.nr():     " << m.nr() 
@@ -202,7 +219,7 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.nr() == 1 || m.nc() == 1, 
+        DLIB_ASSERT(is_vector(m) == true, 
             "\ttype length_squared(const matrix_exp& m)"
             << "\n\tm must be a row or column vector"
             << "\n\tm.nr():     " << m.nr() 
@@ -698,7 +715,7 @@ namespace dlib
     {
         // You can only make a diagonal matrix out of a row or column vector
         COMPILE_TIME_ASSERT(EXP::NR == 0 || EXP::NR == 1 || EXP::NC == 1 || EXP::NC == 0);
-        DLIB_ASSERT(m.nr() == 1 || m.nc() == 1, 
+        DLIB_ASSERT(is_vector(m), 
             "\tconst matrix_exp diagm(const matrix_exp& m)"
             << "\n\tYou can only apply diagm() to a row or column matrix"
             << "\n\tm.nr(): " << m.nr()
@@ -966,7 +983,7 @@ namespace dlib
         // perform static checks to make sure the matrices contained in m are column vectors
         COMPILE_TIME_ASSERT(EXP::type::NC == 1 || EXP::type::NC == 0 );
 
-        DLIB_ASSERT(m.nr() > 1 && m.nc() == 1, 
+        DLIB_ASSERT(m.size() > 1 && is_col_vector(m), 
             "\tconst matrix covariance(const matrix_exp& m)"
             << "\n\tYou can only apply covariance() to a column matrix"
             << "\n\tm.nr(): " << m.nr()
@@ -975,12 +992,12 @@ namespace dlib
 #ifdef ENABLE_ASSERTS
         for (long i = 0; i < m.nr(); ++i)
         {
-            DLIB_ASSERT(m(0).nr() == m(i).nr() && m(i).nr() > 0 && m(i).nc() == 1, 
+            DLIB_ASSERT(m(0).size() == m(i).size() && m(i).size() > 0 && is_col_vector(m(i)), 
                    "\tconst matrix covariance(const matrix_exp& m)"
                    << "\n\tYou can only apply covariance() to a column matrix of column matrices"
-                   << "\n\tm(0).nr(): " << m(0).nr()
-                   << "\n\tm(i).nr(): " << m(i).nr() 
-                   << "\n\tm(i).nc(): " << m(i).nc() 
+                   << "\n\tm(0).size(): " << m(0).size()
+                   << "\n\tm(i).size(): " << m(i).size() 
+                   << "\n\tis_col_vector(m(i)): " << (is_col_vector(m(i)) ? "true" : "false")
                    << "\n\ti:         " << i 
                 );
         }
@@ -1700,7 +1717,7 @@ namespace dlib
         COMPILE_TIME_ASSERT(EXP2::NC == 1 || EXP2::NC == 0);
         COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NR || EXP1::NC == 0 || EXP2::NR == 0);
 
-        DLIB_ASSERT(v.nc() == 1 && v.nr() == m.nc(), 
+        DLIB_ASSERT(is_col_vector(v) == true && v.size() == m.nc(), 
             "\tconst matrix_exp scale_columns(m, v)"
             << "\n\tv must be a column vector and its length must match the number of columns in m"
             << "\n\tm.nr(): " << m.nr()
@@ -1738,7 +1755,7 @@ namespace dlib
         COMPILE_TIME_ASSERT(NC2 == 1 || NC2 == 0);
         COMPILE_TIME_ASSERT(NC == NR2 || NC == 0 || NR2 == 0);
 
-        DLIB_ASSERT(v.nc() == 1 && v.nr() == m.nc(), 
+        DLIB_ASSERT(is_col_vector(v) == true && v.size() == m.nc(), 
             "\tconst matrix_exp sort_columns(m, v)"
             << "\n\tv must be a column vector and its length must match the number of columns in m"
             << "\n\tm.nr(): " << m.nr()
@@ -1785,7 +1802,7 @@ namespace dlib
         COMPILE_TIME_ASSERT(NC2 == 1 || NC2 == 0);
         COMPILE_TIME_ASSERT(NC == NR2 || NC == 0 || NR2 == 0);
 
-        DLIB_ASSERT(v.nc() == 1 && v.nr() == m.nc(), 
+        DLIB_ASSERT(is_col_vector(v) == true && v.size() == m.nc(), 
             "\tconst matrix_exp rsort_columns(m, v)"
             << "\n\tv must be a column vector and its length must match the number of columns in m"
             << "\n\tm.nr(): " << m.nr()

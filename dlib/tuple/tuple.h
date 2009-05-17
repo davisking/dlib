@@ -234,7 +234,7 @@ namespace dlib
         ) { return tuple_helpers::get_helper<idx,tuple>::get(*this); }
 
         template < class Q>  
-        const long index (
+        long index (
         ) const { return tuple_helpers::get_index<Q>(*this); }
 
         template <class Q>  
