@@ -344,6 +344,18 @@
                   <name>utilities</name>
                   <sub>
                      <item>
+                        <name>is_col_vector</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#is_col_vector</link>
+                     </item>
+                     <item>
+                        <name>is_row_vector</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#is_row_vector</link>
+                     </item>
+                     <item>
+                        <name>is_vector</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#is_vector</link>
+                     </item>
+                     <item>
                         <name>const_temp_matrix</name>
                         <link>dlib/matrix/matrix_abstract.h.html#const_temp_matrix</link>
                      </item>
