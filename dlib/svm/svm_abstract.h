@@ -73,10 +73,12 @@ namespace dlib
             - U == a matrix or something convertible to a matrix via vector_to_matrix()
         ensures
             - returns true if all of the following are true and false otherwise:
-                - x.nc()        == 1 (i.e. x is a column vector)
-                - x_labels.nc() == 1 (i.e. x_labels is a column vector)
-                - x.nr() == x_labels.nr() 
-                - x.nr() > 1
+                - is_col_vector(x) == true
+                - is_col_vector(x_labels) == true
+                - x.size() == x_labels.size() 
+                - x.size() > 1
+                - there exists at least one sample from both the +1 and -1 classes.
+                  (i.e. all samples can't have the same label)
                 - for all valid i:
                     - x_labels(i) == -1 or +1
     !*/

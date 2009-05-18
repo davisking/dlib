@@ -103,6 +103,8 @@ namespace dlib
         const U& x_labels
     )
     {
+        bool seen_neg_class = false;
+        bool seen_pos_class = false;
         if (x.nc() != 1 || x_labels.nc() != 1) return false; 
         if (x.nr() != x_labels.nr()) return false;
         if (x.nr() <= 1) return false;
@@ -110,9 +112,14 @@ namespace dlib
         {
             if (x_labels(r) != -1 && x_labels(r) != 1)
                 return false;
+
+            if (x_labels(r) == 1)
+                seen_pos_class = true;
+            if (x_labels(r) == -1)
+                seen_neg_class = true;
         }
 
-        return true;
+        return seen_pos_class && seen_neg_class;
     }
 
     template <
