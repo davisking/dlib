@@ -28,7 +28,7 @@ namespace dlib
                 So for example, suppose you wanted to set the bias term so that
                 the accuracy of your decision function on +1 labeled samples was 99%.
                 To do this you would use an instance of this object declared as follows:
-                    roc_trainer_type(your_trainer, 0.99, +1);
+                    roc_trainer_type<trainer_type>(your_trainer, 0.99, +1);
         !*/
 
     public:
