@@ -69,6 +69,9 @@
          <item>batch_trainer</item> 
          <item>null_trainer_type</item> 
          <item>null_trainer</item> 
+         <item>roc_trainer_type</item> 
+         <item>roc_c1_trainer</item> 
+         <item>roc_c2_trainer</item> 
       </section>
 
       <section>
@@ -803,6 +806,56 @@
             This is a convenience function for creating 
             <a href="#null_trainer_type">null_trainer_type</a>
             objects.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>roc_c1_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/roc_trainer_abstract.h</spec_file>
+         <description>
+            This is a convenience function for creating 
+            <a href="#roc_trainer_type">roc_trainer_type</a> objects that are
+            setup to pick a point on the ROC curve with respect to the +1 class.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>roc_c2_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/roc_trainer_abstract.h</spec_file>
+         <description>
+            This is a convenience function for creating 
+            <a href="#roc_trainer_type">roc_trainer_type</a> objects that are
+            setup to pick a point on the ROC curve with respect to the -1 class.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>roc_trainer_type</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/roc_trainer_abstract.h</spec_file>
+         <description>
+                This object is a simple trainer post processor that allows you to 
+                easily adjust the bias term in a trained decision_function object.
+                That is, this object lets you pick a point on the ROC curve and 
+                it will adjust the bias term appropriately.  
+
+               <p>
+                So for example, suppose you wanted to set the bias term so that
+                the accuracy of your decision function on +1 labeled samples was 99%.
+                To do this you would use an instance of this object declared as follows:
+                <tt>roc_trainer_type&lt;trainer_type&gt;(your_trainer, 0.99, +1);</tt>
+               </p>
          </description>
                                  
       </component>
