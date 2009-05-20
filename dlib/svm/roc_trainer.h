@@ -5,6 +5,7 @@
 
 #include "roc_trainer_abstract.h"
 #include "../algs.h"
+#include <limits>
 
 namespace dlib
 {
@@ -100,6 +101,16 @@ namespace dlib
                 idx = scores.size()-1;
 
             df.b = scores[idx];
+
+            // In this case add a very small extra amount to the bias so that all the samples
+            // with the class_selection label are classified correctly.
+            if (desired_accuracy == 1)
+            {
+                if (class_selection == +1)
+                    df.b -= std::numeric_limits<scalar_type>::epsilon()*df.b;
+                else
+                    df.b += std::numeric_limits<scalar_type>::epsilon()*df.b;
+            }
 
             return df;
         }
