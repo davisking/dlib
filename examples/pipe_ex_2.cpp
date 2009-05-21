@@ -83,6 +83,7 @@ public:
     // Here we declare our pipe object.  It will contain our messages.
     pipe_type message_pipe;
 
+private:
 
     // When we call apply_to_contents() below these are the
     // functions which get called.   
@@ -101,8 +102,6 @@ public:
         cout << "got a string: " << val << endl;
     }
 
-private:
-
     void thread ()
     {
         tsu_type msg;
@@ -110,13 +109,22 @@ private:
         // Here we loop on messages from the message_pipe.  
         while (message_pipe.dequeue(msg))
         {
-            // Tell the msg type_safe_union object to take whatever object
-            // it contains and call (*this)(contained_object);   So what
-            // happens here is one of the three above functions gets called
-            // with the message we just got.  
+            // Here we call the apply_to_contents() function on our type_safe_union.
+            // It takes a function object and applies that function object
+            // to the contents of the union.  In our case we have setup
+            // the pipe_example class as our function object and so below we
+            // tell the msg object to take whatever it contains and 
+            // call (*this)(contained_object);   So what happens here is 
+            // one of the three above functions gets called with the message 
+            // we just got.  
             msg.apply_to_contents(*this);
         }
     }
+
+    // Finally, note that since we declared the operator() member functions 
+    // private we need to declare the type_safe_union as a friend of this 
+    // class so that it will be able to call them.   
+    friend class type_safe_union<int, float, std::string>;
 
 };
 
