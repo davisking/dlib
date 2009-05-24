@@ -106,7 +106,12 @@
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/integral_image_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+                This object is an alternate way of representing image data
+                that allows for very fast computations of sums of pixels in 
+                rectangular regions.  To use this object you load it with a
+                normal image and then you can use the get_sum_of_area()
+                member function to compute sums of pixels in a given area in
+                constant time.
          </description>
                                  
       </component>
@@ -118,7 +123,9 @@
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/integral_image_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+            This is a function that operates on an <a href="#integral_image">integral_image</a>
+            and allows you to compute the response of a Haar wavelet oriented along
+            the X axis.  
          </description>
                                  
       </component>
@@ -130,7 +137,9 @@
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/integral_image_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+            This is a function that operates on an <a href="#integral_image">integral_image</a>
+            and allows you to compute the response of a Haar wavelet oriented along
+            the Y axis.  
          </description>
                                  
       </component>
@@ -142,7 +151,9 @@
          <file>dlib/image_keypoint.h</file>
          <spec_file link="true">dlib/image_keypoint/surf_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+            Computes and returns the dominant angle (i.e. the angle of the dominant gradient)
+            at a given point and scale in an image.   This function is part of the
+            main processing of the SURF algorithm.
          </description>
                                  
       </component>
@@ -154,7 +165,18 @@
          <file>dlib/image_keypoint.h</file>
          <spec_file link="true">dlib/image_keypoint/surf_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+             This function runs the complete SURF algorithm on an input image and 
+             returns the points it found.  For a description of what exactly
+             the SURF algorithm does you should read the following paper:
+             <blockquote>
+               SURF: Speeded Up Robust Features
+               By Herbert Bay1 , Tinne Tuytelaars2 , and Luc Van Gool12
+             </blockquote>
+             <p>
+                Also note that there are numerous flavors of the SURF algorithm
+                you can put together using the functions in dlib.  The get_surf_points()
+                function is just an example of one way you might do so.  
+             </p>
          </description>
                                  
       </component>
@@ -166,7 +188,9 @@
          <file>dlib/image_keypoint.h</file>
          <spec_file link="true">dlib/image_keypoint/surf_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+            Computes the 64 dimensional SURF descriptor vector of a box centered
+              at a given center point, tilted at a given angle, and sized according to 
+              a given scale.  
          </description>
                                  
       </component>
@@ -178,7 +202,23 @@
          <file>dlib/image_keypoint.h</file>
          <spec_file link="true">dlib/image_keypoint/hessian_pyramid_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+                This object represents an image pyramid where each level in the
+                pyramid holds determinants of Hessian matrices for the original 
+                input image.  This object can be used to find stable interest
+                points in an image.  
+
+               <br/><br/>
+                This object is an implementation of the fast Hessian pyramid 
+                as described in the paper: 
+                <blockquote>
+                   SURF: Speeded Up Robust Features
+                   By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
+                </blockquote>
+
+                This implementation was also influenced by the very well documented
+                OpenSURF library and its corresponding description of how the fast
+                Hessian algorithm functions:  
+                <blockquote>Notes on the OpenSURF Library by Christopher Evans</blockquote>
          </description>
                                  
       </component>
@@ -190,7 +230,7 @@
          <file>dlib/image_keypoint.h</file>
          <spec_file link="true">dlib/image_keypoint/hessian_pyramid_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+            This function extracts interest points from a <a href="#hessian_pyramid">hessian_pyramid</a>.
          </description>
                                  
       </component>
@@ -202,7 +242,8 @@
          <file>dlib/image_keypoint.h</file>
          <spec_file link="true">dlib/image_keypoint/hessian_pyramid_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+            This is a simple struct used to represent the interest points returned
+            by the <a href="#get_interest_points">get_interest_points</a> function.
          </description>
                                  
       </component>
@@ -214,7 +255,8 @@
          <file>dlib/image_keypoint.h</file>
          <spec_file link="true">dlib/image_keypoint/surf_abstract.h</spec_file>
          <description>
-            <!-- TODO -->
+            This is a simple struct used to represent the SURF points returned
+            by the <a href="#get_surf_points">get_surf_points</a> function.
          </description>
                                  
       </component>
