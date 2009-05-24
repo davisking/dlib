@@ -649,7 +649,7 @@ namespace
         DLIB_TEST_MSG(approx_equal(test(temp2), dist(k,temp2,val)), test(temp2) - dist(k,temp2,val));
         DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
         DLIB_TEST(approx_equal(test.inner_product(test), length_squared(val)));
-        DLIB_TEST(approx_equal(test(test), 0));
+        DLIB_TEST_MSG(approx_equal(test(test), 0, 1e-6), test(test));
         DLIB_TEST(approx_equal(test.get_distance_function()(test.get_distance_function()), 0));
     }
 
