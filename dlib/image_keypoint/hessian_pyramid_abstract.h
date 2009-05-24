@@ -173,6 +173,8 @@ namespace dlib
                 hessian_pyramid object.  Its fields have the following
                 meanings:
                     - center == the x/y location of the center of the interest point
+                      (in image space coordinates.  y gives the row and x gives the
+                      column in the image)
                     - scale == the scale at which the point was detected
                     - score == the determinant of the Hessian for the interest point
                     - laplacian == the sign of the laplacian for the interest point

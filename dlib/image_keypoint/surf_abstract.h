@@ -9,6 +9,20 @@
 
 namespace dlib
 {
+    /*
+        The functions in this file implement the components of the SURF algorithm
+        for extracting scale invariant feature descriptors from images.
+
+        For the full story on what this algorithm does and how it works
+        you should refer to the following papers.
+
+        This is the original paper which introduced the algorithm:
+            SURF: Speeded Up Robust Features
+            By Herbert Bay1 , Tinne Tuytelaars2 , and Luc Van Gool12
+
+        This paper provides a nice detailed overview of how the algorithm works:
+            Notes on the OpenSURF Library by Christopher Evans
+    */
 
 // ----------------------------------------------------------------------------------------
     
@@ -18,11 +32,12 @@ namespace dlib
         double sig
     );
     /*!
+        requires
+            - sig > 0
+        ensures
+            - computes and returns the value of a 2D Gaussian function with mean 0 
+              and standard deviation sig at the given (x,y) point.
     !*/
-    {
-        const double pi = 3.1415926535898;
-        return 1.0/(sig*std::sqrt(2*pi)) * std::exp( -(x*x + y*y)/(2*sig*sig));
-    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -39,6 +54,11 @@ namespace dlib
             - scale > 0
             - get_rect(img).contains(centered_rect(center, 17*scale, 17*scale)) == true
               (i.e. center can't be within 17*scale pixels of the edge of the image)
+        ensures
+            - computes and returns the dominant angle (i.e. the angle of the dominant gradient)
+              at the given center point and scale in img.  
+            - The returned angle is in radians.  Specifically, if the angle is described by
+              a vector vect then the angle is exactly the value of std::atan2(vect.y(), vect.x())
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -58,6 +78,11 @@ namespace dlib
             - scale > 0
             - get_rect(img).contains(centered_rect(center, 31*scale, 31*scale)) == true
               (i.e. center can't be within 31*scale pixels of the edge of the image)
+        ensures
+            - computes the 64 dimensional SURF descriptor vector of a box centered
+              at the given center point, tilted at an angle determined by the given 
+              angle, and sized according to the given scale.  
+            - #des == the computed SURF descriptor vector extracted from the img object.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -66,16 +91,13 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a detected SURF point.
+                This object represents a detected SURF point.  The meanings of 
+                its fields are defined below in the get_surf_points() function.
         !*/
 
         interest_point p;
         matrix<double,64,1> des;
         double angle;
-
-        double match_score;
-
-        bool operator < (const surf_point& p) const { return match_score < p.match_score; }
     };
 
 // ----------------------------------------------------------------------------------------
@@ -88,6 +110,21 @@ namespace dlib
     /*!
         requires
             - max_points > 0
+            - image_type == a type that implements the array2d/array2d_kernel_abstract.h interface
+            - pixel_traits<image_type::type> must be defined
+        ensures
+            - This function runs the complete SURF algorithm on the given input image and 
+              returns the points it found. 
+            - returns a vector V such that:
+                - V.size() <= max_points
+                - for all valid i:
+                    - V[i] == a SURF point found in the given input image img
+                    - V[i].p == the interest_point extracted from the hessian pyramid for this
+                      SURF point.
+                    - V[i].des == the SURF descriptor for this point (calculated using 
+                      compute_surf_descriptor())
+                    - V[i].angle == the angle of the SURF box at this point (calculated using 
+                      compute_dominant_angle())
     !*/
 
 // ----------------------------------------------------------------------------------------

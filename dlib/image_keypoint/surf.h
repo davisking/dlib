@@ -17,16 +17,17 @@ namespace dlib
         interest_point p;
         matrix<double,64,1> des;
         double angle;
-
-        double match_score;
-
-        bool operator < (const surf_point& p) const { return match_score < p.match_score; }
     };
 
 // ----------------------------------------------------------------------------------------
 
     inline double gaussian (double x, double y, double sig)
     {
+        DLIB_ASSERT(sig > 0,
+            "\tdouble gaussian()"
+            << "\n\t sig must be bigger than 0"
+            << "\n\t sig: " << sig 
+        );
         const double pi = 3.1415926535898;
         return 1.0/(sig*std::sqrt(2*pi)) * std::exp( -(x*x + y*y)/(2*sig*sig));
     }
@@ -40,7 +41,8 @@ namespace dlib
         const double& scale
     )
     {
-        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, 17*scale,17*scale)) == true,
+        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, 17*scale,17*scale)) == true &&
+                    scale > 0,
             "\tdouble compute_dominant_angle(img, center, scale)"
             << "\n\tAll arguments to this function must be > 0"
             << "\n\t get_rect(img): " << get_rect(img) 
@@ -71,7 +73,6 @@ namespace dlib
             }
         }
 
-        //cout << "ang size: " << ang.size() << endl;
 
         // now find the dominant direction
         double max_length = 0;
@@ -94,15 +95,12 @@ namespace dlib
                 if (ang1 <= ang[i] && ang[i] <= ang2)
                 {
                     vect += samples[i];
-                    //cout << ".";
                 }
                 else if (ang2 > pi && (ang[i] >= ang1 || ang[i] <= (-2*pi+ang2)))
                 {
                     vect += samples[i];
-                    //cout << ".";
                 }
             }
-            //cout << "$";
 
 
             // record the angle of the best vectors
@@ -127,7 +125,8 @@ namespace dlib
         matrix<double,64,1,MM,L>& des
     )
     {
-        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, 31*scale,31*scale)) == true,
+        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, 31*scale,31*scale)) == true &&
+                    scale > 0,
             "\tvoid compute_surf_descriptor(img, center, scale, angle)"
             << "\n\tAll arguments to this function must be > 0"
             << "\n\t get_rect(img): " << get_rect(img) 
@@ -186,12 +185,21 @@ namespace dlib
         long max_points
     )
     {
-        integral_image int_img;
+        DLIB_ASSERT(max_points > 0,
+            "\t std::vector<surf_point> get_surf_points()"
+            << "\n\t invalid arguments to this function"
+            << "\n\t max_points: " << max_points 
+        );
 
+        // make an integral image first
+        integral_image int_img;
         int_img.load(img);
+
+        // now make a hessian pyramid
         hessian_pyramid pyr;
         pyr.build_pyramid(int_img, 4, 6, 2);
 
+        // now get all the interest points from the hessian pyramid
         std::vector<interest_point> points; 
         get_interest_points(pyr, 0.10, points);
         std::vector<surf_point> spoints;
@@ -199,22 +207,19 @@ namespace dlib
         // sort all the points by how strong their detect is
         std::sort(points.rbegin(), points.rend());
 
-
         // now extract SURF descriptors for the points
+        surf_point sp;
         for (unsigned long i = 0; i < std::min((size_t)max_points,points.size()); ++i)
         {
             // ignore points that are close to the edge of the image
             const double border = 31;
-            //const double border = std::sqrt(22.0*22 + 22*22);
             if (get_rect(int_img).contains(centered_rect(points[i].center, border*points[i].scale, border*points[i].scale)))
             {
-                surf_point sp;
                 sp.angle = compute_dominant_angle(int_img, points[i].center, points[i].scale);
                 compute_surf_descriptor(int_img, points[i].center, points[i].scale, sp.angle, sp.des);
                 sp.p = points[i];
 
                 spoints.push_back(sp);
-
             }
         }
 

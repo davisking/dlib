@@ -109,7 +109,6 @@ namespace dlib
                                          img.get_sum_of_area(centered_rect(p+tl, lobe_size, lobe_size)) -
                                          img.get_sum_of_area(centered_rect(p+br, lobe_size, lobe_size));
 
-                            //std::cout << "(((((: " << Dxx << "  " << Dyy << "  " << Dxy << std::endl;
                             // now we normalize the filter responses
                             Dxx *= area_inv;
                             Dyy *= area_inv;
@@ -127,7 +126,6 @@ namespace dlib
                             if (determinant < 0)
                                 determinant = 0;
 
-                            //std::cout << "****: " << Dxx << "  " << Dyy << "  " << Dxy << std::endl;
                             // Save the determinant of the Hessian into our image pyramid.  Also
                             // pack the laplacian sign into the value so we can get it out later.
                             pyramid[o*num_intervals + i][r/step_size][c/step_size] = sign_of_laplacian*determinant;
@@ -413,6 +411,11 @@ namespace dlib
         std::vector<interest_point,Alloc>& result_points
     )
     {
+        DLIB_ASSERT(threshold > 0,
+            "\tvoid get_interest_points()"
+            << "\n\t Invalid arguments to this function"
+            << "\n\t threshold: " << threshold 
+        );
         using namespace std;
         using namespace hessian_pyramid_helpers;
 
