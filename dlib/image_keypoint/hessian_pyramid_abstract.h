@@ -27,7 +27,7 @@ namespace dlib
                 This object is an implementation of the fast Hessian pyramid 
                 as described in the paper: 
                    SURF: Speeded Up Robust Features
-                   By Herbert Bay1 , Tinne Tuytelaars2 , and Luc Van Gool12
+                   By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
 
                 This implementation was also influenced by the very well documented
                 OpenSURF library and its corresponding description of how the fast

@@ -18,7 +18,7 @@ namespace dlib
 
         This is the original paper which introduced the algorithm:
             SURF: Speeded Up Robust Features
-            By Herbert Bay1 , Tinne Tuytelaars2 , and Luc Van Gool12
+            By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
 
         This paper provides a nice detailed overview of how the algorithm works:
             Notes on the OpenSURF Library by Christopher Evans
