@@ -43,7 +43,7 @@ namespace dlib
 
             // compute the first row of the integral image
             unsigned long temp = 0;
-            for (unsigned long c = 0; c < img.nc(); ++c)
+            for (long c = 0; c < img.nc(); ++c)
             {
                 assign_pixel(pixel, img[0][c]);
                 temp += pixel;
@@ -51,10 +51,10 @@ namespace dlib
             }
 
             // now compute the rest of the integral image
-            for (unsigned long r = 1; r < img.nr(); ++r)
+            for (long r = 1; r < img.nr(); ++r)
             {
                 temp = 0;
-                for (unsigned long c = 0; c < img.nc(); ++c)
+                for (long c = 0; c < img.nc(); ++c)
                 {
                     assign_pixel(pixel, img[r][c]);
                     temp += pixel;
