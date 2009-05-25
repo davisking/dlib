@@ -178,6 +178,9 @@
                 function is just an example of one way you might do so.  
              </p>
          </description>
+         <examples>
+            <example>surf_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
@@ -258,6 +261,9 @@
             This is a simple struct used to represent the SURF points returned
             by the <a href="#get_surf_points">get_surf_points</a> function.
          </description>
+         <examples>
+            <example>surf_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 

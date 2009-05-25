@@ -1186,6 +1186,7 @@
          <examples>
             <example>gui_api_ex.cpp.html</example>
             <example>image_ex.cpp.html</example>
+            <example>surf_ex.cpp.html</example>
             <example>bayes_net_gui_ex.cpp.html</example>
          </examples>
       </component>
