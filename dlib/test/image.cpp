@@ -8,6 +8,7 @@
 #include <dlib/array2d.h>
 #include <dlib/image_transforms.h>
 #include <dlib/image_io.h>
+#include <dlib/matrix.h>
 
 #include "tester.h"
 
@@ -391,6 +392,50 @@ namespace
 
         }
 
+        {
+            array2d<unsigned char>::kernel_1a_c img;
+            img.set_size(10,10);
+            assign_all_pixels(img, 0);
+
+            assign_border_pixels(img, 2,2, 4);
+
+            DLIB_TEST(zeros_matrix<unsigned char>(6,6) == subm(array_to_matrix(img), rectangle(2,2,7,7)));
+            DLIB_TEST(uniform_matrix<unsigned char>(1,10, 4) == rowm(array_to_matrix(img), 0));
+            DLIB_TEST(uniform_matrix<unsigned char>(1,10, 4) == rowm(array_to_matrix(img), 1));
+            DLIB_TEST(uniform_matrix<unsigned char>(1,10, 4) == rowm(array_to_matrix(img), 8));
+            DLIB_TEST(uniform_matrix<unsigned char>(1,10, 4) == rowm(array_to_matrix(img), 9));
+
+            DLIB_TEST(uniform_matrix<unsigned char>(10,1, 4) == colm(array_to_matrix(img), 0));
+            DLIB_TEST(uniform_matrix<unsigned char>(10,1, 4) == colm(array_to_matrix(img), 1));
+            DLIB_TEST(uniform_matrix<unsigned char>(10,1, 4) == colm(array_to_matrix(img), 8));
+            DLIB_TEST(uniform_matrix<unsigned char>(10,1, 4) == colm(array_to_matrix(img), 9));
+
+
+            assign_border_pixels(img, 7, 7, 5);
+            DLIB_TEST(uniform_matrix<unsigned char>(10,10, 5) == array_to_matrix(img));
+        }
+
+        {
+            array2d<unsigned char>::kernel_1a_c img;
+            img.set_size(11,11);
+            assign_all_pixels(img, 0);
+
+            assign_border_pixels(img, 2,2, 4);
+
+            DLIB_TEST(zeros_matrix<unsigned char>(7,7) == subm(array_to_matrix(img), rectangle(2,2,8,8)));
+            DLIB_TEST(uniform_matrix<unsigned char>(1,11, 4) == rowm(array_to_matrix(img), 0));
+            DLIB_TEST(uniform_matrix<unsigned char>(1,11, 4) == rowm(array_to_matrix(img), 1));
+            DLIB_TEST(uniform_matrix<unsigned char>(1,11, 4) == rowm(array_to_matrix(img), 9));
+            DLIB_TEST(uniform_matrix<unsigned char>(1,11, 4) == rowm(array_to_matrix(img), 10));
+
+            DLIB_TEST(uniform_matrix<unsigned char>(11,1, 4) == colm(array_to_matrix(img), 0));
+            DLIB_TEST(uniform_matrix<unsigned char>(11,1, 4) == colm(array_to_matrix(img), 1));
+            DLIB_TEST(uniform_matrix<unsigned char>(11,1, 4) == colm(array_to_matrix(img), 9));
+            DLIB_TEST(uniform_matrix<unsigned char>(11,1, 4) == colm(array_to_matrix(img), 10));
+
+            assign_border_pixels(img, 7, 7, 5);
+            DLIB_TEST(uniform_matrix<unsigned char>(11,11, 5) == array_to_matrix(img));
+        }
 
 
     }
