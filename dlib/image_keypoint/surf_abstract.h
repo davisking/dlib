@@ -83,6 +83,9 @@ namespace dlib
               at the given center point, tilted at an angle determined by the given 
               angle, and sized according to the given scale.  
             - #des == the computed SURF descriptor vector extracted from the img object.
+            - The angle is measured in radians and measures the degree of counter-clockwise 
+              rotation around the center point.  This is the same kind of rotation as is 
+              performed by the dlib::rotate_point() function.
     !*/
 
 // ----------------------------------------------------------------------------------------
