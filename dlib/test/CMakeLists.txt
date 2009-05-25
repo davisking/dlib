@@ -65,6 +65,7 @@ set (tests
    sliding_buffer.cpp
    smart_pointers.cpp
    sockets.cpp
+   sockets2.cpp
    sockstreambuf.cpp
    stack.cpp
    static_map.cpp

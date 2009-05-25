@@ -273,6 +273,34 @@ namespace dlib
                 - returns SHUTDOWN if the connection has been shutdown locally
         !*/
 
+        long read (
+            char* buf, 
+            long num,
+            unsigned long timeout 
+        );
+        /*!
+            requires
+                - num > 0 
+                - buf points to an array of at least num bytes
+                - timeout < 2000000                
+            ensures
+                - read() will not read more than num bytes of data into #buf 
+                - if (timeout > 0) then read() blocks until ONE of the following happens:
+                    - there is some data available and it has been written into #buf 
+                    - the remote end of the connection is closed 
+                    - an error has occurred
+                    - the connection has been shutdown locally
+                    - timeout milliseconds has elapsed
+                - else
+                    - read() does not block
+
+                - returns the number of bytes read into #buf if there was any data.
+                - returns 0 if the connection has ended/terminated and there is no more data.
+                - returns TIMEOUT if timeout milliseconds elapsed before we got any data.
+                - returns OTHER_ERROR if there was an error.
+                - returns SHUTDOWN if the connection has been shutdown locally
+        !*/
+
         unsigned short get_local_port (
         ) const;
         /*!

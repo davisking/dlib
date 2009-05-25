@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net), Miguel Grinberg
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SOCKETS_KERNEL_1_CPp_
 #define DLIB_SOCKETS_KERNEL_1_CPp_
@@ -323,6 +323,69 @@ namespace dlib
             return SHUTDOWN;
         }
         return status;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    long connection::
+    read (
+        char* buf, 
+        long num,
+        unsigned long timeout
+    )
+    {
+        if (readable() == false)
+            return TIMEOUT;
+
+        const long max_recv_length = 1024*1024*100;
+        // Make sure to cap the max value num can take on so that if it is 
+        // really large (it might be big on 64bit platforms) so that the OS
+        // can't possibly get upset about it being large.
+        const long length = std::min(max_recv_length, num);
+        long status = recv(connection_socket,buf,length,0);
+        if (status == SOCKET_ERROR)
+        {
+            // if this error is the result of a shutdown call then return SHUTDOWN
+            if (sd_called())
+                return SHUTDOWN;
+            else
+                return OTHER_ERROR;
+        }
+        else if (status == 0 && sd_called())
+        {
+            return SHUTDOWN;
+        }
+        return status;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool connection::
+    readable (
+        unsigned long timeout
+    ) const
+    {
+        fd_set read_set;
+        // initialize read_set
+        FD_ZERO(&read_set);
+
+        // add the listening socket to read_set
+        FD_SET(connection_socket, &read_set);
+
+        // setup a timeval structure
+        timeval time_to_wait;
+        time_to_wait.tv_sec = static_cast<long>(timeout/1000);
+        time_to_wait.tv_usec = static_cast<long>((timeout%1000)*1000);
+
+        // wait on select
+        int status = select(0,&read_set,0,0,&time_to_wait);
+
+        // if select timed out or there was an error
+        if (status <= 0)
+            return false;
+        
+        // data is ready to be read
+        return true;
     }
 
 // ----------------------------------------------------------------------------------------

@@ -75,6 +75,7 @@ SRC += set.cpp
 SRC += sliding_buffer.cpp
 SRC += smart_pointers.cpp
 SRC += sockets.cpp
+SRC += sockets2.cpp
 SRC += sockstreambuf.cpp
 SRC += stack.cpp
 SRC += static_map.cpp

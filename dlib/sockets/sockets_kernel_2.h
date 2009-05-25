@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net), Miguel Grinberg
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SOCKETS_KERNEl_2_
 #define DLIB_SOCKETS_KERNEl_2_
@@ -133,6 +133,12 @@ namespace dlib
             long num
         );
 
+        long read (
+            char* buf, 
+            long num,
+            unsigned long timeout
+        );
+
         int get_local_port (
         ) const { return connection_local_port; }
 
@@ -184,6 +190,17 @@ namespace dlib
 
     private:
 
+        bool readable (
+            unsigned long timeout 
+        ) const;
+        /*! 
+            requires 
+                - timeout < 2000000  
+            ensures 
+                - returns true if a read call on this connection will not block. 
+                - returns false if a read call on this connection will block or if 
+                  there was an error. 
+        !*/ 
 
         bool sd_called (
         )const
