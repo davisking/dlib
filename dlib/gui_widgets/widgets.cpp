@@ -5708,8 +5708,10 @@ namespace dlib
         // push this new overlay into our overlay vector
         overlay_lines.push_back(overlay);
 
+        const point origin(total_rect().tl_corner());
+
         // make the parent window redraw us now that we changed the overlay
-        parent.invalidate_rectangle(rect);
+        parent.invalidate_rectangle(rectangle(overlay.p1+origin, overlay.p2+origin));
     }
 
 // ----------------------------------------------------------------------------------------
