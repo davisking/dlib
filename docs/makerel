@@ -46,7 +46,6 @@ DLIB_REPOS=`svn info | grep URL | awk '{print $2}' | sed -e 's/\/docs$//'  `
 REVISION=`svn info | grep Revision | awk '{ print $2}'`
 
 svn log -v -r $REVISION:`cat $REVNUM_FILE` $DLIB_REPOS/dlib > release/change_log.txt || report_failure
-flip -m release/change_log.txt
 
 echo $REVISION | awk '{ print $1 + 1}' > $REVNUM_FILE
 
