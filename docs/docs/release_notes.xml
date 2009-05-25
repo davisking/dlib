@@ -18,16 +18,40 @@ New Stuff:
       interest_point, surf_point, compute_dominant_angle(), 
       compute_surf_descriptor(), haar_x(), haar_y(), get_interest_points(), 
       and get_surf_points().
+    - Added the zeros_matrix() and ones_matrix() functions.
+    - Added serialization support to the type_safe_union object.
+    - Added the grow_rect() and shrink_rect() functions.
+    - Added the get_files_in_directory_tree() function.
+    - Added the null_trainer_type object.
+    - Added the roc_trainer_type object.
 
 Non-Backwards Compatible Changes:
+    - Removed some extraneous get_kernel() functions from some of the 
+      trainer adapter classes since they really aren't needed.  
 
 Bug fixes:
+    - Changed the socket read/write code so that it can handle a large 
+      number ( > 2 billion) of bytes in I/O calls.
+    - Added a missing type cast to the reciprocal() function to fix a compile
+      time error you get when you use it with complex&lt;float&gt; type matrices.
+    - Fixed a bug in the assign_border_pixels() and zero_border_pixels() functions.  
+      Their contracts said there was no upper limit on the size of the border that 
+      could be assigned/zeroed but the implementations failed to handle the case 
+      where the border was bigger than the image.
 
 Other:
-
+    - Generally cleaned up the code and documentation here and there.
+    - Added in Steven Van Ingelgem's patches to improve the usability of the
+      HTTP server object.
+    - Updated the load_bmp() function so that it is capable of reading BMP
+      files that have been compressed with the RLE compression sometimes
+      used for 8bit BMP files.
+    - Merged in Miguel Grinberg's patch to add a non-blocking read() function to the
+      connection object.
 </current>
 
 <!-- *******************************************************************************  -->
+
 <old name="17.18" date="Apr 5, 2009">
 New Stuff:
    - Added a set of kernels that can operate on sparse vectors.
