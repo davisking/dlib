@@ -413,6 +413,8 @@ namespace
 
             assign_border_pixels(img, 7, 7, 5);
             DLIB_TEST(uniform_matrix<unsigned char>(10,10, 5) == array_to_matrix(img));
+            assign_border_pixels(img, 37, 47, 5);
+            DLIB_TEST(uniform_matrix<unsigned char>(10,10, 5) == array_to_matrix(img));
         }
 
         {
@@ -434,6 +436,8 @@ namespace
             DLIB_TEST(uniform_matrix<unsigned char>(11,1, 4) == colm(array_to_matrix(img), 10));
 
             assign_border_pixels(img, 7, 7, 5);
+            DLIB_TEST(uniform_matrix<unsigned char>(11,11, 5) == array_to_matrix(img));
+            assign_border_pixels(img, 70, 57, 5);
             DLIB_TEST(uniform_matrix<unsigned char>(11,11, 5) == array_to_matrix(img));
         }
 
