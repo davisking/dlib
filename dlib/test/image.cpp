@@ -9,6 +9,7 @@
 #include <dlib/image_transforms.h>
 #include <dlib/image_io.h>
 #include <dlib/matrix.h>
+#include <dlib/rand.h>
 
 #include "tester.h"
 
@@ -445,6 +446,51 @@ namespace
     }
 
 
+    void test_integral_image (
+    )
+    {
+        dlib::rand::float_1a rnd;
+
+        array2d<unsigned char>::kernel_1a_c img;
+        integral_image int_img;
+
+        int_img.load(img);
+        DLIB_TEST(int_img.nr() == 0);
+        DLIB_TEST(int_img.nc() == 0);
+
+        // make 5 random images
+        for (int i = 0; i < 5; ++i)
+        {
+            print_spinner();
+            img.set_size(rnd.get_random_16bit_number()%200+1, rnd.get_random_16bit_number()%200+1);
+
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    img[r][c] = rnd.get_random_8bit_number();
+                }
+            }
+
+            int_img.load(img);
+            DLIB_TEST(int_img.nr() == img.nr());
+            DLIB_TEST(int_img.nc() == img.nc());
+
+            // make 200 random rectangles
+            for (int j = 0; j < 200; ++j)
+            {
+                point p1(rnd.get_random_32bit_number()%img.nc(), rnd.get_random_32bit_number()%img.nr());
+                point p2(rnd.get_random_32bit_number()%img.nc(), rnd.get_random_32bit_number()%img.nr());
+                rectangle rect(p1,p2);
+                DLIB_TEST(int_img.get_sum_of_area(rect) == sum(subm(matrix_cast<long>(array_to_matrix(img)), rect)));
+                rect = rectangle(p1,p1);
+                DLIB_TEST(int_img.get_sum_of_area(rect) == sum(subm(matrix_cast<long>(array_to_matrix(img)), rect)));
+            }
+
+        }
+
+
+    }
 
 
     class image_tester : public tester
@@ -460,6 +506,7 @@ namespace
         )
         {
             image_test();
+            test_integral_image();
         }
     } a;
 
