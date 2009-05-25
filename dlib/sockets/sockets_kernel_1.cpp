@@ -334,7 +334,7 @@ namespace dlib
         unsigned long timeout
     )
     {
-        if (readable() == false)
+        if (readable(timeout) == false)
             return TIMEOUT;
 
         const long max_recv_length = 1024*1024*100;
