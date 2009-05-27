@@ -399,9 +399,60 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename kernel_type>
+    struct kernel_der_obj
+    {
+        typename kernel_type::sample_type x;
+        kernel_type k;
+
+        double operator()(const typename kernel_type::sample_type& y) const { return k(x,y); }
+    };
 
 
+    template <typename kernel_type>
+    void test_kernel_derivative (
+        const kernel_type& k,
+        const typename kernel_type::sample_type& x, 
+        const typename kernel_type::sample_type& y 
+    )
+    {
+        kernel_der_obj<kernel_type> obj;
+        obj.x = x;
+        obj.k = k;
+        kernel_derivative<kernel_type> der(obj.k);
+        DLIB_CASSERT(dlib::equal(derivative(obj)(y) , der(obj.x,y), 1e-5), "");
+    }
 
+    void test_kernel_derivative (
+    )
+    {
+        typedef matrix<double, 2, 1> sample_type;
+
+        sigmoid_kernel<sample_type> k1;
+        radial_basis_kernel<sample_type> k2;
+        linear_kernel<sample_type> k3;
+        polynomial_kernel<sample_type> k4(2,3,4);
+
+        offset_kernel<sigmoid_kernel<sample_type> > k5;
+        offset_kernel<radial_basis_kernel<sample_type> > k6;
+
+        dlib::rand::float_1a rnd;
+
+        sample_type x, y;
+        for (int i = 0; i < 10; ++i)
+        {
+            x = randm(2,1,rnd);
+            y = randm(2,1,rnd);
+            test_kernel_derivative(k1, x, y);
+            test_kernel_derivative(k2, x, y);
+            test_kernel_derivative(k3, x, y);
+            test_kernel_derivative(k4, x, y);
+            test_kernel_derivative(k5, x, y);
+            test_kernel_derivative(k6, x, y);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 
     class svm_tester : public tester
     {
@@ -415,6 +466,7 @@ namespace
         void perform_test (
         )
         {
+            test_kernel_derivative();
             test_binary_classification();
             test_clutering();
             test_regression();

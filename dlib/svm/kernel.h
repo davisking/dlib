@@ -318,6 +318,28 @@ namespace dlib
         }
     }
 
+    template <
+        typename T 
+        >
+    struct kernel_derivative<sigmoid_kernel<T> >
+    {
+        typedef typename T::type scalar_type;
+        typedef T sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        kernel_derivative(const sigmoid_kernel<T>& k_) : k(k_){}
+
+        const sample_type& operator() (const sample_type& x, const sample_type& y) const
+        {
+            // return the derivative of the rbf kernel
+            temp = k.gamma*x*(1-std::pow(k(x,y),2));
+            return temp;
+        }
+
+        const sigmoid_kernel<T>& k;
+        mutable sample_type temp;
+    };
+
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
@@ -358,6 +380,25 @@ namespace dlib
         linear_kernel<T>& item,
         std::istream& in 
     ){}
+
+    template <
+        typename T 
+        >
+    struct kernel_derivative<linear_kernel<T> >
+    {
+        typedef typename T::type scalar_type;
+        typedef T sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        kernel_derivative(const linear_kernel<T>& k_) : k(k_){}
+
+        const sample_type& operator() (const sample_type& x, const sample_type& y) const
+        {
+            return x;
+        }
+
+        const linear_kernel<T>& k;
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -441,6 +482,25 @@ namespace dlib
             throw serialization_error(e.info + "\n   while deserializing object of type offset_kernel"); 
         }
     }
+
+    template <
+        typename T 
+        >
+    struct kernel_derivative<offset_kernel<T> >
+    {
+        typedef typename T::scalar_type scalar_type;
+        typedef typename T::sample_type sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        kernel_derivative(const offset_kernel<T>& k) : der(k.kernel){}
+
+        const sample_type operator() (const sample_type& x, const sample_type& y) const
+        {
+            return der(x,y);
+        }
+
+        kernel_derivative<T> der;
+    };
 
 // ----------------------------------------------------------------------------------------
 

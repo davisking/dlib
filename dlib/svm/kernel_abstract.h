@@ -537,6 +537,9 @@ namespace dlib
                 kernel_type must be one of the following kernel types:
                     - radial_basis_kernel
                     - polynomial_kernel 
+                    - sigmoid_kernel
+                    - linear_kernel
+                    - offset_kernel
 
             WHAT THIS OBJECT REPRESENTS
                 This is a function object that computes the derivative of a kernel 
@@ -562,7 +565,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the derivative of k with respect to y.  Or in other words, k(x, y+dy)/dy 
+                - returns the derivative of k with respect to y.  
         !*/
 
         const kernel_type& k;
