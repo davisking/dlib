@@ -420,7 +420,7 @@ namespace
         obj.x = x;
         obj.k = k;
         kernel_derivative<kernel_type> der(obj.k);
-        DLIB_CASSERT(dlib::equal(derivative(obj)(y) , der(obj.x,y), 1e-5), "");
+        DLIB_TEST(dlib::equal(derivative(obj)(y) , der(obj.x,y), 1e-5));
     }
 
     void test_kernel_derivative (

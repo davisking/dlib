@@ -392,7 +392,7 @@ namespace dlib
 
         kernel_derivative(const linear_kernel<T>& k_) : k(k_){}
 
-        const sample_type& operator() (const sample_type& x, const sample_type& y) const
+        const sample_type& operator() (const sample_type& x, const sample_type& ) const
         {
             return x;
         }
