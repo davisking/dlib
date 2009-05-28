@@ -552,7 +552,27 @@ namespace dlib
             // out_vectors matrices
             obj.vector_to_state(opt_starting_point);
 
-            decision_function<kernel_type> new_df(beta, 
+
+            // Do a final reoptimization of beta just to make sure it is optimal given the new
+            // set of support vectors.
+            for (long r = 0; r < K_inv.nr(); ++r)
+            {
+                for (long c = 0; c < K_inv.nc(); ++c)
+                {
+                    K_inv(r,c) = kernel(out_vectors(r), out_vectors(c));
+                }
+            }
+            K_inv = pinv(K_inv);
+            for (long r = 0; r < K.nr(); ++r)
+            {
+                for (long c = 0; c < K.nc(); ++c)
+                {
+                    K(r,c) = kernel(out_vectors(r), dec_funct.support_vectors(c));
+                }
+            }
+
+
+            decision_function<kernel_type> new_df(K_inv*K*dec_funct.alpha, 
                                                   0,
                                                   kernel, 
                                                   out_vectors);
