@@ -467,7 +467,7 @@
       
    <!-- ************************************************************************* -->
       
-      <component checked="true">
+      <component>
          <name>config_reader</name>
          <file>dlib/config_reader.h</file>
          <spec_file>dlib/config_reader/config_reader_kernel_abstract.h</spec_file>
