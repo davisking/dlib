@@ -112,7 +112,7 @@ namespace dlib
             ensures
                 - for each argument to the given option:
                     - this argument is convertable by string_cast<T>() to an object of
-                      type T and the resulting value is equal to some string in the
+                      type T and the resulting value is equal to some element in the
                       arg_set array.
             throws
                 - std::bad_alloc
