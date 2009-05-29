@@ -257,7 +257,6 @@ namespace dlib
         matrix_unary_exp (
             const M& m_
         ) :
-            matrix_exp<matrix_unary_exp>(*this),
             m(m_)
         {}
 
@@ -344,7 +343,6 @@ namespace dlib
             const M& m_,
             const S& s_
         ) :
-            matrix_exp<matrix_scalar_binary_exp>(*this),
             m(m_),
             s(s_)
         {
@@ -438,7 +436,6 @@ namespace dlib
             const S& s1_,
             const S& s2_
         ) :
-            matrix_exp<matrix_scalar_ternary_exp>(*this),
             m(m_),
             s1(s1_),
             s2(s2_)
@@ -531,7 +528,6 @@ namespace dlib
             const M1& m1_,
             const M2& m2_
         ) :
-            matrix_exp<matrix_binary_exp>(*this),
             m1(m1_),
             m2(m2_)
         {}
@@ -624,7 +620,6 @@ namespace dlib
             const M2& m2_,
             const M3& m3_
         ) :
-            matrix_exp<matrix_ternary_exp>(*this),
             m1(m1_),
             m2(m2_),
             m3(m3_)
@@ -722,7 +717,6 @@ namespace dlib
             const M3& m3_,
             const M4& m4_
         ) :
-            matrix_exp<matrix_fourary_exp>(*this),
             m1(m1_),
             m2(m2_),
             m3(m3_),
@@ -809,7 +803,6 @@ namespace dlib
             long nc__,
             const S& s_
         ) :
-            matrix_exp<dynamic_matrix_scalar_unary_exp>(*this),
             nr_(nr__),
             nc_(nc__),
             s(s_)
@@ -892,7 +885,6 @@ namespace dlib
         matrix_scalar_unary_exp (
             const S& s_
         ) :
-            matrix_exp<matrix_scalar_unary_exp>(*this),
             s(s_)
         {
             COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
@@ -963,9 +955,7 @@ namespace dlib
         {}
 
         matrix_zeroary_exp (
-        ) :
-            matrix_exp<matrix_zeroary_exp>(*this)
-        {}
+        ) {}
 
         const typename OP::type operator() (
             long r, 
@@ -1052,7 +1042,6 @@ namespace dlib
             const EXPr& rows_,
             const EXPc& cols_
         ) :
-            matrix_exp<matrix_sub_range_exp>(*this),
             m(m_),
             rows(rows_),
             cols(cols_)
@@ -1140,7 +1129,6 @@ namespace dlib
         matrix_std_vector_exp (
             const M& m_
         ) :
-            matrix_exp<matrix_std_vector_exp>(*this),
             m(m_)
         {
         }
@@ -1223,7 +1211,6 @@ namespace dlib
         matrix_array_exp (
             const M& m_
         ) :
-            matrix_exp<matrix_array_exp>(*this),
             m(m_)
         {
         }
@@ -1306,7 +1293,6 @@ namespace dlib
         matrix_array2d_exp (
             const M& m_
         ) :
-            matrix_exp<matrix_array2d_exp>(*this),
             m(m_)
         {
         }
@@ -1396,7 +1382,6 @@ namespace dlib
             const long& nr__,
             const long& nc__
         ) :
-            matrix_exp<matrix_sub_exp>(*this),
             m(m_),
             r_(r__),
             c_(c__),
@@ -1473,8 +1458,7 @@ namespace dlib
         matrix_range_exp (
             T start_,
             T end_
-        ) :
-            matrix_exp<matrix_range_exp>(*this)
+        ) 
         {
             start = start_;
             if (start_ <= end_)
@@ -1487,8 +1471,7 @@ namespace dlib
             T start_,
             T inc_,
             T end_
-        ) :
-            matrix_exp<matrix_range_exp>(*this)
+        ) 
         {
             start = start_;
             nc_ = std::abs(end_ - start_)/inc_ + 1;
@@ -1503,8 +1486,7 @@ namespace dlib
             T end_,
             long num,
             bool
-        ) :
-            matrix_exp<matrix_range_exp>(*this)
+        ) 
         {
             start = start_;
             nc_ = num;
@@ -1590,8 +1572,7 @@ namespace dlib
             T start_,
             T end_,
             long num
-        ) :
-            matrix_exp<matrix_log_range_exp>(*this)
+        ) 
         {
             start = start_;
             nc_ = num;
@@ -1673,9 +1654,7 @@ namespace dlib
         {}
 
         matrix_range_static_exp (
-        ) :
-            matrix_exp<matrix_range_static_exp>(*this)
-        {}
+        ) {}
 
         long operator() (
             long , 

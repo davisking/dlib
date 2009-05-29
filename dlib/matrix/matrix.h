@@ -107,7 +107,7 @@ namespace dlib
                 << "\n\tnc(): " << nc() 
                 << "\n\tthis: " << this
                 );
-            return ref_(r,c); 
+            return ref()(r,c); 
         }
 
         const type operator() (
@@ -132,32 +132,32 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
             if (nc() == 1)
-                return ref_(i,0);
+                return ref()(i,0);
             else
-                return ref_(0,i);
+                return ref()(0,i);
         }
 
         long size (
         ) const { return nr()*nc(); }
 
         long nr (
-        ) const { return get_nr_helper<exp_type,NR>::get(ref_); }
+        ) const { return get_nr_helper<exp_type,NR>::get(ref()); }
 
         long nc (
-        ) const { return get_nc_helper<exp_type,NC>::get(ref_); }
+        ) const { return get_nc_helper<exp_type,NC>::get(ref()); }
 
         template <typename U, long iNR, long iNC, typename mm, typename l >
         bool aliases (
             const matrix<U,iNR,iNC,mm,l>& item
-        ) const { return ref_.aliases(item); }
+        ) const { return ref().aliases(item); }
 
         template <typename U, long iNR, long iNC , typename mm, typename l>
         bool destructively_aliases (
             const matrix<U,iNR,iNC,mm,l>& item
-        ) const { return ref_.destructively_aliases(item); }
+        ) const { return ref().destructively_aliases(item); }
 
-        const exp_type& ref (
-        ) const { return ref_; }
+        inline const exp_type& ref (
+        ) const { return *static_cast<const exp_type*>(this); }
 
         inline operator const type (
         ) const 
@@ -176,25 +176,17 @@ namespace dlib
             // a temporary 1x1 matrix so that the expression will encounter
             // all the overloads of matrix_assign() and have the chance to
             // go through any applicable optimizations.
-            matrix<type,1,1> temp(ref_);
+            matrix<type,1,1> temp(ref());
             return temp(0);
         }
 
     protected:
-        explicit matrix_exp (
-            const EXP& exp
-        ) : ref_(exp) {}
-
+        matrix_exp() {}
+        matrix_exp(const matrix_exp& ) {}
 
     private:
 
-        // you can't copy a matrix_exp at all.  Things that inherit from it must
-        // define their own copy constructors that call the above protected 
-        // constructor so that the reference below is maintained correctly.
-        matrix_exp(const matrix_exp& item);
         matrix_exp& operator= (const matrix_exp&);
-
-        const exp_type& ref_;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -333,7 +325,6 @@ namespace dlib
             const LHS& lhs_,
             const RHS& rhs_
         ) :
-            matrix_exp<matrix_multiply_exp>(*this),
             lhs(lhs_),
             rhs(rhs_)
         {
@@ -495,7 +486,6 @@ namespace dlib
             const LHS& lhs_,
             const RHS& rhs_
         ) :
-            matrix_exp<matrix_add_exp>(*this),
             lhs(lhs_),
             rhs(rhs_)
         {
@@ -604,7 +594,7 @@ namespace dlib
         matrix_subtract_exp (
             const LHS& lhs_,
             const RHS& rhs_
-        ) : matrix_exp<matrix_subtract_exp>(*this),
+        ) : 
             lhs(lhs_),
             rhs(rhs_)
         {
@@ -713,7 +703,6 @@ namespace dlib
             const M& m_,
             const type& s_
         ) :
-            matrix_exp<matrix_div_scal_exp>(*this),
             m(m_),
             s(s_)
         {}
@@ -807,7 +796,6 @@ namespace dlib
             const M& m_,
             const type& s_
         ) :
-            matrix_exp<matrix_mul_scal_exp>(*this),
             m(m_),
             s(s_)
         {}
@@ -1022,13 +1010,13 @@ namespace dlib
         const static long NC = matrix_traits<matrix>::NC;
         const static long cost = matrix_traits<matrix>::cost;
 
-        matrix () : matrix_exp<matrix>(*this) 
+        matrix () 
         {
         }
 
         explicit matrix (
             long length 
-        ) : matrix_exp<matrix>(*this) 
+        ) 
         {
             // This object you are trying to call matrix(length) on is not a column or 
             // row vector.
@@ -1073,7 +1061,7 @@ namespace dlib
         matrix (
             long rows,
             long cols 
-        ) : matrix_exp<matrix>(*this) 
+        )  
         {
             DLIB_ASSERT( (NR == 0 || NR == rows) && ( NC == 0 || NC == cols) && 
                     rows >= 0 && cols >= 0, 
@@ -1090,7 +1078,7 @@ namespace dlib
         template <typename EXP>
         matrix (
             const matrix_exp<EXP>& m
-        ): matrix_exp<matrix>(*this) 
+        )
         {
             // You get an error on this line if the matrix m contains a type that isn't
             // the same as the type contained in the target matrix.
@@ -1127,7 +1115,7 @@ namespace dlib
         template <typename U, size_t len>
         matrix (
             U (&array)[len]
-        ): matrix_exp<matrix>(*this) 
+        ) 
         {
             COMPILE_TIME_ASSERT(NR*NC == len && len > 0);
             size_t idx = 0;
@@ -1765,13 +1753,11 @@ namespace dlib
         const_temp_matrix (
             const matrix_exp<EXP>& item
         ) :
-            matrix_exp<const_temp_matrix>(*this),
             ref_(item.ref())
         {}
         const_temp_matrix (
             const EXP& item
         ) :
-            matrix_exp<const_temp_matrix>(*this),
             ref_(item)
         {}
 

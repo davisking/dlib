@@ -161,29 +161,22 @@ namespace dlib
                     - returns false
         !*/
 
-        const exp_type& ref (
+        inline const exp_type& ref (
         ) const; 
         /*!
             ensures
                 - returns a reference to the expression contained in *this.
+                  (i.e. returns *static_cast<const exp_type*>(this) )
         !*/
 
     protected:
 
-        explicit matrix_exp (
-            const EXP& exp
-        ); 
-        /*!
-            ensures
-                - #ref() == exp.ref()
-        !*/
+        // Only derived classes of matrix_exp may call the matrix_exp constructors.
+        matrix_exp(const matrix_exp&); 
+        matrix_exp();
 
     private:
-
-        // you can't copy a matrix_exp at all.  Things that inherit from it must
-        // define their own copy constructors that call the above protected 
-        // constructor so that the reference below is maintained correctly.
-        matrix_exp(const matrix_exp& item);
+        // no one may ever use the assignment operator on a matrix_exp
         matrix_exp& operator= (const matrix_exp&);
     };
 
