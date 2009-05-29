@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 
         // Now I will use the parser to validate some things about the command line.
         // If any of the following checks fail then an exception will be thrown and it will
-        // contain a message that tells the user the problem was.
+        // contain a message that tells the user what the problem was.
 
         // First I want to check that none of the options were given on the command line
         // more than once.  To do this I define an array that contains the options
