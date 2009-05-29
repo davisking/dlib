@@ -16,9 +16,31 @@
 #include "matrix_expressions.h"
 
 
-
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    /*!A is_complex
+        This is a template that can be used to determine if a type is a specialization
+        of the std::complex template class.
+
+        For example:
+            is_complex<float>::value == false              
+            is_complex<std::complex<float> >::value == true   
+    !*/
+
+    template <typename T>
+    struct is_complex { static const bool value = false; };
+
+    template <typename T>
+    struct is_complex<std::complex<T> >         { static const bool value = true; };
+    template <typename T>
+    struct is_complex<std::complex<T>& >        { static const bool value = true; };
+    template <typename T>
+    struct is_complex<const std::complex<T>& >  { static const bool value = true; };
+    template <typename T>
+    struct is_complex<const std::complex<T> >   { static const bool value = true; };
 
 // ----------------------------------------------------------------------------------------
 
@@ -1657,7 +1679,7 @@ namespace dlib
         typename EXP1,
         typename EXP2
         >
-    bool equal (
+    typename disable_if<is_complex<typename EXP1::type>,bool>::type equal (
         const matrix_exp<EXP1>& a,
         const matrix_exp<EXP2>& b,
         const typename EXP1::type eps = 100*std::numeric_limits<typename EXP1::type>::epsilon()
@@ -1672,6 +1694,34 @@ namespace dlib
             for (long c = 0; c < a.nc(); ++c)
             {
                 if (std::abs(a(r,c)-b(r,c)) > eps)
+                    return false;
+            }
+        }
+
+        // no non-equal points found so we return true 
+        return true;
+    }
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    typename enable_if<is_complex<typename EXP1::type>,bool>::type equal (
+        const matrix_exp<EXP1>& a,
+        const matrix_exp<EXP2>& b,
+        const typename EXP1::type::value_type eps = 100*std::numeric_limits<typename EXP1::type::value_type>::epsilon()
+    )
+    {
+        // check if the dimensions don't match
+        if (a.nr() != b.nr() || a.nc() != b.nc())
+            return false;
+
+        for (long r = 0; r < a.nr(); ++r)
+        {
+            for (long c = 0; c < a.nc(); ++c)
+            {
+                if (std::abs(real(a(r,c)-b(r,c))) > eps ||
+                    std::abs(imag(a(r,c)-b(r,c))) > eps)
                     return false;
             }
         }

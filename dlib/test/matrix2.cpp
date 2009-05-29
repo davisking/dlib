@@ -857,7 +857,7 @@ namespace
             m = val1;
             m2 = val2;
 
-            DLIB_TEST(reciprocal(m) == m2);
+            DLIB_TEST(equal(reciprocal(m) , m2));
         }
         {
             matrix<complex<float> > m(2,2), m2(2,2);
@@ -865,7 +865,7 @@ namespace
             m = val1;
             m2 = val2;
 
-            DLIB_TEST(reciprocal(m) == m2);
+            DLIB_TEST(equal(reciprocal(m) , m2));
         }
 
         {

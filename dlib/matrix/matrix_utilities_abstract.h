@@ -501,6 +501,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    // if matrix_exp contains non-complex types (e.g. float, double)
     bool equal (
         const matrix_exp& a,
         const matrix_exp& b,
@@ -511,6 +512,25 @@ namespace dlib
             - if (a and b don't have the same dimensions) then
                 - returns false
             - else if (there exists an r and c such that abs(a(r,c)-b(r,c)) > epsilon) then
+                - returns false
+            - else
+                - returns true
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    // if matrix_exp contains std::complex types 
+    bool equal (
+        const matrix_exp& a,
+        const matrix_exp& b,
+        const matrix_exp::type::value_type epsilon = 100*std::numeric_limits<matrix_exp::type::value_type>::epsilon()
+    );
+    /*!
+        ensures
+            - if (a and b don't have the same dimensions) then
+                - returns false
+            - else if (there exists an r and c such that abs(real(a(r,c)-b(r,c))) > epsilon 
+              or abs(imag(a(r,c)-b(r,c))) > epsilon) then
                 - returns false
             - else
                 - returns true
