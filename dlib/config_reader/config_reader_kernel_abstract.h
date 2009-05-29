@@ -5,23 +5,17 @@
 
 #include <string>
 #include <iosfwd>
-#include "../interfaces/enumerable.h"
 
 namespace dlib
 {
 
-    class config_reader : public enumerable<config_reader>
+    class config_reader 
     {
 
         /*!                
             INITIAL VALUE
                 - there aren't any keys defined for this object
                 - there aren't any blocks defined for this object
-
-            ENUMERATION ORDER
-                The enumerator will iterate over the sub blocks in the config_reader.
-                They will be enumerated in sorted order according to the ordering 
-                established on the block names by operator<. 
 
             POINTERS AND REFERENCES TO INTERNAL DATA
                 The destructor, clear(), and load_from() invalidate pointers
@@ -92,7 +86,7 @@ namespace dlib
     
     public:
 
-        // exception class
+        // exception classes
         class config_reader_error : public dlib::error 
         {
             /*!
@@ -113,6 +107,28 @@ namespace dlib
         public:
             const unsigned long line_number;
             const bool redefinition;
+        };
+
+        class config_reader_access_error : public dlib::error
+        {
+            /*!
+                GENERAL
+                    This exception is thrown if you try to access a key or
+                    block that doesn't exist inside a config reader.
+            !*/
+        public:
+            config_reader_access_error(
+                const std::string& block_name_,
+                const std::string& key_name_
+            );
+            /*!
+                ensures
+                    - #block_name == block_name_
+                    - #key_name == key_name_
+            !*/
+
+            const std::string block_name;
+            const std::string key_name;
         };
 
     // --------------------------
@@ -207,48 +223,64 @@ namespace dlib
             const std::string& block_name
         ) const;
         /*!
-            requires
-                - is_block_defined(block_name) == true
             ensures
-                - returns a const reference to the config_reader that represents the given named sub block
+                - if (is_block_defined(block_name) == true) then
+                    - returns a const reference to the config_reader that represents the given named sub block
+                - else
+                    - throws config_reader_access_error
+            throws
+                - config_reader_access_error
+                    if this exception is thrown then its block_name field will be set to the
+                    given block_name string.
         !*/
 
         const std::string& operator[] (
             const std::string& key_name
         ) const;
         /*!
-            requires
-                - is_key_defined(key_name) == true
             ensures
-                - returns a const reference to the value string associated with the given key in 
-                  this config_reader's block.
+                - if (is_key_defined(key_name) == true) then
+                    - returns a const reference to the value string associated with the given key in 
+                      this config_reader's block.
+                - else
+                    - throws config_reader_access_error
+            throws
+                - config_reader_access_error
+                    if this exception is thrown then its key_name field will be set to the
+                    given key_name string.
         !*/
 
         template <
             typename queue_of_strings
-            // Is an implementation of queue/queue_kernel_abstract.h with T set to std::string
             >
         void get_keys (
             queue_of_strings& keys
         ) const;
         /*!
+            requires
+                - queue_of_strings is an implementation of queue/queue_kernel_abstract.h 
+                  with T set to std::string, or std::vector<std::string>, or 
+                  dlib::std_vector_c<std::string>
             ensures 
                 - #keys == a queue containing all the keys defined in this config_reader's block.
                   (i.e. for all strings str in keys it is the case that is_key_defined(str) == true)
-            throws
-                - std::bad_alloc
-                    If this exception is thrown then this call has no effect on *this and #keys is 
-                    unusable until keys.clear() is called and succeeds.
         !*/
 
-        const std::string& current_block_name (
+        template <
+            typename queue_of_strings
+            >
+        void get_blocks (
+            queue_of_strings& blocks
         ) const;
         /*!
             requires
-                - current_element_valid() == true
-            ensures
-                - returns a string block_name such that: &block(block_name) == &element()
-                  (i.e. returns the name of the block that the enumerator is currently at)
+                - queue_of_strings is an implementation of queue/queue_kernel_abstract.h 
+                  with T set to std::string, or std::vector<std::string>, or 
+                  dlib::std_vector_c<std::string>
+            ensures 
+                - #blocks == a queue containing the names of all the blocks defined in this 
+                  config_reader's block.
+                  (i.e. for all strings str in blocks it is the case that is_block_defined(str) == true)
         !*/
 
     private:

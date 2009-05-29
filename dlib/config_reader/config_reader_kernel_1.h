@@ -8,7 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include "../algs.h"
-#include "../interfaces/enumerable.h"
+#include "../stl_checked/std_vector_c.h"
 
 namespace dlib
 {
@@ -16,13 +16,9 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking = false
+        typename tokenizer
         >
-    class config_reader_kernel_1 : public enumerable<config_reader_kernel_1<map_string_string,
-                                                                            map_string_void,
-                                                                            tokenizer,
-                                                                            checking> >
+    class config_reader_kernel_1 
     {
 
         /*!                
@@ -34,12 +30,6 @@ namespace dlib
 
             REQUIREMENTS ON tokenizer
                 is an implementation of tokenizer/tokenizer_kernel_abstract.h 
-
-            REQUIREMENTS ON checking
-                - if (checking == true) then
-                    - The preconditions for this object will be checked.
-                - else
-                    - The preconditions for this object will NOT be checked.
 
             CONVENTION
                 key_table.is_in_domain(x) == is_key_defined(x)
@@ -75,6 +65,31 @@ namespace dlib
             const bool redefinition;
         };
 
+        class config_reader_access_error : public dlib::error
+        {
+        public:
+            config_reader_access_error(
+                const std::string& block_name_,
+                const std::string& key_name_
+            ) : 
+                dlib::error(ECONFIG_READER),
+                block_name(block_name_), 
+                key_name(key_name_)
+            {
+                std::ostringstream sout;
+                sout << "Error in config_reader.\n";
+                if (block_name.size() > 0)
+                    sout << "   A block with the name '" << block_name << "' was expected but not found.";
+                else if (key_name.size() > 0)
+                    sout << "   A key with the name '" << key_name << "' was expected but not found.";
+
+                const_cast<std::string&>(info) = sout.str();
+            }
+
+            ~config_reader_access_error() throw() {}
+            const std::string block_name;
+            const std::string key_name;
+        };
 
         config_reader_kernel_1(
             std::istream& in
@@ -114,28 +129,39 @@ namespace dlib
             queue_of_strings& keys
         ) const;
 
-        inline bool at_start (
-        ) const ;
+        template <
+            typename alloc 
+            >
+        void get_keys (
+            std::vector<std::string,alloc>& keys
+        ) const;
 
-        inline void reset (
-        ) const ;
+        template <
+            typename alloc 
+            >
+        void get_keys (
+            std_vector_c<std::string,alloc>& keys
+        ) const;
 
-        inline bool current_element_valid (
-        ) const ;
+        template <
+            typename queue_of_strings
+            >
+        void get_blocks (
+            queue_of_strings& blocks
+        ) const;
 
-        inline const this_type& element (
-        ) const ;
+        template <
+            typename alloc 
+            >
+        void get_blocks (
+            std::vector<std::string,alloc>& blocks
+        ) const;
 
-        inline this_type& element (
-        ) ;
-
-        inline bool move_next (
-        ) const ;
-
-        inline unsigned long size (
-        ) const ;
-
-        inline const std::string& current_block_name (
+        template <
+            typename alloc 
+            >
+        void get_blocks (
+            std_vector_c<std::string,alloc>& blocks
         ) const;
 
     private:
@@ -167,69 +193,6 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
-
-    /* 
-        This is a bunch of crap so we can enable and disable the DLIB_CASSERT statements
-        without getting warnings about conditions always being true or false.
-    */
-    namespace config_reader_kernel_1_helpers
-    {
-        template <typename cr_type, bool do_check>
-        struct helper;
-
-        template <typename cr_type>
-        struct helper<cr_type,false>
-        {
-            static void check_operator_bracket_precondition (const cr_type&, const std::string& ) {}
-            static void check_block_precondition (const cr_type&,  const std::string& ) {}
-            static void check_current_block_name_precondition (const cr_type& ) {} 
-            static void check_element_precondition (const cr_type& ) {}
-        };
-
-        template <typename cr_type>
-        struct helper<cr_type,true>
-        {
-            static void check_operator_bracket_precondition (const cr_type& cr, const std::string& key) 
-            {
-                DLIB_CASSERT ( cr.is_key_defined(key) == true ,
-                          "\tconst std::string& config_reader::operator[](key)"
-                          << "\n\tTo access a key's value in the config_reader the key must actually exist."
-                          << "\n\tkey == " << key 
-                          << "\n\t&cr:  " << &cr 
-                );
-            }
-
-            static void check_block_precondition (const cr_type& cr, const std::string& name) 
-            {
-                DLIB_CASSERT ( cr.is_block_defined(name) == true ,
-                          "\tconst this_type& config_reader::block(name)"
-                          << "\n\tTo access a sub block in the config_reader the block must actually exist."
-                          << "\n\tname == " << name 
-                          << "\n\t&cr:   " << &cr 
-                );
-            }
-
-            static void check_current_block_name_precondition (const cr_type& cr) 
-            {
-                DLIB_CASSERT ( cr.current_element_valid() == true ,
-                          "\tconst std::string& config_reader::current_block_name()"
-                          << "\n\tYou can't call current_block_name() if the current element isn't valid."
-                          << "\n\t&cr: " << &cr 
-                );
-            }
-
-            static void check_element_precondition (const cr_type& cr) 
-            {
-                DLIB_CASSERT ( cr.current_element_valid() == true ,
-                          "\tthis_type& config_reader::element()"
-                          << "\n\tYou can't call element() if the current element isn't valid."
-                          << "\n\t&cr: " << &cr 
-                );
-            }
-        };
-    }
-
-// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     // member function definitions
 // ----------------------------------------------------------------------------------------
@@ -238,10 +201,9 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     config_reader_kernel_1(
     )
     {
@@ -252,10 +214,9 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     clear(
     )
     {
@@ -274,10 +235,9 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     load_from(
         std::istream& in
     )
@@ -308,10 +268,9 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     config_reader_kernel_1(
         std::istream& in
     )
@@ -324,12 +283,11 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     parse_config_file(
-        config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>& cr,
+        config_reader_kernel_1<map_string_string,map_string_void,tokenizer>& cr,
         tokenizer& tok,
         unsigned long& line_number,
         const bool top_of_recursion
@@ -477,10 +435,9 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     ~config_reader_kernel_1(
     ) 
     {
@@ -492,10 +449,9 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    bool config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    bool config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     is_key_defined (
         const std::string& key
     ) const
@@ -508,10 +464,9 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    bool config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    bool config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     is_block_defined (
         const std::string& name
     ) const
@@ -524,16 +479,18 @@ namespace dlib
     template <
         typename mss,
         typename msv,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    const config_reader_kernel_1<mss,msv,tokenizer,checking>& config_reader_kernel_1<mss,msv,tokenizer,checking>::
+    const config_reader_kernel_1<mss,msv,tokenizer>& config_reader_kernel_1<mss,msv,tokenizer>::
     block (
         const std::string& name
     ) const
     {
-        config_reader_kernel_1_helpers::helper<config_reader_kernel_1,checking>::
-            check_block_precondition(*this,name);
+        if (is_block_defined(name) == false)
+        {
+            throw config_reader_access_error(name,"");
+        }
+
         return *reinterpret_cast<config_reader_kernel_1*>(block_table[name]);
     }
 
@@ -542,16 +499,18 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    const std::string& config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    const std::string& config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     operator[] (
         const std::string& key
     ) const
     {
-        config_reader_kernel_1_helpers::helper<config_reader_kernel_1,checking>::
-            check_operator_bracket_precondition(*this,key);
+        if (is_key_defined(key) == false)
+        {
+            throw config_reader_access_error("",key);
+        }
+
         return key_table[key];
     }
 
@@ -560,13 +519,12 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
     template <
         typename queue_of_strings
         >
-    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     get_keys (
         queue_of_strings& keys
     ) const
@@ -586,125 +544,116 @@ namespace dlib
     template <
         typename map_string_string,
         typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename tokenizer
         >
-    bool config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
-    at_start (
-    ) const 
-    {
-        return block_table.at_start();
-    }
-
-// ----------------------------------------------------------------------------------------
-
     template <
-        typename map_string_string,
-        typename map_string_void,
-        typename tokenizer,
-        bool checking
+        typename alloc 
         >
-    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
-    reset (
-    ) const 
-    {
-        block_table.reset();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename map_string_string,
-        typename map_string_void,
-        typename tokenizer,
-        bool checking
-        >
-    bool config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
-    current_element_valid (
-    ) const 
-    {
-        return block_table.current_element_valid();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename mss,
-        typename msv,
-        typename tokenizer,
-        bool checking
-        >
-    const config_reader_kernel_1<mss,msv,tokenizer,checking>& config_reader_kernel_1<mss,msv,tokenizer,checking>::
-    element (
-    ) const 
-    {
-        config_reader_kernel_1_helpers::helper<config_reader_kernel_1,checking>::
-            check_element_precondition(*this);
-        return *reinterpret_cast<config_reader_kernel_1*>(block_table.element().value());
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename mss,
-        typename msv,
-        typename tokenizer,
-        bool checking
-        >
-    config_reader_kernel_1<mss,msv,tokenizer,checking>& config_reader_kernel_1<mss,msv,tokenizer,checking>::
-    element (
-    ) 
-    {
-        config_reader_kernel_1_helpers::helper<config_reader_kernel_1,checking>::
-            check_element_precondition(*this);
-        return *reinterpret_cast<config_reader_kernel_1*>(block_table.element().value());
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename map_string_string,
-        typename map_string_void,
-        typename tokenizer,
-        bool checking
-        >
-    bool config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
-    move_next (
-    ) const 
-    {
-        return block_table.move_next();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename map_string_string,
-        typename map_string_void,
-        typename tokenizer,
-        bool checking
-        >
-    unsigned long config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
-    size (
-    ) const 
-    {
-        return block_table.size();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename map_string_string,
-        typename map_string_void,
-        typename tokenizer,
-        bool checking
-        >
-    const std::string& config_reader_kernel_1<map_string_string,map_string_void,tokenizer,checking>::
-    current_block_name (
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
+    get_keys (
+        std::vector<std::string,alloc>& keys
     ) const
     {
-        config_reader_kernel_1_helpers::helper<config_reader_kernel_1,checking>::
-            check_current_block_name_precondition(*this);
-        return block_table.element().key();
+        keys.clear();
+        key_table.reset();
+        while (key_table.move_next())
+        {
+            keys.push_back(key_table.element().key());
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename map_string_string,
+        typename map_string_void,
+        typename tokenizer
+        >
+    template <
+        typename alloc 
+        >
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
+    get_keys (
+        std_vector_c<std::string,alloc>& keys
+    ) const
+    {
+        keys.clear();
+        key_table.reset();
+        while (key_table.move_next())
+        {
+            keys.push_back(key_table.element().key());
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename map_string_string,
+        typename map_string_void,
+        typename tokenizer
+        >
+    template <
+        typename queue_of_strings
+        >
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
+    get_blocks (
+        queue_of_strings& blocks
+    ) const
+    {
+        blocks.clear();
+        block_table.reset();
+        std::string temp;
+        while (block_table.move_next())
+        {
+            temp = block_table.element().key();
+            blocks.enqueue(temp);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename map_string_string,
+        typename map_string_void,
+        typename tokenizer
+        >
+    template <
+        typename alloc 
+        >
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
+    get_blocks (
+        std::vector<std::string,alloc>& blocks
+    ) const
+    {
+        blocks.clear();
+        block_table.reset();
+        while (block_table.move_next())
+        {
+            blocks.push_back(block_table.element().key());
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename map_string_string,
+        typename map_string_void,
+        typename tokenizer
+        >
+    template <
+        typename alloc 
+        >
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
+    get_blocks (
+        std_vector_c<std::string,alloc>& blocks
+    ) const
+    {
+        blocks.clear();
+        block_table.reset();
+        while (block_table.move_next())
+        {
+            blocks.push_back(block_table.element().key());
+        }
     }
 
 // ----------------------------------------------------------------------------------------

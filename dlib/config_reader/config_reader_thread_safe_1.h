@@ -17,18 +17,17 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    class config_reader_thread_safe_1 : public enumerable<config_reader_thread_safe_1<config_reader_base,map_string_void,checking> >
+    class config_reader_thread_safe_1 
     {
 
         /*!                
             CONVENTION
-                - get_mutex() == m
+                - get_mutex() == *m
                 - *cr == the config reader being extended
                 - block_table[x] == (void*)&block(x)
-                - cr->size == block_table.size()
+                - block_table.size() == the number of blocks in *cr
                 - block_table[key] == a config_reader_thread_safe_1 that contains &cr.block(key)
                 - if (own_pointers) then
                     - this object owns the m and cr pointers and should delete them when destructed 
@@ -44,6 +43,7 @@ namespace dlib
         config_reader_thread_safe_1();
 
         typedef typename config_reader_base::config_reader_error config_reader_error;
+        typedef typename config_reader_base::config_reader_access_error config_reader_access_error;
 
         config_reader_thread_safe_1(
             std::istream& in
@@ -83,28 +83,11 @@ namespace dlib
             queue_of_strings& keys
         ) const;
 
-        inline bool at_start (
-        ) const ;
-
-        inline void reset (
-        ) const ;
-
-        inline bool current_element_valid (
-        ) const ;
-
-        inline const this_type& element (
-        ) const ;
-
-        inline this_type& element (
-        ) ;
-
-        inline bool move_next (
-        ) const ;
-
-        inline unsigned long size (
-        ) const ;
-
-        inline const std::string& current_block_name (
+        template <
+            typename queue_of_strings
+            >
+        void get_blocks (
+            queue_of_strings& blocks
         ) const;
 
         inline const rmutex& get_mutex (
@@ -116,7 +99,7 @@ namespace dlib
         );
         /*!
             ensures
-                - block_table.size() == cr->size()
+                - block_table.size() == the number of blocks in cr 
                 - block_table[key] == a config_reader_thread_safe_1 that contains &cr.block(key)
         !*/
 
@@ -132,58 +115,6 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
-
-    /* 
-        This is a bunch of crap so we can enable and disable the DLIB_CASSERT statements
-        without getting warnings about conditions always being true or false.
-    */
-    namespace config_reader_thread_safe_1_helpers
-    {
-        template <typename cr_type, bool do_check>
-        struct helper;
-
-        template <typename cr_type>
-        struct helper<cr_type,false>
-        {
-            static void check_block_precondition (const cr_type&,  const std::string& ) {}
-            static void check_current_block_name_precondition (const cr_type& ) {} 
-            static void check_element_precondition (const cr_type& ) {}
-        };
-
-        template <typename cr_type>
-        struct helper<cr_type,true>
-        {
-            static void check_block_precondition (const cr_type& cr, const std::string& name) 
-            {
-                DLIB_CASSERT ( cr.is_block_defined(name) == true ,
-                          "\tconst this_type& config_reader_thread_safe::block(name)"
-                          << "\n\tTo access a sub block in the config_reader the block must actually exist."
-                          << "\n\tname == " << name 
-                          << "\n\t&cr:   " << &cr 
-                );
-            }
-
-            static void check_current_block_name_precondition (const cr_type& cr) 
-            {
-                DLIB_CASSERT ( cr.current_element_valid() == true ,
-                          "\tconst std::string& config_reader_thread_safe::current_block_name()"
-                          << "\n\tYou can't call current_block_name() if the current element isn't valid."
-                          << "\n\t&cr: " << &cr 
-                );
-            }
-
-            static void check_element_precondition (const cr_type& cr) 
-            {
-                DLIB_CASSERT ( cr.current_element_valid() == true ,
-                          "\tthis_type& config_reader_thread_safe::element()"
-                          << "\n\tYou can't call element() if the current element isn't valid."
-                          << "\n\t&cr: " << &cr 
-                );
-            }
-        };
-    }
-
-// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     // member function definitions
 // ----------------------------------------------------------------------------------------
@@ -191,10 +122,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    config_reader_thread_safe_1<config_reader_base,map_string_void>::
     config_reader_thread_safe_1(
         const config_reader_base* base,
         rmutex* m_
@@ -210,10 +140,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    config_reader_thread_safe_1<config_reader_base,map_string_void>::
     config_reader_thread_safe_1(
     ) :
         m(0),
@@ -237,10 +166,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    void config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    void config_reader_thread_safe_1<config_reader_base,map_string_void>::
     clear(
     )
     {
@@ -253,10 +181,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    void config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    void config_reader_thread_safe_1<config_reader_base,map_string_void>::
     load_from(
         std::istream& in
     )
@@ -270,10 +197,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    config_reader_thread_safe_1<config_reader_base,map_string_void>::
     config_reader_thread_safe_1(
         std::istream& in
     ) :
@@ -299,10 +225,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    config_reader_thread_safe_1<config_reader_base,map_string_void>::
     ~config_reader_thread_safe_1(
     ) 
     {
@@ -325,10 +250,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    bool config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    bool config_reader_thread_safe_1<config_reader_base,map_string_void>::
     is_key_defined (
         const std::string& key
     ) const
@@ -341,10 +265,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    bool config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    bool config_reader_thread_safe_1<config_reader_base,map_string_void>::
     is_block_defined (
         const std::string& name
     ) const
@@ -357,17 +280,19 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    const config_reader_thread_safe_1<config_reader_base,map_string_void,checking>& config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    const config_reader_thread_safe_1<config_reader_base,map_string_void>& config_reader_thread_safe_1<config_reader_base,map_string_void>::
     block (
         const std::string& name
     ) const
     {
         auto_mutex M(*m);
-        config_reader_thread_safe_1_helpers::helper<config_reader_thread_safe_1,checking>::
-            check_block_precondition(*this,name);
+        if (block_table.is_in_domain(name) == false)
+        {
+            throw config_reader_access_error(name,"");
+        }
+
         return *reinterpret_cast<config_reader_thread_safe_1*>(block_table[name]);
     }
 
@@ -375,10 +300,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    const std::string& config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    const std::string& config_reader_thread_safe_1<config_reader_base,map_string_void>::
     operator[] (
         const std::string& key
     ) const
@@ -391,13 +315,12 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
     template <
         typename queue_of_strings
         >
-    void config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    void config_reader_thread_safe_1<config_reader_base,map_string_void>::
     get_keys (
         queue_of_strings& keys
     ) const
@@ -410,136 +333,27 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    bool config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
-    at_start (
-    ) const 
-    {
-        auto_mutex M(*m);
-        return block_table.at_start();
-    }
-
-// ----------------------------------------------------------------------------------------
-
     template <
-        typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename queue_of_strings
         >
-    void config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
-    reset (
-    ) const 
-    {
-        auto_mutex M(*m);
-        block_table.reset();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename config_reader_base,
-        typename map_string_void,
-        bool checking
-        >
-    bool config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
-    current_element_valid (
-    ) const 
-    {
-        auto_mutex M(*m);
-        return block_table.current_element_valid();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename config_reader_base,
-        typename map_string_void,
-        bool checking
-        >
-    const config_reader_thread_safe_1<config_reader_base,map_string_void,checking>& config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
-    element (
-    ) const 
-    {
-        auto_mutex M(*m);
-        config_reader_thread_safe_1_helpers::helper<config_reader_thread_safe_1,checking>::
-            check_element_precondition(*this);
-        return *reinterpret_cast<config_reader_thread_safe_1*>(block_table.element().value());
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename config_reader_base,
-        typename map_string_void,
-        bool checking
-        >
-    config_reader_thread_safe_1<config_reader_base,map_string_void,checking>& config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
-    element (
-    ) 
-    {
-        auto_mutex M(*m);
-        config_reader_thread_safe_1_helpers::helper<config_reader_thread_safe_1,checking>::
-            check_element_precondition(*this);
-        return *reinterpret_cast<config_reader_thread_safe_1*>(block_table.element().value());
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename config_reader_base,
-        typename map_string_void,
-        bool checking
-        >
-    bool config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
-    move_next (
-    ) const 
-    {
-        auto_mutex M(*m);
-        return block_table.move_next();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename config_reader_base,
-        typename map_string_void,
-        bool checking
-        >
-    unsigned long config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
-    size (
-    ) const 
-    {
-        auto_mutex M(*m);
-        return block_table.size();
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename config_reader_base,
-        typename map_string_void,
-        bool checking
-        >
-    const std::string& config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
-    current_block_name (
+    void config_reader_thread_safe_1<config_reader_base,map_string_void>::
+    get_blocks (
+        queue_of_strings& blocks
     ) const
     {
         auto_mutex M(*m);
-        config_reader_thread_safe_1_helpers::helper<config_reader_thread_safe_1,checking>::
-            check_current_block_name_precondition(*this);
-        return block_table.element().key();
+        cr->get_blocks(blocks);
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    const rmutex& config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    const rmutex& config_reader_thread_safe_1<config_reader_base,map_string_void>::
     get_mutex (
     ) const
     {
@@ -554,10 +368,9 @@ namespace dlib
 
     template <
         typename config_reader_base,
-        typename map_string_void,
-        bool checking
+        typename map_string_void
         >
-    void config_reader_thread_safe_1<config_reader_base,map_string_void,checking>::
+    void config_reader_thread_safe_1<config_reader_base,map_string_void>::
     fill_block_table (
     ) 
     {
@@ -570,14 +383,15 @@ namespace dlib
         }
         block_table.clear();
 
+        std::vector<std::string> blocks;
+        cr->get_blocks(blocks);
+
         // now fill the block table up to match what is in cr
-        cr->reset();
-        while (cr->move_next())
+        for (unsigned long i = 0; i < blocks.size(); ++i)
         {
-            config_reader_thread_safe_1* block = new config_reader_thread_safe_1(&cr->element(),m);
+            config_reader_thread_safe_1* block = new config_reader_thread_safe_1(&cr->block(blocks[i]),m);
             void* temp = block;
-            std::string key(cr->current_block_name());
-            block_table.add(key,temp);
+            block_table.add(blocks[i],temp);
         }
     }
 
