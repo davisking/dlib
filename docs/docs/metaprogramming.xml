@@ -34,6 +34,7 @@
          <item>is_const_type</item>
          <item>is_same_type</item>
          <item>is_convertible</item>
+         <item>is_complex</item>
          <item>is_function</item>
          <item>is_signed_type</item>
          <item>is_unsigned_type</item>
@@ -187,6 +188,19 @@
          <description>
             This is a template that can be used to determine if one type is convertible 
             into another type.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_complex</name>
+         <file>dlib/matrix.h</file>
+         <spec_file link="true">dlib/matrix/matrix_utilities.h</spec_file>
+         <description>
+            This is a template that can be used to determine if a type is a
+            specialization of std::complex.
          </description>
          
       </component>

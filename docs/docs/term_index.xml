@@ -712,6 +712,7 @@
          <term file="metaprogramming.html" name="is_const_type"/>
          <term file="metaprogramming.html" name="is_same_type"/>
          <term file="metaprogramming.html" name="is_convertible"/>
+         <term file="metaprogramming.html" name="is_complex"/>
          <term file="metaprogramming.html" name="is_function"/>
          <term file="metaprogramming.html" name="wrap_function"/>
          <term file="metaprogramming.html" name="is_signed_type"/>
