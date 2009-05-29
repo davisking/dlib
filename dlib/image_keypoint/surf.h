@@ -29,7 +29,7 @@ namespace dlib
             << "\n\t sig: " << sig 
         );
         const double pi = 3.1415926535898;
-        return 1.0/(sig*std::sqrt(2*pi)) * std::exp( -(x*x + y*y)/(2*sig*sig));
+        return 1.0/(sig*sig*2*pi) * std::exp( -(x*x + y*y)/(2*sig*sig));
     }
 
 // ----------------------------------------------------------------------------------------
