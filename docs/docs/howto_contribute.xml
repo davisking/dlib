@@ -64,7 +64,8 @@
                   Design by Contract.   There is a lot that can be said about Design by Contract, in fact,
                   whole books have been written about it, and programming languages exist which
                   use Design by Contract as a central element.  Here I will just go over some
-                  of the basic ways it is used in dlib as well some of the reasons why it is a Good Thing.
+                  of the basic ways it is used in dlib as well as some of the reasons why it is a 
+                  Good Thing.
                </p>
                <li> <b>Functions should have documented preconditions which are programmatically verifiable</b>
                   <ul>
