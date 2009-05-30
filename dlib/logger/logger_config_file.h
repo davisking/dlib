@@ -36,8 +36,8 @@ namespace dlib
         
         # This line is a comment line
 
-        # The config file always has block named logger_config.  This is where all the 
-        # config data for the loggers resides.
+        # The config file always has a block named logger_config.  This is where all the 
+        # config data for the loggers reside.
         logger_config
         {
             # This sets all loggers to the level LINFO since it is just inside the 
