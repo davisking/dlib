@@ -114,7 +114,8 @@ namespace dlib
             /*!
                 GENERAL
                     This exception is thrown if you try to access a key or
-                    block that doesn't exist inside a config reader.
+                    block that doesn't exist inside a config reader.  The type 
+                    member of this exception will be set to ECONFIG_READER.
             !*/
         public:
             config_reader_access_error(
@@ -262,7 +263,7 @@ namespace dlib
                   with T set to std::string, or std::vector<std::string>, or 
                   dlib::std_vector_c<std::string>
             ensures 
-                - #keys == a queue containing all the keys defined in this config_reader's block.
+                - #keys == a collection containing all the keys defined in this config_reader's block.
                   (i.e. for all strings str in keys it is the case that is_key_defined(str) == true)
         !*/
 
@@ -278,7 +279,7 @@ namespace dlib
                   with T set to std::string, or std::vector<std::string>, or 
                   dlib::std_vector_c<std::string>
             ensures 
-                - #blocks == a queue containing the names of all the blocks defined in this 
+                - #blocks == a collection containing the names of all the blocks defined in this 
                   config_reader's block.
                   (i.e. for all strings str in blocks it is the case that is_block_defined(str) == true)
         !*/
