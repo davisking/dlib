@@ -13,6 +13,18 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.19" date="May 25, 2009">
+New Stuff:
     - Added an implementation of the SURF algorithm which includes the
       following new objects and functions:  integral_image, hessian_pyramid, 
       interest_point, surf_point, compute_dominant_angle(), 
@@ -48,7 +60,7 @@ Other:
       used for 8bit BMP files.
     - Merged in Miguel Grinberg's patch to add a non-blocking read() function to the
       connection object.
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
