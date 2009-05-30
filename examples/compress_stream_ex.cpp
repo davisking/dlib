@@ -96,7 +96,7 @@ int main(int argc, char** argv)
         }
 
         // Make some references to the options inside the parser.  This is just
-        // for convenience so we don't have to type out he longer form below.  
+        // for convenience so we don't have to type out the longer form below.  
         const clp::option_type& option_c = parser.option("c");
         const clp::option_type& option_d = parser.option("d");
         const clp::option_type& option_in = parser.option("in");
