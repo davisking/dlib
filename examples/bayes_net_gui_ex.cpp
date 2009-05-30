@@ -222,7 +222,7 @@ main_window(
     sel_node_num_values.set_text_modified_handler(*this, &main_window::on_sel_node_num_values_modified);
     sel_node_text.set_text_modified_handler      (*this, &main_window::on_sel_node_text_modified);
 
-    // now let the text of some of our buttons and labels
+    // now set the text of some of our buttons and labels
     btn_calculate.set_name("Recalculate posterior probability table");
     selected_node_rect.set_name("Selected node");
     sel_node_evidence_label.set_text("evidence value:");
