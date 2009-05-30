@@ -99,9 +99,9 @@ int main()
         cout << cr.block("user1").block("details")["editor"] << endl;
 
         
-        // Finally, note that you can use the string_cast function to easily
-        // convert fields into non-string types.  For example, the config
-        // file has an integer id field that could be converted into an int like so:
+        // Note that you can use the string_cast function to easily convert fields 
+        // into non-string types.  For example, the config file has an integer id 
+        // field that could be converted into an int like so:
         int id = string_cast<int>(cr.block("user2")["id"]);
         cout << "user2's id is " << id << endl;
 
