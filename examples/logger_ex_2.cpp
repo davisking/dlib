@@ -102,6 +102,10 @@ void setup_loggers (
     // logc.level() back to LINFO since temp_log is a parent of logc_temp.
     logger logc_temp("example.test_class");
     logc_temp.set_level(LWARN);
+
+
+    // Finally, note that you can also configure your loggers from a text config file.  
+    // See the documentation for the configure_loggers_from_file() function for details.
 }
 
 int main()
