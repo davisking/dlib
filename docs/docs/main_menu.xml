@@ -94,6 +94,10 @@
             <name>Examples</name>
             <sub>
                <item>
+                  <name>Config_File_Reader</name>
+                  <link>config_reader_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Member_Function_Pointer</name>
                   <link>member_function_pointer_ex.cpp.html</link>
                </item>

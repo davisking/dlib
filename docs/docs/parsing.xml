@@ -268,6 +268,9 @@
             other types.  The types supported are any types that can be read by the basic_istream operator>>.  It
             also supports casting between wstring, string, and ustring objects.
          </description>
+         <examples>
+            <example>config_reader_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -475,6 +478,10 @@
             This object represents something which is intended to be used to read
                          text configuration files.
          </description>
+
+         <examples>
+            <example>config_reader_ex.cpp.html</example>
+         </examples>
          
          <implementations>
             <implementation>
