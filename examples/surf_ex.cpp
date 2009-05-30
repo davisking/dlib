@@ -2,7 +2,7 @@
 /*
 
     This is a simple example illustrating the use of the get_surf_points()
-    function.  It pull out the first 100 SURF points from an input image 
+    function.  It pulls out the first 100 SURF points from an input image 
     and displays them on the screen as an overlay on the image.
 
     For a description of the SURF algorithm you should consult the following
