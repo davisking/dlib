@@ -404,8 +404,8 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#vector_to_matrix</link>
                      </item>
                      <item>
-                        <name>unroll_to_column_vector</name>
-                        <link>dlib/matrix/matrix_utilities_abstract.h.html#unroll_to_column_vector</link>
+                        <name>reshape_to_column_vector</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#reshape_to_column_vector</link>
                      </item>
                      <item>
                         <name>array_to_matrix</name>
