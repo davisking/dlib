@@ -2205,7 +2205,7 @@ namespace dlib
     template <
         typename EXP
         >
-    const matrix_unary_exp<EXP,op_mat_to_vect> unroll_to_column_vector (
+    const matrix_unary_exp<EXP,op_mat_to_vect> reshape_to_column_vector (
         const matrix_exp<EXP>& m
     )
     {

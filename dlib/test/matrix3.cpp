@@ -483,7 +483,7 @@ namespace
 
             m2 = 1,2,3,4,5,6;
 
-            DLIB_TEST(unroll_to_column_vector(m) == m2);
+            DLIB_TEST(reshape_to_column_vector(m) == m2);
 
         }
         {
@@ -495,7 +495,7 @@ namespace
 
             m2 = 1,2,3,4,5,6;
 
-            DLIB_TEST(unroll_to_column_vector(m) == m2);
+            DLIB_TEST(reshape_to_column_vector(m) == m2);
 
         }
     }
