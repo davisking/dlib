@@ -2181,6 +2181,40 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct op_mat_to_vect 
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long cost = EXP::cost+1;
+            const static long NR = EXP::NC*EXP::NR;
+            const static long NC = 1;
+            typedef typename EXP::type type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { return m(r/m.nc(), r%m.nc()); }
+
+            template <typename M>
+            static long nr (const M& m) { return m.size(); }
+            template <typename M>
+            static long nc (const M& m) { return 1; }
+        }; 
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_unary_exp<EXP,op_mat_to_vect> unroll_to_column_vector (
+        const matrix_exp<EXP>& m
+    )
+    {
+        typedef matrix_unary_exp<EXP,op_mat_to_vect> exp;
+        return exp(m.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_UTILITIES_

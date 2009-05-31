@@ -474,6 +474,30 @@ namespace
             DLIB_TEST(abs((rv4*cv4 + 1.0) - ((rv4*cv4)(0) + 1.0)) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul);
 
         }
+
+        {
+            matrix<int> m(2,3), m2(6,1);
+
+            m = 1,2,3,
+                4,5,6;
+
+            m2 = 1,2,3,4,5,6;
+
+            DLIB_TEST(unroll_to_column_vector(m) == m2);
+
+        }
+        {
+            matrix<int,2,3> m(2,3);
+            matrix<int> m2(6,1);
+
+            m = 1,2,3,
+                4,5,6;
+
+            m2 = 1,2,3,4,5,6;
+
+            DLIB_TEST(unroll_to_column_vector(m) == m2);
+
+        }
     }
 
 

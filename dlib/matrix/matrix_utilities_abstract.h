@@ -350,6 +350,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp unroll_to_column_vector (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - returns a matrix M such that: 
+                - is_col_vector(M) == true
+                - M.size() == m.size()
+                - for all valid r and c:
+                    - m(r,c) == M(r*m.nc() + c)
+
+            - i.e. the matrix m is unrolled in row major order into a
+              column vector
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         long R,
         long C
