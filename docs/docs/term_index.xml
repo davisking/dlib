@@ -846,6 +846,7 @@
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="LERROR"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="LFATAL"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_output_streams"/>
+         <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_output_hooks"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="set_all_logging_levels"/>
          <term file="dlib/logger/logger_kernel_abstract.h.html" name="print_default_logger_header"/>
          <term file="dlib/logger/extra_logger_headers.h.html" name="print_datetime_logger_header"/>
