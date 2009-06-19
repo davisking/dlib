@@ -22,9 +22,14 @@ namespace dlib
         while (gd.loggers.move_next())
         {
             gd.loggers.element()->out.rdbuf(out_.rdbuf());
+            gd.loggers.element()->hook.clear();
         }
 
         gd.set_output_stream("",out_);
+
+        // set the default hook to be an empty member function pointer
+        logger::hook_mfp hook;
+        gd.set_output_hook("",hook);
     }
 
     void set_all_logging_levels (
@@ -257,6 +262,29 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    logger::hook_mfp logger::global_data::
+    output_hook (
+        const std::string& name
+    )
+    {
+        auto_mutex M(m);
+        return search_tables(hook_table, name).val;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void logger::global_data::
+    set_output_hook (
+        const std::string& name,
+        const hook_mfp& hook
+    )
+    {
+        auto_mutex M(m);
+        assign_tables( hook_table, name, hook);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     logger::print_header_type logger::global_data::
     logger_header (
         const std::string& name
@@ -339,7 +367,20 @@ namespace dlib
         if (!been_used)
         {
             log.gd.m.lock();
-            log.logger_header()(log.out,log.name(),l,log.gd.get_thread_name());
+
+            // Check if the output hook is setup.  If it isn't then we print the logger
+            // header like normal.  Otherwise we need to remember to clear out the output
+            // stringstream we always write to.
+            if (log.hook.is_set() == false)
+            {
+                log.logger_header()(log.out,log.name(),l,log.gd.get_thread_name());
+            }
+            else
+            {
+                // use the empty_string in hopes that it is generally faster than calling
+                // str("") since this avoids the construction of a new std::string object.
+                log.gd.sout.str(log.gd.empty_string);
+            }
             been_used = true;
         }
     }
@@ -351,10 +392,19 @@ namespace dlib
     )
     {
         auto_unlock M(log.gd.m);
-        if (log.auto_flush_enabled)
-            log.out << std::endl;
+
+        if (log.hook.is_set() == false)
+        {
+            if (log.auto_flush_enabled)
+                log.out << std::endl;
+            else
+                log.out << "\n";
+        }
         else
-            log.out << "\n";
+        {
+            // call the output hook with all the info regarding this log message.
+            log.hook(log.name(), l, log.gd.get_thread_name(), log.gd.sout.str());
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -385,6 +435,7 @@ namespace dlib
         // load the appropriate settings
         print_header        = gd.logger_header(logger_name);
         auto_flush_enabled  = gd.auto_flush(logger_name);
+        hook                = gd.output_hook(logger_name);
     }
 
 // ----------------------------------------------------------------------------------------

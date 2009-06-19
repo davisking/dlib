@@ -13,6 +13,8 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     class log_level
     {
@@ -37,6 +39,8 @@ namespace dlib
         char name[20];
     };
 
+// ----------------------------------------------------------------------------------------
+
     const log_level LALL  (std::numeric_limits<int>::min(),"ALL");
     const log_level LNONE (std::numeric_limits<int>::max(),"NONE");
     const log_level LTRACE(-100,"TRACE");
@@ -47,6 +51,8 @@ namespace dlib
     const log_level LFATAL(400 ,"FATAL");
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     void set_all_logging_output_streams (
         std::ostream& out
@@ -55,9 +61,35 @@ namespace dlib
         ensures
             - for all loggers L:
                 - #L.output_streambuf() == out.rdbuf() 
+                - Removes any previous output hook from L.  So now the logger
+                  L will write all its messages to the given output stream.
         throws
             - std::bad_alloc
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    void set_all_logging_output_hooks (
+        T& object,
+        void (T::*hook)(const std::string& logger_name, 
+                        const log_level& l,
+                        const uint64 thread_id,
+                        const std::string& message_to_log)
+    );
+    /*!
+        ensures
+            - for all loggers L:
+                - #L.output_streambuf() == 0
+                - performs the equivalent to calling L.set_output_hook(object, hook);
+                  (i.e. sets all loggers so that they will use the given hook function)
+        throws
+            - std::bad_alloc
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
     void set_all_logging_levels (
         const log_level& new_level
@@ -70,6 +102,8 @@ namespace dlib
             - std::bad_alloc
     !*/
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     void print_default_logger_header (
@@ -87,6 +121,8 @@ namespace dlib
             - prints a string to out in the form:  "MS l.name [thread_id] logger_name:"
     !*/
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     class logger 
@@ -183,9 +219,9 @@ namespace dlib
         /*!
             ensures
                 - if (l.priority >= level().priority) then
-                    - returns a logger stream with is_enabled() == true and this
-                      stream will write its output to the streambuf given by 
-                      output_streambuf().
+                    - returns a logger_stream with is_enabled() == true.  I.e. this
+                      returned stream will write its output to the I/O destination 
+                      used by this logger object.
                 - else
                     - returns a logger stream with is_enabled() == false 
             throws
@@ -228,7 +264,8 @@ namespace dlib
         /*!
             ensures
                 - returns true if the output stream is flushed after every logged message.
-                  returns false otherwise.
+                  returns false otherwise.  (Note that flushing only does anything if
+                  the logger is set to use an output stream rather than a hook)
         !*/
 
         void set_auto_flush (
@@ -242,12 +279,48 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+                
+        template <
+            typename T
+            >
+        void set_output_hook (
+            T& object,
+            void (T::*hook)(const std::string& logger_name, 
+                            const log_level& l,
+                            const uint64 thread_id,
+                            const std::string& message_to_log)
+        );
+        /*!
+            requires
+                - hook is a valid pointer to a member function in T 
+            ensures
+                - for all loggers L such that L.is_child_of(*this) == true:
+                    - #L.output_streambuf() == 0
+                    - #L will not send its log messages to an ostream object anymore.  Instead
+                      it will call the given hook member function (i.e. (object.*hook)(name,l,id,msg) )
+                      for each message that needs to be logged.
+                    - The arguments to the hook function have the following meanings:
+                        - logger_name == The name of the logger that is printing the log message.
+                        - l == The level of the logger that is printing the log message.
+                        - thread_id == A number that uniquely identifies the thread trying to log
+                          the message.  Note that this number is unique among all threads, past and
+                          present.  Also note that this id is not the same one returned by
+                          get_thread_id().
+                        - message_to_log == the actual text of the message the user is giving to
+                          the logger object to log.
+                    - All hook functions will also only be called one at a time. This means
+                      that hook functions don't need to be thread safe.
+        !*/
+
         std::streambuf* output_streambuf (
         );
         /*!
             ensures
-                - returns the output stream buffer that this logger writes all
-                  messages to.
+                - if (an output hook isn't set) then
+                    - returns the output stream buffer that this logger writes all
+                      messages to.
+                - else
+                    - returns 0
         !*/
 
         void set_output_stream (
@@ -257,6 +330,8 @@ namespace dlib
             ensures
                 - for all loggers L such that L.is_child_of(*this) == true:
                     - #L.output_streambuf() == out.rdbuf() 
+                    - Removes any previous output hook from L.  So now the logger
+                      L will write all its messages to the given output stream.
             throws
                 - std::bad_alloc
         !*/
@@ -284,6 +359,7 @@ namespace dlib
                       get_thread_id().
                 - This logger_header function will also only be called once at a time. This means
                   the logger_header function doesn't need to be thread safe.
+                - the logger_header function is only used when output_streambuf() != 0
         !*/
 
         void set_logger_header (
@@ -305,6 +381,8 @@ namespace dlib
 
     };    
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }
