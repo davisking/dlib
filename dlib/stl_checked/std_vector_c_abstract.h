@@ -316,7 +316,7 @@ namespace dlib
         ); 
         /*!
             ensures
-                - size() == 0
+                - #size() == 0
         !*/
 
         reference operator[](
