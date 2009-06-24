@@ -2192,7 +2192,7 @@ namespace dlib
             typedef typename EXP::type type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static type apply ( const M& m, long r, long c)
+            static type apply ( const M& m, long r, long )
             { return m(r/m.nc(), r%m.nc()); }
 
             template <typename M>
