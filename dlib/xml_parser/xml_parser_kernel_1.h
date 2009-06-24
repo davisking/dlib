@@ -621,6 +621,8 @@ namespace dlib
             // restore the old exception settings to in
             in.exceptions(old_exceptions);
 
+            // don't forget to rethrow the exception
+            throw;
         }
 
         // restore the old exception settings to in
