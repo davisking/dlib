@@ -31,11 +31,16 @@ namespace dlib
         struct is_small_matrix<EXP, typename enable_if_c<EXP::NR>=1 && EXP::NC>=1 &&
         EXP::NR<=17 && EXP::NC<=17 && (EXP::cost <= 70)>::type> { static const bool value = true; };
 
+        // I wouldn't use this mul object to do the multiply but visual studio 7.1 wouldn't
+        // compile otherwise.
+        template <long a, long b>
+        struct mul { const static long value = a*b; };
+
         template < typename EXP, typename enable = void >
         struct is_very_small_matrix { static const bool value = false; };
         template < typename EXP >
         struct is_very_small_matrix<EXP, typename enable_if_c<EXP::NR>=1 && EXP::NC>=1 &&
-        (EXP::NR*EXP::NC<=16) && (EXP::cost <= 70)>::type> { static const bool value = true; };
+        (mul<EXP::NR,EXP::NC>::value <= 16) && (EXP::cost <= 70)>::type> { static const bool value = true; };
 
 
         template < typename EXP, typename enable = void >

@@ -991,10 +991,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+// this is a workaround for a bug in visual studio 7.1
+    template <typename EXP>
+    struct visual_studio_sucks_cov_helper
+    {
+        typedef typename EXP::type inner_type;
+        typedef matrix<typename inner_type::type, inner_type::NR, inner_type::NR, typename EXP::mem_manager_type> type;
+    };
+
     template <
         typename EXP
         >
-    const matrix<typename EXP::type::type, EXP::type::NR, EXP::type::NR, typename EXP::mem_manager_type> covariance (
+    const typename visual_studio_sucks_cov_helper<EXP>::type covariance (
         const matrix_exp<EXP>& m
     )
     {
@@ -1026,7 +1034,7 @@ namespace dlib
 #endif
 
         // now perform the actual calculation of the covariance matrix.
-        matrix<typename EXP::type::type, EXP::type::NR, EXP::type::NR, typename EXP::mem_manager_type> cov(m(0).nr(),m(0).nr());
+        typename visual_studio_sucks_cov_helper<EXP>::type cov(m(0).nr(),m(0).nr());
         set_all_elements(cov,0);
 
         const matrix<double,EXP::type::NR,EXP::type::NC, typename EXP::mem_manager_type> avg = mean(m);
