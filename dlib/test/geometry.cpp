@@ -9,6 +9,7 @@
 #include <ctime>
 #include <dlib/string.h>
 #include <dlib/matrix.h>
+#include <dlib/rand.h>
 
 #include "tester.h"
 
@@ -323,6 +324,26 @@ namespace
             DLIB_TEST(rect.top() == -1);
             DLIB_TEST(rect.right() == 0);
             DLIB_TEST(rect.bottom() == 0);
+        }
+        {
+            std::vector< dlib::vector<double> > a;
+
+            dlib::vector<double> v;
+            dlib::rand::float_1a rnd;
+
+            for (int i = 0; i < 10; ++i)
+            {
+                v.x() = rnd.get_random_double();
+                v.y() = rnd.get_random_double();
+                v.z() = rnd.get_random_double();
+                a.push_back(v);
+
+            }
+
+            // This test is just to make sure the covariance function can compile when used
+            // on a dlib::vector.  The actual test doesn't matter.
+            DLIB_TEST(sum(covariance(vector_to_matrix(a))) < 10); 
+
         }
 
     }

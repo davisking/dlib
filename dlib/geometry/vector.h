@@ -488,50 +488,10 @@ namespace dlib
 
         // ---------------------------------------
 
-        template <typename U, long N>
-        typename vc_rebind_promote<T,U,3>::type operator + (
-            const vector<U,N>& rhs
-        ) const
-        {
-            typedef vector<typename promote<T,U>::type,3> ret_type;
-            return ret_type(x()+rhs.x(), y()+rhs.y(), z()+rhs.z());
-        }
-
-        // ---------------------------------------
-
-        vector operator + (
-            const vector& rhs
-        ) const
-        {
-            return vector(x()+rhs.x(), y()+rhs.y(), z()+rhs.z());
-        }
-
-        // ---------------------------------------
-
-        template <typename U, long N>
-        typename vc_rebind_promote<T,U,3>::type operator - (
-            const vector<U,N>& rhs
-        ) const
-        {
-            typedef vector<typename promote<T,U>::type,3> ret_type;
-            return ret_type(x()-rhs.x(), y()-rhs.y(), z()-rhs.z());
-        }
-
-        // ---------------------------------------
-
         vector operator - (
         ) const
         {
             return vector(-x(), -y(), -z());
-        }
-
-        // ---------------------------------------
-
-        vector operator - (
-            const vector& rhs
-        ) const
-        {
-            return vector(x()-rhs.x(), y()-rhs.y(), z()-rhs.z());
         }
 
         // ---------------------------------------
@@ -852,50 +812,10 @@ namespace dlib
 
         // ---------------------------------------
 
-        vector operator + (
-            const vector& rhs
-        ) const
-        {
-            return vector(x()+rhs.x(), y()+rhs.y());
-        }
-
-        // ---------------------------------------
-
-        template <typename U, long N>
-        typename vc_rebind_promote<T,U,N>::type operator + (
-            const vector<U,N>& rhs
-        ) const
-        {
-            typedef vector<typename promote<T,U>::type,N> ret_type;
-            return ret_type(*this) + ret_type(rhs);
-        }
-
-        // ---------------------------------------
-
         vector operator - (
         ) const
         {
             return vector(-x(), -y());
-        }
-
-        // ---------------------------------------
-
-        vector operator - (
-            const vector& rhs
-        ) const
-        {
-            return vector(x()-rhs.x(), y()-rhs.y());
-        }
-
-        // ---------------------------------------
-
-        template <typename U, long N>
-        typename vc_rebind_promote<T,U,N>::type operator - (
-            const vector<U,N>& rhs
-        ) const
-        {
-            typedef vector<typename promote<T,U>::type,N> ret_type;
-            return ret_type(*this) - ret_type(rhs);
         }
 
         // ---------------------------------------
@@ -980,6 +900,105 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    template <typename T, typename U>
+    inline const typename vc_rebind_promote<T,U,2>::type operator+ (
+        const vector<T,2>& lhs,
+        const vector<U,2>& rhs 
+    )
+    {
+        typedef typename vc_rebind_promote<T,U,2>::type ret_type;
+        return ret_type(lhs.x()+rhs.x(), lhs.y()+rhs.y());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    inline const typename vc_rebind_promote<T,U,3>::type operator+ (
+        const vector<T,3>& lhs,
+        const vector<U,3>& rhs 
+    )
+    {
+        typedef typename vc_rebind_promote<T,U,3>::type ret_type;
+        return ret_type(lhs.x()+rhs.x(), lhs.y()+rhs.y(), lhs.z()+rhs.z());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    inline const typename vc_rebind_promote<T,U,3>::type operator+ (
+        const vector<T,2>& lhs,
+        const vector<U,3>& rhs 
+    )
+    {
+        typedef typename vc_rebind_promote<T,U,3>::type ret_type;
+        return ret_type(lhs.x()+rhs.x(), lhs.y()+rhs.y(), rhs.z());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    inline const typename vc_rebind_promote<T,U,3>::type operator+ (
+        const vector<T,3>& lhs,
+        const vector<U,2>& rhs 
+    )
+    {
+        typedef typename vc_rebind_promote<T,U,3>::type ret_type;
+        return ret_type(lhs.x()+rhs.x(), lhs.y()+rhs.y(), lhs.z());
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    inline const typename vc_rebind_promote<T,U,2>::type operator- (
+        const vector<T,2>& lhs,
+        const vector<U,2>& rhs 
+    )
+    {
+        typedef typename vc_rebind_promote<T,U,2>::type ret_type;
+        return ret_type(lhs.x()-rhs.x(), lhs.y()-rhs.y());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    inline const typename vc_rebind_promote<T,U,3>::type operator- (
+        const vector<T,3>& lhs,
+        const vector<U,3>& rhs 
+    )
+    {
+        typedef typename vc_rebind_promote<T,U,3>::type ret_type;
+        return ret_type(lhs.x()-rhs.x(), lhs.y()-rhs.y(), lhs.z()-rhs.z());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    inline const typename vc_rebind_promote<T,U,3>::type operator- (
+        const vector<T,2>& lhs,
+        const vector<U,3>& rhs 
+    )
+    {
+        typedef typename vc_rebind_promote<T,U,3>::type ret_type;
+        return ret_type(lhs.x()-rhs.x(), lhs.y()-rhs.y(), -rhs.z());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    inline const typename vc_rebind_promote<T,U,3>::type operator- (
+        const vector<T,3>& lhs,
+        const vector<U,2>& rhs 
+    )
+    {
+        typedef typename vc_rebind_promote<T,U,3>::type ret_type;
+        return ret_type(lhs.x()-rhs.x(), lhs.y()-rhs.y(), lhs.z());
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <typename T, typename U>
     inline typename disable_if<is_matrix<U>, const typename vc_rebind_promote<T,U,2>::type >::type operator* (
