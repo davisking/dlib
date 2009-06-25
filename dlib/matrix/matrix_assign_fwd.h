@@ -31,6 +31,12 @@ namespace dlib
         struct is_small_matrix<EXP, typename enable_if_c<EXP::NR>=1 && EXP::NC>=1 &&
         EXP::NR<=17 && EXP::NC<=17 && (EXP::cost <= 70)>::type> { static const bool value = true; };
 
+        template < typename EXP, typename enable = void >
+        struct is_very_small_matrix { static const bool value = false; };
+        template < typename EXP >
+        struct is_very_small_matrix<EXP, typename enable_if_c<EXP::NR>=1 && EXP::NC>=1 &&
+        (EXP::NR*EXP::NC<=16) && (EXP::cost <= 70)>::type> { static const bool value = true; };
+
 
         template < typename EXP, typename enable = void >
         struct has_column_major_layout { static const bool value = false; };
@@ -301,12 +307,50 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+// this code is here to perform an unrolled version of the matrix_assign() function
+    template < typename DEST, typename SRC, long NR, long NC,
+    long R = 0, long C = 0, bool base_case = (R==NR) >
+    struct matrix_unroll_helper
+    {
+        inline static void go ( DEST& dest, const SRC& src)
+        {
+            dest(R,C) = src(R,C);
+            matrix_unroll_helper<DEST,SRC,NR,NC, R + (C+1)/NC,  (C+1)%NC>::go(dest,src);
+        }
+    };
+
+    template < typename DEST, typename SRC, long NR, long NC, long R, long C >
+    struct matrix_unroll_helper<DEST,SRC,NR,NC,R,C,true>
+    { inline static void go ( DEST& , const SRC& ) {} };
+
+    template <typename DEST, typename SRC>
+    inline void matrix_assign_unrolled (
+        DEST& dest,
+        const SRC& src
+    )
+    /*!
+        requires
+            - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()
+            - dest.nc() == src.nc()
+        ensures
+            - #dest == src
+    !*/
+    {
+        COMPILE_TIME_ASSERT(SRC::NR*SRC::NC != 0);
+        matrix_unroll_helper<DEST,SRC, SRC::NR, SRC::NC>::go(dest,src);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename matrix_dest_type,
         typename src_exp 
         >
-    inline typename enable_if<ma::is_small_matrix<src_exp> >::type matrix_assign (
+    inline typename enable_if_c<ma::is_small_matrix<src_exp>::value && ma::is_very_small_matrix<src_exp>::value==false >::type matrix_assign (
         matrix_dest_type& dest,
         const matrix_exp<src_exp>& src
     )
@@ -320,6 +364,28 @@ namespace dlib
     !*/
     {
         matrix_assign_default(dest,src.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_dest_type,
+        typename src_exp 
+        >
+    inline typename enable_if_c<ma::is_small_matrix<src_exp>::value && ma::is_very_small_matrix<src_exp>::value==true >::type matrix_assign (
+        matrix_dest_type& dest,
+        const matrix_exp<src_exp>& src
+    )
+    /*!
+        requires
+            - src.destructively_aliases(dest) == false
+            - dest.nr() == src.nr()
+            - dest.nc() == src.nc()
+        ensures
+            - #dest == src
+    !*/
+    {
+        matrix_assign_unrolled(dest,src.ref());
     }
 
 // ----------------------------------------------------------------------------------------
