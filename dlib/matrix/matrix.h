@@ -216,12 +216,12 @@ namespace dlib
         inline const static type  eval (
             const RHS_& rhs,
             const LHS_& lhs,
-            long r, 
-            long c
+            const long r, 
+            const long c
         )  
         { 
-            type temp = type();
-            for (long i = 0; i < rhs.nr(); ++i)
+            type temp = lhs(r,0)*rhs(0,c);
+            for (long i = 1; i < rhs.nr(); ++i)
             {
                 temp += lhs(r,i)*rhs(i,c);
             }
@@ -241,12 +241,12 @@ namespace dlib
         inline const static type  eval (
             const RHS_& rhs,
             const LHS_& lhs,
-            long r, 
-            long c
+            const long r, 
+            const long c
         )  
         { 
-            type temp = type();
-            for (long i = 0; i < lhs.nc(); ++i)
+            type temp = lhs(r,0)*rhs(0,c);
+            for (long i = 1; i < lhs.nc(); ++i)
             {
                 temp += lhs(r,i)*rhs(i,c);
             }
@@ -347,8 +347,8 @@ namespace dlib
         }
 
         inline const type operator() (
-            long r, 
-            long c
+            const long r, 
+            const long c
         ) const 
         { 
             return matrix_multiply_helper<LHS,RHS>::eval(rhs,lhs,r,c);
