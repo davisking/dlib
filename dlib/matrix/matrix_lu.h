@@ -128,7 +128,11 @@ namespace dlib
             {
                 // Most of the time is spent in the following dot product.
                 const long kmax = std::min(i,j);
-                const type s = rowm(LU,i, kmax)*colm(LUcolj,0,kmax);
+                type s;
+                if (kmax > 0)
+                    s = rowm(LU,i, kmax)*colm(LUcolj,0,kmax);
+                else 
+                    s = 0;
 
                 LU(i,j) = LUcolj(i) -= s;
             }

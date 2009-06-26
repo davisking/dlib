@@ -331,7 +331,7 @@ namespace dlib
             // You are trying to multiply two incompatible matrices together.  The number of columns 
             // in the matrix on the left must match the number of rows in the matrix on the right.
             COMPILE_TIME_ASSERT(LHS::NC == RHS::NR || LHS::NC*RHS::NR == 0);
-            DLIB_ASSERT(lhs.nc() == rhs.nr(), 
+            DLIB_ASSERT(lhs.nc() == rhs.nr() && lhs.size() > 0 && rhs.size() > 0, 
                 "\tconst matrix_exp operator*(const matrix_exp& lhs, const matrix_exp& rhs)"
                 << "\n\tYou are trying to multiply two incompatible matrices together"
                 << "\n\tlhs.nr(): " << lhs.nr()

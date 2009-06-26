@@ -196,6 +196,8 @@ namespace dlib
     /*!
         requires
             - m1.nc() == m2.nr()
+            - m1.size() > 0 && m2.size() > 0
+              (you can't multiply any sort of empty matrices together)
             - m1 and m2 both contain elements of the same type
         ensures
             - returns the result of doing the matrix multiplication m1*m2.  The resulting
