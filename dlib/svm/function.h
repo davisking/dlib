@@ -363,7 +363,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename function_type
+        typename function_type,
+        typename normalizer_type = vector_normalizer<typename function_type::sample_type>
         >
     struct normalized_function 
     {
@@ -372,7 +373,7 @@ namespace dlib
         typedef typename function_type::sample_type sample_type;
         typedef typename function_type::mem_manager_type mem_manager_type;
 
-        vector_normalizer<sample_type> normalizer;
+        normalizer_type normalizer;
         function_type function;
 
         normalized_function (

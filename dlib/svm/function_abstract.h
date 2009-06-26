@@ -364,7 +364,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename function_type
+        typename function_type,
+        typename normalizer_type = vector_normalizer<typename function_type::sample_type>
         >
     struct normalized_function 
     {
@@ -373,12 +374,14 @@ namespace dlib
                 - function_type must be a function object with an overloaded
                   operator() similar to the other function objects defined in
                   this file.
-                - function_type::sample_type must be a dlib::matrix column
-                  matrix type
+
+            REQUIREMENTS ON normalizer_type
+                - normalizer_type must be a function object with an overloaded
+                  operator() that takes a sample_type and returns a sample_type.
 
             WHAT THIS OBJECT REPRESENTS 
                 This object represents a container for another function
-                object and an instance of the vector_normalizer object.  
+                object and an instance of a normlizer function.  
 
                 It automatically noramlizes all inputs before passing them
                 off to the contained function object.
@@ -389,7 +392,7 @@ namespace dlib
         typedef typename function_type::sample_type sample_type;
         typedef typename function_type::mem_manager_type mem_manager_type;
 
-        vector_normalizer<sample_type> normalizer;
+        normalizer_type normalizer;
         function_type function;
 
         normalized_function (
