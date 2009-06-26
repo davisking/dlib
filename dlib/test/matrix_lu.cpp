@@ -81,6 +81,8 @@ namespace
         DLIB_TEST(test.nr() == m.nr());
         DLIB_TEST(test.nc() == m.nc());
 
+        dlog << LDEBUG << "m.nr(): " << m.nr() << "  m.nc(): " << m.nc();
+
         type temp;
         DLIB_TEST_MSG( (temp= max(abs(test.get_l()*test.get_u() - rowm(m,test.get_pivot())))) < eps,temp);
 
@@ -131,8 +133,8 @@ namespace
     {
 
 
-        test_lu(10*randmat<double>(1,1));
         test_lu(10*randmat<double>(2,2));
+        test_lu(10*randmat<double>(1,1));
         test_lu(10*symm(randmat<double>(2,2)));
         test_lu(10*randmat<double>(4,4));
         test_lu(10*randmat<double>(9,4));
@@ -143,8 +145,8 @@ namespace
         test_lu(10*randmat<double>(137,200));
         test_lu(10*randmat<double>(200,101));
 
-        test_lu(10*randmat<double,1,1>());
         test_lu(10*randmat<double,2,2>());
+        test_lu(10*randmat<double,1,1>());
         test_lu(10*randmat<double,4,3>());
         test_lu(10*randmat<double,4,4>());
         test_lu(10*randmat<double,9,4>());
