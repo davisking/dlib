@@ -16,28 +16,28 @@
 #include <iostream>
 // ----------------------------------------------------------------------------------------
 
-#define TIME_THIS_TO(op,out)                                                        \
-    {                                                                               \
-        clock_t start, end;                                                         \
-        tms timesbuf;                                                               \
-        start = times(&timesbuf);                                                   \
-        op;                                                                         \
-        end = times(&timesbuf);                                                     \
-        long ticks = sysconf(_SC_CLK_TCK);                                          \
-        if ((double)(end-start)/(double)ticks < 1)                                  \
-        {                                                                           \
-            out << "\ntime: "                                                       \
-            << (int)(1000*((double)(end-start)/(double)ticks)) << "ms\n";           \
-        }                                                                           \
-        else                                                                        \
-        {                                                                           \
-            out << "\ntime: "                                                       \
-                      << (double)(end-start)/(double)ticks << "sec\n";              \
-        }                                                                           \
-    }                                                                               \
+#define TIME_THIS_TO(_tt_op,_tt_out)                                                        \
+    {                                                                                       \
+        clock_t _tt_start, _tt_end;                                                         \
+        tms _tt_timesbuf;                                                                   \
+        _tt_start = times(&_tt_timesbuf);                                                   \
+        _tt_op;                                                                             \
+        _tt_end = times(&_tt_timesbuf);                                                     \
+        long _tt_ticks = sysconf(_SC_CLK_TCK);                                              \
+        if ((double)(_tt_end-_tt_start)/(double)_tt_ticks < 1)                              \
+        {                                                                                   \
+            _tt_out << "\ntime: "                                                           \
+            << (int)(1000*((double)(_tt_end-_tt_start)/(double)_tt_ticks)) << "ms\n";       \
+        }                                                                                   \
+        else                                                                                \
+        {                                                                                   \
+            _tt_out << "\ntime: "                                                           \
+                      << (double)(_tt_end-_tt_start)/(double)_tt_ticks << "sec\n";          \
+        }                                                                                   \
+    }                                                                                       \
 
 
-#define TIME_THIS(op)  TIME_THIS_TO(op,std::cout)
+#define TIME_THIS(_tt_op)  TIME_THIS_TO(_tt_op,std::cout)
 
 // ----------------------------------------------------------------------------------------
 
@@ -52,25 +52,26 @@
 
 // ----------------------------------------------------------------------------------------
 
-#define TIME_THIS_TO(op,out)                                                        \
-    {                                                                               \
-        unsigned long count = GetTickCount();                                       \
-        op;                                                                         \
-        count = GetTickCount() - count;                                             \
-        if (count < 1000)                                                           \
-        {                                                                           \
-            out << "\ntime: " << count << "ms\n";                                   \
-        }                                                                           \
-        else                                                                        \
-        {                                                                           \
-            out << "\ntime: " << static_cast<double>(count)/1000 << "sec\n";        \
-        }                                                                           \
-    }                                                                               \
+#define TIME_THIS_TO(_tt_op,_tt_out)                                                        \
+    {                                                                                       \
+        unsigned long _tt_count = GetTickCount();                                           \
+        _tt_op;                                                                             \
+        _tt_count = GetTickCount() - _tt_count;                                             \
+        if (_tt_count < 1000)                                                               \
+        {                                                                                   \
+            _tt_out << "\ntime: " << _tt_count << "ms\n";                                   \
+        }                                                                                   \
+        else                                                                                \
+        {                                                                                   \
+            _tt_out << "\ntime: " << static_cast<double>(_tt_count)/1000 << "sec\n";        \
+        }                                                                                   \
+    }                                                                                       \
 
-#define TIME_THIS(op) TIME_THIS_TO(op,std::cout)
+#define TIME_THIS(_tt_op) TIME_THIS_TO(_tt_op,std::cout)
 
 // ----------------------------------------------------------------------------------------
 
 #endif
 
 #endif // DLIB_TIME_THIs_
+
