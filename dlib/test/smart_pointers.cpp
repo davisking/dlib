@@ -12,6 +12,27 @@
 
 namespace  
 {
+    bool used_array_delete;
+    template <typename T>
+    struct test_deleter
+    {
+        void operator() (T* item) const
+        {
+            used_array_delete = false;
+            delete item;
+        }
+    };
+
+    template <typename T>
+    struct test_deleter<T[]>
+    {
+        void operator() (T* item) const
+        {
+            used_array_delete = true;
+            delete [] item;
+        }
+    };
+
 
     using namespace test;
     using namespace dlib;
@@ -366,6 +387,32 @@ namespace
 
         DLIB_TEST_MSG(counter == 0,counter);
         DLIB_TEST_MSG(deleter_called == 3,counter);
+
+        {
+            scoped_ptr<int[]> a(new int[10]);
+
+            {
+                used_array_delete = false;
+                scoped_ptr<int[],test_deleter<int[]> > b(new int[10]);
+
+                for (int i = 0; i < 10; ++i)
+                {
+                    a[i] = i;
+                    b[i] = i;
+                }
+            }
+            DLIB_TEST(used_array_delete == true);
+
+
+            {
+                used_array_delete = true;
+                scoped_ptr<int,test_deleter<int> > c(new int);
+            }
+            DLIB_TEST(used_array_delete == false);
+
+            scoped_ptr<const int[]> const_a(new int[10]);
+
+        }
 
     }
 
