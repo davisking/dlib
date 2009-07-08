@@ -408,7 +408,7 @@ namespace dlib
                 result = keycode;
 
                 // make the result lower case if we need to.
-                if (shift && caps || !caps && !shift)
+                if ((shift && caps) || (!caps && !shift))
                     result = result - 'A' + 'a';               
             }
             else
