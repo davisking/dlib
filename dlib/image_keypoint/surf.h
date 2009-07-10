@@ -213,7 +213,8 @@ namespace dlib
         {
             // ignore points that are close to the edge of the image
             const double border = 31;
-            if (get_rect(int_img).contains(centered_rect(points[i].center, border*points[i].scale, border*points[i].scale)))
+            const unsigned long border_size = static_cast<unsigned long>(border*points[i].scale);
+            if (get_rect(int_img).contains(centered_rect(points[i].center, border_size, border_size)))
             {
                 sp.angle = compute_dominant_angle(int_img, points[i].center, points[i].scale);
                 compute_surf_descriptor(int_img, points[i].center, points[i].scale, sp.angle, sp.des);
