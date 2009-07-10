@@ -309,7 +309,7 @@ namespace dlib
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_rowm>& m)
+        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_rowm>& )
         {
             return 1;
         }
@@ -321,7 +321,7 @@ namespace dlib
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_rowm2>& m)
+        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_rowm2>& )
         {
             return 1;
         }
@@ -329,7 +329,7 @@ namespace dlib
 
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_colm>& m)
+        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_colm>& )
         {
             return 1;
         }
@@ -341,7 +341,7 @@ namespace dlib
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_colm2>& m)
+        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_colm2>& )
         {
             return 1;
         }
@@ -355,7 +355,7 @@ namespace dlib
 
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const assignable_row_matrix<T,NR,NC,MM,row_major_layout>& m)
+        int get_inc(const assignable_row_matrix<T,NR,NC,MM,row_major_layout>& )
         {
             return 1;
         }
@@ -373,7 +373,7 @@ namespace dlib
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const assignable_col_matrix<T,NR,NC,MM,column_major_layout>& m)
+        int get_inc(const assignable_col_matrix<T,NR,NC,MM,column_major_layout>& )
         {
             return 1;
         }
