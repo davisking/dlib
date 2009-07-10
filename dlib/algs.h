@@ -764,7 +764,6 @@ namespace dlib
                 and properly aligned to hold any kind of object.
         !*/
     public:
-
         static const unsigned long size = bSIZE;
 
         stack_based_memory_block(): data(mem.data) {}
@@ -782,6 +781,10 @@ namespace dlib
         !*/
 
     private:
+
+        // You obviously can't have a block of memory that has zero bytes in it.
+        COMPILE_TIME_ASSERT(bSIZE > 0);
+        
         union mem_block
         {
             // All of this garbage is to make sure this union is properly aligned 

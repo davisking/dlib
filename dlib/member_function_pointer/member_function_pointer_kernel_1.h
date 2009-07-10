@@ -164,7 +164,13 @@ namespace dlib
 
     protected:
 
-        stack_based_memory_block<sizeof(mp_null_impl)> mp_memory;
+        // The reason for adding 1 here is because visual studio 2003 will sometimes
+        // try to compile this code with sizeof(mp_null_impl) == 0 (which is a bug in visual studio).
+        // Fortunately, no actual real instances of this template seem to end up with that screwed up
+        // value so everything works fine if we just add 1 so that this degenerate case doesn't cause
+        // trouble.  Note that we know it all works fine because safe_clone() checks the size of this
+        // memory block whenever the member function pointer is used.  
+        stack_based_memory_block<sizeof(mp_null_impl)+1> mp_memory;
 
         void destroy_mp_memory (
         )
