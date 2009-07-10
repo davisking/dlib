@@ -8,6 +8,7 @@
 #include "xml_parser_kernel_interfaces.h"
 #include "xml_parser_kernel_abstract.h"
 #include "../algs.h"
+#include <cstdio>
 
 namespace dlib
 {

@@ -204,7 +204,7 @@ namespace dlib
 
     // don't declare this if we are using mingw because it apparently doesn't
     // support iostreams with wchar_t?
-#ifndef __MINGW32__
+#if !(defined(__MINGW32__) && (__GNUC__ < 4))
     template <
         typename T
         >

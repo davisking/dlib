@@ -11,6 +11,7 @@
 
 namespace dlib
 {
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -31,7 +32,7 @@ namespace dlib
             CONVENTION
                 - is_empty() ==  (type_identity == 0)
                 - contains<T>() == (type_identity == get_id<T>())
-                - mem.data == the block of memory on the stack which is
+                - mem.get() == the block of memory on the stack which is
                   where objects in the union are stored
         !*/
 
@@ -48,26 +49,10 @@ namespace dlib
                                                         sizeof(T9)>::value,
                                                         sizeof(T10)>::value; 
 
-        union mem_block
-        {
-            // All of this garbage is to make sure this union is properly aligned 
-            // (a union is always aligned such that everything in it would be properly
-            // aligned.  So the assumption here is that one of these objects has 
-            // a large enough alignment requirement to satisfy any object this
-            // type_safe_union might contain).
-            void* void_ptr;
-            struct {
-                void (type_safe_union::*callback)();
-                type_safe_union* o; 
-            } stuff;
-            long double more_stuff;
-
-            char data[max_size]; 
-        };
+        stack_based_memory_block<max_size> mem;
 
 
         int type_identity;
-        mem_block mem;
 
         struct destruct_helper
         {
@@ -120,7 +105,7 @@ namespace dlib
             if (type_identity != get_id<T>())
             {
                 destruct(); 
-                new((void*)mem.data) T(); 
+                new(mem.get()) T(); 
                 type_identity = get_id<T>();
             }
         }
@@ -316,7 +301,7 @@ namespace dlib
             }
         }
 
-        template <typename T> T& get() { construct<T>();  return *reinterpret_cast<T*>(mem.data); }
+        template <typename T> T& get() { construct<T>();  return *reinterpret_cast<T*>(mem.get()); }
 
     };
 

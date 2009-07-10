@@ -752,6 +752,61 @@ namespace dlib
     template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4>
     funct_wrap5<T,A0,A1,A2,A3,A4> wrap_function(T (&f)(A0, A1, A2, A3, A4)) { return funct_wrap5<T,A0,A1,A2,A3,A4>(f); }
 
+// ----------------------------------------------------------------------------------------
+
+    template <unsigned long bSIZE>
+    class stack_based_memory_block : noncopyable
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple container for a block of memory
+                of bSIZE bytes.  This memory block is located on the stack
+                and properly aligned to hold any kind of object.
+        !*/
+    public:
+
+        static const unsigned long size = bSIZE;
+
+        stack_based_memory_block(): data(mem.data) {}
+
+        void* get () { return data; }
+        /*!
+            ensures
+                - returns a pointer to the block of memory contained in this object
+        !*/
+
+        const void* get () const { return data; }
+        /*!
+            ensures
+                - returns a pointer to the block of memory contained in this object
+        !*/
+
+    private:
+        union mem_block
+        {
+            // All of this garbage is to make sure this union is properly aligned 
+            // (a union is always aligned such that everything in it would be properly
+            // aligned.  So the assumption here is that one of these objects has 
+            // a large enough alignment requirement to satisfy any object this
+            // block of memory might be cast into).
+            void* void_ptr;
+            int integer;
+            struct {
+                void (stack_based_memory_block::*callback)();
+                stack_based_memory_block* o; 
+            } stuff;
+            long double more_stuff;
+
+            char data[size]; 
+        } mem;
+
+        // The reason for having this variable is that doing it this way avoids
+        // warnings from gcc about violations of strict-aliasing rules.
+        void* const data; 
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_ALGs_

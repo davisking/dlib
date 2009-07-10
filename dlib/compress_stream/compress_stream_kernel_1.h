@@ -6,6 +6,7 @@
 #include "../algs.h"
 #include <iostream>
 #include <streambuf>
+#include <cstdio>
 #include "compress_stream_kernel_abstract.h"
 
 namespace dlib

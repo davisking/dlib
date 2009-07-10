@@ -196,13 +196,13 @@ namespace dlib
             }
 
             template <unsigned long mem_size>
-            void safe_clone(char (&buf)[mem_size])
+            void safe_clone(stack_based_memory_block<mem_size>& buf)
             {
                 // This is here just to validate the assumption that our block of memory we have made
-                // in bf_memory.data is the right size to store the data for this object.  If you
+                // in bf_memory is the right size to store the data for this object.  If you
                 // get a compiler error on this line then email me :)
                 COMPILE_TIME_ASSERT(sizeof(bound_function_helper_T) <= mem_size);
-                clone(buf);
+                clone(buf.get());
             }
 
             void clone   (void* ptr) const  
@@ -227,11 +227,11 @@ namespace dlib
 
     public:
         bound_function_pointer_kernel_1 (
-        ) { bf_null_type().safe_clone(bf_memory.data); }
+        ) { bf_null_type().safe_clone(bf_memory); }
 
         bound_function_pointer_kernel_1 ( 
             const bound_function_pointer_kernel_1& item
-        ) { item.bf()->clone(bf_memory.data); }
+        ) { item.bf()->clone(bf_memory.get()); }
 
         ~bound_function_pointer_kernel_1()
         { destroy_bf_memory(); }
@@ -259,12 +259,12 @@ namespace dlib
             // destory the stuff in item
             item.destroy_bf_memory();
             // copy *this into item
-            bf()->clone(item.bf_memory.data);
+            bf()->clone(item.bf_memory.get());
 
             // destory the stuff in this 
             destroy_bf_memory();
             // copy temp into *this
-            temp.bf()->clone(bf_memory.data);
+            temp.bf()->clone(bf_memory.get());
         }
 
         void operator() (
@@ -300,7 +300,7 @@ namespace dlib
             bf_helper_type temp;
             temp.fp = &function_object;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename F, typename A1 >
@@ -320,7 +320,7 @@ namespace dlib
             temp.arg1 = &arg1;
             temp.fp = &function_object;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename F, typename A1, typename A2 >
@@ -342,7 +342,7 @@ namespace dlib
             temp.arg2 = &arg2;
             temp.fp = &function_object;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename F, typename A1, typename A2, typename A3 >
@@ -366,7 +366,7 @@ namespace dlib
             temp.arg3 = &arg3;
             temp.fp = &function_object;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename F, typename A1, typename A2, typename A3, typename A4>
@@ -392,7 +392,7 @@ namespace dlib
             temp.arg4 = &arg4;
             temp.fp = &function_object;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
     // -------------------------------------------
@@ -412,7 +412,7 @@ namespace dlib
             bf_helper_type temp;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename T >
@@ -428,7 +428,7 @@ namespace dlib
             bf_helper_type temp;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
     // -------------------------------------------
@@ -448,7 +448,7 @@ namespace dlib
             temp.arg1 = &arg1;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename T, typename T1, typename A1 >
@@ -466,7 +466,7 @@ namespace dlib
             temp.arg1 = &arg1;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
     // ----------------
@@ -489,7 +489,7 @@ namespace dlib
             temp.arg2 = &arg2;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename T, typename T1, typename A1,
@@ -510,7 +510,7 @@ namespace dlib
             temp.arg2 = &arg2;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
     // ----------------
@@ -536,7 +536,7 @@ namespace dlib
             temp.arg3 = &arg3;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename T, typename T1, typename A1,
@@ -560,7 +560,7 @@ namespace dlib
             temp.arg3 = &arg3;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
     // ----------------
@@ -589,7 +589,7 @@ namespace dlib
             temp.arg4 = &arg4;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename T, typename T1, typename A1,
@@ -616,7 +616,7 @@ namespace dlib
             temp.arg4 = &arg4;
             temp.mfp.set(object,funct);
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
     // -------------------------------------------
@@ -634,7 +634,7 @@ namespace dlib
             bf_helper_type temp;
             temp.fp = funct;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename T1, typename A1>
@@ -651,7 +651,7 @@ namespace dlib
             temp.arg1 = &arg1;
             temp.fp = funct;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename T1, typename A1,
@@ -671,7 +671,7 @@ namespace dlib
             temp.arg2 = &arg2;
             temp.fp = funct;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename T1, typename A1,
@@ -694,7 +694,7 @@ namespace dlib
             temp.arg3 = &arg3;
             temp.fp = funct;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
         template <typename T1, typename A1,
@@ -720,28 +720,14 @@ namespace dlib
             temp.arg4 = &arg4;
             temp.fp = funct;
 
-            temp.safe_clone(bf_memory.data);
+            temp.safe_clone(bf_memory);
         }
 
     // -------------------------------------------
 
     private:
 
-        union data_block_type
-        {
-            // All of this garbage is to make sure this union is properly aligned 
-            // (a union is always aligned such that everything in it would be properly
-            // aligned.  So the assumption here is that one of these things big good
-            // alignment to satisfy mp_null_impl objects (or other objects like it).
-            void* void_ptr;
-            long double dtemp;
-            struct {
-                void (bfp1_helpers::bound_function_helper_base_base::*callback)();
-                bfp1_helpers::bound_function_helper_base_base* o; 
-            } stuff;
-
-            char data[sizeof(bf_null_type)];
-        } bf_memory;
+        stack_based_memory_block<sizeof(bf_null_type)> bf_memory;
 
         void destroy_bf_memory (
         )
@@ -752,10 +738,10 @@ namespace dlib
         }
 
         bfp1_helpers::bound_function_helper_base_base*       bf ()       
-        { void* ptr = bf_memory.data;       return static_cast<bfp1_helpers::bound_function_helper_base_base*>(ptr); }
+        { return static_cast<bfp1_helpers::bound_function_helper_base_base*>(bf_memory.get()); }
 
         const bfp1_helpers::bound_function_helper_base_base* bf () const 
-        { const void* ptr = bf_memory.data; return static_cast<const bfp1_helpers::bound_function_helper_base_base*>(ptr); }
+        { return static_cast<const bfp1_helpers::bound_function_helper_base_base*>(bf_memory.get()); }
 
     };
 
