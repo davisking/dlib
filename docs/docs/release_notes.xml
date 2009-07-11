@@ -13,12 +13,37 @@
 
 <current>
 New Stuff:
+   - Added the reshape_to_column_vector() function.
+   - Added a hook to the logger object that lets you set a different kind of
+     output logging destination (in addition to the std::ostream supported 
+     already).
+   - Upgraded the smart_ptr so that it can handle array pointers as well
+     as customer deleter functions.
+   - Added overloads of the kernel_derivative object for all the kernels 
+     in dlib.
 
 Non-Backwards Compatible Changes:
+   - Reworked the config_reader interface a little to make it easier to use.  
+     In particular, I removed the enumerator over blocks in favor of a simple 
+     get_blocks() function that just returns a std::vector of all the blocks.  
+     I also removed the requires clauses on the block and key accessor functions 
+     and instead made a request for a non-existent key/block result in a non-fatal 
+     exception.  This way users can let the config reader perform a more natural 
+     role in config file validation (by catching this exception and acting 
+     accordingly).
+   - It is now illegal to multiply matrices of size zero together. 
 
 Bug fixes:
+   - Fixed the gaussian() function used by the SURF code.  It wasn't computing 
+     a properly weighted Gaussian function.
+   - Fixed a few things in various parts of the code to avoid compiler errors 
+     in certain use-cases.
+   - Added a missing rethrow statement.  The xml parser would eat exceptions 
+     thrown by event handlers rather than letting them propagate out as 
+     documented in the specification.
 
 Other:
+
 </current>
 
 <!-- *******************************************************************************  -->
