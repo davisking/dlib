@@ -8,10 +8,24 @@
 
 <release_notes>
 
-
 <!-- *******************************************************************************  -->
 
 <current>
+New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+   - Made the thread_function object more general.   It can now handle
+     arbitrary functions of up to four arguments.
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.20" date="Jul 11, 2009">
 New Stuff:
    - Added the reshape_to_column_vector() function.
    - Added a hook to the logger object that lets you set a different kind of
@@ -44,7 +58,7 @@ Bug fixes:
 
 Other:
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
