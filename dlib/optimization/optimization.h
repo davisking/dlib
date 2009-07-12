@@ -24,7 +24,9 @@ namespace dlib
     public:
         // You get an error on this line when you pass in a global function to this function.
         // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
         COMPILE_TIME_ASSERT(is_function<funct>::value == false);
 
         central_differences(const funct& f_, double eps_ = 1e-7) : f(f_), eps(eps_){}
@@ -65,7 +67,9 @@ namespace dlib
     { 
         // You get an error on this line when you pass in a global function to this function.
         // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
         COMPILE_TIME_ASSERT(is_function<funct>::value == false);
 
         DLIB_ASSERT (
@@ -85,7 +89,9 @@ namespace dlib
     public:
         // You get an error on this line when you pass in a global function to this function.
         // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
         COMPILE_TIME_ASSERT(is_function<funct>::value == false);
 
         line_search_funct(const funct& f_, const T& start_, const T& direction_) : f(f_),start(start_), direction(direction_)
@@ -122,7 +128,9 @@ namespace dlib
     { 
         // You get an error on this line when you pass in a global function to this function.
         // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
         COMPILE_TIME_ASSERT(is_function<funct>::value == false);
 
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
@@ -201,7 +209,9 @@ namespace dlib
     {
         // You get an error on this line when you pass in a global function to this function.
         // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
         COMPILE_TIME_ASSERT(is_function<funct>::value == false);
         COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
 
@@ -414,7 +424,9 @@ namespace dlib
     {
         // You get an error on this line when you pass in a global function to this function.
         // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
         COMPILE_TIME_ASSERT(is_function<funct>::value == false);
         COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
 
@@ -494,7 +506,9 @@ namespace dlib
     {
         // You get an error on this line when you pass in a global function to this function.
         // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
         COMPILE_TIME_ASSERT(is_function<funct>::value == false);
         COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
 
@@ -557,7 +571,9 @@ namespace dlib
     {
         // You get an error on this line when you pass in a global function to this function.
         // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
         COMPILE_TIME_ASSERT(is_function<funct>::value == false);
 
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
@@ -639,7 +655,9 @@ namespace dlib
     {
         // You get an error on this line when you pass in a global function to this function.
         // You have to either use a function object or pass a pointer to your global function
-        // by taking its address using the & operator.
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
         COMPILE_TIME_ASSERT(is_function<funct>::value == false);
 
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
