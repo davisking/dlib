@@ -14,19 +14,19 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a thread on a global C++ function.  That is, 
-                it allows you to run a global function in its own thread.
+                This object represents a thread on a global C++ function or function
+                object.  That is, it allows you to run a function in its own thread.
         !*/
     public:
 
-        template <typename T>
+        template <typename F>
         thread_function (
-            const T& funct
+            F funct
         );
         /*!
             ensures
                 - #*this is properly initialized
-                - the function object funct has been started in its own thread
+                - the function funct has been started in its own thread
             throws
                 - std::bad_alloc
                 - dlib::thread_error
@@ -34,13 +34,15 @@ namespace dlib
                     gathering resources to create threading objects.
         !*/
 
+        template <typename F, typename T1>
         thread_function (
-            void (*funct)()
+            F funct,
+            T1 arg1
         );
         /*!
             ensures
                 - #*this is properly initialized
-                - the function pointed to by funct has been started in its own thread
+                - A thread has been created and it will call funct(arg1)
             throws
                 - std::bad_alloc
                 - dlib::thread_error
@@ -48,16 +50,53 @@ namespace dlib
                     gathering resources to create threading objects.
         !*/
 
-        template <typename T>
+        template <typename F, typename T1, typename T2>
         thread_function (
-            void (*funct)(T),
-            T arg
+            F funct,
+            T1 arg1,
+            T2 arg2
         );
         /*!
             ensures
                 - #*this is properly initialized
-                - the function pointed to by funct has been started in its own thread and
-                  passed the argument arg
+                - A thread has been created and it will call funct(arg1, arg2)
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+                    the constructor may throw this exception if there is a problem 
+                    gathering resources to create threading objects.
+        !*/
+
+        template <typename F, typename T1, typename T2, typename T3>
+        thread_function (
+            F funct,
+            T1 arg1,
+            T2 arg2,
+            T3 arg3
+        );
+        /*!
+            ensures
+                - #*this is properly initialized
+                - A thread has been created and it will call funct(arg1, arg2, arg3)
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+                    the constructor may throw this exception if there is a problem 
+                    gathering resources to create threading objects.
+        !*/
+
+        template <typename F, typename T1, typename T2, typename T3, typename T4>
+        thread_function (
+            F funct,
+            T1 arg1,
+            T2 arg2,
+            T3 arg3,
+            T4 arg4
+        );
+        /*!
+            ensures
+                - #*this is properly initialized
+                - A thread has been created and it will call funct(arg1, arg2, arg3, arg4)
             throws
                 - std::bad_alloc
                 - dlib::thread_error

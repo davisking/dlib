@@ -7,6 +7,7 @@
 #include "threads_kernel.h"
 #include "auto_mutex_extension.h"
 #include "threaded_object_extension.h"
+#include "../smart_pointers.h"
 
 namespace dlib
 {
@@ -20,18 +21,77 @@ namespace dlib
         {
         public:
             virtual void go() = 0;
-
             virtual ~base_funct() {}
         };
 
-        template <typename T>
-        class super_funct_arg : public base_funct
+        template <typename F, typename T1, typename T2, typename T3, typename T4>
+        class super_funct_4 : public base_funct
         {
         public:
-            super_funct_arg (
-                void (*funct)(T),
-                T arg
-            )
+            super_funct_4 ( F funct, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+            {
+                a1 = arg1;
+                a2 = arg2;
+                a3 = arg3;
+                a4 = arg4;
+                f = funct;
+            }
+
+            void go() { f(a1, a2, a3, a4); }
+
+
+            T1 a1;
+            T2 a2;
+            T3 a3;
+            T4 a4;
+            F f;
+        };
+
+        template <typename F, typename T1, typename T2, typename T3>
+        class super_funct_3 : public base_funct
+        {
+        public:
+            super_funct_3 ( F funct, T1 arg1, T2 arg2, T3 arg3)
+            {
+                a1 = arg1;
+                a2 = arg2;
+                a3 = arg3;
+                f = funct;
+            }
+
+            void go() { f(a1, a2, a3); }
+
+
+            T1 a1;
+            T2 a2;
+            T3 a3;
+            F f;
+        };
+
+        template <typename F, typename T1, typename T2>
+        class super_funct_2 : public base_funct
+        {
+        public:
+            super_funct_2 ( F funct, T1 arg1, T2 arg2)
+            {
+                a1 = arg1;
+                a2 = arg2;
+                f = funct;
+            }
+
+            void go() { f(a1, a2); }
+
+
+            T1 a1;
+            T2 a2;
+            F f;
+        };
+
+        template <typename F, typename T>
+        class super_funct_1 : public base_funct
+        {
+        public:
+            super_funct_1 ( F funct, T arg)
             {
                 a = arg;
                 f = funct;
@@ -41,69 +101,77 @@ namespace dlib
 
 
             T a;
-            void (*f)(T);
+            F f;
         };
 
-
-        class super_funct_no_arg : public base_funct
+        template <typename F>
+        class super_funct_0 : public base_funct
         {
         public:
-            super_funct_no_arg (
-                void (*funct)()
-            )
+            super_funct_0 ( F funct)
             {
                 f = funct;
             }
             
             void go() { f(); }
 
-            void (*f)();
-
-        };
-
-        template <typename T>
-        class super_Tfunct_no_arg : public base_funct
-        {
-        public:
-            super_Tfunct_no_arg (
-                const T& funct
-            )
-            {
-                f = funct;
-            }
-            
-            void go() { f(); }
-
-            T f;
-
+            F f;
         };
 
     public:
 
-        template <typename T>
+        template <typename F>
         thread_function (
-            const T& funct
+            F funct
         )
         {
-            f = new super_Tfunct_no_arg<T>(funct);
+            f.reset(new super_funct_0<F>(funct));
             start();
         }
 
+        template <typename F, typename T>
         thread_function (
-            void (*funct)()
-        )
-        {
-            f = new super_funct_no_arg(funct);
-            start();
-        }
-
-        template <typename T>
-        thread_function (
-            void (*funct)(T),
+            F funct,
             T arg
         )
         {
-            f = new super_funct_arg<T>(funct,arg);
+            f.reset(new super_funct_1<F,T>(funct,arg));
+            start();
+        }
+
+        template <typename F, typename T1, typename T2>
+        thread_function (
+            F funct,
+            T1 arg1,
+            T2 arg2
+        )
+        {
+            f.reset(new super_funct_2<F,T1,T2>(funct, arg1, arg2));
+            start();
+        }
+
+        template <typename F, typename T1, typename T2, typename T3>
+        thread_function (
+            F funct,
+            T1 arg1,
+            T2 arg2,
+            T3 arg3
+        )
+        {
+            f.reset(new super_funct_3<F,T1,T2,T3>(funct, arg1, arg2, arg3));
+            start();
+        }
+
+        template <typename F, typename T1, typename T2, typename T3, typename T4>
+        thread_function (
+            F funct,
+            T1 arg1,
+            T2 arg2,
+            T3 arg3,
+            T4 arg4
+        )
+        {
+            f.reset(new super_funct_4<F,T1,T2,T3,T4>(funct, arg1, arg2, arg3, arg4));
             start();
         }
 
@@ -111,7 +179,6 @@ namespace dlib
         )
         {
             threaded_object::wait();
-            delete f;
         }
 
         bool is_alive (
@@ -133,7 +200,7 @@ namespace dlib
             f->go();
         }
 
-        base_funct* f;
+        scoped_ptr<base_funct> f;
 
         // restricted functions
         thread_function(thread_function&);        // copy constructor
