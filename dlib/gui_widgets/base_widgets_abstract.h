@@ -1584,7 +1584,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a 2D Cartesian graph that you can zoom into and
-                out of.  It is a graphical a widget that draws a rectangle with 
+                out of.  It is a graphical widget that draws a rectangle with 
                 a horizontal and vertical scroll bar that allow the user to scroll
                 around on a Cartesian graph that is much larger than the actual 
                 area occupied by this object on the screen.  It also allows 
