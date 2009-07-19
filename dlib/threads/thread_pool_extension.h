@@ -11,13 +11,14 @@
 #include "multithreaded_object_extension.h"
 #include "../uintn.h"
 #include "../array.h"
+#include "../smart_pointers_thread_safe.h"
 
 namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
-    class thread_pool;
+    class thread_pool_implementation;
 
     template <
         typename T
@@ -27,29 +28,29 @@ namespace dlib
         /*!
             INITIAL VALUE
                 - task_id == 0
-                - tp == 0
+                - tp.get() == 0
 
             CONVENTION
-                - is_ready() == (tp == 0)
+                - is_ready() == (tp.get() == 0)
                 - get() == var
 
-                - if (tp != 0)
-                    - tp == a pointer to the thread_pool that is using this future object
+                - if (tp.get() != 0)
+                    - tp == a pointer to the thread_pool_implementation that is using this future object
                     - task_id == the task id of the task in the thread pool tp that is using
                       this future object.
         !*/
     public:
 
         future (
-        ) : task_id(0), tp(0) {}
+        ) : task_id(0) {}
 
         future (
             const T& item
-        ) : task_id(0), tp(0), var(item) {}
+        ) : task_id(0), var(item) {}
 
         future (
             const future& item
-        ) :task_id(0), tp(0), var(item.get()) {}
+        ) :task_id(0), var(item.get()) {}
 
         ~future (
         ) { wait(); }
@@ -75,7 +76,7 @@ namespace dlib
         ) const { wait(); return var; }
 
         bool is_ready (
-        ) const { return tp == 0; }
+        ) const { return tp.get() == 0; }
 
     private:
 
@@ -84,7 +85,7 @@ namespace dlib
         inline void wait () const;
 
         mutable uint64 task_id;
-        mutable thread_pool* tp;
+        mutable shared_ptr_thread_safe<thread_pool_implementation> tp;
 
         T var;
     };
@@ -123,7 +124,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class thread_pool : private multithreaded_object
+    class thread_pool_implementation : private multithreaded_object
     {
         /*!
             CONVENTION
@@ -141,12 +142,13 @@ namespace dlib
         !*/
         typedef bound_function_pointer::kernel_1a_c bfp_type;
 
-    public:
-        explicit thread_pool (
+        friend class thread_pool;
+        explicit thread_pool_implementation (
             unsigned long num_threads
         );
 
-        ~thread_pool(
+    public:
+        ~thread_pool_implementation(
         );
 
         void wait_for_task (
@@ -294,425 +296,6 @@ namespace dlib
             return tasks[idx].task_id;
         }
 
-        // --------------------
-
-        template <typename F>
-        uint64 add_task (
-            F& function_object
-        ) 
-        { 
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
-            
-            bfp_type temp;
-            temp.set(function_object);
-            uint64 id = add_task_internal(temp);
-
-            return id;
-        }
-        
-        template <typename T>
-        uint64 add_task (
-            const T& obj,
-            void (T::*funct)() const
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(obj,funct);
-            uint64 id = add_task_internal(temp);
-
-            return id;
-        }
-        
-        uint64 add_task (
-            void (*funct)()
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(funct);
-            uint64 id = add_task_internal(temp);
-
-            return id;
-        }
-
-        // --------------------
-
-        template <typename F, typename A1>
-        uint64 add_task (
-            F& function_object,
-            future<A1>& arg1
-        ) 
-        { 
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
-            
-            bfp_type temp;
-            temp.set(function_object,arg1.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the future to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            return id;
-        }
-        
-        template <typename T, typename T1, typename A1>
-        uint64 add_task (
-            T& obj,
-            void (T::*funct)(T1),
-            future<A1>& arg1
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(obj,funct,arg1.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the future to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            return id;
-        }
-        
-        template <typename T, typename T1, typename A1>
-        uint64 add_task (
-            const T& obj,
-            void (T::*funct)(T1) const,
-            future<A1>& arg1
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(obj,funct,arg1.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the future to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            return id;
-        }
-        
-        template <typename T1, typename A1>
-        uint64 add_task (
-            void (*funct)(T1),
-            future<A1>& arg1
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(funct,arg1.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the future to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            return id;
-        }
-
-        // --------------------
-
-        template <typename F, typename A1, typename A2>
-        uint64 add_task (
-            F& function_object,
-            future<A1>& arg1,
-            future<A2>& arg2
-        ) 
-        { 
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
-            
-            bfp_type temp;
-            temp.set(function_object, arg1.get(), arg2.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the future to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            return id;
-        }
-        
-        template <typename T, typename T1, typename A1,
-                              typename T2, typename A2>
-        uint64 add_task (
-            T& obj,
-            void (T::*funct)(T1,T2),
-            future<A1>& arg1,
-            future<A2>& arg2
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(obj, funct, arg1.get(), arg2.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the futures to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            return id;
-        }
-        
-        template <typename T, typename T1, typename A1,
-                              typename T2, typename A2>
-        uint64 add_task (
-            const T& obj,
-            void (T::*funct)(T1,T2) const,
-            future<A1>& arg1,
-            future<A2>& arg2
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(obj, funct, arg1.get(), arg2.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the futures to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            return id;
-        }
-        
-        template <typename T1, typename A1,
-                  typename T2, typename A2>
-        uint64 add_task (
-            void (*funct)(T1,T2),
-            future<A1>& arg1,
-            future<A2>& arg2
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(funct, arg1.get(), arg2.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the futures to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            return id;
-        }
-
-        // --------------------
-
-        template <typename F, typename A1, typename A2, typename A3>
-        uint64 add_task (
-            F& function_object,
-            future<A1>& arg1,
-            future<A2>& arg2,
-            future<A3>& arg3
-        ) 
-        { 
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
-            
-            bfp_type temp;
-            temp.set(function_object, arg1.get(), arg2.get(), arg3.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the future to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            arg3.task_id = id;
-            arg3.tp = this;
-            return id;
-        }
-        
-        template <typename T, typename T1, typename A1,
-                              typename T2, typename A2,
-                              typename T3, typename A3>
-        uint64 add_task (
-            T& obj,
-            void (T::*funct)(T1,T2,T3),
-            future<A1>& arg1,
-            future<A2>& arg2,
-            future<A3>& arg3
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the futures to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            arg3.task_id = id;
-            arg3.tp = this;
-            return id;
-        }
-        
-        template <typename T, typename T1, typename A1,
-                              typename T2, typename A2,
-                              typename T3, typename A3>
-        uint64 add_task (
-            const T& obj,
-            void (T::*funct)(T1,T2,T3) const,
-            future<A1>& arg1,
-            future<A2>& arg2,
-            future<A3>& arg3
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the futures to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            arg3.task_id = id;
-            arg3.tp = this;
-            return id;
-        }
-        
-        template <typename T1, typename A1,
-                  typename T2, typename A2,
-                  typename T3, typename A3>
-        uint64 add_task (
-            void (*funct)(T1,T2,T3),
-            future<A1>& arg1,
-            future<A2>& arg2,
-            future<A3>& arg3
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(funct, arg1.get(), arg2.get(), arg3.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the futures to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            arg3.task_id = id;
-            arg3.tp = this;
-            return id;
-        }
-
-        // --------------------
-
-        template <typename F, typename A1, typename A2, typename A3, typename A4>
-        uint64 add_task (
-            F& function_object,
-            future<A1>& arg1,
-            future<A2>& arg2,
-            future<A3>& arg3,
-            future<A4>& arg4
-        ) 
-        { 
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
-            
-            bfp_type temp;
-            temp.set(function_object, arg1.get(), arg2.get(), arg3.get(), arg4.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the future to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            arg3.task_id = id;
-            arg3.tp = this;
-            arg4.task_id = id;
-            arg4.tp = this;
-            return id;
-        }
-        
-        template <typename T, typename T1, typename A1,
-                              typename T2, typename A2,
-                              typename T3, typename A3,
-                              typename T4, typename A4>
-        uint64 add_task (
-            T& obj,
-            void (T::*funct)(T1,T2,T3,T4),
-            future<A1>& arg1,
-            future<A2>& arg2,
-            future<A3>& arg3,
-            future<A4>& arg4
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the futures to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            arg3.task_id = id;
-            arg3.tp = this;
-            arg4.task_id = id;
-            arg4.tp = this;
-            return id;
-        }
-        
-        template <typename T, typename T1, typename A1,
-                              typename T2, typename A2,
-                              typename T3, typename A3,
-                              typename T4, typename A4>
-        uint64 add_task (
-            const T& obj,
-            void (T::*funct)(T1,T2,T3,T4) const,
-            future<A1>& arg1,
-            future<A2>& arg2,
-            future<A3>& arg3,
-            future<A4>& arg4
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the futures to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            arg3.task_id = id;
-            arg3.tp = this;
-            arg4.task_id = id;
-            arg4.tp = this;
-            return id;
-        }
-        
-        template <typename T1, typename A1,
-                  typename T2, typename A2,
-                  typename T3, typename A3,
-                  typename T4, typename A4>
-        uint64 add_task (
-            void (*funct)(T1,T2,T3,T4),
-            future<A1>& arg1,
-            future<A2>& arg2,
-            future<A3>& arg3,
-            future<A4>& arg4
-        ) 
-        { 
-            bfp_type temp;
-            temp.set(funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
-            uint64 id = add_task_internal(temp);
-
-            // tie the futures to this task
-            arg1.task_id = id;
-            arg1.tp = this;
-            arg2.task_id = id;
-            arg2.tp = this;
-            arg3.task_id = id;
-            arg3.tp = this;
-            arg4.task_id = id;
-            arg4.tp = this;
-            return id;
-        }
-
-        // --------------------
-
-    private:
-
         uint64 add_task_internal (
             const bfp_type& bfp
         );
@@ -721,6 +304,16 @@ namespace dlib
                 - adds a task to call the given bfp object.
                 - returns the task id for this new task
         !*/
+
+        void shutdown_pool (
+        );
+        /*!
+            ensures
+                - causes all threads to terminate and blocks the
+                  caller until this happens.
+        !*/
+
+    private:
 
         bool is_worker_thread (
             const thread_id_type id
@@ -842,6 +435,502 @@ namespace dlib
         bool we_are_destructing;
 
         // restricted functions
+        thread_pool_implementation(thread_pool_implementation&);        // copy constructor
+        thread_pool_implementation& operator=(thread_pool_implementation&);    // assignment operator
+
+    };
+
+
+// ----------------------------------------------------------------------------------------
+
+    class thread_pool 
+    {
+        /*!
+            This object is just a shell that holds a shared_ptr_thread_safe 
+            to the real thread_pool_implementation object.  The reason for doing
+            it this way is so that we can allow any mixture of destruction orders
+            between thread_pool objects and futures.  Whoever gets destroyed
+            last cleans up the thread_pool_implementation resources.
+        !*/
+        typedef bound_function_pointer::kernel_1a_c bfp_type;
+
+    public:
+        explicit thread_pool (
+            unsigned long num_threads
+        ) 
+        {
+            impl.reset(new thread_pool_implementation(num_threads));
+        }
+
+        ~thread_pool (
+        )
+        {
+            impl->shutdown_pool();
+        }
+
+        void wait_for_task (
+            uint64 task_id
+        ) const { impl->wait_for_task(task_id); }
+
+        unsigned long num_threads_in_pool (
+        ) const { return impl->num_threads_in_pool(); }
+
+        void wait_for_all_tasks (
+        ) const { impl->wait_for_all_tasks(); }
+
+        bool is_task_thread (
+        ) const { return impl->is_task_thread(); }
+
+        template <typename T>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)()
+        )
+        {
+            return impl->add_task(obj, funct);
+        }
+
+        template <typename T>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(long),
+            long arg1
+        )
+        {
+            return impl->add_task(obj, funct, arg1);
+        }
+
+        template <typename T>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(long,long),
+            long arg1,
+            long arg2
+        )
+        {
+            return impl->add_task(obj, funct, arg1, arg2);
+        }
+
+        // --------------------
+
+        template <typename F>
+        uint64 add_task (
+            F& function_object
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object);
+            uint64 id = impl->add_task_internal(temp);
+
+            return id;
+        }
+        
+        template <typename T>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)() const
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj,funct);
+            uint64 id = impl->add_task_internal(temp);
+
+            return id;
+        }
+        
+        uint64 add_task (
+            void (*funct)()
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct);
+            uint64 id = impl->add_task_internal(temp);
+
+            return id;
+        }
+
+        // --------------------
+
+        template <typename F, typename A1>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object,arg1.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(T1),
+            future<A1>& arg1
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj,funct,arg1.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1) const,
+            future<A1>& arg1
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj,funct,arg1.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            return id;
+        }
+        
+        template <typename T1, typename A1>
+        uint64 add_task (
+            void (*funct)(T1),
+            future<A1>& arg1
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct,arg1.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            return id;
+        }
+
+        // --------------------
+
+        template <typename F, typename A1, typename A2>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object, arg1.get(), arg2.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(T1,T2),
+            future<A1>& arg1,
+            future<A2>& arg2
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1,T2) const,
+            future<A1>& arg1,
+            future<A2>& arg2
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            return id;
+        }
+        
+        template <typename T1, typename A1,
+                  typename T2, typename A2>
+        uint64 add_task (
+            void (*funct)(T1,T2),
+            future<A1>& arg1,
+            future<A2>& arg2
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct, arg1.get(), arg2.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            return id;
+        }
+
+        // --------------------
+
+        template <typename F, typename A1, typename A2, typename A3>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object, arg1.get(), arg2.get(), arg3.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            arg3.task_id = id;
+            arg3.tp = impl;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(T1,T2,T3),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            arg3.task_id = id;
+            arg3.tp = impl;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1,T2,T3) const,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            arg3.task_id = id;
+            arg3.tp = impl;
+            return id;
+        }
+        
+        template <typename T1, typename A1,
+                  typename T2, typename A2,
+                  typename T3, typename A3>
+        uint64 add_task (
+            void (*funct)(T1,T2,T3),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct, arg1.get(), arg2.get(), arg3.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            arg3.task_id = id;
+            arg3.tp = impl;
+            return id;
+        }
+
+        // --------------------
+
+        template <typename F, typename A1, typename A2, typename A3, typename A4>
+        uint64 add_task (
+            F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ) 
+        { 
+            COMPILE_TIME_ASSERT(is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            
+            bfp_type temp;
+            temp.set(function_object, arg1.get(), arg2.get(), arg3.get(), arg4.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the future to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            arg3.task_id = id;
+            arg3.tp = impl;
+            arg4.task_id = id;
+            arg4.tp = impl;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3,
+                              typename T4, typename A4>
+        uint64 add_task (
+            T& obj,
+            void (T::*funct)(T1,T2,T3,T4),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            arg3.task_id = id;
+            arg3.tp = impl;
+            arg4.task_id = id;
+            arg4.tp = impl;
+            return id;
+        }
+        
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3,
+                              typename T4, typename A4>
+        uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1,T2,T3,T4) const,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(obj, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            arg3.task_id = id;
+            arg3.tp = impl;
+            arg4.task_id = id;
+            arg4.tp = impl;
+            return id;
+        }
+        
+        template <typename T1, typename A1,
+                  typename T2, typename A2,
+                  typename T3, typename A3,
+                  typename T4, typename A4>
+        uint64 add_task (
+            void (*funct)(T1,T2,T3,T4),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ) 
+        { 
+            bfp_type temp;
+            temp.set(funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
+            uint64 id = impl->add_task_internal(temp);
+
+            // tie the futures to this task
+            arg1.task_id = id;
+            arg1.tp = impl;
+            arg2.task_id = id;
+            arg2.tp = impl;
+            arg3.task_id = id;
+            arg3.tp = impl;
+            arg4.task_id = id;
+            arg4.tp = impl;
+            return id;
+        }
+
+    private:
+
+        shared_ptr_thread_safe<thread_pool_implementation> impl;
+
+        // restricted functions
         thread_pool(thread_pool&);        // copy constructor
         thread_pool& operator=(thread_pool&);    // assignment operator
 
@@ -858,7 +947,7 @@ namespace dlib
         if (tp)
         {
             tp->wait_for_task(task_id);
-            tp = 0;
+            tp.reset();
             task_id = 0;
         }
     }

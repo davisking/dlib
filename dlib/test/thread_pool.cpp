@@ -67,12 +67,13 @@ namespace
         void perform_test (
         )
         {
+            add_functor f;
             for (int num_threads= 0; num_threads < 4; ++num_threads)
             {
+                future<int> a, b, c, res;
                 thread_pool tp(num_threads);
                 print_spinner();
 
-                future<int> a, b, c, res;
                 future<some_struct> obj;
 
 
@@ -205,11 +206,11 @@ namespace
                     a = 1;
                     b = 2;
                     res = 0;
-                    add_functor f;
                     tp.add_task(f, a, b, res);
                     DLIB_TEST(a == 1);
                     DLIB_TEST(b == 2);
                     DLIB_TEST(res == 3);
+
 
                     global_var = 0;
                     DLIB_TEST(global_var == 0);
@@ -239,6 +240,9 @@ namespace
 
 
                 }
+
+                // add this task just to to perterb the thread pool before it goes out of scope
+                tp.add_task(f, a, b, res);
             }
         }
 

@@ -10,8 +10,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    thread_pool::
-    thread_pool (
+    thread_pool_implementation::
+    thread_pool_implementation (
         unsigned long num_threads
     ) : 
         task_done_signaler(m),
@@ -21,7 +21,7 @@ namespace dlib
         tasks.resize(num_threads);
         for (unsigned long i = 0; i < num_threads; ++i)
         {
-            register_thread(*this, &thread_pool::thread);
+            register_thread(*this, &thread_pool_implementation::thread);
         }
 
         start();
@@ -29,10 +29,33 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    thread_pool::
-    ~thread_pool()
+    void thread_pool_implementation::
+    shutdown_pool (
+    )
     {
-        {auto_mutex M(m);
+        {
+            auto_mutex M(m);
+            
+            // first wait for all pending tasks to finish
+            bool found_task = true;
+            while (found_task)
+            {
+                found_task = false;
+                for (unsigned long i = 0; i < tasks.size(); ++i)
+                {
+                    // If task bucket i has a task that is currently supposed to be processed
+                    if (tasks[i].is_empty() == false)
+                    {
+                        found_task = true;
+                        break;
+                    }
+                }
+
+                if (found_task)
+                    task_done_signaler.wait();
+            }
+
+            // now tell the threads to kill themselves
             we_are_destructing = true;
             task_ready_signaler.broadcast();
         }
@@ -42,7 +65,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long thread_pool::
+    thread_pool_implementation::
+    ~thread_pool_implementation()
+    {
+        shutdown_pool();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    unsigned long thread_pool_implementation::
     num_threads_in_pool (
     ) const
     {
@@ -52,7 +83,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void thread_pool::
+    void thread_pool_implementation::
     wait_for_task (
         uint64 task_id
     ) const
@@ -68,7 +99,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void thread_pool::
+    void thread_pool_implementation::
     wait_for_all_tasks (
     ) const
     {
@@ -97,7 +128,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool thread_pool::
+    bool thread_pool_implementation::
     is_worker_thread (
         const thread_id_type id
     ) const
@@ -118,7 +149,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void thread_pool::
+    void thread_pool_implementation::
     thread (
     )
     {
@@ -175,7 +206,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    long thread_pool::
+    long thread_pool_implementation::
     find_empty_task_slot (
     ) const
     {
@@ -190,7 +221,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    long thread_pool::
+    long thread_pool_implementation::
     find_ready_task (
     ) const
     {
@@ -205,7 +236,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    uint64 thread_pool::
+    uint64 thread_pool_implementation::
     make_next_task_id (
         long idx
     )
@@ -217,7 +248,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long thread_pool::
+    unsigned long thread_pool_implementation::
     task_id_to_index (
         uint64 id
     ) const
@@ -227,7 +258,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    uint64 thread_pool::
+    uint64 thread_pool_implementation::
     add_task_internal (
         const bfp_type& bfp
     )
@@ -270,7 +301,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool thread_pool::
+    bool thread_pool_implementation::
     is_task_thread (
     ) const
     {

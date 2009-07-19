@@ -76,11 +76,6 @@ namespace dlib
         ~future (
         );
         /*!
-            requires
-                - if (item.is_ready() == false) then
-                    - The thread_pool that this future was passed to should still exist
-                      (i.e. You can't pass a future to a thread_pool and then destruct the
-                      thread_pool before you destruct the future).
             ensures
                 - if (item.is_ready() == false) then
                     - the call to this function blocks until the thread processing the task related
@@ -223,6 +218,12 @@ namespace dlib
                 mode any thread that calls add_task() is considered to be
                 a thread_pool thread capable of executing tasks.
 
+                Also note that all function objects are passed to the tasks
+                by reference.  This means you should ensure that your function
+                objects are not destroyed while tasks are still using them.
+                (e.g. Don't let them go out of scope right after a call to 
+                add_task())
+
             EXCEPTIONS
                 Note that if an exception is thrown inside a task thread and 
                 is not caught then the normal rule for uncaught exceptions in
@@ -248,7 +249,7 @@ namespace dlib
         );
         /*!
             ensures
-                - all resources allocated by *this have been freed.  
+                - blocks until all tasks in the pool have finished.
         !*/
 
         bool is_task_thread (
