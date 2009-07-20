@@ -647,7 +647,7 @@
             This function takes a <a href="containers.html#graph">graph</a> and
             turns it into a chordal graph.  It also returns a 
             <a href="containers.html#set">set</a> that contains
-            all the cliques present in the choral graph.
+            all the cliques present in the chordal graph.
          </description>
                                  
       </component>
