@@ -48,11 +48,11 @@ public:
         rect = area;
         set_draggable_area(rectangle(10,10,400,400));
         
-        // Whenever you make your own drawable (or inherit from draggable or button_action)
-        // you have to remember to call this function to enable the events.  The idea
-        // here is that you can perform whatever setup you need to do to get your 
-        // object into a valid state without needing to worry about event handlers 
-        // triggering before you are ready.
+        // Whenever you make your own drawable widget (or inherit from any drawable widget 
+        // or interface such as draggable) you have to remember to call this function to 
+        // enable the events.  The idea here is that you can perform whatever setup you 
+        // need to do to get your object into a valid state without needing to worry about 
+        // event handlers triggering before you are ready.
         enable_events();
     }
 
@@ -60,8 +60,8 @@ public:
     )
     {
         // Disable all further events for this drawable object.  We have to do this 
-        // because we don't want draw() events coming to this object while or after 
-        // it has been destructed.
+        // because we don't want any events (like draw()) coming to this object while or 
+        // after it has been destructed.
         disable_events();
         
         // Tell the parent window to redraw its area that previously contained this
@@ -75,17 +75,20 @@ private:
         const canvas& c
     ) const
     {
+        // The canvas is an object that represents a part of the parent window
+        // that needs to be redrawn.  
+
         // The first thing I usually do is check if the draw call is for part
         // of the window that overlaps with my widget.  We don't have to do this 
         // but it is usually good to do as a speed hack.  Also, the reason
         // I don't have it set to only give you draw calls when it does indeed
         // overlap is because you might want to do some drawing outside of your
-        // widgets rectangle.  But usually you don't want to do that :)
+        // widget's rectangle.  But usually you don't want to do that :)
         rectangle area = c.intersect(rect);
         if (area.is_empty() == true)
             return;
 
-        // this simple widget is just going to draw a box on the screen.   
+        // This simple widget is just going to draw a box on the screen.   
         fill_rect(c,rect,rgb_pixel(red,green,blue));
     }
 };
@@ -101,7 +104,7 @@ class win : public drawable_window
     */
 public:
     win(
-    ) :
+    ) : // All widgets take their parent window as an argument to their constructor.
         c(*this),
         b(*this),
         cb(*this,rectangle(100,100,200,200),0,0,255), // the color_box will be blue and 101 pixels wide and tall
@@ -120,7 +123,7 @@ public:
         b.set_click_handler(*this,&win::on_button_clicked);
         
         // Lets also make a simple menu bar.  
-        // First we say how many menus we want in our menu bar.  In this example we only have 1
+        // First we say how many menus we want in our menu bar.  In this example we only want 1.
         mbar.set_number_of_menus(1);
         // Now we set the name of our menu.  The 'M' means that the M in Menu will be underlined
         // and the user will be able to select it by hitting alt+M
