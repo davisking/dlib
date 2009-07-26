@@ -88,9 +88,11 @@ namespace dlib
             ensures
                 - #get_train_count() == 0
                 - clears out any memory of previous calls to train()
-                - #get_lambda() == get_lambda()
-                - #get_tolerance() == get_tolerance()
-                - #get_kernel() == get_kernel()
+                - doesn't change any of the algorithm parameters.  I.e.
+                    - #get_lambda()     == get_lambda()
+                    - #get_tolerance()  == get_tolerance()
+                    - #get_kernel()     == get_kernel()
+                    - #get_max_num_sv() == get_max_num_sv()
         !*/
 
         const scalar_type get_lambda (
