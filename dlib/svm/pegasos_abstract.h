@@ -51,6 +51,11 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef decision_function<kernel_type> trained_function_type;
 
+        template <typename K_>
+        struct rebind {
+            typedef svm_pegasos<K_> other;
+        };
+
         svm_pegasos (
         );
         /*!
@@ -273,6 +278,24 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U
+        >
+    void replicate_settings (
+        const svm_pegasos<T>& source,
+        svm_pegasos<U>& dest
+    );
+    /*!
+        ensures
+            - copies all the parameters from the source trainer to the dest trainer.
+            - #dest.get_tolerance() == source.get_tolerance()
+            - #dest.get_lambda() == source.get_lambda()
+            - #dest.get_max_num_sv() == source.get_max_num_sv()
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -284,6 +307,7 @@ namespace dlib
         /*!
             REQUIREMENTS ON trainer_type
                 - trainer_type == some kind of online trainer object (e.g. svm_pegasos)
+                  replicate_settings() must also be defined for the type.
 
             WHAT THIS OBJECT REPRESENTS
                 This is a trainer object that is meant to wrap online trainer objects 
@@ -313,11 +337,14 @@ namespace dlib
         batch_trainer (
             const trainer_type& online_trainer, 
             const scalar_type min_learning_rate_,
-            bool verbose_
+            bool verbose_,
+            bool use_cache_,
+            long cache_size_ = 100
         );
         /*!
             requires
                 - min_learning_rate_ > 0
+                - cache_size_ > 0
             ensures
                 - returns a batch trainer object that uses the given online_trainer object
                   to train a decision function.
@@ -325,6 +352,9 @@ namespace dlib
                 - if (verbose_ == true) then
                     - this object will output status messages to standard out while
                       training is under way.
+                - if (use_cache_ == true) then
+                    - this object will cache up to cache_size_ columns of the kernel 
+                      matrix during the training process.
         !*/
 
         const scalar_type get_min_learning_rate (
@@ -364,12 +394,12 @@ namespace dlib
     const batch_trainer<trainer_type> batch (
         const trainer_type& trainer,
         const typename trainer_type::scalar_type min_learning_rate = 0.1
-    ) { return batch_trainer<trainer_type>(trainer, min_learning_rate, false); }
+    ) { return batch_trainer<trainer_type>(trainer, min_learning_rate, false, false); }
     /*!
         requires
             - min_learning_rate > 0
             - trainer_type == some kind of online trainer object that creates decision_function
-              objects (e.g. svm_pegasos)
+              objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
         ensures
             - returns a batch_trainer object that has been instantiated with the 
               given arguments.
@@ -383,18 +413,61 @@ namespace dlib
     const batch_trainer<trainer_type> verbose_batch (
         const trainer_type& trainer,
         const typename trainer_type::scalar_type min_learning_rate = 0.1
-    ) { return batch_trainer<trainer_type>(trainer, min_learning_rate, true); }
+    ) { return batch_trainer<trainer_type>(trainer, min_learning_rate, true, false); }
     /*!
         requires
             - min_learning_rate > 0
             - trainer_type == some kind of online trainer object that creates decision_function
-              objects (e.g. svm_pegasos)
+              objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
         ensures
             - returns a batch_trainer object that has been instantiated with the 
               given arguments (and is verbose).
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename trainer_type
+        >
+    const batch_trainer<trainer_type> batch_cached (
+        const trainer_type& trainer,
+        const typename trainer_type::scalar_type min_learning_rate = 0.1,
+        long cache_size = 100
+    ) { return batch_trainer<trainer_type>(trainer, min_learning_rate, false, true, cache_size); }
+    /*!
+        requires
+            - min_learning_rate > 0
+            - cache_size > 0
+            - trainer_type == some kind of online trainer object that creates decision_function
+              objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
+        ensures
+            - returns a batch_trainer object that has been instantiated with the 
+              given arguments (uses a kernel cache).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename trainer_type
+        >
+    const batch_trainer<trainer_type> verbose_batch_cached (
+        const trainer_type& trainer,
+        const typename trainer_type::scalar_type min_learning_rate = 0.1,
+        long cache_size = 100
+    ) { return batch_trainer<trainer_type>(trainer, min_learning_rate, true, true, cache_size); }
+    /*!
+        requires
+            - min_learning_rate > 0
+            - cache_size > 0
+            - trainer_type == some kind of online trainer object that creates decision_function
+              objects (e.g. svm_pegasos).  replicate_settings() must also be defined for the type.
+        ensures
+            - returns a batch_trainer object that has been instantiated with the 
+              given arguments (is verbose and uses a kernel cache).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 
 }
 
