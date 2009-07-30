@@ -66,6 +66,8 @@
          <item>reduced2</item> 
          <item>batch</item> 
          <item>verbose_batch</item> 
+         <item>batch_cached</item> 
+         <item>verbose_batch_cached</item> 
          <item>batch_trainer</item> 
          <item>null_trainer_type</item> 
          <item>null_trainer</item> 
@@ -749,6 +751,36 @@
          <examples>
             <example>svm_pegasos_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>batch_cached</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/pegasos_abstract.h</spec_file>
+         <description>
+            This is a convenience function for creating 
+            <a href="#batch_trainer">batch_trainer</a> objects that are setup
+            to use a kernel matrix cache.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>verbose_batch_cached</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/pegasos_abstract.h</spec_file>
+         <description>
+            This is a convenience function for creating 
+            <a href="#batch_trainer">batch_trainer</a> objects.  This function
+            generates a batch_trainer that will print status messages to standard
+            output so that you can observe the progress of a training algorithm.
+            It will also be configured to use a kernel matrix cache.
+         </description>
                                  
       </component>
       

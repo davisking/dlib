@@ -92,12 +92,15 @@
          <term file="algorithms.html" name="point_rotator"/>
          <term file="algorithms.html" name="running_stats"/>
 
+         <term file="dlib/svm/pegasos_abstract.h.html" name="replicate_settings"/>
          <term file="ml.html" name="mlp"/>
          <term link="ml.html#mlp" name="multi-layer perceptron"/>
          <term link="ml.html#mlp" name="neural network"/>
          <term file="ml.html" name="svm_pegasos"/>
          <term file="ml.html" name="batch"/>
          <term file="ml.html" name="verbose_batch"/>
+         <term file="ml.html" name="batch_cached"/>
+         <term file="ml.html" name="verbose_batch_cached"/>
          <term file="ml.html" name="batch_trainer"/>
          <term file="ml.html" name="randomize_samples"/>
          <term file="ml.html" name="is_binary_classification_problem"/>
