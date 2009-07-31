@@ -359,16 +359,23 @@ namespace
         print_spinner();
         matrix<scalar_type> peg_cv = cross_validate_trainer_threaded(batch(pegasos_trainer,1.0), x,y, 4, 2);
         print_spinner();
+        matrix<scalar_type> peg_c_cv = cross_validate_trainer_threaded(batch_cached(pegasos_trainer,1.0), x,y, 4, 2);
+        print_spinner();
 
         dlog << LDEBUG << "rvm cv: " << rvm_cv;
         dlog << LDEBUG << "svm cv: " << svm_cv;
         dlog << LDEBUG << "rbf cv: " << rbf_cv;
         dlog << LDEBUG << "peg cv: " << peg_cv;
+        dlog << LDEBUG << "peg cached cv: " << peg_c_cv;
+
+        // make sure the cached version of pegasos computes the same result
+        DLIB_TEST(sum(abs(peg_cv - peg_c_cv)) < std::sqrt(std::numeric_limits<double>::epsilon()));
 
         DLIB_TEST_MSG(mean(rvm_cv) > 0.9, rvm_cv);
         DLIB_TEST_MSG(mean(svm_cv) > 0.9, svm_cv);
         DLIB_TEST_MSG(mean(rbf_cv) > 0.9, rbf_cv);
-        DLIB_TEST_MSG(mean(peg_cv) > 0.9, rbf_cv);
+        DLIB_TEST_MSG(mean(peg_cv) > 0.9, peg_cv);
+        DLIB_TEST_MSG(mean(peg_c_cv) > 0.9, peg_c_cv);
 
         const long num_sv = trainer.train(x,y).support_vectors.size();
         print_spinner();

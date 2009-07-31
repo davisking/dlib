@@ -313,7 +313,7 @@ namespace dlib
 
                 cache.reset(new cache_type);
                 cache->frequency_of_use.resize(samps.size());
-                for (unsigned long i = 0; i < samps.size(); ++i)
+                for (long i = 0; i < samps.size(); ++i)
                     cache->frequency_of_use[i] = std::make_pair(0, i);
 
                 // Set the cache build/rebuild threshold so that we have to have
@@ -328,17 +328,17 @@ namespace dlib
                 const sample_type& b
             )  const
             { 
-                const long a_loc = cache->sample_location[a];
-                const long b_loc = cache->sample_location[b];
-
-                cache->frequency_of_use[a].first += 1;
-                cache->frequency_of_use[b].first += 1;
-
                 // rebuild the cache every so often
                 if (counter > counter_threshold )
                 {
                     build_cache();
                 }
+
+                const long a_loc = cache->sample_location[a];
+                const long b_loc = cache->sample_location[b];
+
+                cache->frequency_of_use[a].first += 1;
+                cache->frequency_of_use[b].first += 1;
 
                 if (a_loc != -1)
                 {
@@ -377,13 +377,13 @@ namespace dlib
                 cache->sample_location.assign(samples->size(), -1);
 
                 // loop over all the samples in the cache
-                for (unsigned long i = 0; i < cache_size; ++i)
+                for (long i = 0; i < cache_size; ++i)
                 {
                     const long cur = cache->frequency_of_use[i].second;
                     cache->sample_location[cur] = i;
 
                     // now populate all possible kernel products with the current sample
-                    for (unsigned long j = 0; j < samples->size(); ++j)
+                    for (long j = 0; j < samples->size(); ++j)
                     {
                         cache->kernel(i, j) = real_kernel((*samples)(cur), (*samples)(j));
                     }
@@ -391,7 +391,7 @@ namespace dlib
                 }
 
                 // reset the frequency of use metrics
-                for (unsigned long i = 0; i < samples->size(); ++i)
+                for (long i = 0; i < samples->size(); ++i)
                     cache->frequency_of_use[i] = std::make_pair(0, i);
             }
 
@@ -547,7 +547,8 @@ namespace dlib
             ckernel_type ck(trainer.get_kernel(), x, cache_size);
 
             // now rebind the trainer to use the caching kernel
-            typename trainer_type::template rebind<ckernel_type>::other my_trainer;
+            typedef typename trainer_type::template rebind<ckernel_type>::other rebound_trainer_type;
+            rebound_trainer_type my_trainer;
             my_trainer.set_kernel(ck);
             replicate_settings(trainer, my_trainer);
 
