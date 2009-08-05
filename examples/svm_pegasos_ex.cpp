@@ -69,7 +69,7 @@ int main()
 
     // Now lets go into a loop and randomly generate 1000 samples.
     srand(time(0));
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 10000; ++i)
     {
         // Make a random sample vector. 
         sample = randm(2,1)*40 - center;
