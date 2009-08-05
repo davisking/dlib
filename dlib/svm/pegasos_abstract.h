@@ -225,12 +225,6 @@ namespace dlib
                   (i.e. clears any memory of previous training)
         !*/
 
-        const scalar_type get_lambda_class1 (
-        ) const;
-
-        const scalar_type get_lambda_class2 (
-        ) const;
-
         unsigned long get_train_count (
         ) const;
         /*!
