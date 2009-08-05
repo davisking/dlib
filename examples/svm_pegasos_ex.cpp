@@ -127,18 +127,18 @@ int main()
     trainer.clear();
 
     // Now to begin with, you might want to compute the cross validation score of a trainer object
-    // on your data.  To do this you should use the batch() function to convert the svm_pegasos object
+    // on your data.  To do this you should use the batch_cached() function to convert the svm_pegasos object
     // into a batch training object.  Note that the second argument to batch() is the minimum 
     // learning rate the trainer object must report for the batch() function to consider training
     // complete.  So smaller values of this parameter cause training to take longer but may result
     // in a more accurate solution. 
     // Here we perform 4-fold cross validation and print the results
-    cout << "cross validation: " << cross_validate_trainer(batch(trainer,1.0), samples, labels, 4);
+    cout << "cross validation: " << cross_validate_trainer(batch_cached(trainer,0.1), samples, labels, 4);
 
-    // Here is an example of creating a decision function.  Note that we have used the verbose_batch()
-    // function instead of batch() as above.  They do the same things except verbose_batch() will
+    // Here is an example of creating a decision function.  Note that we have used the verbose_batch_cached()
+    // function instead of batch_cached() as above.  They do the same things except verbose_batch_cached() will
     // print status messages to standard output while training is under way.
-    decision_function<kernel_type> df = verbose_batch(trainer,0.1).train(samples, labels);
+    decision_function<kernel_type> df = verbose_batch_cached(trainer,0.1).train(samples, labels);
 
     // At this point we have obtained a decision function from the above batch mode training.
     // Now we can use it on some test samples exactly as we did above.
