@@ -61,7 +61,8 @@ namespace dlib
         /*!
             ensures
                 - this object is properly initialized 
-                - #get_lambda() == 0.0001
+                - #get_lambda_class1() == 0.0001
+                - #get_lambda_class2() == 0.0001
                 - #get_tolerance() == 0.01
                 - #get_train_count() == 0
                 - #get_max_num_sv() == 40
@@ -80,7 +81,8 @@ namespace dlib
                 - max_num_sv > 0
             ensures
                 - this object is properly initialized 
-                - #get_lambda() == lambda_ 
+                - #get_lambda_class1() == lambda_ 
+                - #get_lambda_class2() == lambda_ 
                 - #get_tolerance() == tolerance_
                 - #get_kernel() == kernel_
                 - #get_train_count() == 0
@@ -94,26 +96,36 @@ namespace dlib
                 - #get_train_count() == 0
                 - clears out any memory of previous calls to train()
                 - doesn't change any of the algorithm parameters.  I.e.
-                    - #get_lambda()     == get_lambda()
-                    - #get_tolerance()  == get_tolerance()
-                    - #get_kernel()     == get_kernel()
-                    - #get_max_num_sv() == get_max_num_sv()
+                    - #get_lambda_class1()  == get_lambda_class1()
+                    - #get_lambda_class2()  == get_lambda_class2()
+                    - #get_tolerance()      == get_tolerance()
+                    - #get_kernel()         == get_kernel()
+                    - #get_max_num_sv()     == get_max_num_sv()
         !*/
 
-        const scalar_type get_lambda (
+        const scalar_type get_lambda_class1 (
         ) const;
         /*!
             ensures
-                - returns the SVM regularization term.  It is the parameter that 
-                  determines the trade off between trying to fit the training data 
-                  exactly or allowing more errors but hopefully improving the 
-                  generalization ability of the resulting classifier.  Smaller 
-                  values encourage exact fitting while larger values may encourage 
-                  better generalization. It is also worth noting that the number 
-                  of iterations it takes for this algorithm to converge is 
+                - returns the SVM regularization term for the +1 class.  It is the 
+                  parameter that determines the trade off between trying to fit the 
+                  +1 training data exactly or allowing more errors but hopefully 
+                  improving the generalization ability of the resulting classifier.  
+                  Smaller values encourage exact fitting while larger values may 
+                  encourage better generalization. It is also worth noting that the 
+                  number of iterations it takes for this algorithm to converge is 
                   proportional to 1/lambda.  So smaller values of this term cause 
                   the running time of this algorithm to increase.  For more 
                   information you should consult the paper referenced above.
+        !*/
+
+        const scalar_type get_lambda_class2 (
+        ) const;
+        /*!
+            ensures
+                - returns the SVM regularization term for the -1 class.  It has
+                  the same properties as the get_lambda_class1() parameter except that
+                  it applies to the -1 class.
         !*/
 
         const scalar_type get_tolerance (
@@ -183,10 +195,41 @@ namespace dlib
             requires
                 - lambda_ > 0
             ensures
-                - #get_lambda() == tol
+                - #get_lambda_class1() == lambda_
+                - #get_lambda_class2() == lambda_
                 - #get_train_count() == 0
                   (i.e. clears any memory of previous training)
         !*/
+
+        void set_lambda_class1 (
+            scalar_type lambda_
+        );
+        /*!
+            requires
+                - lambda_ > 0
+            ensures
+                - #get_lambda_class1() == lambda_ 
+                  #get_train_count() == 0
+                  (i.e. clears any memory of previous training)
+        !*/
+
+        void set_lambda_class2 (
+            scalar_type lambda_
+        );
+        /*!
+            requires
+                - lambda_ > 0
+            ensures
+                - #get_lambda_class2() == lambda_ 
+                  #get_train_count() == 0
+                  (i.e. clears any memory of previous training)
+        !*/
+
+        const scalar_type get_lambda_class1 (
+        ) const;
+
+        const scalar_type get_lambda_class2 (
+        ) const;
 
         unsigned long get_train_count (
         ) const;
@@ -207,7 +250,7 @@ namespace dlib
                 - trains this svm using the given sample x and label y
                 - #get_train_count() == get_train_count() + 1
                 - returns the current learning rate
-                  (i.e. 1/(get_lambda()*get_train_count()))
+                  (i.e. 1/(get_train_count()*min(get_lambda_class1(),get_lambda_class2())) )
         !*/
 
         scalar_type operator() (
@@ -291,7 +334,8 @@ namespace dlib
         ensures
             - copies all the parameters from the source trainer to the dest trainer.
             - #dest.get_tolerance() == source.get_tolerance()
-            - #dest.get_lambda() == source.get_lambda()
+            - #dest.get_lambda_class1() == source.get_lambda_class1()
+            - #dest.get_lambda_class2() == source.get_lambda_class2()
             - #dest.get_max_num_sv() == source.get_max_num_sv()
     !*/
 
