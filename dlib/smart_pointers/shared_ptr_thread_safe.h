@@ -9,7 +9,7 @@
 #include <string>       // for the exceptions
 #include "../algs.h"
 #include "shared_ptr_thread_safe_abstract.h"
-#include "../threads.h"
+#include "../threads/threads_kernel.h"
 
 
 namespace dlib 
