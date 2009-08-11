@@ -599,7 +599,7 @@ namespace dlib
         double f_value = min_f - 1;
         double old_f_value = 0;
 
-        // loop until the derivative is almost zero
+        // loop until there isn't any large change in the function value 
         while(std::abs(old_f_value - f_value) > min_delta)
         {
             old_f_value = f_value;
@@ -679,7 +679,7 @@ namespace dlib
         double f_value = min_f - 1;
         double old_f_value = 0;
 
-        // loop until the derivative is almost zero
+        // loop until there isn't any large change in the function value 
         while(std::abs(old_f_value - f_value) > min_delta)
         {
             old_f_value = f_value;
