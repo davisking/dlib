@@ -438,10 +438,11 @@ namespace dlib
     };
 
     template <
-        typename K
+        typename function_type,
+        typename normalizer_type 
         >
     void serialize (
-        const normalized_function<K>& item,
+        const normalized_function<function_type, normalizer_type>& item,
         std::ostream& out
     );
     /*!
@@ -449,10 +450,11 @@ namespace dlib
     !*/
 
     template <
-        typename K
+        typename function_type,
+        typename normalizer_type 
         >
     void deserialize (
-        normalized_function<K>& item,
+        normalized_function<function_type, normalizer_type>& item,
         std::istream& in 
     );
     /*!
