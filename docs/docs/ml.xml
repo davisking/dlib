@@ -102,6 +102,7 @@
       <section>
          <name>Miscellaneous</name>
          <item>vector_normalizer</item> 
+         <item>vector_normalizer_pca</item> 
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
          <item>test_binary_decision_function</item> 
@@ -274,16 +275,30 @@
                 This object represents something that can learn to normalize a set 
                 of column vectors.  In particular, normalized column vectors should 
                 have zero mean and a variance of one.  
-
-                Also, if desired, this object can use principal component 
-                analysis for the purposes of reducing the number of elements in a 
-                vector.  
          </description>
 
          <examples>
             <example>svm_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      
+      <component>
+         <name>vector_normalizer_pca</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object represents something that can learn to normalize a set 
+                of column vectors.  In particular, normalized column vectors should 
+                have zero mean and a variance of one.  
+
+                This object also uses principal component analysis for the purposes 
+                of reducing the number of elements in a vector.  
+         </description>
+
       </component>
       
    <!-- ************************************************************************* -->

@@ -122,6 +122,7 @@
          <term file="ml.html" name="kcentroid"/>
          <term file="ml.html" name="linearly_independent_subset_finder"/>
          <term file="ml.html" name="vector_normalizer"/>
+         <term file="ml.html" name="vector_normalizer_pca"/>
          <term file="ml.html" name="kkmeans"/>
          <term file="ml.html" name="pick_initial_centers"/>
          <term file="ml.html" name="rank_features"/>
