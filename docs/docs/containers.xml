@@ -376,6 +376,10 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#trans</link>
                      </item>
                      <item>
+                        <name>dot</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#dot</link>
+                     </item>
+                     <item>
                         <name>lowerm</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#lowerm</link>
                      </item>

@@ -183,6 +183,7 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diagm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="trans"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="dot"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="lowerm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="upperm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="zeros_matrix"/>
