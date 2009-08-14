@@ -54,6 +54,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_type::type dot (
+        const matrix_exp& m1,
+        const matrix_exp& m2
+    );
+    /*!
+        requires
+            - is_vector(m1) == true
+            - is_vector(m2) == true
+            - m1.size() == m2.size()
+        ensures
+            - returns the dot product between m1 and m2.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp lowerm (
         const matrix_exp& m
     );

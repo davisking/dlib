@@ -1146,6 +1146,56 @@ namespace
 
         }
 
+        {
+            matrix<double> m1, m2;
+            m1.set_size(3,1);
+            m2.set_size(1,3);
+
+            m1 = 1,2,3;
+            m2 = 4,5,6;
+            DLIB_TEST(dot(m1, m2)               == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(m1, trans(m2))        == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(trans(m1), m2)        == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(trans(m1), trans(m2)) == 1*4 + 2*5 + 3*6);
+        }
+
+        {
+            matrix<double,3,1> m1, m2;
+            m1.set_size(3,1);
+            m2.set_size(3,1);
+
+            m1 = 1,2,3;
+            m2 = 4,5,6;
+            DLIB_TEST(dot(m1, m2)               == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(m1, trans(m2))        == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(trans(m1), m2)        == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(trans(m1), trans(m2)) == 1*4 + 2*5 + 3*6);
+        }
+        {
+            matrix<double,1,3> m1, m2;
+            m1.set_size(1,3);
+            m2.set_size(1,3);
+
+            m1 = 1,2,3;
+            m2 = 4,5,6;
+            DLIB_TEST(dot(m1, m2)               == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(m1, trans(m2))        == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(trans(m1), m2)        == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(trans(m1), trans(m2)) == 1*4 + 2*5 + 3*6);
+        }
+        {
+            matrix<double,1,3> m1;
+            matrix<double> m2;
+            m1.set_size(1,3);
+            m2.set_size(3,1);
+
+            m1 = 1,2,3;
+            m2 = 4,5,6;
+            DLIB_TEST(dot(m1, m2)               == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(m1, trans(m2))        == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(trans(m1), m2)        == 1*4 + 2*5 + 3*6);
+            DLIB_TEST(dot(trans(m1), trans(m2)) == 1*4 + 2*5 + 3*6);
+        }
     }
 
 

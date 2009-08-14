@@ -372,6 +372,98 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    typename enable_if_c<(EXP1::NR != 1 && EXP1::NC != 1) || (EXP2::NR != 1 && EXP2::NC != 1),
+                         typename EXP1::type>::type 
+    dot (
+        const matrix_exp<EXP1>& m1,
+        const matrix_exp<EXP2>& m2
+    )
+    {
+        // You are getting an error on this line because you are trying to 
+        // compute the dot product between two matrices that aren't both vectors (i.e. 
+        // they aren't column or row matrices).
+        COMPILE_TIME_ASSERT(EXP1::NR*EXP1::NC == 0 ||
+                            EXP2::NR*EXP2::NC == 0);
+
+        DLIB_ASSERT(is_vector(m1) && is_vector(m2) && m1.size() == m2.size(), 
+            "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
+            << "\n\t You can only compute the dot product between vectors of equal length"
+            << "\n\t is_vector(m1): " << is_vector(m1) 
+            << "\n\t is_vector(m2): " << is_vector(m2) 
+            << "\n\t m1.size():     " << m1.size() 
+            << "\n\t m2.size():     " << m2.size() 
+            );
+
+        if (is_col_vector(m1) && is_col_vector(m2)) return (trans(m1)*m2)(0);
+        if (is_col_vector(m1) && is_row_vector(m2)) return (m2*m1)(0);
+        if (is_row_vector(m1) && is_col_vector(m2)) return (m1*m2)(0);
+
+        //if (is_row_vector(m1) && is_row_vector(m2)) 
+        return (m1*trans(m2))(0);
+    }
+
+    template < typename EXP1, typename EXP2 >
+    typename enable_if_c<EXP1::NR == 1 && EXP2::NR == 1, typename EXP1::type>::type 
+    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
+    { 
+        DLIB_ASSERT(m1.size() == m2.size(), 
+            "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
+            << "\n\t You can only compute the dot product between vectors of equal length"
+            << "\n\t m1.size():     " << m1.size() 
+            << "\n\t m2.size():     " << m2.size() 
+            );
+        
+        return m1*trans(m2); 
+    }
+
+    template < typename EXP1, typename EXP2 >
+    typename enable_if_c<EXP1::NR == 1 && EXP2::NC == 1, typename EXP1::type>::type 
+    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
+    { 
+        DLIB_ASSERT(m1.size() == m2.size(), 
+            "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
+            << "\n\t You can only compute the dot product between vectors of equal length"
+            << "\n\t m1.size():     " << m1.size() 
+            << "\n\t m2.size():     " << m2.size() 
+            );
+        
+        return m1*m2; 
+    }
+
+    template < typename EXP1, typename EXP2 >
+    typename enable_if_c<EXP1::NC == 1 && EXP2::NR == 1, typename EXP1::type>::type 
+    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
+    { 
+        DLIB_ASSERT(m1.size() == m2.size(), 
+            "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
+            << "\n\t You can only compute the dot product between vectors of equal length"
+            << "\n\t m1.size():     " << m1.size() 
+            << "\n\t m2.size():     " << m2.size() 
+            );
+        
+        return m2*m1; 
+    }
+
+    template < typename EXP1, typename EXP2 >
+    typename enable_if_c<EXP1::NC == 1 && EXP2::NC == 1, typename EXP1::type>::type 
+    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
+    { 
+        DLIB_ASSERT(m1.size() == m2.size(), 
+            "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
+            << "\n\t You can only compute the dot product between vectors of equal length"
+            << "\n\t m1.size():     " << m1.size() 
+            << "\n\t m2.size():     " << m2.size() 
+            );
+        
+        return trans(m1)*m2; 
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <long R, long C>
     struct op_removerc
     {
