@@ -190,6 +190,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp reciprocal_max (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - matrix_exp::type == float, double, long double
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (m(r,c) != 0) then
+                        - R(r,c) == 1.0/m(r,c) 
+                    - else
+                        - R(r,c) == std::numeric_limits<R::type>::max() 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp normalize (
         const matrix_exp& m
     );

@@ -1128,6 +1128,24 @@ namespace
             DLIB_TEST(colm(m,5) == c5);
         }
 
+
+        {
+            matrix<double> m(2,2), mr(2,2), mr_max(2,2);
+
+            m = 1, 2,
+                0, 4;
+
+            mr = 1, 1.0/2.0,
+                0,  1.0/4.0;
+
+            mr_max = 1, 1.0/2.0,
+                     std::numeric_limits<double>::max(),  1.0/4.0;
+
+            DLIB_TEST(equal(reciprocal(m), mr));
+            DLIB_TEST(equal(reciprocal_max(m), mr_max));
+
+        }
+
     }
 
 

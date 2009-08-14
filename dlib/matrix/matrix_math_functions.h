@@ -294,6 +294,43 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
 
 // ----------------------------------------------------------------------------------------
 
+    struct op_reciprocal_max
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+6;
+            typedef typename EXP::type type;
+            template <typename M>
+            static type apply ( const M& m, long r, long c)
+            { 
+                const type temp = m(r,c);
+                if (temp != static_cast<type>(0))
+                    return static_cast<type>((type)1.0/temp);
+                else
+                    return std::numeric_limits<type>::max();
+            }
+        };
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_unary_exp<EXP,op_reciprocal_max> reciprocal_max (
+        const matrix_exp<EXP>& m
+    )
+    {
+        // you can only compute reciprocal_max matrices that contain floats, doubles or long doubles.
+        COMPILE_TIME_ASSERT((
+                is_same_type<typename EXP::type,float>::value == true || 
+                is_same_type<typename EXP::type,double>::value == true || 
+                is_same_type<typename EXP::type,long double>::value == true 
+        ));
+        return matrix_unary_exp<EXP,op_reciprocal_max>(m.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
     struct op_normalize
     {
         template <typename EXP>
