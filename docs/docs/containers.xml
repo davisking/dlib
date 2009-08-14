@@ -112,6 +112,10 @@
                         <link>dlib/matrix/matrix_math_functions_abstract.h.html#reciprocal</link>
                      </item>
                      <item>
+                        <name>reciprocal_max</name>
+                        <link>dlib/matrix/matrix_math_functions_abstract.h.html#reciprocal_max</link>
+                     </item>
+                     <item>
                         <name>normalize</name>
                         <link>dlib/matrix/matrix_math_functions_abstract.h.html#normalize</link>
                      </item>

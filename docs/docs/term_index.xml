@@ -168,6 +168,7 @@
 
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="sigmoid"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="reciprocal"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="reciprocal_max"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="round"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="round_zeros"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="complex_matrix"/>
