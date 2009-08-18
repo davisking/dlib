@@ -2050,12 +2050,14 @@ namespace dlib
     {
         auto_mutex M(m);
         min_scale = ms;
+
         if (scale < ms)
         {
             scale = min_scale;
-            lr_point = gui_to_graph_space(point(display_rect_.right(),display_rect_.bottom()));
-            redraw_graph();
         }
+
+        // just call set_size so that everything gets redrawn right
+        set_size(rect.width(), rect.height());
     }
 
 // ----------------------------------------------------------------------------------------
