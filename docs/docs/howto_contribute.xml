@@ -22,7 +22,7 @@
             <li> Help make the web page prettier </li>
             <li> Link to dlib from your web page </li>
             <li> Add yourself or your project to the list of 
-            <a href="http://dclib.wiki.sourceforge.net/dlib_users">dlib users</a> </li>
+            <a href="http://sourceforge.net/apps/mediawiki/dclib/index.php?title=Known_users">dlib users</a> </li>
             <li> Try to run the dlib regression test suite on any platforms you
             have access to </li>
          </ul>
