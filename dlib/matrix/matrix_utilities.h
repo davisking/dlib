@@ -1775,6 +1775,43 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct op_clamp2
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            typedef typename EXP::type type;
+            const static long cost = EXP::cost + 2;
+
+            template <typename M>
+            static type apply ( const M& m, const type& lower, const type& upper, long r, long c)
+            { 
+                const type temp = m(r,c);
+                if (temp > upper)
+                    return upper;
+                else if (temp < lower)
+                    return lower;
+                else
+                    return temp;
+            }
+        };
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_scalar_ternary_exp<EXP,typename EXP::type, op_clamp2> clamp (
+        const matrix_exp<EXP>& m,
+        const typename EXP::type& lower,
+        const typename EXP::type& upper
+    )
+    {
+        typedef matrix_scalar_ternary_exp<EXP,typename EXP::type, op_clamp2> exp;
+        return exp(m.ref(),lower, upper);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename EXP1,
         typename EXP2
