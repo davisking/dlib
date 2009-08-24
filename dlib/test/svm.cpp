@@ -369,7 +369,8 @@ namespace
         dlog << LDEBUG << "peg cached cv: " << peg_c_cv;
 
         // make sure the cached version of pegasos computes the same result
-        DLIB_TEST(sum(abs(peg_cv - peg_c_cv)) < std::sqrt(std::numeric_limits<double>::epsilon()));
+        DLIB_TEST_MSG(sum(abs(peg_cv - peg_c_cv)) < std::sqrt(std::numeric_limits<double>::epsilon()),
+                      sum(abs(peg_cv - peg_c_cv)) << "   \n" << peg_cv << peg_c_cv  );
 
         DLIB_TEST_MSG(mean(rvm_cv) > 0.9, rvm_cv);
         DLIB_TEST_MSG(mean(svm_cv) > 0.9, svm_cv);

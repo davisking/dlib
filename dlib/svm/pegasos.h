@@ -452,7 +452,7 @@ namespace dlib
 
             struct cache_type
             {
-                matrix<float> kernel;  
+                matrix<scalar_type> kernel;  
 
                 std::vector<long> sample_location; // where in the cache a sample is.  -1 means not in cache
                 std::vector<std::pair<long,long> > frequency_of_use;  
