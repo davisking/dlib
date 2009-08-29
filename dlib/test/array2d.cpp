@@ -38,6 +38,7 @@ namespace
         long nc, nr;
 
 
+        DLIB_TEST(get_rect(test).is_empty());
 
         enumerable<unsigned long>& e = test;
         DLIB_TEST(e.at_start() == true);
@@ -67,6 +68,7 @@ namespace
         DLIB_TEST(e.current_element_valid() == false);
 
 
+        DLIB_TEST(get_rect(test).is_empty());
 
 
 
@@ -116,6 +118,7 @@ namespace
 
         test.set_size(0,0);
 
+        DLIB_TEST(get_rect(test).is_empty());
 
         DLIB_TEST(test.at_start() == true);
 
@@ -183,6 +186,11 @@ namespace
             }
 
             test.set_size(nr,nc);
+
+            DLIB_TEST(get_rect(test).left() == 0);
+            DLIB_TEST(get_rect(test).top() == 0);
+            DLIB_TEST(get_rect(test).right() == nc-1);
+            DLIB_TEST(get_rect(test).bottom() == nr-1);
 
             DLIB_TEST(test.size() == static_cast<unsigned long>(nc*nr));
             DLIB_TEST(test.nr() == nr);

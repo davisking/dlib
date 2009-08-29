@@ -6,6 +6,7 @@
 #include "../interfaces/enumerable.h"
 #include "../serialize.h"
 #include "../memory_manager/memory_manager_kernel_abstract.h"
+#include "../geometry/rectangle_abstract.h"
 
 namespace dlib
 {
@@ -239,6 +240,18 @@ namespace dlib
         provides deserialization support 
     !*/
 
+    template <
+        typename T
+        >
+    const rectangle get_rect (
+        const array2d<T>& item
+    );
+    /*!
+        ensures
+            - returns rectangle(0, 0, item.nc()-1, item.nr()-1)
+              (i.e. returns a rectangle that has the same dimensions as
+              the array2d item)
+    !*/
 }
 
 #endif // DLIB_ARRAY2D_KERNEl_ABSTRACT_ 

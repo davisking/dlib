@@ -8,6 +8,7 @@
 #include "../interfaces/enumerable.h"
 #include "../serialize.h"
 #include "../memory_manager.h"
+#include "../geometry/rectangle.h"
 
 namespace dlib
 {
@@ -301,6 +302,11 @@ namespace dlib
             throw serialization_error(e.info + "\n   while deserializing object of type array2d_kernel_1"); 
         }
     }
+
+    template < typename T >
+    const rectangle get_rect (
+        const array2d_kernel_1<T>& item
+    ) { return rectangle(0, 0, item.nc()-1, item.nr()-1); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
