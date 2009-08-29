@@ -70,7 +70,7 @@ int main(int argc, char** argv)
         {
             // Pull out the info from the SURF point relevant to figuring out
             // where its rotated box should be.
-            const unsigned long box_size = static_cast<unsigned long>(sp[i].p.scale*10);
+            const unsigned long box_size = static_cast<unsigned long>(sp[i].p.scale*20);
             const double ang = sp[i].angle;
             const point center(sp[i].p.center);
             rectangle rect = centered_rect(center, box_size, box_size); 
