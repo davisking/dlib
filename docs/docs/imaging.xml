@@ -26,6 +26,8 @@
       <section>
          <name>Pixels</name>
          <item>rgb_pixel</item>
+         <item>bgr_pixel</item>
+         <item>cv_image</item>
          <item>rgb_alpha_pixel</item>
          <item>hsi_pixel</item>
          <item>pixel_traits</item>
@@ -287,9 +289,7 @@
          <file>dlib/pixel.h</file>
          <spec_file link="true">dlib/pixel.h</spec_file>
          <description>
-            This is a simple struct that represents an HSI colored graphical pixel.  Note that
-            since this is just a struct with no member functions there is only one 
-            "implementation" of this object.
+            This is a simple struct that represents an HSI colored graphical pixel.  
          </description>
                                  
       </component>
@@ -302,9 +302,7 @@
          <spec_file link="true">dlib/pixel.h</spec_file>
          <description>
             This is a simple struct that represents an RGB colored graphical pixel with an 
-            alpha channel.  Note that
-            since this is just a struct with no member functions there is only one 
-            "implementation" of this object.
+            alpha channel.  
          </description>
                                  
       </component>
@@ -316,9 +314,46 @@
          <file>dlib/pixel.h</file>
          <spec_file link="true">dlib/pixel.h</spec_file>
          <description>
-            This is a simple struct that represents an RGB colored graphical pixel.  Note that
-            since this is just a struct with no member functions there is only one 
-            "implementation" of this object.
+            This is a simple struct that represents an RGB colored graphical pixel.  
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bgr_pixel</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            This is a simple struct that represents a BGR colored graphical pixel.  
+            <p>
+            The difference between this object and the <a href="#rgb_pixel">rgb_pixel</a>
+            is just that this struct lays its pixels down in memory in BGR order rather
+            than RGB order.  You only care about this if you are doing something like
+            using the <a href="#cv_image">cv_image</a> object to map an OpenCV image
+            into a more object oriented form.
+            </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>cv_image</name>
+         <file>dlib/opencv.h</file>
+         <spec_file link="true">dlib/opencv/cv_image_abstract.h</spec_file>
+         <description>
+            This object is meant to be used as a simple wrapper around the OpenCV
+            IplImage struct.  Using this class template you can turn an IplImage
+            object into something that looks like a normal dlib style image object.
+
+            <p>
+            So you should be able to use cv_image objects with many of the image
+            processing functions in dlib as well as the GUI tools for displaying
+            images on the screen.
+            </p>
          </description>
                                  
       </component>
