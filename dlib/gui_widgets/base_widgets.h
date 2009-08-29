@@ -463,8 +463,8 @@ namespace dlib
         ){ disable_events();}
 
         void set_size (
-            long width, 
-            long height 
+            unsigned long width, 
+            unsigned long height 
         )
         {
             auto_mutex M(m);
@@ -2143,8 +2143,8 @@ namespace dlib
         ) const;
 
         void set_size (
-            long width,
-            long height
+            unsigned long width,
+            unsigned long height
         );
 
         void show (
@@ -2510,8 +2510,8 @@ namespace dlib
         );
 
         void set_size (
-            long width, 
-            long height
+            unsigned long width, 
+            unsigned long height
         );
 
         void set_rect (

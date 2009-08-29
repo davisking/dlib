@@ -1040,8 +1040,8 @@ namespace dlib
         !*/
 
         void set_size (
-            long width_, 
-            long height_ 
+            unsigned long width_, 
+            unsigned long height_ 
         );
         /*!
             ensures
@@ -1520,8 +1520,8 @@ namespace dlib
         !*/
 
         void set_size (
-            long width_, 
-            long height_ 
+            unsigned long width_, 
+            unsigned long height_ 
         );
         /*!
             ensures
@@ -1579,7 +1579,7 @@ namespace dlib
             INITIAL VALUE
                 - min_zoom_scale() == 0.15
                 - max_zoom_scale() == 1.0
-                - zoom_increment() == 0.02
+                - zoom_increment() == 0.90
                 - zoom_scale() == 1.0
 
             WHAT THIS OBJECT REPRESENTS
@@ -1651,6 +1651,8 @@ namespace dlib
             double zi
         );
         /*!
+            requires
+                - 0 < zi < 1
             ensures
                 - #zoom_increment() == zi
         !*/
@@ -1659,14 +1661,20 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the amount by which zoom_scale() is changed when the user
-                  zooms in or out by using the mouse wheel.
+                - When the user zooms in using the mouse wheel:
+                    - #zoom_scale() == zoom_scale() / zoom_increment()
+                - When the user zooms out using the mouse wheel:
+                    - #zoom_scale() == zoom_scale() * zoom_increment()
+                - So this function returns the number that determines how much the zoom
+                  changes when the mouse wheel is moved.
         !*/
 
         void set_max_zoom_scale (
             double ms 
         );
         /*!
+            requires
+                - ms > 0
             ensures
                 - #max_zoom_scale() == ms
         !*/
@@ -1675,6 +1683,8 @@ namespace dlib
             double ms 
         );
         /*!
+            requires
+                - ms > 0
             ensures
                 - #min_zoom_scale() == ms
         !*/
@@ -1684,6 +1694,7 @@ namespace dlib
         /*!
             ensures
                 - returns the minimum allowed value of zoom_scale()
+                  (i.e. this is the number that determines how far out the user is allowed to zoom)
         !*/
 
         double max_zoom_scale (
@@ -1691,11 +1702,12 @@ namespace dlib
         /*!
             ensures
                 - returns the maximum allowed value of zoom_scale() 
+                  (i.e. this is the number that determines how far in the user is allowed to zoom)
         !*/
 
         void set_size (
-            long width,
-            long height
+            unsigned long width,
+            unsigned long height
         );
         /*! 
             ensures
@@ -1775,12 +1787,13 @@ namespace dlib
             requires
                 - mutex drawable::m is locked
             ensures
+                - invalidates the display_rect() so that it will be redrawn
                 - if (min_zoom_scale() <= new_scale && new_scale <= max_zoom_scale()) then
                     - #zoom_scale() == new_scale
-                    - invalidates the display_rect() so that it will be redrawn
-                - else
-                   - #zoom_scale() == zoom_scale()
-                     I.e. this function has no effect
+                - else if (new_scale < min_zoom_scale()) then
+                    - #zoom_scale() == min_zoom_scale() 
+                - else if (new_scale > max_zoom_scale()) then
+                    - #zoom_scale() == max_zoom_scale() 
         !*/
 
         void center_display_at_graph_point (
