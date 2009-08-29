@@ -101,6 +101,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct bgr_pixel
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an BGR colored graphical pixel.
+                (the reason it exists in addition to the rgb_pixel is so you can lay
+                it down on top of a memory region that organizes its color data in the
+                BGR format and still be able to read it)
+        !*/
+
+        bgr_pixel (
+        ) {}
+
+        bgr_pixel (
+            unsigned char blue_,
+            unsigned char green_,
+            unsigned char red_
+        ) : blue(blue_), green(green_), red(red_) {}
+
+        unsigned char blue;
+        unsigned char green;
+        unsigned char red;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct rgb_alpha_pixel
     {
         /*!
@@ -267,6 +293,26 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
+        const bgr_pixel& item, 
+        std::ostream& out 
+    );   
+    /*!
+        provides serialization support for the bgr_pixel struct
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline void deserialize (
+        bgr_pixel& item, 
+        std::istream& in
+    );   
+    /*!
+        provides deserialization support for the bgr_pixel struct
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline void serialize (
         const rgb_alpha_pixel& item, 
         std::ostream& out 
     );   
@@ -308,6 +354,20 @@ namespace dlib
 
     template <>
     struct pixel_traits<rgb_pixel>
+    {
+        const static bool rgb  = true;
+        const static bool rgb_alpha  = false;
+        const static bool grayscale = false;
+        const static bool hsi = false;
+        const static long num = 3;
+        static unsigned long max() { return 255;}
+        const static bool has_alpha = false;
+    };
+
+// ----------------------------------------------------------------------------------------
+    
+    template <>
+    struct pixel_traits<bgr_pixel>
     {
         const static bool rgb  = true;
         const static bool rgb_alpha  = false;
@@ -1058,6 +1118,44 @@ namespace dlib
         catch (serialization_error& e)
         {
             throw serialization_error(e.info + "\n   while deserializing object of type rgb_pixel"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void serialize (
+        const bgr_pixel& item, 
+        std::ostream& out 
+    )   
+    {
+        try
+        {
+            serialize(item.red,out);
+            serialize(item.green,out);
+            serialize(item.blue,out);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type bgr_pixel"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void deserialize (
+        bgr_pixel& item, 
+        std::istream& in
+    )   
+    {
+        try
+        {
+            deserialize(item.red,in);
+            deserialize(item.green,in);
+            deserialize(item.blue,in);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type bgr_pixel"); 
         }
     }
 
