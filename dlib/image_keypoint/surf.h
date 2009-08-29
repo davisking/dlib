@@ -41,7 +41,7 @@ namespace dlib
         const double& scale
     )
     {
-        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, 17*scale,17*scale)) == true &&
+        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, (unsigned long)(17*scale),(unsigned long)(17*scale))) == true &&
                     scale > 0,
             "\tdouble compute_dominant_angle(img, center, scale)"
             << "\n\tAll arguments to this function must be > 0"
@@ -125,7 +125,7 @@ namespace dlib
         matrix<double,64,1,MM,L>& des
     )
     {
-        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, 31*scale,31*scale)) == true &&
+        DLIB_ASSERT(get_rect(img).contains(centered_rect(center, (unsigned long)(31*scale),(unsigned long)(31*scale))) == true &&
                     scale > 0,
             "\tvoid compute_surf_descriptor(img, center, scale, angle)"
             << "\n\tAll arguments to this function must be > 0"
