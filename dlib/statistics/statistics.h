@@ -242,6 +242,11 @@ namespace dlib
             // Keep deserializing the pca matrix for backwards compatibility.
             matrix<double> pca;
             deserialize(pca, in);
+
+            if (pca.size() != 0)
+                throw serialization_error("Error deserializing object of type vector_normalizer\n"   
+                                          "It looks like a serialized vector_normalizer_pca was accidentally deserialized into \n"
+                                          "a vector_normalizer object.");
         }
 
         friend void serialize (
