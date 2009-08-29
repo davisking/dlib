@@ -332,8 +332,8 @@ namespace dlib
         ){return CLOSE_WINDOW;}
 
         virtual void on_user_event (
-            void* p,
-            int i
+            void* ,
+            int 
         ){}
 
         virtual void on_window_resized(
@@ -343,24 +343,24 @@ namespace dlib
         ){}
 
         virtual void on_mouse_down (
-            unsigned long btn,
-            unsigned long state,
-            long x,
-            long y,
-            bool is_double_click
+            unsigned long ,
+            unsigned long ,
+            long ,
+            long ,
+            bool 
         ){}
 
         virtual void on_mouse_up (
-            unsigned long btn,
-            unsigned long state,
-            long x,
-            long y
+            unsigned long ,
+            unsigned long ,
+            long ,
+            long 
         ){}
 
         virtual void on_mouse_move (
-            unsigned long state,
-            long x,
-            long y
+            unsigned long ,
+            long ,
+            long 
         ){}
 
         virtual void on_mouse_leave (
@@ -370,11 +370,11 @@ namespace dlib
         ){}
 
         virtual void on_wheel_up (
-            unsigned long state
+            unsigned long 
         ){}
 
         virtual void on_wheel_down (
-            unsigned long state
+            unsigned long 
         ){}
 
         virtual void on_focus_gained (
@@ -384,19 +384,19 @@ namespace dlib
         ){}
 
         virtual void on_keydown (
-            unsigned long key,          
-            bool is_printable,
-            unsigned long state
+            unsigned long ,          
+            bool ,
+            unsigned long 
         ){}
             
         virtual void on_string_put (
-            const std::wstring &str
+            const std::wstring&
         ){}
 
     private:
 
         virtual void paint (
-            const canvas& c
+            const canvas& 
         ) =0;
 
         base_window(base_window&);        // copy constructor
