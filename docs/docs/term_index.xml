@@ -334,6 +334,10 @@
          <term file="other.html" name="uint16"/>
          <term file="other.html" name="uint32"/>
          <term file="other.html" name="uint64"/>
+         <term file="other.html" name="int8"/>
+         <term file="other.html" name="int16"/>
+         <term file="other.html" name="int32"/>
+         <term file="other.html" name="int64"/>
          <term file="other.html" name="zero_extend_cast"/>
 
          <term name="kernel">

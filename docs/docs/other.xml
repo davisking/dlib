@@ -41,10 +41,19 @@
          <item>pipe</item>
          <item>copy_functor</item>
          <item>logger</item>
-         <item>uint64</item>
-         <item>uint32</item>
-         <item>uint16</item>
-         <item>uint8</item>
+         <item nolink="true">
+            <name>Fixed_width_integers</name>
+            <sub>
+               <item>uint64</item>
+               <item>uint32</item>
+               <item>uint16</item>
+               <item>uint8</item>
+               <item>int64</item>
+               <item>int32</item>
+               <item>int16</item>
+               <item>int8</item>
+            </sub>
+         </item>
       </section>
  
       <section>
@@ -116,6 +125,54 @@
          <spec_file link="true">dlib/uintn.h</spec_file>
          <description>
             This is just a typedef for a 16 bit unsigned integer.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>int8</name>
+         <file>dlib/uintn.h</file>
+         <spec_file link="true">dlib/uintn.h</spec_file>
+         <description>
+            This is just a typedef for an 8 bit integer.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>int16</name>
+         <file>dlib/uintn.h</file>
+         <spec_file link="true">dlib/uintn.h</spec_file>
+         <description>
+            This is just a typedef for a 16 bit integer.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>int32</name>
+         <file>dlib/uintn.h</file>
+         <spec_file link="true">dlib/uintn.h</spec_file>
+         <description>
+            This is just a typedef for a 32 bit integer.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>int64</name>
+         <file>dlib/uintn.h</file>
+         <spec_file link="true">dlib/uintn.h</spec_file>
+         <description>
+            This is just a typedef for a 64 bit integer.
          </description>
          
       </component>
