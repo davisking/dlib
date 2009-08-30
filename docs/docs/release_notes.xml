@@ -12,10 +12,35 @@
 
 <current>
 New Stuff:
+   - Added the ability to use a kernel cache to the batch_trainer object.  
+   - svm_pegasos can now be configured to use two different lambda arguments
+     for use with unbalanced data.
+   - Added the reciprocal_max() and dot() matrix functions.
+   - Added the bgr_pixel and cv_image objects so that OpenCV images can
+     be easily used with dlib routines.
 
 Non-Backwards Compatible Changes:
+   - I changed the batch trainers so that they always call clear() on the 
+     trainer being used before training begins.  
+   - Modified the svm_pegasos class so that the user can set independent lambda
+     parameters for each class.  This breaks backwards compatibility with 
+     the previous interface slightly and changes the serialization format
+     of this class.
+   - Split the vector_normalizer into a normal normalizer and a pca normalizer
+     version. 
+   - The zoomable_region widget now uses exponential rather than linear 
+     zoom scaling since this is much more pleasing to use.  There is now 
+     a new requirement on the zoom increment that it must be between 0 
+     and 1.
 
 Bug fixes:
+   - Fixed a bug in the cross_validate_trainer_threaded() function.  It could 
+     deadlock if more than about 10 folds were requested.
+   - Fixed the serialization functions for the normalized_function object.  
+     They will now work with custom normalizer function objects.
+   - Fixed a minor bug in the zoomable_region::set_min_zoom_scale() function.
+     It didn't always end up zooming in a smooth sensible manner after this
+     function was called.
 
 Other:
    - Made the thread_function object more general.   It can now handle
