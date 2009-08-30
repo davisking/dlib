@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.21" date="Aug 30, 2009">
+New Stuff:
    - Added the ability to use a kernel cache to the batch_trainer object.  
    - svm_pegasos can now be configured to use two different lambda arguments
      for use with unbalanced data.
@@ -46,7 +59,7 @@ Other:
    - Made the thread_function object more general.   It can now handle
      arbitrary functions of up to four arguments.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
