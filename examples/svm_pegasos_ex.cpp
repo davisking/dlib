@@ -128,8 +128,8 @@ int main()
 
     // Now to begin with, you might want to compute the cross validation score of a trainer object
     // on your data.  To do this you should use the batch_cached() function to convert the svm_pegasos object
-    // into a batch training object.  Note that the second argument to batch() is the minimum 
-    // learning rate the trainer object must report for the batch() function to consider training
+    // into a batch training object.  Note that the second argument to batch_cached() is the minimum 
+    // learning rate the trainer object must report for the batch_cached() function to consider training
     // complete.  So smaller values of this parameter cause training to take longer but may result
     // in a more accurate solution. 
     // Here we perform 4-fold cross validation and print the results
