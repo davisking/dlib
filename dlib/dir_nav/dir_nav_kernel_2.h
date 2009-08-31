@@ -650,7 +650,7 @@ namespace dlib
         typename queue_of_dir
         >
     typename enable_if<is_std_vector<queue_of_dir>,void>::type get_filesystem_roots (
-        const std::vector<directory>& roots
+        std::vector<directory>& roots
     )
     {
         roots.clear();
