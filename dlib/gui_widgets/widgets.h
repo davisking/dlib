@@ -3077,8 +3077,15 @@ namespace dlib
         )
         {
             auto_mutex M(m);
+
+            // if the new image has a different size when compared to the previous image
+            // then we should readjust the total rectangle size.
+            if (new_img.nr() != img.nr() || new_img.nc() != img.nc())
+                set_total_rect_size(new_img.nc(), new_img.nr());
+            else
+                parent.invalidate_rectangle(rect);
+
             assign_image(img,new_img);
-            set_total_rect_size(img.nc(), img.nr());
         }
 
         struct overlay_rect
@@ -3162,7 +3169,7 @@ namespace dlib
         template < typename image_type >
         image_window(
             const image_type& img
-        ) : gui_img(*this) { set_image(img); show(); }
+        ) : gui_img(*this), nr(0), nc(0) { set_image(img); show(); }
 
         ~image_window(
         );
@@ -3176,11 +3183,19 @@ namespace dlib
             auto_mutex M(wm);
             gui_img.set_image(img); 
 
-            // set the size of this window to match the size of the input image
-            set_size(img.nc()+padding*2,img.nr()+padding*2);
+            // Only readjust the size of the window if the new image has a different size
+            // than the last image given to this object.
+            if (img.nr() != nr || img.nc() != nc)
+            {
+                // set the size of this window to match the size of the input image
+                set_size(img.nc()+padding*2,img.nr()+padding*2);
 
-            // call this to make sure everything else is setup properly
-            on_window_resized();
+                // call this to make sure everything else is setup properly
+                on_window_resized();
+
+                nr = img.nr();
+                nc = img.nc();
+            }
         }
 
         void add_overlay (
@@ -3212,6 +3227,7 @@ namespace dlib
         image_window& operator= (image_window&);
 
         image_display gui_img;
+        long nr, nc;
     };
 
 // ----------------------------------------------------------------------------------------

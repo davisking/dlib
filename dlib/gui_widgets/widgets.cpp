@@ -5806,7 +5806,9 @@ namespace dlib
     image_window::
     image_window(
     ) :
-        gui_img(*this)
+        gui_img(*this),
+        nr(0),
+        nc(0)
     {
         // show this window on the screen
         show();
