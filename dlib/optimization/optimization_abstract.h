@@ -88,9 +88,8 @@ namespace dlib
         requires
             - is_matrix<T>::value == true (i.e. T must be a dlib::matrix)
             - f must take a dlib::matrix that is a column vector
-            - start.nc() == 1  
-            - direction.nc() == 1
-              (i.e. start and direction should be column vectors)
+            - is_col_vector(start) && is_col_vector(direction) && start.size() == direction.size() 
+              (i.e. start and direction should be column vectors of the same size)
             - f must return either a double or a column vector the same length and
               type as start
             - f(start + 1.5*direction) should be a valid expression
