@@ -546,7 +546,9 @@ namespace dlib
 
 
             // perform the actual optimization
-            find_min_conjugate_gradient(obj, obj_der, opt_starting_point, 0, eps); 
+            find_min(lbfgs_search_strategy(20),
+                     objective_delta_stop_strategy(eps),
+                     obj, obj_der, opt_starting_point, 0); 
 
             // now make sure that the final optimized value is loaded into the beta and
             // out_vectors matrices
