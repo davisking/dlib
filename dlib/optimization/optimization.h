@@ -8,6 +8,7 @@
 #include "../matrix.h"
 #include "../algs.h"
 #include "optimization_abstract.h"
+#include "../sequence.h"
 
 namespace dlib
 {
@@ -79,7 +80,7 @@ namespace dlib
     class bfgs_strategy
     {
     public:
-        bfgs_strategy() : been_used(false) {}
+        bfgs_strategy() : been_used(false), been_used_twice(false) {}
 
         double get_wolfe_rho (
         ) const { return 0.01; }
@@ -105,10 +106,25 @@ namespace dlib
                 delta = (x-prev_x); 
                 gamma = funct_derivative-prev_derivative;
 
+                double dg = dot(delta,gamma);
+
+                // Try to set the initial value of the H matrix to something reasonable if we are still
+                // in the early stages of figuring out what it is.  This formula below is what is suggested
+                // in the book Numerical Optimization by Nocedal and Wright in the chapter on Quasi-Newton methods.
+                if (been_used_twice == false)
+                {
+                    double gg = trans(gamma)*gamma;
+                    if (std::abs(gg) > std::numeric_limits<double>::epsilon())
+                    {
+                        const double temp = put_in_range(0.01, 100, dg/gg);
+                        H = diagm(uniform_matrix<double>(x.size(),1, temp));
+                        been_used_twice = true;
+                    }
+                }
+
                 Hg = H*gamma;
                 gH = trans(trans(gamma)*H);
                 double gHg = trans(gamma)*H*gamma;
-                double dg = trans(delta)*gamma;
                 if (gHg < std::numeric_limits<double>::infinity() && dg < std::numeric_limits<double>::infinity() &&
                     dg != 0)
                 {
@@ -117,6 +133,7 @@ namespace dlib
                 else
                 {
                     H = identity_matrix<double>(H.nr());
+                    been_used_twice = false;
                 }
             }
 
@@ -128,11 +145,124 @@ namespace dlib
 
     private:
         bool been_used;
+        bool been_used_twice;
         matrix<double,0,1> prev_x;
         matrix<double,0,1> prev_derivative;
         matrix<double,0,1> prev_direction;
         matrix<double> H;
         matrix<double,0,1> delta, gamma, Hg, gH;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class lbfgs_strategy
+    {
+    public:
+        lbfgs_strategy(unsigned long max_size_) : max_size(max_size_), been_used(false) {}
+
+        double get_wolfe_rho (
+        ) const { return 0.01; }
+
+        double get_wolfe_sigma (
+        ) const { return 0.9; }
+
+        template <typename T>
+        const matrix<double,0,1>& get_next_direction (
+            const T& x,
+            const double ,
+            const T& funct_derivative
+        )
+        {
+            if (been_used == false)
+            {
+                prev_direction = -funct_derivative;
+                been_used = true;
+            }
+            else
+            {
+                // add an element into the stored data sequence
+                dh_temp.s = x - prev_x;
+                dh_temp.y = funct_derivative - prev_derivative;
+                double temp = dlib::dot(dh_temp.s, dh_temp.y);
+                // only accept this bit of data if temp isn't zero
+                if (std::abs(temp) > std::numeric_limits<double>::epsilon())
+                {
+                    dh_temp.rho = 1/temp;
+                    data.add(data.size(), dh_temp);
+                }
+                else
+                {
+                    data.clear();
+                }
+
+                if (data.size() > 0)
+                {
+                    // This block of code is from algorithm 7.4 in the Nocedal book.
+
+                    prev_direction = -funct_derivative;
+                    alpha.resize(data.size());
+                    for (unsigned long i = data.size()-1; i < data.size(); --i)
+                    {
+                        alpha[i] = data[i].rho*dot(data[i].s, prev_direction);
+                        prev_direction -= alpha[i]*data[i].y;
+                    }
+
+                    // Take a guess at what the first H matrix should be.  This formula below is what is suggested
+                    // in the book Numerical Optimization by Nocedal and Wright in the chapter on Large Scale 
+                    // Unconstrained Optimization (in the L-BFGS section).
+                    double H_0 = 1.0/data[data.size()-1].rho/dot(data[data.size()-1].y, data[data.size()-1].y);
+                    H_0 = put_in_range(0.001, 1000.0, H_0);
+                    prev_direction *= H_0;
+
+                    for (unsigned long i = 0; i < data.size(); ++i)
+                    {
+                        double beta = data[i].rho*dot(data[i].y, prev_direction);
+                        prev_direction += data[i].s * (alpha[i] - beta);
+                    }
+                }
+                else
+                {
+                    prev_derivative = -funct_derivative;
+                }
+
+            }
+
+            if (data.size() > max_size)
+            {
+                // remove the oldest element in the data sequence
+                data.remove(0, dh_temp);
+            }
+
+            prev_x = x;
+            prev_derivative = funct_derivative;
+            return prev_direction;
+        }
+
+    private:
+
+        struct data_helper
+        {
+            matrix<double,0,1> s;
+            matrix<double,0,1> y;
+            double rho;
+
+            friend void swap(data_helper& a, data_helper& b)
+            {
+                a.s.swap(b.s);
+                a.y.swap(b.y);
+                std::swap(a.rho, b.rho);
+            }
+        };
+        sequence<data_helper>::kernel_2a data;
+
+        unsigned long max_size;
+        bool been_used;
+        matrix<double,0,1> prev_x;
+        matrix<double,0,1> prev_derivative;
+        matrix<double,0,1> prev_direction;
+        std::vector<double> alpha;
+
+        data_helper dh_temp;
     };
 
 // ----------------------------------------------------------------------------------------
