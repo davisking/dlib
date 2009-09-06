@@ -372,11 +372,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+// I introduced this struct because it avoids an inane compiler warning from gcc
+    template <typename EXP>
+    struct is_not_ct_vector{ static const bool value = (EXP::NR != 1 && EXP::NC != 1); };
+
     template <
         typename EXP1,
         typename EXP2
         >
-    typename enable_if_c<(EXP1::NR != 1 && EXP1::NC != 1) || (EXP2::NR != 1 && EXP2::NC != 1),
+    typename enable_if_c<(is_not_ct_vector<EXP1>::value) || (is_not_ct_vector<EXP2>::value),
                          typename EXP1::type>::type 
     dot (
         const matrix_exp<EXP1>& m1,
