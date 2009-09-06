@@ -164,7 +164,6 @@ int main()
     // a better choice.
     starting_point = 4, 8;
     find_min(lbfgs_search_strategy(10),  // The 10 here is basically a measure of how much memory L-BFGS will use.
-                                         // See the documentation for details.
              objective_delta_stop_strategy(1e-7),
              &rosen, &rosen_derivative, starting_point, -1);
 
