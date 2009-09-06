@@ -1,12 +1,12 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example illustrating the use the optimization 
+    This is an example illustrating the use the unconstrained optimization 
     routines from the dlib C++ Library.
 
-    The library provides implementations of the conjugate gradient and 
-    quasi-newton BFGS optimization algorithms.  Both of these algorithms 
-    allow you to find the minimum of a function of many input variables.  
+    The library provides implementations of the conjugate gradient,  
+    BFGS and L-BFGS optimization algorithms.  These algorithms allow 
+    you to find the minimum of a function of many input variables.  
     This example walks though a few of the ways you might put these 
     routines to use.
 
@@ -118,45 +118,62 @@ int main()
     cout << "Find the minimum of the rosen function()" << endl;
 
     // Set the starting point to (4,8).  This is the point the optimization algorithm
-    // will start out from and it will slowly move it closer and closer to the
-    // function's minimum point
+    // will start out from and it will move it closer and closer to the function's 
+    // minimum point.   So generally you want to try and compute a good guess that is
+    // somewhat near the actual optimum value.
     starting_point = 4, 8;
-    // Now we use the quasi newton algorithm to find the minimum point.  The first argument
-    // to this routine is the function we wish to minimize, the second is the 
-    // derivative of that function, the third is the starting point, and the last is
-    // an acceptable minimum value of the rosen() function.  That is, if the algorithm
-    // finds any inputs to rosen() that gives an output value <= -1 then it will
-    // stop immediately.  Usually you supply a number smaller than the actual 
-    // global minimum.  So since the smallest output of the rosen function is 0 
+
+    // Now we use the find_min() function to find the minimum point.  The first argument
+    // to this routine is the search strategy we want to use.  The second argument is the 
+    // stopping strategy.  Below I'm using the objective_delta_stop_strategy() which just 
+    // says that the search should stop when the change in the function being optimized 
+    // is small enough.
+    
+    // The other arguments to find_min() are the function to be minimized, its derivative, 
+    // then the starting point, and the last is an acceptable minimum value of the rosen() 
+    // function.  That is, if the algorithm finds any inputs to rosen() that gives an output 
+    // value <= -1 then it will stop immediately.  Usually you supply a number smaller than 
+    // the actual global minimum.  So since the smallest output of the rosen function is 0 
     // we just put -1 here which effectively causes this last argument to be disregarded.
-    find_min_quasi_newton(&rosen, &rosen_derivative, starting_point, -1);
+
+    find_min(bfgs_search_strategy(),  // Use BFGS search algorithm
+             objective_delta_stop_strategy(1e-7), // Stop when the change in rosen() is less than 1e-7
+             &rosen, &rosen_derivative, starting_point, -1);
     // Once the function ends the starting_point vector will contain the optimum point 
     // of (1,1).
     cout << starting_point << endl;
 
 
     // Now lets try doing it again with a different starting point and the version
-    // of the quasi newton algorithm that doesn't require you to supply 
-    // a derivative function.  This version will compute a numerical approximation
-    // of the derivative since we didn't supply one to it.
+    // of find_min() that doesn't require you to supply a derivative function.  
+    // This version will compute a numerical approximation of the derivative since 
+    // we didn't supply one to it.
     starting_point = -94, 5.2;
-    find_min_quasi_newton2(&rosen, starting_point, -1);
+    find_min_using_approximate_derivatives(bfgs_search_strategy(),
+                                           objective_delta_stop_strategy(1e-7),
+                                           &rosen, starting_point, -1);
     // Again the correct minimum point is found and stored in starting_point
     cout << starting_point << endl;
 
 
-    // Here we repeat the same thing as above but this time using the conjugate 
-    // gradient algorithm.  As a rule of thumb, the quasi newton algorithm is 
-    // a better algorithm.  However, it uses O(N^2) memory where N is the size
-    // of the starting_point vector.  The conjugate gradient algorithm however
-    // uses only O(N) memory.  So if you have a function of a huge number
-    // of variables the conjugate gradient algorithm is often a better choice.
+    // Here we repeat the same thing as above but this time using the L-BFGS 
+    // algorithm.  L-BFGS is very similar to the BFGS algorithm, however, BFGS 
+    // uses O(N^2) memory where N is the size of the starting_point vector.  
+    // The L-BFGS algorithm however uses only O(N) memory.  So if you have a 
+    // function of a huge number of variables the L-BFGS algorithm is probably 
+    // a better choice.
     starting_point = 4, 8;
-    find_min_conjugate_gradient(&rosen, &rosen_derivative, starting_point, -1);
+    find_min(lbfgs_search_strategy(10),  // The 10 here is basically a measure of how much memory L-BFGS will use.
+                                         // See the documentation for details.
+             objective_delta_stop_strategy(1e-7),
+             &rosen, &rosen_derivative, starting_point, -1);
+
     cout << starting_point << endl;
 
     starting_point = -94, 5.2;
-    find_min_conjugate_gradient2(&rosen, starting_point, -1);
+    find_min_using_approximate_derivatives(lbfgs_search_strategy(10),
+                                           objective_delta_stop_strategy(1e-7),
+                                           &rosen, starting_point, -1);
     cout << starting_point << endl;
 
 
@@ -179,13 +196,17 @@ int main()
 
     // set the starting point far from the global minimum
     starting_point = 1,2,3,4;
-    find_min_quasi_newton2(test_function(target), starting_point, -1);
+    find_min_using_approximate_derivatives(bfgs_search_strategy(),
+                                           objective_delta_stop_strategy(1e-7),
+                                           test_function(target), starting_point, -1);
     // At this point the correct value of (3,6,1,7) should be found and stored in starting_point
     cout << starting_point << endl;
 
     // Now lets try it again with the conjugate gradient algorithm.
     starting_point = -4,5,99,3;
-    find_min_conjugate_gradient2(test_function(target), starting_point, -1);
+    find_min_using_approximate_derivatives(cg_search_strategy(),
+                                           objective_delta_stop_strategy(1e-7),
+                                           test_function(target), starting_point, -1);
     cout << starting_point << endl;
 
 }
