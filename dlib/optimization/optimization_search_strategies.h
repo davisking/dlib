@@ -148,7 +148,14 @@ namespace dlib
     class lbfgs_search_strategy
     {
     public:
-        lbfgs_search_strategy(unsigned long max_size_) : max_size(max_size_), been_used(false) {}
+        lbfgs_search_strategy(unsigned long max_size_) : max_size(max_size_), been_used(false) 
+        {
+            DLIB_ASSERT (
+                max_size > 0,
+                "\t lbfgs_search_strategy(max_size)"
+                << "\n\t max_size can't be zero"
+            );
+        }
 
         lbfgs_search_strategy(const lbfgs_search_strategy& item) 
         {

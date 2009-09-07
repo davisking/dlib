@@ -19,12 +19,29 @@ namespace dlib
     public:
         objective_delta_stop_strategy (
             double min_delta = 1e-7
-        ) : _been_used(false), _min_delta(min_delta), _max_iter(0), _cur_iter(0), _prev_funct_value(0) {}
+        ) : _been_used(false), _min_delta(min_delta), _max_iter(0), _cur_iter(0), _prev_funct_value(0) 
+        {
+            DLIB_ASSERT (
+                min_delta >= 0,
+                "\t objective_delta_stop_strategy(min_delta)"
+                << "\n\t min_delta can't be negative"
+                << "\n\t min_delta: " << min_delta
+            );
+        }
 
         objective_delta_stop_strategy (
             double min_delta,
             unsigned long max_iter
-        ) : _been_used(false), _min_delta(min_delta), _max_iter(max_iter), _cur_iter(0), _prev_funct_value(0) {}
+        ) : _been_used(false), _min_delta(min_delta), _max_iter(max_iter), _cur_iter(0), _prev_funct_value(0) 
+        {
+            DLIB_ASSERT (
+                min_delta >= 0 && max_iter > 0,
+                "\t objective_delta_stop_strategy(min_delta, max_iter)"
+                << "\n\t min_delta can't be negative and max_iter can't be 0"
+                << "\n\t min_delta: " << min_delta
+                << "\n\t max_iter:  " << max_iter 
+            );
+        }
 
         template <typename T>
         bool should_continue_search (

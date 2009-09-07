@@ -117,8 +117,7 @@ namespace dlib
             - stop_strategy == an object that defines a stop strategy such as one of 
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - f(x) must be a valid expression that evaluates to a double
-            - der(x) must be a valid expression that evaluates to the derivative of
-              f() at x.
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
             - is_col_vector(x) == true
         ensures
             - Performs an unconstrained minimization of the function f() using the given
@@ -152,8 +151,7 @@ namespace dlib
             - stop_strategy == an object that defines a stop strategy such as one of 
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - f(x) must be a valid expression that evaluates to a double
-            - der(x) must be a valid expression that evaluates to the derivative of
-              f() at x.
+            - der(x) must be a valid expression that evaluates to the derivative of f() at x.
             - is_col_vector(x) == true
         ensures
             - Performs an unconstrained maximization of the function f() using the given

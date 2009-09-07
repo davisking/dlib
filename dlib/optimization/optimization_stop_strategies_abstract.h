@@ -61,7 +61,9 @@ namespace dlib
         );
         /*!
             requires
-                - for some function f():
+                - this function is only called once per search iteration
+                - for some objective function f():
+                    - x == the search point for the current iteration
                     - funct_value == f(x)
                     - funct_derivative == derivative(f)(x)
             ensures

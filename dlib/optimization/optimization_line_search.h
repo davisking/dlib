@@ -217,7 +217,7 @@ namespace dlib
         COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
 
         DLIB_ASSERT (
-            1 > sigma && sigma > rho && rho > 0,
+            0 < rho && rho < sigma && sigma < 1,
             "\tdouble line_search()"
             << "\n\tYou have given invalid arguments to this function"
             << "\n\tsigma: " << sigma
