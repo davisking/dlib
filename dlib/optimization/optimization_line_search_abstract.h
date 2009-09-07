@@ -137,7 +137,7 @@ namespace dlib
               an alpha is found such that f(alpha) <= min_f then the search stops
               immediately.
             - This function is also optimized for the case where der(0) is negative.  I.e.
-              positive values of the argument to f() should be a descent direcion.  
+              positive values of the argument to f() should be in a descent direction.  
     !*/
 
     /*
