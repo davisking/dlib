@@ -138,6 +138,10 @@ namespace dlib
               immediately.
             - This function is also optimized for the case where der(0) is negative.  I.e.
               positive values of the argument to f() should be in a descent direction.  
+            - When this function makes calls to f() and der() it always does so by
+              first calling f() and then calling der().  That is, these two functions
+              are always called in pairs with f() being called first and then der()
+              being called second.
     !*/
 
     /*

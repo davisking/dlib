@@ -125,6 +125,10 @@ namespace dlib
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) < min_f.
             - #x == the value of x that was found to minimize f()
+            - When this function makes calls to f() and der() it always does so by
+              first calling f() and then calling der().  That is, these two functions
+              are always called in pairs with f() being called first and then der()
+              being called second.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -159,6 +163,10 @@ namespace dlib
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) > max_f.
             - #x == the value of x that was found to maximize f()
+            - When this function makes calls to f() and der() it always does so by
+              first calling f() and then calling der().  That is, these two functions
+              are always called in pairs with f() being called first and then der()
+              being called second.
     !*/
 
 // ----------------------------------------------------------------------------------------
