@@ -7,6 +7,9 @@
 #include <limits>
 #include "../matrix/matrix_abstract.h"
 #include "../algs.h"
+#include "optimization_search_strategies_abstract.h"
+#include "optimization_stop_strategies_abstract.h"
+#include "optimization_line_search_abstract.h"
 
 
 namespace dlib
@@ -28,7 +31,8 @@ namespace dlib
 
         Note that if funct is a function of a double then the derivative of 
         funct is just a double but if funct is a function of a dlib::matrix (i.e. a
-        function of many variables) then its derivative is a gradient vector.
+        function of many variables) then its derivative is a gradient vector (a column
+        vector in particular).
     !*/
 
     template <
@@ -60,49 +64,29 @@ namespace dlib
             - returns derivative(f, 1e-7)
     !*/
 
-
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename funct, 
-        typename T
+        typename funct
         >
-    class line_search_funct; 
+    class negate_function_object;
     /*!
-        This object is a function object that represents a line search function.
-
-        It represents a function with the signature:
-            double l(double x)
+        This is a function object that represents the negative of some other
+        function.   
     !*/
 
     template <
-        typename funct, 
-        typename T
+        typename funct
         >
-    const line_search_funct<funct,T> make_line_search_function (
-        const funct& f, 
-        const T& start, 
-        const T& direction
-    ); 
+    const negate_function_object<funct> negate_function(
+        const funct& f
+    );
     /*!
         requires
-            - is_matrix<T>::value == true (i.e. T must be a dlib::matrix)
-            - f must take a dlib::matrix that is a column vector
-            - is_col_vector(start) && is_col_vector(direction) && start.size() == direction.size() 
-              (i.e. start and direction should be column vectors of the same size)
-            - f must return either a double or a column vector the same length and
-              type as start
-            - f(start + 1.5*direction) should be a valid expression
+            - f == a function that returns a scalar
         ensures
-            - if (f returns a double) then
-                - returns a line search function that computes l(x) == f(start + x*direction)
-            - else
-                - returns a line search function that computes l(x) == trans(f(start + x*direction))*direction
-                - We assume that f is the derivative of some other function and that what
-                  f returns is a gradient vector. 
-                  So the following two expressions both create the derivative of l(x): 
-                    - derivative(make_line_search_function(funct,start,direction))
-                    - make_line_search_function(derivative(funct),start,direction)
+            - returns a function that represents the negation of f.  That is,
+              the returned function object represents g(x) == -f(x)
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -111,177 +95,142 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    inline double poly_min_extrap (
-        double f0,
-        double d0,
-        double f1,
-        double d1
-    );
-    /*!
-        ensures
-            - let c(x) be a 3rd degree polynomial such that:
-                - c(0) == f0
-                - c(1) == f1
-                - derivative of c(x) at x==0 is d0
-                - derivative of c(x) at x==1 is d1
-            - returns the point in the range [0,1] that minimizes the polynomial c(x) 
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     template <
-        typename funct, 
-        typename funct_der
-        >
-    double line_search (
-        const funct& f, 
-        const funct_der& der, 
-        double rho, 
-        double sigma, 
-        double minf,
-        double& f0_out
-    );
-    /*!
-        requires
-            - 1 > sigma > rho > 0
-            - f and der are scalar functions of scalars
-              (e.g. line_search_funct objects)
-            - der is the derivative of f
-        ensures
-            - returns a value alpha such that f(alpha) is
-              significantly closer to the minimum of f than f(0).
-            - bigger values of sigma result in a less accurate but faster line search
-            - f0_out == f(0)
-    !*/
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-    template <
+        typename search_strategy_type,
+        typename stop_strategy_type,
         typename funct, 
         typename funct_der, 
         typename T
         >
-    void find_min_quasi_newton (
+    void find_min (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
         const funct& f, 
         const funct_der& der, 
         T& x, 
-        double min_f, 
-        double min_delta = 1e-7 
+        double min_f
     );
     /*!
         requires
-            - min_delta >= 0 
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - f(x) must be a valid expression that evaluates to a double
             - der(x) must be a valid expression that evaluates to the derivative of
               f() at x.
-            - is_matrix<T>::value == true (i.e. T must be a dlib::matrix type)
-            - x.nc() == 1 (i.e. x must be a column vector)
+            - is_col_vector(x) == true
         ensures
-            - Performs an unconstrained minimization of the function f() using the BFGS 
-              quasi newton method.  The optimization stops when any of the following
-              conditions are satisfied: 
-                - the change in f() from one iteration to the next is less than min_delta
-                - f(#x) <= min_f
+            - Performs an unconstrained minimization of the function f() using the given
+              search_strategy.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or f(#x) < min_f.
             - #x == the value of x that was found to minimize f()
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename search_strategy_type,
+        typename stop_strategy_type,
         typename funct, 
+        typename funct_der, 
         typename T
         >
-    void find_min_quasi_newton2 (
+    void find_max (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
         const funct& f, 
+        const funct_der& der, 
         T& x, 
-        double min_f, 
-        double min_delta = 1e-7, 
-        const double derivative_eps = 1e-7 
+        double max_f
     );
     /*!
         requires
-            - min_delta >= 0 
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - der(x) must be a valid expression that evaluates to the derivative of
+              f() at x.
+            - is_col_vector(x) == true
+        ensures
+            - Performs an unconstrained maximization of the function f() using the given
+              search_strategy.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or f(#x) > max_f.
+            - #x == the value of x that was found to maximize f()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename search_strategy_type,
+        typename stop_strategy_type,
+        typename funct,
+        typename T
+        >
+    void find_min_using_approximate_derivatives (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        const funct& f,
+        T& x,
+        double min_f,
+        double derivative_eps = 1e-7
+    );
+    /*!
+        requires
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - f(x) must be a valid expression that evaluates to a double
+            - is_col_vector(x) == true
             - derivative_eps > 0 
-            - f(x) must be a valid expression that evaluates to a double
-            - is_matrix<T>::value == true (i.e. T must be a dlib::matrix type)
-            - x.nc() == 1 (i.e. x must be a column vector)
         ensures
-            - Performs an unconstrained minimization of the function f() using a 
-              quasi newton method.  The optimization stops when any of the following
-              conditions are satisfied: 
-                - the change in f() from one iteration to the next is less than min_delta
-                - f(#x) <= min_f
+            - Performs an unconstrained minimization of the function f() using the given
+              search_strategy.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or f(#x) < min_f.
+            - #x == the value of x that was found to minimize f()
             - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
-              information
-            - #x == the value of x that was found to minimize f()
-    !*/
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct, 
-        typename funct_der, 
-        typename T
-        >
-    void find_min_conjugate_gradient (
-        const funct& f, 
-        const funct_der& der, 
-        T& x, 
-        double min_f, 
-        double min_delta = 1e-7
-    );
-    /*!
-        requires
-            - min_delta >= 0 
-            - f(x) must be a valid expression that evaluates to a double
-            - der(x) must be a valid expression that evaluates to the derivative of
-              f() at x.
-            - is_matrix<T>::value == true (i.e. T must be a dlib::matrix type)
-            - x.nc() == 1 (i.e. x must be a column vector)
-        ensures
-            - Performs an unconstrained minimization of the function f() using a 
-              conjugate gradient method.  The optimization stops when any of the following
-              conditions are satisfied: 
-                - the change in f() from one iteration to the next is less than min_delta
-                - f(#x) <= min_f
-            - #x == the value of x that was found to minimize f()
+              information.
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename funct, 
+        typename search_strategy_type,
+        typename stop_strategy_type,
+        typename funct,
         typename T
         >
-    void find_min_conjugate_gradient2 (
-        const funct& f, 
-        T& x, 
-        double min_f, 
-        double min_delta = 1e-7,
-        const double derivative_eps = 1e-7 
+    void find_max_using_approximate_derivatives (
+        search_strategy_type search_strategy,
+        stop_strategy_type stop_strategy,
+        const funct& f,
+        T& x,
+        double max_f,
+        double derivative_eps = 1e-7
     );
     /*!
         requires
-            - min_delta >= 0 
-            - derivative_eps > 0
+            - search_strategy == an object that defines a search strategy such as one 
+              of the objects from dlib/optimization/optimization_search_strategies_abstract.h
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - f(x) must be a valid expression that evaluates to a double
-            - der(x) must be a valid expression that evaluates to the derivative of
-              f() at x.
-            - is_matrix<T>::value == true (i.e. T must be a dlib::matrix type)
-            - x.nc() == 1 (i.e. x must be a column vector)
+            - is_col_vector(x) == true
+            - derivative_eps > 0 
         ensures
-            - Performs an unconstrained minimization of the function f() using a 
-              conjugate gradient method.  The optimization stops when any of the following
-              conditions are satisfied: 
-                - the change in f() from one iteration to the next is less than min_delta
-                - f(#x) <= min_f
+            - Performs an unconstrained maximization of the function f() using the given
+              search_strategy.  
+            - The function is optimized until stop_strategy decides that an acceptable 
+              point has been found or f(#x) > max_f.
+            - #x == the value of x that was found to maximize f()
             - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
-              information
-            - #x == the value of x that was found to minimize f()
+              information.
     !*/
 
 // ----------------------------------------------------------------------------------------
