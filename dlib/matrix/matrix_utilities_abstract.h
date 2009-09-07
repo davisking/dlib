@@ -978,7 +978,7 @@ namespace dlib
     );
     /*!
         requires
-            - pixel_traits<P>::has_alpha == false
+            - pixel_traits<P> must be defined
         ensures
             - returns a matrix M such that:
                 - M::type == T
@@ -1007,7 +1007,6 @@ namespace dlib
     );
     /*!
         requires
-            - pixel_traits<P>::has_alpha == false
             - vector::NR == pixel_traits<P>::num
             - vector::NC == 1 
               (i.e. you have to use a statically dimensioned vector)
