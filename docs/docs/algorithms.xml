@@ -32,13 +32,19 @@
             <name>Optimization</name>
             <sub>
                <item>derivative</item> 
+               <item>negate_function</item> 
                <item>make_line_search_function</item> 
                <item>poly_min_extrap</item> 
                <item>line_search</item> 
-               <item>find_min_quasi_newton</item> 
-               <item>find_min_conjugate_gradient</item> 
-               <item>find_min_quasi_newton2</item> 
-               <item>find_min_conjugate_gradient2</item> 
+               <item>find_min</item> 
+               <item>find_min_using_approximate_derivatives</item> 
+               <item>find_max</item> 
+               <item>find_max_using_approximate_derivatives</item> 
+
+               <item>cg_search_strategy</item>
+               <item>bfgs_search_strategy</item>
+               <item>lbfgs_search_strategy</item>
+               <item>objective_delta_stop_strategy</item>
             </sub>
          </item>
          <item nolink="true">
@@ -129,12 +135,28 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>make_line_search_function</name>
+         <name>negate_function</name>
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
          <description>
+            This is a function that takes another function as input and returns
+            a function object that computes the negation of the input function.
+         </description>
+                                 
+      </component>
+
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>make_line_search_function</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
+         <description>
             This is a function that takes another function f(x) as input and returns
-            a function object l(z) = f(start + z*direction). 
+            a function object l(z) = f(start + z*direction).   It is useful for
+            turning multi-variable functions into single-variable functions for
+            use with the <a href="#line_search">line_search</a> routine.
          </description>
                                  
       </component>
@@ -145,7 +167,7 @@
       <component>
          <name>poly_min_extrap</name>
          <file>dlib/optimization.h</file>
-         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
          <description>
             This function finds the 3rd degree polynomial that interpolates a 
             set of points and returns you the minimum of that polynomial.
@@ -158,7 +180,7 @@
       <component>
          <name>line_search</name>
          <file>dlib/optimization.h</file>
-         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
          <description>
             Performs a line search on a given function and returns the input
             that makes the function significantly smaller.
@@ -168,14 +190,24 @@
 
 
    <!-- ************************************************************************* -->
-      
+
       <component>
-         <name>find_min_quasi_newton</name>
+         <name>cg_search_strategy</name>
          <file>dlib/optimization.h</file>
-         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <spec_file link="true">dlib/optimization/optimization_search_strategies_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the potentially nonlinear function f() using the 
-             BFGS quasi newton method.  
+                This object represents a strategy for determining which direction
+                a <a href="#line_search">line search</a> should be carried out along.  This particular object
+                is an implementation of the Polak-Ribiere conjugate gradient method
+                for determining this direction.
+
+                  <p>
+                This method uses an amount of memory that is linear in the number
+                of variables to be optimized.  So it is capable of handling problems
+                with a very large number of variables.  However, it is generally
+                not as good as the L-BFGS algorithm (see the 
+                <a href="#lbfgs_search_strategy">lbfgs_search_strategy</a> class).
+                  </p>
          </description>
          <examples>
             <example>optimization_ex.cpp.html</example>
@@ -186,12 +218,21 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>find_min_conjugate_gradient</name>
+         <name>bfgs_search_strategy</name>
          <file>dlib/optimization.h</file>
-         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <spec_file link="true">dlib/optimization/optimization_search_strategies_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the potentially nonlinear function f() using a 
-              conjugate gradient method. 
+                This object represents a strategy for determining which direction
+                a <a href="#line_search">line search</a> should be carried out along.  This particular object
+                is an implementation of the BFGS quasi-newton method for determining 
+                this direction.
+
+                  <p>
+                This method uses an amount of memory that is quadratic in the number
+                of variables to be optimized.  It is generally very effective but 
+                if your problem has a very large number of variables then it isn't 
+                appropriate.  Instead You should try the <a href="#lbfgs_search_strategy">lbfgs_search_strategy</a>.
+                  </p>
          </description>
          <examples>
             <example>optimization_ex.cpp.html</example>
@@ -202,13 +243,20 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>find_min_quasi_newton2</name>
+         <name>lbfgs_search_strategy</name>
          <file>dlib/optimization.h</file>
-         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <spec_file link="true">dlib/optimization/optimization_search_strategies_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the potentially nonlinear function f() using the
-             BFGS quasi newton method.  This version doesn't take a gradient function of f()
-              but instead numerically approximates the gradient.
+                This object represents a strategy for determining which direction
+                a <a href="#line_search">line search</a> should be carried out along.  This particular object
+                is an implementation of the L-BFGS quasi-newton method for determining 
+                this direction.
+
+                  <p>
+                This method uses an amount of memory that is linear in the number
+                of variables to be optimized.  This makes it an excellent method 
+                to use when an optimization problem has a large number of variables.
+                  </p>
          </description>
          <examples>
             <example>optimization_ex.cpp.html</example>
@@ -219,17 +267,81 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>find_min_conjugate_gradient2</name>
+         <name>objective_delta_stop_strategy</name>
          <file>dlib/optimization.h</file>
-         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <spec_file link="true">dlib/optimization/optimization_stop_strategies_abstract.h</spec_file>
          <description>
-             Performs an unconstrained minimization of the potentially nonlinear function f() using a 
-              conjugate gradient method. This version doesn't take a gradient function of f()
-              but instead numerically approximates the gradient.
+                This object represents a strategy for deciding if an optimization
+                algorithm should terminate.   This particular object looks at the 
+                change in the objective function from one iteration to the next and 
+                bases its decision on how large this change is.  If the change
+                is below a user given threshold then the search stops.
          </description>
          <examples>
             <example>optimization_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_min</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained minimization of a nonlinear function using 
+             some search strategy (e.g. <a href="#bfgs_search_strategy">bfgs_search_strategy</a>).
+         </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_min_using_approximate_derivatives</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained minimization of a nonlinear function using 
+             some search strategy (e.g. <a href="#bfgs_search_strategy">bfgs_search_strategy</a>).
+             This version doesn't take a gradient function but instead numerically approximates 
+             the gradient.
+         </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_max</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained maximization of a nonlinear function using 
+             some search strategy (e.g. <a href="#bfgs_search_strategy">bfgs_search_strategy</a>).
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_max_using_approximate_derivatives</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained maximization of a nonlinear function using 
+             some search strategy (e.g. <a href="#bfgs_search_strategy">bfgs_search_strategy</a>).
+             This version doesn't take a gradient function but instead numerically approximates 
+             the gradient.
+         </description>
                                  
       </component>
 

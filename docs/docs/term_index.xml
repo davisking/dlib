@@ -33,10 +33,15 @@
          <term file="algorithms.html" name="make_line_search_function"/>
          <term file="algorithms.html" name="poly_min_extrap"/>
          <term file="algorithms.html" name="line_search"/>
-         <term file="algorithms.html" name="find_min_quasi_newton"/>
-         <term file="algorithms.html" name="find_min_conjugate_gradient"/>
-         <term file="algorithms.html" name="find_min_quasi_newton2"/>
-         <term file="algorithms.html" name="find_min_conjugate_gradient2"/>
+         <term file="algorithms.html" name="find_min"/>
+         <term file="algorithms.html" name="find_min_using_approximate_derivatives"/>
+         <term file="algorithms.html" name="find_max"/>
+         <term file="algorithms.html" name="find_max_using_approximate_derivatives"/>
+         <term file="algorithms.html" name="objective_delta_stop_strategy"/>
+         <term file="algorithms.html" name="negate_function"/>
+         <term file="algorithms.html" name="cg_search_strategy"/>
+         <term file="algorithms.html" name="bfgs_search_strategy"/>
+         <term file="algorithms.html" name="lbfgs_search_strategy"/>
 
          <term file="bayes.html" name="set_node_value"/>
          <term file="bayes.html" name="node_value"/>
