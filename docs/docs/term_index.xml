@@ -38,6 +38,7 @@
          <term file="algorithms.html" name="find_max"/>
          <term file="algorithms.html" name="find_max_using_approximate_derivatives"/>
          <term file="algorithms.html" name="objective_delta_stop_strategy"/>
+         <term file="algorithms.html" name="gradient_norm_stop_strategy"/>
          <term file="algorithms.html" name="negate_function"/>
          <term file="algorithms.html" name="cg_search_strategy"/>
          <term file="algorithms.html" name="bfgs_search_strategy"/>

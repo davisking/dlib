@@ -45,6 +45,7 @@
                <item>bfgs_search_strategy</item>
                <item>lbfgs_search_strategy</item>
                <item>objective_delta_stop_strategy</item>
+               <item>gradient_norm_stop_strategy</item>
             </sub>
          </item>
          <item nolink="true">
@@ -280,6 +281,21 @@
          <examples>
             <example>optimization_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>gradient_norm_stop_strategy</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_stop_strategies_abstract.h</spec_file>
+         <description>
+                This object represents a strategy for deciding if an optimization
+                algorithm should terminate.   This particular object looks at the 
+                norm (i.e. the length) of the current gradient vector and
+                stops if it is smaller than a user given threshold.  
+         </description>
                                  
       </component>
 
