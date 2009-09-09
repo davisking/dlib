@@ -3,6 +3,8 @@
 #ifndef DLIB_WINDOWS_MAGIc_ 
 #define DLIB_WINDOWS_MAGIc_ 
 
+#include "platform.h"
+
 #ifdef WIN32
 
 // This file contains all the magical #defines you have to setup  before you
