@@ -39,7 +39,7 @@
 #define _WIN32_WINNT 0x0500
 #endif
 
-#endif WIN32
+#endif // WIN32
 
 #endif // DLIB_WINDOWS_MAGIc_
 
