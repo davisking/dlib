@@ -60,12 +60,13 @@ namespace std
 }
 #endif
 
+#include "platform.h"
+#include "windows_magic.h"
 
 
 #include <algorithm>    // for std::swap
 #include <new>          // for std::bad_alloc
 #include <cstdlib>
-#include "platform.h"
 #include "assert.h"
 #include "error.h"
 #include "noncopyable.h"
