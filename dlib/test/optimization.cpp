@@ -158,6 +158,14 @@ namespace
                      wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
             dlog << LINFO << "find_min() bgfs: got apq in " << total_count;
+
+            total_count = 0;
+            x = p;
+            find_min(bfgs_search_strategy(), 
+                     gradient_norm_stop_strategy(),
+                     wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
+            DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            dlog << LINFO << "find_min() bgfs(gn): got apq in " << total_count;
         }
 
 
@@ -290,6 +298,15 @@ namespace
 
         total_count = 0;
         x = p;
+        find_min_using_approximate_derivatives(lbfgs_search_strategy(4),
+                                               gradient_norm_stop_strategy(),
+                                               &powell, x, minf, 1e-10);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
+        dlog << LINFO << "find_min() lbfgs-4(gn): got powell/noder2 in " << total_count;
+
+
+        total_count = 0;
+        x = p;
         find_min_using_approximate_derivatives(cg_search_strategy(),
                                                objective_delta_stop_strategy(eps),
                                                &powell, x, minf, 1e-10);
@@ -318,6 +335,15 @@ namespace
                  &simple, &der_simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min() bfgs: got simple in " << total_count;
+
+
+        total_count = 0;
+        x = p;
+        find_min(bfgs_search_strategy(),
+                 gradient_norm_stop_strategy(),
+                 &simple, &der_simple, x, minf);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        dlog << LINFO << "find_min() bfgs(gn): got simple in " << total_count;
 
 
         total_count = 0;
@@ -415,6 +441,15 @@ namespace
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
         dlog << LINFO << "find_min() bfgs: got rosen in " << total_count;
+
+
+        total_count = 0;
+        x = p;
+        find_min(bfgs_search_strategy(),
+                 gradient_norm_stop_strategy(),
+                 &rosen, &der_rosen, x, minf);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
+        dlog << LINFO << "find_min() bfgs(gn): got rosen in " << total_count;
 
 
         total_count = 0;

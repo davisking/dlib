@@ -79,6 +79,65 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class gradient_norm_stop_strategy
+    {
+    public:
+        gradient_norm_stop_strategy (
+            double min_norm = 1e-7
+        ) : _min_norm(min_norm), _max_iter(0), _cur_iter(0) 
+        {
+            DLIB_ASSERT (
+                min_norm >= 0,
+                "\t gradient_norm_stop_strategy(min_norm)"
+                << "\n\t min_norm can't be negative"
+                << "\n\t min_norm: " << min_norm
+            );
+        }
+
+        gradient_norm_stop_strategy (
+            double min_norm,
+            unsigned long max_iter
+        ) : _min_norm(min_norm), _max_iter(max_iter), _cur_iter(0) 
+        {
+            DLIB_ASSERT (
+                min_norm >= 0 && max_iter > 0,
+                "\t gradient_norm_stop_strategy(min_norm, max_iter)"
+                << "\n\t min_norm can't be negative and max_iter can't be 0"
+                << "\n\t min_norm: " << min_norm
+                << "\n\t max_iter:  " << max_iter 
+            );
+        }
+
+        template <typename T>
+        bool should_continue_search (
+            const T& ,
+            const double ,
+            const T& funct_derivative
+        ) 
+        {
+            ++_cur_iter;
+
+            // Check if we have hit the max allowable number of iterations.  (but only
+            // check if _max_iter is enabled (i.e. not 0)).
+            if (_max_iter != 0 && _cur_iter > _max_iter)
+                return false;
+
+            // check if the gradient norm is too small 
+            if (length(funct_derivative) < _min_norm)
+                return false;
+
+            return true;
+        }
+
+    private:
+
+        double _min_norm;
+        unsigned long _max_iter;
+        unsigned long _cur_iter;
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_OPTIMIZATIOn_STOP_STRATEGIES_H_
