@@ -225,35 +225,11 @@ namespace dlib
                     self.data_empty.signal();
 
                     self.data_mutex.unlock();
-                    // call funct with its intended parameter
-                    try
-                    {
-                        funct(param);
-                        self.call_end_handlers();
-                    }
-                    catch (std::exception& e)
-                    {
-                        std::cerr << "An exception was thrown in a thread and was not caught.  Its what() string is:\n"
-                             << e.what() << std::endl;
-
-                        self.data_mutex.lock();
-                        --self.total_count;
-                        self.destructed.signal();
-                        self.data_mutex.unlock();
-
-                        abort();
-                    }
-                    catch (...)
-                    {
-                        std::cerr << "An exception was thrown in a thread and was not caught." << std::endl;
-
-                        self.data_mutex.lock();
-                        --self.total_count;
-                        self.destructed.signal();
-                        self.data_mutex.unlock();
-
-                        abort();
-                    }
+                    // Call funct with its intended parameter.  If this function throws then
+                    // we intentionally let the exception escape the thread and result in whatever
+                    // happens when it gets caught by the OS (generally the program is terminated).
+                    funct(param);
+                    self.call_end_handlers();
 
                     self.data_mutex.lock();
 

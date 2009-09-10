@@ -113,6 +113,16 @@ namespace dlib
 
     private:
 
+        class raii_thread_helper
+        {
+        public:
+            raii_thread_helper(multithreaded_object& self_, thread_id_type id_);
+            ~raii_thread_helper();
+
+            multithreaded_object& self;
+            thread_id_type id;
+        };
+
         void thread_helper(
         );
 

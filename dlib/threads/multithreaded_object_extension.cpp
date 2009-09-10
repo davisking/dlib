@@ -161,78 +161,64 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    multithreaded_object::raii_thread_helper::
+    raii_thread_helper(
+        multithreaded_object& self_,
+        thread_id_type id_
+    ) : self(self_), id(id_){}
+
+    multithreaded_object::raii_thread_helper::
+    ~raii_thread_helper()
+    {
+        auto_mutex M(self.m_);
+        if (self.thread_ids.is_in_domain(id))
+        {
+            mfp temp;
+            thread_id_type id_temp;
+            self.thread_ids.remove(id,id_temp,temp);
+            // put this thread's registered function back into the dead_threads queue
+            self.dead_threads.enqueue(temp);
+        }
+
+        --self.threads_started;
+        // If this is the last thread to terminate then
+        // signal that that is the case.
+        if (self.threads_started == 0)
+        {
+            self.is_running_ = false;
+            self.should_stop_ = false;
+            self.s.broadcast();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void multithreaded_object::
     thread_helper(
     )
     {
         mfp mf;
-        const thread_id_type id = get_thread_id();
+        thread_id_type id = get_thread_id();
 
-        try
+        // this guy's destructor does all the necessary cleanup in this function
+        raii_thread_helper raii(*this, id);
+
+        // if there is a dead_thread sitting around then pull it
+        // out and put it into mf
         {
-            // if there is a dead_thread sitting around then pull it
-            // out and put it into mf
-            {
-                auto_mutex M(m_);
-                if (dead_threads.size() > 0)
-                {
-                    dead_threads.dequeue(mf);
-                    mfp temp;
-                    thread_id_type id_temp = id;
-                    temp = mf;
-                    thread_ids.add(id_temp,temp);
-                }
-            }
-
-            if (mf.is_set())
-            {
-                // call the registered thread function
-                mf();
-
-                auto_mutex M(m_);
-                if (thread_ids.is_in_domain(id))
-                {
-                    mfp temp;
-                    thread_id_type id_temp;
-                    thread_ids.remove(id,id_temp,temp);
-
-                }
-
-                // put this thread's registered function back into the dead_threads queue
-                dead_threads.enqueue(mf);
-            }
-
             auto_mutex M(m_);
-            --threads_started;
-            // If this is the last thread to terminate then
-            // signal that that is the case.
-            if (threads_started == 0)
+            if (dead_threads.size() > 0)
             {
-                is_running_ = false;
-                should_stop_ = false;
-                s.broadcast();
+                dead_threads.dequeue(mf);
+                mfp temp(mf);
+                thread_ids.add(id,temp);
             }
         }
-        catch (...)
-        {
-            auto_mutex M(m_);
-            if (thread_ids.is_in_domain(id))
-            {
-                mfp temp;
-                thread_id_type id_temp;
-                thread_ids.remove(id,id_temp,temp);
-            }
 
-            --threads_started;
-            // If this is the last thread to terminate then
-            // signal that that is the case.
-            if (threads_started == 0)
-            {
-                is_running_ = false;
-                should_stop_ = false;
-                s.broadcast();
-            }
-            throw;
+        if (mf.is_set())
+        {
+            // call the registered thread function
+            mf();
         }
     }
 

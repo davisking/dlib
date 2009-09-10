@@ -271,6 +271,7 @@ namespace
                 test5 a5;
             }
             DLIB_TEST(count == (i+1)*3);
+            print_spinner();
         }
         count = 0;
 
@@ -285,6 +286,7 @@ namespace
                 dlib::sleep(50);
             }
             DLIB_TEST(count == (i+1)*3);
+            print_spinner();
         }
     }
 
