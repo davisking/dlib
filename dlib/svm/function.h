@@ -140,18 +140,18 @@ namespace dlib
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
 
-        scalar_type a;
-        scalar_type b;
+        scalar_type alpha;
+        scalar_type beta;
         decision_function<K> decision_funct;
 
         probabilistic_decision_function (
-        ) : a(0), b(0), decision_funct(decision_function<K>()) {}
+        ) : alpha(0), beta(0), decision_funct(decision_function<K>()) {}
 
         probabilistic_decision_function (
             const probabilistic_decision_function& d
         ) : 
-            a(d.a),
-            b(d.b),
+            alpha(d.alpha),
+            beta(d.beta),
             decision_funct(d.decision_funct)
         {}
 
@@ -160,8 +160,8 @@ namespace dlib
             const scalar_type b_,
             const decision_function<K>& decision_funct_ 
         ) :
-            a(a_),
-            b(b_),
+            alpha(a_),
+            beta(b_),
             decision_funct(decision_funct_)
         {}
 
@@ -171,8 +171,8 @@ namespace dlib
         {
             if (this != &d)
             {
-                a = d.a;
-                b = d.b;
+                alpha = d.alpha;
+                beta = d.beta;
                 decision_funct = d.decision_funct;
             }
             return *this;
@@ -183,7 +183,7 @@ namespace dlib
         ) const
         {
             scalar_type f = decision_funct(x);
-            return 1/(1 + std::exp(a*f + b));
+            return 1/(1 + std::exp(alpha*f + beta));
         }
     };
 
@@ -197,8 +197,8 @@ namespace dlib
     {
         try
         {
-            serialize(item.a, out);
-            serialize(item.b, out);
+            serialize(item.alpha, out);
+            serialize(item.beta, out);
             serialize(item.decision_funct, out);
         }
         catch (serialization_error& e)
@@ -218,8 +218,8 @@ namespace dlib
         typedef typename K::scalar_type scalar_type;
         try
         {
-            deserialize(item.a, in);
-            deserialize(item.b, in);
+            deserialize(item.alpha, in);
+            deserialize(item.beta, in);
             deserialize(item.decision_funct, in);
         }
         catch (serialization_error& e)

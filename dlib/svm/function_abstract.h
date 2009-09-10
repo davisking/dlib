@@ -143,16 +143,16 @@ namespace dlib
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
 
-        scalar_type a;
-        scalar_type b;
+        scalar_type alpha;
+        scalar_type beta;
         decision_function<K> decision_funct;
 
         probabilistic_decision_function (
         );
         /*!
             ensures
-                - #a == 0
-                - #b == 0
+                - #alpha == 0
+                - #beta == 0
                 - #decision_function has its initial value
         !*/
 
@@ -165,13 +165,13 @@ namespace dlib
         !*/
 
         probabilistic_decision_function (
-            const scalar_type a_,
-            const scalar_type b_,
+            const scalar_type a,
+            const scalar_type b,
             const decision_function<K>& decision_funct_ 
-        ) : a(a_), b(b_), decision_funct(decision_funct_) {}
+        ) : alpha(a), beta(b), decision_funct(decision_funct_) {}
         /*!
             ensures
-                - populates the probabilistic decision function with the given a, b, 
+                - populates the probabilistic decision function with the given alpha, beta, 
                   and decision_function.
         !*/
 
@@ -200,7 +200,7 @@ namespace dlib
             // Now basically normalize the output so that it is a properly
             // conditioned probability of x being in the +1 class given
             // the output of the SVM.
-            return 1/(1 + std::exp(a*f + b));
+            return 1/(1 + std::exp(alpha*f + beta));
         }
     };
 
