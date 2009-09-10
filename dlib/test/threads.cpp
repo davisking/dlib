@@ -104,7 +104,10 @@ namespace
             for (int i = 0; i < 0x3FFFF; ++i)
             {
                 if ((i&0xFFF) == 0)
+                {
+                    print_spinner();
                     dlib::sleep(10);
+                }
                 // if this isn't equal to num then there is a problem with the thread specific data stuff
                 if (tsd.data() != num)
                 {
