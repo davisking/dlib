@@ -35,6 +35,23 @@
             All that is necessary is an appropriate kernel.
          </p>
 
+
+         <br/> 
+         <h3>Paper Describing dlib Machine Learning</h3>
+         <pre>
+Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf">Dlib-ml: A Machine Learning Toolkit</a>. 
+   <i>Journal of Machine Learning Research</i> 10, pp. 1755-1758, 2009
+
+@Article{dlib09,
+  author = {Davis E. King},
+  title = {Dlib-ml: A Machine Learning Toolkit},
+  journal = {Journal of Machine Learning Research},
+  year = {2009},
+  volume = {10},
+  pages = {1755-1758},
+}
+         </pre>
+
    </body>
 
    <!-- ************************************************************************* -->

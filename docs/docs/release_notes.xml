@@ -12,10 +12,17 @@
 
 <current>
 New Stuff:
+   - Added an implementation of the L-BFGS algorithm for unconstrained non-linear
+     optimization. 
 
 Non-Backwards Compatible Changes:
+   - Refactored the optimization code.  It is now much more flexible but
+     this resulted in changes to the API.  See the optimization example program 
+     for a discussion of the new API.
 
 Bug fixes:
+   - Fixed a bug in the get_filesystem_roots() roots function that
+     prevented it from compiling.
 
 Other:
 
