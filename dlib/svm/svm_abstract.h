@@ -327,11 +327,8 @@ namespace dlib
               given binary classification problem for the given number of folds.
               Each fold is tested using the output of the trainer and the average 
               classification accuracy from all folds is returned.  
-            - The accuracy is returned in a row vector, let us call it R.  Both 
-              quantities in R are numbers between 0 and 1 which represent the fraction 
-              of examples correctly classified.  R(0) is the fraction of +1 examples 
-              correctly classified and R(1) is the fraction of -1 examples correctly 
-              classified.
+            - The average accuracy is computed by running test_binary_decision_function()
+              on each fold and its output is averaged and returned.
             - The number of folds used is given by the folds argument.
         throws
             - any exceptions thrown by trainer.train()
@@ -347,7 +344,7 @@ namespace dlib
         >
     const matrix<typename dec_funct_type::scalar_type, 1, 2, typename dec_funct_type::mem_manager_type> 
     test_binary_decision_function (
-        const dec_funct_type& trainer,
+        const dec_funct_type& dec_funct,
         const in_sample_vector_type& x_test,
         const in_scalar_vector_type& y_test
     );
@@ -356,7 +353,9 @@ namespace dlib
             - is_binary_classification_problem(x_test,y_test) == true
             - dec_funct_type == some kind of decision function object (e.g. decision_function)
         ensures
-            - tests the given decision function by calling on the x_test and y_test samples.
+            - Tests the given decision function by calling it on the x_test and y_test samples.
+              The output of dec_funct is interpreted as a prediction for the +1 class
+              if its output is >= 0 and as a prediction for the -1 class otherwise.
             - The test accuracy is returned in a row vector, let us call it R.  Both 
               quantities in R are numbers between 0 and 1 which represent the fraction 
               of examples correctly classified.  R(0) is the fraction of +1 examples 
