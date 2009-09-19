@@ -412,6 +412,10 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#vector_to_matrix</link>
                      </item>
                      <item>
+                        <name>pointer_to_column_vector</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#pointer_to_column_vector</link>
+                     </item>
+                     <item>
                         <name>reshape_to_column_vector</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#reshape_to_column_vector</link>
                      </item>

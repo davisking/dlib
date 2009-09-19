@@ -205,6 +205,7 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="tmp"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="array_to_matrix"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="vector_to_matrix"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointer_to_column_vector"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="reshape_to_column_vector"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="squared"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="cubed"/>
