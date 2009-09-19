@@ -338,6 +338,39 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T 
+        >
+    struct op_pointer_to_col_vect : has_nondestructive_aliasing 
+    {
+        const static long cost = 1;
+        const static long NR = 0;
+        const static long NC = 1;
+        typedef typename memory_manager<char>::kernel_1a mem_manager_type;
+        typedef T type;
+        static type apply (const T* val, long r, long )
+        { return val[r]; }
+    };
+
+    template <
+        typename T
+        >
+    const dynamic_matrix_scalar_unary_exp<const T*,op_pointer_to_col_vect<T> > pointer_to_column_vector (
+        const T* ptr,
+        long nr
+    )
+    {
+        DLIB_ASSERT(nr > 0 , 
+                    "\tconst matrix_exp pointer_to_column_vector(ptr, nr)"
+                    << "\n\t nr must be bigger than 0"
+                    << "\n\t nr: " << nr
+        );
+        typedef dynamic_matrix_scalar_unary_exp<const T*,op_pointer_to_col_vect<T> > exp;
+        return exp(nr,1,ptr);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     struct op_trans 
     {
         template <typename EXP>

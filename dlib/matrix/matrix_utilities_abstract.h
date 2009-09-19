@@ -365,6 +365,29 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    const matrix_exp pointer_to_column_vector (
+        const T* ptr,
+        long nr
+    );
+    /*!
+        requires
+            - nr > 0
+            - ptr == a pointer to at least nr T objects
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == nr
+                - m.nc() == 1
+                - for all valid i:
+                  M(i) == ptr[i]
+            - Note that the returned matrix doesn't take "ownership" of
+              the pointer and thus will not delete or free it.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp reshape_to_column_vector (
         const matrix_exp& m
     );
