@@ -75,7 +75,7 @@ namespace dlib
         dlib__out << "Error occurred in file " << __FILE__ << ".\n";      \
         dlib__out << "Error occurred in function " << DLIB_FUNCTION_NAME << ".\n\n";      \
         dlib__out << "Failing expression was " << #_exp << ".\n";           \
-        dlib__out << _message << "\n";                                      \
+        dlib__out << std::boolalpha << _message << "\n";                    \
         throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib__out.str());      \
     }}                                                                      
 
