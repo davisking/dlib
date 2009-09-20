@@ -4,6 +4,7 @@
 #define DLIB_SVM_HEADER
 
 #include "optimization/optimization.h"
+#include "optimization/optimization_bobyqa.h"
 
 #endif // DLIB_OPTIMIZATIOn_HEADER
 

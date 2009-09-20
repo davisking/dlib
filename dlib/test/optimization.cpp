@@ -169,6 +169,20 @@ namespace
         }
 
 
+        if (p.size() < 100)
+        {
+            total_count = 0;
+            x = p;
+            find_min_bobyqa(wrap_function(apq<T>), x, 2*x.size()+1,
+                            uniform_matrix<double>(x.size(),1,-1e100),
+                            uniform_matrix<double>(x.size(),1,1e100),
+                            (max(abs(x))+1)/10,
+                            1e-6,
+                            10000);
+            DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            dlog << LINFO << "find_min_bobyqa(): got apq in " << total_count;
+        }
+
         total_count = 0;
         x = p;
         find_min(lbfgs_search_strategy(10), 
@@ -312,6 +326,19 @@ namespace
                                                &powell, x, minf, 1e-10);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
         dlog << LINFO << "find_min() cg: got powell/noder2 in " << total_count;
+
+
+        total_count = 0;
+        x = p;
+        find_min_bobyqa(&powell, x, 2*x.size()+1,
+                        uniform_matrix<double>(x.size(),1,-1e100),
+                        uniform_matrix<double>(x.size(),1,1e100),
+                        (max(abs(x))+1)/10,
+                        1e-7,
+                        10000);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-3),opt-x);
+        dlog << LINFO << "find_min_bobyqa(): got powell in " << total_count;
+
     }
 
 
@@ -419,6 +446,18 @@ namespace
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
         dlog << LINFO << "find_min() cg: got simple/noder2 in " << total_count;
 
+
+        total_count = 0;
+        x = p;
+        find_min_bobyqa(&simple, x, 2*x.size()+1,
+                        uniform_matrix<double>(x.size(),1,-1e100),
+                        uniform_matrix<double>(x.size(),1,1e100),
+                        (max(abs(x))+1)/10,
+                        1e-6,
+                        10000);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        dlog << LINFO << "find_min_bobyqa(): got simple in " << total_count;
+
     }
 
 
@@ -514,6 +553,21 @@ namespace
                                                &rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
         dlog << LINFO << "find_min() cg: got rosen/noder2 in " << total_count;
+
+
+        if (max(abs(p)) < 1000)
+        {
+            total_count = 0;
+            x = p;
+            find_min_bobyqa(&rosen, x, 2*x.size()+1,
+                            uniform_matrix<double>(x.size(),1,-1e100),
+                            uniform_matrix<double>(x.size(),1,1e100),
+                            (max(abs(x))+1)/10,
+                            1e-6,
+                            10000);
+            DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            dlog << LINFO << "find_min_bobyqa(): got rosen in " << total_count;
+        }
     }
 
 
@@ -561,6 +615,18 @@ namespace
             objective_delta_stop_strategy(eps), &neg_rosen, x, maxf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
         dlog << LINFO << "find_max() cg: got neg_rosen/noder2 in " << total_count;
+
+
+        total_count = 0;
+        x = p;
+        find_max_bobyqa(&neg_rosen, x, 2*x.size()+1,
+                        uniform_matrix<double>(x.size(),1,-1e100),
+                        uniform_matrix<double>(x.size(),1,1e100),
+                        (max(abs(x))+1)/10,
+                        1e-6,
+                        10000);
+        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        dlog << LINFO << "find_max_bobyqa(): got neg_rosen in " << total_count;
     }
 
 // ----------------------------------------------------------------------------------------
