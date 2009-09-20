@@ -5,7 +5,7 @@
     routines from the dlib C++ Library.
 
     The library provides implementations of the conjugate gradient,  
-    BFGS and L-BFGS optimization algorithms.  These algorithms allow 
+    BFGS, L-BFGS, and BOBYQA optimization algorithms.  These algorithms allow 
     you to find the minimum of a function of many input variables.  
     This example walks though a few of the ways you might put these 
     routines to use.
@@ -206,6 +206,25 @@ int main()
     find_min_using_approximate_derivatives(cg_search_strategy(),
                                            objective_delta_stop_strategy(1e-7),
                                            test_function(target), starting_point, -1);
+    cout << starting_point << endl;
+
+
+
+    // Finally, lets try the BOBYQA algorithm.  This is a technique specially
+    // designed to minimize a function in the absence of derivative information.  
+    // Generally speaking, it is the method of choice if derivatives are not available.
+
+    // For the details on what the parameters to this function represent see its documentation.
+    starting_point = -4,5,99,3;
+    find_min_bobyqa(test_function(target), 
+                    starting_point, 
+                    9,    // number of interpolation points
+                    uniform_matrix<double>(4,1, -1e100),  // lower bound constraint
+                    uniform_matrix<double>(4,1, 1e100),   // upper bound constraint
+                    10,    // initial trust region radius
+                    1e-6,  // stopping trust region radius
+                    100    // max number of objective function evaluations
+                    );
     cout << starting_point << endl;
 
 }
