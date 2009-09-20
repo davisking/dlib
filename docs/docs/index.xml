@@ -112,6 +112,8 @@
                       <a href="algorithms.html#cg_search_strategy">conjugate gradient</a>, 
                       <a href="algorithms.html#bfgs_search_strategy">BFGS</a>, and
                       <a href="algorithms.html#lbfgs_search_strategy">L-BFGS</a> techniques</li>
+                  <li>Box constrained derivative free optimization via the 
+                      <a href="algorithms.html#find_min_bobyqa">BOBYQA</a> algorithm</li> 
                   <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
                   <li>A <a href="algorithms.html#rand">random number</a> object</li>
                </ul>

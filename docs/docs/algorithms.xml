@@ -38,8 +38,10 @@
                <item>line_search</item> 
                <item>find_min</item> 
                <item>find_min_using_approximate_derivatives</item> 
+               <item>find_min_bobyqa</item> 
                <item>find_max</item> 
                <item>find_max_using_approximate_derivatives</item> 
+               <item>find_max_bobyqa</item> 
 
                <item>cg_search_strategy</item>
                <item>bfgs_search_strategy</item>
@@ -312,6 +314,54 @@
          <examples>
             <example>optimization_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_min_bobyqa</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_bobyqa_abstract.h</spec_file>
+         <description>
+            This function defines the dlib interface to the BOBYQA software developed by M.J.D Powell.
+            BOBYQA is a method for optimizing a function in the absence of derivative information.  
+            Powell described it as a method that seeks the least value of a function of many 
+            variables, by applying a trust region method that forms quadratic models by 
+            interpolation.  There is usually some freedom in the interpolation conditions, 
+            which is taken up by minimizing the Frobenius norm of the change to the second 
+            derivative of the model, beginning with the zero matrix. The values of the variables 
+            are constrained by upper and lower bounds.  
+
+            <p>
+            The following paper, published in 2009 by Powell, describes the
+            detailed working of the BOBYQA algorithm.  
+
+               <blockquote>
+               The BOBYQA algorithm for bound constrained optimization 
+               without derivatives by M.J.D. Powell
+               </blockquote>
+            </p>
+
+         </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_max_bobyqa</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_bobyqa_abstract.h</spec_file>
+         <description>
+            This function is identical to the <a href="#find_min_bobyqa">find_min_bobyqa</a> routine 
+            except that it negates the objective function before performing optimization.  
+            Thus this function will attempt to find the maximizer of the objective rather than 
+            the minimizer.
+         </description>
                                  
       </component>
 
