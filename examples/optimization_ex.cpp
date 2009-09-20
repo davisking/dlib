@@ -1,8 +1,8 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example illustrating the use the unconstrained optimization 
-    routines from the dlib C++ Library.
+    This is an example illustrating the use the optimization routines from 
+    the dlib C++ Library.
 
     The library provides implementations of the conjugate gradient,  
     BFGS, L-BFGS, and BOBYQA optimization algorithms.  These algorithms allow 
@@ -213,8 +213,6 @@ int main()
     // Finally, lets try the BOBYQA algorithm.  This is a technique specially
     // designed to minimize a function in the absence of derivative information.  
     // Generally speaking, it is the method of choice if derivatives are not available.
-
-    // For the details on what the parameters to this function represent see its documentation.
     starting_point = -4,5,99,3;
     find_min_bobyqa(test_function(target), 
                     starting_point, 
