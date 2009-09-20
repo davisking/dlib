@@ -46,7 +46,7 @@ namespace dlib
             typename T, 
             typename U
             >
-        void find_min (
+        double find_min (
             const funct& f,
             T& x,
             long npt,
@@ -68,23 +68,23 @@ namespace dlib
             matrix<double,0,1> xu(xu_);
 
             
-            bobyqa_ (f,
-                     x.size(),
-                     npt,
-                     &x(0),
-                     &xl(0),
-                     &xu(0),
-                     rhobeg,
-                     rhoend,
-                     max_f_evals,
-                     w.get() );
+            return bobyqa_ (f,
+                            x.size(),
+                            npt,
+                            &x(0),
+                            &xl(0),
+                            &xu(0),
+                            rhobeg,
+                            rhoend,
+                            max_f_evals,
+                            w.get() );
         }
 
     private:
 
 
         template <typename funct>
-        void bobyqa_(
+        doublereal bobyqa_(
             const funct& calfun,
             const integer n, 
             const integer npt, 
@@ -225,7 +225,7 @@ namespace dlib
 
             /*     Make the call of BOBYQB. */
 
-            bobyqb_(calfun, n, npt, &x[1], &xl[1], &xu[1], rhobeg, rhoend, maxfun, &w[
+            return bobyqb_(calfun, n, npt, &x[1], &xl[1], &xu[1], rhobeg, rhoend, maxfun, &w[
                     ixb], &w[ixp], &w[ifv], &w[ixo], &w[igo], &w[ihq], &w[ipq], &w[
                     ibmat], &w[izmat], ndim, &w[isl], &w[isu], &w[ixn], &w[ixa], &w[
                     id], &w[ivl], &w[iw]);
@@ -236,7 +236,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
         template <typename funct>
-        void bobyqb_(
+        doublereal bobyqb_(
             const funct& calfun,
             const integer n,
             const integer npt,
@@ -271,7 +271,7 @@ namespace dlib
             doublereal d__1, d__2, d__3, d__4;
 
             /* Local variables */
-            doublereal f;
+            doublereal f = 0;
             integer i__, j, k, ih, nf, jj, nh, ip, jp;
             doublereal dx;
             integer np;
@@ -1320,6 +1320,7 @@ L720:
                 f = fval[kopt];
             }
 
+            return f;
         } /* bobyqb_ */
 
     // ----------------------------------------------------------------------------------------
@@ -3344,7 +3345,7 @@ L210:
         typename T, 
         typename U
         >
-    void find_min_bobyqa (
+    double find_min_bobyqa (
         const funct& f,
         T& x,
         long npt,
@@ -3355,6 +3356,14 @@ L210:
         const long max_f_evals
     ) 
     {
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+
+
         // check the requirements.  Also split the assert up so that the error message isn't huge.
         DLIB_CASSERT(is_col_vector(x) && is_col_vector(x_lower) && is_col_vector(x_upper) &&
                     x.size() == x_lower.size() && x_lower.size() == x_upper.size() &&
@@ -3386,7 +3395,7 @@ L210:
 
 
         bobyqa_implementation impl;
-        impl.find_min(f, x, npt, x_lower, x_upper, rho_begin, rho_end, max_f_evals);
+        return impl.find_min(f, x, npt, x_lower, x_upper, rho_begin, rho_end, max_f_evals);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3396,7 +3405,7 @@ L210:
         typename T, 
         typename U
         >
-    void find_max_bobyqa (
+    double find_max_bobyqa (
         const funct& f,
         T& x,
         long npt,
@@ -3407,7 +3416,7 @@ L210:
         const long max_f_evals
     ) 
     {
-        find_min_bobyqa(negate_function(f), x, npt, x_lower, x_upper, rho_begin, rho_end, max_f_evals);
+        return -find_min_bobyqa(negate_function(f), x, npt, x_lower, x_upper, rho_begin, rho_end, max_f_evals);
     }
 
 // ----------------------------------------------------------------------------------------

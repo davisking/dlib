@@ -142,6 +142,7 @@ namespace
         const double minf = -10;
         matrix<double,0,1> x(p.nr()), opt(p.nr());
         set_all_elements(opt, 0);
+        double val = 0;
 
         if (p.size() < 20)
             dlog << LINFO << "testing with apq and the start point: " << trans(p);
@@ -153,10 +154,11 @@ namespace
         {
             total_count = 0;
             x = p;
-            find_min(bfgs_search_strategy(), 
+            val = find_min(bfgs_search_strategy(), 
                      objective_delta_stop_strategy(eps),
                      wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            DLIB_TEST(val == apq(x));
             dlog << LINFO << "find_min() bgfs: got apq in " << total_count;
 
             total_count = 0;
@@ -173,40 +175,44 @@ namespace
         {
             total_count = 0;
             x = p;
-            find_min_bobyqa(wrap_function(apq<T>), x, 2*x.size()+1,
+            val=find_min_bobyqa(wrap_function(apq<T>), x, 2*x.size()+1,
                             uniform_matrix<double>(x.size(),1,-1e100),
                             uniform_matrix<double>(x.size(),1,1e100),
                             (max(abs(x))+1)/10,
                             1e-6,
                             10000);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            DLIB_TEST(val == apq(x));
             dlog << LINFO << "find_min_bobyqa(): got apq in " << total_count;
         }
 
         total_count = 0;
         x = p;
-        find_min(lbfgs_search_strategy(10), 
+        val=find_min(lbfgs_search_strategy(10), 
                  objective_delta_stop_strategy(eps),
                  wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == apq(x));
         dlog << LINFO << "find_min() lbgfs-10: got apq in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(lbfgs_search_strategy(1), 
+        val=find_min(lbfgs_search_strategy(1), 
                  objective_delta_stop_strategy(eps),
                  wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == apq(x));
         dlog << LINFO << "find_min() lbgfs-1: got apq in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(cg_search_strategy(),
+        val=find_min(cg_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == apq(x));
         dlog << LINFO << "find_min() cg: got apq in " << total_count;
 
 
@@ -215,34 +221,37 @@ namespace
         {
             total_count = 0;
             x = p;
-            find_min(bfgs_search_strategy(),
+            val=find_min(bfgs_search_strategy(),
                      objective_delta_stop_strategy(eps),
                      wrap_function(apq<T>), derivative(wrap_function(apq<T>)), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            DLIB_TEST(val == apq(x));
             dlog << LINFO << "find_min() bfgs: got apq/noder in " << total_count;
 
 
             total_count = 0;
             x = p;
-            find_min(cg_search_strategy(),
+            val=find_min(cg_search_strategy(),
                      objective_delta_stop_strategy(eps),
                      wrap_function(apq<T>), derivative(wrap_function(apq<T>)), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            DLIB_TEST(val == apq(x));
             dlog << LINFO << "find_min() cg: got apq/noder in " << total_count;
 
 
             total_count = 0;
             x = p;
-            find_min_using_approximate_derivatives(bfgs_search_strategy(),
+            val=find_min_using_approximate_derivatives(bfgs_search_strategy(),
                                                    objective_delta_stop_strategy(eps), 
                                                    wrap_function(apq<T>), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            DLIB_TEST(val == apq(x));
             dlog << LINFO << "find_min() bfgs: got apq/noder2 in " << total_count;
 
 
             total_count = 0;
             x = p;
-            find_min_using_approximate_derivatives(lbfgs_search_strategy(10),
+            val=find_min_using_approximate_derivatives(lbfgs_search_strategy(10),
                                                    objective_delta_stop_strategy(eps), 
                                                    wrap_function(apq<T>), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
@@ -251,10 +260,11 @@ namespace
 
             total_count = 0;
             x = p;
-            find_min_using_approximate_derivatives(cg_search_strategy(),
+            val=find_min_using_approximate_derivatives(cg_search_strategy(),
                                                    objective_delta_stop_strategy(eps),
                                                    wrap_function(apq<T>), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            DLIB_TEST(val == apq(x));
             dlog << LINFO << "find_min() cg: got apq/noder2 in " << total_count;
         }
     }
@@ -271,72 +281,81 @@ namespace
         opt(2) = 0;
         opt(3) = 0;
 
+        double val = 0;
+
         dlog << LINFO << "testing with powell and the start point: " << trans(p);
 
         /*
         total_count = 0;
         x = p;
-        find_min(bfgs_search_strategy(),
+        val=find_min(bfgs_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &powell, derivative(&powell,1e-8), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-2),opt-x);
+        DLIB_TEST(val == powell(x));
         dlog << LINFO << "find_min() bfgs: got powell/noder in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(cg_search_strategy(),
+        val=find_min(cg_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &powell, derivative(&powell,1e-9), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-2),opt-x);
+        DLIB_TEST(val == powell(x));
         dlog << LINFO << "find_min() cg: got powell/noder in " << total_count;
         */
 
         total_count = 0;
         x = p;
-        find_min_using_approximate_derivatives(bfgs_search_strategy(),
+        val=find_min_using_approximate_derivatives(bfgs_search_strategy(),
                                                objective_delta_stop_strategy(eps),
                                                &powell, x, minf, 1e-10);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
+        DLIB_TEST(val == powell(x));
         dlog << LINFO << "find_min() bfgs: got powell/noder2 in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min_using_approximate_derivatives(lbfgs_search_strategy(4),
+        val=find_min_using_approximate_derivatives(lbfgs_search_strategy(4),
                                                objective_delta_stop_strategy(eps),
                                                &powell, x, minf, 1e-10);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
+        DLIB_TEST(val == powell(x));
         dlog << LINFO << "find_min() lbfgs-4: got powell/noder2 in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min_using_approximate_derivatives(lbfgs_search_strategy(4),
+        val=find_min_using_approximate_derivatives(lbfgs_search_strategy(4),
                                                gradient_norm_stop_strategy(),
                                                &powell, x, minf, 1e-10);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
+        DLIB_TEST(val == powell(x));
         dlog << LINFO << "find_min() lbfgs-4(gn): got powell/noder2 in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min_using_approximate_derivatives(cg_search_strategy(),
+        val=find_min_using_approximate_derivatives(cg_search_strategy(),
                                                objective_delta_stop_strategy(eps),
                                                &powell, x, minf, 1e-10);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
+        DLIB_TEST(val == powell(x));
         dlog << LINFO << "find_min() cg: got powell/noder2 in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min_bobyqa(&powell, x, 2*x.size()+1,
+        val=find_min_bobyqa(&powell, x, 2*x.size()+1,
                         uniform_matrix<double>(x.size(),1,-1e100),
                         uniform_matrix<double>(x.size(),1,1e100),
                         (max(abs(x))+1)/10,
                         1e-7,
                         10000);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-3),opt-x);
+        DLIB_TEST(val == powell(x));
         dlog << LINFO << "find_min_bobyqa(): got powell in " << total_count;
 
     }
@@ -352,110 +371,122 @@ namespace
         matrix<double,2,1> x, opt;
         opt(0) = 0;
         opt(1) = 0;
+        double val = 0;
 
         dlog << LINFO << "testing with simple and the start point: " << trans(p);
 
         total_count = 0;
         x = p;
-        find_min(bfgs_search_strategy(),
+        val=find_min(bfgs_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &simple, &der_simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() bfgs: got simple in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(bfgs_search_strategy(),
+        val=find_min(bfgs_search_strategy(),
                  gradient_norm_stop_strategy(),
                  &simple, &der_simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() bfgs(gn): got simple in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(lbfgs_search_strategy(3),
+        val=find_min(lbfgs_search_strategy(3),
                  objective_delta_stop_strategy(eps),
                  &simple, &der_simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() lbfgs-3: got simple in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(cg_search_strategy(),
+        val=find_min(cg_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &simple, &der_simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() cg: got simple in " << total_count;
 
 
 
         total_count = 0;
         x = p;
-        find_min(bfgs_search_strategy(),
+        val=find_min(bfgs_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &simple, derivative(&simple), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() bfgs: got simple/noder in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(lbfgs_search_strategy(8),
+        val=find_min(lbfgs_search_strategy(8),
                  objective_delta_stop_strategy(eps),
                  &simple, derivative(&simple), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() lbfgs-8: got simple/noder in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(cg_search_strategy(),
+        val=find_min(cg_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &simple, derivative(&simple), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() cg: got simple/noder in " << total_count;
 
 
 
         total_count = 0;
         x = p;
-        find_min_using_approximate_derivatives(bfgs_search_strategy(),
+        val=find_min_using_approximate_derivatives(bfgs_search_strategy(),
                                                objective_delta_stop_strategy(eps),
                                                &simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() bfgs: got simple/noder2 in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min_using_approximate_derivatives(lbfgs_search_strategy(6),
+        val=find_min_using_approximate_derivatives(lbfgs_search_strategy(6),
                                                objective_delta_stop_strategy(eps),
                                                &simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() lbfgs-6: got simple/noder2 in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min_using_approximate_derivatives(cg_search_strategy(),
+        val=find_min_using_approximate_derivatives(cg_search_strategy(),
                                                objective_delta_stop_strategy(eps),
                                                &simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min() cg: got simple/noder2 in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min_bobyqa(&simple, x, 2*x.size()+1,
+        val=find_min_bobyqa(&simple, x, 2*x.size()+1,
                         uniform_matrix<double>(x.size(),1,-1e100),
                         uniform_matrix<double>(x.size(),1,1e100),
                         (max(abs(x))+1)/10,
                         1e-6,
                         10000);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == simple(x));
         dlog << LINFO << "find_min_bobyqa(): got simple in " << total_count;
 
     }
@@ -471,87 +502,88 @@ namespace
         opt(0) = 1;
         opt(1) = 1;
 
+        double val = 0;
+
         dlog << LINFO << "testing with rosen and the start point: " << trans(p);
 
         total_count = 0;
         x = p;
-        find_min(bfgs_search_strategy(),
+        val=find_min(bfgs_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_TEST(val == rosen(x));
         dlog << LINFO << "find_min() bfgs: got rosen in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(bfgs_search_strategy(),
+        val=find_min(bfgs_search_strategy(),
                  gradient_norm_stop_strategy(),
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_TEST(val == rosen(x));
         dlog << LINFO << "find_min() bfgs(gn): got rosen in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(lbfgs_search_strategy(20),
+        val=find_min(lbfgs_search_strategy(20),
                  objective_delta_stop_strategy(eps),
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_TEST(val == rosen(x));
         dlog << LINFO << "find_min() lbfgs-20: got rosen in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(cg_search_strategy(),
+        val=find_min(cg_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_TEST(val == rosen(x));
         dlog << LINFO << "find_min() cg: got rosen in " << total_count;
 
 
 
         total_count = 0;
         x = p;
-        find_min(bfgs_search_strategy(),
+        val=find_min(bfgs_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &rosen, derivative(&rosen,1e-5), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
+        DLIB_TEST(val == rosen(x));
         dlog << LINFO << "find_min() bfgs: got rosen/noder in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(lbfgs_search_strategy(5),
+        val=find_min(lbfgs_search_strategy(5),
                  objective_delta_stop_strategy(eps),
                  &rosen, derivative(&rosen,1e-5), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
+        DLIB_TEST(val == rosen(x));
         dlog << LINFO << "find_min() lbfgs-5: got rosen/noder in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_min(cg_search_strategy(),
+        val=find_min(cg_search_strategy(),
                  objective_delta_stop_strategy(eps),
                  &rosen, derivative(&rosen,1e-5), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
+        DLIB_TEST(val == rosen(x));
         dlog << LINFO << "find_min() cg: got rosen/noder in " << total_count;
 
 
-        // TODO uncomment
-        /*
         total_count = 0;
         x = p;
-        find_min_quasi_newton2(&rosen, x, minf, eps);
-        DLIB_TEST_MSG(dlib::equal(x,opt, 1e-2),opt-x);
-        dlog << LINFO << "find_min_quasi_newton got rosen/noder2 in " << total_count;
-        */
-
-        total_count = 0;
-        x = p;
-        find_min_using_approximate_derivatives(cg_search_strategy(),
+        val=find_min_using_approximate_derivatives(cg_search_strategy(),
                                                objective_delta_stop_strategy(eps),
                                                &rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
+        DLIB_TEST(val == rosen(x));
         dlog << LINFO << "find_min() cg: got rosen/noder2 in " << total_count;
 
 
@@ -559,13 +591,14 @@ namespace
         {
             total_count = 0;
             x = p;
-            find_min_bobyqa(&rosen, x, 2*x.size()+1,
+            val=find_min_bobyqa(&rosen, x, 2*x.size()+1,
                             uniform_matrix<double>(x.size(),1,-1e100),
                             uniform_matrix<double>(x.size(),1,1e100),
                             (max(abs(x))+1)/10,
                             1e-6,
                             10000);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+            DLIB_TEST(val == rosen(x));
             dlog << LINFO << "find_min_bobyqa(): got rosen in " << total_count;
         }
     }
@@ -581,51 +614,58 @@ namespace
         opt(0) = 1;
         opt(1) = 1;
 
+        double val = 0;
+
         dlog << LINFO << "testing with neg_rosen and the start point: " << trans(p);
 
         total_count = 0;
         x = p;
-        find_max(
+        val=find_max(
             bfgs_search_strategy(), 
             objective_delta_stop_strategy(eps), &neg_rosen, &der_neg_rosen, x, maxf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_TEST(val == neg_rosen(x));
         dlog << LINFO << "find_max() bfgs: got neg_rosen in " << total_count;
 
         total_count = 0;
         x = p;
-        find_max(
+        val=find_max(
             lbfgs_search_strategy(5), 
             objective_delta_stop_strategy(eps), &neg_rosen, &der_neg_rosen, x, maxf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_TEST(val == neg_rosen(x));
         dlog << LINFO << "find_max() lbfgs-5: got neg_rosen in " << total_count;
 
         total_count = 0;
         x = p;
-        find_max(
+        val=find_max(
             lbfgs_search_strategy(5), 
             objective_delta_stop_strategy(eps), &neg_rosen, derivative(&neg_rosen), x, maxf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_TEST(val == neg_rosen(x));
         dlog << LINFO << "find_max() lbfgs-5: got neg_rosen/noder in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_max_using_approximate_derivatives(
+        val=find_max_using_approximate_derivatives(
             cg_search_strategy(), 
             objective_delta_stop_strategy(eps), &neg_rosen, x, maxf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
+        DLIB_TEST(val == neg_rosen(x));
         dlog << LINFO << "find_max() cg: got neg_rosen/noder2 in " << total_count;
 
 
         total_count = 0;
         x = p;
-        find_max_bobyqa(&neg_rosen, x, 2*x.size()+1,
+        val=find_max_bobyqa(&neg_rosen, x, 2*x.size()+1,
                         uniform_matrix<double>(x.size(),1,-1e100),
                         uniform_matrix<double>(x.size(),1,1e100),
                         (max(abs(x))+1)/10,
                         1e-6,
                         10000);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
+        DLIB_TEST(val == neg_rosen(x));
         dlog << LINFO << "find_max_bobyqa(): got neg_rosen in " << total_count;
     }
 

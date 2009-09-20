@@ -41,7 +41,7 @@ namespace dlib
         typename T, 
         typename U
         >
-    void find_min_bobyqa (
+    double find_min_bobyqa (
         const funct& f,
         T& x,
         long npt,
@@ -75,6 +75,7 @@ namespace dlib
             - #x == the value of x (within the bounds defined by x_lower and x_upper) that 
               was found to minimize f().  More precisely:
                 - min(#x - x_lower) >= 0 && min(x_upper - #x) >= 0
+            - returns f(#x). 
             - rho_begin and rho_end are used as the initial and final values of a trust 
               region radius.  Typically, rho_begin should be about one tenth of the greatest 
               expected change to a variable, while rho_end should indicate the accuracy that 
@@ -94,7 +95,7 @@ namespace dlib
         typename T, 
         typename U
         >
-    void find_max_bobyqa (
+    double find_max_bobyqa (
         const funct& f,
         T& x,
         long npt,

@@ -130,7 +130,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    void find_min (
+    double find_min (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
         const funct& f, 
@@ -175,6 +175,8 @@ namespace dlib
             // Take the search step indicated by the above line search
             x += alpha*s;
         }
+
+        return f_value;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -186,7 +188,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    void find_max (
+    double find_max (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
         const funct& f, 
@@ -239,6 +241,7 @@ namespace dlib
             f_value *= -1;
         }
 
+        return -f_value;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -249,7 +252,7 @@ namespace dlib
         typename funct,
         typename T
         >
-    void find_min_using_approximate_derivatives (
+    double find_min_using_approximate_derivatives (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
         const funct& f,
@@ -297,6 +300,7 @@ namespace dlib
             g = derivative(f,derivative_eps)(x);
         }
 
+        return f_value;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -307,7 +311,7 @@ namespace dlib
         typename funct,
         typename T
         >
-    void find_max_using_approximate_derivatives (
+    double find_max_using_approximate_derivatives (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
         const funct& f,
@@ -333,7 +337,7 @@ namespace dlib
         );
 
         // Just negate the necessary things and call the find_min version of this function.
-        find_min_using_approximate_derivatives(
+        return -find_min_using_approximate_derivatives(
             search_strategy, 
             stop_strategy, 
             negate_function(f),

@@ -102,7 +102,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    void find_min (
+    double find_min (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
         const funct& f, 
@@ -125,6 +125,7 @@ namespace dlib
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) < min_f.
             - #x == the value of x that was found to minimize f()
+            - returns f(#x). 
             - When this function makes calls to f() and der() it always does so by
               first calling f() and then calling der().  That is, these two functions
               are always called in pairs with f() being called first and then der()
@@ -140,7 +141,7 @@ namespace dlib
         typename funct_der, 
         typename T
         >
-    void find_max (
+    double find_max (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
         const funct& f, 
@@ -163,6 +164,7 @@ namespace dlib
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) > max_f.
             - #x == the value of x that was found to maximize f()
+            - returns f(#x). 
             - When this function makes calls to f() and der() it always does so by
               first calling f() and then calling der().  That is, these two functions
               are always called in pairs with f() being called first and then der()
@@ -177,7 +179,7 @@ namespace dlib
         typename funct,
         typename T
         >
-    void find_min_using_approximate_derivatives (
+    double find_min_using_approximate_derivatives (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
         const funct& f,
@@ -200,6 +202,7 @@ namespace dlib
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) < min_f.
             - #x == the value of x that was found to minimize f()
+            - returns f(#x). 
             - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
               information.
     !*/
@@ -212,7 +215,7 @@ namespace dlib
         typename funct,
         typename T
         >
-    void find_max_using_approximate_derivatives (
+    double find_max_using_approximate_derivatives (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
         const funct& f,
@@ -235,6 +238,7 @@ namespace dlib
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) > max_f.
             - #x == the value of x that was found to maximize f()
+            - returns f(#x). 
             - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
               information.
     !*/
