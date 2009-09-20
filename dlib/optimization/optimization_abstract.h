@@ -121,7 +121,7 @@ namespace dlib
             - is_col_vector(x) == true
         ensures
             - Performs an unconstrained minimization of the function f() using the given
-              search_strategy.  
+              search_strategy and starting from the initial point x.  
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) < min_f.
             - #x == the value of x that was found to minimize f()
@@ -159,7 +159,7 @@ namespace dlib
             - is_col_vector(x) == true
         ensures
             - Performs an unconstrained maximization of the function f() using the given
-              search_strategy.  
+              search_strategy and starting from the initial point x.  
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) > max_f.
             - #x == the value of x that was found to maximize f()
@@ -196,7 +196,7 @@ namespace dlib
             - derivative_eps > 0 
         ensures
             - Performs an unconstrained minimization of the function f() using the given
-              search_strategy.  
+              search_strategy and starting from the initial point x.  
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) < min_f.
             - #x == the value of x that was found to minimize f()
@@ -231,7 +231,7 @@ namespace dlib
             - derivative_eps > 0 
         ensures
             - Performs an unconstrained maximization of the function f() using the given
-              search_strategy.  
+              search_strategy and starting from the initial point x.  
             - The function is optimized until stop_strategy decides that an acceptable 
               point has been found or f(#x) > max_f.
             - #x == the value of x that was found to maximize f()
