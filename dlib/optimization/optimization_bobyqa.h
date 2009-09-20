@@ -102,9 +102,6 @@ namespace dlib
             integer i__1;
             doublereal d__1, d__2;
 
-            /* Builtin functions */
-            //integer s_wsfe(cilist *), e_wsfe(void);
-
             /* Local variables */
             integer j, id, np, iw, igo, ihq, ixb, ixa, ifv, isl, jsl, ipq, ivl, ixn, ixo, ixp, isu, jsu, ndim;
             doublereal temp, zero;
@@ -273,27 +270,22 @@ namespace dlib
             zmat_offset, i__1, i__2, i__3;
             doublereal d__1, d__2, d__3, d__4;
 
-            /* Builtin functions */
-            //integer s_wsfe(cilist *), e_wsfe(void);
-            //doublereal std::sqrt(doublereal);
-            //integer do_fio(integer *, char *, ftnlen);
-
             /* Local variables */
             doublereal f;
             integer i__, j, k, ih, nf, jj, nh, ip, jp;
             doublereal dx;
             integer np;
-            doublereal den, one, ten, dsq, rho, sum, two, diff, half, beta, gisq;
-            integer knew;
+            doublereal den = 0, one = 0, ten = 0, dsq = 0, rho = 0, sum = 0, two = 0, diff = 0, half = 0, beta = 0, gisq = 0;
+            integer knew = 0;
             doublereal temp, suma, sumb, bsum, fopt;
             integer kopt, nptm;
             doublereal zero, curv;
             integer ksav;
-            doublereal gqsq, dist, sumw, sumz, diffa, diffb, diffc, hdiag;
+            doublereal gqsq = 0, dist = 0, sumw = 0, sumz = 0, diffa = 0, diffb = 0, diffc = 0, hdiag = 0;
             integer kbase;
-            doublereal alpha, delta, adelt, denom, fsave, bdtol, delsq;
+            doublereal alpha = 0, delta = 0, adelt = 0, denom = 0, fsave = 0, bdtol = 0, delsq = 0;
             integer nresc, nfsav;
-            doublereal ratio, dnorm, vquad, pqold, tenth;
+            doublereal ratio = 0, dnorm = 0, vquad = 0, pqold = 0, tenth = 0;
             integer itest;
             doublereal sumpq, scaden;
             doublereal errbig, cauchy, fracsq, biglsq, densav;
@@ -1359,8 +1351,6 @@ L720:
             zmat_offset, i__1, i__2;
             doublereal d__1, d__2, d__3, d__4;
 
-            /* Builtin functions */
-            //doublereal std::sqrt(doublereal);
 
             /* Local variables */
             integer i__, j, k;
@@ -1369,14 +1359,13 @@ L720:
             doublereal slbd;
             integer iubd;
             doublereal vlag, subd, temp;
-            integer ksav;
-            doublereal step, zero, curv;
+            integer ksav = 0;
+            doublereal step = 0, zero = 0, curv = 0;
             integer iflag;
-            doublereal scale, csave, tempa, tempb, tempd, const__, sumin, 
-            ggfree;
-            integer ibdsav;
-            doublereal dderiv, bigstp, predsq, presav, distsq, stpsav, wfixsq, 
-            wsqsav;
+            doublereal scale = 0, csave = 0, tempa = 0, tempb = 0, tempd = 0, const__ = 0, sumin = 0, 
+                       ggfree = 0;
+            integer ibdsav = 0;
+            doublereal dderiv = 0, bigstp = 0, predsq = 0, presav = 0, distsq = 0, stpsav = 0, wfixsq = 0, wsqsav = 0;
 
 
             /*     The arguments N, NPT, XPT, XOPT, BMAT, ZMAT, NDIM, SL and SU all have */
@@ -1802,16 +1791,13 @@ L200:
             zmat_offset, i__1, i__2;
             doublereal d__1, d__2, d__3, d__4;
 
-            /* Builtin functions */
-            //integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
-            //doublereal std::sqrt(doublereal);
 
             /* Local variables */
             doublereal f;
             integer i__, j, k, ih, np, nfm;
             doublereal one;
-            integer nfx, ipt, jpt;
-            doublereal two, fbeg, diff, half, temp, zero, recip, stepa, stepb;
+            integer nfx = 0, ipt = 0, jpt = 0;
+            doublereal two = 0, fbeg = 0, diff = 0, half = 0, temp = 0, zero = 0, recip = 0, stepa = 0, stepb = 0;
             integer itemp;
             doublereal rhosq;
 
@@ -2064,24 +2050,21 @@ L50:
             zmat_offset, i__1, i__2, i__3;
             doublereal d__1, d__2, d__3, d__4;
 
-            /* Builtin functions */
-            //doublereal std::sqrt(doublereal);
-            //integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
             /* Local variables */
             doublereal f;
             integer i__, j, k, ih, jp, ip, iq, np, iw;
-            doublereal xp, xq, den;
-            integer ihp;
+            doublereal xp = 0, xq = 0, den = 0;
+            integer ihp = 0;
             doublereal one;
             integer ihq, jpn, kpt;
-            doublereal sum, diff, half, beta;
+            doublereal sum = 0, diff = 0, half = 0, beta = 0;
             integer kold;
             doublereal winc;
             integer nrem, knew;
             doublereal temp, bsum;
             integer nptm;
-            doublereal zero, hdiag, fbase, sfrac, denom, vquad, sumpq;
+            doublereal zero = 0, hdiag = 0, fbase = 0, sfrac = 0, denom = 0, vquad = 0, sumpq = 0;
             doublereal dsqmin, distsq, vlmxsq;
 
 
@@ -2676,23 +2659,21 @@ L350:
             integer xpt_dim1, xpt_offset, i__1, i__2;
             doublereal d__1, d__2, d__3, d__4;
 
-            /* Builtin functions */
-            //doublereal std::sqrt(doublereal);
-
             /* Local variables */
             integer i__, j, k, ih;
             doublereal ds;
             integer iu;
             doublereal dhd, dhs, cth, one, shs, sth, ssq, half, beta, sdec, blen;
-            integer iact, nact;
+            integer iact = 0, nact = 0;
             doublereal angt, qred;
             integer isav;
-            doublereal temp, zero, xsav, xsum, angbd, dredg, sredg;
+            doublereal temp = 0, zero = 0, xsav = 0, xsum = 0, angbd = 0, dredg = 0, sredg = 0;
             integer iterc;
-            doublereal resid, delsq, ggsav, tempa, tempb, ratio, sqstp, redmax, dredsq, redsav, onemin, gredsq, rednew;
-            integer itcsav;
-            doublereal rdprev, rdnext, stplen, stepsq;
-            integer itermax;
+            doublereal resid = 0, delsq = 0, ggsav = 0, tempa = 0, tempb = 0, ratio = 0, sqstp = 0, 
+                       redmax = 0, dredsq = 0, redsav = 0, onemin = 0, gredsq = 0, rednew = 0;
+            integer itcsav = 0;
+            doublereal rdprev = 0, rdnext = 0, stplen = 0, stepsq = 0;
+            integer itermax = 0;
 
 
             /*     The arguments N, NPT, XPT, XOPT, GOPT, HQ, PQ, SL and SU have the same */
@@ -3237,9 +3218,6 @@ L210:
             /* System generated locals */
             integer bmat_dim1, bmat_offset, zmat_dim1, zmat_offset, i__1, i__2;
             doublereal d__1, d__2, d__3;
-
-            /* Builtin functions */
-            //doublereal std::sqrt(doublereal);
 
             /* Local variables */
             integer i__, j, k, jl, jp;
