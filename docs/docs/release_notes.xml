@@ -12,6 +12,21 @@
 
 <current>
 New Stuff:
+   - Added the pointer_to_column_vector function.
+   - Added the BOBYQA algorithm for derivative-free optimization
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.22" date="Sep 10, 2009">
+New Stuff:
    - Added an implementation of the L-BFGS algorithm for unconstrained non-linear
      optimization. 
 
@@ -26,7 +41,7 @@ Bug fixes:
 
 Other:
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
