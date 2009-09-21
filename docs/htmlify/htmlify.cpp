@@ -10,7 +10,7 @@
 #include "dlib/dir_nav.h"
 
 
-const char* VERSION = "2.6";
+const char* VERSION = "2.7";
 
 using namespace std;
 using namespace dlib;
