@@ -103,7 +103,7 @@ namespace dlib
             doublereal d__1, d__2;
 
             /* Local variables */
-            integer j, id, np, iw, igo, ihq, ixb, ixa, ifv, isl, jsl, ipq, ivl, ixn, ixo, ixp, isu, jsu, ndim;
+            integer j, id_, np, iw, igo, ihq, ixb, ixa, ifv, isl, jsl, ipq, ivl, ixn, ixo, ixp, isu, jsu, ndim;
             doublereal temp, zero;
             integer ibmat, izmat;
 
@@ -172,8 +172,8 @@ namespace dlib
             isu = isl + n;
             ixn = isu + n;
             ixa = ixn + n;
-            id = ixa + n;
-            ivl = id + n;
+            id_ = ixa + n;
+            ivl = id_ + n;
             iw = ivl + ndim;
 
             /*     Return if there is insufficient space between the bounds. Modify the */
@@ -228,7 +228,7 @@ namespace dlib
             return bobyqb_(calfun, n, npt, &x[1], &xl[1], &xu[1], rhobeg, rhoend, maxfun, &w[
                     ixb], &w[ixp], &w[ifv], &w[ixo], &w[igo], &w[ihq], &w[ipq], &w[
                     ibmat], &w[izmat], ndim, &w[isl], &w[isu], &w[ixn], &w[ixa], &w[
-                    id], &w[ivl], &w[iw]);
+                    id_], &w[ivl], &w[iw]);
             //L40:
             ;
         } /* bobyqa_ */
