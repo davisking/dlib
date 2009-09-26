@@ -29,7 +29,7 @@ namespace dlib
                 The implementation of the Pegasos algorithm used by this object is based
                 on the following excellent paper:
                     Pegasos: Primal estimated sub-gradient solver for SVM (2007)
-                    by Yoram Singer, Nathan Srebro 
+                    by Shai Shalev-Shwartz, Yoram Singer, Nathan Srebro 
                     In ICML 
 
                 This SVM training algorithm has two interesting properties.  First, the 
