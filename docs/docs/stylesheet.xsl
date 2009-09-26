@@ -208,7 +208,7 @@
                   <xsl:apply-templates select="document($main_menu)/doc/menu"/>
 
                   <!-- ************************************************************************* -->
-                  <td  VALIGN="TOP" width="100%">
+                  <td  VALIGN="TOP" width="100%" style="border: 1px solid rgb(102,102,102);" >
                      <xsl:if test="title">
                         <center><h1> <xsl:value-of select="title" /> </h1></center>
                      </xsl:if>
@@ -276,7 +276,7 @@
    
    <xsl:template match="menu">
       <xsl:param name="file_name" />
-      <td BGCOLOR="{$gray}" VALIGN="TOP" height="100%">
+      <td BGCOLOR="#F5F5F5" style="padding:7px; border: 1px solid rgb(102,102,102);" VALIGN="TOP" height="100%">
          <br/>
          <table WIDTH="{@width}" height="100%">
          <tr><td VALIGN="TOP">
