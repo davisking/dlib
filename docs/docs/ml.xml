@@ -239,7 +239,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 on the following excellent paper:
                <blockquote>
                     Pegasos: Primal estimated sub-gradient solver for SVM (2007)
-                    by Yoram Singer, Nathan Srebro 
+                    by Shai Shalev-Shwartz, Yoram Singer, Nathan Srebro 
                     In ICML 
                </blockquote>
             </p>
