@@ -138,6 +138,14 @@
                   padding: 0.7em;
                }
 
+               div#extension {
+                  background-color:#FDFDFD; 
+                  border: 1px solid rgb(102,102,102); 
+                  text-align:left;
+                  margin-top: 1.0em;
+                  padding: 0.7em;
+               }
+
                div#logb {
                   text-align:left;
                   padding: 0.0em;
@@ -377,11 +385,11 @@
             <xsl:choose>
                <xsl:when test="spec_file/@link = 'true'">
                   <BR/>
-                  <b>Specification: </b> <a href="{spec_file}.html#{name}"><xsl:value-of select="spec_file"/></a>
+                  <b><font style='font-size:1.3em' color='#006600'>Specification: </font></b> <a href="{spec_file}.html#{name}"><xsl:value-of select="spec_file"/></a>
                </xsl:when>
                <xsl:otherwise>
                   <BR/>
-                  <b>Specification: </b> <a href="{spec_file}.html"><xsl:value-of select="spec_file"/></a>
+                  <b><font style='font-size:1.3em' color='#006600'>Specification: </font></b> <a href="{spec_file}.html"><xsl:value-of select="spec_file"/></a>
                </xsl:otherwise>
             </xsl:choose>
          </xsl:if>
@@ -405,26 +413,25 @@
          </xsl:choose>
       
          <xsl:if test="extensions">
+            <br/>
             <center>
-            <HR align='center'/>
-            <h2>Extensions to <xsl:value-of select="name"/></h2>
+            <h1>Extensions to <xsl:value-of select="name"/></h1>
             </center>
             
             <xsl:for-each select="extensions/extension">
             <xsl:sort select="translate(name,$lcletters, $ucletters)"/> 
-               <BR/><a name="{name}"><B><font size='4'><xsl:value-of select="name"/>:</font></B></a><Br/>
+               <div id="extension">
+               <a name="{name}"><B><font size='5'><xsl:value-of select="name"/></font></B></a><Br/>
+               <BR/>
                <xsl:apply-templates select="description"/>
                <BR/>
                <BR/>
-               <b>Specification: </b> <a href="{spec_file}.html"><xsl:value-of select="spec_file"/></a>
+               <b><font style='font-size:1.3em' color='#006600'>Specification: </font></b> <a href="{spec_file}.html"><xsl:value-of select="spec_file"/></a>
                <xsl:apply-templates select="examples"/>
                <xsl:apply-templates select="implementations">           
                   <xsl:with-param name="checked" select="$checked" />
                </xsl:apply-templates>
-               
-               <xsl:if test="position() != last()">
-                  <HR width='20%' align='left'/>
-               </xsl:if>
+               </div>
             </xsl:for-each>            
          </xsl:if>
       
