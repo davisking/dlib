@@ -57,6 +57,54 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename sample_matrix_type,
+        typename label_matrix_type
+        >
+    matrix<double,0,2> rank_features_rbf (
+        const sample_matrix_type& samples,
+        const label_matrix_type& labels,
+        unsigned long num_sv = 40
+    );
+    /*!
+        requires
+            - num_sv > 0
+            - is_binary_classification_problem(samples, labels) == true
+        ensures
+            - This function just calls the above rank_features() function but uses the 
+              radial_basis_kernel and automatically picks a gamma parameter for you.  
+              It also sets the kcentroid up to use num_sv dictionary vectors.  Finally, it 
+              tells rank_features() to rank all the features.
+            - The return value from this function is the matrix returned by rank_features()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename sample_matrix_type,
+        typename label_matrix_type
+        >
+    matrix<double,0,2> verbose_rank_features_rbf (
+        const sample_matrix_type& samples,
+        const label_matrix_type& labels,
+        unsigned long num_sv = 40
+    );
+    /*!
+        requires
+            - num_sv > 0
+            - is_binary_classification_problem(samples, labels) == true
+        ensures
+            - This function just calls the above rank_features() function but uses the 
+              radial_basis_kernel and automatically picks a gamma parameter for you.  
+              It also sets the kcentroid up to use num_sv dictionary vectors.  Finally, it 
+              tells rank_features() to rank all the features.
+            - The return value from this function is the matrix returned by rank_features()
+            - This function is verbose in the sense that it will print status messages to
+              standard out during its processing.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_KERNEL_FEATURE_RANKINg_ABSTRACT_H_
