@@ -126,6 +126,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>cross_validate_trainer</item> 
          <item>cross_validate_trainer_threaded</item> 
          <item>pick_initial_centers</item> 
+         <item>rank_features_rbf</item> 
+         <item>verbose_rank_features_rbf</item> 
       </section>
 
     </top>  
@@ -745,6 +747,47 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
               does this by computing the distance between the centroids of both classes in kernel defined 
               feature space.  Good features are then ones that result in the biggest separation between
               the two centroids. 
+              <p>
+                 Note that there are convenience wrappers for calling this function.  
+                 They are the <a href="#rank_features_rbf">rank_features_rbf</a> and 
+                 <a href="#verbose_rank_features_rbf">verbose_rank_features_rbf</a> functions.
+                 They automatically create the <a href="#kcentroid">kcentroid</a> required to 
+                 use this function and fill out the relevant parameters for you with a reasonable set
+                 of defaults.
+              </p>
+         </description>
+         <examples>
+            <example>rank_features_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rank_features_rbf</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/feature_ranking_abstract.h</spec_file>
+         <description>
+            This is just a wrapper for the <a href="#rank_features">rank_features</a> function.  It 
+            sets up the ranking to use the <a href="#radial_basis_kernel">radial_basis_kernel</a> and
+            automatically picks the gamma parameter of this kernel.  
+         </description>
+         <examples>
+            <example>rank_features_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>verbose_rank_features_rbf</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/feature_ranking_abstract.h</spec_file>
+         <description>
+            This is just a version of <a href="#rank_features_rbf">rank_features_rbf</a> that is 
+            verbose in the sense that it prints out status messages as it proceeds.
          </description>
          <examples>
             <example>rank_features_ex.cpp.html</example>

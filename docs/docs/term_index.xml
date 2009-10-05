@@ -138,6 +138,8 @@
          <term file="ml.html" name="kkmeans"/>
          <term file="ml.html" name="pick_initial_centers"/>
          <term file="ml.html" name="rank_features"/>
+         <term file="ml.html" name="rank_features_rbf"/>
+         <term file="ml.html" name="verbose_rank_features_rbf"/>
          <term file="dlib/svm/svm_abstract.h.html" name="maximum_nu"/>
 
          <term file="ml.html" name="null_trainer"/>
