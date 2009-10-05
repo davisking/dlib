@@ -18,8 +18,8 @@
 
 #include <algorithm>
 #include <cmath>
-#include "dlib/matrix.h"
-#include "dlib/smart_pointers.h"
+#include "../matrix.h"
+#include "../smart_pointers.h"
 #include "optimization_bobyqa_abstract.h"
 #include "optimization.h"
 
