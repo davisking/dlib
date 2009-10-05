@@ -4,17 +4,17 @@
     This is an example illustrating the use of the feature ranking 
     tools from the dlib C++ Library.  
 
-    This example creates a simple set of data and then shows
-    you how to use the feature ranking function to find a good 
-    set of features (where "good" means the feature set will probably
-    work well with a classification algorithm).
+    This example creates a simple set of data and then shows you how 
+    to use feature ranking to find a good set of features (where 
+    "good" means the feature set will probably work well with a 
+    classification algorithm).
 
     The data used in this example will be 4 dimensional data and will
     come from a distribution where points with a distance less than 10
     from the origin are labeled +1 and all other points are labeled
     as -1.  Note that this data is conceptually 2 dimensional but we
     will add two extra features for the purpose of showing what
-    the feature ranking function does.
+    feature ranking does.
 */
 
 
@@ -87,7 +87,7 @@ int main()
 
 
     // This is another thing that is often good to do from a numerical stability point of view.  
-    // However, in our case it doesn't really matter.  
+    // However, in our case it doesn't matter.   It's just here to show you how to do it.
     randomize_samples(samples,labels);
 
 
