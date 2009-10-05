@@ -511,8 +511,8 @@ namespace dlib
         double jump_size = 1;
         while ( !(f1 > f2 && f2 < f3))
         {
-            // check for hitting max_iter
-            if (f_evals >= max_iter)
+            // check for hitting max_iter or if the interval is now too small
+            if (f_evals >= max_iter || p3-p1 < eps)
             {
                 if (f1 < min(f2,f3)) return std::make_pair(p1, f1);
                 if (f2 < min(f1,f3)) return std::make_pair(p2, f2);
@@ -522,40 +522,65 @@ namespace dlib
 
             // if f1 is small then take a step to the left
             if (f1 < f3)
-            {
-                // check if the minimum is butting up against the bounds and return if we are.
+            { 
+                // check if the minimum is butting up against the bounds and if so then pick
+                // a point between p1 and p2 in the hopes that shrinking the interval will
+                // be a good things to do.
                 if (p1 == begin)
-                    return std::make_pair(p1, f1);
+                {
+                    p3 = p2;
+                    f3 = f2;
 
-                p3 = p2;
-                f3 = f2;
+                    p2 = (p1+p2)/2.0;
+                    f2 = f(p2);
+                }
+                else
+                {
+                    // pick a new point to the left of our current bracket
+                    p3 = p2;
+                    f3 = f2;
 
-                p2 = p1;
-                f2 = f1;
+                    p2 = p1;
+                    f2 = f1;
 
-                p1 = max(p1 - jump_size, begin);
-                f1 = f(p1);
+                    p1 = max(p1 - jump_size, begin);
+                    f1 = f(p1);
+
+                    jump_size *= 2;
+                }
 
             }
             // otherwise f3 is small and we should take a step to the right
             else 
             {
-                // check if the minimum is butting up against the bounds and return if we are.
+                // check if the minimum is butting up against the bounds and if so then pick
+                // a point between p2 and p3 in the hopes that shrinking the interval will
+                // be a good things to do.
                 if (p3 == end)
-                    return std::make_pair(p3, f3);
+                {
+                    p1 = p2;
+                    f1 = f2;
 
-                p1 = p2;
-                f1 = f2;
+                    p2 = (p3+p2)/2.0;
+                    f2 = f(p2);
+                }
+                else
+                {
+                    // pick a new point to the right of our current bracket
+                    p1 = p2;
+                    f1 = f2;
 
-                p2 = p3;
-                f2 = f3;
+                    p2 = p3;
+                    f2 = f3;
 
-                p3 = min(p3 + jump_size, end);
-                f3 = f(p3);
+                    p3 = min(p3 + jump_size, end);
+                    f3 = f(p3);
+
+                    jump_size *= 2;
+                }
             }
 
             ++f_evals;
-            jump_size *= 2;
         }
 
 
