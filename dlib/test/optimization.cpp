@@ -128,6 +128,14 @@ namespace
             pow(std::sqrt(10.0)*(x(0) - x(3))*(x(0) - x(3)),2);
     }
 
+// ----------------------------------------------------------------------------------------
+
+// a simple function with a minimum at zero
+    double single_variable_function ( double x)
+    {
+        ++total_count;
+        return 3*x*x + 5;
+    }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -671,6 +679,30 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_single_variable_function (
+        const double p
+    )
+    {
+        const double eps = 1e-9;
+
+
+        dlog << LINFO << "testing with single_variable_function and the start point: " << p;
+
+        total_count = 0;
+        double out = find_min_single_variable(&single_variable_function, p, -1e100, 1e100, eps, 1000).first;
+        DLIB_TEST_MSG(std::abs(out) < 1e-6, out);
+        dlog << LINFO << "find_min_single_variable(): got single_variable_function in " << total_count;
+
+
+        total_count = 0;
+        out = find_max_single_variable(negate_function(&single_variable_function), p, -1e100, 1e100, eps, 1000).first;
+        DLIB_TEST_MSG(std::abs(out) < 1e-6, out);
+        dlog << LINFO << "find_max_single_variable(): got single_variable_function in " << total_count;
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void optimization_test (
     )
     /*!
@@ -684,6 +716,11 @@ namespace
 
         p.set_size(2);
 
+        // test with single_variable_function
+        test_single_variable_function(0);
+        test_single_variable_function(1);
+        test_single_variable_function(-10);
+        test_single_variable_function(900.53);
 
         // test with the rosen function
         p(0) = 9;

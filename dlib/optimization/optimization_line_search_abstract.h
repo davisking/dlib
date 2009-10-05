@@ -105,6 +105,27 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double lagrange_poly_min_extrap (
+        double p1, 
+        double p2,
+        double p3,
+        double f1,
+        double f2,
+        double f3
+    );
+    /*!
+        requires
+            - f1 >= f2 <= f3
+            - p1 < p2 < p3
+        ensures
+            - let c(x) be the second order Lagrange polynomial that interpolates the
+              points p1, p2, and p3 where c(p1)==f1, c(p2)==f2, and c(p3)==f3
+            - this function returns the point in the range [p1,p3] that minimizes 
+              the polynomial c(x) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename funct, 
         typename funct_der
@@ -149,6 +170,66 @@ namespace dlib
         general can be found in the book Practical Methods of Optimization by R. Fletcher
         and also in the more recent book Numerical Optimization by Nocedal and Wright.
     */
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct
+        >
+    std::pair<double,double> find_min_single_variable (
+        const funct& f,
+        const double starting_point,
+        const double begin = -1e200,
+        const double end = 1e200,
+        const double eps = 1e-3,
+        const long max_iter = 100
+    )
+    /*!
+        requires
+            - eps > 0
+            - max_iter > 1
+            - begin <= starting_point <= end
+            - f must be a function of a double that returns a double
+              (e.g. f(starting_point) should be a valid expression that evaluates to a double)
+        ensures
+            - Finds a point P such that:
+                - P is a local minimum of the function f().   
+                - begin <= P <= end
+            - Evaluates f() no more than max_iter times
+            - Stops searching when the window around the minimum point is smaller than eps.
+              The search will begin with the given starting_point.
+            - returns std::make_pair(P, f(P))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct
+        >
+    std::pair<double,double> find_max_single_variable (
+        const funct& f,
+        const double starting_point,
+        const double begin = -1e200,
+        const double end = 1e200,
+        const double eps = 1e-3,
+        const long max_iter = 100
+    )
+    /*!
+        requires
+            - eps > 0
+            - max_iter > 1
+            - begin <= starting_point <= end
+            - f must be a function of a double that returns a double
+              (e.g. f(starting_point) should be a valid expression that evaluates to a double)
+        ensures
+            - Finds a point P such that:
+                - P is a local maximum of the function f().   
+                - begin <= P <= end
+            - Evaluates f() no more than max_iter times
+            - Stops searching when the window around the minimum point is smaller than eps.
+              The search will begin with the given starting_point.
+            - returns std::make_pair(P, f(P))
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
