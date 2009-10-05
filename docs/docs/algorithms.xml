@@ -35,11 +35,14 @@
                <item>negate_function</item> 
                <item>make_line_search_function</item> 
                <item>poly_min_extrap</item> 
+               <item>lagrange_poly_min_extrap</item> 
                <item>line_search</item> 
                <item>find_min</item> 
+               <item>find_min_single_variable</item> 
                <item>find_min_using_approximate_derivatives</item> 
                <item>find_min_bobyqa</item> 
                <item>find_max</item> 
+               <item>find_max_single_variable</item> 
                <item>find_max_using_approximate_derivatives</item> 
                <item>find_max_bobyqa</item> 
 
@@ -181,11 +184,24 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>lagrange_poly_min_extrap</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
+         <description>
+            This function finds the second order polynomial that interpolates a 
+            set of points and returns you the minimum of that polynomial.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>line_search</name>
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
          <description>
-            Performs a line search on a given function and returns the input
+            Performs a gradient based line search on a given function and returns the input
             that makes the function significantly smaller.
          </description>
                                  
@@ -318,6 +334,19 @@
       </component>
 
    <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_min_single_variable</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
+         <description>
+             Performs a bound constrained minimization of a nonlinear function.  The 
+             function must be of a single variable.  Derivatives are not required.  
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
       
       <component>
          <name>find_min_bobyqa</name>
@@ -343,6 +372,13 @@
                </blockquote>
             </p>
 
+            <p>
+               Note that BOBYQA only works on functions of two or more variables.  So if you need to perform 
+               derivative-free optimization on a function of a single variable 
+               then you should use the <a href="#find_min_single_variable">find_min_single_variable</a>
+               function.
+            </p>
+
          </description>
          <examples>
             <example>optimization_ex.cpp.html</example>
@@ -361,6 +397,12 @@
             except that it negates the objective function before performing optimization.  
             Thus this function will attempt to find the maximizer of the objective rather than 
             the minimizer.
+            <p>
+               Note that BOBYQA only works on functions of two or more variables.  So if you need to perform 
+               derivative-free optimization on a function of a single variable 
+               then you should use the <a href="#find_max_single_variable">find_max_single_variable</a>
+               function.
+            </p>
          </description>
                                  
       </component>
@@ -392,6 +434,19 @@
          <description>
              Performs an unconstrained maximization of a nonlinear function using 
              some search strategy (e.g. <a href="#bfgs_search_strategy">bfgs_search_strategy</a>).
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_max_single_variable</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_line_search_abstract.h</spec_file>
+         <description>
+             Performs a bound constrained maximization of a nonlinear function.  The 
+             function must be of a single variable.  Derivatives are not required.
          </description>
                                  
       </component>
