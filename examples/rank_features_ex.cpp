@@ -1,11 +1,11 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example illustrating the use of the rank_features() function 
-    from the dlib C++ Library.  
+    This is an example illustrating the use of the feature ranking 
+    tools from the dlib C++ Library.  
 
     This example creates a simple set of data and then shows
-    you how to use the rank_features() function to find a good 
+    you how to use the feature ranking function to find a good 
     set of features (where "good" means the feature set will probably
     work well with a classification algorithm).
 
@@ -14,7 +14,7 @@
     from the origin are labeled +1 and all other points are labeled
     as -1.  Note that this data is conceptually 2 dimensional but we
     will add two extra features for the purpose of showing what
-    the rank_features() function does.
+    the feature ranking function does.
 */
 
 
@@ -55,7 +55,7 @@ int main()
             samp(1) = y;
 
             // This is a worthless feature since it is just random noise.  It should
-            // be indicated as worthless by the rank_features() function below.
+            // be indicated as worthless by the feature ranking below.
             samp(2) = rnd.get_random_double();
 
             // This is a version of the y feature that is corrupted by random noise.  It
@@ -85,45 +85,31 @@ int main()
     for (unsigned long i = 0; i < samples.size(); ++i)
         samples[i] = pointwise_multiply(samples[i] - m, sd); 
 
+
     // This is another thing that is often good to do from a numerical stability point of view.  
     // However, in our case it doesn't really matter.  
     randomize_samples(samples,labels);
 
 
 
-    // This is a typedef for the type of kernel we are going to use in this example.
-    // In this case I have selected the radial basis kernel that can operate on our
-    // 4D sample_type objects.  In general, I would suggest using the same kernel for
-    // classification and feature ranking. 
-    typedef radial_basis_kernel<sample_type> kernel_type;
-    
-    // Here we declare an instance of the kcentroid object.  It is used by rank_features() 
-    // two represent the centroids of the two classes.  The kcentroid has 3 parameters 
-    // you need to set.  The first argument to the constructor is the kernel we wish to 
-    // use.  The second is a parameter that determines the numerical accuracy with which 
-    // the object will perform part of the ranking algorithm.  Generally, smaller values 
-    // give better results but cause the algorithm to attempt to use more support vectors 
-    // (and thus run slower and use more memory).  The third argument, however, is the 
-    // maximum number of support vectors a kcentroid is allowed to use.  So you can use
-    // it to control the runtime complexity.  
-    kcentroid<kernel_type> kc(kernel_type(0.05), 0.001, 25);
-
-    // And finally we get to the feature ranking. Here we call rank_features() with the kcentroid we just made,
-    // the samples and labels we made above, and the number of features we want it to rank.  
-    cout << rank_features(kc, samples, labels) << endl;
+    // Finally we get to the feature ranking. Here we call verbose_rank_features_rbf() with
+    // the samples and labels we made above.  The 20 is a measure of how much memory and CPU
+    // resources the algorithm should use.  Generally bigger values give better results but 
+    // take longer to run.
+    cout << verbose_rank_features_rbf(samples, labels, 20) << endl;
 
     // The output is:
     /*
-        1 0.514254 
-        0 0.810668 
-        3        1 
-        2 0.994169 
+        0 0.810087 
+        1        1 
+        3 0.873991 
+        2 0.668913 
     */
 
-    // The first column is a list of the features in order of decreasing goodness.  So the rank_features() function
+    // The first column is a list of the features in order of decreasing goodness.  So the feature ranking function
     // is telling us that the samples[i](0) and samples[i](1) (i.e. the x and y) features are the best two.  Then
     // after that the next best feature is the samples[i](3) (i.e. the y corrupted by noise) and finally the worst
-    // feature is the one that is just random noise.  So in this case rank_features did exactly what we would
+    // feature is the one that is just random noise.  So in this case the feature ranking did exactly what we would
     // intuitively expect.
 
 
@@ -132,10 +118,10 @@ int main()
     // indicate a larger separation.
 
     // So to break it down a little more.
-    //    1 0.514254   <-- class separation of feature 1 all by itself
-    //    0 0.810668   <-- class separation of feature 1 and 0
-    //    3        1   <-- class separation of feature 1, 0, and 3
-    //    2 0.994169   <-- class separation of feature 1, 0, 3, and 2
+    //    1 0.810087   <-- class separation of feature 1 all by itself
+    //    0        1   <-- class separation of feature 1 and 0
+    //    3 0.873991   <-- class separation of feature 1, 0, and 3
+    //    2 0.668913   <-- class separation of feature 1, 0, 3, and 2
         
 
 }
