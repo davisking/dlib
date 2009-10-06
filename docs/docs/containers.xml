@@ -1694,10 +1694,6 @@
             achieving faster searching. 
          </description>
          
-         <examples>
-            <example>dir_nav_ex.cpp.html</example>
-         </examples>
-
          <implementations>
             <implementation>
                <name>static_set_kernel_1</name>
