@@ -441,9 +441,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename funct>
-    std::pair<double,double> find_min_single_variable (
+    double find_min_single_variable (
         const funct& f,
-        const double starting_point,
+        double& starting_point,
         const double begin = -1e200,
         const double end = 1e200,
         const double eps = 1e-3,
@@ -463,11 +463,9 @@ namespace dlib
         double p1=0, p2=0, p3=0, f1=0, f2=0, f3=0;
         long f_evals = 1;
 
-        const std::pair<double,double> p(starting_point, f(starting_point));
-
         if (begin == end)
         {
-            return p;
+            return f(starting_point);
         }
 
         using std::abs;
@@ -481,27 +479,20 @@ namespace dlib
 
 
         // The first thing we do is get a starting set of 3 points that are inside the [begin,end] bounds
-        p1 = max(p.first-1, begin);
-        p3 = min(p.first+1, end);
-        if (p1 == p.first)
-            f1 = p.second;
-        else
-            f1 = f(p1);
+        p1 = max(starting_point-1, begin);
+        p3 = min(starting_point+1, end);
+        f1 = f(p1);
+        f3 = f(p3);
 
-        if (p3 == p.first)
-            f3 = p.second;
-        else
-            f3 = f(p3);
-
-        if (p.first == p1 || p.first == p3)
+        if (starting_point == p1 || starting_point == p3)
         {
             p2 = (p1+p3)/2;
             f2 = f(p2);
         }
         else
         {
-            p2 = p.first;
-            f2 = p.second;
+            p2 = starting_point;
+            f2 = f(starting_point);
         }
 
         f_evals += 2;
@@ -514,10 +505,20 @@ namespace dlib
             // check for hitting max_iter or if the interval is now too small
             if (f_evals >= max_iter || p3-p1 < eps)
             {
-                if (f1 < min(f2,f3)) return std::make_pair(p1, f1);
-                if (f2 < min(f1,f3)) return std::make_pair(p2, f2);
+                if (f1 < min(f2,f3)) 
+                {
+                    starting_point = p1;
+                    return f1;
+                }
 
-                return std::make_pair(p3, f3);
+                if (f2 < min(f1,f3)) 
+                {
+                    starting_point = p2;
+                    return f2;
+                }
+
+                starting_point = p3;
+                return f3;
             }
 
             // if f1 is small then take a step to the left
@@ -672,22 +673,23 @@ namespace dlib
             ++f_evals;
         }
 
-        return std::make_pair(p2, f2);
+        starting_point = p2;
+        return f2;
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename funct>
-    std::pair<double,double> find_max_single_variable (
+    double find_max_single_variable (
         const funct& f,
-        const double starting_point,
+        double& starting_point,
         const double begin = -1e200,
         const double end = 1e200,
         const double eps = 1e-3,
         const long max_iter = 100
     )
     {
-        return find_min_single_variable(negate_function(f), starting_point, begin, end, eps, max_iter);
+        return -find_min_single_variable(negate_function(f), starting_point, begin, end, eps, max_iter);
     }
 
 // ----------------------------------------------------------------------------------------

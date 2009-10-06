@@ -334,10 +334,6 @@ namespace dlib
             ) const
             {
                 using namespace std;
-                if (verbose)
-                {
-                    cout << "\rChecking goodness of gamma = " << gamma << ". " << flush;
-                }
 
                 typedef radial_basis_kernel<sample_type> kernel_type;
                 // make a kcentroid and find out what the gap is at the current gamma
@@ -346,7 +342,8 @@ namespace dlib
 
                 if (verbose)
                 {
-                    cout << "Goodness = " << temp << "                    " << flush;
+                    cout << "\rChecking goodness of gamma = " << gamma << ".  Goodness = " 
+                         << temp << "                    " << flush;
                 }
                 return temp;
             }
@@ -381,7 +378,8 @@ namespace dlib
             // works by ranking features by how much they separate the centroids of the two classes
             // we will pick the gamma to use by finding the one that best separates the two classes.
             test<sample_matrix_type, label_matrix_type> funct(samples, labels, num_sv, verbose);
-            double best_gamma = find_max_single_variable(funct, 1.0, 1e-8, 1000, 1e-3, 50).first;
+            double best_gamma = 1.0;
+            find_max_single_variable(funct, best_gamma, 1e-8, 1000, 1e-3, 50);
 
             typedef radial_basis_kernel<sample_type> kernel_type;
 

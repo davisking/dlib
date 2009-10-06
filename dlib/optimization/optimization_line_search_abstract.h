@@ -176,9 +176,9 @@ namespace dlib
     template <
         typename funct
         >
-    std::pair<double,double> find_min_single_variable (
+    double find_min_single_variable (
         const funct& f,
-        const double starting_point,
+        double& starting_point,
         const double begin = -1e200,
         const double end = 1e200,
         const double eps = 1e-3,
@@ -198,7 +198,8 @@ namespace dlib
             - Evaluates f() no more than max_iter times
             - Stops searching when the window around the minimum point is smaller than eps.
               The search will begin with the given starting_point.
-            - returns std::make_pair(P, f(P))
+            - #starting_point == P
+            - returns f(P)
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -206,9 +207,9 @@ namespace dlib
     template <
         typename funct
         >
-    std::pair<double,double> find_max_single_variable (
+    double find_max_single_variable (
         const funct& f,
-        const double starting_point,
+        double& starting_point,
         const double begin = -1e200,
         const double end = 1e200,
         const double eps = 1e-3,
@@ -228,7 +229,8 @@ namespace dlib
             - Evaluates f() no more than max_iter times
             - Stops searching when the window around the minimum point is smaller than eps.
               The search will begin with the given starting_point.
-            - returns std::make_pair(P, f(P))
+            - #starting_point == P
+            - returns f(P)
     !*/
 
 // ----------------------------------------------------------------------------------------
