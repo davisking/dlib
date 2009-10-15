@@ -440,6 +440,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class optimize_single_variable_failure : public error {
+    public: optimize_single_variable_failure(const std::string& s):error(s){}
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <typename funct>
     double find_min_single_variable (
         const funct& f,
@@ -450,6 +456,13 @@ namespace dlib
         const long max_iter = 100
     )
     {
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+
         DLIB_CASSERT( eps > 0 &&
                       max_iter > 1 &&
                       begin <= starting_point && starting_point <= end,
@@ -503,7 +516,13 @@ namespace dlib
         while ( !(f1 > f2 && f2 < f3))
         {
             // check for hitting max_iter or if the interval is now too small
-            if (f_evals >= max_iter || p3-p1 < eps)
+            if (f_evals >= max_iter)
+            {
+                throw optimize_single_variable_failure(
+                    "The max number of iterations of single variable optimization have been reached\n"
+                    "without converging.");
+            }
+            if (p3-p1 < eps)
             {
                 if (f1 < min(f2,f3)) 
                 {
@@ -673,6 +692,13 @@ namespace dlib
             ++f_evals;
         }
 
+        if (f_evals >= max_iter)
+        {
+            throw optimize_single_variable_failure(
+                "The max number of iterations of single variable optimization have been reached\n"
+                "without converging.");
+        }
+
         starting_point = p2;
         return f2;
     }
@@ -689,6 +715,13 @@ namespace dlib
         const long max_iter = 100
     )
     {
+        // You get an error on this line when you pass in a global function to this function.
+        // You have to either use a function object or pass a pointer to your global function
+        // by taking its address using the & operator.  (This check is here because gcc 4.0
+        // has a bug that causes it to silently corrupt return values from functions that
+        // invoked through a reference)
+        COMPILE_TIME_ASSERT(is_function<funct>::value == false);
+
         return -find_min_single_variable(negate_function(f), starting_point, begin, end, eps, max_iter);
     }
 

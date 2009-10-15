@@ -173,6 +173,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class optimize_single_variable_failure : public error;
+    /*!
+        This is the exception class used by the functions defined below.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename funct
         >
@@ -200,6 +207,10 @@ namespace dlib
               The search will begin with the given starting_point.
             - #starting_point == P
             - returns f(P)
+        throws
+            - optimize_single_variable_failure 
+                This exception is thrown if max_iter iterations are performed without 
+                determining the min point to the requsted accuracy of eps.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -231,6 +242,10 @@ namespace dlib
               The search will begin with the given starting_point.
             - #starting_point == P
             - returns f(P)
+        throws
+            - optimize_single_variable_failure 
+                This exception is thrown if max_iter iterations are performed without 
+                determining the max point to the requsted accuracy of eps.
     !*/
 
 // ----------------------------------------------------------------------------------------
