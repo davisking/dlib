@@ -117,7 +117,7 @@ namespace dlib
                         break;
                     case EINCOMPATIBLE_OPTIONS:
                         sout << "Command line error: The '" << narrow(opt) << "' and '" << narrow(opt2) 
-                            << "' options can not be given together on the command line.";
+                            << "' options cannot be given together on the command line.";
                         break;
                     case EMULTIPLE_OCCURANCES:
                         sout << "Command line error: The '" << narrow(opt) << "' option can only "
