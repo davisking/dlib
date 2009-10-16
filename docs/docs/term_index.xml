@@ -28,6 +28,8 @@
 
          <term file="dlib/optimization/optimization_abstract.h.html" name="central_differences"/>
          <term file="dlib/optimization/optimization_abstract.h.html" name="line_search_funct"/>
+         <term file="dlib/optimization/optimization_line_search_abstract.h.html" name="optimize_single_variable_failure"/>
+         <term file="dlib/optimization/optimization_bobyqa_abstract.h.html" name="bobyqa_failure"/>
 
          <term file="algorithms.html" name="derivative"/>
          <term file="algorithms.html" name="make_line_search_function"/>
@@ -138,8 +140,8 @@
          <term file="ml.html" name="kkmeans"/>
          <term file="ml.html" name="pick_initial_centers"/>
          <term file="ml.html" name="rank_features"/>
-         <term file="ml.html" name="rank_features_rbf"/>
-         <term file="ml.html" name="verbose_rank_features_rbf"/>
+         <term file="ml.html" name="find_gamma_with_big_centroid_gap"/>
+         <term file="ml.html" name="verbose_find_gamma_with_big_centroid_gap"/>
          <term file="dlib/svm/svm_abstract.h.html" name="maximum_nu"/>
 
          <term file="ml.html" name="null_trainer"/>
