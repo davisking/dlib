@@ -1,20 +1,20 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example illustrating the use of the feature ranking 
-    tools from the dlib C++ Library.  
+    This is an example illustrating the use of the rank_features() function 
+    from the dlib C++ Library.  
 
-    This example creates a simple set of data and then shows you how 
-    to use feature ranking to find a good set of features (where 
-    "good" means the feature set will probably work well with a 
-    classification algorithm).
+    This example creates a simple set of data and then shows
+    you how to use the rank_features() function to find a good 
+    set of features (where "good" means the feature set will probably
+    work well with a classification algorithm).
 
     The data used in this example will be 4 dimensional data and will
     come from a distribution where points with a distance less than 10
     from the origin are labeled +1 and all other points are labeled
     as -1.  Note that this data is conceptually 2 dimensional but we
     will add two extra features for the purpose of showing what
-    feature ranking does.
+    the rank_features() function does.
 */
 
 
@@ -55,7 +55,7 @@ int main()
             samp(1) = y;
 
             // This is a worthless feature since it is just random noise.  It should
-            // be indicated as worthless by the feature ranking below.
+            // be indicated as worthless by the rank_features() function below.
             samp(2) = rnd.get_random_double();
 
             // This is a version of the y feature that is corrupted by random noise.  It
@@ -85,43 +85,64 @@ int main()
     for (unsigned long i = 0; i < samples.size(); ++i)
         samples[i] = pointwise_multiply(samples[i] - m, sd); 
 
-
     // This is another thing that is often good to do from a numerical stability point of view.  
-    // However, in our case it doesn't matter.   It's just here to show you how to do it.
+    // However, in our case it doesn't really matter.   It's just here to show you how to do it.
     randomize_samples(samples,labels);
 
 
 
-    // Finally we get to the feature ranking. Here we call verbose_rank_features_rbf() with
-    // the samples and labels we made above.  The 20 is a measure of how much memory and CPU
-    // resources the algorithm should use.  Generally bigger values give better results but 
-    // take longer to run.
-    cout << verbose_rank_features_rbf(samples, labels, 20) << endl;
+    // This is a typedef for the type of kernel we are going to use in this example.
+    // In this case I have selected the radial basis kernel that can operate on our
+    // 4D sample_type objects.  In general, I would suggest using the same kernel for
+    // classification and feature ranking. 
+    typedef radial_basis_kernel<sample_type> kernel_type;
+
+    // The radial_basis_kernel has a parameter called gamma that we need to set.  Generally,
+    // you should try the same gamma that you are using for training.  But if you don't
+    // have a particular gamma in mind then you can use the following function to
+    // find a reasonable default gamma for your data.
+    const double gamma = verbose_find_gamma_with_big_centroid_gap(samples, labels);
+
+    // Next we declare an instance of the kcentroid object.  It is used by rank_features() 
+    // two represent the centroids of the two classes.  The kcentroid has 3 parameters 
+    // you need to set.  The first argument to the constructor is the kernel we wish to 
+    // use.  The second is a parameter that determines the numerical accuracy with which 
+    // the object will perform part of the ranking algorithm.  Generally, smaller values 
+    // give better results but cause the algorithm to attempt to use more support vectors 
+    // (and thus run slower and use more memory).  The third argument, however, is the 
+    // maximum number of support vectors a kcentroid is allowed to use.  So you can use
+    // it to put an upper limit on the runtime complexity.  
+    kcentroid<kernel_type> kc(kernel_type(gamma), 0.001, 25);
+
+    // And finally we get to the feature ranking. Here we call rank_features() with the kcentroid we just made,
+    // the samples and labels we made above, and the number of features we want it to rank.  
+    cout << rank_features(kc, samples, labels) << endl;
 
     // The output is:
     /*
-        0 0.810087 
+        0 0.749265 
         1        1 
-        3 0.873991 
-        2 0.668913 
+        3 0.933378 
+        2 0.825179 
     */
 
-    // The first column is a list of the features in order of decreasing goodness.  So the feature ranking function
+    // The first column is a list of the features in order of decreasing goodness.  So the rank_features() function
     // is telling us that the samples[i](0) and samples[i](1) (i.e. the x and y) features are the best two.  Then
     // after that the next best feature is the samples[i](3) (i.e. the y corrupted by noise) and finally the worst
-    // feature is the one that is just random noise.  So in this case the feature ranking did exactly what we would
+    // feature is the one that is just random noise.  So in this case rank_features did exactly what we would
     // intuitively expect.
 
 
     // The second column of the matrix is a number that indicates how much the features up to that point
     // contribute to the separation of the two classes.  So bigger numbers are better since they
-    // indicate a larger separation.
+    // indicate a larger separation.  The max value is always 1.  In the case below we see that the bad
+    // features actually make the class separation go down.
 
     // So to break it down a little more.
-    //    1 0.810087   <-- class separation of feature 1 all by itself
-    //    0        1   <-- class separation of feature 1 and 0
-    //    3 0.873991   <-- class separation of feature 1, 0, and 3
-    //    2 0.668913   <-- class separation of feature 1, 0, 3, and 2
+    //    0 0.749265   <-- class separation of feature 0 all by itself
+    //    1        1   <-- class separation of feature 0 and 1
+    //    3 0.933378   <-- class separation of feature 0, 1, and 3
+    //    2 0.825179   <-- class separation of feature 0, 1, 3, and 2
         
 
 }
