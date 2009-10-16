@@ -133,7 +133,7 @@ int main()
 
     // Lets do a simple grid search
 
-    matrix<double> params = cartesian_product(logspace(log10(20), log10(1e-5), 4),  // gamma parameter
+    matrix<double> params = cartesian_product(logspace(log10(20.0), log10(1e-5), 4),  // gamma parameter
                                               logspace(log10(max_nu), log10(1e-5), 4) // nu parameter
                                               );
 
