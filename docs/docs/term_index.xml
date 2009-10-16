@@ -141,7 +141,7 @@
          <term file="ml.html" name="pick_initial_centers"/>
          <term file="ml.html" name="rank_features"/>
          <term file="ml.html" name="find_gamma_with_big_centroid_gap"/>
-         <term file="ml.html" name="verbose_find_gamma_with_big_centroid_gap"/>
+         <term file="dlib/svm/feature_ranking_abstract.h.html" name="verbose_find_gamma_with_big_centroid_gap"/>
          <term file="dlib/svm/svm_abstract.h.html" name="maximum_nu"/>
 
          <term file="ml.html" name="null_trainer"/>

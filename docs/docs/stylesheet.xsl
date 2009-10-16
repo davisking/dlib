@@ -32,7 +32,7 @@
    
    <xsl:variable name="gray">#E3E3E3</xsl:variable>
    <xsl:variable name="background_color">#EDF3EE</xsl:variable>
-   <xsl:variable name="main_width">62em</xsl:variable>
+   <xsl:variable name="main_width">62.5em</xsl:variable>
 
    <!-- ************************************************************************* -->
    <!-- ************************************************************************* -->
@@ -127,7 +127,7 @@
                pre {margin:0px;}
 
                ul.tree  li { list-style: none;  margin-left:10px;} 
-               ul.tree  { margin:0px; padding:0px; margin-left:5px;  }
+               ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
                ul.tree  li ul { margin-left:10px; padding:0px; }
 
                div#component {

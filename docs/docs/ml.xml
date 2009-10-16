@@ -127,7 +127,6 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>cross_validate_trainer_threaded</item> 
          <item>pick_initial_centers</item> 
          <item>find_gamma_with_big_centroid_gap</item> 
-         <item>verbose_find_gamma_with_big_centroid_gap</item> 
       </section>
 
     </top>  
@@ -765,23 +764,6 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             gamma parameter of the <a href="#radial_basis_kernel">radial_basis_kernel</a>.  It
             picks the parameter that gives the largest separation between the centroids, in 
             kernel feature space, of two classes of data.
-         </description>
-         <examples>
-            <example>rank_features_ex.cpp.html</example>
-         </examples>
-                                 
-      </component>
-      
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>verbose_find_gamma_with_big_centroid_gap</name>
-         <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/feature_ranking_abstract.h</spec_file>
-         <description>
-            This is just a version of 
-            <a href="#find_gamma_with_big_centroid_gap">find_gamma_with_big_centroid_gap</a> that is 
-            verbose in the sense that it prints out status messages as it proceeds.
          </description>
          <examples>
             <example>rank_features_ex.cpp.html</example>
