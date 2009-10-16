@@ -73,16 +73,15 @@ namespace dlib
             - num_sv > 0
             - is_binary_classification_problem(samples, labels) == true
         ensures
-            - This function uses the kcentroid object to attempt to determine what value
-              of the gamma parameter of the radial_basis_kernel gives the largest
-              separation between the two classes in the given training data.
-              It also sets the kcentroid up to use num_sv dictionary vectors.
+            - This is a function that tries to pick a reasonable default value for the gamma 
+              parameter of the radial_basis_kernel.  It picks the parameter that gives the 
+              largest separation between the centroids, in kernel feature space, of two classes 
+              of data. It does this using the kcentroid object and it sets the kcentroid up 
+              to use num_sv dictionary vectors.
             - This function does a search for the best gamma and the search starts with
               the value given by initial_gamma.  Better initial guesses will give 
               better results since the routine may get stuck in a local minima.
-            - returns the value of gamma that results in the largest separation
-            - This function is verbose in the sense that it will print status messages to
-              standard out during its processing.
+            - returns the value of gamma that results in the largest separation.
     !*/
 
 // ----------------------------------------------------------------------------------------
