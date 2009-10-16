@@ -9,16 +9,17 @@
 
     The output from the program when the -h option is given is:
 
-        Usage: dclib_example (-c|-d) --in input_file --out output_file
+        Usage: dclib_example (-c|-d|-l) --in input_file --out output_file
         Options:
-        -c                       Indicates that we want to compress a file.
-        -d                       Indicates that we want to decompress a file.
-        -h                       Display this help message.
-        --in <arg>               This option takes one argument which specifies the
-                                 name of the file we want to compress/decompress.
-        --out <arg>              This option takes one argument which specifies the
-                                 name of the output file.
-
+          -c            Indicates that we want to compress a file. 
+          -d            Indicates that we want to decompress a file. 
+          -h            Display this help message. 
+          --in <arg>    This option takes one argument which specifies the name of the 
+                        file we want to compress/decompress. 
+          -l <arg>      Set the compression level [1-3], 3 is max compression, default 
+                        is 2. 
+          --out <arg>   This option takes one argument which specifies the name of the 
+                        output file. 
 */
 
 
@@ -30,9 +31,10 @@
 #include <fstream>
 #include <string>
 
-// I am making a typedef for the version of compress_stream I want to use.
-// I have selected kernel_1ec.
-typedef dlib::compress_stream::kernel_1ec cs;
+// I am making a typedef for the versions of compress_stream I want to use.  
+typedef dlib::compress_stream::kernel_1da cs1;
+typedef dlib::compress_stream::kernel_1ea cs2;
+typedef dlib::compress_stream::kernel_1ec cs3;
 
 // Here I am making another typedef, this time for the version of
 // cmd_line_parser I want to use.  This version gives me a
@@ -51,7 +53,6 @@ int main(int argc, char** argv)
     try
     {
         clp parser;
-        cs compressor;
 
         // first I will define the command line options I want.  
         // Add a -c option and tell the parser what the option is for.
@@ -62,6 +63,7 @@ int main(int argc, char** argv)
         // add a --out option that takes 1 argument
         parser.add_option("out","This option takes one argument which specifies the name of the output file.",1);
         parser.add_option("h","Display this help message.");
+        parser.add_option("l","Set the compression level [1-3], 3 is max compression, default is 2.",1);
 
 
         // now I will parse the command line
@@ -80,13 +82,22 @@ int main(int argc, char** argv)
         // Here I'm checking that the user didn't pick both the c and d options at the
         // same time. 
         parser.check_incompatible_options("c", "d");
+        // You can't set the compression level during decompression.  The level is read from the compressed file.
+        parser.check_incompatible_options("l", "d");
+
+        // Here I'm checking that the argument to the l option is an integer in the range 1 to 3.  
+        // That is, it should be convertible to an int by dlib::string_cast<int>() and be either 
+        // 1, 2, or 3.  Note that if you wanted to allow floating point values in the range 1 to 
+        // 3 then you could give a range 1.0 to 3.0 or explicitly supply a type of float or double 
+        // to the template argument of the check_option_arg_range() function.
+        parser.check_option_arg_range("l", 1, 3);
 
 
         // check if the -h option was given on the command line
         if (parser.option("h"))
         {
             // display all the command line options
-            cout << "Usage: dclib_example (-c|-d) --in input_file --out output_file\n";
+            cout << "Usage: dclib_example (-c|-d|-l) --in input_file --out output_file\n";
             // This function prints out a nicely formatted list of
             // all the options the parser has
             parser.print_options(cout); 
@@ -101,6 +112,14 @@ int main(int argc, char** argv)
         const clp::option_type& option_d = parser.option("d");
         const clp::option_type& option_in = parser.option("in");
         const clp::option_type& option_out = parser.option("out");
+
+        // Figure out what the compression level should be.  The default is 2.
+        int compression_level = 2;
+        // If the user supplied the -l option then use whatever value they gave for the level.
+        if (parser.option("l"))
+            compression_level = string_cast<int>(parser.option("l").argument());
+
+
 
         // make sure one of the c or d options was given
         if (!option_c && !option_d)
@@ -164,11 +183,51 @@ int main(int argc, char** argv)
         // now perform the actual compression or decompression.
         if (option_c)
         {
-            compressor.compress(fin,fout);
+            // save the compression level to the output file
+            serialize(compression_level, fout);
+
+            switch (compression_level)
+            {
+                case 1:
+                    {
+                        cs1 compressor;
+                        compressor.compress(fin,fout);
+                    }break;
+                case 2:
+                    {
+                        cs2 compressor;
+                        compressor.compress(fin,fout);
+                    }break;
+                case 3:
+                    {
+                        cs3 compressor;
+                        compressor.compress(fin,fout);
+                    }break;
+            }
         }
         else
         {
-            compressor.decompress(fin,fout);
+            // obtain the compression level from the input file
+            deserialize(compression_level, fin);
+
+            switch (compression_level)
+            {
+                case 1:
+                    {
+                        cs1 compressor;
+                        compressor.decompress(fin,fout);
+                    }break;
+                case 2:
+                    {
+                        cs2 compressor;
+                        compressor.decompress(fin,fout);
+                    }break;
+                case 3:
+                    {
+                        cs3 compressor;
+                        compressor.decompress(fin,fout);
+                    }break;
+            }
         }
 
 
