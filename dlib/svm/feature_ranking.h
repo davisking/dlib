@@ -330,14 +330,19 @@ namespace dlib
             }
 
             double operator() (
-                const double gamma
+                double gamma
             ) const
             {
                 using namespace std;
 
+                // we are doing the optimization in log space so don't forget to convert back to normal space
+                gamma = std::exp(gamma);
+
                 typedef radial_basis_kernel<sample_type> kernel_type;
-                // make a kcentroid and find out what the gap is at the current gamma
-                kcentroid<kernel_type> kc(kernel_type(gamma), 0.0001, num_sv);
+                // Make a kcentroid and find out what the gap is at the current gamma.  Try to pick a reasonable
+                // tolerance.
+                const double tolerance = std::min(gamma*0.01, 0.01);
+                kcentroid<kernel_type> kc(kernel_type(gamma), tolerance, num_sv);
                 scalar_type temp = centroid_gap(kc, samples, labels);
 
                 if (verbose)
@@ -359,9 +364,10 @@ namespace dlib
             typename sample_matrix_type,
             typename label_matrix_type
             >
-        matrix<double,0,2> rank_features_rbf_impl (
+        double find_gamma_with_big_centroid_gap_impl (
             const sample_matrix_type& samples,
             const label_matrix_type& labels,
+            double initial_gamma,
             unsigned long num_sv,
             bool verbose
         )
@@ -374,22 +380,17 @@ namespace dlib
                 cout << endl;
             }
 
-            // The first thing to do is to estimate what a good gamma is.  Since the feature ranking
-            // works by ranking features by how much they separate the centroids of the two classes
-            // we will pick the gamma to use by finding the one that best separates the two classes.
             test<sample_matrix_type, label_matrix_type> funct(samples, labels, num_sv, verbose);
-            double best_gamma = 1.0;
-            find_max_single_variable(funct, best_gamma, 1e-8, 1000, 1e-3, 50);
-
-            typedef radial_basis_kernel<sample_type> kernel_type;
-
+            double best_gamma = std::log(initial_gamma);
+            double goodness = find_max_single_variable(funct, best_gamma, -15, 15, 1e-3, 100);
+            
             if (verbose)
             {
-                cout << "\nNow doing feature ranking using a gamma of " << best_gamma << endl; 
-            } 
-            // now just call the normal rank_features function and return whatever it says
-            kcentroid<kernel_type> kc(kernel_type(best_gamma), 0.0001, num_sv);
-            return matrix_cast<double>(rank_features(kc, samples, labels));
+                cout << "\rBest gamma = " << std::exp(best_gamma) << ".  Goodness = " 
+                    << goodness << "                    " << endl;
+            }
+
+            return std::exp(best_gamma);
         }
     }
 
@@ -399,14 +400,23 @@ namespace dlib
         typename sample_matrix_type,
         typename label_matrix_type
         >
-    matrix<double,0,2> rank_features_rbf (
+    double find_gamma_with_big_centroid_gap (
         const sample_matrix_type& samples,
         const label_matrix_type& labels,
+        double initial_gamma = 0.1,
         unsigned long num_sv = 40
     )
     {
-        return rank_features_helpers::rank_features_rbf_impl(vector_to_matrix(samples), 
+        DLIB_ASSERT(initial_gamma > 0 && num_sv > 0 && is_binary_classification_problem(samples, labels),
+            "\t double find_gamma_with_big_centroid_gap()"
+            << "\n\t initial_gamma: " << initial_gamma
+            << "\n\t num_sv:        " << num_sv 
+            << "\n\t is_binary_classification_problem(): " << is_binary_classification_problem(samples, labels) 
+            );
+
+        return rank_features_helpers::find_gamma_with_big_centroid_gap_impl(vector_to_matrix(samples), 
                                                              vector_to_matrix(labels),
+                                                             initial_gamma,
                                                              num_sv,
                                                              false);
     }
@@ -417,14 +427,23 @@ namespace dlib
         typename sample_matrix_type,
         typename label_matrix_type
         >
-    matrix<double,0,2> verbose_rank_features_rbf (
+    double verbose_find_gamma_with_big_centroid_gap (
         const sample_matrix_type& samples,
         const label_matrix_type& labels,
+        double initial_gamma = 0.1,
         unsigned long num_sv = 40
     )
     {
-        return rank_features_helpers::rank_features_rbf_impl(vector_to_matrix(samples),
+        DLIB_ASSERT(initial_gamma > 0 && num_sv > 0 && is_binary_classification_problem(samples, labels),
+            "\t double verbose_find_gamma_with_big_centroid_gap()"
+            << "\n\t initial_gamma: " << initial_gamma
+            << "\n\t num_sv:        " << num_sv 
+            << "\n\t is_binary_classification_problem(): " << is_binary_classification_problem(samples, labels) 
+            );
+
+        return rank_features_helpers::find_gamma_with_big_centroid_gap_impl(vector_to_matrix(samples), 
                                                              vector_to_matrix(labels),
+                                                             initial_gamma,
                                                              num_sv,
                                                              true);
     }

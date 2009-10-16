@@ -61,21 +61,28 @@ namespace dlib
         typename sample_matrix_type,
         typename label_matrix_type
         >
-    matrix<double,0,2> rank_features_rbf (
+    double find_gamma_with_big_centroid_gap (
         const sample_matrix_type& samples,
         const label_matrix_type& labels,
+        double initial_gamma = 0.1,
         unsigned long num_sv = 40
     );
     /*!
         requires
+            - initial_gamma > 0
             - num_sv > 0
             - is_binary_classification_problem(samples, labels) == true
         ensures
-            - This function just calls the above rank_features() function but uses the 
-              radial_basis_kernel and automatically picks a gamma parameter for you.  
-              It also sets the kcentroid up to use num_sv dictionary vectors.  Finally, it 
-              tells rank_features() to rank all the features.
-            - The return value from this function is the matrix returned by rank_features()
+            - This function uses the kcentroid object to attempt to determine what value
+              of the gamma parameter of the radial_basis_kernel gives the largest
+              separation between the two classes in the given training data.
+              It also sets the kcentroid up to use num_sv dictionary vectors.
+            - This function does a search for the best gamma and the search starts with
+              the value given by initial_gamma.  Better initial guesses will give 
+              better results since the routine may get stuck in a local minima.
+            - returns the value of gamma that results in the largest separation
+            - This function is verbose in the sense that it will print status messages to
+              standard out during its processing.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -84,22 +91,20 @@ namespace dlib
         typename sample_matrix_type,
         typename label_matrix_type
         >
-    matrix<double,0,2> verbose_rank_features_rbf (
+    double verbose_find_gamma_with_big_centroid_gap (
         const sample_matrix_type& samples,
         const label_matrix_type& labels,
+        double initial_gamma = 0.1,
         unsigned long num_sv = 40
     );
     /*!
         requires
+            - initial_gamma > 0
             - num_sv > 0
             - is_binary_classification_problem(samples, labels) == true
         ensures
-            - This function just calls the above rank_features() function but uses the 
-              radial_basis_kernel and automatically picks a gamma parameter for you.  
-              It also sets the kcentroid up to use num_sv dictionary vectors.  Finally, it 
-              tells rank_features() to rank all the features.
-            - The return value from this function is the matrix returned by rank_features()
-            - This function is verbose in the sense that it will print status messages to
+            - This function does the same exact thing as the above find_gamma_with_big_centroid_gap()
+              except that it is also verbose in the sense that it will print status messages to
               standard out during its processing.
     !*/
 
