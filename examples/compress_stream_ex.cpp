@@ -82,8 +82,6 @@ int main(int argc, char** argv)
         // Here I'm checking that the user didn't pick both the c and d options at the
         // same time. 
         parser.check_incompatible_options("c", "d");
-        // You can't set the compression level during decompression.  The level is read from the compressed file.
-        parser.check_incompatible_options("l", "d");
 
         // Here I'm checking that the argument to the l option is an integer in the range 1 to 3.  
         // That is, it should be convertible to an int by dlib::string_cast<int>() and be either 
@@ -92,6 +90,11 @@ int main(int argc, char** argv)
         // to the template argument of the check_option_arg_range() function.
         parser.check_option_arg_range("l", 1, 3);
 
+        // The 'l' option is a sub-option of the 'c' option. That is, you can only select the
+        // compression level when compressing.  This command below checks that the listed
+        // sub options are always given in the presence of their parent options.
+        const char* c_sub_opts[] = {"l"};
+        parser.check_sub_options("c", c_sub_opts);
 
         // check if the -h option was given on the command line
         if (parser.option("h"))
