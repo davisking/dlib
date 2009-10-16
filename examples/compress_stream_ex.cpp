@@ -31,7 +31,7 @@
 #include <fstream>
 #include <string>
 
-// I am making a typedef for the versions of compress_stream I want to use.  
+// I am making a typedefs for the versions of compress_stream I want to use.  
 typedef dlib::compress_stream::kernel_1da cs1;
 typedef dlib::compress_stream::kernel_1ea cs2;
 typedef dlib::compress_stream::kernel_1ec cs3;
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
         // First I want to check that none of the options were given on the command line
         // more than once.  To do this I define an array that contains the options
         // that shouldn't appear more than once and then I just call check_one_time_options()
-        const char* one_time_opts[] = {"c", "d", "in", "out", "h"};
+        const char* one_time_opts[] = {"c", "d", "in", "out", "h", "l"};
         parser.check_one_time_options(one_time_opts);
         // Here I'm checking that the user didn't pick both the c and d options at the
         // same time. 
@@ -229,6 +229,10 @@ int main(int argc, char** argv)
                     {
                         cs3 compressor;
                         compressor.decompress(fin,fout);
+                    }break;
+                default:
+                    {
+                        cout << "Error in compressed file, invalid compression level" << endl;
                     }break;
             }
         }
