@@ -734,6 +734,8 @@ namespace
             argc = 8;
 
 
+			DLIB_TEST(std::basic_string<ct>(argv[0]) == _dT(ct,"program"));
+
             test.add_option(_dT(ct,"mavis"),_dT(ct,"mavis option"), 1);
             test.add_option(_dT(ct,"b"),_dT(ct,"b option"));
             test.add_option(_dT(ct,"d"),_dT(ct,"d option"));
