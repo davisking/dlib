@@ -102,9 +102,9 @@ int main()
     svm_nu_trainer<kernel_type> trainer;
 
     // Now we loop over some different nu and gamma values to see how good they are.  Note
-    // that this is just a simple brute force way to try out a few possible parameter 
-    // choices.  You may want to investigate more sophisticated strategies for determining 
-    // good parameter choices.
+    // that this is a very simple way to try out a few possible parameter choices.  You 
+    // should look at the model_selection_ex.cpp program for examples of more sophisticated 
+    // strategies for determining good parameter choices.
     cout << "doing cross validation" << endl;
     for (double gamma = 0.00001; gamma <= 1; gamma += 0.1)
     {
