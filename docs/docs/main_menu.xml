@@ -150,6 +150,10 @@
                   <link>svm_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Model_Selection</name>
+                  <link>model_selection_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Online_SVM</name>
                   <link>svm_pegasos_ex.cpp.html</link>
                </item>

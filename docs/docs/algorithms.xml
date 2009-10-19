@@ -382,6 +382,7 @@
          </description>
          <examples>
             <example>optimization_ex.cpp.html</example>
+            <example>model_selection_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -404,6 +405,10 @@
                function.
             </p>
          </description>
+         <examples>
+            <example>optimization_ex.cpp.html</example>
+            <example>model_selection_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 

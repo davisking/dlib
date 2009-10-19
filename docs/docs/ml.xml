@@ -20,6 +20,8 @@
          <p> 
             A good tutorial and introduction to the general concepts used by most of the
             objects in this part of the library can be found in the <a href="svm_ex.cpp.html">svm example</a> program.
+            After reading this example another good one to consult would be the <a href="model_selection_ex.cpp.html">model selection</a>
+            example program.
          </p>
 
          <p>   
@@ -505,6 +507,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          </description>
          <examples>
             <example>svm_ex.cpp.html</example>
+            <example>model_selection_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -1061,6 +1064,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          </description>
          <examples>
             <example>svm_ex.cpp.html</example>
+            <example>model_selection_ex.cpp.html</example>
          </examples>
                                  
       </component>
