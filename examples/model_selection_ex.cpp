@@ -4,7 +4,7 @@
     This is an example that shows some reasonable ways you can perform
     model selection with the dlib C++ Library.  
 
-    This example creates a simple set of data and then shows you how to use 
+    It will create a simple set of data and then show you how to use 
     the cross validation and optimization routines to determine good model 
     parameters for the purpose of training an svm to classify the sample data.
 
@@ -82,7 +82,7 @@ public:
         // heavily penalize results that didn't obtain the desired accuracy.  Or similarly, you 
         // might use the roc_c1_trainer() function to adjust the trainer output so that it always
         // obtained roughly a 90% accuracy on class +1.  In that case returning the sum of the two
-        // class accuracies might then be appropriate.  
+        // class accuracies might be appropriate.  
         return sum(result);
     }
 
@@ -145,7 +145,7 @@ int main()
         // validation on our training data.  However, there is a problem with the way we have sampled 
         // our distribution above.  The problem is that there is a definite ordering to the samples.  
         // That is, the first half of the samples look like they are from a different distribution 
-        // than the second half do.  This would screw up the cross validation process but we can 
+        // than the second half.  This would screw up the cross validation process but we can 
         // fix it by randomizing the order of the samples with the following function call.
         randomize_samples(samples, labels);
 
@@ -157,7 +157,7 @@ int main()
 
 
         // The first kind of model selection we will do is a simple grid search.  That is, below we just
-        // generate a fixed grid of points (each point represents one possible setting of the model parameters).
+        // generate a fixed grid of points (each point represents one possible setting of the model parameters)
         // and test each via cross validation.
 
         // This code generates a 4x4 grid of logarithmically spaced points.  The result is a matrix
@@ -175,7 +175,6 @@ int main()
         matrix<double> best_result(2,1);
         best_result = 0;
         double best_gamma, best_nu;
-        set_all_elements(best_result, 0);
         for (long col = 0; col < params.nc(); ++col)
         {
             // pull out the current set of model parameters
@@ -215,14 +214,14 @@ int main()
         // point due to the possibility of the optimization getting stuck in a local minima.  
         params.set_size(2,1);
         params = best_gamma, // initial gamma
-               best_nu;    // initial nu
+                 best_nu;    // initial nu
 
         // We also need to supply lower and upper bounds for the search.  
         matrix<double> lower_bound(2,1), upper_bound(2,1);
-        lower_bound = 1e-7, // smallest allowed gamma
-                    1e-7; // smallest allowed nu
+        lower_bound = 1e-7,   // smallest allowed gamma
+                      1e-7;   // smallest allowed nu
         upper_bound = 100,    // largest allowed gamma
-                    max_nu; // largest allowed nu
+                      max_nu; // largest allowed nu
 
 
         // For the gamma and nu SVM parameters it is generally a good idea to search
@@ -252,7 +251,7 @@ int main()
         cout << " best gamma: " << params(0) << "   best nu: " << params(1) << endl;
 
         // Also note that the find_max_bobyqa() function only works for optimization problems
-        // with 2 variables or more.  If you have only a single variable then you should use
+        // with 2 variables or more.  If you only have a single variable then you should use
         // the find_max_single_variable() function.
 
     }

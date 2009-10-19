@@ -89,7 +89,7 @@ int main()
     // validation on our training data.  However, there is a problem with the way we have sampled 
     // our distribution above.  The problem is that there is a definite ordering to the samples.  
     // That is, the first half of the samples look like they are from a different distribution 
-    // than the second half do.  This would screw up the cross validation process but we can 
+    // than the second half.  This would screw up the cross validation process but we can 
     // fix it by randomizing the order of the samples with the following function call.
     randomize_samples(samples, labels);
 
