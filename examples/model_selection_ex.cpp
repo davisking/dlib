@@ -164,7 +164,7 @@ int main()
         // with 2 rows and 16 columns where each column represents one of our points. 
         matrix<double> params = cartesian_product(logspace(log10(5.0), log10(1e-5), 4),  // gamma parameter
                                                   logspace(log10(max_nu), log10(1e-5), 4) // nu parameter
-        );
+                                                  );
         // As an aside, if you wanted to do a grid search over points of dimensionality more than two
         // you would just nest calls to cartesian_product().  You can also use linspace() to generate 
         // linearly spaced points if that is more appropriate for the parameters you are working with.   
