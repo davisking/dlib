@@ -13,7 +13,10 @@ namespace dlib
 
     /*!
         GENERAL COMMENTS:
-            Nothing in here will throw exceptions
+            Nothing in here will throw exceptions.   
+            
+            All ip address strings in this file refer to IPv4 addresses.  For 
+            example "192.168.1.1"
 
             Timeouts:
                 All timeout values are measured in milliseconds but you are not 
