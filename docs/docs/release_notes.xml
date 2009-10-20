@@ -13,13 +13,19 @@
 <current>
 New Stuff:
    - Added the pointer_to_column_vector function.
-   - Added the BOBYQA algorithm for derivative-free optimization
+   - Added the BOBYQA algorithm for derivative-free optimization.
+   - Added some functions to make it easy to do a line search on a function
+     of a single variable when derivatives are not available.
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a bug in the cpp pretty printer.  It wasn't parsing 
+     exponentiated numbers like 1e100 correctly.
 
 Other:
+   - Added a model selection example program using grid search
+     and the new BOBYQA algorithm.
 
 </current>
 
