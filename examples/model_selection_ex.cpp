@@ -211,7 +211,7 @@ int main()
 
         // We need to supply a starting point for the optimization.  Here we are using the best
         // result of the grid search.  Generally, you want to try and give a reasonable starting
-        // point due to the possibility of the optimization getting stuck in a local minima.  
+        // point due to the possibility of the optimization getting stuck in a local maxima.  
         params.set_size(2,1);
         params = best_gamma, // initial gamma
                  best_nu;    // initial nu
