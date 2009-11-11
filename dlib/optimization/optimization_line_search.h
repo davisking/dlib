@@ -545,7 +545,7 @@ namespace dlib
             { 
                 // check if the minimum is butting up against the bounds and if so then pick
                 // a point between p1 and p2 in the hopes that shrinking the interval will
-                // be a good things to do.
+                // be a good thing to do.
                 if (p1 == begin)
                 {
                     p3 = p2;
@@ -575,7 +575,7 @@ namespace dlib
             {
                 // check if the minimum is butting up against the bounds and if so then pick
                 // a point between p2 and p3 in the hopes that shrinking the interval will
-                // be a good things to do.
+                // be a good thing to do.
                 if (p3 == end)
                 {
                     p1 = p2;
