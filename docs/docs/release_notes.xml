@@ -97,7 +97,7 @@ New Stuff:
    - Added a hook to the logger object that lets you set a different kind of
      output logging destination (in addition to the std::ostream supported 
      already).
-   - Upgraded the smart_ptr so that it can handle array pointers as well
+   - Upgraded the scoped_ptr so that it can handle array pointers as well
      as customer deleter functions.
    - Added overloads of the kernel_derivative object for all the kernels 
      in dlib.
