@@ -181,9 +181,10 @@ namespace dlib
             const T& funct_derivative
         )
         {
+            prev_direction = -funct_derivative;
+
             if (been_used == false)
             {
-                prev_direction = -funct_derivative;
                 been_used = true;
             }
             else
@@ -207,7 +208,6 @@ namespace dlib
                 {
                     // This block of code is from algorithm 7.4 in the Nocedal book.
 
-                    prev_direction = -funct_derivative;
                     alpha.resize(data.size());
                     for (unsigned long i = data.size()-1; i < data.size(); --i)
                     {
@@ -227,10 +227,6 @@ namespace dlib
                         double beta = data[i].rho*dot(data[i].y, prev_direction);
                         prev_direction += data[i].s * (alpha[i] - beta);
                     }
-                }
-                else
-                {
-                    prev_derivative = -funct_derivative;
                 }
 
             }
