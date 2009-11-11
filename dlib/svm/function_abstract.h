@@ -195,11 +195,11 @@ namespace dlib
                       the class +1
         !*/
         {
-            // Evaluate the normal SVM decision function
+            // Evaluate the normal decision function
             scalar_type f = decision_funct(x);
             // Now basically normalize the output so that it is a properly
             // conditioned probability of x being in the +1 class given
-            // the output of the SVM.
+            // the output of the decision function.
             return 1/(1 + std::exp(alpha*f + beta));
         }
     };
