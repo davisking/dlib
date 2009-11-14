@@ -123,22 +123,23 @@ namespace dlib
                 - returns nr()*nc()
         !*/
 
-        template <typename U, long iNR, long iNC , typename mm, typename l>
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,mm,l>& item
+            const matrix_exp<U>& item
         ) const;
         /*!
             ensures
-                - if (this matrix expression contains/aliases the given matrix or contains
-                  any subexpressions that contain/alias the given matrix) then
+                - if (A change to the state of item could cause a change to the state of *this
+                      matrix_exp object.  ) then
                     - returns true
+                    - This happens when this matrix_exp contains item in some way. 
                 - else
                     - returns false
         !*/
 
-        template <typename U, long iNR, long iNC, typename mm, typename l>
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,mm,l>& item
+            const matrix_exp<U>& item
         ) const; 
         /*!
             ensures
@@ -148,7 +149,7 @@ namespace dlib
                           (i.e. if this expression has different dimensions than item then
                           we have destructive aliasing)
 
-                    - returns true if the following expression would evaluate incorrectly:
+                    - returns true if the following assignment would evaluate incorrectly:
                       for (long r = 0; r < nr(); ++r)
                         for (long c = 0; c < nc(); ++c)
                           item(r,c) = (*this)(r,c)

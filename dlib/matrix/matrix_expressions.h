@@ -102,34 +102,34 @@ namespace dlib
 
     struct has_destructive_aliasing
     {
-        template <typename M, typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename M, typename U>
         static bool destructively_aliases (
             const M& m,
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) { return m.aliases(item); }
 
-        template <typename M1, typename M2, typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename M1, typename M2, typename U>
         static bool destructively_aliases (
             const M1& m1,
             const M2& m2,
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) { return m1.aliases(item) || m2.aliases(item) ; }
 
-        template <typename M1, typename M2, typename M3, typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename M1, typename M2, typename M3, typename U>
         static bool destructively_aliases (
             const M1& m1,
             const M2& m2,
             const M3& m3,
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) { return m1.aliases(item) || m2.aliases(item) || m3.aliases(item); }
 
-        template <typename M1, typename M2, typename M3, typename M4, typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename M1, typename M2, typename M3, typename M4, typename U>
         static bool destructively_aliases (
             const M1& m1,
             const M2& m2,
             const M3& m3,
             const M4& m4,
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) { return m1.aliases(item) || m2.aliases(item) || m3.aliases(item) || m4.aliases(item); }
     };
 
@@ -137,34 +137,34 @@ namespace dlib
 
     struct has_nondestructive_aliasing
     {
-        template <typename M, typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename M, typename U>
         static bool destructively_aliases (
             const M& m,
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) { return m.destructively_aliases(item); }
 
-        template <typename M1, typename M2, typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename M1, typename M2, typename U>
         static bool destructively_aliases (
             const M1& m1,
             const M2& m2,
-            const matrix<U,iNR,iNC, MM, L>& item
+            const matrix_exp<U>& item
         ) { return m1.destructively_aliases(item) || m2.destructively_aliases(item) ; }
 
-        template <typename M1, typename M2, typename M3, typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename M1, typename M2, typename M3, typename U>
         static bool destructively_aliases (
             const M1& m1,
             const M2& m2,
             const M3& m3,
-            const matrix<U,iNR,iNC, MM, L>& item
+            const matrix_exp<U>& item
         ) { return m1.destructively_aliases(item) || m2.destructively_aliases(item) || m3.destructively_aliases(item) ; }
 
-        template <typename M1, typename M2, typename M3, typename M4, typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename M1, typename M2, typename M3, typename M4, typename U>
         static bool destructively_aliases (
             const M1& m1,
             const M2& m2,
             const M3& m3,
             const M4& m4,
-            const matrix<U,iNR,iNC, MM, L>& item
+            const matrix<U>& item
         ) { return m1.destructively_aliases(item) || 
                    m2.destructively_aliases(item) || 
                    m3.destructively_aliases(item) || 
@@ -261,14 +261,14 @@ namespace dlib
         const typename OP::type operator() ( long i ) const 
         { return matrix_exp<matrix_unary_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return OP::destructively_aliases(m,item); }
 
         long nr (
@@ -343,14 +343,14 @@ namespace dlib
         const typename OP::type operator() ( long i ) const 
         { return matrix_exp<matrix_scalar_binary_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return OP::destructively_aliases(m,item); }
 
         long nr (
@@ -428,14 +428,14 @@ namespace dlib
         const typename OP::type operator() ( long i ) const 
         { return matrix_exp<matrix_scalar_ternary_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L>
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return OP::destructively_aliases(m,item); }
 
         long nr (
@@ -510,14 +510,14 @@ namespace dlib
         const typename OP::type operator() ( long i ) const 
         { return matrix_exp<matrix_binary_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m1.aliases(item) || m2.aliases(item); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return OP::destructively_aliases(m1,m2,item); }
 
         long nr (
@@ -595,14 +595,14 @@ namespace dlib
         const typename OP::type operator() ( long i ) const 
         { return matrix_exp<matrix_ternary_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m1.aliases(item) || m2.aliases(item) || m3.aliases(item); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return OP::destructively_aliases(m1,m2,m3,item); }
 
         long nr (
@@ -684,14 +684,14 @@ namespace dlib
         const typename OP::type operator() ( long i ) const 
         { return matrix_exp<matrix_fourary_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m1.aliases(item) || m2.aliases(item) || m3.aliases(item) || m4.aliases(item); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return OP::destructively_aliases(m1,m2,m3,m4,item); }
 
         long nr (
@@ -763,14 +763,14 @@ namespace dlib
         const typename OP::type operator() ( long i ) const 
         { return matrix_exp<dynamic_matrix_scalar_unary_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
         long nr (
@@ -837,14 +837,14 @@ namespace dlib
         const typename OP::type operator() ( long i ) const 
         { return matrix_exp<matrix_scalar_unary_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
         long nr (
@@ -899,14 +899,14 @@ namespace dlib
         const typename OP::type operator() ( long i ) const 
         { return matrix_exp<matrix_zeroary_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return false; }
 
         long nr (
@@ -981,14 +981,14 @@ namespace dlib
         const typename M::type operator() ( long i ) const 
         { return matrix_exp<matrix_sub_range_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m.aliases(item) || rows.aliases(item) || cols.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m.aliases(item) || rows.aliases(item) || cols.aliases(item); }
 
         long nr (
@@ -1059,14 +1059,14 @@ namespace dlib
         const typename M::value_type& operator() ( long i ) const 
         { return m[i]; }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L>
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
         long nr (
@@ -1134,14 +1134,14 @@ namespace dlib
         const typename M::type& operator() ( long i ) const 
         { return m[i]; }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L>
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return false; }
 
         long nr (
@@ -1209,14 +1209,14 @@ namespace dlib
         const typename M::type operator() ( long i ) const 
         { return matrix_exp<matrix_array2d_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L>
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
         long nr (
@@ -1291,14 +1291,14 @@ namespace dlib
         const typename M::type operator() ( long i ) const 
         { return matrix_exp<matrix_sub_exp>::operator()(i); }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m.aliases(item); }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return m.aliases(item); }
 
         long nr (
@@ -1396,14 +1396,14 @@ namespace dlib
             long c
         ) const { return start + c*inc;  }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
         long nr (
@@ -1474,14 +1474,14 @@ namespace dlib
             long c
         ) const { return std::pow(10,start + c*inc);  }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& 
+            const matrix_exp<U>& 
         ) const { return false; }
 
         long nr (
@@ -1537,14 +1537,14 @@ namespace dlib
             long c
         ) const { return start + c*inc;  }
 
-        template <typename U, long iNR, long iNC , typename MM, typename L>
+        template <typename U>
         bool aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return false; }
 
-        template <typename U, long iNR, long iNC, typename MM, typename L >
+        template <typename U>
         bool destructively_aliases (
-            const matrix<U,iNR,iNC,MM,L>& item
+            const matrix_exp<U>& item
         ) const { return false; }
 
         long nr (
