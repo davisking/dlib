@@ -312,10 +312,6 @@ namespace dlib
         typedef typename conditional_matrix_temp<const LHS,lhs_is_costly == false>::type LHS_ref_type;
         typedef typename conditional_matrix_temp<const RHS,rhs_is_costly == false>::type RHS_ref_type;
 
-        matrix_multiply_exp (
-            const matrix_multiply_exp& item
-        ) : matrix_exp<matrix_multiply_exp>(*this), lhs(item.lhs), rhs(item.rhs) {}
-
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2>
@@ -473,10 +469,6 @@ namespace dlib
         const static long cost = matrix_traits<matrix_add_exp>::cost;
         typedef typename matrix_traits<matrix_add_exp>::layout_type layout_type;
 
-        matrix_add_exp (
-            const matrix_add_exp& item
-        ) : matrix_exp<matrix_add_exp>(*this), lhs(item.lhs), rhs(item.rhs) {}
-
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2>
@@ -582,9 +574,6 @@ namespace dlib
         const static long cost = matrix_traits<matrix_subtract_exp>::cost;
         typedef typename matrix_traits<matrix_subtract_exp>::layout_type layout_type;
 
-        matrix_subtract_exp (
-            const matrix_subtract_exp& item
-        ) : matrix_exp<matrix_subtract_exp>(*this), lhs(item.lhs), rhs(item.rhs) {}
 
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
@@ -690,9 +679,6 @@ namespace dlib
         const static long cost = matrix_traits<matrix_div_scal_exp>::cost;
         typedef typename matrix_traits<matrix_div_scal_exp>::layout_type layout_type;
 
-        matrix_div_scal_exp (
-            const matrix_div_scal_exp& item
-        ) : matrix_exp<matrix_div_scal_exp>(*this), m(item.m), s(item.s) {}
 
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
@@ -783,9 +769,6 @@ namespace dlib
         const static long cost = matrix_traits<matrix_mul_scal_exp>::cost;
         typedef typename matrix_traits<matrix_mul_scal_exp>::layout_type layout_type;
 
-        matrix_mul_scal_exp (
-            const matrix_mul_scal_exp& item
-        ) : matrix_exp<matrix_mul_scal_exp>(*this), m(item.m), s(item.s) {}
 
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
@@ -1106,7 +1089,7 @@ namespace dlib
 
         matrix (
             const matrix& m
-        ): matrix_exp<matrix>(*this) 
+        ) 
         {
             data.set_size(m.nr(),m.nc());
             matrix_assign(*this, m);
