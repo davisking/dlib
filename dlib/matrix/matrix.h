@@ -1089,7 +1089,7 @@ namespace dlib
 
         matrix (
             const matrix& m
-        ) 
+        ) : matrix_exp<matrix>(*this) 
         {
             data.set_size(m.nr(),m.nc());
             matrix_assign(*this, m);
@@ -1490,7 +1490,7 @@ namespace dlib
 
         template <typename U>
         bool aliases (
-            const matrix_exp<U>& item
+            const matrix_exp<U>& 
         ) const { return false; }
 
         bool aliases (
