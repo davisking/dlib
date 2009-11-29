@@ -108,14 +108,18 @@ namespace dlib
             const scalar_type kx = kernel(x,x);
             if (dictionary.size() == 0)
             {
-                // set initial state since this is the first sample we have seen
-                K_inv.set_size(1,1);
-                K_inv(0,0) = 1/kx;
+                // just ignore this sample if it is the zero vector (or really close to being zero)
+                if (std::abs(kx) > std::numeric_limits<scalar_type>::epsilon())
+                {
+                    // set initial state since this is the first sample we have seen
+                    K_inv.set_size(1,1);
+                    K_inv(0,0) = 1/kx;
 
-                K.set_size(1,1);
-                K(0,0) = kx;
+                    K.set_size(1,1);
+                    K(0,0) = kx;
 
-                dictionary.push_back(x);
+                    dictionary.push_back(x);
+                }
             }
             else
             {
