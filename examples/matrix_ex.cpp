@@ -138,7 +138,7 @@ int main()
     A = identity_matrix<double>(3);
 
     // MATLAB: B = ones(3,4)
-    B = uniform_matrix<double>(3,4, 1);
+    B = ones_matrix<double>(3,4);
 
     // MATLAB: B = rand(3,4)
     B = randm(3,4);
