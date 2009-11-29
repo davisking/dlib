@@ -379,8 +379,8 @@ namespace dlib
     USE_DEFAULT_BYTE_SERIALIZATION_FOR(signed char)
     USE_DEFAULT_BYTE_SERIALIZATION_FOR(unsigned char)
 
-    // Don't define serialization for wchar_t when using a version of visual studio
-    // older than 8.0 (visual studio 2005) since before then they improperly set
+    // Don't define serialization for wchar_t when using visual studio and
+    // _NATIVE_WCHAR_T_DEFINED isn't defined since if it isn't they improperly set
     // wchar_t to be a typedef rather than its own type as required by the C++ 
     // standard.
 #if !defined(_MSC_VER) || _NATIVE_WCHAR_T_DEFINED
