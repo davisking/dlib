@@ -41,7 +41,7 @@ int main(int argc, char** argv)
         test.get_dirs(dirs);
         test.get_files(files);
 
-        // sort the files and directorys
+        // sort the files and directories
         sort(files.begin(), files.end());
         sort(dirs.begin(), dirs.end());
 
@@ -62,11 +62,11 @@ int main(int argc, char** argv)
     }
     catch (file::file_not_found& e)
     {
-        cout << "file not found or accessable: " << e.info << endl;
+        cout << "file not found or accessible: " << e.info << endl;
     }
     catch (directory::dir_not_found& e)
     {
-        cout << "dir not found or accessable: " << e.info << endl;
+        cout << "dir not found or accessible: " << e.info << endl;
     }
     catch (directory::listing_error& e)
     {
