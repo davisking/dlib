@@ -29,7 +29,7 @@ Other:
 
 <!-- *******************************************************************************  -->
 
-<old name="17.23" date="Nov 13, 2009">
+<old name="17.23" date="Oct 20, 2009">
 New Stuff:
    - Added the pointer_to_column_vector function.
    - Added the BOBYQA algorithm for derivative-free optimization.
