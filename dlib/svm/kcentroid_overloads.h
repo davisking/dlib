@@ -253,8 +253,8 @@ namespace dlib
             if (samples_seen > 0)
             {
                 temp.b = squared_norm();
-                temp.support_vectors.set_size(1);
-                temp.support_vectors(0) = w;
+                temp.basis_vectors.set_size(1);
+                temp.basis_vectors(0) = w;
                 temp.alpha.set_size(1);
                 temp.alpha(0) = alpha;
             }
@@ -595,20 +595,20 @@ namespace dlib
                 if (std::abs(w_extra) > std::numeric_limits<scalar_type>::epsilon())
                 {
                     scale = (x_extra/w_extra);
-                    temp.support_vectors.set_size(1);
+                    temp.basis_vectors.set_size(1);
                     temp.alpha.set_size(1);
-                    temp.support_vectors(0) = w*scale;
+                    temp.basis_vectors(0) = w*scale;
                     temp.alpha(0) = alpha/scale;
                 }
                 else
                 {
                     // In this case w_extra is zero. So the only way we can get the same
-                    // thing in the output support vector set is by using two vectors
-                    temp.support_vectors.set_size(2);
+                    // thing in the output basis vector set is by using two vectors
+                    temp.basis_vectors.set_size(2);
                     temp.alpha.set_size(2);
-                    temp.support_vectors(0) = 2*w;
+                    temp.basis_vectors(0) = 2*w;
                     temp.alpha(0) = alpha;
-                    temp.support_vectors(1) = w;
+                    temp.basis_vectors(1) = w;
                     temp.alpha(1) = -alpha;
                 }
 
@@ -883,8 +883,8 @@ namespace dlib
             if (samples_seen > 0)
             {
                 temp.b = squared_norm();
-                temp.support_vectors.set_size(1);
-                temp.support_vectors(0) = sample_type(w.begin(), w.end());
+                temp.basis_vectors.set_size(1);
+                temp.basis_vectors(0) = sample_type(w.begin(), w.end());
                 temp.alpha.set_size(1);
                 temp.alpha(0) = alpha;
             }
@@ -1220,22 +1220,22 @@ namespace dlib
                 if (std::abs(w_extra) > std::numeric_limits<scalar_type>::epsilon())
                 {
                     scale = (x_extra/w_extra);
-                    temp.support_vectors.set_size(1);
+                    temp.basis_vectors.set_size(1);
                     temp.alpha.set_size(1);
-                    temp.support_vectors(0) = sample_type(w.begin(), w.end());
-                    sparse_vector::scale_by(temp.support_vectors(0), scale);
+                    temp.basis_vectors(0) = sample_type(w.begin(), w.end());
+                    sparse_vector::scale_by(temp.basis_vectors(0), scale);
                     temp.alpha(0) = alpha/scale;
                 }
                 else
                 {
                     // In this case w_extra is zero. So the only way we can get the same
-                    // thing in the output support vector set is by using two vectors
-                    temp.support_vectors.set_size(2);
+                    // thing in the output basis vector set is by using two vectors
+                    temp.basis_vectors.set_size(2);
                     temp.alpha.set_size(2);
-                    temp.support_vectors(0) = sample_type(w.begin(), w.end());
-                    sparse_vector::scale_by(temp.support_vectors(0), 2);
+                    temp.basis_vectors(0) = sample_type(w.begin(), w.end());
+                    sparse_vector::scale_by(temp.basis_vectors(0), 2);
                     temp.alpha(0) = alpha;
-                    temp.support_vectors(1) = sample_type(w.begin(), w.end());
+                    temp.basis_vectors(1) = sample_type(w.begin(), w.end());
                     temp.alpha(1) = -alpha;
                 }
 

@@ -378,9 +378,9 @@ namespace
         DLIB_TEST_MSG(mean(peg_cv) > 0.9, peg_cv);
         DLIB_TEST_MSG(mean(peg_c_cv) > 0.9, peg_c_cv);
 
-        const long num_sv = trainer.train(x,y).support_vectors.size();
+        const long num_sv = trainer.train(x,y).basis_vectors.size();
         print_spinner();
-        const long num_rv = rvm_trainer.train(x,y).support_vectors.size();
+        const long num_rv = rvm_trainer.train(x,y).basis_vectors.size();
         print_spinner();
         dlog << LDEBUG << "num sv: " << num_sv;
         dlog << LDEBUG << "num rv: " << num_rv;
@@ -394,14 +394,14 @@ namespace
         matrix<scalar_type> svm_reduced_error = test_binary_decision_function(df, x, y);
         print_spinner();
         dlog << LDEBUG << "svm reduced test error: " << svm_reduced_error;
-        dlog << LDEBUG << "svm reduced num sv: " << df.support_vectors.size();
+        dlog << LDEBUG << "svm reduced num sv: " << df.basis_vectors.size();
         DLIB_TEST(mean(svm_reduced_error) > 0.9);
 
         svm_cv = cross_validate_trainer(reduced(trainer,30), x,y, 4);
         dlog << LDEBUG << "svm reduced cv: " << svm_cv;
         DLIB_TEST_MSG(mean(svm_cv) > 0.9, svm_cv);
 
-        DLIB_TEST(df.support_vectors.size() == 19);
+        DLIB_TEST(df.basis_vectors.size() == 19);
         dlog << LINFO << "   end test_binary_classification()";
     }
 

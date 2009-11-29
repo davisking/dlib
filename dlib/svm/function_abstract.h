@@ -42,7 +42,7 @@ namespace dlib
         scalar_vector_type alpha;
         scalar_type        b;
         K                  kernel_function;
-        sample_vector_type support_vectors;
+        sample_vector_type basis_vectors;
 
         decision_function (
         );
@@ -50,7 +50,7 @@ namespace dlib
             ensures
                 - #b == 0
                 - #alpha.nr() == 0
-                - #support_vectors.nr() == 0
+                - #basis_vectors.nr() == 0
         !*/
 
         decision_function (
@@ -65,11 +65,11 @@ namespace dlib
             const scalar_vector_type& alpha_,
             const scalar_type& b_,
             const K& kernel_function_,
-            const sample_vector_type& support_vectors_
-        ) : alpha(alpha_), b(b_), kernel_function(kernel_function_), support_vectors(support_vectors_) {}
+            const sample_vector_type& basis_vectors_
+        ) : alpha(alpha_), b(b_), kernel_function(kernel_function_), basis_vectors(basis_vectors_) {}
         /*!
             ensures
-                - populates the decision function with the given support vectors, weights(i.e. alphas),
+                - populates the decision function with the given basis vectors, weights(i.e. alphas),
                   b term, and kernel function.
         !*/
 
@@ -93,7 +93,7 @@ namespace dlib
         {
             scalar_type temp = 0;
             for (long i = 0; i < alpha.nr(); ++i)
-                temp += alpha(i) * kernel_function(x,support_vectors(i));
+                temp += alpha(i) * kernel_function(x,basis_vectors(i));
 
             return temp - b;
         }
@@ -255,7 +255,7 @@ namespace dlib
         scalar_vector_type alpha;
         scalar_type        b;
         K                  kernel_function;
-        sample_vector_type support_vectors;
+        sample_vector_type basis_vectors;
 
         distance_function (
         );
@@ -263,7 +263,7 @@ namespace dlib
             ensures
                 - #b == 0
                 - #alpha.nr() == 0
-                - #support_vectors.nr() == 0
+                - #basis_vectors.nr() == 0
         !*/
 
         distance_function (
@@ -278,11 +278,11 @@ namespace dlib
             const scalar_vector_type& alpha_,
             const scalar_type& b_,
             const K& kernel_function_,
-            const sample_vector_type& support_vectors_
-        ) : alpha(alpha_), b(b_), kernel_function(kernel_function_), support_vectors(support_vectors_) {}
+            const sample_vector_type& basis_vectors_
+        ) : alpha(alpha_), b(b_), kernel_function(kernel_function_), basis_vectors(basis_vectors_) {}
         /*!
             ensures
-                - populates the decision function with the given support vectors, weights(i.e. alphas),
+                - populates the distance function with the given basis vectors, weights(i.e. alphas),
                   b term, and kernel function.
         !*/
 
@@ -301,15 +301,15 @@ namespace dlib
         /*!
             ensures
                 - Let O(x) represent the point x projected into kernel induced feature space.
-                - let c == sum alpha(i)*O(support_vectors(i)) == the point in kernel space that
+                - let c == sum alpha(i)*O(basis_vectors(i)) == the point in kernel space that
                   this object represents.
-                - Then this object returns the distance between the points O(x) and c in kernel
+                - Then this object returns the distance between the point O(x) and c in kernel
                   space. 
         !*/
         {
             scalar_type temp = 0;
             for (long i = 0; i < alpha.nr(); ++i)
-                temp += alpha(i) * kernel_function(x,support_vectors(i));
+                temp += alpha(i) * kernel_function(x,basis_vectors(i));
 
             temp = b + kernel_function(x,x) - 2*temp; 
             if (temp > 0)
@@ -329,7 +329,7 @@ namespace dlib
             scalar_type temp = 0;
             for (long i = 0; i < alpha.nr(); ++i)
                 for (long j = 0; j < x.alpha.nr(); ++j)
-                    temp += alpha(i)*x.alpha(j) * kernel_function(support_vectors(i), x.support_vectors(j));
+                    temp += alpha(i)*x.alpha(j) * kernel_function(basis_vectors(i), x.basis_vectors(j));
 
             temp = b + x.b - 2*temp;
             if (temp > 0)

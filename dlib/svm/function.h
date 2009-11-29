@@ -34,7 +34,7 @@ namespace dlib
         scalar_vector_type alpha;
         scalar_type b;
         K kernel_function;
-        sample_vector_type support_vectors;
+        sample_vector_type basis_vectors;
 
         decision_function (
         ) : b(0), kernel_function(K()) {}
@@ -45,19 +45,19 @@ namespace dlib
             alpha(d.alpha), 
             b(d.b),
             kernel_function(d.kernel_function),
-            support_vectors(d.support_vectors) 
+            basis_vectors(d.basis_vectors) 
         {}
 
         decision_function (
             const scalar_vector_type& alpha_,
             const scalar_type& b_,
             const K& kernel_function_,
-            const sample_vector_type& support_vectors_
+            const sample_vector_type& basis_vectors_
         ) :
             alpha(alpha_),
             b(b_),
             kernel_function(kernel_function_),
-            support_vectors(support_vectors_)
+            basis_vectors(basis_vectors_)
         {}
 
         decision_function& operator= (
@@ -69,7 +69,7 @@ namespace dlib
                 alpha = d.alpha;
                 b = d.b;
                 kernel_function = d.kernel_function;
-                support_vectors = d.support_vectors;
+                basis_vectors = d.basis_vectors;
             }
             return *this;
         }
@@ -80,7 +80,7 @@ namespace dlib
         {
             scalar_type temp = 0;
             for (long i = 0; i < alpha.nr(); ++i)
-                temp += alpha(i) * kernel_function(x,support_vectors(i));
+                temp += alpha(i) * kernel_function(x,basis_vectors(i));
 
             return temp - b;
         }
@@ -99,7 +99,7 @@ namespace dlib
             serialize(item.alpha, out);
             serialize(item.b,     out);
             serialize(item.kernel_function, out);
-            serialize(item.support_vectors, out);
+            serialize(item.basis_vectors, out);
         }
         catch (serialization_error e)
         { 
@@ -120,7 +120,7 @@ namespace dlib
             deserialize(item.alpha, in);
             deserialize(item.b, in);
             deserialize(item.kernel_function, in);
-            deserialize(item.support_vectors, in);
+            deserialize(item.basis_vectors, in);
         }
         catch (serialization_error e)
         { 
@@ -246,7 +246,7 @@ namespace dlib
         scalar_vector_type alpha;
         scalar_type b;
         K kernel_function;
-        sample_vector_type support_vectors;
+        sample_vector_type basis_vectors;
 
         distance_function (
         ) : b(0), kernel_function(K()) {}
@@ -257,19 +257,19 @@ namespace dlib
             alpha(d.alpha), 
             b(d.b),
             kernel_function(d.kernel_function),
-            support_vectors(d.support_vectors) 
+            basis_vectors(d.basis_vectors) 
         {}
 
         distance_function (
             const scalar_vector_type& alpha_,
             const scalar_type& b_,
             const K& kernel_function_,
-            const sample_vector_type& support_vectors_
+            const sample_vector_type& basis_vectors_
         ) :
             alpha(alpha_),
             b(b_),
             kernel_function(kernel_function_),
-            support_vectors(support_vectors_)
+            basis_vectors(basis_vectors_)
         {}
 
         distance_function& operator= (
@@ -281,7 +281,7 @@ namespace dlib
                 alpha = d.alpha;
                 b = d.b;
                 kernel_function = d.kernel_function;
-                support_vectors = d.support_vectors;
+                basis_vectors = d.basis_vectors;
             }
             return *this;
         }
@@ -292,7 +292,7 @@ namespace dlib
         {
             scalar_type temp = 0;
             for (long i = 0; i < alpha.nr(); ++i)
-                temp += alpha(i) * kernel_function(x,support_vectors(i));
+                temp += alpha(i) * kernel_function(x,basis_vectors(i));
 
             temp = b + kernel_function(x,x) - 2*temp; 
             if (temp > 0)
@@ -308,7 +308,7 @@ namespace dlib
             scalar_type temp = 0;
             for (long i = 0; i < alpha.nr(); ++i)
                 for (long j = 0; j < x.alpha.nr(); ++j)
-                    temp += alpha(i)*x.alpha(j) * kernel_function(support_vectors(i), x.support_vectors(j));
+                    temp += alpha(i)*x.alpha(j) * kernel_function(basis_vectors(i), x.basis_vectors(j));
 
             temp = b + x.b - 2*temp;
             if (temp > 0)
@@ -331,7 +331,7 @@ namespace dlib
             serialize(item.alpha, out);
             serialize(item.b,     out);
             serialize(item.kernel_function, out);
-            serialize(item.support_vectors, out);
+            serialize(item.basis_vectors, out);
         }
         catch (serialization_error e)
         { 
@@ -352,7 +352,7 @@ namespace dlib
             deserialize(item.alpha, in);
             deserialize(item.b, in);
             deserialize(item.kernel_function, in);
-            deserialize(item.support_vectors, in);
+            deserialize(item.basis_vectors, in);
         }
         catch (serialization_error e)
         { 

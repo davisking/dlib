@@ -117,7 +117,7 @@ namespace dlib
             {
                 for (long c = 0; c < K.nc(); ++c)
                 {
-                    K(r,c) = kernel(lisf[r], dec_funct.support_vectors(c));
+                    K(r,c) = kernel(lisf[r], dec_funct.basis_vectors(c));
                 }
             }
 
@@ -255,7 +255,7 @@ namespace dlib
                     for (long j = 0; j < dec_funct.alpha.size(); ++j)
                     {
                         bias += dec_funct.alpha(i)*dec_funct.alpha(j)*
-                            k(dec_funct.support_vectors(i), dec_funct.support_vectors(j));
+                            k(dec_funct.basis_vectors(i), dec_funct.basis_vectors(j));
                     }
                 }
             }
@@ -332,9 +332,9 @@ namespace dlib
                 double temp = 0;
                 for (long i = 0; i < out_vectors.size(); ++i)
                 {
-                    for (long j = 0; j < dec_funct.support_vectors.nr(); ++j)
+                    for (long j = 0; j < dec_funct.basis_vectors.nr(); ++j)
                     {
-                        temp -= b(i)*dec_funct.alpha(j)*k(out_vectors(i), dec_funct.support_vectors(j));
+                        temp -= b(i)*dec_funct.alpha(j)*k(out_vectors(i), dec_funct.basis_vectors(j));
                     }
                 }
 
@@ -436,9 +436,9 @@ namespace dlib
                 }
                 for (long i = 0; i < out_vectors.size(); ++i)
                 {
-                    for (long j = 0; j < dec_funct.support_vectors.size(); ++j)
+                    for (long j = 0; j < dec_funct.basis_vectors.size(); ++j)
                     {
-                        res(i) -= dec_funct.alpha(j)*k(out_vectors(i), dec_funct.support_vectors(j)); 
+                        res(i) -= dec_funct.alpha(j)*k(out_vectors(i), dec_funct.basis_vectors(j)); 
                     }
                 }
 
@@ -454,9 +454,9 @@ namespace dlib
                     {
                         temp += b(j)*K_der(out_vectors(j), out_vectors(i));
                     }
-                    for (long j = 0; j < dec_funct.support_vectors.nr(); ++j)
+                    for (long j = 0; j < dec_funct.basis_vectors.nr(); ++j)
                     {
-                        temp -= dec_funct.alpha(j)*K_der(dec_funct.support_vectors(j), out_vectors(i) );
+                        temp -= dec_funct.alpha(j)*K_der(dec_funct.basis_vectors(j), out_vectors(i) );
                     }
 
                     // store the gradient for out_vectors[i] into result in the proper spot
@@ -529,7 +529,7 @@ namespace dlib
             {
                 for (long c = 0; c < K.nc(); ++c)
                 {
-                    K(r,c) = kernel(lisf[r], dec_funct.support_vectors(c));
+                    K(r,c) = kernel(lisf[r], dec_funct.basis_vectors(c));
                 }
             }
 
@@ -556,7 +556,7 @@ namespace dlib
 
 
             // Do a final reoptimization of beta just to make sure it is optimal given the new
-            // set of support vectors.
+            // set of basis vectors.
             for (long r = 0; r < K_inv.nr(); ++r)
             {
                 for (long c = 0; c < K_inv.nc(); ++c)
@@ -569,7 +569,7 @@ namespace dlib
             {
                 for (long c = 0; c < K.nc(); ++c)
                 {
-                    K(r,c) = kernel(out_vectors(r), dec_funct.support_vectors(c));
+                    K(r,c) = kernel(out_vectors(r), dec_funct.basis_vectors(c));
                 }
             }
 

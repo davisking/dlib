@@ -248,7 +248,7 @@ namespace dlib
         ) const
         {
             distance_function<offset_kernel<kernel_type> > df = w.get_distance_function();
-            return decision_function<kernel_type>(df.alpha, -tau*sum(df.alpha), kernel, df.support_vectors);
+            return decision_function<kernel_type>(df.alpha, -tau*sum(df.alpha), kernel, df.basis_vectors);
         }
 
         void swap (
@@ -572,7 +572,7 @@ namespace dlib
             {
                 decision_function<kernel_type> df = my_trainer.get_decision_function();
                 std::cout << "\rbatch_trainer(): Percent complete: 100           " << std::endl;
-                std::cout << "    Num sv: " << df.support_vectors.size() << std::endl;
+                std::cout << "    Num sv: " << df.basis_vectors.size() << std::endl;
                 std::cout << "    bias:   " << df.b << std::endl;
                 return df;
             }
@@ -632,14 +632,14 @@ namespace dlib
                 cached_df = my_trainer.get_decision_function();
 
                 std::cout << "\rbatch_trainer(): Percent complete: 100           " << std::endl;
-                std::cout << "    Num sv: " << cached_df.support_vectors.size() << std::endl;
+                std::cout << "    Num sv: " << cached_df.basis_vectors.size() << std::endl;
                 std::cout << "    bias:   " << cached_df.b << std::endl;
 
                 return decision_function<kernel_type> (
                         cached_df.alpha,
                         cached_df.b,
                         trainer.get_kernel(),
-                        rowm(x, cached_df.support_vectors)
+                        rowm(x, cached_df.basis_vectors)
                         );
             }
             else
@@ -651,7 +651,7 @@ namespace dlib
                         cached_df.alpha,
                         cached_df.b,
                         trainer.get_kernel(),
-                        rowm(x, cached_df.support_vectors)
+                        rowm(x, cached_df.basis_vectors)
                         );
             }
         }

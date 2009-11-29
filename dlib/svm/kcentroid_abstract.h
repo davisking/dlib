@@ -93,9 +93,9 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the maximum number of dictionary vectors (i.e. support 
-                  vectors) this object will use at a time.  That is, dictionary_size() 
-                  will never be greater than max_dictionary_size().
+                - returns the maximum number of dictionary vectors this object will 
+                  use at a time.  That is, dictionary_size() will never be greater 
+                  than max_dictionary_size().
         !*/
 
         bool remove_oldest_first (
@@ -122,7 +122,9 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of "support vectors" in the dictionary.  
+                - returns the number of basis vectors in the dictionary.  These are
+                  the basis vectors used by this object to represent a point in kernel
+                  feature space.
         !*/
 
         scalar_type samples_trained (
@@ -140,11 +142,11 @@ namespace dlib
                   test used for sparsification (see the KRLS paper for details).  This is 
                   a number which governs how accurately this object will approximate the 
                   centroid it is learning.  Smaller values generally result in a more 
-                  accurate estimate while also resulting in a bigger set of support 
-                  vectors in the learned dictionary.  Bigger tolerances values result in 
-                  a less accurate estimate but also in less support vectors.  (Note
-                  that in any case, the max_dictionary_size() limits the number
-                  of support vectors no matter the setting of the tolerance)
+                  accurate estimate while also resulting in a bigger set of vectors in 
+                  the dictionary.  Bigger tolerances values result in a less accurate 
+                  estimate but also in less dictionary vectors.  (Note that in any case, 
+                  the max_dictionary_size() limits the number of dictionary vectors no 
+                  matter the setting of the tolerance)
         !*/
 
         void clear_dictionary (

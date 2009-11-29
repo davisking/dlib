@@ -75,7 +75,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the maximum number of centers (a.k.a. support_vectors in the 
+                - returns the maximum number of centers (a.k.a. basis_vectors in the 
                   trained decision_function) you will get when you train this object on data.
         !*/
 
