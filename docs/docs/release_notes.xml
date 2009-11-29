@@ -12,6 +12,25 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+   - Renamed the support_vectors member of the decision_function and
+     distance_function classes to basis_vectors.  This name more appropriately 
+     reflects how these two classes are used within the library.
+   - Changed the matrix_exp interface slightly.  This could only impact users
+     who created their own custom matrix expressions.  If you don't get a 
+     compiler error then you don't have to worry about it.
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.23" date="Nov 13, 2009">
+New Stuff:
    - Added the pointer_to_column_vector function.
    - Added the BOBYQA algorithm for derivative-free optimization.
    - Added some functions to make it easy to do a line search on a function
@@ -27,7 +46,7 @@ Other:
    - Added a model selection example program using grid search
      and the new BOBYQA algorithm.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
