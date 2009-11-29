@@ -144,7 +144,7 @@ int main()
 
     // print out the number of support vectors in the resulting decision function
     cout << "\nnumber of support vectors in our learned_function is " 
-         << learned_function.function.support_vectors.nr() << endl;
+         << learned_function.function.basis_vectors.nr() << endl;
 
     // now lets try this decision_function on some samples we haven't seen before 
     sample_type sample;
@@ -180,7 +180,7 @@ int main()
     // print out the number of support vectors in the resulting decision function.  
     // (it should be the same as in the one above)
     cout << "\nnumber of support vectors in our learned_pfunct is " 
-         << learned_pfunct.function.decision_funct.support_vectors.nr() << endl;
+         << learned_pfunct.function.decision_funct.basis_vectors.nr() << endl;
 
     sample(0) = 3.123;
     sample(1) = 2;

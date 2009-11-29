@@ -136,9 +136,9 @@ int main()
     learned_function.normalizer = normalizer;  // save normalization information
     learned_function.function = trainer.train(samples, labels); // perform the actual RVM training and save the results
 
-    // print out the number of support vectors in the resulting decision function
-    cout << "\nnumber of support vectors in our learned_function is " 
-         << learned_function.function.support_vectors.nr() << endl;
+    // print out the number of relevance vectors in the resulting decision function
+    cout << "\nnumber of relevance vectors in our learned_function is " 
+         << learned_function.function.basis_vectors.nr() << endl;
 
     // now lets try this decision_function on some samples we haven't seen before 
     sample_type sample;
@@ -171,10 +171,10 @@ int main()
     learned_pfunct.function = train_probabilistic_decision_function(trainer, samples, labels, 3);
     // Now we have a function that returns the probability that a given sample is of the +1 class.  
 
-    // print out the number of support vectors in the resulting decision function.  
+    // print out the number of relevance vectors in the resulting decision function.  
     // (it should be the same as in the one above)
-    cout << "\nnumber of support vectors in our learned_pfunct is " 
-         << learned_pfunct.function.decision_funct.support_vectors.nr() << endl;
+    cout << "\nnumber of relevance vectors in our learned_pfunct is " 
+         << learned_pfunct.function.decision_funct.basis_vectors.nr() << endl;
 
     sample(0) = 3.123;
     sample(1) = 2;

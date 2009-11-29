@@ -108,9 +108,9 @@ int main()
     // you need to set.  The first argument to the constructor is the kernel we wish to 
     // use.  The second is a parameter that determines the numerical accuracy with which 
     // the object will perform part of the ranking algorithm.  Generally, smaller values 
-    // give better results but cause the algorithm to attempt to use more support vectors 
+    // give better results but cause the algorithm to attempt to use more dictionary vectors 
     // (and thus run slower and use more memory).  The third argument, however, is the 
-    // maximum number of support vectors a kcentroid is allowed to use.  So you can use
+    // maximum number of dictionary vectors a kcentroid is allowed to use.  So you can use
     // it to put an upper limit on the runtime complexity.  
     kcentroid<kernel_type> kc(kernel_type(gamma), 0.001, 25);
 
