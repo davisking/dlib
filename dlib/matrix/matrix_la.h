@@ -118,7 +118,7 @@ namespace dlib
             COMPILE_TIME_ASSERT(rX == 0 || rX == 1);
 
             const T one = 1.0;
-            const long max_iter = 30;
+            const long max_iter = 300;
             const long n = a.nc();
             const long m = a.nr();
             const T eps = std::numeric_limits<T>::epsilon();
@@ -859,7 +859,7 @@ test_f_convergence:
 
             /* shift from bottom 2x2 minor */
             iter++;
-            if (iter > 30) 
+            if (iter > 300) 
             {
                 retval = k;
                 break;
