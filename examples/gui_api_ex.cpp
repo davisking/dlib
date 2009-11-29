@@ -196,6 +196,8 @@ int main()
     // wait until the user closes this window before we let the program 
     // terminate.
     my_window.wait_until_closed();
+
+    return 0;
 }
 
 //  ----------------------------------------------------------------------------
@@ -216,8 +218,7 @@ int WINAPI WinMain (
     int 
 )
 {
-    main();
-    return 0;
+    return main();
 }
 #endif
 
