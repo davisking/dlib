@@ -171,9 +171,33 @@ namespace dlib
 
         };
 
+        // Used only below.  They help strip off the const and & qualifiers that can show up 
+        // in the LHS_ref_type and RHS_ref_type typedefs.
+        template <typename T> struct noref{ typedef T type;};
+        template <typename T> struct noref<T&>{ typedef T type;}; 
+        template <typename T> struct noref<const T&>{ typedef T type;}; 
+        template <typename T> struct noref<const T>{ typedef T type;}; 
+
         template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout> 
         struct same_exp<matrix_multiply_exp<Tlhs,Trhs>, matrix_multiply_exp<Ulhs,Urhs>,layout > 
-        { const static bool value = same_exp<Tlhs,Ulhs,layout>::value && same_exp<Trhs,Urhs,layout>::value; };
+        { 
+            // The reason this case is more complex than the others is because the matrix_multiply_exp 
+            // will use a temporary matrix instead of Tlhs or Trhs in the event that one of these 
+            // types corresponds to an expensive expression.  So we have to use the type that really
+            // gets used.  The following typedefs are here to pick out that true type.
+            typedef typename matrix_multiply_exp<Tlhs,Trhs>::LHS_ref_type T_LHS_ref_type;
+            typedef typename matrix_multiply_exp<Tlhs,Trhs>::RHS_ref_type T_RHS_ref_type;
+            typedef typename noref<T_LHS_ref_type>::type T_lhs_type;
+            typedef typename noref<T_RHS_ref_type>::type T_rhs_type;
+
+            typedef typename matrix_multiply_exp<Ulhs,Urhs>::LHS_ref_type U_LHS_ref_type;
+            typedef typename matrix_multiply_exp<Ulhs,Urhs>::RHS_ref_type U_RHS_ref_type;
+            typedef typename noref<U_LHS_ref_type>::type U_lhs_type;
+            typedef typename noref<U_RHS_ref_type>::type U_rhs_type;
+
+            const static bool value = same_exp<T_lhs_type,U_lhs_type,layout>::value && 
+                                      same_exp<T_rhs_type,U_rhs_type,layout>::value; 
+        };
 
         template <typename Tlhs, typename Ulhs, typename Trhs, typename Urhs, typename layout> 
         struct same_exp<matrix_add_exp<Tlhs,Trhs>, matrix_add_exp<Ulhs,Urhs>, layout > 
