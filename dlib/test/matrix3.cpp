@@ -115,7 +115,7 @@ namespace
             matrix<type> at;
             at = trans(a);
 
-            matrix<complex<type> > c_a(rows,cols), c_at;
+            matrix<complex<type> > c_a(rows,cols), c_at, c_sqr;
             for (long r= 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -124,6 +124,9 @@ namespace
                 }
             }
             c_at = trans(c_a);
+            const int size = max(rows,cols);
+            c_sqr = 10*matrix_cast<complex<type> >(complex_matrix(randm(size,size,rnd), randm(size,size,rnd)));
+
 
             matrix<complex<type> > c_temp(cols,cols), c_temp2(cols,cols);
             const complex<type> i(0,1);
@@ -188,10 +191,22 @@ namespace
 
             print_spinner();
             c_check_equal(tmp(conj(trans(c_a))*c_a),   trans(conj(c_a))*c_a);
+            dlog << LTRACE << "1.5.1";
             c_check_equal(tmp(trans(conj(trans(c_a))*c_a)),   trans(trans(conj(c_a))*c_a));
+            dlog << LTRACE << "1.5.2";
+            c_check_equal(tmp((conj(trans(c_sqr))*trans(c_sqr))),   (trans(conj(c_sqr))*trans(c_sqr)));
+            dlog << LTRACE << "1.5.3";
+            c_check_equal(tmp(trans(conj(trans(c_sqr))*trans(c_sqr))),   trans(trans(conj(c_sqr))*trans(c_sqr)));
             dlog << LTRACE << "1.6";
             c_check_equal(tmp(c_at*trans(conj(c_at))),   c_at*conj(trans(c_at)));
+            dlog << LTRACE << "1.6.1";
             c_check_equal(tmp(trans(c_at*trans(conj(c_at)))),   trans(c_at*conj(trans(c_at))));
+            dlog << LTRACE << "1.6.2";
+            c_check_equal(tmp((c_sqr)*trans(conj(c_sqr))),   (c_sqr)*conj(trans(c_sqr)));
+            dlog << LTRACE << "1.6.2.1";
+            c_check_equal(tmp(trans(c_sqr)*trans(conj(c_sqr))),   trans(c_sqr)*conj(trans(c_sqr)));
+            dlog << LTRACE << "1.6.3";
+            c_check_equal(tmp(trans(trans(c_sqr)*trans(conj(c_sqr)))),   trans(trans(c_sqr)*conj(trans(c_sqr))));
             dlog << LTRACE << "1.7";
             c_check_equal(tmp(conj(trans(c_at))*trans(conj(c_a))),  conj(trans(c_at))*trans(conj(c_a)));
             c_check_equal(tmp(trans(conj(trans(c_at))*trans(conj(c_a)))), trans(conj(trans(c_at))*trans(conj(c_a))));
@@ -280,6 +295,16 @@ namespace
             c_check_equal(tmp(conj(trans(c_a))*trans(c_rv3)),  trans(conj(c_a))*trans(c_rv3));
             c_check_equal(tmp(c_rv4*conj(c_at)),  c_rv4*conj(c_at));
             c_check_equal(tmp(trans(c_cv4)*conj(c_at)),  trans(c_cv4)*conj(c_at));
+
+            dlog << LTRACE << "2.00";
+
+            c_check_equal(tmp(trans(trans(conj(c_a))*c_cv3)),           trans(trans(conj(c_a))*c_cv3));
+            c_check_equal(tmp(trans(c_rv4*trans(conj(c_a)))),           trans(c_rv4*trans(conj(c_a))));
+            c_check_equal(tmp(trans(trans(c_cv3)*trans(conj(c_at)))),   trans(trans(c_cv3)*trans(conj(c_at))));
+            dlog << LTRACE << "2.20";
+            c_check_equal(tmp(trans(conj(trans(c_a))*trans(c_rv3))),    trans(trans(conj(c_a))*trans(c_rv3)));
+            c_check_equal(tmp(trans(c_rv4*conj(c_at))),                 trans(c_rv4*conj(c_at)));
+            c_check_equal(tmp(trans(trans(c_cv4)*conj(c_at))),          trans(trans(c_cv4)*conj(c_at)));
 
 
 
@@ -436,7 +461,61 @@ namespace
             assign_no_blas(c_temp2, c_temp2 + trans(c_rv4)*trans(conj(c_cv4)));
             c_check_equal(c_temp, c_temp2);
 
+
+            dlog << LTRACE << "9.4";
+            c_temp += conj(c_cv4)*c_rv4;
+            assign_no_blas(c_temp2, c_temp2 + conj(c_cv4)*c_rv4);
+            c_check_equal(c_temp, c_temp2);
+            dlog << LTRACE << "9.5";
+            c_temp += conj(c_cv4)*conj(c_rv4);
+            assign_no_blas(c_temp2, c_temp2 + conj(c_cv4)*conj(c_rv4));
+            c_check_equal(c_temp, c_temp2);
+            dlog << LTRACE << "9.6";
+            c_temp = conj(c_cv4)*conj(c_rv4) + c_temp;
+            assign_no_blas(c_temp2, c_temp2 + conj(c_cv4)*conj(c_rv4));
+            c_check_equal(c_temp, c_temp2);
+            dlog << LTRACE << "9.7";
+            c_temp = conj(trans(c_rv4))*trans(conj(c_cv4)) + c_temp;
+            assign_no_blas(c_temp2, c_temp2 + conj(trans(c_rv4))*trans(conj(c_cv4)));
+            c_check_equal(c_temp, c_temp2);
+
+
             dlog << LTRACE << "10";
+            c_temp += trans(c_cv4*c_rv4);
+            assign_no_blas(c_temp2, c_temp2 + trans(c_cv4*c_rv4));
+            c_check_equal(c_temp, c_temp2);
+            dlog << LTRACE << "10.1";
+            c_temp += trans(c_cv4*conj(c_rv4));
+            assign_no_blas(c_temp2, c_temp2 + trans(c_cv4*conj(c_rv4)));
+            c_check_equal(c_temp, c_temp2);
+            dlog << LTRACE << "10.2";
+            c_temp = trans(c_cv4*conj(c_rv4)) + c_temp;
+            assign_no_blas(c_temp2, c_temp2 + trans(c_cv4*conj(c_rv4)));
+            c_check_equal(c_temp, c_temp2);
+            dlog << LTRACE << "10.3";
+            c_temp = trans(trans(c_rv4)*trans(conj(c_cv4))) + c_temp;
+            assign_no_blas(c_temp2, c_temp2 + trans(trans(c_rv4)*trans(conj(c_cv4))));
+            c_check_equal(c_temp, c_temp2);
+
+
+            dlog << LTRACE << "10.4";
+            c_temp += trans(conj(c_cv4)*c_rv4);
+            assign_no_blas(c_temp2, c_temp2 + trans(conj(c_cv4)*c_rv4));
+            c_check_equal(c_temp, c_temp2);
+            dlog << LTRACE << "10.5";
+            c_temp += trans(conj(c_cv4)*conj(c_rv4));
+            assign_no_blas(c_temp2, c_temp2 + trans(conj(c_cv4)*conj(c_rv4)));
+            c_check_equal(c_temp, c_temp2);
+            dlog << LTRACE << "10.6";
+            c_temp = trans(conj(c_cv4)*conj(c_rv4)) + c_temp;
+            assign_no_blas(c_temp2, c_temp2 + trans(conj(c_cv4)*conj(c_rv4)));
+            c_check_equal(c_temp, c_temp2);
+            dlog << LTRACE << "10.7";
+            c_temp = trans(conj(trans(c_rv4))*trans(conj(c_cv4))) + c_temp;
+            assign_no_blas(c_temp2, c_temp2 + trans(conj(trans(c_rv4))*trans(conj(c_cv4))));
+            c_check_equal(c_temp, c_temp2);
+
+            dlog << LTRACE << "10.8";
 
 
             print_spinner();
@@ -449,6 +528,16 @@ namespace
             check_equal( tmp(trans(cv4)*3.9*trans(rv4)), trans(cv4)*3.9*trans(rv4));
             check_equal( tmp(rv4*cv4*3.9), rv4*3.9*cv4);
             check_equal( tmp(trans(cv4)*trans(rv4)*3.9), trans(cv4)*3.9*trans(rv4));
+
+
+            check_equal( tmp(trans(rv4*cv4)),                    trans(rv4*cv4));
+            check_equal( tmp(trans(trans(rv4*cv4))),             trans(trans(rv4*cv4)));
+            check_equal( tmp(trans(trans(cv4)*trans(rv4))),      trans(trans(cv4)*trans(rv4)));
+            check_equal( tmp(trans(rv4*3.9*cv4)),                trans(rv4*3.9*cv4));
+            check_equal( tmp(trans(trans(cv4)*3.9*trans(rv4))),  trans(trans(cv4)*3.9*trans(rv4)));
+            check_equal( tmp(trans(rv4*cv4*3.9)),                trans(rv4*3.9*cv4));
+            check_equal( tmp(trans(trans(cv4)*trans(rv4)*3.9)),  trans(trans(cv4)*3.9*trans(rv4)));
+
 
             temp.set_size(1,1);
             temp = 4;
