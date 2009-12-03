@@ -216,7 +216,7 @@ namespace dlib
     {
         if (add_to)
         {
-            if (alpha == 1)
+            if (alpha == static_cast<typename EXP2::type>(1))
             {
                 for (long c = 0; c < src.nc(); ++c)
                 {
@@ -226,7 +226,7 @@ namespace dlib
                     }
                 }
             }
-            else if (alpha == -1)
+            else if (alpha == static_cast<typename EXP2::type>(-1))
             {
                 for (long c = 0; c < src.nc(); ++c)
                 {
@@ -249,7 +249,7 @@ namespace dlib
         }
         else
         {
-            if (alpha == 1)
+            if (alpha == static_cast<typename EXP2::type>(1))
             {
                 for (long c = 0; c < src.nc(); ++c)
                 {

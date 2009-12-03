@@ -176,7 +176,7 @@ namespace dlib
             // a temporary 1x1 matrix so that the expression will encounter
             // all the overloads of matrix_assign() and have the chance to
             // go through any applicable optimizations.
-            matrix<type,1,1> temp(ref());
+            matrix<type,1,1,mem_manager_type,layout_type> temp(ref());
             return temp(0);
         }
 
@@ -266,8 +266,15 @@ namespace dlib
         const static long NR = LHS::NR;
         const static long NC = RHS::NC;
 
+#ifdef DLIB_USE_BLAS
+        // if there are BLAS functions to be called then we want to make sure we
+        // always evaluate any complex expressions so that the BLAS bindings can happen.
+        const static bool lhs_is_costly = (LHS::cost > 1)&&(RHS::NC != 1 || LHS::cost >= 10000);
+        const static bool rhs_is_costly = (RHS::cost > 1)&&(LHS::NR != 1 || RHS::cost >= 10000);
+#else
         const static bool lhs_is_costly = (LHS::cost > 4)&&(RHS::NC != 1);
         const static bool rhs_is_costly = (RHS::cost > 4)&&(LHS::NR != 1);
+#endif
 
         // Note that if we decide that one of the matrices is too costly we will evaluate it
         // into a temporary.  Doing this resets its cost back to 1.
