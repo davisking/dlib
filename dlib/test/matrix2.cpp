@@ -514,6 +514,7 @@ namespace
             set_all_elements(bt2,3);
 
             DLIB_TEST(trans(bt1)*bt2 == 18);
+            DLIB_TEST(trans(bt1)*bt2 != 19);
         }
         {
             matrix<float,3,1> bt1;
@@ -522,6 +523,7 @@ namespace
             set_all_elements(bt2,3);
 
             DLIB_TEST(trans(bt1)*bt2 == 18);
+            DLIB_TEST(trans(bt1)*bt2 != 19);
         }
         {
             matrix<float> bt1(3,1);
@@ -530,6 +532,7 @@ namespace
             set_all_elements(bt2,3);
 
             DLIB_TEST(trans(bt1)*bt2 == 18);
+            DLIB_TEST(trans(bt1)*bt2 != 19);
         }
         {
             matrix<float,3,1> bt1;
@@ -538,6 +541,7 @@ namespace
             set_all_elements(bt2,3);
 
             DLIB_TEST(trans(bt1)*bt2 == 18);
+            DLIB_TEST(trans(bt1)*bt2 != 19);
         }
 
 
