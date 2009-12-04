@@ -67,6 +67,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>krls</item>
          <item>kcentroid</item>
          <item>linearly_independent_subset_finder</item>
+         <item>empirical_kernel_map</item>
          <item>kkmeans</item>
          <item>svm_nu_trainer</item> 
          <item>rvm_trainer</item> 
@@ -363,6 +364,21 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 This object uses the Approximately Linearly Dependent metric described in the paper 
                 The Kernel Recursive Least Squares Algorithm by Yaakov Engel to decide which
                 points are more linearly independent than others.
+            </p>
+         </description>
+
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>empirical_kernel_map</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/empirical_kernel_map_abstract.h</spec_file>
+         <description>
+            <p>
+               TODO
             </p>
          </description>
 
