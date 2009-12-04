@@ -513,8 +513,10 @@ namespace
             set_all_elements(bt1,2);
             set_all_elements(bt2,3);
 
-            DLIB_TEST(trans(bt1)*bt2 == 18);
-            DLIB_TEST(trans(bt1)*bt2 != 19);
+			float val = trans(bt1)*bt2;
+            DLIB_TEST((float)(trans(bt1)*bt2) == 18);
+            DLIB_TEST((float)(trans(bt1)*bt2) != 19);
+			DLIB_TEST(val == 18);
         }
         {
             matrix<float,3,1> bt1;
@@ -522,8 +524,10 @@ namespace
             set_all_elements(bt1,2);
             set_all_elements(bt2,3);
 
-            DLIB_TEST(trans(bt1)*bt2 == 18);
-            DLIB_TEST(trans(bt1)*bt2 != 19);
+			float val = trans(bt1)*bt2;
+            DLIB_TEST((float)(trans(bt1)*bt2) == 18);
+            DLIB_TEST((float)(trans(bt1)*bt2) != 19);
+			DLIB_TEST(val == 18);
         }
         {
             matrix<float> bt1(3,1);
@@ -531,8 +535,10 @@ namespace
             set_all_elements(bt1,2);
             set_all_elements(bt2,3);
 
-            DLIB_TEST(trans(bt1)*bt2 == 18);
-            DLIB_TEST(trans(bt1)*bt2 != 19);
+			float val = trans(bt1)*bt2;
+            DLIB_TEST((float)(trans(bt1)*bt2) == 18);
+            DLIB_TEST((float)(trans(bt1)*bt2) != 19);
+			DLIB_TEST(val == 18);
         }
         {
             matrix<float,3,1> bt1;
@@ -540,8 +546,10 @@ namespace
             set_all_elements(bt1,2);
             set_all_elements(bt2,3);
 
-            DLIB_TEST(trans(bt1)*bt2 == 18);
-            DLIB_TEST(trans(bt1)*bt2 != 19);
+			float val = trans(bt1)*bt2;
+            DLIB_TEST((float)(trans(bt1)*bt2) == 18);
+            DLIB_TEST((float)(trans(bt1)*bt2) != 19);
+			DLIB_TEST(val == 18);
         }
 
 
