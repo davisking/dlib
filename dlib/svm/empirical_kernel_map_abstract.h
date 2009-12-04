@@ -20,7 +20,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON kern_type
-                - must be a kernel function object type as defined in dlib/svm/kernel_abstract.h
+                - must be a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             INITIAL VALUE
                 - out_vector_size() == 0
