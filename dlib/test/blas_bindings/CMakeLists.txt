@@ -17,6 +17,7 @@ set (tests
    blas_bindings_gemv.cpp
    blas_bindings_ger.cpp
    blas_bindings_dot.cpp
+   vector.cpp
    )
 
 # create a variable called target_name and set it to the string "test"
