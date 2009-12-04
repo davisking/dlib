@@ -129,6 +129,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>cross_validate_trainer_threaded</item> 
          <item>pick_initial_centers</item> 
          <item>find_gamma_with_big_centroid_gap</item> 
+         <item>kernel_matrix</item> 
       </section>
 
     </top>  
@@ -155,6 +156,21 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>kkmeans_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>kernel_matrix</name>
+         <file>dlib/svm.h</file>
+         <spec_file>dlib/svm/kernel_matrix_abstract.h</spec_file>
+         <description>
+            This is a simple set of functions that makes it easy to turn a kernel 
+            object and a set of samples into a kernel matrix.  It takes these two
+            things and returns a <a href="dlib/matrix/matrix_abstract.h.html#matrix_exp">matrix expression</a>
+            that represents the kernel matrix.
+         </description>
                                  
       </component>
 

@@ -111,6 +111,7 @@
          <term link="ml.html#mlp" name="multi-layer perceptron"/>
          <term link="ml.html#mlp" name="neural network"/>
          <term file="ml.html" name="svm_pegasos"/>
+         <term file="ml.html" name="kernel_matrix"/>
          <term file="ml.html" name="batch"/>
          <term file="ml.html" name="verbose_batch"/>
          <term file="ml.html" name="batch_cached"/>
