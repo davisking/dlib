@@ -165,7 +165,7 @@ namespace dlib
             COMPILE_TIME_ASSERT(NC == 1 || NC == 0);
             COMPILE_TIME_ASSERT(NR == 1 || NR == 0);
             DLIB_ASSERT(nr() == 1 && nc() == 1, 
-                "\tmatrix_exp::operator const type&() const"
+                "\tmatrix_exp::operator const type() const"
                 << "\n\tYou can only use this operator on a 1x1 matrix"
                 << "\n\tnr(): " << nr()
                 << "\n\tnc(): " << nc()
