@@ -806,6 +806,286 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+//                      Thresholding relational operators 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator< (
+        const matrix_exp& m,
+        const S& s
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (m(r,c) < s) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator< (
+        const S& s,
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (s < m(r,c)) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator<= (
+        const matrix_exp& m,
+        const S& s
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (m(r,c) <= s) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator<= (
+        const S& s,
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (s <= m(r,c)) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator> (
+        const matrix_exp& m,
+        const S& s
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (m(r,c) > s) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator> (
+        const S& s,
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (s > m(r,c)) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator>= (
+        const matrix_exp& m,
+        const S& s
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (m(r,c) >= s) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator>= (
+        const S& s,
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (s >= m(r,c)) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator== (
+        const matrix_exp& m,
+        const S& s
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (m(r,c) == s) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator== (
+        const S& s,
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (s == m(r,c)) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator!= (
+        const matrix_exp& m,
+        const S& s
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (m(r,c) != s) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename S>
+    const matrix_exp operator!= (
+        const S& s,
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - is_built_in_scalar_type<S>::value == true 
+            - is_built_in_scalar_type<matrix_exp::type>::value == true
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                    - if (s != m(r,c)) then
+                        - R(r,c) == 1
+                    - else
+                        - R(r,c) == 0
+                - i.e. R is a binary matrix of all 1s or 0s.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 //                              Statistics
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

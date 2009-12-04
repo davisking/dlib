@@ -698,6 +698,47 @@ namespace
             DLIB_TEST(pointer_to_column_vector(&v2[0], v.size()) != vector_to_matrix(v));
         }
 
+        {
+            matrix<double> a(3,3), b(3,3);
+            a = 1,   2.5, 1,
+                3,   4,   5,
+                0.5, 2.2, 3;
+
+            b = 0, 1, 0,
+                1, 1, 1,
+                0, 1, 1;
+
+            DLIB_TEST((a>1) == b);
+            DLIB_TEST((1<a) == b);
+
+            b = 1, 1, 1,
+                1, 1, 1,
+                0, 1, 1;
+
+            DLIB_TEST((a>=1) == b);
+            DLIB_TEST((1<=a) == b);
+
+            b = 0, 0, 0,
+                0, 0, 0,
+                0, 1, 0;
+            DLIB_TEST((a==2.2) == b);
+            DLIB_TEST((a!=2.2) == (b==0));
+            DLIB_TEST((2.2==a) == b);
+            DLIB_TEST((2.2!=a) == (0==b));
+
+            b = 0, 0, 0,
+                0, 0, 0,
+                1, 0, 0;
+            DLIB_TEST((a<1) == b);
+            DLIB_TEST((1>a) == b);
+
+            b = 1, 0, 1,
+                0, 0, 0,
+                1, 0, 0;
+            DLIB_TEST((a<=1) == b);
+            DLIB_TEST((1>=a) == b);
+        }
+
     }
 
 

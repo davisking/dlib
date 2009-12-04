@@ -939,6 +939,322 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    struct op_lessthan
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+1;
+            typedef typename EXP::type type;
+            template <typename M, typename S>
+            static type apply ( const M& m, const S& s, long r, long c)
+            { 
+                if (m(r,c) < s)
+                    return 1;
+                else
+                    return 0;
+            }
+        };
+    };
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_lessthan> >::type operator< (
+        const matrix_exp<EXP>& m,
+        const S& s
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_lessthan>(m.ref(),s);
+    }
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_lessthan> >::type operator> (
+        const S& s,
+        const matrix_exp<EXP>& m
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_lessthan>(m.ref(),s);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_lessthan_eq
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+1;
+            typedef typename EXP::type type;
+            template <typename M, typename S>
+            static type apply ( const M& m, const S& s, long r, long c)
+            { 
+                if (m(r,c) <= s)
+                    return 1;
+                else
+                    return 0;
+            }
+        };
+    };
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_lessthan_eq> >::type operator<= (
+        const matrix_exp<EXP>& m,
+        const S& s
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_lessthan_eq>(m.ref(),s);
+    }
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_lessthan_eq> >::type operator>= (
+        const S& s,
+        const matrix_exp<EXP>& m
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_lessthan_eq>(m.ref(),s);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_greaterthan
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+1;
+            typedef typename EXP::type type;
+            template <typename M, typename S>
+            static type apply ( const M& m, const S& s, long r, long c)
+            { 
+                if (m(r,c) > s)
+                    return 1;
+                else
+                    return 0;
+            }
+        };
+    };
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_greaterthan> >::type operator> (
+        const matrix_exp<EXP>& m,
+        const S& s
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_greaterthan>(m.ref(),s);
+    }
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_greaterthan> >::type operator< (
+        const S& s,
+        const matrix_exp<EXP>& m
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_greaterthan>(m.ref(),s);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_greaterthan_eq
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+1;
+            typedef typename EXP::type type;
+            template <typename M, typename S>
+            static type apply ( const M& m, const S& s, long r, long c)
+            { 
+                if (m(r,c) >= s)
+                    return 1;
+                else
+                    return 0;
+            }
+        };
+    };
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_greaterthan_eq> >::type operator>= (
+        const matrix_exp<EXP>& m,
+        const S& s
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_greaterthan_eq>(m.ref(),s);
+    }
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_greaterthan_eq> >::type operator<= (
+        const S& s,
+        const matrix_exp<EXP>& m
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_greaterthan_eq>(m.ref(),s);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_equal_to
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+1;
+            typedef typename EXP::type type;
+            template <typename M, typename S>
+            static type apply ( const M& m, const S& s, long r, long c)
+            { 
+                if (m(r,c) == s)
+                    return 1;
+                else
+                    return 0;
+            }
+        };
+    };
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_equal_to> >::type operator== (
+        const matrix_exp<EXP>& m,
+        const S& s
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_equal_to>(m.ref(),s);
+    }
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_equal_to> >::type operator== (
+        const S& s,
+        const matrix_exp<EXP>& m
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_equal_to>(m.ref(),s);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_not_equal_to
+    {
+        template <typename EXP>
+        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        {
+            const static long cost = EXP::cost+1;
+            typedef typename EXP::type type;
+            template <typename M, typename S>
+            static type apply ( const M& m, const S& s, long r, long c)
+            { 
+                if (m(r,c) != s)
+                    return 1;
+                else
+                    return 0;
+            }
+        };
+    };
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_not_equal_to> >::type operator!= (
+        const matrix_exp<EXP>& m,
+        const S& s
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_not_equal_to>(m.ref(),s);
+    }
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename enable_if<is_built_in_scalar_type<S>,matrix_scalar_binary_exp<EXP,S,op_not_equal_to> >::type operator!= (
+        const S& s,
+        const matrix_exp<EXP>& m
+    )
+    {
+        // you can only use this relational operator with the built in scalar types like
+        // long, float, etc...
+        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
+
+        return matrix_scalar_binary_exp<EXP,S, op_not_equal_to>(m.ref(),s);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename T,
