@@ -131,7 +131,7 @@ namespace
 
         template <typename matrix_type, typename cv_type, typename rv_type>
         void test_dot_stuff_conj(
-            matrix_type& m,
+            matrix_type& ,
             rv_type& rv,
             cv_type& cv
         ) const
