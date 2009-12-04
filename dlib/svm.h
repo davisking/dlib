@@ -18,6 +18,7 @@
 #include "svm/null_trainer.h"
 #include "svm/roc_trainer.h"
 #include "svm/kernel_matrix.h"
+#include "svm/empirical_kernel_map.h"
 
 #endif // DLIB_SVm_HEADER
 
