@@ -17,6 +17,7 @@
 #include "svm/sparse_kernel.h"
 #include "svm/null_trainer.h"
 #include "svm/roc_trainer.h"
+#include "svm/kernel_matrix.h"
 
 #endif // DLIB_SVm_HEADER
 
