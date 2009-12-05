@@ -379,7 +379,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <description>
             <p>
                 This object represents a map from objects of sample_type (the kind of object 
-                the <a href="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects">kernel function</a> 
+                a <a href="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects">kernel function</a> 
                 operates on) to finite dimensional column vectors which 
                 represent points in the kernel feature space defined by whatever kernel 
                 is used with this object. 
