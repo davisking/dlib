@@ -32,20 +32,20 @@ namespace dlib
         typedef typename trainer_type::trained_function_type trained_function_type;
 
         reduced_decision_function_trainer (
-        ) :num_sv(0) {}
+        ) :num_bv(0) {}
 
         reduced_decision_function_trainer (
             const trainer_type& trainer_,
-            const unsigned long num_sv_ 
+            const unsigned long num_sb_ 
         ) :
             trainer(trainer_),
-            num_sv(num_sv_)
+            num_bv(num_sb_)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(num_sv > 0,
+            DLIB_ASSERT(num_bv > 0,
                         "\t reduced_decision_function_trainer()"
                         << "\n\t you have given invalid arguments to this function"
-                        << "\n\t num_sv: " << num_sv 
+                        << "\n\t num_bv: " << num_bv 
             );
         }
 
@@ -59,10 +59,10 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(num_sv > 0,
+            DLIB_ASSERT(num_bv > 0,
                         "\t reduced_decision_function_trainer::train(x,y)"
                         << "\n\t You have tried to use an uninitialized version of this object"
-                        << "\n\t num_sv: " << num_sv );
+                        << "\n\t num_bv: " << num_bv );
             return do_train(vector_to_matrix(x), vector_to_matrix(y));
         }
 
@@ -82,8 +82,8 @@ namespace dlib
             // get the decision function object we are going to try and approximate
             const decision_function<kernel_type> dec_funct = trainer.train(x,y);
             
-            // now find a linearly independent subset of the training points of num_sv points.
-            linearly_independent_subset_finder<kernel_type> lisf(dec_funct.kernel_function, num_sv);
+            // now find a linearly independent subset of the training points of num_bv points.
+            linearly_independent_subset_finder<kernel_type> lisf(dec_funct.kernel_function, num_bv);
             for (long i = 0; i < x.nr(); ++i)
             {
                 lisf.add(x(i));
@@ -145,7 +145,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         trainer_type trainer;
-        unsigned long num_sv; 
+        unsigned long num_bv; 
 
 
     }; // end of class reduced_decision_function_trainer
@@ -153,17 +153,17 @@ namespace dlib
     template <typename trainer_type>
     const reduced_decision_function_trainer<trainer_type> reduced (
         const trainer_type& trainer,
-        const unsigned long num_sv
+        const unsigned long num_bv
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(num_sv > 0,
+        DLIB_ASSERT(num_bv > 0,
                     "\tconst reduced_decision_function_trainer reduced()"
                     << "\n\t you have given invalid arguments to this function"
-                    << "\n\t num_sv: " << num_sv 
+                    << "\n\t num_bv: " << num_bv 
         );
 
-        return reduced_decision_function_trainer<trainer_type>(trainer, num_sv);
+        return reduced_decision_function_trainer<trainer_type>(trainer, num_bv);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -183,23 +183,23 @@ namespace dlib
         typedef typename trainer_type::mem_manager_type mem_manager_type;
         typedef typename trainer_type::trained_function_type trained_function_type;
 
-        reduced_decision_function_trainer2 () : num_sv(0) {}
+        reduced_decision_function_trainer2 () : num_bv(0) {}
         reduced_decision_function_trainer2 (
             const trainer_type& trainer_,
-            const long num_sv_,
+            const long num_sb_,
             const double eps_ = 1e-3
         ) :
             trainer(trainer_),
-            num_sv(num_sv_),
+            num_bv(num_sb_),
             eps(eps_)
         {
             COMPILE_TIME_ASSERT(is_matrix<sample_type>::value);
 
             // make sure requires clause is not broken
-            DLIB_ASSERT(num_sv > 0 && eps > 0,
+            DLIB_ASSERT(num_bv > 0 && eps > 0,
                         "\t reduced_decision_function_trainer2()"
                         << "\n\t you have given invalid arguments to this function"
-                        << "\n\t num_sv: " << num_sv 
+                        << "\n\t num_bv: " << num_bv 
                         << "\n\t eps:    " << eps 
             );
         }
@@ -214,10 +214,10 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(num_sv > 0,
+            DLIB_ASSERT(num_bv > 0,
                         "\t reduced_decision_function_trainer2::train(x,y)"
                         << "\n\t You have tried to use an uninitialized version of this object"
-                        << "\n\t num_sv: " << num_sv );
+                        << "\n\t num_bv: " << num_bv );
             return do_train(vector_to_matrix(x), vector_to_matrix(y));
         }
 
@@ -494,8 +494,8 @@ namespace dlib
             // get the decision function object we are going to try and approximate
             const decision_function<kernel_type> dec_funct = trainer.train(x,y);
             
-            // now find a linearly independent subset of the training points of num_sv points.
-            linearly_independent_subset_finder<kernel_type> lisf(dec_funct.kernel_function, num_sv);
+            // now find a linearly independent subset of the training points of num_bv points.
+            linearly_independent_subset_finder<kernel_type> lisf(dec_funct.kernel_function, num_bv);
             for (long i = 0; i < x.nr(); ++i)
             {
                 lisf.add(x(i));
@@ -596,7 +596,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         trainer_type trainer;
-        long num_sv;
+        long num_bv;
         double eps;
 
 
@@ -605,21 +605,21 @@ namespace dlib
     template <typename trainer_type>
     const reduced_decision_function_trainer2<trainer_type> reduced2 (
         const trainer_type& trainer,
-        const long num_sv,
+        const long num_bv,
         double eps = 1e-3
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<typename trainer_type::sample_type>::value);
 
         // make sure requires clause is not broken
-        DLIB_ASSERT(num_sv > 0 && eps > 0,
+        DLIB_ASSERT(num_bv > 0 && eps > 0,
                     "\tconst reduced_decision_function_trainer2 reduced2()"
                     << "\n\t you have given invalid arguments to this function"
-                    << "\n\t num_sv: " << num_sv 
+                    << "\n\t num_bv: " << num_bv 
                     << "\n\t eps:    " << eps 
         );
 
-        return reduced_decision_function_trainer2<trainer_type>(trainer, num_sv, eps);
+        return reduced_decision_function_trainer2<trainer_type>(trainer, num_bv, eps);
     }
 
 // ----------------------------------------------------------------------------------------

@@ -26,12 +26,12 @@ namespace dlib
                 - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an implementation of a reduced set algorithm
-                for support vector decision functions.  This object acts as a post
-                processor for anything that creates decision_function objects.  It
-                wraps another trainer object and performs this reduced set post 
-                processing with the goal of representing the original decision 
-                function in a form that involves fewer support vectors.
+                This object represents an implementation of a reduced set algorithm.  
+                This object acts as a post processor for anything that creates 
+                decision_function objects.  It wraps another trainer object and 
+                performs this reduced set post processing with the goal of 
+                representing the original decision function in a form that 
+                involves fewer basis vectors.
         !*/
 
     public:
@@ -52,17 +52,17 @@ namespace dlib
 
         reduced_decision_function_trainer (
             const trainer_type& trainer,
-            const unsigned long num_sv 
+            const unsigned long num_bv 
         );
         /*!
             requires
-                - num_sv > 0
+                - num_bv > 0
             ensures
                 - returns a trainer object that applies post processing to the decision_function
                   objects created by the given trainer object with the goal of creating
-                  decision_function objects with fewer support vectors.
+                  decision_function objects with fewer basis vectors.
                 - The reduced decision functions that are output will have at most
-                  num_sv support vectors.
+                  num_bv basis vectors.
         !*/
 
         template <
@@ -92,11 +92,11 @@ namespace dlib
         >
     const reduced_decision_function_trainer<trainer_type> reduced (
         const trainer_type& trainer,
-        const unsigned long num_sv
-    ) { return reduced_decision_function_trainer<trainer_type>(trainer, num_sv); }
+        const unsigned long num_bv
+    ) { return reduced_decision_function_trainer<trainer_type>(trainer, num_bv); }
     /*!
         requires
-            - num_sv > 0
+            - num_bv > 0
             - trainer_type == some kind of batch trainer object that creates decision_function
               objects (e.g. svm_nu_trainer)
         ensures
@@ -120,12 +120,12 @@ namespace dlib
                 - kernel_derivative<trainer_type::kernel_type> must be defined
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an implementation of a reduced set algorithm
-                for support vector decision functions.  This object acts as a post
-                processor for anything that creates decision_function objects.  It
-                wraps another trainer object and performs this reduced set post 
-                processing with the goal of representing the original decision 
-                function in a form that involves fewer support vectors.
+                This object represents an implementation of a reduced set algorithm.  
+                This object acts as a post processor for anything that creates 
+                decision_function objects.  It wraps another trainer object and 
+                performs this reduced set post processing with the goal of 
+                representing the original decision function in a form that 
+                involves fewer basis vectors.
 
                 This object's implementation is the same as that in the above
                 reduced_decision_function_trainer object except it also performs 
@@ -152,19 +152,19 @@ namespace dlib
 
         reduced_decision_function_trainer2 (
             const trainer_type& trainer,
-            const unsigned long num_sv,
+            const unsigned long num_bv,
             double eps = 1e-3
         );
         /*!
             requires
-                - num_sv > 0
+                - num_bv > 0
                 - eps > 0
             ensures
                 - returns a trainer object that applies post processing to the decision_function
                   objects created by the given trainer object with the goal of creating
-                  decision_function objects with fewer support vectors.
+                  decision_function objects with fewer basis vectors.
                 - The reduced decision functions that are output will have at most
-                  num_sv support vectors.
+                  num_bv basis vectors.
                 - the gradient based optimization will continue until the change in the
                   objective function is less than eps.  So smaller values of eps will
                   give better results but take longer to compute.
@@ -197,12 +197,12 @@ namespace dlib
         >
     const reduced_decision_function_trainer2<trainer_type> reduced2 (
         const trainer_type& trainer,
-        const unsigned long num_sv,
+        const unsigned long num_bv,
         double eps = 1e-3
-    ) { return reduced_decision_function_trainer2<trainer_type>(trainer, num_sv, eps); }
+    ) { return reduced_decision_function_trainer2<trainer_type>(trainer, num_bv, eps); }
     /*!
         requires
-            - num_sv > 0
+            - num_bv > 0
             - trainer_type == some kind of batch trainer object that creates decision_function
               objects (e.g. svm_nu_trainer)
             - kernel_derivative<trainer_type::kernel_type> is defined
