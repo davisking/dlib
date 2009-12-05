@@ -28,7 +28,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a map from objects of sample_type (the kind of object 
-                the kernel function operates on) to finite dimensional column vectors which 
+                a kernel function operates on) to finite dimensional column vectors which 
                 represent points in the kernel feature space defined by whatever kernel 
                 is used with this object. 
 
