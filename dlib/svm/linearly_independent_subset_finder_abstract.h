@@ -44,6 +44,15 @@ namespace dlib
         typedef typename kernel_type::sample_type sample_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
+        linearly_independent_subset_finder (
+        );
+        /*!
+            ensures
+                - #minimum_tolerance() == 0.001 
+                - this object is properly initialized
+                - #get_kernel() == kernel_type()  (i.e. whatever the default is for the supplied kernel) 
+                - #max_dictionary_size() == 100 
+        !*/
 
         linearly_independent_subset_finder (
             const kernel_type& kernel_, 
