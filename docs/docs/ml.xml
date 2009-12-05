@@ -378,7 +378,36 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/empirical_kernel_map_abstract.h</spec_file>
          <description>
             <p>
-               TODO
+                This object represents a map from objects of sample_type (the kind of object 
+                the <a href="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects">kernel function</a> 
+                operates on) to finite dimensional column vectors which 
+                represent points in the kernel feature space defined by whatever kernel 
+                is used with this object. 
+            </p>
+
+            <p>
+                More precisely, to use this object you supply it with a particular kernel and 
+                a set of basis samples.  After that you can present it with new samples and it 
+                will project them into the part of kernel feature space spanned by your basis 
+                samples.   
+            </p>
+                
+            <p>
+                This means the empirical_kernel_map is a tool you can use to very easily kernelize 
+                any algorithm that operates on column vectors.  All you have to do is select a 
+                set of basis samples and then use the empirical_kernel_map to project all your 
+                data points into the part of kernel feature space spanned by those basis samples.
+                Then just run your normal algorithm on the output vectors and it will be effectively 
+                kernelized.  
+            </p>
+
+            <p>
+                Regarding methods to select a set of basis samples, if you are working with only a 
+                few thousand samples then you can just use all of them as basis samples.  
+                Alternatively, the 
+                <a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a> 
+                often works well for selecting a basis set.  Some people also find that picking a 
+                random subset works fine.
             </p>
          </description>
 
