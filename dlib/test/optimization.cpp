@@ -540,7 +540,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
-        DLIB_TEST(val == rosen(x));
+        DLIB_TEST(std::abs(val - rosen(x)) < 100*std::numeric_limits<double>::epsilon());
         dlog << LINFO << "find_min() lbfgs-20: got rosen in " << total_count;
 
 
