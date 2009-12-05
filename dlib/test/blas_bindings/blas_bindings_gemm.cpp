@@ -44,13 +44,14 @@ namespace
 
         template <typename matrix_type>
         void test_gemm_stuff(
-            matrix_type& a
+            const matrix_type& c
         ) const
         {
             using namespace dlib;
             using namespace dlib::blas_bindings;
 
-            matrix_type b;
+            matrix_type b, a;
+            a = c;
 
             counter_gemm() = 0;
             b = a*a;
@@ -71,41 +72,49 @@ namespace
             counter_gemm() = 0;
             b = a*a*a*a;
             DLIB_TEST(counter_gemm() == 3);
+            b = c;
 
             counter_gemm() = 0;
             a = a*a*a*a;
             DLIB_TEST(counter_gemm() == 3);
+            a = c;
 
             counter_gemm() = 0;
             a = (b + a*trans(a)*a*3*a)*trans(b);
             DLIB_TEST(counter_gemm() == 4);
+            a = c;
 
             counter_gemm() = 0;
             a = trans((trans(b) + trans(a)*trans(a)*a*3*a)*trans(b));
             DLIB_TEST(counter_gemm() == 4);
+            a = c;
 
             counter_gemm() = 0;
             a = trans((trans(b) + trans(a)*(a)*trans(a)*3*a)*trans(b));
             DLIB_TEST(counter_gemm() == 4);
+            a = c;
 
             counter_gemm() = 0;
             a = trans((trans(b) + trans(a)*(a + b)*trans(a)*3*a)*trans(b));
             DLIB_TEST_MSG(counter_gemm() == 4, counter_gemm());
+            a = c;
 
             counter_gemm() = 0;
             a = trans((trans(b) + trans(a)*(a*8 + b+b+b+b)*trans(a)*3*a)*trans(b));
             DLIB_TEST_MSG(counter_gemm() == 4, counter_gemm());
+            a = c;
         }
 
         template <typename matrix_type>
         void test_gemm_stuff_conj(
-            matrix_type& a
+            const matrix_type& c
         ) const
         {
             using namespace dlib;
             using namespace dlib::blas_bindings;
 
-            matrix_type b;
+            matrix_type b, a;
+            a = c;
 
             counter_gemm() = 0;
             b = a*conj(a);
@@ -126,30 +135,37 @@ namespace
             counter_gemm() = 0;
             b = a*a*conj(a)*a;
             DLIB_TEST(counter_gemm() == 3);
+            b = c;
 
             counter_gemm() = 0;
             a = a*trans(conj(a))*a*a;
             DLIB_TEST(counter_gemm() == 3);
+            a = c;
 
             counter_gemm() = 0;
             a = (b + a*trans(conj(a))*a*3*a)*trans(b);
             DLIB_TEST(counter_gemm() == 4);
+            a = c;
 
             counter_gemm() = 0;
             a = (trans((conj(trans(b)) + trans(a)*conj(trans(a))*a*3*a)*trans(b)));
             DLIB_TEST(counter_gemm() == 4);
+            a = c;
 
             counter_gemm() = 0;
             a = ((trans(b) + trans(a)*(a)*trans(a)*3*a)*trans(conj(b)));
             DLIB_TEST(counter_gemm() == 4);
+            a = c;
 
             counter_gemm() = 0;
             a = trans((trans(b) + trans(a)*conj(a + b)*trans(a)*3*a)*trans(b));
             DLIB_TEST_MSG(counter_gemm() == 4, counter_gemm());
+            a = c;
 
             counter_gemm() = 0;
             a = trans((trans(b) + trans(a)*(a*8 + b+b+b+b)*trans(a)*3*conj(a))*trans(b));
             DLIB_TEST_MSG(counter_gemm() == 4, counter_gemm());
+            a = c;
         }
 
         void perform_test (
@@ -158,18 +174,22 @@ namespace
             using namespace dlib;
             typedef dlib::memory_manager<char>::kernel_1a mm;
 
+            print_spinner();
+
             dlog << dlib::LINFO << "test double";
             {
                 matrix<double> a = randm(4,4);
                 test_gemm_stuff(a);
             }
 
+            print_spinner();
             dlog << dlib::LINFO << "test float";
             {
                 matrix<float> a = matrix_cast<float>(randm(4,4));
                 test_gemm_stuff(a);
             }
 
+            print_spinner();
             dlog << dlib::LINFO << "test complex<float>";
             {
                 matrix<float> a = matrix_cast<float>(randm(4,4));
@@ -179,6 +199,7 @@ namespace
                 test_gemm_stuff_conj(c);
             }
 
+            print_spinner();
             dlog << dlib::LINFO << "test complex<double>";
             {
                 matrix<double> a = matrix_cast<double>(randm(4,4));
@@ -189,6 +210,7 @@ namespace
             }
 
 
+            print_spinner();
 
             dlog << dlib::LINFO << "test double, column major";
             {
@@ -196,12 +218,14 @@ namespace
                 test_gemm_stuff(a);
             }
 
+            print_spinner();
             dlog << dlib::LINFO << "test float, column major";
             {
                 matrix<float,100,100,mm,column_major_layout> a = matrix_cast<float>(randm(100,100));
                 test_gemm_stuff(a);
             }
 
+            print_spinner();
             dlog << dlib::LINFO << "test complex<double>, column major";
             {
                 matrix<double,100,100,mm,column_major_layout> a = matrix_cast<double>(randm(100,100));
@@ -211,6 +235,7 @@ namespace
                 test_gemm_stuff_conj(c);
             }
 
+            print_spinner();
 
             dlog << dlib::LINFO << "test complex<float>, column major";
             {
