@@ -6,6 +6,7 @@
 #include <vector>
 #include "../matrix.h"
 #include "kernel_abstract.h"
+#include "function_abstract.h"
 #include <vector>
 
 namespace dlib

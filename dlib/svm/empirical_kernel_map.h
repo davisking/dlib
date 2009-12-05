@@ -8,6 +8,7 @@
 #include <vector>
 #include "../algs.h"
 #include "kernel_matrix.h"
+#include "function.h"
 
 namespace dlib
 {
