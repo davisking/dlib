@@ -31,22 +31,24 @@ namespace dlib
 
         void load(
             const kernel_type& kernel_,
-            const std::vector<sample_type>& samples
+            const std::vector<sample_type>& basis_samples
         )
         {
-            load(kernel_, vector_to_matrix(samples));
+            load(kernel_, vector_to_matrix(basis_samples));
         }
 
         template <typename EXP>
         void load(
             const kernel_type& kernel_,
-            const matrix_exp<EXP>& samples
+            const matrix_exp<EXP>& basis_samples
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(samples.size() > 0,
-                "\tvoid empirical_kernel_map::load(kernel,samples)"
-                << "\n\t You have to give a non-empty set of samples"
+            DLIB_ASSERT(basis_samples.size() > 0 && is_vector(basis_samples),
+                "\tvoid empirical_kernel_map::load(kernel,basis_samples)"
+                << "\n\t You have to give a non-empty set of basis_samples and it must be a vector"
+                << "\n\t basis_samples.size():     " << basis_samples.size() 
+                << "\n\t is_vector(basis_samples): " << is_vector(basis_samples) 
                 << "\n\t this: " << this
                 );
 
@@ -55,24 +57,24 @@ namespace dlib
             weights.set_size(0,0);
             kernel = kernel_;
             basis.clear();
-            basis.reserve(samples.size());
+            basis.reserve(basis_samples.size());
 
-            // find out the value of the largest norm of the elements in samples.
-            const scalar_type max_norm = max(diag(kernel_matrix(kernel, samples)));
+            // find out the value of the largest norm of the elements in basis_samples.
+            const scalar_type max_norm = max(diag(kernel_matrix(kernel, basis_samples)));
 
-            // Copy all the samples into basis but make sure we don't copy any samples
+            // Copy all the basis_samples into basis but make sure we don't copy any samples
             // that have length 0
-            for (long i = 0; i < samples.size(); ++i)
+            for (long i = 0; i < basis_samples.size(); ++i)
             {
-                const scalar_type norm = kernel(samples(i), samples(i));
+                const scalar_type norm = kernel(basis_samples(i), basis_samples(i));
                 if (norm > max_norm*std::numeric_limits<scalar_type>::epsilon())
                 {
-                    basis.push_back(samples(i));
+                    basis.push_back(basis_samples(i));
                 }
             }
 
             if (basis.size() == 0)
-                throw empirical_kernel_map_error("All samples given to empirical_kernel_map::load() were zero vectors");
+                throw empirical_kernel_map_error("All basis_samples given to empirical_kernel_map::load() were zero vectors");
 
             matrix<scalar_type,0,0,mem_manager_type> K(kernel_matrix(kernel, basis)), U,W,V;
 
@@ -103,6 +105,7 @@ namespace dlib
                     ++counter;
                 }
             }
+
         }
 
         const kernel_type get_kernel (
@@ -124,12 +127,48 @@ namespace dlib
             return weights.nr();
         }
 
+        template <typename EXP>
+        const decision_function<kernel_type> convert_to_decision_function (
+            const matrix<EXP>& vect
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(out_vector_size() != 0 && is_vector(vect) && out_vector_size() == vect.size(),
+                "\t const decision_function empirical_kernel_map::convert_to_decision_function()"
+                << "\n\t Invalid inputs to this function."
+                << "\n\t out_vector_size(): " << out_vector_size() 
+                << "\n\t is_vector(vect):   " << is_vector(vect) 
+                << "\n\t vect.size():       " << vect.size() 
+                << "\n\t this: " << this
+                );
+
+            return decision_function<kernel_type>(trans(weights)*vect, 0, kernel, vector_to_matrix(basis));
+        }
+
+        template <typename EXP>
+        const distance_function<kernel_type> convert_to_distance_function (
+            const matrix<EXP>& vect
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(out_vector_size() != 0 && is_vector(vect) && out_vector_size() == vect.size(),
+                "\t const distance_function empirical_kernel_map::convert_to_distance_function()"
+                << "\n\t Invalid inputs to this function."
+                << "\n\t out_vector_size(): " << out_vector_size() 
+                << "\n\t is_vector(vect):   " << is_vector(vect) 
+                << "\n\t vect.size():       " << vect.size() 
+                << "\n\t this: " << this
+                );
+
+            return distance_function<kernel_type>(trans(weights)*vect, dot(vect,vect), kernel, vector_to_matrix(basis));
+        }
+
         const matrix<scalar_type,0,1,mem_manager_type>& project (
             const sample_type& samp
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(out_vector_size() > 0,
+            DLIB_ASSERT(out_vector_size() != 0,
                 "\tconst matrix empirical_kernel_map::project()"
                 << "\n\t You have to load this object with data before you can call this function"
                 << "\n\t this: " << this
