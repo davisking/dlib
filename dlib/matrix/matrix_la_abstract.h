@@ -630,7 +630,7 @@ namespace dlib
                           All you need are the get_real_eigenvalues() and
                           get_pseudo_v() functions.  
                     - V*trans(V) should be equal to the identity matrix.  That is, all the
-                      eigenvectors in V should be linearly independent. 
+                      eigenvectors in V should be orthonormal. 
                         - So A == V*D*trans(V)
 
                 On the other hand, if A is not symmetric then:
