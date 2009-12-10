@@ -9,7 +9,7 @@
 
     The output from the program when the -h option is given is:
 
-        Usage: dclib_example (-c|-d|-l) --in input_file --out output_file
+        Usage: compress_stream_ex (-c|-d|-l) --in input_file --out output_file
         Options:
           -c            Indicates that we want to compress a file. 
           -d            Indicates that we want to decompress a file. 
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
         if (parser.option("h"))
         {
             // display all the command line options
-            cout << "Usage: dclib_example (-c|-d|-l) --in input_file --out output_file\n";
+            cout << "Usage: compress_stream_ex (-c|-d|-l) --in input_file --out output_file\n";
             // This function prints out a nicely formatted list of
             // all the options the parser has
             parser.print_options(cout); 
