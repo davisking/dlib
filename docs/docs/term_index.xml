@@ -112,6 +112,7 @@
          <term link="ml.html#mlp" name="neural network"/>
          <term file="ml.html" name="svm_pegasos"/>
          <term file="ml.html" name="empirical_kernel_map"/>
+         <term file="dlib/svm/empirical_kernel_map_abstract.h.html" name="empirical_kernel_map_error"/>
          <term file="ml.html" name="kernel_matrix"/>
          <term file="ml.html" name="batch"/>
          <term file="ml.html" name="verbose_batch"/>
@@ -139,6 +140,8 @@
          <term file="ml.html" name="linearly_independent_subset_finder"/>
          <term file="ml.html" name="vector_normalizer"/>
          <term file="ml.html" name="vector_normalizer_pca"/>
+         <term file="ml.html" name="discriminant_pca"/>
+         <term file="dlib/statistics/dpca_abstract.h.html" name="discriminant_pca_error"/>
          <term file="ml.html" name="kkmeans"/>
          <term file="ml.html" name="pick_initial_centers"/>
          <term file="ml.html" name="rank_features"/>

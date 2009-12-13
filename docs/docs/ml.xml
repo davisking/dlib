@@ -123,6 +123,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <name>Miscellaneous</name>
          <item>vector_normalizer</item> 
          <item>vector_normalizer_pca</item> 
+         <item>discriminant_pca</item> 
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
          <item>test_binary_decision_function</item> 
@@ -323,6 +324,22 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
 
       
+      <component>
+         <name>discriminant_pca</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/dpca_abstract.h</spec_file>
+         <description>
+                This object implements the Discriminant PCA technique described in the paper:
+                  <blockquote>
+                    A New Discriminant Principal Component Analysis Method with Partial Supervision
+                    by Dan Sun and Daoqiang Zhang
+                  </blockquote>
+         </description>
+
+      </component>
+      
+   <!-- ************************************************************************* -->
+
       <component>
          <name>vector_normalizer_pca</name>
          <file>dlib/statistics.h</file>
