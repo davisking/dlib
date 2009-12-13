@@ -4,6 +4,7 @@
 #define DLIB_STATISTICs_H_ 
 
 #include "statistics/statistics.h"
+#include "statistics/dpca.h"
 
 #endif // DLIB_STATISTICs_H_ 
 
