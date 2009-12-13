@@ -22,7 +22,6 @@ namespace dlib
                 Must be some type of dlib::matrix capable of representing a column vector.
 
             INITIAL VALUE
-                - dpca_matrix().size() == 0
                 - in_vector_size() == 0
                 - between_class_weight() == 1
                 - within_class_weight() == 1

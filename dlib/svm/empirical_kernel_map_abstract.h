@@ -189,6 +189,7 @@ namespace dlib
                 - is_vector(vect) == true
                 - vect.size() == out_vector_size()
                 - out_vector_size() != 0
+                - TODO premultiply_projections_by() hasn't been called
             ensures
                 - This function interprets the given vector as a point in the kernel feature space defined 
                   by this empirical_kernel_map.  The return value of this function is a distance 
