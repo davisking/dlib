@@ -164,6 +164,23 @@ namespace dlib
             return distance_function<kernel_type>(trans(weights)*vect, dot(vect,vect), kernel, vector_to_matrix(basis));
         }
 
+        template <typename EXP>
+        void premultiply_projections_by (
+            const matrix_exp<EXP>& mat
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(out_vector_size() != 0 && mat.nc() == out_vector_size(),
+                "\t void empirical_kernel_map::premultiply_projections_by()"
+                << "\n\t Invalid inputs to this function."
+                << "\n\t out_vector_size(): " << out_vector_size() 
+                << "\n\t mat.nc():          " << mat.nc() 
+                << "\n\t this: " << this
+                );
+
+            weights = mat*weights;
+        }
+
         const matrix<scalar_type,0,1,mem_manager_type>& project (
             const sample_type& samp
         ) const

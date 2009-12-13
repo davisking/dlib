@@ -122,6 +122,20 @@ namespace dlib
                     - returns 0
         !*/
 
+        template <typename EXP>
+        void premultiply_projections_by (
+            const matrix_exp<EXP>& mat
+        );
+        /*!
+            requires
+                - out_vector_size() != 0
+                - mat.nc() == out_vector_size()
+            ensures
+                - #out_vector_size() == mat.nr()
+                - TODO explain what this does.  introduce functions to get the
+                  weights and basis vectors and relate it to those.
+        !*/
+
         const matrix<scalar_type,0,1,mem_manager_type>& project (
             const sample_type& sample 
         ) const;
