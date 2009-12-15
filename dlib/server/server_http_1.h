@@ -102,7 +102,7 @@ namespace dlib
 
         unsigned char to_hex( unsigned char x ) const 
         {
-            return x + (x > 9 ? 'A' : '0');
+            return x + (x > 9 ? ('A'-10) : '0');
         }
 
         const std::string urlencode( const std::string& s ) const 
