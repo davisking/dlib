@@ -12,6 +12,7 @@
 #include "../serialize.h"
 #include "../rand.h"
 #include "../statistics.h"
+#include "kernel_matrix.h"
 
 namespace dlib
 {
@@ -101,7 +102,7 @@ namespace dlib
             serialize(item.kernel_function, out);
             serialize(item.basis_vectors, out);
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type decision_function"); 
         }
@@ -122,7 +123,7 @@ namespace dlib
             deserialize(item.kernel_function, in);
             deserialize(item.basis_vectors, in);
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while deserializing object of type decision_function"); 
         }
@@ -333,7 +334,7 @@ namespace dlib
             serialize(item.kernel_function, out);
             serialize(item.basis_vectors, out);
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type distance_function"); 
         }
@@ -354,7 +355,7 @@ namespace dlib
             deserialize(item.kernel_function, in);
             deserialize(item.basis_vectors, in);
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while deserializing object of type distance_function"); 
         }
@@ -410,7 +411,7 @@ namespace dlib
             serialize(item.normalizer, out);
             serialize(item.function,     out);
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type normalized_function"); 
         }
@@ -430,13 +431,107 @@ namespace dlib
             deserialize(item.normalizer, in);
             deserialize(item.function, in);
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while deserializing object of type normalized_function"); 
         }
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename K
+        >
+    struct projection_function 
+    {
+        typedef K kernel_type;
+        typedef typename K::scalar_type scalar_type;
+        typedef typename K::sample_type sample_type;
+        typedef typename K::mem_manager_type mem_manager_type;
+
+        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
+        typedef matrix<scalar_type,0,0,mem_manager_type> scalar_matrix_type;
+        typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
+
+        scalar_matrix_type weights;
+        K                  kernel_function;
+        sample_vector_type basis_vectors;
+
+        projection_function (
+        ) {}
+
+        projection_function (
+            const projection_function& f
+        ) : weights(f.weights), kernel_function(f.kernel_function), basis_vectors(f.basis_vectors) {}
+
+        projection_function (
+            const scalar_matrix_type& weights_,
+            const K& kernel_function_,
+            const sample_vector_type& basis_vectors_
+        ) : weights(weights_), kernel_function(kernel_function_), basis_vectors(basis_vectors_) {}
+
+        long out_vector_size (
+        ) const { return weights.nr(); }
+
+        const scalar_vector_type& operator() (
+            const sample_type& x
+        ) const
+        {
+            // Run the x sample through all the basis functions we have and then
+            // multiply it by the weights matrix and return the result.  Note that
+            // the temp vectors are here to avoid reallocating their memory every
+            // time this function is called.
+            temp1 = kernel_matrix(kernel_function, basis_vectors, x);
+            temp2 = weights*temp1;
+            return temp2;
+        }
+
+    private:
+        mutable scalar_vector_type temp1, temp2;
+    };
+
+    template <
+        typename K
+        >
+    void serialize (
+        const projection_function<K>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.weights, out);
+            serialize(item.kernel_function,     out);
+            serialize(item.basis_vectors,     out);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type projection_function"); 
+        }
+    }
+
+    template <
+        typename K
+        >
+    void deserialize (
+        projection_function<K>& item,
+        std::istream& in 
+    )
+    {
+        try
+        {
+            deserialize(item.weights, in);
+            deserialize(item.kernel_function,     in);
+            deserialize(item.basis_vectors,     in);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while deserializing object of type projection_function"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 
 }
 

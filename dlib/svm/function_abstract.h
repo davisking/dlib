@@ -463,6 +463,129 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename K
+        >
+    struct projection_function 
+    {
+        /*!
+            REQUIREMENTS ON K
+                K must be a kernel function object type as defined at the
+                top of dlib/svm/kernel_abstract.h
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a function that takes a data sample and projects
+                it into kernel feature space.  The result is a real valued column vector that 
+                represents a point in a kernel feature space.
+        !*/
+
+        typedef K kernel_type;
+        typedef typename K::scalar_type scalar_type;
+        typedef typename K::sample_type sample_type;
+        typedef typename K::mem_manager_type mem_manager_type;
+
+        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
+        typedef matrix<scalar_type,0,0,mem_manager_type> scalar_matrix_type;
+        typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
+
+        scalar_matrix_type weights;
+        K                  kernel_function;
+        sample_vector_type basis_vectors;
+
+        projection_function (
+        );
+        /*!
+            ensures
+                - #weights.size() == 0
+                - #basis_vectors.size() == 0
+        !*/
+
+        projection_function (
+            const projection_function& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
+        projection_function (
+            const scalar_matrix_type& weights_,
+            const K& kernel_function_,
+            const sample_vector_type& basis_vectors_
+        ) : weights(weights_), kernel_function(kernel_function_), basis_vectors(basis_vectors_) {}
+        /*!
+            ensures
+                - populates the projection function with the given basis vectors, weights,
+                  and kernel function.
+        !*/
+
+        projection_function& operator= (
+            const projection_function& d
+        );
+        /*!
+            ensures
+                - #*this is identical to d
+                - returns *this
+        !*/
+
+        long out_vector_size (
+        ) const;
+        /*!
+            ensures
+                - returns weights.nr()
+                  (i.e. returns the dimensionality of the vectors output by this projection_function.)
+        !*/
+
+        const scalar_vector_type& operator() (
+            const sample_type& x
+        ) const
+        /*!
+            requires
+                - weights.nc() == basis_vectors.size()
+                - out_vector_size() > 0
+            ensures
+                - Takes the given x sample and projects it onto part of the kernel feature 
+                  space spanned by the basis_vectors.  The exact projection arithmetic is 
+                  defined below.
+        !*/
+        {
+            // Run the x sample through all the basis functions we have and then
+            // multiply it by the weights matrix and return the result.  Note that
+            // the temp vectors are here to avoid reallocating their memory every
+            // time this function is called.
+            temp1 = kernel_matrix(kernel_function, basis_vectors, x);
+            temp2 = weights*temp1;
+            return temp2;
+        }
+
+    private:
+        mutable scalar_vector_type temp1, temp2;
+    };
+
+    template <
+        typename K
+        >
+    void serialize (
+        const projection_function<K>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for projection_function
+    !*/
+
+    template <
+        typename K
+        >
+    void deserialize (
+        projection_function<K>& item,
+        std::istream& in 
+    );
+    /*!
+        provides serialization support for projection_function
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_FUNCTION_ABSTRACT_

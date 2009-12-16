@@ -99,7 +99,7 @@ namespace dlib
             ensures
                 - performs load(kernel,vector_to_matrix(basis_samples)).  I.e. This function
                   does the exact same thing as the above load() function but lets you use
-                  a std::vector of basis samples in addition to a row/column matrix of basis samples.
+                  a std::vector of basis samples instead of a row/column matrix of basis samples.
         !*/
 
         const kernel_type get_kernel (
@@ -115,25 +115,10 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - if (this object has been loaded with sample basis functions) then
-                    - returns the dimensionality of the space the kernel map projects
-                      new data samples into via the project() function.
+                - if (this object has been loaded with basis samples) then
+                    - returns the dimensionality of the vectors output by the project() function.
                 - else
                     - returns 0
-        !*/
-
-        template <typename EXP>
-        void premultiply_projections_by (
-            const matrix_exp<EXP>& mat
-        );
-        /*!
-            requires
-                - out_vector_size() != 0
-                - mat.nc() == out_vector_size()
-            ensures
-                - #out_vector_size() == mat.nr()
-                - TODO explain what this does.  introduce functions to get the
-                  weights and basis vectors and relate it to those.
         !*/
 
         const matrix<scalar_type,0,1,mem_manager_type>& project (
@@ -173,7 +158,8 @@ namespace dlib
                   function, DF, that represents the given vector in the following sense:
                     - for all possible sample_type objects, S, it is the case that DF(S) == dot(project(S), vect)
                       (i.e. the returned decision function computes dot products, in kernel feature space, 
-                      between vect and any argument you give it. )
+                      between vect and any argument you give it.  Note also that this equality is exact, even
+                      for sample_type objects not in the span of the basis samples.)
                 - DF.kernel_function == get_kernel()
                 - DF.b == 0
                 - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
@@ -189,18 +175,35 @@ namespace dlib
                 - is_vector(vect) == true
                 - vect.size() == out_vector_size()
                 - out_vector_size() != 0
-                - TODO premultiply_projections_by() hasn't been called
             ensures
                 - This function interprets the given vector as a point in the kernel feature space defined 
                   by this empirical_kernel_map.  The return value of this function is a distance 
                   function, DF, that represents the given vector in the following sense:
-                    - for all possible sample_type objects, S, it is the case that DF(S) == length(project(S) - vect)
-                      (i.e. the returned distance function computes distances, in kernel feature space, 
-                      between vect and any argument you give it. )
+                    - for any sample_type object S, the following equality is approximately true: 
+                        - DF(S) == length(project(S) - vect)
+                          (i.e. the returned distance function computes distances, in kernel feature space, 
+                          between vect and any argument you give it. )
+                    - The approximation error in the above equality will be zero (within rounding error)
+                      if both sample_type objects involved are within the span of the set of basis 
+                      samples given to the load() function.  If they are not then there will be some 
+                      approximation error.  Note that all the basis samples are always within their
+                      own span.  So the equality is always exact for the samples given to the load() 
+                      function.
                 - DF.kernel_function == get_kernel()
                 - DF.b == dot(vect,vect) 
                 - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
                   that it is possible for there to be fewer basis_vectors than basis samples given to load().  
+        !*/
+
+        const projection_function<kernel_type> get_projection_function (
+        ) const;
+        /*!
+            requires
+                - out_vector_size() != 0
+            ensures
+                - returns a projection_function, PF, that computes the same projection as project().
+                  That is, calling PF() on any sample will produce the same output vector as calling
+                  this->project() on that sample.
         !*/
 
         void swap (
@@ -246,6 +249,35 @@ namespace dlib
     );
     /*!
         provides serialization support for empirical_kernel_map objects
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename kernel_type, 
+        typename EXP
+        >
+    const decision_function<kernel_type> convert_to_decision_function (
+        const projection_function<kernel_type>& project_funct,
+        const matrix<EXP>& vect
+    );
+    /*!
+        requires
+            - is_vector(vect) == true
+            - vect.size() == project_funct.out_vector_size()
+            - project_funct.out_vector_size() > 0
+            - project_funct.weights.nc() == project_funct.basis_vectors.size()
+        ensures
+            - This function interprets the given vector as a point in the kernel feature space defined 
+              by the given projection function.  The return value of this function is a decision 
+              function, DF, that represents the given vector in the following sense:
+                - for all possible sample_type objects, S, it is the case that DF(S) == dot(project_funct(S), vect)
+                  (i.e. the returned decision function computes dot products, in kernel feature space, 
+                  between vect and any argument you give it.  Note also that this equality is exact, even
+                  for sample_type objects not in the span of the basis_vectors.)
+                - DF.kernel_function == project_funct.kernel_function
+                - DF.b == 0
+                - DF.basis_vectors == project_funct.basis_vectors.  
     !*/
 
 // ----------------------------------------------------------------------------------------
