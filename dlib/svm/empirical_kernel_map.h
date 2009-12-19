@@ -68,35 +68,44 @@ namespace dlib
 
             // find out the value of the largest norm of the elements in basis_samples.
             const scalar_type max_norm = max(diag(kernel_matrix(kernel, basis_samples)));
+            // we will consider anything less than or equal to this number to be 0
+            const scalar_type eps = max_norm*std::numeric_limits<scalar_type>::epsilon();
 
             // Copy all the basis_samples into basis but make sure we don't copy any samples
             // that have length 0
             for (long i = 0; i < basis_samples.size(); ++i)
             {
                 const scalar_type norm = kernel(basis_samples(i), basis_samples(i));
-                if (norm > max_norm*std::numeric_limits<scalar_type>::epsilon())
+                if (norm > eps)
                 {
                     basis.push_back(basis_samples(i));
                 }
             }
 
             if (basis.size() == 0)
+            {
+                clear();
                 throw empirical_kernel_map_error("All basis_samples given to empirical_kernel_map::load() were zero vectors");
+            }
 
             matrix<scalar_type,0,0,mem_manager_type> K(kernel_matrix(kernel, basis)), U,W,V;
 
             if (svd2(false,true,K,U,W,V))
+            {
+                clear();
                 throw empirical_kernel_map_error("While loading empirical_kernel_map with data, SVD failed to converge.");
+            }
 
-            // we will consider anything less than or equal to this number to be 0
-            const scalar_type eps = max(W)*std::numeric_limits<scalar_type>::epsilon();
 
             // now count how many elements of W are non-zero
             const long num_not_zero = sum(W>eps);
 
             // Really, this should never happen.  But I'm checking for good measure.
             if (num_not_zero == 0)
+            {
+                clear();
                 throw empirical_kernel_map_error("While loading empirical_kernel_map with data, SVD failed");
+            }
 
             weights.set_size(num_not_zero, basis.size());
 

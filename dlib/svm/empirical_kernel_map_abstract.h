@@ -32,10 +32,9 @@ namespace dlib
                 represent points in the kernel feature space defined by whatever kernel 
                 is used with this object. 
 
-                More precisely, to use this object you supply it with a particular kernel and 
-                a set of basis samples.  After that you can present it with new samples and it 
-                will project them into the part of kernel feature space spanned by your basis 
-                samples.   
+                To use the empirical_kernel_map you supply it with a particular kernel and a set of 
+                basis samples.  After that you can present it with new samples and it will project 
+                them into the part of kernel feature space spanned by your basis samples.   
                 
                 This means the empirical_kernel_map is a tool you can use to very easily kernelize 
                 any algorithm that operates on column vectors.  All you have to do is select a 
@@ -64,6 +63,13 @@ namespace dlib
             kernel map from data given by the user.
         !*/
 
+        empirical_kernel_map (
+        );
+        /*!
+            ensures
+                - this object is properly initialized
+        !*/
+
         void clear (
         );
         /*!
@@ -89,7 +95,7 @@ namespace dlib
                   subspace of the kernel feature space defined by the given kernel and the
                   given set of basis samples.  So after this function has been called you
                   will be able to project sample_type objects into kernel feature space
-                  and obtain the resulting vector as a normal column matrix.
+                  and obtain the resulting vector as a regular column matrix.
             throws
                 - empirical_kernel_map_error
                     This exception is thrown if we are unable to create a kernel map.
@@ -167,10 +173,10 @@ namespace dlib
                       (i.e. the returned decision function computes dot products, in kernel feature space, 
                       between vect and any argument you give it.  Note also that this equality is exact, even
                       for sample_type objects not in the span of the basis samples.)
-                - DF.kernel_function == get_kernel()
-                - DF.b == 0
-                - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
-                  that it is possible for there to be fewer basis_vectors than basis samples given to load().  
+                    - DF.kernel_function == get_kernel()
+                    - DF.b == 0
+                    - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
+                      that it is possible for there to be fewer basis_vectors than basis samples given to load().  
         !*/
 
         template <typename EXP>
@@ -196,10 +202,10 @@ namespace dlib
                       approximation error.  Note that all the basis samples are always within their
                       own span.  So the equality is always exact for the samples given to the load() 
                       function.
-                - DF.kernel_function == get_kernel()
-                - DF.b == dot(vect,vect) 
-                - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
-                  that it is possible for there to be fewer basis_vectors than basis samples given to load().  
+                    - DF.kernel_function == get_kernel()
+                    - DF.b == dot(vect,vect) 
+                    - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
+                      that it is possible for there to be fewer basis_vectors than basis samples given to load().  
         !*/
 
         const projection_function<kernel_type> get_projection_function (
