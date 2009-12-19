@@ -41,6 +41,7 @@ SRC += conditioning_class.cpp
 SRC += conditioning_class_c.cpp
 SRC += config_reader.cpp
 SRC += directed_graph.cpp
+SRC += empirical_kernel_map.cpp
 SRC += graph.cpp
 SRC += geometry.cpp
 SRC += entropy_coder.cpp

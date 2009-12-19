@@ -30,6 +30,12 @@ namespace dlib
         typedef typename kernel_type::scalar_type scalar_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
+        void clear (
+        )
+        {
+            empirical_kernel_map().swap(*this);
+        }
+
         void load(
             const kernel_type& kernel_,
             const std::vector<sample_type>& basis_samples
@@ -130,7 +136,7 @@ namespace dlib
 
         template <typename EXP>
         const decision_function<kernel_type> convert_to_decision_function (
-            const matrix<EXP>& vect
+            const matrix_exp<EXP>& vect
         ) const
         {
             // make sure requires clause is not broken
@@ -148,7 +154,7 @@ namespace dlib
 
         template <typename EXP>
         const distance_function<kernel_type> convert_to_distance_function (
-            const matrix<EXP>& vect
+            const matrix_exp<EXP>& vect
         ) const
         {
             // make sure requires clause is not broken
@@ -249,7 +255,7 @@ namespace dlib
     template <typename kernel_type, typename EXP>
     const decision_function<kernel_type> convert_to_decision_function (
         const projection_function<kernel_type>& project_funct,
-        const matrix<EXP>& vect
+        const matrix_exp<EXP>& vect
     ) 
     {
         // make sure requires clause is not broken

@@ -64,6 +64,13 @@ namespace dlib
             kernel map from data given by the user.
         !*/
 
+        void clear (
+        );
+        /*!
+            ensures
+                - this object has its initial value
+        !*/
+
         template <typename EXP>
         void load(
             const kernel_type& kernel,
@@ -145,7 +152,7 @@ namespace dlib
 
         template <typename EXP>
         const decision_function<kernel_type> convert_to_decision_function (
-            const matrix<EXP>& vect
+            const matrix_exp<EXP>& vect
         ) const;
         /*!
             requires
@@ -168,7 +175,7 @@ namespace dlib
 
         template <typename EXP>
         const distance_function<kernel_type> convert_to_distance_function (
-            const matrix<EXP>& vect
+            const matrix_exp<EXP>& vect
         ) const
         /*!
             requires
@@ -259,7 +266,7 @@ namespace dlib
         >
     const decision_function<kernel_type> convert_to_decision_function (
         const projection_function<kernel_type>& project_funct,
-        const matrix<EXP>& vect
+        const matrix_exp<EXP>& vect
     );
     /*!
         requires
