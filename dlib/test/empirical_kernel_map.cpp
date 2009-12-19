@@ -7,6 +7,7 @@
 #include <dlib/string.h>
 #include <vector>
 #include <sstream>
+#include <ctime>
 
 namespace  
 {
