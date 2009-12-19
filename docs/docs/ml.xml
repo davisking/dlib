@@ -404,10 +404,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             </p>
 
             <p>
-                More precisely, to use this object you supply it with a particular kernel and 
-                a set of basis samples.  After that you can present it with new samples and it 
-                will project them into the part of kernel feature space spanned by your basis 
-                samples.   
+                To use the empirical_kernel_map you supply it with a particular kernel and a set of 
+                basis samples.  After that you can present it with new samples and it will project 
+                them into the part of kernel feature space spanned by your basis samples.   
             </p>
                 
             <p>
