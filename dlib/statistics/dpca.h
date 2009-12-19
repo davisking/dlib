@@ -16,7 +16,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename column_matrix
+        typename column_matrix_type
         >
     class discriminant_pca
     {
@@ -56,6 +56,7 @@ namespace dlib
             discriminant_pca_error(const std::string& message): error(message) {}
         };
 
+        typedef column_matrix_type column_matrix;
         typedef typename column_matrix::mem_manager_type mem_manager_type;
         typedef typename column_matrix::type scalar_type;
         typedef typename column_matrix::layout_type layout_type;
@@ -98,6 +99,14 @@ namespace dlib
             scalar_type weight
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(weight >= 0,
+                "\t void discriminant_pca::set_within_class_weight()"
+                << "\n\t You can't use negative weight values"
+                << "\n\t weight: " << weight 
+                << "\n\t this:   " << this
+                );
+
             within_weight = weight;
         }
 
@@ -111,6 +120,14 @@ namespace dlib
             scalar_type weight
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(weight >= 0,
+                "\t void discriminant_pca::set_between_class_weight()"
+                << "\n\t You can't use negative weight values"
+                << "\n\t weight: " << weight 
+                << "\n\t this:   " << this
+                );
+
             between_weight = weight;
         }
 
@@ -125,6 +142,20 @@ namespace dlib
             const column_matrix& y
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_col_vector(x) && is_col_vector(y) && 
+                         x.size() == y.size() &&
+                         (in_vector_size() == 0 || x.size() == in_vector_size()),
+                "\t void discriminant_pca::add_to_within_class_variance()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t is_col_vector(x): " << is_col_vector(x) 
+                << "\n\t is_col_vector(y): " << is_col_vector(y) 
+                << "\n\t x.size():         " << x.size() 
+                << "\n\t y.size():         " << y.size() 
+                << "\n\t in_vector_size(): " << in_vector_size() 
+                << "\n\t this:             " << this
+                );
+
             vect_size = x.size();
             if (within_count == 0)
             {
@@ -142,6 +173,20 @@ namespace dlib
             const column_matrix& y
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_col_vector(x) && is_col_vector(y) && 
+                         x.size() == y.size() &&
+                         (in_vector_size() == 0 || x.size() == in_vector_size()),
+                "\t void discriminant_pca::add_to_between_class_variance()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t is_col_vector(x): " << is_col_vector(x) 
+                << "\n\t is_col_vector(y): " << is_col_vector(y) 
+                << "\n\t x.size():         " << x.size() 
+                << "\n\t y.size():         " << y.size() 
+                << "\n\t in_vector_size(): " << in_vector_size() 
+                << "\n\t this:             " << this
+                );
+
             vect_size = x.size();
             if (between_count == 0)
             {
@@ -158,6 +203,16 @@ namespace dlib
             const column_matrix& x
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_col_vector(x) && (in_vector_size() == 0 || x.size() == in_vector_size()),
+                "\t void discriminant_pca::add_to_total_variance()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t is_col_vector(x): " << is_col_vector(x) 
+                << "\n\t in_vector_size(): " << in_vector_size() 
+                << "\n\t x.size():         " << x.size() 
+                << "\n\t this:             " << this
+                );
+
             vect_size = x.size();
             if (total_count == 0)
             {
@@ -188,6 +243,15 @@ namespace dlib
             const double eps = 0.99
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 < eps && eps <= 1 && in_vector_size() != 0,
+                "\t void discriminant_pca::dpca_matrix()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t eps:              " << eps 
+                << "\n\t in_vector_size(): " << in_vector_size() 
+                << "\n\t this:             " << this
+                );
+
             general_matrix cov;
 
             // now combine the three measures of variance into a single matrix by using the
@@ -252,7 +316,7 @@ namespace dlib
             swap(between_weight, item.between_weight);
             swap(within_cov, item.within_cov);
             swap(within_count, item.within_count);
-            swap(between_weight, item.between_weight);
+            swap(within_weight, item.within_weight);
         }
 
         friend void deserialize (
@@ -269,7 +333,7 @@ namespace dlib
             deserialize( item.between_weight, in);
             deserialize( item.within_cov, in);
             deserialize( item.within_count, in);
-            deserialize( item.between_weight, in);
+            deserialize( item.within_weight, in);
         }
 
         friend void serialize (
@@ -286,7 +350,69 @@ namespace dlib
             serialize( item.between_weight, out);
             serialize( item.within_cov, out);
             serialize( item.within_count, out);
-            serialize( item.between_weight, out);
+            serialize( item.within_weight, out);
+        }
+
+        const discriminant_pca operator+ (
+            const discriminant_pca& item
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT((in_vector_size() == 0 || item.in_vector_size() == 0 || in_vector_size() == item.in_vector_size()) &&
+                         between_class_weight() == item.between_class_weight() &&
+                         within_class_weight() == item.within_class_weight(),
+                "\t discriminant_pca discriminant_pca::operator+()"
+                << "\n\t The two discriminant_pca objects being added must have compatible parameters"
+                << "\n\t in_vector_size():            " << in_vector_size() 
+                << "\n\t item.in_vector_size():       " << item.in_vector_size() 
+                << "\n\t between_class_weight():      " << between_class_weight() 
+                << "\n\t item.between_class_weight(): " << item.between_class_weight() 
+                << "\n\t within_class_weight():       " << within_class_weight() 
+                << "\n\t item.within_class_weight():  " << item.within_class_weight() 
+                << "\n\t this:                        " << this
+                );
+
+            discriminant_pca temp(item);
+
+            // We need to make sure to ignore empty matrices.  That's what these if statements
+            // are for.
+
+            if (total_count != 0 && temp.total_count != 0)
+            {
+                temp.total_cov += total_cov;
+                temp.total_sum += total_sum;
+                temp.total_count += total_count;
+            }
+            else if (total_count != 0)
+            {
+                temp.total_cov = total_cov;
+                temp.total_sum = total_sum;
+                temp.total_count = total_count;
+            }
+
+            if (between_count != 0 && temp.between_count != 0)
+            {
+                temp.between_cov += between_cov;
+                temp.between_count += between_count;
+            }
+            else if (between_count != 0)
+            {
+                temp.between_cov = between_cov;
+                temp.between_count = between_count;
+            }
+
+            if (within_count != 0 && temp.within_count != 0)
+            {
+                temp.within_cov += within_cov;
+                temp.within_count += within_count;
+            }
+            else if (within_count != 0)
+            {
+                temp.within_cov = within_cov;
+                temp.within_count = within_count;
+            }
+
+            return temp;
         }
 
     private:
@@ -320,16 +446,16 @@ namespace dlib
 
         general_matrix total_cov;
         general_matrix total_sum;
-        long total_count;
+        scalar_type total_count;
 
         long vect_size;
 
         general_matrix between_cov;
-        long between_count;
+        scalar_type between_count;
         scalar_type between_weight;
 
         general_matrix within_cov;
-        long within_count;
+        scalar_type within_count;
         scalar_type within_weight;
     };
 

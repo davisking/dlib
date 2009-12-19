@@ -13,12 +13,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename column_matrix
+        typename column_matrix_type
         >
     class discriminant_pca
     {
         /*!
-            REQUIREMENTS ON column_matrix
+            REQUIREMENTS ON column_matrix_type
                 Must be some type of dlib::matrix capable of representing a column vector.
 
             INITIAL VALUE
@@ -36,7 +36,7 @@ namespace dlib
                 dimensionality reduction rule using a bunch of data that is partially labeled.  
                 
                 It functions by estimating three different scatter matrices.  The first is the total scatter 
-                matrix St (i.e.  the total data covariance matrix), the second is the between class scatter 
+                matrix St (i.e. the total data covariance matrix), the second is the between class scatter 
                 matrix Sb (basically a measure of the variance between data of different classes) and the 
                 third is the within class scatter matrix Sw (a measure of the variance of data within the 
                 same classes).  
@@ -45,8 +45,8 @@ namespace dlib
                    S = St + a*Sb - b*Sw
                 Where a and b are user supplied weights.  Then the largest eigenvalues of the S matrix are 
                 computed and their associated eigenvectors are returned as the output of this algorithm.  
-                That is, the desired linear dimensionality reduction is given by the transformation matrix 
-                with these eigenvectors stored in its rows.
+                That is, the desired linear dimensionality reduction is given by the matrix with these 
+                eigenvectors stored in its rows.
 
                 Note that if a and b are set to 0 (or no labeled data is provided) then the output transformation
                 matrix is the same as the one produced by the classical PCA algorithm.
@@ -60,6 +60,7 @@ namespace dlib
             a DPCA matrix.
         !*/
 
+        typedef column_matrix_type column_matrix;
         typedef typename column_matrix::mem_manager_type mem_manager_type;
         typedef typename column_matrix::type scalar_type;
         typedef typename column_matrix::layout_type layout_type;
@@ -214,17 +215,20 @@ namespace dlib
                 - in_vector_size() != 0
                   (i.e. you have to have given this object some data)
             ensures
-                - #is_col_vector(eigenvalues) == true
+                - is_col_vector(#eigenvalues) == true
                 - #dpca_mat.nr() == eigenvalues.size() 
                 - #dpca_mat.nc() == in_vector_size()
                 - rowm(#dpca_mat,i) represents the ith eigenvector of the S matrix described
                   in the class description and its eigenvalue is given by eigenvalues(i).
                 - all values in #eigenvalues are > 0.  Moreover, the eigenvalues are in
                   sorted order with the largest eigenvalue stored at eigenvalues(0).
+                - (#dpca_mat)*trans(#dpca_mat) == identity_matrix.  
+                  (i.e. the rows of the dpca_matrix are all unit length vectors and are mutually
+                  orthogonal)
                 - Note that #dpca_mat is the desired linear transformation matrix.  That is, 
                   multiplying a vector by #dpca_mat performs the desired linear dimensionality 
                   reduction.
-                - sum(eigenvalues) will be equal to about eps times the total sum of all 
+                - sum(#eigenvalues) will be equal to about eps times the total sum of all 
                   positive eigenvalues in the S matrix described in this class's description.
                   This means that eps is a number that controls how "lossy" the dimensionality
                   reduction will be.  Large values of eps result in more output dimensions 
@@ -237,6 +241,23 @@ namespace dlib
                     that prevents this algorithm from working properly.
         !*/
 
+        const discriminant_pca operator+ (
+            const discriminant_pca& item
+        ) const;
+        /*!
+            requires
+                - in_vector_size() == 0 || item.in_vector_size() == 0 || in_vector_size() == item.in_vector_size()
+                  (i.e. the in_vector_size() of *this and item must match or one must be zero)
+                - between_class_weight() == item.between_class_weight()
+                - within_class_weight() == item.within_class_weight()
+            ensures
+                - returns a new discriminant_pca object that represents the combination of all 
+                  the measurements given to *this and item.  That is, this function returns a
+                  discriminant_pca object, R, that is equivalent to what you would obtain if all
+                  modifying calls (e.g. the add_to_*() functions) to *this and item had instead 
+                  been done to R.
+        !*/
+
         void swap (
             discriminant_pca& item
         );
@@ -246,6 +267,8 @@ namespace dlib
         !*/
 
     };
+
+// ----------------------------------------------------------------------------------------
 
     template <
         typename column_matrix

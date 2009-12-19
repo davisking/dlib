@@ -31,6 +31,7 @@ set (tests
    conditioning_class.cpp
    config_reader.cpp
    directed_graph.cpp
+   discriminant_pca.cpp
    empirical_kernel_map.cpp
    entropy_coder.cpp
    entropy_encoder_model.cpp
