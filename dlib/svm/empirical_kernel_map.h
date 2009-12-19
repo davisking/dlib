@@ -15,6 +15,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename kernel_type, typename EXP>
+    const decision_function<kernel_type> convert_to_decision_function (
+        const projection_function<kernel_type>& project_funct,
+        const matrix_exp<EXP>& vect
+    ) 
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(project_funct.out_vector_size() > 0 && is_vector(vect) && 
+                    project_funct.out_vector_size() == vect.size() && project_funct.weights.nc() == project_funct.basis_vectors.size(),
+            "\t const decision_function convert_to_decision_function()"
+            << "\n\t Invalid inputs to this function."
+            << "\n\t project_funct.out_vector_size():    " << project_funct.out_vector_size() 
+            << "\n\t project_funct.weights.nc():         " << project_funct.weights.nc() 
+            << "\n\t project_funct.basis_vectors.size(): " << project_funct.basis_vectors.size() 
+            << "\n\t is_vector(vect):                    " << is_vector(vect) 
+            << "\n\t vect.size():                        " << vect.size() 
+            );
+
+        return decision_function<kernel_type>(trans(project_funct.weights)*vect, 
+                                              0, 
+                                              project_funct.kernel_function,
+                                              project_funct.basis_vectors);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename kern_type>
     class empirical_kernel_map
     {
@@ -259,32 +285,6 @@ namespace dlib
         empirical_kernel_map<kernel_type>& b
     ) { a.swap(b); }
     
-// ----------------------------------------------------------------------------------------
-
-    template <typename kernel_type, typename EXP>
-    const decision_function<kernel_type> convert_to_decision_function (
-        const projection_function<kernel_type>& project_funct,
-        const matrix_exp<EXP>& vect
-    ) 
-    {
-        // make sure requires clause is not broken
-        DLIB_ASSERT(project_funct.out_vector_size() > 0 && is_vector(vect) && 
-                    project_funct.out_vector_size() == vect.size() && project_funct.weights.nc() == project_funct.basis_vectors.size(),
-            "\t const decision_function convert_to_decision_function()"
-            << "\n\t Invalid inputs to this function."
-            << "\n\t project_funct.out_vector_size():    " << project_funct.out_vector_size() 
-            << "\n\t project_funct.weights.nc():         " << project_funct.weights.nc() 
-            << "\n\t project_funct.basis_vectors.size(): " << project_funct.basis_vectors.size() 
-            << "\n\t is_vector(vect):                    " << is_vector(vect) 
-            << "\n\t vect.size():                        " << vect.size() 
-            );
-
-        return decision_function<kernel_type>(trans(project_funct.weights)*vect, 
-                                              0, 
-                                              project_funct.kernel_function,
-                                              project_funct.basis_vectors);
-    }
-
 // ----------------------------------------------------------------------------------------
 
 }

@@ -15,6 +15,35 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename kernel_type, 
+        typename EXP
+        >
+    const decision_function<kernel_type> convert_to_decision_function (
+        const projection_function<kernel_type>& project_funct,
+        const matrix_exp<EXP>& vect
+    );
+    /*!
+        requires
+            - is_vector(vect) == true
+            - vect.size() == project_funct.out_vector_size()
+            - project_funct.out_vector_size() > 0
+            - project_funct.weights.nc() == project_funct.basis_vectors.size()
+        ensures
+            - This function interprets the given vector as a point in the kernel feature space defined 
+              by the given projection function.  The return value of this function is a decision 
+              function, DF, that represents the given vector in the following sense:
+                - for all possible sample_type objects, S, it is the case that DF(S) == dot(project_funct(S), vect)
+                  (i.e. the returned decision function computes dot products, in kernel feature space, 
+                  between vect and any argument you give it.  Note also that this equality is exact, even
+                  for sample_type objects not in the span of the basis_vectors.)
+                - DF.kernel_function == project_funct.kernel_function
+                - DF.b == 0
+                - DF.basis_vectors == project_funct.basis_vectors.  
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename kern_type
         >
     class empirical_kernel_map
@@ -262,35 +291,6 @@ namespace dlib
     );
     /*!
         provides serialization support for empirical_kernel_map objects
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename kernel_type, 
-        typename EXP
-        >
-    const decision_function<kernel_type> convert_to_decision_function (
-        const projection_function<kernel_type>& project_funct,
-        const matrix_exp<EXP>& vect
-    );
-    /*!
-        requires
-            - is_vector(vect) == true
-            - vect.size() == project_funct.out_vector_size()
-            - project_funct.out_vector_size() > 0
-            - project_funct.weights.nc() == project_funct.basis_vectors.size()
-        ensures
-            - This function interprets the given vector as a point in the kernel feature space defined 
-              by the given projection function.  The return value of this function is a decision 
-              function, DF, that represents the given vector in the following sense:
-                - for all possible sample_type objects, S, it is the case that DF(S) == dot(project_funct(S), vect)
-                  (i.e. the returned decision function computes dot products, in kernel feature space, 
-                  between vect and any argument you give it.  Note also that this equality is exact, even
-                  for sample_type objects not in the span of the basis_vectors.)
-                - DF.kernel_function == project_funct.kernel_function
-                - DF.b == 0
-                - DF.basis_vectors == project_funct.basis_vectors.  
     !*/
 
 // ----------------------------------------------------------------------------------------
