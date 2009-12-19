@@ -156,6 +156,7 @@
          <term file="ml.html" name="roc_trainer_type"/>
 
          <term file="ml.html" name="decision_function"/>
+         <term file="ml.html" name="projection_function"/>
          <term file="ml.html" name="normalized_function"/>
          <term file="ml.html" name="distance_function"/>
          <term file="ml.html" name="probabilistic_decision_function"/>

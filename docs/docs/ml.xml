@@ -114,6 +114,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       <section>
          <name>Function Objects</name>
          <item>decision_function</item>
+         <item>projection_function</item>
          <item>distance_function</item>
          <item>probabilistic_decision_function</item>
          <item>normalized_function</item>
@@ -654,6 +655,20 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>svm_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>projection_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
+         <description>
+               This object represents a function that takes a data sample and projects
+               it into kernel feature space.  The result is a real valued column vector that 
+               represents a point in a kernel feature space.
+         </description>
                                  
       </component>
       
