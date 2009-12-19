@@ -41,6 +41,7 @@ set (tests
    hash_table.cpp
    image.cpp
    kcentroid.cpp
+   kernel_matrix.cpp
    lz77_buffer.cpp
    map.cpp
    matrix2.cpp
