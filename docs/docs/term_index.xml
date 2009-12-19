@@ -113,6 +113,7 @@
          <term file="ml.html" name="svm_pegasos"/>
          <term file="ml.html" name="empirical_kernel_map"/>
          <term file="dlib/svm/empirical_kernel_map_abstract.h.html" name="empirical_kernel_map_error"/>
+         <term file="dlib/svm/empirical_kernel_map_abstract.h.html" name="convert_to_decision_function"/>
          <term file="ml.html" name="kernel_matrix"/>
          <term file="ml.html" name="batch"/>
          <term file="ml.html" name="verbose_batch"/>
