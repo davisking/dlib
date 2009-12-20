@@ -332,9 +332,12 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <description>
                 This object implements the Discriminant PCA technique described in the paper:
                   <blockquote>
-                    A New Discriminant Principal Component Analysis Method with Partial Supervision
+                    A New Discriminant Principal Component Analysis Method with Partial Supervision (2009)
                     by Dan Sun and Daoqiang Zhang
                   </blockquote>
+                This algorithm is basically a straightforward generalization of the classical PCA
+                technique to handle partially labeled data.  It is useful if you want to learn a linear
+                dimensionality reduction rule using a bunch of data that is partially labeled.  
          </description>
 
       </component>
