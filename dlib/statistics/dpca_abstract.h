@@ -13,13 +13,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename column_matrix_type
+        typename matrix_type
         >
     class discriminant_pca
     {
         /*!
-            REQUIREMENTS ON column_matrix_type
-                Must be some type of dlib::matrix capable of representing a column vector.
+            REQUIREMENTS ON matrix_type
+                Must be some type of dlib::matrix.
 
             INITIAL VALUE
                 - in_vector_size() == 0
@@ -60,12 +60,11 @@ namespace dlib
             a DPCA matrix.
         !*/
 
-        typedef column_matrix_type column_matrix;
-        typedef typename column_matrix::mem_manager_type mem_manager_type;
-        typedef typename column_matrix::type scalar_type;
-        typedef typename column_matrix::layout_type layout_type;
-        const static long N = column_matrix::NR;
+        typedef typename matrix_type::mem_manager_type mem_manager_type;
+        typedef typename matrix_type::type scalar_type;
+        typedef typename matrix_type::layout_type layout_type;
         typedef matrix<scalar_type,0,0,mem_manager_type,layout_type> general_matrix;
+        typedef matrix<scalar_type,0,1,mem_manager_type,layout_type> column_matrix;
 
         discriminant_pca (
         );
@@ -128,8 +127,8 @@ namespace dlib
         !*/
 
         void add_to_within_class_variance(
-            const column_matrix& x,
-            const column_matrix& y
+            const matrix_exp& x,
+            const matrix_exp& y
         );
         /*!
             requires
@@ -147,8 +146,8 @@ namespace dlib
         !*/
 
         void add_to_between_class_variance(
-            const column_matrix& x,
-            const column_matrix& y
+            const matrix_exp& x,
+            const matrix_exp& y
         );
         /*!
             requires
@@ -166,7 +165,7 @@ namespace dlib
         !*/
 
         void add_to_total_variance(
-            const column_matrix& x
+            const matrix_exp& x
         );
         /*!
             requires
@@ -271,21 +270,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename column_matrix
+        typename matrix_type
         >
     inline void swap (
-        discriminant_pca<column_matrix>& a, 
-        discriminant_pca<column_matrix>& b 
+        discriminant_pca<matrix_type>& a, 
+        discriminant_pca<matrix_type>& b 
     ) { a.swap(b); }   
     /*!
         provides a global swap function
     !*/
 
     template <
-        typename column_matrix,
+        typename matrix_type,
         >
     void deserialize (
-        discriminant_pca<column_matrix>& item, 
+        discriminant_pca<matrix_type>& item, 
         std::istream& in
     );   
     /*!
@@ -293,10 +292,10 @@ namespace dlib
     !*/
 
     template <
-        typename column_matrix,
+        typename matrix_type,
         >
     void serialize (
-        const discriminant_pca<column_matrix>& item, 
+        const discriminant_pca<matrix_type>& item, 
         std::ostream& out 
     );   
     /*!

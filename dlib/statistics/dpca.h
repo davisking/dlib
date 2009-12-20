@@ -16,7 +16,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename column_matrix_type
+        typename matrix_type
         >
     class discriminant_pca
     {
@@ -56,12 +56,11 @@ namespace dlib
             discriminant_pca_error(const std::string& message): error(message) {}
         };
 
-        typedef column_matrix_type column_matrix;
-        typedef typename column_matrix::mem_manager_type mem_manager_type;
-        typedef typename column_matrix::type scalar_type;
-        typedef typename column_matrix::layout_type layout_type;
-        const static long N = column_matrix::NR;
+        typedef typename matrix_type::mem_manager_type mem_manager_type;
+        typedef typename matrix_type::type scalar_type;
+        typedef typename matrix_type::layout_type layout_type;
         typedef matrix<scalar_type,0,0,mem_manager_type,layout_type> general_matrix;
+        typedef matrix<scalar_type,0,1,mem_manager_type,layout_type> column_matrix;
 
         discriminant_pca (
         ) 
@@ -83,7 +82,7 @@ namespace dlib
             within_weight = 1;
 
 
-            total_sum.set_size(0,0);
+            total_sum.set_size(0);
             between_cov.set_size(0,0);
             total_cov.set_size(0,0);
             within_cov.set_size(0,0);
@@ -137,9 +136,10 @@ namespace dlib
             return between_weight;
         }
 
+        template <typename EXP1, typename EXP2>
         void add_to_within_class_variance(
-            const column_matrix& x,
-            const column_matrix& y
+            const matrix_exp<EXP1>& x,
+            const matrix_exp<EXP2>& y
         )
         {
             // make sure requires clause is not broken
@@ -168,9 +168,10 @@ namespace dlib
             ++within_count;
         }
 
+        template <typename EXP1, typename EXP2>
         void add_to_between_class_variance(
-            const column_matrix& x,
-            const column_matrix& y
+            const matrix_exp<EXP1>& x,
+            const matrix_exp<EXP2>& y
         )
         {
             // make sure requires clause is not broken
@@ -199,8 +200,9 @@ namespace dlib
             ++between_count;
         }
 
+        template <typename EXP>
         void add_to_total_variance(
-            const column_matrix& x
+            const matrix_exp<EXP>& x
         )
         {
             // make sure requires clause is not broken
@@ -445,7 +447,7 @@ namespace dlib
         }
 
         general_matrix total_cov;
-        general_matrix total_sum;
+        column_matrix total_sum;
         scalar_type total_count;
 
         long vect_size;
@@ -460,11 +462,11 @@ namespace dlib
     };
 
     template <
-        typename column_matrix
+        typename matrix_type
         >
     inline void swap (
-        discriminant_pca<column_matrix>& a, 
-        discriminant_pca<column_matrix>& b 
+        discriminant_pca<matrix_type>& a, 
+        discriminant_pca<matrix_type>& b 
     ) { a.swap(b); }   
 
 // ----------------------------------------------------------------------------------------
