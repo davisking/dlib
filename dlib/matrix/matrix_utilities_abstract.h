@@ -64,7 +64,8 @@ namespace dlib
             - is_vector(m2) == true
             - m1.size() == m2.size()
         ensures
-            - returns the dot product between m1 and m2.
+            - returns the dot product between m1 and m2. That is, this function 
+              computes and returns the sum, for all i, of m1(i)*m2(i).
     !*/
 
 // ----------------------------------------------------------------------------------------
