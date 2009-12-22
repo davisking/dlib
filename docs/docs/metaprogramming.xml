@@ -42,6 +42,7 @@
          <item>noncopyable</item>
          <item>enable_if</item>
          <item>is_graph</item>
+         <item>is_rand</item>
          <item>is_matrix</item>
          <item>is_std_vector</item>
          <item>is_directed_graph</item>
@@ -324,6 +325,19 @@
          <description>
             This is a template where is_graph&lt;T&gt;::value == true when T
             is a <a href="containers.html#graph">graph</a> object.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_rand</name>
+         <file>dlib/is_kind.h</file>
+         <spec_file link="true">dlib/is_kind.h</spec_file>
+         <description>
+            This is a template where is_rand&lt;T&gt;::value == true when T
+            is a <a href="algorithms.html#rand">rand</a> object.
          </description>
          
       </component>
