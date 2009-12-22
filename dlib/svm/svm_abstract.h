@@ -366,6 +366,7 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename T,
@@ -387,6 +388,40 @@ namespace dlib
         ensures
             - randomizes the order of the samples and labels but preserves
               the pairing between each sample and its label
+            - A default initialized random number generator is used to perform the randomizing.
+              Note that this means that each call this this function does the same thing.  
+              That is, the random number generator always uses the same seed.
+            - for all valid i:
+                - let r == the random index samples(i) was moved to.  then:
+                    - #labels(r) == labels(i)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U,
+        typename rand_type
+        >
+    void randomize_samples (
+        T& samples,
+        U& labels,
+        rand_type& rnd
+    );
+    /*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - U == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if samples or labels are matrix objects then is_vector(samples) == true and
+              is_vector(labels) == true
+            - samples.size() == labels.size()
+            - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
+        ensures
+            - randomizes the order of the samples and labels but preserves
+              the pairing between each sample and its label
+            - the given rnd random number generator object is used to do the randomizing
             - for all valid i:
                 - let r == the random index samples(i) was moved to.  then:
                     - #labels(r) == labels(i)
@@ -407,8 +442,32 @@ namespace dlib
             - if samples is a matrix then is_vector(samples) == true 
         ensures
             - randomizes the order of the elements inside samples 
+            - A default initialized random number generator is used to perform the randomizing.
+              Note that this means that each call this this function does the same thing.  
+              That is, the random number generator always uses the same seed.
     !*/
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename rand_type
+        >
+    void randomize_samples (
+        T& samples,
+        rand_type& rnd
+    );
+    /*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if samples is a matrix then is_vector(samples) == true 
+        ensures
+            - randomizes the order of the elements inside samples 
+            - the given rnd random number generator object is used to do the randomizing
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }

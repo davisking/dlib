@@ -7,6 +7,7 @@
 #include "../algs.h"
 #include "rand_kernel_abstract.h"
 #include "mersenne_twister.h"
+#include "../is_kind.h"
 
 namespace dlib
 {
@@ -114,6 +115,13 @@ namespace dlib
         rand_kernel_1& a, 
         rand_kernel_1& b 
     ) { a.swap(b); }   
+
+
+    template <>
+    struct is_rand<rand_kernel_1>
+    {
+        static const bool value = true; 
+    };
 
 }
 

@@ -91,6 +91,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename rand_base>
+    struct is_rand<rand_float_1<rand_base> >
+    {
+        static const bool value = true; 
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RAND_FLOAt_1_ 

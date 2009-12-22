@@ -805,14 +805,17 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <
         typename T,
-        typename U
+        typename U,
+        typename rand_type 
         >
     typename enable_if<is_matrix<T>,void>::type randomize_samples (
         T& t,
-        U& u
+        U& u,
+        rand_type& r
     )
     {
         // make sure requires clause is not broken
@@ -824,8 +827,6 @@ namespace dlib
             << "\n\t is_vector(t): " << (is_vector(t)? "true" : "false")
             << "\n\t is_vector(u): " << (is_vector(u)? "true" : "false")
             );
-
-        rand::kernel_1a r;
 
         long n = t.size()-1;
         while (n > 0)
@@ -848,11 +849,13 @@ namespace dlib
 
     template <
         typename T,
-        typename U
+        typename U,
+        typename rand_type
         >
     typename disable_if<is_matrix<T>,void>::type randomize_samples (
         T& t,
-        U& u
+        U& u,
+        rand_type& r
     )
     {
         // make sure requires clause is not broken
@@ -862,8 +865,6 @@ namespace dlib
             << "\n\t t.size(): " << t.size()
             << "\n\t u.size(): " << u.size()
             );
-
-        rand::kernel_1a r;
 
         long n = t.size()-1;
         while (n > 0)
@@ -885,10 +886,27 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T
+        typename T,
+        typename U
         >
-    typename enable_if<is_matrix<T>,void>::type randomize_samples (
-        T& t
+    typename disable_if<is_rand<U>,void>::type randomize_samples (
+        T& t,
+        U& u
+    )
+    {
+        rand::kernel_1a r;
+        randomize_samples(t,u,r);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename rand_type
+        >
+    typename enable_if_c<is_matrix<T>::value && is_rand<rand_type>::value,void>::type randomize_samples (
+        T& t,
+        rand_type& r
     )
     {
         // make sure requires clause is not broken
@@ -897,8 +915,6 @@ namespace dlib
             << "\n\t invalid inputs were given to this function"
             << "\n\t is_vector(t): " << (is_vector(t)? "true" : "false")
             );
-
-        rand::kernel_1a r;
 
         long n = t.size()-1;
         while (n > 0)
@@ -919,14 +935,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T
+        typename T,
+        typename rand_type
         >
-    typename disable_if<is_matrix<T>,void>::type randomize_samples (
-        T& t
+    typename disable_if_c<(is_matrix<T>::value==true)||(is_rand<rand_type>::value==false),void>::type randomize_samples (
+        T& t,
+        rand_type& r
     )
     {
-        rand::kernel_1a r;
-
         long n = t.size()-1;
         while (n > 0)
         {
@@ -941,6 +957,19 @@ namespace dlib
 
             --n;
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    void randomize_samples (
+        T& t
+    )
+    {
+        rand::kernel_1a r;
+        randomize_samples(t,r);
     }
 
 // ----------------------------------------------------------------------------------------
