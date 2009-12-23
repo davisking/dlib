@@ -303,11 +303,6 @@ namespace dlib
         }
     }
 
-    template < typename T >
-    const rectangle get_rect (
-        const array2d_kernel_1<T>& item
-    ) { return rectangle(0, 0, item.nc()-1, item.nr()-1); }
-
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     // member function definitions

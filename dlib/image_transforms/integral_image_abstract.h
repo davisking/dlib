@@ -78,18 +78,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const rectangle get_rect (
-        const integral_image& img
-    ); 
-    /*!
-        ensures
-            - returns rectangle(0, 0, img.nc()-1, img.nr()-1)
-              (i.e. returns a rectangle that has the same dimensions as
-              the integral_image img)
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     template <typename integral_image_type>
     typename integral_image_type::value_type haar_x (
         const integral_image_type& img,

@@ -62,18 +62,6 @@ namespace dlib
     template <
         typename EXP
         >
-    const rectangle get_rect (
-        const matrix_exp<EXP>& m
-    )
-    {
-        return rectangle(0, 0, m.nc()-1, m.nr()-1);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename EXP
-        >
     const matrix_sub_exp<EXP> subm (
         const matrix_exp<EXP>& m,
         long r, 

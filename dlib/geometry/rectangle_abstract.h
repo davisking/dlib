@@ -608,6 +608,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T 
+        >
+    const rectangle get_rect (
+        const T& m
+    );
+    /*!
+        requires
+            - T has nr() and nc() functions that return longs
+        ensures
+            - returns rectangle(0, 0, m.nc()-1, m.nr()-1)
+              (i.e. assuming T represents some kind of rectangular grid, such as
+              the dlib::matrix or dlib::array2d objects, this function returns the
+              bounding rectangle for that gridded object.)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 namespace std

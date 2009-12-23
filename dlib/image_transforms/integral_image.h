@@ -19,9 +19,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     class integral_image;
-    inline const rectangle get_rect (
-        const integral_image& img
-    );
 
 // ----------------------------------------------------------------------------------------
 
@@ -105,15 +102,6 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
-
-    inline const rectangle get_rect (
-        const integral_image& img
-    )
-    {
-        return rectangle(0, 0, img.nc()-1, img.nr()-1);
-    }
-
-    //  ----------------------------------------------------------------------------
 
     template <typename integral_image_type>
     typename integral_image_type::value_type haar_x (

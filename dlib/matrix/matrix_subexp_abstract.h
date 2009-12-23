@@ -11,18 +11,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const rectangle get_rect (  
-        const matrix_exp& m
-    );
-    /*!
-        ensures
-            - returns rectangle(0, 0, m.nc()-1, m.nr()-1)
-              (i.e. returns a rectangle that has the same dimensions as
-              the matrix m)
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     template <long start, long inc, long end>
     const matrix_exp range (
     );
