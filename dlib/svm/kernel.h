@@ -369,16 +369,16 @@ namespace dlib
         typename T
         >
     void serialize (
-        const linear_kernel<T>& item,
-        std::ostream& out
+        const linear_kernel<T>& ,
+        std::ostream& 
     ){}
 
     template <
         typename T
         >
     void deserialize (
-        linear_kernel<T>& item,
-        std::istream& in 
+        linear_kernel<T>& ,
+        std::istream&  
     ){}
 
     template <
