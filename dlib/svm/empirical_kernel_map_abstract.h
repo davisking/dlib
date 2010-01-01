@@ -173,10 +173,10 @@ namespace dlib
                 - takes the given sample and projects it into the kernel feature space
                   of out_vector_size() dimensions defined by this kernel map and 
                   returns the resulting vector.
-                - in more precise terms, this function returns a vector V such that:
-                    - V.size() == out_vector_size()
+                - in more precise terms, this function returns a vector such that:
+                    - The returned vector will contain out_vector_size() elements.
                     - for any sample_type object S, the following equality is approximately true:
-                        - get_kernel()(sample,S) == dot(V, project(S)).  
+                        - get_kernel()(sample,S) == dot(project(sample), project(S)).  
                     - The approximation error in the above equality will be zero (within rounding error)
                       if both sample_type objects involved are within the span of the set of basis 
                       samples given to the load() function.  If they are not then there will be some 
@@ -226,11 +226,10 @@ namespace dlib
                           (i.e. the returned distance function computes distances, in kernel feature space, 
                           between vect and any argument you give it. )
                     - The approximation error in the above equality will be zero (within rounding error)
-                      if both sample_type objects involved are within the span of the set of basis 
-                      samples given to the load() function.  If they are not then there will be some 
-                      approximation error.  Note that all the basis samples are always within their
-                      own span.  So the equality is always exact for the samples given to the load() 
-                      function.
+                      if S is within the span of the set of basis samples given to the load() function.  
+                      If it is not then there will be some approximation error.  Note that all the basis 
+                      samples are always within their own span.  So the equality is always exact for the 
+                      samples given to the load() function.
                     - DF.kernel_function == get_kernel()
                     - DF.b == dot(vect,vect) 
                     - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
