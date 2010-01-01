@@ -545,8 +545,7 @@
 
          <term name="get_rect">
             <term link="dlib/gui_widgets/drawable_abstract.h.html#get_rect" name="in drawable object"/>
-            <term link="dlib/matrix/matrix_subexp_abstract.h.html#get_rect" name="for matrix objects"/>
-            <term link="dlib/image_transforms/integral_image_abstract.h.html#get_rect" name="for integral_image objects"/>
+            <term link="algorithms.html#get_rect" name="for general matrix like objects"/>
          </term>
 
          <term file="dlib/gui_widgets/drawable_abstract.h.html" name="is_enabled"/>

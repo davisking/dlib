@@ -262,10 +262,6 @@
                   <name>sub_expressions</name>
                   <sub>
                      <item>
-                        <name>get_rect</name>
-                        <link>dlib/matrix/matrix_subexp_abstract.h.html#get_rect</link>
-                     </item>
-                     <item>
                         <name>range</name>
                         <link>dlib/matrix/matrix_subexp_abstract.h.html#range</link>
                      </item>
