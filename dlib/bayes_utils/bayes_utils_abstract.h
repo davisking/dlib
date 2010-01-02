@@ -708,7 +708,7 @@ namespace dlib
                 - T::type == bayes_node
                 - n < bn.number_of_nodes()
             ensures
-                - returns bn.node(n).data.set_as_evidence()
+                - executes: bn.node(n).data.set_as_evidence()
         !*/
 
     // ------------------------------------------------------------------------------------
@@ -726,7 +726,7 @@ namespace dlib
                 - T::type == bayes_node
                 - n < bn.number_of_nodes()
             ensures
-                - returns bn.node(n).data.set_as_nonevidence()
+                - executes: bn.node(n).data.set_as_nonevidence()
         !*/
 
     // ------------------------------------------------------------------------------------
