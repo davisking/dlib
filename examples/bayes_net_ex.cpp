@@ -166,17 +166,18 @@ int main()
 
     // First we need to create an undirected graph which contains set objects at each node and
     // edge.  This long declaration does the trick.
-    typedef graph<set<unsigned long>::compare_1b_c, set<unsigned long>::compare_1b_c>::kernel_1a_c join_tree_type;
+    typedef set<unsigned long>::compare_1b_c set_type;
+    typedef graph<set_type, set_type>::kernel_1a_c join_tree_type;
     join_tree_type join_tree;
 
-    // Now we need populate the join_tree with data from our bayesian network.  The next to 
+    // Now we need to populate the join_tree with data from our bayesian network.  The next  
     // function calls do this.  Explaining exactly what they do is outside the scope of this
     // example.  Just think of them as filling join_tree with information that is useful 
     // later on for dealing with our bayesian network.  
     create_moral_graph(bn, join_tree);
     create_join_tree(join_tree, join_tree);
 
-    // Now we have a proper join_tree we can use it to obtain a solution to our
+    // Now that we have a proper join_tree we can use it to obtain a solution to our
     // bayesian network.  Doing this is as simple as declaring an instance of
     // the bayesian_network_join_tree object as follows:
     bayesian_network_join_tree solution(bn, join_tree);
