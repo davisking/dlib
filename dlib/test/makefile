@@ -71,6 +71,7 @@ SRC += pipe.cpp
 SRC += pixel.cpp
 SRC += queue.cpp
 SRC += rand.cpp
+SRC += read_write_mutex.cpp
 SRC += reference_counter.cpp
 SRC += sequence.cpp
 SRC += serialize.cpp

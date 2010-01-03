@@ -61,6 +61,7 @@ set (tests
    pixel.cpp
    queue.cpp
    rand.cpp
+   read_write_mutex.cpp
    reference_counter.cpp
    sequence.cpp
    serialize.cpp

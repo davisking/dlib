@@ -15,6 +15,7 @@
 #include "threads/thread_specific_data_extension.h"
 #include "threads/thread_function_extension.h"
 #include "threads/thread_pool_extension.h"
+#include "threads/read_write_mutex_extension.h"
 
 #endif // DLIB_THREADs_
 
