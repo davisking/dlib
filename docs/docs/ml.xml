@@ -669,7 +669,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <description>
                This object represents a function that takes a data sample and projects
                it into kernel feature space.  The result is a real valued column vector that 
-               represents a point in a kernel feature space.
+               represents a point in a kernel feature space.   Instances of
+               this object are created using the 
+               <a href="#empirical_kernel_map">empirical_kernel_map</a>.
          </description>
                                  
       </component>
