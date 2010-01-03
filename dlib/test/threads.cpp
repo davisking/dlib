@@ -30,8 +30,8 @@ namespace
         {}
 
         thread_specific_data<int> tsd;
-        mutex cm;
-        signaler sm;
+        rmutex cm;
+        rsignaler sm;
         int count;
         bool failure;
 
