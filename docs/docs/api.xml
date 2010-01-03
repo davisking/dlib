@@ -622,12 +622,24 @@
                         <link>dlib/threads/rmutex_extension_abstract.h.html#rmutex</link>
                      </item>
                      <item>   
+                        <name>read_write_mutex</name>
+                        <link>dlib/threads/read_write_mutex_extension_abstract.h.html#read_write_mutex</link>
+                     </item>
+                     <item>   
                         <name>auto_mutex</name>
                         <link>dlib/threads/auto_mutex_extension_abstract.h.html#auto_mutex</link>
                      </item>
                      <item>   
+                        <name>auto_mutex_readonly</name>
+                        <link>dlib/threads/auto_mutex_extension_abstract.h.html#auto_mutex_readonly</link>
+                     </item>
+                     <item>   
                         <name>auto_unlock</name>
                         <link>dlib/threads/auto_unlock_extension_abstract.h.html#auto_unlock</link>
+                     </item>
+                     <item>   
+                        <name>auto_unlock_readonly</name>
+                        <link>dlib/threads/auto_unlock_extension_abstract.h.html#auto_unlock_readonly</link>
                      </item>
                      <item>   
                         <name>threaded_object</name>
@@ -1021,6 +1033,21 @@
             </extension>
 
             <extension>
+               <name>read_write_mutex</name>
+               <spec_file>dlib/threads/read_write_mutex_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                  This extension adds a mutex object that can perform both normal "write locks" as well as "readonly locks".  
+                  See the specification for details.
+                  Also note that this extension is included by dlib/threads.h so you don't have to include 
+                  anything extra to get it.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/read_write_mutex_extension.h.html">here</a>.
+               </description> 
+            </extension>
+
+            <extension>
                <name>create_new_thread extension</name>
                <spec_file>dlib/threads/create_new_thread_extension_abstract.h</spec_file>
                <description> 
@@ -1055,6 +1082,36 @@
                </examples>
                
             </extension>
+
+            <extension>
+               <name>auto_mutex_readonly</name>
+               <spec_file link="true">dlib/threads/auto_mutex_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                  This extension adds a mechanism to automatically perform a readonly lock and unlock 
+                  of a <a href="#read_write_mutex">read_write_mutex</a>.
+                  Also note that this extension is included by dlib/threads.h so you don't have to include 
+                  anything extra to get it.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/auto_mutex_extension.h.html">here</a>.
+               </description> 
+            </extension>
+
+            <extension>
+               <name>auto_unlock_readonly</name>
+               <spec_file link="true">dlib/threads/auto_unlock_extension_abstract.h</spec_file>
+               <description> 
+                   <p>
+                  This extension adds a mechanism to automatically remove a readonly unlock from a <a href="#read_write_mutex">read_write_mutex</a>.
+                  Also note that this extension is included by dlib/threads.h so you don't have to include 
+                  anything extra to get it.
+                  </p>
+                  The implementation of this extension can be found 
+                  <a href="dlib/threads/auto_unlock_extension.h.html">here</a>.
+               </description> 
+            </extension>
+
             <extension>
                <name>thread_function</name>
                <spec_file>dlib/threads/thread_function_extension_abstract.h</spec_file>

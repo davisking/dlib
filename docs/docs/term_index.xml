@@ -394,9 +394,12 @@
          <term file="api.html" name="threads"/>
          <term file="api.html" name="auto_mutex"/>
          <term file="api.html" name="auto_unlock"/>
+         <term file="api.html" name="auto_mutex_readonly"/>
+         <term file="api.html" name="auto_unlock_readonly"/>
          <term link="api.html#create_new_thread%20extension" name="create_new_thread extension"/> 
          <term file="api.html" name="multithreaded_object"/>
          <term file="api.html" name="rmutex"/>
+         <term file="api.html" name="read_write_mutex"/>
          <term file="api.html" name="rsignaler"/>
          <term file="api.html" name="thread_function"/>
          <term file="api.html" name="thread_specific_data"/>
