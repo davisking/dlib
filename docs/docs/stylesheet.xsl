@@ -426,7 +426,16 @@
                <xsl:apply-templates select="description"/>
                <BR/>
                <BR/>
-               <b><font style='font-size:1.3em' color='#007700'>Specification: </font></b> <a href="{spec_file}.html"><xsl:value-of select="spec_file"/></a>
+               <xsl:choose>
+                  <xsl:when test="spec_file/@link = 'true'">
+                     <b><font style='font-size:1.3em' color='#007700'>Specification: </font></b> <a href="{spec_file}.html#{name}"><xsl:value-of select="spec_file"/></a>
+                  </xsl:when>
+                  <xsl:otherwise>
+                     <b><font style='font-size:1.3em' color='#007700'>Specification: </font></b> <a href="{spec_file}.html"><xsl:value-of select="spec_file"/></a>
+                  </xsl:otherwise>
+               </xsl:choose>
+
+
                <xsl:apply-templates select="examples"/>
                <xsl:apply-templates select="implementations">           
                   <xsl:with-param name="checked" select="$checked" />
