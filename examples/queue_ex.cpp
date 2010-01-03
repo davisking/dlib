@@ -2,7 +2,7 @@
 /*
 
     This is an example illustrating the use of the queue component (and 
-    to some degree the generial idea behind most of the other container 
+    to some degree the general idea behind most of the other container 
     classes) from the dlib C++ Library.
 
     It loads a queue with 20 random numbers.  Then it uses the enumerable 
