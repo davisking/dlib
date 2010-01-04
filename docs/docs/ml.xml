@@ -387,6 +387,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 points are more linearly independent than others.
             </p>
          </description>
+         <examples>
+            <example>empirical_kernel_map_ex.cpp.html</example>
+         </examples>
 
       </component>
       
@@ -430,7 +433,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 random subset works fine.
             </p>
          </description>
-
+         <examples>
+            <example>empirical_kernel_map_ex.cpp.html</example>
+         </examples>
       </component>
       
       

@@ -102,6 +102,10 @@
                   <link>member_function_pointer_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Empirical_Kernel_Map</name>
+                  <link>empirical_kernel_map_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Kernel_RLS_Regression</name>
                   <link>krls_ex.cpp.html</link>
                </item>
