@@ -16,10 +16,10 @@
     so-called kernel trick.  This trick is to replace the dot product with a user 
     supplied function which takes two samples and returns a real number.  This function 
     is the kernel that is required by so many algorithms.  The most basic kernel is the 
-    linear_kernel which is simply a normal dot product.  However, more interesting
-    kernels first apply some nonlinear transformation to the user's data samples and
-    then compute a dot product.  In this way, a simple algorithm that finds a linear
-    plane to separate data (i.e. the SVM algorithm) can be made to solve complex 
+    linear_kernel which is simply a normal dot product.  More interesting, however,
+    are kernels which first apply some nonlinear transformation to the user's data samples 
+    and then compute a dot product.  In this way, a simple algorithm that finds a linear
+    plane to separate data (e.g. the SVM algorithm) can be made to solve complex 
     nonlinear learning problems.  
     
     An important element of the kernel trick is that these kernel functions perform 
