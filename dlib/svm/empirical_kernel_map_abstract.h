@@ -77,6 +77,15 @@ namespace dlib
                 Alternatively, the linearly_independent_subset_finder often works well for 
                 selecting a basis set.  Some people also find that picking a random subset 
                 works fine.
+
+
+                The empirical kernel map is something that has been around in the kernel methods
+                literature for a long time but is seemingly not well known.  Anyway, one of the
+                best books on the subject is the following:
+                    Learning with Kernels: Support Vector Machines, Regularization, Optimization, 
+                    and Beyond by Bernhard Schlkopf, Alexander J. Smola
+                The authors discuss the empirical kernel map as well as many other interesting 
+                topics.
         !*/
 
     public:
