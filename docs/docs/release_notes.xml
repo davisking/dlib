@@ -12,6 +12,11 @@
 
 <current>
 New Stuff:
+   - Added some MATLAB style thresholding relational operators to the matrix.
+   - Added the kernel_matrix() functions.
+   - Added the empirical_kernel_map object.
+   - Added the discriminant_pca object.
+   - Added the read_write_mutex object.
 
 Non-Backwards Compatible Changes:
    - Renamed the support_vectors member of the decision_function and
@@ -22,8 +27,22 @@ Non-Backwards Compatible Changes:
      compiler error then you don't have to worry about it.
 
 Bug fixes:
+   - Fixed a minor error in the LBFGS code.
+   - Added a missing check for division by zero to the kcentroid, krls,  
+     and linearly_independent_subset_finder classes.  If someone added
+     the zero vector to them as the first training example a division by zero 
+     could result.
+   - There were a few cases where the code wouldn't compile when using
+     matrices of complex numbers.  There was also a runtime bug that triggered 
+     when a rank 1 update was performed where one of the vectors was conjugated
+     and two or more transposes were used in certain positions.  This bug
+     caused the wrong output to be computed if the BLAS bindings were used.  
+     Both of these bugs have been fixed.
+   - Fixed a bug in the http server that affected cookies with certain kinds of 
+     data.  The result was invalid data being sent back to the web browser.
 
 Other:
+   - Generally improved the BLAS bindings for the matrix object.
 
 </current>
 
