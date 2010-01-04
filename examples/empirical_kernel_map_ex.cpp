@@ -13,7 +13,7 @@
     This means they are all simple linear algorithms that have been formulated such 
     that the only way they look at the data given by a user is via dot products between
     the data samples.  These algorithms are made more useful via the application of the
-    so called kernel trick.  This trick is to replace the dot product with a user 
+    so-called kernel trick.  This trick is to replace the dot product with a user 
     supplied function which takes two samples and returns a real number.  This function 
     is the kernel that is required by so many algorithms.  The most basic kernel is the 
     linear_kernel which is simply a normal dot product.  However, more interesting
@@ -47,14 +47,14 @@
     
     The empirical_kernel_map is useful because it is often difficult to formulate an 
     algorithm in a way that uses only dot products.  So the empirical_kernel_map lets 
-    non-experts effectively kernelize any algorithm they like by using this object 
-    during a preprocessing step.   However, it should be noted that the algorithm
-    is only practical when used with at most a few thousand basis samples.  Fortunately,
-    most datasets live in subspaces that are relatively low dimensional.  So for these 
-    datasets, using the empirical_kernel_map is practical assuming a reasonable set of 
-    basis samples can be selected by the user.  To help with this dlib supplies the 
-    linearly_independent_subset_finder.  Some people also find that just picking a random 
-    subset of their data and using that as a basis set is fine as well.    
+    us easily kernelize any algorithm we like by using this object during a preprocessing 
+    step.  However, it should be noted that the algorithm is only practical when used 
+    with at most a few thousand basis samples.  Fortunately, most datasets live in 
+    subspaces that are relatively low dimensional.  So for these datasets, using the 
+    empirical_kernel_map is practical assuming an appropriate set of basis samples can be 
+    selected by the user.  To help with this dlib supplies the linearly_independent_subset_finder.  
+    Some people also find that just picking a random subset of their data and using that 
+    as a basis set is fine as well.    
 
 
 
@@ -91,6 +91,8 @@ void generate_concentric_circles (
     const int num_points
 );
 /*!
+    requires
+        - num_points > 0
     ensures
         - generates two circles centered at the point (0,0), one of radius 1 and
           the other of radius 5.  These points are stored into samples.  labels will
@@ -130,7 +132,7 @@ int main()
     // Here we create an empirical_kernel_map using all of our data samples as basis samples.  
     cout << "\n\nBuilding an empirical_kernel_map " << samples.size() << " basis samples." << endl;
     ekm.load(kern, samples);
-    cout << "Test the empirical_kernel_map when it is loaded with every sample." << endl;
+    cout << "Test the empirical_kernel_map when loaded with every sample." << endl;
     test_empirical_kernel_map(samples, labels, ekm);
 
 
@@ -153,7 +155,7 @@ int main()
     // selected using the linearly_independent_subset_finder.
     cout << "\n\nBuilding an empirical_kernel_map with " << lisf.dictionary_size() << " basis samples." << endl;
     ekm.load(kern, lisf.get_dictionary());
-    cout << "Test the empirical_kernel_map when it is loaded with samples from the lisf object." << endl;
+    cout << "Test the empirical_kernel_map when loaded with samples from the lisf object." << endl;
     test_empirical_kernel_map(samples, labels, ekm);
 
 
@@ -181,7 +183,7 @@ void test_empirical_kernel_map (
     // Note that a kernel matrix is just a matrix M such that M(i,j) == kernel(samples[i],samples[j]).
     // So below we are computing the normal kernel matrix as given by the radial_basis_kernel and the
     // input samples.  We also compute the kernel matrix for all the projected_samples as given by the 
-    // linear_kernel.  Note that the linear_kernel just computes normal dot products.   So what we want to
+    // linear_kernel.  Note that the linear_kernel just computes normal dot products.  So what we want to
     // see is that the dot products between all the projected_samples samples are the same as the outputs
     // of the kernel function for their respective untransformed input samples.  If they match then
     // we know that the empirical_kernel_map is working properly.
@@ -189,28 +191,29 @@ void test_empirical_kernel_map (
     const matrix<double> new_kernel_matrix = kernel_matrix(linear_kernel<sample_type>(), projected_samples);
 
     cout << "Max kernel matrix error: " << max(abs(normal_kernel_matrix - new_kernel_matrix)) << endl;
-    cout << "mean kernel matrix error: " << mean(abs(normal_kernel_matrix - new_kernel_matrix)) << endl;
+    cout << "Mean kernel matrix error: " << mean(abs(normal_kernel_matrix - new_kernel_matrix)) << endl;
     /*
         Example outputs from these cout statements.
         For the case where we use all samples as basis samples:
             Max kernel matrix error: 2.73115e-14
-            mean kernel matrix error: 6.19125e-15
+            Mean kernel matrix error: 6.19125e-15
 
         For the case where we use only 20 samples as basis samples:
             Max kernel matrix error: 0.0154466
-            mean kernel matrix error: 0.000753427
+            Mean kernel matrix error: 0.000753427
 
 
-        Note that if we use enough basis samples to perfectly span the space of input samples
-        then we get errors that are essentially just rounding noise (Moreover, using all the 
+        Note that if we use enough basis samples we can perfectly span the space of input samples.
+        In that case we get errors that are essentially just rounding noise (Moreover, using all the 
         samples is always enough since they are always within their own span).  Once we start 
-        to use fewer basis samples we begin to get approximation error since the data doesn't
-        really lay exactly in a 20 dimensional subspace.  But it is pretty close.  
+        to use fewer basis samples we may begin to get approximation error.  In the second case we 
+        used 20 and we can see that the data doesn't really lay exactly in a 20 dimensional subspace.  
+        But it is pretty close.  
     */
 
 
 
-    // Now lets do something more interesting.   The below loop finds the centroids
+    // Now lets do something more interesting.  The following loop finds the centroids
     // of the two classes of data.
     sample_type class1_center(ekm.out_vector_size()); 
     sample_type class2_center(ekm.out_vector_size()); 
@@ -283,7 +286,7 @@ void test_empirical_kernel_map (
     // following example code:
     decision_function<kernel_type> dec_funct = ekm.convert_to_decision_function(plane_normal_vector);
     // The dec_funct now computes dot products between plane_normal_vector and the projection
-    // of any sample point given to it.   All that remains is to account for the bias. 
+    // of any sample point given to it.  All that remains is to account for the bias. 
     dec_funct.b = bias;
 
     // now classify points by which side of the plane they are on.
