@@ -432,7 +432,7 @@ namespace dlib
         !*/
 
         template <typename U, size_t len>
-        matrix (
+        explicit matrix (
             U (&array)[len]
         );
         /*!

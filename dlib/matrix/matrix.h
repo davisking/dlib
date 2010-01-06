@@ -776,6 +776,8 @@ namespace dlib
         const static long cost = matrix_traits<matrix_mul_scal_exp>::cost;
         typedef typename matrix_traits<matrix_mul_scal_exp>::layout_type layout_type;
 
+        // You aren't allowed to multiply a matrix of matrices by a scalar.   
+        COMPILE_TIME_ASSERT(is_matrix<type>::value == false);
 
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
@@ -1103,7 +1105,7 @@ namespace dlib
         }
 
         template <typename U, size_t len>
-        matrix (
+        explicit matrix (
             U (&array)[len]
         ) 
         {
