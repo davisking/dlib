@@ -8,6 +8,11 @@
 
 namespace test
 {
+// -----------------------------------------------------------------------------
+
+    bool be_verbose = true;
+
+// -----------------------------------------------------------------------------
 
     static dlib::mutex spinner_mutex;
 
@@ -122,19 +127,22 @@ namespace test
     void print_spinner (
     )
     {
-        using namespace std;
-        dlib::auto_mutex M(spinner_mutex);
-        static int i = 0;
-        cout << "\b\b";
-        switch (i)
+        if (be_verbose)
         {
-            case 0: cout << '|'; break;
-            case 1: cout << '/'; break;
-            case 2: cout << '-'; break;
-            case 3: cout << '\\'; break;
+            using namespace std;
+            dlib::auto_mutex M(spinner_mutex);
+            static int i = 0;
+            cout << "\b\b";
+            switch (i)
+            {
+                case 0: cout << '|'; break;
+                case 1: cout << '/'; break;
+                case 2: cout << '-'; break;
+                case 3: cout << '\\'; break;
+            }
+            cout << " " << flush;
+            i = (i+1)%4;
         }
-        cout << " " << flush;
-        i = (i+1)%4;
     }
 
 // -----------------------------------------------------------------------------

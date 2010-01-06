@@ -49,6 +49,12 @@ namespace test
     
 // -----------------------------------------------------------------------------
 
+// This bool controls any cout statements in this program.  Only print to 
+// standard out if we should be verbose.  The default is true
+    extern bool be_verbose;
+
+// -----------------------------------------------------------------------------
+
     void print_spinner (
     );
     /*!
