@@ -272,6 +272,43 @@ namespace
                 check_equal(temp, temp3);
             }
 
+            dlog << LTRACE << "1.17.1";
+            {
+                matrix<type> m1, m2;
+
+                m1 = matrix_cast<type>(randm(rows, cols, rnd));
+                m2 = matrix_cast<type>(randm(cols, rows + 8, rnd));
+                check_equal(tmp(m1*m2), m1*m2);
+                check_equal(tmp(trans(m1*m2)), trans(m1*m2));
+
+                m1 = trans(m1);
+                check_equal(tmp(trans(m1)*m2), trans(m1)*m2);
+                check_equal(tmp(trans(trans(m1)*m2)), trans(trans(m1)*m2));
+
+                m2 = trans(m2);
+                check_equal(tmp(trans(m1)*trans(m2)), trans(m1)*trans(m2));
+                check_equal(tmp(trans(trans(m1)*trans(m2))), trans(trans(m1)*trans(m2)));
+
+                m1 = trans(m1);
+                check_equal(tmp(m1*trans(m2)), m1*trans(m2));
+                check_equal(tmp(trans(m1*trans(m2))), trans(m1*trans(m2)));
+            }
+
+            dlog << LTRACE << "1.17.5";
+            {
+                matrix<type,1,0> r;
+                matrix<type,0,1> c;
+
+                r = matrix_cast<type>(randm(1, rows+9, rnd));
+                c = matrix_cast<type>(randm(rows, 1, rnd));
+
+                check_equal(tmp(c*r), c*r);
+                check_equal(tmp(trans(c*r)), trans(c*r));
+
+                check_equal(tmp(trans(r)*trans(c)), trans(r)*trans(c));
+                check_equal(tmp(trans(trans(r)*trans(c))), trans(trans(r)*trans(c)));
+            }
+
             dlog << LTRACE << "1.18";
 
             // GEMV tests
