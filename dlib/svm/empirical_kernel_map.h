@@ -124,7 +124,7 @@ namespace dlib
 
 
             // now count how many elements of W are non-zero
-            const long num_not_zero = sum(W>eps);
+            const long num_not_zero = static_cast<long>(sum(W>eps));
 
             // Really, this should never happen.  But I'm checking for good measure.
             if (num_not_zero == 0)
