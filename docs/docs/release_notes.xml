@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.24" date="Jan 04, 2010">
+New Stuff:
    - Added some MATLAB style thresholding relational operators to the matrix.
    - Added the kernel_matrix() functions.
    - Added the empirical_kernel_map object.
@@ -44,7 +57,7 @@ Bug fixes:
 Other:
    - Generally improved the BLAS bindings for the matrix object.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
