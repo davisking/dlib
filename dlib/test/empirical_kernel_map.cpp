@@ -96,7 +96,7 @@ namespace
 
                     // make sure the distances match 
                     const double dist_error = abs(length(proj_samples[idx1] - proj_samples[idx2]) - dist_funct(samples[idx2]));
-                    DLIB_TEST_MSG( dist_error < 1e-7, dist_error);
+                    DLIB_TEST_MSG( dist_error < 1e-6, dist_error);
                     // make sure the dot products match 
                     DLIB_TEST(abs(dot(proj_samples[idx1],proj_samples[idx2]) - dec_funct(samples[idx2])) < 1e-10);
 
@@ -160,6 +160,87 @@ namespace
                 }
 
 
+
+
+
+            }
+
+            for (int j = 1; j <= 20; ++j)
+            {
+                dlog << LTRACE << "j: " << j;
+                sample_type samp, samp2;
+                std::vector<sample_type> samples1;
+                std::vector<sample_type> samples2;
+                print_spinner();
+                // make some random samples.  At the end samples1 will be a subset of samples2
+                for (int i = 0; i < 5*j; ++i)
+                {
+                    samples1.push_back(randm(10,1,rnd));
+                    samples2.push_back(samples1.back());
+                }
+                for (int i = 0; i < 5*j; ++i)
+                {
+                    samples2.push_back(randm(10,1,rnd));
+                }
+                // add on a little bit to make sure there is at least one non-zero sample.  If all the 
+                // samples are zero then empirical_kernel_map_error will be thrown and we don't want that.
+                samples1.front()(0) += 0.001;
+                samples2.front()(0) += 0.001;
+
+                ekm.load(kern, samples1);
+                ekm2.load(kern, samples2);
+                 
+                dlog << LTRACE << "ekm.out_vector_size(): " << ekm.out_vector_size();
+                dlog << LTRACE << "ekm2.out_vector_size(): " << ekm2.out_vector_size();
+                const double eps = 1e-6;
+
+                matrix<double> transform;
+                // Make sure transformations back to yourself work right.  Note that we can't just
+                // check that transform is the identity matrix since it might be an identity transform
+                // for only a subspace of vectors (this happens if the ekm maps points into a subspace of
+                // all possible ekm.out_vector_size() vectors).
+                transform = ekm.get_transformation_to(ekm);
+                DLIB_TEST(transform.nr() == ekm.out_vector_size());
+                DLIB_TEST(transform.nc() == ekm.out_vector_size());
+                for (unsigned long i = 0; i < samples1.size(); ++i)
+                {
+                    samp = ekm.project(samples1[i]);
+                    DLIB_TEST_MSG(length(samp - transform*samp) < eps, length(samp - transform*samp));
+                    samp = ekm.project((samples1[0] + samples1[i])/2);
+                    DLIB_TEST_MSG(length(samp - transform*samp) < eps, length(samp - transform*samp));
+                }
+
+                transform = ekm2.get_transformation_to(ekm2);
+                DLIB_TEST(transform.nr() == ekm2.out_vector_size());
+                DLIB_TEST(transform.nc() == ekm2.out_vector_size());
+                for (unsigned long i = 0; i < samples2.size(); ++i)
+                {
+                    samp = ekm2.project(samples2[i]);
+                    DLIB_TEST_MSG(length(samp - transform*samp) < eps, length(samp - transform*samp));
+                    samp = ekm2.project((samples2[0] + samples2[i])/2);
+                    DLIB_TEST_MSG(length(samp - transform*samp) < eps, length(samp - transform*samp));
+                    //dlog << LTRACE << "mapping error: " << length(samp - transform*samp);
+                }
+
+
+                // now test the transform from ekm to ekm2
+                transform = ekm.get_transformation_to(ekm2);
+                DLIB_TEST(transform.nr() == ekm2.out_vector_size());
+                DLIB_TEST(transform.nc() == ekm.out_vector_size());
+                for (unsigned long i = 0; i < samples1.size(); ++i)
+                {
+                    samp = ekm.project(samples1[i]);
+                    distance_function<kernel_type> df1 = ekm.convert_to_distance_function(samp);
+                    distance_function<kernel_type> df2 = ekm2.convert_to_distance_function(transform*samp);
+                    DLIB_TEST_MSG(df1(df2) < eps, df1(df2));
+                    //dlog << LTRACE << "mapping error: " << df1(df2);
+
+
+                    samp = ekm.project((samples1[0] + samples1[i])/2);
+                    df1 = ekm.convert_to_distance_function(samp);
+                    df2 = ekm2.convert_to_distance_function(transform*samp);
+                    DLIB_TEST_MSG(df1(df2) < eps, df1(df2));
+                }
             }
         }
 
@@ -172,8 +253,10 @@ namespace
             rnd.set_seed(cast_to_string(thetime));
 
             print_spinner();
+            dlog << LINFO << "test with linear kernel";
             test_with_kernel(linear_kernel<sample_type>());
             print_spinner();
+            dlog << LINFO << "test with rbf kernel";
             test_with_kernel(radial_basis_kernel<sample_type>(0.2));
             print_spinner();
         }

@@ -256,6 +256,37 @@ namespace dlib
                   this->project() on that sample.
         !*/
 
+        const matrix<scalar_type,0,0,mem_manager_type> get_transformation_to (
+            const empirical_kernel_map& target
+        ) const;
+        /*!
+            requires
+                - get_kernel() == target.get_kernel()
+                - out_vector_size() != 0
+                - target.out_vector_size() != 0
+            ensures
+                - A point in the kernel feature space defined by the kernel get_kernel() typically
+                  has different representations with respect to different empirical_kernel_maps.
+                  This function lets you obtain a transformation matrix that will allow you
+                  to map between these different representations. That is, this function returns 
+                  a matrix M with the following properties:    
+                    - M maps vectors represented according to *this into the representation used by target. 
+                    - M.nr() == target.out_vector_size()
+                    - M.nc() == this->out_vector_size()
+                    - Let V be a vector of this->out_vector_size() length.  Then define two distance_functions
+                      DF1 = this->convert_to_distance_function(V)
+                      DF2 = target.convert_to_distance_function(M*V)
+
+                      Then DF1(DF2) == 0 // i.e. the distance between these two points should be 0
+
+                      That is, DF1 and DF2 both represent the same point in kernel feature space.  Note
+                      that the above equality is only approximate.  If the vector V represents a point in
+                      kernel space that isn't in the span of the basis samples used by target then the 
+                      equality is approximate.  However, if it is in their span then the equality will
+                      be exact.  For example, if target's basis samples are a superset of the basis samples
+                      used by *this then the equality will always be exact (within rounding error).
+        !*/
+
         void swap (
             empirical_kernel_map& item
         );

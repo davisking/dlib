@@ -95,7 +95,7 @@ namespace dlib
             // find out the value of the largest norm of the elements in basis_samples.
             const scalar_type max_norm = max(diag(kernel_matrix(kernel, basis_samples)));
             // we will consider anything less than or equal to this number to be 0
-            const scalar_type eps = max_norm*std::numeric_limits<scalar_type>::epsilon();
+            const scalar_type eps = max_norm*100*std::numeric_limits<scalar_type>::epsilon();
 
             // Copy all the basis_samples into basis but make sure we don't copy any samples
             // that have length 0
@@ -216,6 +216,25 @@ namespace dlib
                 );
 
             return projection_function<kernel_type>(weights, kernel, vector_to_matrix(basis));
+        }
+
+        const matrix<scalar_type,0,0,mem_manager_type> get_transformation_to (
+            const empirical_kernel_map& target
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(out_vector_size() != 0 && 
+                        target.out_vector_size() != 0 &&
+                        get_kernel() == target.get_kernel(),
+                "\t const matrix empirical_kernel_map::get_transformation_to(target)"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t out_vector_size():                 " << out_vector_size() 
+                << "\n\t target.out_vector_size():          " << target.out_vector_size() 
+                << "\n\t get_kernel()==target.get_kernel(): " << (get_kernel()==target.get_kernel())
+                << "\n\t this: " << this
+                );
+
+            return target.weights * kernel_matrix(target.get_kernel(),target.basis, basis)*trans(weights);
         }
 
         const matrix<scalar_type,0,1,mem_manager_type>& project (
