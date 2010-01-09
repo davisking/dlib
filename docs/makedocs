@@ -162,6 +162,12 @@ makedocs ()
     echo Generating sitemap
     cd docs/web || report_failure
     find . -name "*.html" |  awk '{ print "http://dclib.sourceforge.net" substr($1,2)}' > sitemap.txt
+
+    # make the main index have a 301 redirect.  Use php to do this
+    echo '<?php if ($_SERVER["SERVER_NAME"] != "dlib.net") { header("Location: http://dlib.net/", true, 301); exit; } ?>' > index.php
+    cat index.html >> index.php
+    rm index.html
+
     cd ../..
 }
 
