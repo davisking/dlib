@@ -20,6 +20,7 @@
 
    <!-- This is the ID you get from Google Webmaster Tools -->
    <xsl:variable name="google_verify_id">02MiiaFNVzS5/u0eQhsy3/knioFHsia1X3DXRpHkE6I=</xsl:variable>
+   <xsl:variable name="google_verify_id2">DGSSJMKDomaDaDTIRJ8jDkv0YMx9Cz7OESbXHjjr6Jw</xsl:variable>
 
    <!-- ************************************************************************* -->
 
@@ -48,6 +49,7 @@
          <head>
             <!-- Verify with Google -->
             <meta name="verify-v1" content="{$google_verify_id}" />
+            <meta name="google-site-verification" content="{$google_verify_id2}" />
             <title>
                <xsl:value-of select="$project_name"/>
                <xsl:if test="title">
