@@ -34,6 +34,12 @@ namespace dlib
 
                 Thus, using this allocator object you can use any of the dlib memory manager objects with
                 the contains in the STL or with any other object that requires a C++ allocator object.
+
+                It is important to note that many STL implementations make the assumption that the memory
+                allocated by one allocator can be freed by another.  This effectively means that you should
+                only use a global or stateless memory manager with the std_allocator.  Either that or you
+                have to verify that your version of the STL isn't going to try and allocate and deallocate
+                memory with different allocators.
         !*/
 
     public:
