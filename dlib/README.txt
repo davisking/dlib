@@ -14,7 +14,7 @@ other general utilities.
 
 Documentation:  
   There should be HTML documentation accompanying this library.  But
-  if there isn't you can download it from http://dclib.sourceforge.net
+  if there isn't you can download it from http://dlib.net
 
 Installation :
   To use this library all you have to do is extract the library 
@@ -30,7 +30,7 @@ Installation :
   the examples folder.
 
   For further information see the accompanying HTML documentation or
-  visit http://dclib.sourceforge.net
+  visit http://dlib.net
 
 The license for this library can be found in LICENSE.txt.  But the
 long and short of the license is that you can use this code however
