@@ -33,7 +33,7 @@ namespace dlib
                     / *!
                         ensures
                             - returns a pointer to an instance of a memory_manager object
-                              where memory_manager_type is defined 
+                              where memory_manager_type implements the interface defined 
                               by dlib/memory_manager/memory_manager_kernel_abstract.h
                     !* /
                 };
@@ -45,11 +45,10 @@ namespace dlib
                 is provided by the factory object's static member get_instance().
 
             THREAD SAFETY
-                This object must be used with care in a threaded program.  The exact 
-                steps needed to ensure safe usage in a threaded program depend on 
-                how the factory class is implemented though.
-
-                Also note that only the constructor calls factory::get_instance(). 
+                This object is, by itself, threadsafe.  However, if you want to use this
+                object in multiple threads then you must ensure that your factory is
+                threadsafe.  This means its factory::get_instance() method should be 
+                threadsafe and the memory_manager object it returns must also be threadsafe.
         !*/
         
         public:
