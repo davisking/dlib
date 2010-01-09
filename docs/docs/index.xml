@@ -11,10 +11,10 @@
 
 
       <p>
-         <web>Welcome to the dlib C++ library's homepage. </web>
+         <web>Welcome to the dlib C++ library homepage. </web>
          <chm>Welcome to the dlib C++ library documentation.</chm>
 
-      It is a modern C++ library with a focus on portability
+      Dlib is a modern C++ library with a focus on portability
       and program correctness.  It strives to be easy to use right and hard to use wrong. 
       Thus, it comes with extensive documentation and thorough debugging modes. 
       </p>
@@ -33,7 +33,7 @@
 
       <chm>
          <p>
-            For updates to this project check its sourceforge page at <a href="http://dclib.sourceforge.net">http://dclib.sourceforge.net</a>.
+            For updates to this project see <a href="http://dlib.net">dlib.net</a>.
          </p>
       </chm>
 
