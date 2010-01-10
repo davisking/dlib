@@ -190,17 +190,17 @@ namespace dlib
     template <typename T> bool operator>  (const future<T>& a, const future<T>& b) { return a.get() >  b.get(); }
 
     template <typename T> bool operator== (const future<T>& a, const T& b)         { return a.get() == b; }
-    template <typename T> bool operator== (const T& a,         const future<T>& b) { return a.get() == b; }
+    template <typename T> bool operator== (const T& a,         const future<T>& b) { return a       == b.get(); }
     template <typename T> bool operator!= (const future<T>& a, const T& b)         { return a.get() != b; }
-    template <typename T> bool operator!= (const T& a,         const future<T>& b) { return a.get() != b; }
+    template <typename T> bool operator!= (const T& a,         const future<T>& b) { return a       != b.get(); }
     template <typename T> bool operator<= (const future<T>& a, const T& b)         { return a.get() <= b; }
-    template <typename T> bool operator<= (const T& a,         const future<T>& b) { return a.get() <= b; }
+    template <typename T> bool operator<= (const T& a,         const future<T>& b) { return a       <= b.get(); }
     template <typename T> bool operator>= (const future<T>& a, const T& b)         { return a.get() >= b; }
-    template <typename T> bool operator>= (const T& a,         const future<T>& b) { return a.get() >= b; }
+    template <typename T> bool operator>= (const T& a,         const future<T>& b) { return a       >= b.get(); }
     template <typename T> bool operator<  (const future<T>& a, const T& b)         { return a.get() <  b; }
-    template <typename T> bool operator<  (const T& a,         const future<T>& b) { return a.get() <  b; }
+    template <typename T> bool operator<  (const T& a,         const future<T>& b) { return a       <  b.get(); }
     template <typename T> bool operator>  (const future<T>& a, const T& b)         { return a.get() >  b; }
-    template <typename T> bool operator>  (const T& a,         const future<T>& b) { return a.get() >  b; }
+    template <typename T> bool operator>  (const T& a,         const future<T>& b) { return a       >  b.get(); }
 
 // ----------------------------------------------------------------------------------------
 
