@@ -251,12 +251,22 @@
       <xsl:param name="file_name" />
       <b><xsl:value-of select="name"/></b>
       <ul  class="tree">
-         <xsl:for-each select="item">  
-         <xsl:sort select="translate(concat(name,.),$lcletters, $ucletters)"/> 
-            <xsl:apply-templates select=".">
-               <xsl:with-param name="file_name" select="$file_name" />
-            </xsl:apply-templates>
-         </xsl:for-each>
+         <xsl:if test="$is_chm = 'true'">
+            <xsl:for-each select="item | chm/item">  
+            <xsl:sort select="translate(concat(name,.),$lcletters, $ucletters)"/> 
+               <xsl:apply-templates select=".">
+                  <xsl:with-param name="file_name" select="$file_name" />
+               </xsl:apply-templates>
+            </xsl:for-each>
+         </xsl:if>
+         <xsl:if test="$is_chm != 'true'">
+            <xsl:for-each select="item | web/item">  
+            <xsl:sort select="translate(concat(name,.),$lcletters, $ucletters)"/> 
+               <xsl:apply-templates select=".">
+                  <xsl:with-param name="file_name" select="$file_name" />
+               </xsl:apply-templates>
+            </xsl:for-each>
+         </xsl:if>
       </ul>
       <br/>           
    </xsl:template>

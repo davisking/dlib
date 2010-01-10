@@ -65,10 +65,19 @@
 
       <section>
          <name>Help/Info</name>
-         <item>
-            <name>Home</name>
-            <link>index.html</link>
-         </item>
+         <chm>
+            <item>
+               <name>Home</name>
+               <link>index.html</link>
+            </item>
+         </chm>
+         <web>
+            <item>
+               <name>Home</name>
+               <link>http://dlib.net</link>
+            </item>
+         </web>
+
          <item>
             <name>Introduction</name>
             <link>intro.html</link>
