@@ -120,6 +120,8 @@ namespace dlib
         T& get(
         );
         /*!
+            requires
+                - T must be one of the types given to this object's template arguments
             ensures
                 - #is_empty() == false
                 - #contains<T>() == true

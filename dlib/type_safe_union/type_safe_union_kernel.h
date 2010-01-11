@@ -301,7 +301,26 @@ namespace dlib
             }
         }
 
-        template <typename T> T& get() { construct<T>();  return *reinterpret_cast<T*>(mem.get()); }
+        template <typename T> 
+        T& get(
+        ) 
+        { 
+            // ERROR: You are trying to get a type of object that isn't currently
+            // in the type_safe_union.
+            COMPILE_TIME_ASSERT(( is_same_type<T,T1>::value ||
+                                 is_same_type<T,T2>::value ||
+                                 is_same_type<T,T3>::value ||
+                                 is_same_type<T,T4>::value ||
+                                 is_same_type<T,T5>::value ||
+                                 is_same_type<T,T6>::value ||
+                                 is_same_type<T,T7>::value ||
+                                 is_same_type<T,T8>::value ||
+                                 is_same_type<T,T9>::value ||
+                                 is_same_type<T,T10>::value 
+                                    ));
+
+            construct<T>();  return *reinterpret_cast<T*>(mem.get()); 
+        }
 
     };
 
