@@ -3,7 +3,7 @@
 #undef DLIB_OPTIMIZATIOn_BOBYQA_ABSTRACT_H__
 #ifdef DLIB_OPTIMIZATIOn_BOBYQA_ABSTRACT_H__
 
-#include "dlib/matrix.h"
+#include "../matrix.h"
 
 // ----------------------------------------------------------------------------------------
 
