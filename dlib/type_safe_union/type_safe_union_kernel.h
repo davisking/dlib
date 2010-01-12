@@ -305,8 +305,10 @@ namespace dlib
         T& get(
         ) 
         { 
-            // ERROR: You are trying to get a type of object that isn't currently
-            // in the type_safe_union.
+            // ERROR: You are trying to get a type of object that isn't
+            // representable by this type_safe_union.  I.e. The given
+            // type T isn't one of the ones given to this object's template
+            // arguments.
             COMPILE_TIME_ASSERT(( is_same_type<T,T1>::value ||
                                  is_same_type<T,T2>::value ||
                                  is_same_type<T,T3>::value ||
@@ -319,7 +321,8 @@ namespace dlib
                                  is_same_type<T,T10>::value 
                                     ));
 
-            construct<T>();  return *reinterpret_cast<T*>(mem.get()); 
+            construct<T>();  
+            return *reinterpret_cast<T*>(mem.get()); 
         }
 
     };
