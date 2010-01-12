@@ -17,10 +17,9 @@ namespace dlib
         typename T,
         typename Allocator = std::allocator<T>
         >
-    class std_vector_c 
+    class std_vector_c : public std::vector<T,Allocator>
     {
         typedef typename std::vector<T,Allocator> base_type;
-        base_type impl;
     public:
         // types:
         typedef typename Allocator::reference         reference;
@@ -38,63 +37,53 @@ namespace dlib
 
 
         // 23.2.4.1 construct/copy/destroy:
-        explicit std_vector_c(const Allocator& alloc= Allocator()) : impl(alloc) {}
+        explicit std_vector_c(const Allocator& alloc= Allocator()) : base_type(alloc) {}
 
         explicit std_vector_c(size_type n, const T& value = T(),
-                              const Allocator& alloc= Allocator()) : impl(n, value, alloc) {}
+                              const Allocator& alloc= Allocator()) : base_type(n, value, alloc) {}
 
         template <typename InputIterator>
         std_vector_c(InputIterator first, InputIterator last,
-                     const Allocator& alloc= Allocator()) : impl(first,last,alloc) {}
+                     const Allocator& alloc= Allocator()) : base_type(first,last,alloc) {}
 
-        std_vector_c(const std_vector_c<T,Allocator>& x) : impl(x.impl) {}
-        std_vector_c(const std::vector<T,Allocator>& x) : impl(x) {}
-
-        operator const base_type& () const { return impl; }
-        operator base_type& () { return impl; }
-
-        std_vector_c<T,Allocator>& operator=(const std_vector_c<T,Allocator>& x)
-        {
-            impl = x.impl;
-            return *this;
-        }
+        std_vector_c(const std::vector<T,Allocator>& x) : base_type(x) {}
 
         std_vector_c<T,Allocator>& operator=(const std::vector<T,Allocator>& x)
         {
-            impl = x;
+            static_cast<base_type&>(*this) = x;
             return *this;
         }
 
         template <typename InputIterator>
-        void assign(InputIterator first, InputIterator last)    { impl.assign(first,last); }
-        void assign(size_type n, const T& u)                    { impl.assign(n,u); }
-        allocator_type          get_allocator() const           { return impl.get_allocator(); }
+        void assign(InputIterator first, InputIterator last)    { base_type::assign(first,last); }
+        void assign(size_type n, const T& u)                    { base_type::assign(n,u); }
+        allocator_type          get_allocator() const           { return base_type::get_allocator(); }
         // iterators:
-        iterator                begin()                         { return impl.begin(); }
-        const_iterator          begin() const                   { return impl.begin(); }
-        iterator                end()                           { return impl.end(); }
-        const_iterator          end() const                     { return impl.end(); }
-        reverse_iterator        rbegin()                        { return impl.rbegin(); }
-        const_reverse_iterator  rbegin() const                  { return impl.rbegin(); }
-        reverse_iterator        rend()                          { return impl.rend(); }
-        const_reverse_iterator  rend() const                    { return impl.rend(); }
+        iterator                begin()                         { return base_type::begin(); }
+        const_iterator          begin() const                   { return base_type::begin(); }
+        iterator                end()                           { return base_type::end(); }
+        const_iterator          end() const                     { return base_type::end(); }
+        reverse_iterator        rbegin()                        { return base_type::rbegin(); }
+        const_reverse_iterator  rbegin() const                  { return base_type::rbegin(); }
+        reverse_iterator        rend()                          { return base_type::rend(); }
+        const_reverse_iterator  rend() const                    { return base_type::rend(); }
         // 23.2.4.2 capacity:
-        size_type               size() const                    { return impl.size(); }
-        size_type               max_size() const                { return impl.max_size(); }
-        void                    resize(size_type sz, T c = T()) { impl.resize(sz,c); }
-        size_type               capacity() const                { return impl.capacity(); }
-        bool                    empty() const                   { return impl.empty(); }
-        void                    reserve(size_type n)            { impl.reserve(n); }
+        size_type               size() const                    { return base_type::size(); }
+        size_type               max_size() const                { return base_type::max_size(); }
+        void                    resize(size_type sz, T c = T()) { base_type::resize(sz,c); }
+        size_type               capacity() const                { return base_type::capacity(); }
+        bool                    empty() const                   { return base_type::empty(); }
+        void                    reserve(size_type n)            { base_type::reserve(n); }
 
         // element access:
-        const_reference         at(size_type n) const           { return impl.at(n); }
-        reference               at(size_type n)                 { return impl.at(n); }
+        const_reference         at(size_type n) const           { return base_type::at(n); }
+        reference               at(size_type n)                 { return base_type::at(n); }
 
 
         // 23.2.4.3 modifiers:
-        void     push_back(const T& x) { impl.push_back(x); }
-        void     swap(std_vector_c<T,Allocator>& x) { impl.swap(x.impl); }
-        void     clear() { impl.clear(); }
+        void     push_back(const T& x) { base_type::push_back(x); }
+        void     swap(std_vector_c<T,Allocator>& x) { base_type::swap(x); }
+        void     clear() { base_type::clear(); }
 
 
     // ------------------------------------------------------
@@ -112,7 +101,7 @@ namespace dlib
                 << "\n\tn:      " << n 
                 << "\n\tsize(): " << size()
             );
-            return impl[n]; 
+            return static_cast<base_type&>(*this)[n]; 
         }
 
     // ------------------------------------------------------
@@ -128,7 +117,7 @@ namespace dlib
                 << "\n\tn:      " << n 
                 << "\n\tsize(): " << size()
             );
-            return impl[n]; 
+            return static_cast<const base_type&>(*this)[n]; 
         }
 
     // ------------------------------------------------------
@@ -141,7 +130,7 @@ namespace dlib
                 << "\n\tYou can't call front() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            return impl.front(); 
+            return base_type::front(); 
         }
 
     // ------------------------------------------------------
@@ -154,7 +143,7 @@ namespace dlib
                 << "\n\tYou can't call front() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            return impl.front(); 
+            return base_type::front(); 
         }
 
     // ------------------------------------------------------
@@ -167,7 +156,7 @@ namespace dlib
                 << "\n\tYou can't call back() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            return impl.back(); 
+            return base_type::back(); 
         }
 
     // ------------------------------------------------------
@@ -180,7 +169,7 @@ namespace dlib
                 << "\n\tYou can't call back() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            return impl.back(); 
+            return base_type::back(); 
         }
 
     // ------------------------------------------------------
@@ -193,7 +182,7 @@ namespace dlib
                 << "\n\tYou can't call pop_back() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            impl.pop_back(); 
+            base_type::pop_back(); 
         }
 
     // ------------------------------------------------------
@@ -208,7 +197,7 @@ namespace dlib
                 << "\n\tYou have called insert() with an invalid position"
                 << "\n\tthis:   " << this
             );
-            return impl.insert(position, x); 
+            return base_type::insert(position, x); 
         }
 
     // ------------------------------------------------------
@@ -224,7 +213,7 @@ namespace dlib
                 << "\n\tYou have called insert() with an invalid position"
                 << "\n\tthis:   " << this
             );
-            impl.insert(position, n, x); 
+            base_type::insert(position, n, x); 
         }
 
     // ------------------------------------------------------
@@ -241,7 +230,7 @@ namespace dlib
                 << "\n\tYou have called insert() with an invalid position"
                 << "\n\tthis:   " << this
             );
-            impl.insert(position, first, last); 
+            base_type::insert(position, first, last); 
         }
 
     // ------------------------------------------------------
@@ -255,7 +244,7 @@ namespace dlib
                 << "\n\tYou have called erase() with an invalid position"
                 << "\n\tthis:   " << this
             );
-            return impl.erase(position); 
+            return base_type::erase(position); 
         }
 
     // ------------------------------------------------------
@@ -270,7 +259,7 @@ namespace dlib
                 << "\n\tYou have called erase() with an invalid range of iterators"
                 << "\n\tthis:   " << this
             );
-            return impl.erase(first,last); 
+            return base_type::erase(first,last); 
         }
 
     // ------------------------------------------------------
@@ -280,33 +269,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename Allocator>
-    bool operator==(const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y) 
-    { return x.size() == y.size() && std::equal(x.begin(), x.end(), y.begin()); }
-
-    template <typename T, typename Allocator>
-    bool operator< (const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y)
-    { return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end()); }
-
-    template <typename T, typename Allocator>
-    bool operator!=(const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y) 
-    { return !(x == y); }
-
-    template <typename T, typename Allocator>
-    bool operator> (const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y)
-    { return y < x; }
-
-    template <typename T, typename Allocator>
-    bool operator>=(const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y)
-    { return !(x < y); }
-
-    template <typename T, typename Allocator>
-    bool operator<=(const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y)
-    { return !(y < x); }
-
-    // specialized algorithms:
+// Add these swaps just to make absolutely sure the specialized swap always gets called even
+// if the compiler is crappy and would otherwise mess it up.
     template <typename T, typename Allocator>
     void swap(std_vector_c<T,Allocator>& x, std_vector_c<T,Allocator>& y) { x.swap(y); }
+
+    template <typename T, typename Allocator>
+    void swap(std::vector<T,Allocator>& x, std_vector_c<T,Allocator>& y) { x.swap(y); }
+
+    template <typename T, typename Allocator>
+    void swap(std_vector_c<T,Allocator>& x, std::vector<T,Allocator>& y) { y.swap(x); }
 
 // ----------------------------------------------------------------------------------------
 

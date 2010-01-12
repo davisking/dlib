@@ -14,7 +14,7 @@ namespace dlib
         typename T,
         typename Allocator = std::allocator<T>
         >
-    class std_vector_c 
+    class std_vector_c : public std::vector<T,Allocator>
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -76,44 +76,11 @@ namespace dlib
         !*/
 
         std_vector_c(
-            const std_vector_c<T,Allocator>& x
-        );
-        /*!
-            ensures
-                - #*this == x
-        !*/
-
-        std_vector_c(
             const std::vector<T,Allocator>& x
         );
         /*!
             ensures
                 - #*this == x
-        !*/
-
-        operator const std::vector<T,Allocator>& (
-        ) const;
-        /*!
-            ensures
-                - returns a const reference to the normal unchecked std::vector
-                  object contained inside *this
-        !*/
-
-        operator std::vector<T,Allocator>& (
-        );
-        /*!
-            ensures
-                - returns a non-const reference to the normal unchecked std::vector
-                  object contained inside *this
-        !*/
-
-        std_vector_c<T,Allocator>& operator= (
-            const std_vector_c<T,Allocator>& x
-        );
-        /*!
-            ensures
-                - #*this == x
-                - returns #*this
         !*/
 
         std_vector_c<T,Allocator>& operator= (
@@ -471,42 +438,6 @@ namespace dlib
         !*/
 
     };
-
-// ----------------------------------------------------------------------------------------
-
-// provide global comparison operators that work for the std_vector_c object.
-
-    template <typename T, typename Allocator>
-    bool operator==(const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y) 
-    { return x.size() == y.size() && std::equal(x.begin(), x.end(), y.begin()); }
-
-    template <typename T, typename Allocator>
-    bool operator< (const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y)
-    { return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end()); }
-
-    template <typename T, typename Allocator>
-    bool operator!=(const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y) 
-    { return !(x == y); }
-
-    template <typename T, typename Allocator>
-    bool operator> (const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y)
-    { return y < x; }
-
-    template <typename T, typename Allocator>
-    bool operator>=(const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y)
-    { return !(x < y); }
-
-    template <typename T, typename Allocator>
-    bool operator<=(const std_vector_c<T,Allocator>& x, const std_vector_c<T,Allocator>& y)
-    { return !(y < x); }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T, typename Allocator>
-    void swap(std_vector_c<T,Allocator>& x, std_vector_c<T,Allocator>& y) { x.swap(y); }
-    /*!
-        provides a global swap function
-    !*/
 
 // ----------------------------------------------------------------------------------------
 

@@ -84,6 +84,7 @@ SRC += sockstreambuf.cpp
 SRC += stack.cpp
 SRC += static_map.cpp
 SRC += static_set.cpp
+SRC += std_vector_c.cpp
 SRC += string.cpp
 SRC += svm.cpp
 SRC += thread_pool.cpp
