@@ -196,6 +196,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void serialize (
+        const interest_point& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support
+    !*/
+
+    void deserialize (
+        interest_point& item,
+        std::istream& in 
+    );
+    /*!
+        provides serialization support
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <typename Alloc>
     void get_interest_points (
         const hessian_pyramid& pyr,

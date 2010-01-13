@@ -105,6 +105,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void serialize (
+        const surf_point& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support
+    !*/
+
+    void deserialize (
+        surf_point& item,
+        std::istream& in 
+    );
+    /*!
+        provides serialization support
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <typename image_type>
     const std::vector<surf_point> get_surf_points (
         const image_type& img,

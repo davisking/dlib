@@ -21,6 +21,44 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline void serialize(
+        const surf_point& item,  
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.p,out);
+            serialize(item.des,out);
+            serialize(item.angle,out);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type surf_point"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void deserialize(
+        surf_point& item,  
+        std::istream& in 
+    )
+    {
+        try
+        {
+            deserialize(item.p,in);
+            deserialize(item.des,in);
+            deserialize(item.angle,in);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while deserializing object of type surf_point"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline double gaussian (double x, double y, double sig)
     {
         DLIB_ASSERT(sig > 0,

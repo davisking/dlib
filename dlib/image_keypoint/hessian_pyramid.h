@@ -33,6 +33,46 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline void serialize(
+        const interest_point& item,  
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.center,out);
+            serialize(item.scale,out);
+            serialize(item.score,out);
+            serialize(item.laplacian,out);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type interest_point"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void deserialize(
+        interest_point& item,  
+        std::istream& in 
+    )
+    {
+        try
+        {
+            deserialize(item.center,in);
+            deserialize(item.scale,in);
+            deserialize(item.score,in);
+            deserialize(item.laplacian,in);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while deserializing object of type interest_point"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class hessian_pyramid : noncopyable
     {
     public:
