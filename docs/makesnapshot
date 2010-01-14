@@ -11,17 +11,26 @@ report_failure ()
 
 ./makedocs snapshot || exit 1 
 
+REVNUM_FILE=.logger_revnum
 
 
-REVISION=`svn info | grep Revision | awk '{ print $2 }'`
+rm -rf release/* || report_failure
 
 
 DLIB_REPOS=`svn info | grep URL | awk '{print $2}' | sed -e 's/\/docs$//'  `
 
 
+REVISION=`svn info | grep Revision | awk '{ print $2 }'`
+
+svn log -v -r $REVISION:`cat $REVNUM_FILE` $DLIB_REPOS/dlib > release/change_log.txt || report_failure
+
+
+
+
 
 cd release || report_failure
-rm -rf *
+
+
 RELDIR=`echo dlib_snapshot-rev$REVISION`
 mkdir $RELDIR
 cd $RELDIR || report_failure
@@ -47,11 +56,11 @@ rm -rf $RELDIR
 
 
 # make an index.html with links to the snapshot archives and chm file
-echo "<html><body>" > index.html
-echo "<a href='$SOURCE_ZIP'>$SOURCE_ZIP</a><br/>" >> index.html
-echo "<a href='$SOURCE_TAR.bz2'>$SOURCE_TAR.bz2</a><br/>" >> index.html
-echo "<a href='dlib_documentation_snapshot-rev$REVISION.chm'>dlib_documentation_snapshot-rev$REVISION.chm</a><br/>" >> index.html
-echo "</body></html>" >> index.html
+#echo "<html><body>" > index.html
+#echo "<a href='$SOURCE_ZIP'>$SOURCE_ZIP</a><br/>" >> index.html
+#echo "<a href='$SOURCE_TAR.bz2'>$SOURCE_TAR.bz2</a><br/>" >> index.html
+#echo "<a href='dlib_documentation_snapshot-rev$REVISION.chm'>dlib_documentation_snapshot-rev$REVISION.chm</a><br/>" >> index.html
+#echo "</body></html>" >> index.html
 
 
 # finally, generate the chm help file
