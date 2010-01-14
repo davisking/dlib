@@ -939,7 +939,11 @@
          <term file="dlib/quantum_computing/quantum_computing_abstract.h.html" name="toffoli"/>
 
 
-
+         <term link="dlib/algs.h.html#general_return_codes" name="TIMEOUT"/>
+         <term link="dlib/algs.h.html#general_return_codes" name="WOULDBLOCK"/>
+         <term link="dlib/algs.h.html#general_return_codes" name="OTHER_ERROR"/>
+         <term link="dlib/algs.h.html#general_return_codes" name="SHUTDOWN"/>
+         <term link="dlib/algs.h.html#general_return_codes" name="PORTINUSE"/>
 
       </term_list>
    
