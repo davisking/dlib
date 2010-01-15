@@ -232,34 +232,17 @@ namespace dlib
             temp_out.swap(item.temp_out);
         }
 
+        template <typename mt>
         friend void deserialize (
-            vector_normalizer& item, 
+            vector_normalizer<mt>& item, 
             std::istream& in
-        )   
-        {
-            deserialize(item.m, in);
-            deserialize(item.sd, in);
-            // Keep deserializing the pca matrix for backwards compatibility.
-            matrix<double> pca;
-            deserialize(pca, in);
+        ); 
 
-            if (pca.size() != 0)
-                throw serialization_error("Error deserializing object of type vector_normalizer\n"   
-                                          "It looks like a serialized vector_normalizer_pca was accidentally deserialized into \n"
-                                          "a vector_normalizer object.");
-        }
-
+        template <typename mt>
         friend void serialize (
-            const vector_normalizer& item, 
+            const vector_normalizer<mt>& item, 
             std::ostream& out 
-        )
-        {
-            serialize(item.m, out);
-            serialize(item.sd, out);
-            // Keep serializing the pca matrix for backwards compatibility.
-            matrix<double> pca;
-            serialize(pca, out);
-        }
+        );
 
     private:
 
@@ -272,6 +255,8 @@ namespace dlib
         mutable matrix_type temp_out;
     };
 
+// ----------------------------------------------------------------------------------------
+
     template <
         typename matrix_type
         >
@@ -280,6 +265,47 @@ namespace dlib
         vector_normalizer<matrix_type>& b 
     ) { a.swap(b); }   
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_type
+        >
+    void deserialize (
+        vector_normalizer<matrix_type>& item, 
+        std::istream& in
+    )   
+    {
+        deserialize(item.m, in);
+        deserialize(item.sd, in);
+        // Keep deserializing the pca matrix for backwards compatibility.
+        matrix<double> pca;
+        deserialize(pca, in);
+
+        if (pca.size() != 0)
+            throw serialization_error("Error deserializing object of type vector_normalizer\n"   
+                                        "It looks like a serialized vector_normalizer_pca was accidentally deserialized into \n"
+                                        "a vector_normalizer object.");
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_type
+        >
+    void serialize (
+        const vector_normalizer<matrix_type>& item, 
+        std::ostream& out 
+    )
+    {
+        serialize(item.m, out);
+        serialize(item.sd, out);
+        // Keep serializing the pca matrix for backwards compatibility.
+        matrix<double> pca;
+        serialize(pca, out);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
