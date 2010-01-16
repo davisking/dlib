@@ -545,8 +545,9 @@ namespace dlib
             { 
                 // check if the minimum is butting up against the bounds and if so then pick
                 // a point between p1 and p2 in the hopes that shrinking the interval will
-                // be a good thing to do.
-                if (p1 == begin)
+                // be a good thing to do.  Or if p1 and p2 aren't differentiated then try and
+                // get them to obtain different values.
+                if (p1 == begin || (f1 == f2 && (end-begin) < jump_size ))
                 {
                     p3 = p2;
                     f3 = f2;
@@ -575,8 +576,9 @@ namespace dlib
             {
                 // check if the minimum is butting up against the bounds and if so then pick
                 // a point between p2 and p3 in the hopes that shrinking the interval will
-                // be a good thing to do.
-                if (p3 == end)
+                // be a good thing to do.  Or if p2 and p3 aren't differentiated then try and
+                // get them to obtain different values.
+                if (p3 == end || (f2 == f3 && (end-begin) < jump_size))
                 {
                     p1 = p2;
                     f1 = f2;
