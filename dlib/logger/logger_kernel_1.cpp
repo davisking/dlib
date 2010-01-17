@@ -123,6 +123,9 @@ namespace dlib
         auto_flush_table.val = true;
         streambuf_table.val = std::cout.rdbuf(); 
         header_table.val = print_default_logger_header;
+
+        // also allocate an initial buffer for hook based logging
+        hookbuf.buffer.reserve(1000);
     }
 
     logger::global_data::level_container::
@@ -262,6 +265,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void logger::global_data::
+    set_output_stream (
+        const std::string& name,
+        std::streambuf& buf 
+    )
+    {
+        auto_mutex M(m);
+        assign_tables( streambuf_table, name, &buf);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     logger::hook_mfp logger::global_data::
     output_hook (
         const std::string& name
@@ -377,9 +392,9 @@ namespace dlib
             }
             else
             {
-                // use the empty_string in hopes that it is generally faster than calling
-                // str("") since this avoids the construction of a new std::string object.
-                log.gd.sout.str(log.gd.empty_string);
+                // Make sure the hook buffer doesn't have any old data in it before we start
+                // logging a new message into it.
+                log.gd.hookbuf.buffer.resize(0);
             }
             been_used = true;
         }
@@ -402,8 +417,10 @@ namespace dlib
         }
         else
         {
+            // Make sure the buffer is a proper C-string
+            log.gd.hookbuf.buffer.push_back('\0');
             // call the output hook with all the info regarding this log message.
-            log.hook(log.name(), l, log.gd.get_thread_name(), log.gd.sout.str());
+            log.hook(log.name(), l, log.gd.get_thread_name(), &log.gd.hookbuf.buffer[0]);
         }
     }
 

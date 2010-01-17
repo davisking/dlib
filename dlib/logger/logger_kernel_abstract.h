@@ -77,7 +77,7 @@ namespace dlib
         void (T::*hook)(const std::string& logger_name, 
                         const log_level& l,
                         const uint64 thread_id,
-                        const std::string& message_to_log)
+                        const char* message_to_log)
     );
     /*!
         ensures
@@ -140,6 +140,12 @@ namespace dlib
                 Also note that unlike most other objects in this library there is only 
                 one implementation of this object at a time.  Thus, to create instances 
                 of the logger you would simply write logger my_logger("some_name");
+
+                Finally, note that the logger doesn't perform any memory allocations during
+                each logging action.  It just writes directly into the user supplied output
+                stream.  Alternatively, if you use a logging output hook no memory allocations
+                are performed either.  Logging just goes straight into a memory buffer
+                which gets passed to the user supplied logging hook.
 
             DEFAULTS
                 If the user hasn't specified values for the four inherited values level(),
@@ -288,7 +294,7 @@ namespace dlib
             void (T::*hook)(const std::string& logger_name, 
                             const log_level& l,
                             const uint64 thread_id,
-                            const std::string& message_to_log)
+                            const char* message_to_log)
         );
         /*!
             requires

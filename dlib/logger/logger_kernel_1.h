@@ -9,13 +9,14 @@
 #include "logger_kernel_abstract.h"
 #include <limits>
 #include <cstring>
-#include <sstream>
 #include "../algs.h"
 #include "../assert.h"
 #include "../uintn.h"
 #include "../map.h"
 #include "../smart_pointers.h"
 #include "../member_function_pointer.h"
+#include <streambuf>
+#include <vector>
 
 namespace dlib
 {
@@ -84,7 +85,7 @@ namespace dlib
                 - if (hook.is_set() == false) then
                     - out.rdbuf() == output_streambuf()
                 - else
-                    - out.rdbuf() == gd.sout.rdbuf()
+                    - out.rdbuf() == &gd.hookbuf
                     - output_streambuf() == 0
 
                 - cur_level == level()
@@ -98,6 +99,8 @@ namespace dlib
                   to a thread when we find that it isn't already in thread_names.
         !*/
 
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
 
         class logger_stream
         {
@@ -180,13 +183,16 @@ namespace dlib
             logger& log;
             bool been_used;
             const bool enabled;
-        };
+        }; // end of class logger_stream
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
 
         friend class logger_stream;
     public:
 
         typedef member_function_pointer<const std::string&, const log_level&, 
-                                        const uint64, const std::string&>::kernel_1a_c hook_mfp;
+                                        const uint64, const char*>::kernel_1a_c hook_mfp;
 
         logger (  
             const char* name_
@@ -273,7 +279,7 @@ namespace dlib
             void (T::*hook_)(const std::string& logger_name, 
                             const log_level& l,
                             const uint64 thread_id,
-                            const std::string& message_to_log)
+                            const char* message_to_log)
         )
         {
             auto_mutex M(gd.m);
@@ -284,13 +290,13 @@ namespace dlib
             {
                 if (gd.loggers.element()->is_child_of(*this))
                 {
-                    gd.loggers.element()->out.rdbuf(gd.sout.rdbuf());
+                    gd.loggers.element()->out.rdbuf(&gd.hookbuf);
                     gd.loggers.element()->hook = hook;
                 }
             }
 
             gd.set_output_hook(logger_name, hook);
-            gd.set_output_stream(logger_name, gd.sout);
+            gd.set_output_stream(logger_name, gd.hookbuf);
         }
 
         void set_output_stream (
@@ -341,6 +347,8 @@ namespace dlib
 
     private:
 
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
 
         struct global_data
         {
@@ -348,8 +356,30 @@ namespace dlib
             set<logger*>::kernel_1b loggers;
             map<thread_id_type,uint64>::kernel_1b thread_names;
             uint64 next_thread_name;
-            std::ostringstream sout;
-            const std::string empty_string;
+
+            // Make a very simple streambuf that writes characters into a std::vector<char>.  We can
+            // use this as the output target for hooks.  The reason we don't just use a std::ostringstream
+            // instead is that this way we can be guaranteed that logging doesn't perform memory allocations.
+            // This is because a std::vector never frees memory.  I.e. its capacity() doesn't go down when
+            // you resize it back to 0.  It just stays the same.
+            class hook_streambuf : public std::streambuf
+            {
+            public:
+                std::vector<char> buffer;
+                int_type overflow ( int_type c)
+                {
+                    if (c != EOF) buffer.push_back(static_cast<char>(c));
+                    return c;
+                }
+
+                std::streamsize xsputn ( const char* s, std::streamsize num)
+                {
+                    buffer.insert(buffer.end(), s, s+num);
+                    return num;
+                }
+            };
+
+            hook_streambuf hookbuf;
 
             global_data (
             );
@@ -460,6 +490,19 @@ namespace dlib
                             - #output_streambuf(L) == out_.rdbuf() 
             !*/
 
+            void set_output_stream (
+                const std::string& name,
+                std::streambuf& buf 
+            );
+            /*!
+                ensures
+                    - for all children C of name:
+                        - #output_streambuf(C) == &buf 
+                    - if name == "" then
+                        - for all loggers L:
+                            - #output_streambuf(L) == &buf 
+            !*/
+
             struct output_hook_container
             {
                 hook_mfp val;
@@ -521,6 +564,7 @@ namespace dlib
         static global_data& get_global_data();
 
     // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
 
         friend void set_all_logging_levels (
             const log_level& new_level
@@ -538,7 +582,7 @@ namespace dlib
             void (T::*hook_)(const std::string& logger_name, 
                             const log_level& l,
                             const uint64 thread_id,
-                            const std::string& message_to_log)
+                            const char* message_to_log)
         )
         {
             logger::hook_mfp hook;
@@ -549,11 +593,11 @@ namespace dlib
             gd.loggers.reset();
             while (gd.loggers.move_next())
             {
-                gd.loggers.element()->out.rdbuf(gd.sout.rdbuf());
+                gd.loggers.element()->out.rdbuf(&gd.hookbuf);
                 gd.loggers.element()->hook = hook;
             }
 
-            gd.set_output_stream("",gd.sout);
+            gd.set_output_stream("",gd.hookbuf);
             gd.set_output_hook("",hook);
         }
 
