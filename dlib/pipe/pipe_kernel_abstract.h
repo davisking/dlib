@@ -99,9 +99,10 @@ namespace dlib
                 - returns true if the enqueue() and enqueue_or_timeout() functions are 
                   currently enabled, returns false otherwise.  (note that the higher 
                   level is_enabled() function can overrule this one.  So if 
-                  is_enabled() == false then enqueue functions are still disabled. 
-                  But if is_enqueue_enabled() == false then enqueue functions are always 
-                  disabled no matter the state of is_enabled())
+                  is_enabled() == false then enqueue functions are still disabled even
+                  if is_enqueue_enabled() returns true.  But if is_enqueue_enabled() == false 
+                  then enqueue functions are always disabled no matter the state of 
+                  is_enabled())
         !*/
 
         void disable_enqueue (
