@@ -451,7 +451,7 @@ namespace dlib
         std::vector<interest_point,Alloc>& result_points
     )
     {
-        DLIB_ASSERT(threshold > 0,
+        DLIB_ASSERT(threshold >= 0,
             "\tvoid get_interest_points()"
             << "\n\t Invalid arguments to this function"
             << "\n\t threshold: " << threshold 
