@@ -246,7 +246,7 @@ namespace dlib
                         - F(new_x) < 0
             throws
                 - invalid_svm_nu_error
-                  This exception is thrown if get_nu() > maximum_nu(y)
+                  This exception is thrown if get_nu() >= maximum_nu(y)
                 - std::bad_alloc
         !*/
 

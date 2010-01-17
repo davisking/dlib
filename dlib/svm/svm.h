@@ -1237,6 +1237,7 @@ namespace dlib
             long num = (long)std::floor(temp);
             long num_total = (long)std::ceil(temp);
 
+            bool has_slack = false;
             int count = 0;
             for (int i = 0; i < alpha.nr(); ++i)
             {
@@ -1249,6 +1250,7 @@ namespace dlib
                     }
                     else 
                     {
+                        has_slack = true;
                         if (temp > num)
                         {
                             ++count;
@@ -1259,13 +1261,14 @@ namespace dlib
                 }
             }
 
-            if (count != num_total)
+            if (count != num_total || has_slack == false)
             {
                 std::ostringstream sout;
-                sout << "invalid nu of " << nu << ".  Must be between 0 and " << (scalar_type)count/y.nr();
+                sout << "Invalid nu of " << nu << ".  It is required that: 0 < nu < " << 2*(scalar_type)count/y.nr();
                 throw invalid_svm_nu_error(sout.str(),nu);
             }
 
+            has_slack = false;
             count = 0;
             for (int i = 0; i < alpha.nr(); ++i)
             {
@@ -1278,6 +1281,7 @@ namespace dlib
                     }
                     else 
                     {
+                        has_slack = true;
                         if (temp > num)
                         {
                             ++count;
@@ -1288,10 +1292,10 @@ namespace dlib
                 }
             }
 
-            if (count != num_total)
+            if (count != num_total || has_slack == false)
             {
                 std::ostringstream sout;
-                sout << "invalid nu of " << nu << ".  Must be between 0 and " << (scalar_type)count/y.nr();
+                sout << "Invalid nu of " << nu << ".  It is required that: 0 < nu < " << 2*(scalar_type)count/y.nr();
                 throw invalid_svm_nu_error(sout.str(),nu);
             }
         }
