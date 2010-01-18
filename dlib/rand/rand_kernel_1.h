@@ -103,11 +103,6 @@ namespace dlib
             mt19937 mt;
 
             std::string seed;
-
-            // restricted functions
-            rand_kernel_1(rand_kernel_1&);        // copy constructor
-            rand_kernel_1& operator=(rand_kernel_1&);    // assignment operator
-
     };
 
 

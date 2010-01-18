@@ -105,12 +105,6 @@ namespace dlib
                     - swaps *this and item
             !*/ 
 
-        private:
-
-            // restricted functions
-            rand(rand&);        // copy constructor
-            rand& operator=(rand&);    // assignment operator
-
     };
 
     inline void swap (
