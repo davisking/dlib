@@ -26,6 +26,16 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    bool approx_equal (
+        double a,
+        double b
+    )
+    {
+        return std::abs(a - b) < 100*std::numeric_limits<double>::epsilon();
+    }
+
+// ----------------------------------------------------------------------------------------
+
     long total_count = 0;
 
 
@@ -166,7 +176,7 @@ namespace
                      objective_delta_stop_strategy(eps),
                      wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-            DLIB_TEST(val == apq(x));
+            DLIB_TEST(approx_equal(val , apq(x)));
             dlog << LINFO << "find_min() bgfs: got apq in " << total_count;
 
             total_count = 0;
@@ -190,7 +200,7 @@ namespace
                             1e-6,
                             10000);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-            DLIB_TEST(val == apq(x));
+            DLIB_TEST(approx_equal(val , apq(x)));
             dlog << LINFO << "find_min_bobyqa(): got apq in " << total_count;
         }
 
@@ -200,7 +210,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == apq(x));
+        DLIB_TEST(approx_equal(val , apq(x)));
         dlog << LINFO << "find_min() lbgfs-10: got apq in " << total_count;
 
 
@@ -210,7 +220,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == apq(x));
+        DLIB_TEST(approx_equal(val , apq(x)));
         dlog << LINFO << "find_min() lbgfs-1: got apq in " << total_count;
 
 
@@ -220,7 +230,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  wrap_function(apq<T>), wrap_function(der_apq<T>), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == apq(x));
+        DLIB_TEST(approx_equal(val , apq(x)));
         dlog << LINFO << "find_min() cg: got apq in " << total_count;
 
 
@@ -233,7 +243,7 @@ namespace
                      objective_delta_stop_strategy(eps),
                      wrap_function(apq<T>), derivative(wrap_function(apq<T>)), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-            DLIB_TEST(val == apq(x));
+            DLIB_TEST(approx_equal(val , apq(x)));
             dlog << LINFO << "find_min() bfgs: got apq/noder in " << total_count;
 
 
@@ -243,7 +253,7 @@ namespace
                      objective_delta_stop_strategy(eps),
                      wrap_function(apq<T>), derivative(wrap_function(apq<T>)), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-            DLIB_TEST(val == apq(x));
+            DLIB_TEST(approx_equal(val , apq(x)));
             dlog << LINFO << "find_min() cg: got apq/noder in " << total_count;
 
 
@@ -253,7 +263,7 @@ namespace
                                                    objective_delta_stop_strategy(eps), 
                                                    wrap_function(apq<T>), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-            DLIB_TEST(val == apq(x));
+            DLIB_TEST(approx_equal(val , apq(x)));
             dlog << LINFO << "find_min() bfgs: got apq/noder2 in " << total_count;
 
 
@@ -272,7 +282,7 @@ namespace
                                                    objective_delta_stop_strategy(eps),
                                                    wrap_function(apq<T>), x, minf);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-            DLIB_TEST(val == apq(x));
+            DLIB_TEST(approx_equal(val , apq(x)));
             dlog << LINFO << "find_min() cg: got apq/noder2 in " << total_count;
         }
     }
@@ -300,7 +310,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &powell, derivative(&powell,1e-8), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-2),opt-x);
-        DLIB_TEST(val == powell(x));
+        DLIB_TEST(approx_equal(val , powell(x)));
         dlog << LINFO << "find_min() bfgs: got powell/noder in " << total_count;
 
 
@@ -310,7 +320,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &powell, derivative(&powell,1e-9), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-2),opt-x);
-        DLIB_TEST(val == powell(x));
+        DLIB_TEST(approx_equal(val , powell(x)));
         dlog << LINFO << "find_min() cg: got powell/noder in " << total_count;
         */
 
@@ -320,7 +330,7 @@ namespace
                                                objective_delta_stop_strategy(eps),
                                                &powell, x, minf, 1e-10);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
-        DLIB_TEST(val == powell(x));
+        DLIB_TEST(approx_equal(val , powell(x)));
         dlog << LINFO << "find_min() bfgs: got powell/noder2 in " << total_count;
 
 
@@ -330,7 +340,7 @@ namespace
                                                objective_delta_stop_strategy(eps),
                                                &powell, x, minf, 1e-10);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
-        DLIB_TEST(val == powell(x));
+        DLIB_TEST(approx_equal(val , powell(x)));
         dlog << LINFO << "find_min() lbfgs-4: got powell/noder2 in " << total_count;
 
 
@@ -340,7 +350,7 @@ namespace
                                                gradient_norm_stop_strategy(),
                                                &powell, x, minf, 1e-10);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
-        DLIB_TEST(val == powell(x));
+        DLIB_TEST(approx_equal(val , powell(x)));
         dlog << LINFO << "find_min() lbfgs-4(gn): got powell/noder2 in " << total_count;
 
 
@@ -350,7 +360,7 @@ namespace
                                                objective_delta_stop_strategy(eps),
                                                &powell, x, minf, 1e-10);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-1),opt-x);
-        DLIB_TEST(val == powell(x));
+        DLIB_TEST(approx_equal(val , powell(x)));
         dlog << LINFO << "find_min() cg: got powell/noder2 in " << total_count;
 
 
@@ -363,7 +373,7 @@ namespace
                         1e-7,
                         10000);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-3),opt-x);
-        DLIB_TEST(val == powell(x));
+        DLIB_TEST(approx_equal(val , powell(x)));
         dlog << LINFO << "find_min_bobyqa(): got powell in " << total_count;
 
     }
@@ -389,7 +399,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &simple, &der_simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() bfgs: got simple in " << total_count;
 
 
@@ -399,7 +409,7 @@ namespace
                  gradient_norm_stop_strategy(),
                  &simple, &der_simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() bfgs(gn): got simple in " << total_count;
 
 
@@ -409,7 +419,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &simple, &der_simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() lbfgs-3: got simple in " << total_count;
 
 
@@ -419,7 +429,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &simple, &der_simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() cg: got simple in " << total_count;
 
 
@@ -430,7 +440,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &simple, derivative(&simple), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() bfgs: got simple/noder in " << total_count;
 
 
@@ -440,7 +450,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &simple, derivative(&simple), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() lbfgs-8: got simple/noder in " << total_count;
 
 
@@ -450,7 +460,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &simple, derivative(&simple), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() cg: got simple/noder in " << total_count;
 
 
@@ -461,7 +471,7 @@ namespace
                                                objective_delta_stop_strategy(eps),
                                                &simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() bfgs: got simple/noder2 in " << total_count;
 
 
@@ -471,7 +481,7 @@ namespace
                                                objective_delta_stop_strategy(eps),
                                                &simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() lbfgs-6: got simple/noder2 in " << total_count;
 
 
@@ -481,7 +491,7 @@ namespace
                                                objective_delta_stop_strategy(eps),
                                                &simple, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min() cg: got simple/noder2 in " << total_count;
 
 
@@ -494,7 +504,7 @@ namespace
                         1e-6,
                         10000);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == simple(x));
+        DLIB_TEST(approx_equal(val , simple(x)));
         dlog << LINFO << "find_min_bobyqa(): got simple in " << total_count;
 
     }
@@ -520,7 +530,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
-        DLIB_TEST(val == rosen(x));
+        DLIB_TEST(approx_equal(val , rosen(x)));
         dlog << LINFO << "find_min() bfgs: got rosen in " << total_count;
 
 
@@ -530,7 +540,7 @@ namespace
                  gradient_norm_stop_strategy(),
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
-        DLIB_TEST(val == rosen(x));
+        DLIB_TEST(approx_equal(val , rosen(x)));
         dlog << LINFO << "find_min() bfgs(gn): got rosen in " << total_count;
 
 
@@ -540,7 +550,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
-        DLIB_TEST(std::abs(val - rosen(x)) < 100*std::numeric_limits<double>::epsilon());
+        DLIB_TEST(approx_equal(val , rosen(x)));
         dlog << LINFO << "find_min() lbfgs-20: got rosen in " << total_count;
 
 
@@ -550,7 +560,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &rosen, &der_rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
-        DLIB_TEST(val == rosen(x));
+        DLIB_TEST(approx_equal(val , rosen(x)));
         dlog << LINFO << "find_min() cg: got rosen in " << total_count;
 
 
@@ -561,7 +571,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &rosen, derivative(&rosen,1e-5), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
-        DLIB_TEST(val == rosen(x));
+        DLIB_TEST(approx_equal(val , rosen(x)));
         dlog << LINFO << "find_min() bfgs: got rosen/noder in " << total_count;
 
 
@@ -571,7 +581,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &rosen, derivative(&rosen,1e-5), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
-        DLIB_TEST(val == rosen(x));
+        DLIB_TEST(approx_equal(val , rosen(x)));
         dlog << LINFO << "find_min() lbfgs-5: got rosen/noder in " << total_count;
 
 
@@ -581,7 +591,7 @@ namespace
                  objective_delta_stop_strategy(eps),
                  &rosen, derivative(&rosen,1e-5), x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
-        DLIB_TEST(val == rosen(x));
+        DLIB_TEST(approx_equal(val , rosen(x)));
         dlog << LINFO << "find_min() cg: got rosen/noder in " << total_count;
 
 
@@ -591,7 +601,7 @@ namespace
                                                objective_delta_stop_strategy(eps),
                                                &rosen, x, minf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-4),opt-x);
-        DLIB_TEST(val == rosen(x));
+        DLIB_TEST(approx_equal(val , rosen(x)));
         dlog << LINFO << "find_min() cg: got rosen/noder2 in " << total_count;
 
 
@@ -606,7 +616,7 @@ namespace
                             1e-6,
                             10000);
             DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-            DLIB_TEST(val == rosen(x));
+            DLIB_TEST(approx_equal(val , rosen(x)));
             dlog << LINFO << "find_min_bobyqa(): got rosen in " << total_count;
         }
     }
@@ -632,7 +642,7 @@ namespace
             bfgs_search_strategy(), 
             objective_delta_stop_strategy(eps), &neg_rosen, &der_neg_rosen, x, maxf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
-        DLIB_TEST(val == neg_rosen(x));
+        DLIB_TEST(approx_equal(val , neg_rosen(x)));
         dlog << LINFO << "find_max() bfgs: got neg_rosen in " << total_count;
 
         total_count = 0;
@@ -641,7 +651,7 @@ namespace
             lbfgs_search_strategy(5), 
             objective_delta_stop_strategy(eps), &neg_rosen, &der_neg_rosen, x, maxf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
-        DLIB_TEST(val == neg_rosen(x));
+        DLIB_TEST(approx_equal(val , neg_rosen(x)));
         dlog << LINFO << "find_max() lbfgs-5: got neg_rosen in " << total_count;
 
         total_count = 0;
@@ -650,7 +660,7 @@ namespace
             lbfgs_search_strategy(5), 
             objective_delta_stop_strategy(eps), &neg_rosen, derivative(&neg_rosen), x, maxf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
-        DLIB_TEST(val == neg_rosen(x));
+        DLIB_TEST(approx_equal(val , neg_rosen(x)));
         dlog << LINFO << "find_max() lbfgs-5: got neg_rosen/noder in " << total_count;
 
 
@@ -660,7 +670,7 @@ namespace
             cg_search_strategy(), 
             objective_delta_stop_strategy(eps), &neg_rosen, x, maxf);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-7),opt-x);
-        DLIB_TEST(val == neg_rosen(x));
+        DLIB_TEST(approx_equal(val , neg_rosen(x)));
         dlog << LINFO << "find_max() cg: got neg_rosen/noder2 in " << total_count;
 
 
@@ -673,7 +683,7 @@ namespace
                         1e-6,
                         10000);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-5),opt-x);
-        DLIB_TEST(val == neg_rosen(x));
+        DLIB_TEST(approx_equal(val , neg_rosen(x)));
         dlog << LINFO << "find_max_bobyqa(): got neg_rosen in " << total_count;
     }
 
