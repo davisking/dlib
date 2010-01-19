@@ -167,7 +167,7 @@ namespace dlib
         >
     void serialize (
         const type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>& item, 
-        std::istream& in
+        std::ostream& out 
     );   
     /*!
         provides serialization support 
