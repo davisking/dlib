@@ -801,6 +801,10 @@ namespace dlib
             } stuff;
             long double more_stuff;
 
+            uint64 var1;
+            uint32 var2;
+            double var3;
+
             char data[size]; 
         } mem;
 
