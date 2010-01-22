@@ -393,7 +393,9 @@
          <file>dlib/cmd_line_parser.h</file>
          <spec_file>dlib/cmd_line_parser/cmd_line_parser_kernel_abstract.h</spec_file>
          <description>
-            This object allows you to easily parse a command line.         
+            This object allows you to easily parse a command line.      Note that the
+            documentation for the <a href="dlib/interfaces/cmd_line_parser_option.h.html">cmd_line_parser_option</a>
+            (the object returned by the parser's .option() function) is in a separate file.
          </description>
          
          <examples>

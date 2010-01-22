@@ -874,6 +874,7 @@
          <term link="parsing.html#utf8_uifstream" name="basic_utf8_ifstream"/>
          <term file="parsing.html" name="base64"/>
          <term file="parsing.html" name="cmd_line_parser"/>
+         <term file="dlib/interfaces/cmd_line_parser_option.h.html" name="cmd_line_parser_option"/>
          <term link="parsing.html#cmd_line_parser" name="command line parsing"/>
          <term file="parsing.html" name="config_reader"/>
          <term link="parsing.html#config_reader" name="config file parser"/>
