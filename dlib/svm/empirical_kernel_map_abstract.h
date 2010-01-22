@@ -194,6 +194,21 @@ namespace dlib
                       function.
         !*/
 
+        const matrix<scalar_type,0,1,mem_manager_type>& project (
+            const sample_type& sample,
+            scalar_type& projection_error
+        ) const;
+        /*!
+            requires
+                - out_vector_size() != 0
+            ensures
+                - This function returns project(sample)
+                  (i.e. it returns the same thing as the above project() function)
+                - #projection_error == the distance between the point sample gets projected
+                  onto and sample's true image in kernel feature space.  That is, this value
+                  is equal to: convert_to_distance_function(project(sample))(sample)
+        !*/
+
         template <typename EXP>
         const decision_function<kernel_type> convert_to_decision_function (
             const matrix_exp<EXP>& vect
@@ -238,7 +253,10 @@ namespace dlib
                       if S is within the span of the set of basis samples given to the load() function.  
                       If it is not then there will be some approximation error.  Note that all the basis 
                       samples are always within their own span.  So the equality is always exact for the 
-                      samples given to the load() function.
+                      samples given to the load() function.  Note further that the distance computed
+                      by DF(S) is always the correct distance in kernel feature space between vect and
+                      the true projection of S.  That is, the above equality is approximate only because 
+                      of potential error in the project() function.
                     - DF.kernel_function == get_kernel()
                     - DF.b == dot(vect,vect) 
                     - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note

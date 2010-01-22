@@ -253,6 +253,26 @@ namespace dlib
             return temp2;
         }
 
+        const matrix<scalar_type,0,1,mem_manager_type>& project (
+            const sample_type& samp,
+            scalar_type& projection_error 
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(out_vector_size() != 0,
+                "\tconst matrix empirical_kernel_map::project()"
+                << "\n\t You have to load this object with data before you can call this function"
+                << "\n\t this: " << this
+                );
+
+            temp1 = kernel_matrix(kernel, basis, samp);
+            temp2 = weights*temp1;
+            // The std::abs is here because rounding error could make the expresison negative
+            // which would be bad since sqrt() would get upset.
+            projection_error = std::sqrt(std::abs( kernel(samp,samp) - dot(temp2,temp2)));
+            return temp2;
+        }
+
         void swap (
             empirical_kernel_map& item
         )

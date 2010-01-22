@@ -39,6 +39,95 @@ namespace
         time_t thetime;
         dlib::rand::float_1a rnd;
 
+        void test_projection_error()
+        {
+            for (int runs = 0; runs < 10; ++runs)
+            {
+                print_spinner();
+                typedef matrix<double,0,1> sample_type;
+                typedef radial_basis_kernel<sample_type> kernel_type;
+                const kernel_type kern(0.2);
+
+                empirical_kernel_map<kernel_type> ekm;
+
+                // generate samples
+                const int num = rnd.get_random_8bit_number()%50 + 1;
+                std::vector<sample_type> samples;
+                for (int i = 0; i < num; ++i)
+                {
+                    samples.push_back(randm(5,1,rnd));
+                }
+
+
+                ekm.load(kern, samples);
+
+                double err;
+
+                // the samples in the basis should have zero projection error
+                for (int i = 0; i < samples.size(); ++i)
+                {
+                    ekm.project(samples[i], err);
+                    DLIB_TEST_MSG(abs(err) < 1e-7, abs(err));
+
+                }
+                
+                // Do some sanity tests on the conversion to distance functions while we are at it.
+                for (int i = 0; i < 30; ++i)
+                {
+                    // pick two random samples
+                    const sample_type samp1 = samples[rnd.get_random_32bit_number()%samples.size()];
+                    const sample_type samp2 = samples[rnd.get_random_32bit_number()%samples.size()];
+
+                    matrix<double,0,1> proj1 = ekm.project(samp1);
+                    matrix<double,0,1> proj2 = ekm.project(samp2);
+
+                    distance_function<kernel_type> df1 = ekm.convert_to_distance_function(proj1);
+                    distance_function<kernel_type> df2 = ekm.convert_to_distance_function(proj2);
+
+                    const double true_dist = std::sqrt(kern(samp1,samp1) + kern(samp2,samp2) - 2*kern(samp1,samp2));
+                    DLIB_TEST_MSG(abs(df1(df2) - true_dist) < 1e-7, abs(df1(df2) - true_dist));
+                    DLIB_TEST_MSG(abs(length(proj1-proj2) - true_dist) < 1e-7, abs(length(proj1-proj2) - true_dist));
+                }
+                // Do some sanity tests on the conversion to distance functions while we are at it.  This
+                // time multiply one of the projections by 30 and see that it still all works out right.
+                for (int i = 0; i < 30; ++i)
+                {
+                    // pick two random samples
+                    const sample_type samp1 = samples[rnd.get_random_32bit_number()%samples.size()];
+                    const sample_type samp2 = samples[rnd.get_random_32bit_number()%samples.size()];
+
+                    matrix<double,0,1> proj1 = ekm.project(samp1);
+                    matrix<double,0,1> proj2 = 30*ekm.project(samp2);
+
+                    distance_function<kernel_type> df1 = ekm.convert_to_distance_function(proj1);
+                    distance_function<kernel_type> df2 = ekm.convert_to_distance_function(proj2);
+
+                    DLIB_TEST_MSG(abs(length(proj1-proj2) - df1(df2)) < 1e-7, abs(length(proj1-proj2) - df1(df2)));
+                }
+
+
+                // now generate points with projection error
+                for (double i = 1; i < 10; ++i)
+                {
+                    sample_type test_point = i*randm(5,1,rnd);
+                    ekm.project(test_point, err);
+                    dlog << LTRACE << "projection error: " << err;
+
+                    distance_function<kernel_type> df = ekm.convert_to_distance_function(ekm.project(test_point));
+
+                    // the projection error should be the distance between the test_point and the point it gets
+                    // projected onto
+                    DLIB_TEST_MSG(abs(df(test_point) - err) < 1e-10, abs(df(test_point) - err));
+                    // while we are at it make sure the squared norm in the distance function is right
+                    double df_error = abs(df.b - trans(df.alpha)*kernel_matrix(kern, samples)*df.alpha);
+                    DLIB_TEST_MSG( df_error < 1e-10, df_error);
+                }
+
+
+
+            }
+        }
+
         template <typename kernel_type>
         void test_with_kernel(const kernel_type& kern)
         {
@@ -241,6 +330,8 @@ namespace
                     df2 = ekm2.convert_to_distance_function(transform*samp);
                     DLIB_TEST_MSG(df1(df2) < eps, df1(df2));
                 }
+
+
             }
         }
 
@@ -252,6 +343,8 @@ namespace
             dlog << LINFO << "time seed: " << thetime;
             rnd.set_seed(cast_to_string(thetime));
 
+            print_spinner();
+            test_projection_error();
             print_spinner();
             dlog << LINFO << "test with linear kernel";
             test_with_kernel(linear_kernel<sample_type>());
