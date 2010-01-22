@@ -50,7 +50,7 @@ namespace
             // make sure 5 is not equal to 9
             DLIB_TEST_MSG(5 != 9,"This message prints if your compiler thinks 5 is the same as 9");
 
-            // This is a form of test you can use when you don't care about haivng a message
+            // This is a form of test you can use when you don't care about having a message
             DLIB_TEST(5 != 8);
 
             // If your test takes a long time to run you can also call print_spinner() 
@@ -64,7 +64,7 @@ namespace
     // Create an instance of this object.  Doing this causes this test
     // to be automatically inserted into the testing framework whenever this cpp file
     // is linked into the project.  Note that since we are inside an unnamed-namespace 
-    // we won't get any linker errors about the symbol a being defined multple times. 
+    // we won't get any linker errors about the symbol a being defined multiple times. 
     example_tester a;
 
 }

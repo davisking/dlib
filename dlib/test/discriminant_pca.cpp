@@ -347,7 +347,7 @@ namespace
     // Create an instance of this object.  Doing this causes this test
     // to be automatically inserted into the testing framework whenever this cpp file
     // is linked into the project.  Note that since we are inside an unnamed-namespace 
-    // we won't get any linker errors about the symbol a being defined multple times. 
+    // we won't get any linker errors about the symbol a being defined multiple times. 
     discriminant_pca_tester a;
 
 }
