@@ -1,4 +1,4 @@
-// Copyright (C) 2009  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SVm_KERNEL_MATRIX_
 #define DLIB_SVm_KERNEL_MATRIX_

@@ -1,4 +1,4 @@
-// Copyright (C) 2006  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_THREAD_SPECIFIC_DATA_EXTENSIOn_
 #define DLIB_THREAD_SPECIFIC_DATA_EXTENSIOn_

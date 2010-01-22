@@ -1,4 +1,4 @@
-// Copyright (C) 2006  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_MORPHOLOGICAL_OPERATIONs_ABSTRACT_
 #ifdef DLIB_MORPHOLOGICAL_OPERATIONs_ABSTRACT_

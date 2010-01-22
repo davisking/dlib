@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_CPP_PRETTY_PRINTER_KERNEl_ABSTRACT_
 #ifdef DLIB_CPP_PRETTY_PRINTER_KERNEl_ABSTRACT_

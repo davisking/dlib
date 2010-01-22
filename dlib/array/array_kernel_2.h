@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: GNU LGPL   See LICENSE.txt for the full license.
 #ifndef DLIB_ARRAY_KERNEl_2_
 #define DLIB_ARRAY_KERNEl_2_

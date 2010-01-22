@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2005  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_ENTROPY_DECODER_MODEL_KERNEl_5_
 #define DLIB_ENTROPY_DECODER_MODEL_KERNEl_5_

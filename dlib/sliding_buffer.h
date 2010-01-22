@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2004  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SLIDING_BUFFEr_
 #define DLIB_SLIDING_BUFFEr_

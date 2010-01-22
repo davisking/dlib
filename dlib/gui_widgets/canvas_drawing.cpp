@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), and Nils Labugt
+// Copyright (C) 2005  Davis E. King (davis@dlib.net), and Nils Labugt
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_CANVAS_DRAWINg_CPP_
 #define DLIB_CANVAS_DRAWINg_CPP_

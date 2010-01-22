@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Keita Mochizuki, Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2008 Keita Mochizuki, Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_UNICODe_CPp_
 #define DLIB_UNICODe_CPp_

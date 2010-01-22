@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Keita Mochizuki 
+// Copyright (C) 2005  Davis E. King (davis@dlib.net), Keita Mochizuki 
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_GUI_CORE_KERNEl_1_
 #define DLIB_GUI_CORE_KERNEl_1_

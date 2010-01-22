@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_XML_PARSER_KERNEl_INTERFACES_
 #define DLIB_XML_PARSER_KERNEl_INTERFACES_

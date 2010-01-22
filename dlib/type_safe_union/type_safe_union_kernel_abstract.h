@@ -1,4 +1,4 @@
-// Copyright (C) 2009  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_TYPE_SAFE_UNION_KERNEl_ABSTRACT_
 #ifdef DLIB_TYPE_SAFE_UNION_KERNEl_ABSTRACT_

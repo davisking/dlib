@@ -1,4 +1,4 @@
-// Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net), and Nils Labugt
+// Copyright (C) 2008  Davis E. King (davis@dlib.net), and Nils Labugt
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_WIDGETs_STYLE_ABSTRACT_
 #ifdef DLIB_WIDGETs_STYLE_ABSTRACT_

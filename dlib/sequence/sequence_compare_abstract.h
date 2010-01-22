@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_SEQUENCE_COMPARe_ABSTRACT_
 #ifdef DLIB_SEQUENCE_COMPARe_ABSTRACT_

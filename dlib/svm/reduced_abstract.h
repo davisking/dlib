@@ -1,4 +1,4 @@
-// Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2008  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_REDUCED_TRAINERs_ABSTRACT_
 #ifdef DLIB_REDUCED_TRAINERs_ABSTRACT_

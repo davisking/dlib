@@ -1,4 +1,4 @@
-// Copyright (C) 2006  Davis E. King (davisking@users.sourceforge.net), Steven Van Ingelgem
+// Copyright (C) 2006  Davis E. King (davis@dlib.net), Steven Van Ingelgem
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SERVER_HTTp_1_
 #define DLIB_SERVER_HTTp_1_

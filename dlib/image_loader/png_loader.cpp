@@ -1,4 +1,4 @@
-// Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net), Nils Labugt
+// Copyright (C) 2008  Davis E. King (davis@dlib.net), Nils Labugt
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_PNG_LOADER_CPp_
 #define DLIB_PNG_LOADER_CPp_

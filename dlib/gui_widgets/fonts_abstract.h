@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davisking@users.sourceforge.net), Nils Labugt, Keita Mochizuki
+// Copyright (C) 2005  Davis E. King (davis@dlib.net), Nils Labugt, Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_FONTs_ABSTRACT_
 #ifdef DLIB_FONTs_ABSTRACT_

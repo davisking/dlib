@@ -1,4 +1,4 @@
-// Copyright (C) 2009  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_DIR_NAV_EXTENSIONs_ABSTRACT_
 #ifdef DLIB_DIR_NAV_EXTENSIONs_ABSTRACT_

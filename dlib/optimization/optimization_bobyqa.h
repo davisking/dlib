@@ -1,4 +1,4 @@
-// Copyright (C) 2009 M.J.D. Powell, Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2009 M.J.D. Powell, Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_OPTIMIZATIOn_BOBYQA_H__
 #define DLIB_OPTIMIZATIOn_BOBYQA_H__

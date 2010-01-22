@@ -1,4 +1,4 @@
-// Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net)
+// Copyright (C) 2008  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_THREAD_POOl_ABSTRACT_H__
 #ifdef DLIB_THREAD_POOl_ABSTRACT_H__ 

@@ -1,4 +1,4 @@
-// Copyright (C) 2008  Davis E. King (davisking@users.sourceforge.net), Nils Labugt
+// Copyright (C) 2008  Davis E. King (davis@dlib.net), Nils Labugt
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_PNG_IMPORT_ABSTRACT
 #ifdef DLIB_PNG_IMPORT_ABSTRACT
