@@ -154,7 +154,7 @@ int main(int argc, char** argv)
             cout << "Htmlify v" << VERSION 
                  << "\nCompiled: " << __TIME__ << " " << __DATE__ 
                  << "\nWritten by Davis King\n";
-            cout << "Check for updates at http://dclib.sf.net\n\n";
+            cout << "Check for updates at http://dlib.net\n\n";
             no_run = true;
         }
 
