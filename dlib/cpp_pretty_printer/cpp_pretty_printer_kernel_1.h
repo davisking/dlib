@@ -130,7 +130,7 @@ namespace dlib
         t.set_stream(in);
 
         out << "<html><!-- " 
-            << "Created using the cpp_pretty_printer from the dlib C++ library.  See http://dclib.sf.net for updates." 
+            << "Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates." 
             << " --><head><title>" << title << "</title></head><body bgcolor='white'><pre>\n";
         if (!out)
             throw std::ios::failure("error occurred in cpp_pretty_printer_kernel_1::print");
