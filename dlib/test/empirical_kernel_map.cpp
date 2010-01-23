@@ -67,7 +67,7 @@ namespace
                 for (int i = 0; i < samples.size(); ++i)
                 {
                     ekm.project(samples[i], err);
-                    DLIB_TEST_MSG(abs(err) < 1e-7, abs(err));
+                    DLIB_TEST_MSG(abs(err) < 1e-13, abs(err));
 
                 }
                 
@@ -111,6 +111,8 @@ namespace
                 {
                     sample_type test_point = i*randm(5,1,rnd);
                     ekm.project(test_point, err);
+                    // turn into normal distance rather than squared distance
+                    err = sqrt(err);
                     dlog << LTRACE << "projection error: " << err;
 
                     distance_function<kernel_type> df = ekm.convert_to_distance_function(ekm.project(test_point));

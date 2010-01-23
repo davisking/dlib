@@ -267,9 +267,12 @@ namespace dlib
 
             temp1 = kernel_matrix(kernel, basis, samp);
             temp2 = weights*temp1;
-            // The std::abs is here because rounding error could make the expresison negative
-            // which would be bad since sqrt() would get upset.
-            projection_error = std::sqrt(std::abs( kernel(samp,samp) - dot(temp2,temp2)));
+            projection_error = std::abs( kernel(samp,samp) - dot(temp2,temp2));
+            // Rounding error could make the expression slightly negative which is an impossible result
+            // since it measures a distance.  Just force it to be zero in that case.
+            if (projection_error < 0)
+                projection_error = 0;
+
             return temp2;
         }
 

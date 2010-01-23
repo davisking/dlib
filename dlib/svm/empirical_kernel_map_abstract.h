@@ -195,18 +195,19 @@ namespace dlib
         !*/
 
         const matrix<scalar_type,0,1,mem_manager_type>& project (
-            const sample_type& sample,
+            const sample_type& samp,
             scalar_type& projection_error
         ) const;
         /*!
             requires
                 - out_vector_size() != 0
             ensures
-                - This function returns project(sample)
+                - This function returns project(samp)
                   (i.e. it returns the same thing as the above project() function)
-                - #projection_error == the distance between the point sample gets projected
-                  onto and sample's true image in kernel feature space.  That is, this value
-                  is equal to: convert_to_distance_function(project(sample))(sample)
+                - #projection_error == the square of the distance between the point samp 
+                  gets projected onto and samp's true image in kernel feature space.  
+                  That is, this value is equal to: 
+                    pow(convert_to_distance_function(project(samp))(samp),2)
         !*/
 
         template <typename EXP>
