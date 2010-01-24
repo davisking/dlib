@@ -257,7 +257,7 @@ namespace dlib
                       samples given to the load() function.  Note further that the distance computed
                       by DF(S) is always the correct distance in kernel feature space between vect and
                       the true projection of S.  That is, the above equality is approximate only because 
-                      of potential error in the project() function.
+                      of potential error in the project() function, not in DF(S).
                     - DF.kernel_function == get_kernel()
                     - DF.b == dot(vect,vect) 
                     - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
