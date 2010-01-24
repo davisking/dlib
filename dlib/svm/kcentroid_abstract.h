@@ -147,6 +147,14 @@ namespace dlib
                   estimate but also in less dictionary vectors.  (Note that in any case, 
                   the max_dictionary_size() limits the number of dictionary vectors no 
                   matter the setting of the tolerance)
+                - The exact meaning of the tolerance parameter is the following: 
+                  Imagine that we have an empirical_kernel_map that contains all
+                  the current dictionary vectors.  Then the tolerance is the minimum
+                  projection error (as given by empirical_kernel_map::project()) required
+                  to cause us to include a new vector in the dictionary.  So each time
+                  you call train() the kcentroid basically just computes the projection
+                  error for that new sample and if it is larger than the tolerance
+                  then that new sample becomes part of the dictionary.
         !*/
 
         void clear_dictionary (

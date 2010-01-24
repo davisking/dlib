@@ -75,6 +75,14 @@ namespace dlib
                   estimate while also resulting in a bigger set of dictionary vectors in 
                   the learned decision function.  Bigger tolerances values result in a 
                   less accurate decision function but also in less dictionary vectors.
+                - The exact meaning of the tolerance parameter is the following: 
+                  Imagine that we have an empirical_kernel_map that contains all
+                  the current dictionary vectors.  Then the tolerance is the minimum
+                  projection error (as given by empirical_kernel_map::project()) required
+                  to cause us to include a new vector in the dictionary.  So each time
+                  you call train() the krls object basically just computes the projection
+                  error for that new sample and if it is larger than the tolerance
+                  then that new sample becomes part of the dictionary.
         !*/
 
         const kernel_type& get_kernel (

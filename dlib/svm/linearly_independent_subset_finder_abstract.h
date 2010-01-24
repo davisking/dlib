@@ -95,6 +95,14 @@ namespace dlib
                   a sample must be for it to even be considered for addition to the dictionary.  
                   Moreover, bigger values of this field will make the algorithm run faster but 
                   might give less accurate results.
+                - The exact meaning of the tolerance parameter is the following: 
+                  Imagine that we have an empirical_kernel_map that contains all the current 
+                  dictionary vectors.  Then the tolerance is the minimum projection error 
+                  (as given by empirical_kernel_map::project()) required to cause us to 
+                  include a new vector in the dictionary.  So each time you call add() this 
+                  object basically just computes the projection error for that new sample 
+                  and if it is larger than the tolerance then that new sample becomes part 
+                  of the dictionary.  
         !*/
 
         void clear_dictionary (
