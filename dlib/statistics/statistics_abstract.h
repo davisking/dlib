@@ -118,6 +118,16 @@ namespace dlib
                   object so far.
         !*/
 
+        T stddev (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the standard deviation of all the values presented to this
+                  object so far.
+        !*/
+
         T max (
         ) const;
         /*!

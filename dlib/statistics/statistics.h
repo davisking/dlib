@@ -132,6 +132,19 @@ namespace dlib
                 return 0;
         }
 
+        T stddev (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_stats::stddev"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return std::sqrt(variance());
+        }
+
         T scale (
             const T& val
         ) const
