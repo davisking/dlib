@@ -28,6 +28,7 @@
          <item>crc32</item> 
          <item>rand</item> 
          <item>running_stats</item> 
+         <item>random_subset_selector</item> 
          <item nolink="true">
             <name>Optimization</name>
             <sub>
@@ -669,6 +670,21 @@
          <examples>
             <example>kcentroid_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>random_subset_selector</name>
+         <file>dlib/statistics.h</file>
+         <spec_file>dlib/statistics/random_subset_selector_abstract.h</spec_file>
+         <description>
+               This object is a tool to help you select a random subset of a large body of data.  
+               In particular, it is useful when the body of data is too large to fit into memory.
+         </description>
+
                                  
       </component>
       
