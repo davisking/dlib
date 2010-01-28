@@ -74,6 +74,7 @@ set (tests
    stack.cpp
    static_map.cpp
    static_set.cpp
+   statistics.cpp
    std_vector_c.cpp
    string.cpp
    svm.cpp
