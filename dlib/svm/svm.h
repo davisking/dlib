@@ -540,7 +540,7 @@ namespace dlib
 
         /*
             This function fits a sigmoid function to the output of the 
-            svm trained by svm_nu_train().  The technique used is the one
+            svm trained by svm_nu_trainer.  The technique used is the one
             described in the paper:
                 
                 Probabilistic Outputs for Support Vector Machines and
