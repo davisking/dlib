@@ -4,7 +4,7 @@
 #ifdef DLIB_RANDOM_SUBSeT_SELECTOR_ABSTRACT_H_
 
 #include <vector>
-#include "../rand.h"
+#include "../rand/rand_kernel_abstract.h"
 #include "../memory_manager.h"
 
 namespace dlib
