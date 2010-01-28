@@ -151,8 +151,11 @@ int main()
 
 
         // The nu parameter has a maximum value that is dependent on the ratio of the +1 to -1 
-        // labels in the training data.  This function finds that value.
-        const double max_nu = maximum_nu(labels);
+        // labels in the training data.  This function finds that value.  The 0.999 is here because
+        // the maximum allowable nu is strictly less than the value returned by maximum_nu().  So
+        // rather than dealing with that below we can just back away from it a little bit here and then
+        // not worry about it.
+        const double max_nu = 0.999*maximum_nu(labels);
 
 
 
