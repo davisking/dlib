@@ -241,7 +241,16 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS 
                 This object represents a point in kernel induced feature space. 
                 You may use this object to find the distance from the point it 
-                represents to points in input space.
+                represents to points in input space as well as other points
+                represented by distance_functions.
+
+                Any routine that creates a distance_function should always
+                automatically populate the this->b field.  But for reference, 
+                this->b is supposed to contain the squared norm of the point
+                in kernel feature space.  So this means that if this function
+                is to compute a proper distance then this->b should always be equal 
+                to the following:
+                    trans(alpha)*kernel_matrix(kernel_function,basis_vectors)*alpha
         !*/
 
         typedef K kernel_type;
