@@ -284,8 +284,7 @@ namespace dlib
         // The cost of evaluating an element of a matrix multiply is the cost of evaluating elements from
         // RHS and LHS times the number of rows/columns in the RHS/LHS matrix.  If we don't know the matrix
         // dimensions then just assume it is really large.
-        const static long cost = (lhs_cost+rhs_cost)*
-                                 ((tmax<LHS::NC,RHS::NR>::value!=0)? (tmax<LHS::NC,RHS::NR>::value):(10000));
+        const static long cost = ((tmax<LHS::NC,RHS::NR>::value!=0)? ((lhs_cost+rhs_cost)*tmax<LHS::NC,RHS::NR>::value):(10000));
     };
 
     template <typename T, bool is_ref> struct conditional_matrix_temp { typedef typename T::matrix_type type; };

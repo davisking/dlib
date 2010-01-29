@@ -64,7 +64,7 @@ namespace
                 double err;
 
                 // the samples in the basis should have zero projection error
-                for (int i = 0; i < samples.size(); ++i)
+                for (unsigned long i = 0; i < samples.size(); ++i)
                 {
                     ekm.project(samples[i], err);
                     DLIB_TEST_MSG(abs(err) < 1e-13, abs(err));
