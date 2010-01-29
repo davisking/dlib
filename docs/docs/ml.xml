@@ -132,6 +132,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>cross_validate_trainer_threaded</item> 
          <item>pick_initial_centers</item> 
          <item>find_gamma_with_big_centroid_gap</item> 
+         <item>compute_mean_squared_distance</item> 
          <item>kernel_matrix</item> 
       </section>
 
@@ -874,6 +875,21 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>rank_features_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>compute_mean_squared_distance</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/feature_ranking_abstract.h</spec_file>
+         <description>
+            This is a function that simply finds the average squared distance between all
+            pairs of a set of data samples.  It is often convenient to use the reciprocal
+            of this value as the estimate of the gamma parameter of the 
+            <a href="#radial_basis_kernel">radial_basis_kernel</a>.  
+         </description>
                                  
       </component>
       
