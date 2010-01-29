@@ -94,8 +94,9 @@ int main()
     m(0) = -1.5; m(1) = sinc(m(0))+0.9; cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
     m(0) = -0.5; m(1) = sinc(m(0))+1;   cout << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc." << endl;
 
+    // And finally print out the mean and standard deviation of points that are actually from sinc().  
     cout << "\nmean: " << rs.mean() << endl;
-    cout << "standard deviation: " << sqrt(rs.variance()) << endl;
+    cout << "standard deviation: " << rs.stddev() << endl;
 
     // The output is as follows:
     /*
