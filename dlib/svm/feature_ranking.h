@@ -9,6 +9,7 @@
 #include "feature_ranking_abstract.h"
 #include "kcentroid.h"
 #include "../optimization.h"
+#include "../statistics.h"
 #include <iostream>
 
 namespace dlib
@@ -446,6 +447,28 @@ namespace dlib
                                                              initial_gamma,
                                                              num_sv,
                                                              true);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename alloc
+        >
+    double compute_mean_squared_distance (
+        const std::vector<T,alloc>& samples
+    )
+    {
+        running_stats<double> rs;
+        for (unsigned long i = 0; i < samples.size(); ++i)
+        {
+            for (unsigned long j = i+1; j < samples.size(); ++j)
+            {
+                rs.add(length_squared(samples[i] - samples[j]));
+            }
+        }
+
+        return rs.mean();
     }
 
 // ----------------------------------------------------------------------------------------

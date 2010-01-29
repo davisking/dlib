@@ -109,6 +109,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T,
+        typename alloc
+        >
+    double compute_mean_squared_distance (
+        const std::vector<T,alloc>& samples
+    );
+    /*!
+        requires
+            - for all valid i: is_vector(samples[i]) == true
+        ensures
+            - computes the average value of the squares of all the pairwise 
+              distances between every element of samples.  
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_KERNEL_FEATURE_RANKINg_ABSTRACT_H_
