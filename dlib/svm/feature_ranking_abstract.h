@@ -118,6 +118,8 @@ namespace dlib
     );
     /*!
         requires
+            - T is a dlib::matrix type which contains scalars such as float or double
+              values.
             - for all valid i: is_vector(samples[i]) == true
         ensures
             - computes the average value of the squares of all the pairwise 
