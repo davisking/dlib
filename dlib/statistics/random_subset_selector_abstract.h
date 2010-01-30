@@ -25,6 +25,7 @@ namespace dlib
             INITIAL VALUE
                 - size() == 0
                 - max_size() == 0
+                - next_add_accepts() == false
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool to help you select a random subset of a large body of data.  
@@ -42,6 +43,24 @@ namespace dlib
                 At the end of the for loop you will have your random subset of 1000 samples.  And by
                 random I mean that each of the 1000000 data samples has an equal change of ending
                 up in the rand_subset object.
+
+
+                Note that the above example calls get_next_data_sample() for each data sample.  This 
+                may be inefficient since most of the data samples are just ignored.  An alternative 
+                method that doesn't require you to load each sample can also be used.  Consider the 
+                following:
+
+                    random_subset_selector<sample_type> rand_subset;
+                    rand_subset.set_max_size(1000)
+                    for (int i = 0; i < 1000000; ++i)
+                        if (rand_subset.next_add_accepts())
+                            rand_subset.add(get_data_sample(i));
+                        else
+                            rand_subset.add() 
+
+                In the above example we only actually fetch the data sample into memory if we
+                know that the rand_subset would include it into the random subset.  Otherwise,
+                we can just call the empty add().
 
         !*/
     public:
@@ -118,18 +137,39 @@ namespace dlib
                 - returns a const reference to the idx'th element of this object
         !*/
 
+        bool next_add_accepts (
+        ) const;
+        /*!
+            ensures
+                - if (the next call to add(item) will result in item being included
+                  into *this) then
+                    - returns true
+                    - Note that the next item will always be accepted if size() < max_size().
+                - else
+                    - returns false
+                    - Note that the next item will never be accepted if max_size() == 0.
+        !*/
+
         void add (
             const T& new_item
         );
         /*!
             ensures
-                - if (size() < max_size()) then
-                    - #size() == size() + 1
+                - if (next_add_accepts()) then
                     - places new_item into *this object at a random location
-                - else
-                    - randomly does one of the following:
-                        - ignores new_item and makes no change
-                        - replaces a random element of *this with new_item
+                    - if (size() < max_size()) then
+                        - #size() == size() + 1
+                - #next_add_accepts() == The updated information about the acceptance
+                  of the next call to add()
+        !*/
+
+        void add (
+        );
+        /*!
+            requires
+                - next_add_accepts() == false
+            ensures
+                - This function does nothing but update the value of #next_add_accepts()
         !*/
 
         iterator begin(

@@ -22,12 +22,14 @@ namespace dlib
                 - _max_size == 0
                 - items.size() == 0
                 - count == 0
+                - _next_add_accepts == false
 
             CONVENTION
                 - count == the number of times add() has been called since the last
                   time this object was empty.
                 - items.size() == size()
                 - max_size() == _max_size
+                - next_add_accepts() == _next_add_accepts
         !*/
     public:
         typedef T type;
@@ -55,6 +57,7 @@ namespace dlib
         {
             items.resize(0);
             count = 0;
+            update_next_add_accepts();
         }
 
         unsigned long size (
@@ -70,6 +73,7 @@ namespace dlib
             items.reserve(new_max_size);
             make_empty();
             _max_size = new_max_size;
+            update_next_add_accepts();
         }
 
         unsigned long max_size (
@@ -82,6 +86,15 @@ namespace dlib
             unsigned long idx
         ) 
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(idx < size(),
+                "\tvoid random_subset_selector::operator[]()"
+                << "\n\t idx is out of range"
+                << "\n\t idx:    " << idx 
+                << "\n\t size(): " << size() 
+                << "\n\t this:   " << this
+                );
+
             return items[idx];
         }
 
@@ -89,6 +102,15 @@ namespace dlib
             unsigned long idx
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(idx < size(),
+                "\tvoid random_subset_selector::operator[]()"
+                << "\n\t idx is out of range"
+                << "\n\t idx:    " << idx 
+                << "\n\t size(): " << size() 
+                << "\n\t this:   " << this
+                );
+
             return items[idx];
         }
 
@@ -96,6 +118,12 @@ namespace dlib
         const_iterator          begin() const                   { return items.begin(); }
         iterator                end()                           { return items.end(); }
         const_iterator          end() const                     { return items.end(); }
+
+        bool next_add_accepts (
+        ) const 
+        {
+            return _next_add_accepts;
+        }
 
         void add (
             const T& new_item
@@ -107,14 +135,62 @@ namespace dlib
                 // swap into a random place
                 exchange(items[rnd.get_random_32bit_number()%items.size()], items.back());
             }
+            else if (_next_add_accepts)
+            {
+                // pick a random element of items and replace it.
+                items[rnd.get_random_32bit_number()%items.size()] = new_item;
+            }
+
+            update_next_add_accepts();
+            ++count;
+        }
+
+        void add (
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(next_add_accepts() == false,
+                "\tvoid random_subset_selector::add()"
+                << "\n\t You should be calling the version of add() that takes an argument"
+                << "\n\t this: " << this
+                );
+
+            update_next_add_accepts();
+            ++count;
+        }
+
+        void swap (
+            random_subset_selector& a
+        )
+        {
+            a.swap(a.items);
+            std::swap(_max_size, a._max_size);
+            std::swap(count, a.count);
+            rnd.swap(a.rnd);
+            std::swap(_next_add_accepts, a._next_add_accepts);
+        }
+
+    private:
+
+        void update_next_add_accepts (
+        )
+        {
+            if (items.size() < _max_size)
+            {
+                _next_add_accepts = true;
+            }
+            else if (_max_size == 0)
+            {
+                _next_add_accepts = false;
+            }
             else
             {
                 // At this point each element of items has had an equal chance of being in this object.   
                 // In particular, the probability that each arrived here is currently items.size()/count.    
                 // We need to be able to say that, after this function ends, the probability of any 
                 // particular object ending up in items is items.size()/(count+1).  So this means that 
-                // we should decide to add new_item into items with this probability.  If we do so then 
-                // we pick one of the current items and replace it at random with new_item.
+                // we should decide to add a new item into items with this probability.  Also, if we do 
+                // so then we pick one of the current items and replace it at random with the new item.
 
                 // Make me a random 64 bit number.   This might seem excessive but I want this object
                 // to be able to handle an effectively infinite number of calls to add().  So count
@@ -127,33 +203,18 @@ namespace dlib
 
                 num %= (count+1);
 
-                if (num < items.size())
-                {
-                    // pick a random element of items and replace it.
-                    items[rnd.get_random_32bit_number()%items.size()] = new_item;
-                }
+                _next_add_accepts = (num < items.size());
             }
 
-            ++count;
         }
-
-        void swap (
-            random_subset_selector& a
-        )
-        {
-            a.swap(a.items);
-            std::swap(_max_size, a._max_size);
-            std::swap(count, a.count);
-            rnd.swap(a.rnd);
-        }
-
-    private:
 
         std::vector<T> items;
         unsigned long _max_size;
         uint64 count; 
 
         rand_type rnd;
+
+        bool _next_add_accepts;
 
     };
 

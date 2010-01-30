@@ -60,10 +60,44 @@ namespace
             }
         }
 
+        void test_random_subset_selector2 ()
+        {
+            random_subset_selector<double> rand_set;
+
+            for (int j = 0; j < 30; ++j)
+            {
+                print_spinner();
+
+                running_stats<double> rs, rs2;
+
+                rand_set.set_max_size(1000);
+
+                for (double i = 0; i < 100000; ++i)
+                {
+                    rs.add(i);
+                    if (rand_set.next_add_accepts())
+                        rand_set.add(i);
+                    else
+                        rand_set.add();
+                }
+
+
+                for (unsigned long i = 0; i < rand_set.size(); ++i)
+                    rs2.add(rand_set[i]);
+
+
+                dlog << LDEBUG << "true mean:    " << rs.mean();
+                dlog << LDEBUG << "true sampled: " << rs2.mean();
+                double ratio = rs.mean()/rs2.mean();
+                DLIB_TEST_MSG(0.96 < ratio  && ratio < 1.04, " ratio: " << ratio);
+            }
+        }
+
         void perform_test (
         )
         {
             test_random_subset_selector();
+            test_random_subset_selector2();
         }
     } a;
 
