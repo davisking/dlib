@@ -115,13 +115,15 @@ namespace dlib
                 - this object has its initial value
         !*/
 
-        template <typename EXP>
+        template <typename T>
         void load(
             const kernel_type& kernel,
-            const matrix_exp<EXP>& basis_samples
+            const T& basis_samples
         );
         /*!
             requires
+                - T must be a dlib::matrix type or something convertable to a matrix via vector_to_matrix()
+                  (e.g. a std::vector)
                 - is_vector(basis_samples) == true
                 - basis_samples.size() > 0
                 - kernel must be capable of operating on the elements of basis_samples.  That is,
@@ -138,19 +140,6 @@ namespace dlib
                 - empirical_kernel_map_error
                     This exception is thrown if we are unable to create a kernel map.
                     If this happens then this object will revert back to its initial value.
-        !*/
-
-        void load(
-            const kernel_type& kernel,
-            const std::vector<sample_type>& basis_samples
-        );
-        /*!
-            requires
-                - basis_samples.size() > 0
-            ensures
-                - performs load(kernel,vector_to_matrix(basis_samples)).  I.e. This function
-                  does the exact same thing as the above load() function but lets you use
-                  a std::vector of basis samples instead of a row/column matrix of basis samples.
         !*/
 
         const kernel_type get_kernel (
