@@ -63,6 +63,9 @@ namespace
         void test_random_subset_selector2 ()
         {
             random_subset_selector<double> rand_set;
+            DLIB_TEST(rand_set.next_add_accepts() == false);
+            DLIB_TEST(rand_set.size() == 0);
+            DLIB_TEST(rand_set.max_size() == 0);
 
             for (int j = 0; j < 30; ++j)
             {
@@ -71,6 +74,7 @@ namespace
                 running_stats<double> rs, rs2;
 
                 rand_set.set_max_size(1000);
+                DLIB_TEST(rand_set.next_add_accepts() == true);
 
                 for (double i = 0; i < 100000; ++i)
                 {
@@ -81,6 +85,8 @@ namespace
                         rand_set.add();
                 }
 
+                DLIB_TEST(rand_set.size() == 1000);
+                DLIB_TEST(rand_set.max_size() == 1000);
 
                 for (unsigned long i = 0; i < rand_set.size(); ++i)
                     rs2.add(rand_set[i]);
