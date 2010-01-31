@@ -295,13 +295,14 @@ namespace dlib
     };
 
     template <
-        typename vector_type, 
+        typename vector_type1, 
+        typename vector_type2, 
         typename kernel_type
         >
     void pick_initial_centers(
         long num_centers, 
-        vector_type& centers, 
-        const vector_type& samples, 
+        vector_type1& centers, 
+        const vector_type2& samples, 
         const kernel_type& k, 
         double percentile = 0.01
     )
