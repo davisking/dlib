@@ -477,6 +477,8 @@ namespace dlib
 
                 if (j < n-1)
                 {
+                    if (a(j,j) == 0)
+                        return false;
                     dum = 1/a(j,j);
                     for (long i = j+1; i < n; ++i)
                         a(i,j) *= dum;
