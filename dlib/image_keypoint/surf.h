@@ -211,10 +211,10 @@ namespace dlib
             }
         }
 
-        // return the length normalized descriptor
-        const double len = length(des);
-        if (len != 0)
-            des = des/len;
+        // Return the length normalized descriptor.  Add a small number
+        // to guard against division by zero.
+        const double len = length(des) + 1e-7;
+        des = des/len;
     }
 
 // ----------------------------------------------------------------------------------------
