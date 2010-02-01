@@ -452,11 +452,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T,
-        typename alloc
+        typename vector_type
         >
     double compute_mean_squared_distance (
-        const std::vector<T,alloc>& samples
+        const vector_type& samples
     )
     {
         running_stats<double> rs;

@@ -110,16 +110,16 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T,
-        typename alloc
+        typename vector_type
         >
     double compute_mean_squared_distance (
-        const std::vector<T,alloc>& samples
+        const vector_type& samples
     );
     /*!
         requires
-            - T is a dlib::matrix type which contains scalars such as float or double
-              values.
+            - vector_type is something with an interface compatible with std::vector.  
+              Additionally, it must in turn contain dlib::matrix types which contain 
+              scalars such as float or double values.
             - for all valid i: is_vector(samples[i]) == true
         ensures
             - computes the average value of the squares of all the pairwise 
