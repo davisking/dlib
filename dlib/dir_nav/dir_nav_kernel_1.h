@@ -59,6 +59,7 @@ namespace dlib
         };
 
 
+        void init ( const std::string& name);
 
     public:
 
@@ -94,7 +95,11 @@ namespace dlib
 
         file (
             const std::string& name
-        );
+        ) { init(name); }
+
+        file (
+            const char* name
+        ) { init(name); }
 
         inline file (
             const file& item
@@ -181,6 +186,9 @@ namespace dlib
                 is_root()          == state->name.size() == 0
 
         !*/
+
+        void init (const std::string& name);
+
     public:
 
         struct data
@@ -229,7 +237,11 @@ namespace dlib
 
         directory (
             const std::string& name
-        );
+        ) { init(name); }
+
+        directory (
+            const char* name
+        ) { init(name); }
 
         inline directory (
             const directory& item

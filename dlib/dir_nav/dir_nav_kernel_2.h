@@ -66,6 +66,7 @@ namespace dlib
             unsigned long count;
         };
 
+        void init(const std::string& name);
 
     public:
 
@@ -99,7 +100,11 @@ namespace dlib
 
         file (
             const std::string& name
-        );
+        ) { init(name); }
+
+        file (
+            const char* name
+        ) { init(name); }
 
         inline file (
             const file& item
@@ -187,6 +192,8 @@ namespace dlib
 
         !*/
 
+        void init(const std::string& name);
+
     public:
         struct private_constructor{};
         inline directory (
@@ -224,7 +231,11 @@ namespace dlib
 
         directory (
             const std::string& name
-        );
+        ) { init(name); }
+
+        directory (
+            const char* name
+        ) { init(name); }
 
         inline directory (
             const directory& item

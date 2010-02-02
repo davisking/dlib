@@ -97,6 +97,14 @@ namespace dlib
         !*/
 
         file (
+            const char* name
+        );
+        /*!
+            ensures
+                - this function is idential to file(const std::string& name)
+        !*/
+
+        file (
             const file& item
         );
         /*!
@@ -228,6 +236,14 @@ namespace dlib
                 - dir_not_found
                     This exception is thrown if the directory can not be found or
                     accessed.    
+        !*/
+
+        directory (
+            const char* name
+        );
+        /*!
+            ensures
+                - this function is idential to directory(const std::string& name)
         !*/
 
         directory (
