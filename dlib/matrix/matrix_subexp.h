@@ -158,9 +158,10 @@ namespace dlib
             const static long NR = 1;
             const static long NC = EXP::NC;
             typedef typename EXP::type type;
+            typedef typename EXP::const_ret_type const_ret_type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static type apply ( const M& m, long row, long, long c)
+            static const const_ret_type apply ( const M& m, long row, long, long c)
             { return m(row,c); }
 
             template <typename M>
@@ -201,9 +202,10 @@ namespace dlib
             const static long NR = 1;
             const static long NC = 0;
             typedef typename EXP::type type;
+            typedef typename EXP::const_ret_type const_ret_type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static type apply ( const M& m, long row, long , long , long c)
+            static const const_ret_type apply ( const M& m, long row, long , long , long c)
             { return m(row,c); }
 
             template <typename M>
@@ -245,12 +247,13 @@ namespace dlib
         {
             const static long cost = EXP1::cost+EXP2::cost;
             typedef typename EXP1::type type;
+            typedef typename EXP1::const_ret_type const_ret_type;
             typedef typename EXP1::mem_manager_type mem_manager_type;
             const static long NR = EXP2::NC*EXP2::NR;
             const static long NC = EXP1::NC;
 
             template <typename M1, typename M2>
-            static type apply ( const M1& m1, const M2& rows , long r, long c)
+            static const const_ret_type apply ( const M1& m1, const M2& rows , long r, long c)
             { return m1(rows(r),c); }
 
             template <typename M1, typename M2>
@@ -298,9 +301,10 @@ namespace dlib
             const static long NR = EXP::NR;
             const static long NC = 1;
             typedef typename EXP::type type;
+            typedef typename EXP::const_ret_type const_ret_type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static type apply ( const M& m, long col, long r, long)
+            static const const_ret_type apply ( const M& m, long col, long r, long)
             { return m(r,col); }
 
             template <typename M>
@@ -341,9 +345,10 @@ namespace dlib
             const static long NR = 0;
             const static long NC = 1;
             typedef typename EXP::type type;
+            typedef typename EXP::const_ret_type const_ret_type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static type apply ( const M& m, long col, long , long r, long )
+            static const const_ret_type apply ( const M& m, long col, long , long r, long )
             { return m(r,col); }
 
             template <typename M>
@@ -384,13 +389,14 @@ namespace dlib
         struct op : has_destructive_aliasing
         {
             typedef typename EXP1::type type;
+            typedef typename EXP1::const_ret_type const_ret_type;
             typedef typename EXP1::mem_manager_type mem_manager_type;
             const static long NR = EXP1::NR;
             const static long NC = EXP2::NC*EXP2::NR;
             const static long cost = EXP1::cost+EXP2::cost;
 
             template <typename M1, typename M2>
-            static type apply ( const M1& m1, const M2& cols , long r, long c)
+            static const const_ret_type apply ( const M1& m1, const M2& cols , long r, long c)
             { return m1(r,cols(c)); }
 
             template <typename M1, typename M2>

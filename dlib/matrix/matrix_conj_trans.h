@@ -31,9 +31,10 @@ namespace dlib
             const static long NR = EXP::NC;
             const static long NC = EXP::NR;
             typedef typename EXP::type type;
+            typedef typename EXP::type const_ret_type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static type apply ( const M& m, long r, long c)
+            static const const_ret_type apply ( const M& m, long r, long c)
             { return std::conj(m(c,r)); }
 
             template <typename M>

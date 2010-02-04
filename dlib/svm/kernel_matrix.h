@@ -22,6 +22,7 @@ namespace dlib
     struct matrix_traits<kernel_matrix_exp<kernel_type,alloc> >
     {
         typedef typename kernel_type::scalar_type type;
+        typedef typename kernel_type::scalar_type const_ret_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 0;
@@ -38,6 +39,7 @@ namespace dlib
         typedef typename kernel_type::sample_type sample_type;
     public:
         typedef typename matrix_traits<kernel_matrix_exp>::type type;
+        typedef typename matrix_traits<kernel_matrix_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<kernel_matrix_exp>::mem_manager_type mem_manager_type;
         typedef typename matrix_traits<kernel_matrix_exp>::layout_type layout_type;
         const static long NR = matrix_traits<kernel_matrix_exp>::NR;
@@ -114,8 +116,9 @@ namespace dlib
 
             const static long cost = EXP::cost+100;
             typedef typename kernel_type::scalar_type type;
+            typedef typename kernel_type::scalar_type const_ret_type;
             template <typename M>
-            static type apply ( const M& m, const kernel_type& kern, const long r, long c)
+            static const const_ret_type apply ( const M& m, const kernel_type& kern, const long r, long c)
             { 
                 return kern(m(r),m(c));
             }
@@ -161,6 +164,7 @@ namespace dlib
     struct matrix_traits<kernel_matrix_exp1<kernel_type,lhs_type> >
     {
         typedef typename kernel_type::scalar_type type;
+        typedef typename kernel_type::scalar_type const_ret_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 0;
@@ -177,6 +181,7 @@ namespace dlib
         typedef typename kernel_type::sample_type sample_type;
     public:
         typedef typename matrix_traits<kernel_matrix_exp1>::type type;
+        typedef typename matrix_traits<kernel_matrix_exp1>::type const_ret_type;
         typedef typename matrix_traits<kernel_matrix_exp1>::mem_manager_type mem_manager_type;
         typedef typename matrix_traits<kernel_matrix_exp1>::layout_type layout_type;
         const static long NR = matrix_traits<kernel_matrix_exp1>::NR;
@@ -276,6 +281,7 @@ namespace dlib
     struct matrix_traits<kernel_matrix_exp2<kernel_type,lhs_type> >
     {
         typedef typename kernel_type::scalar_type type;
+        typedef typename kernel_type::scalar_type const_ret_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 1;
@@ -292,6 +298,7 @@ namespace dlib
         typedef typename kernel_type::sample_type sample_type;
     public:
         typedef typename matrix_traits<kernel_matrix_exp2>::type type;
+        typedef typename matrix_traits<kernel_matrix_exp2>::const_ret_type const_ret_type;
         typedef typename matrix_traits<kernel_matrix_exp2>::mem_manager_type mem_manager_type;
         typedef typename matrix_traits<kernel_matrix_exp2>::layout_type layout_type;
         const static long NR = matrix_traits<kernel_matrix_exp2>::NR;
@@ -391,6 +398,7 @@ namespace dlib
     struct matrix_traits<kernel_matrix_exp3<kernel_type,lhs_type,rhs_type> >
     {
         typedef typename kernel_type::scalar_type type;
+        typedef typename kernel_type::scalar_type const_ret_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 0;
@@ -408,6 +416,7 @@ namespace dlib
         typedef typename kernel_type::sample_type sample_type;
     public:
         typedef typename matrix_traits<kernel_matrix_exp3>::type type;
+        typedef typename matrix_traits<kernel_matrix_exp3>::const_ret_type const_ret_type;
         typedef typename matrix_traits<kernel_matrix_exp3>::mem_manager_type mem_manager_type;
         typedef typename matrix_traits<kernel_matrix_exp3>::layout_type layout_type;
         const static long NR = matrix_traits<kernel_matrix_exp3>::NR;

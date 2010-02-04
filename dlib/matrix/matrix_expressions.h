@@ -215,6 +215,7 @@ namespace dlib
     {
         typedef typename OP_::template op<M> OP;
         typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
         typedef typename OP::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const static long NR = OP::NR;
@@ -236,6 +237,7 @@ namespace dlib
 
     public:
         typedef typename matrix_traits<matrix_unary_exp>::type type;
+        typedef typename matrix_traits<matrix_unary_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_unary_exp>::mem_manager_type mem_manager_type;
         typedef typename matrix_traits<matrix_unary_exp>::layout_type layout_type;
         const static long NR = matrix_traits<matrix_unary_exp>::NR;
@@ -253,12 +255,12 @@ namespace dlib
             m(m_)
         {}
 
-        const typename OP::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m,r,c); }
 
-        const typename OP::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_unary_exp>::operator()(i); }
 
         template <typename U>
@@ -291,6 +293,7 @@ namespace dlib
     {
         typedef typename OP_::template op<M> OP;
         typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
         typedef typename OP::mem_manager_type mem_manager_type;
         const static long NR = OP::NR;
         const static long NC = OP::NC;
@@ -313,6 +316,7 @@ namespace dlib
 
     public:
         typedef typename matrix_traits<matrix_scalar_binary_exp>::type type;
+        typedef typename matrix_traits<matrix_scalar_binary_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_scalar_binary_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_scalar_binary_exp>::NR;
         const static long NC = matrix_traits<matrix_scalar_binary_exp>::NC;
@@ -335,12 +339,12 @@ namespace dlib
             COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
         }
 
-        const typename OP::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m,s,r,c); }
 
-        const typename OP::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_scalar_binary_exp>::operator()(i); }
 
         template <typename U>
@@ -374,6 +378,7 @@ namespace dlib
     {
         typedef typename OP_::template op<M> OP;
         typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
         typedef typename OP::mem_manager_type mem_manager_type;
         const static long NR = OP::NR;
         const static long NC = OP::NC;
@@ -396,6 +401,7 @@ namespace dlib
 
     public:
         typedef typename matrix_traits<matrix_scalar_ternary_exp>::type type;
+        typedef typename matrix_traits<matrix_scalar_ternary_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_scalar_ternary_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_scalar_ternary_exp>::NR;
         const static long NC = matrix_traits<matrix_scalar_ternary_exp>::NC;
@@ -420,12 +426,12 @@ namespace dlib
             COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
         }
 
-        const typename OP::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m,s1,s2,r,c); }
 
-        const typename OP::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_scalar_ternary_exp>::operator()(i); }
 
         template <typename U>
@@ -460,6 +466,7 @@ namespace dlib
     {
         typedef typename OP_::template op<M1,M2> OP;
         typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
         typedef typename OP::mem_manager_type mem_manager_type;
         const static long NR = OP::NR;
         const static long NC = OP::NC;
@@ -482,6 +489,7 @@ namespace dlib
 
     public:
         typedef typename matrix_traits<matrix_binary_exp>::type type;
+        typedef typename matrix_traits<matrix_binary_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_binary_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_binary_exp>::NR;
         const static long NC = matrix_traits<matrix_binary_exp>::NC;
@@ -502,12 +510,12 @@ namespace dlib
             m2(m2_)
         {}
 
-        const typename OP::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m1,m2,r,c); }
 
-        const typename OP::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_binary_exp>::operator()(i); }
 
         template <typename U>
@@ -542,6 +550,7 @@ namespace dlib
     {
         typedef typename OP_::template op<M1,M2,M3> OP;
         typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
         typedef typename OP::mem_manager_type mem_manager_type;
         const static long NR = OP::NR;
         const static long NC = OP::NC;
@@ -565,6 +574,7 @@ namespace dlib
 
     public:
         typedef typename matrix_traits<matrix_ternary_exp>::type type;
+        typedef typename matrix_traits<matrix_ternary_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_ternary_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_ternary_exp>::NR;
         const static long NC = matrix_traits<matrix_ternary_exp>::NC;
@@ -587,12 +597,12 @@ namespace dlib
             m3(m3_)
         {}
 
-        const typename OP::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m1,m2,m3,r,c); }
 
-        const typename OP::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_ternary_exp>::operator()(i); }
 
         template <typename U>
@@ -628,6 +638,7 @@ namespace dlib
     {
         typedef typename OP_::template op<M1,M2,M3,M4> OP;
         typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
         typedef typename OP::mem_manager_type mem_manager_type;
         const static long NR = OP::NR;
         const static long NC = OP::NC;
@@ -652,6 +663,7 @@ namespace dlib
 
     public:
         typedef typename matrix_traits<matrix_fourary_exp>::type type;
+        typedef typename matrix_traits<matrix_fourary_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_fourary_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_fourary_exp>::NR;
         const static long NC = matrix_traits<matrix_fourary_exp>::NC;
@@ -676,12 +688,12 @@ namespace dlib
             m4(m4_)
         {}
 
-        const typename OP::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m1,m2,m3,m4,r,c); }
 
-        const typename OP::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_fourary_exp>::operator()(i); }
 
         template <typename U>
@@ -717,6 +729,7 @@ namespace dlib
     struct matrix_traits<dynamic_matrix_scalar_unary_exp<S,OP> >
     {
         typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
         typedef typename OP::mem_manager_type mem_manager_type;
         const static long NR = OP::NR;
         const static long NC = OP::NC;
@@ -736,6 +749,7 @@ namespace dlib
         !*/
     public:
         typedef typename matrix_traits<dynamic_matrix_scalar_unary_exp>::type type;
+        typedef typename matrix_traits<dynamic_matrix_scalar_unary_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<dynamic_matrix_scalar_unary_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<dynamic_matrix_scalar_unary_exp>::NR;
         const static long NC = matrix_traits<dynamic_matrix_scalar_unary_exp>::NC;
@@ -755,12 +769,12 @@ namespace dlib
             COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
         }
 
-        const typename OP::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(s,r,c); }
 
-        const typename OP::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<dynamic_matrix_scalar_unary_exp>::operator()(i); }
 
         template <typename U>
@@ -795,6 +809,7 @@ namespace dlib
     struct matrix_traits<matrix_scalar_unary_exp<S,OP> >
     {
         typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
         typedef typename OP::mem_manager_type mem_manager_type;
         const static long NR = OP::NR;
         const static long NC = OP::NC;
@@ -814,6 +829,7 @@ namespace dlib
         !*/
     public:
         typedef typename matrix_traits<matrix_scalar_unary_exp>::type type;
+        typedef typename matrix_traits<matrix_scalar_unary_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_scalar_unary_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_scalar_unary_exp>::NR;
         const static long NC = matrix_traits<matrix_scalar_unary_exp>::NC;
@@ -829,12 +845,12 @@ namespace dlib
             COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
         }
 
-        const typename OP::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(s,r,c); }
 
-        const typename OP::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_scalar_unary_exp>::operator()(i); }
 
         template <typename U>
@@ -867,6 +883,7 @@ namespace dlib
     struct matrix_traits<matrix_zeroary_exp<OP> >
     {
         typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
         typedef typename OP::mem_manager_type mem_manager_type;
         const static long NR = OP::NR;
         const static long NC = OP::NC;
@@ -881,6 +898,7 @@ namespace dlib
     {
     public:
         typedef typename matrix_traits<matrix_zeroary_exp>::type type;
+        typedef typename matrix_traits<matrix_zeroary_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_zeroary_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_zeroary_exp>::NR;
         const static long NC = matrix_traits<matrix_zeroary_exp>::NC;
@@ -891,12 +909,12 @@ namespace dlib
         matrix_zeroary_exp (
         ) {}
 
-        const typename OP::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(r,c); }
 
-        const typename OP::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_zeroary_exp>::operator()(i); }
 
         template <typename U>
@@ -930,6 +948,7 @@ namespace dlib
     struct matrix_traits<matrix_sub_range_exp<M,EXPr,EXPc> >
     {
         typedef typename M::type type;
+        typedef typename M::const_ret_type const_ret_type;
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const static long NR = EXPr::NR*EXPr::NC;
@@ -950,6 +969,7 @@ namespace dlib
         !*/
     public:
         typedef typename matrix_traits<matrix_sub_range_exp>::type type;
+        typedef typename matrix_traits<matrix_sub_range_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_sub_range_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_sub_range_exp>::NR;
         const static long NC = matrix_traits<matrix_sub_range_exp>::NC;
@@ -973,12 +993,12 @@ namespace dlib
         {
         }
 
-        const typename M::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return m(rows(r),cols(c)); }
 
-        const typename M::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_sub_range_exp>::operator()(i); }
 
         template <typename U>
@@ -1013,6 +1033,7 @@ namespace dlib
     struct matrix_traits<matrix_std_vector_exp<M> >
     {
         typedef typename M::value_type type;
+        typedef const typename M::value_type& const_ret_type;
         typedef typename memory_manager<char>::kernel_1a mem_manager_type;
         const static long NR = 0;
         const static long NC = 1;
@@ -1032,6 +1053,7 @@ namespace dlib
         !*/
     public:
         typedef typename matrix_traits<matrix_std_vector_exp>::type type;
+        typedef typename matrix_traits<matrix_std_vector_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_std_vector_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_std_vector_exp>::NR;
         const static long NC = matrix_traits<matrix_std_vector_exp>::NC;
@@ -1051,12 +1073,12 @@ namespace dlib
         {
         }
 
-        const typename M::value_type& operator() (
+        const const_ret_type operator() (
             long r, 
             long 
         ) const { return m[r]; }
 
-        const typename M::value_type& operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return m[i]; }
 
         template <typename U>
@@ -1088,6 +1110,7 @@ namespace dlib
     struct matrix_traits<matrix_array_exp<M> >
     {
         typedef typename M::type type;
+        typedef const typename M::type& const_ret_type;
         typedef typename M::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 0;
@@ -1107,6 +1130,7 @@ namespace dlib
         !*/
     public:
         typedef typename matrix_traits<matrix_array_exp>::type type;
+        typedef typename matrix_traits<matrix_array_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_array_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_array_exp>::NR;
         const static long NC = matrix_traits<matrix_array_exp>::NC;
@@ -1126,12 +1150,12 @@ namespace dlib
         {
         }
 
-        const typename M::type& operator() (
+        const const_ret_type operator() (
             long r, 
             long 
         ) const { return m[r]; }
 
-        const typename M::type& operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return m[i]; }
 
         template <typename U>
@@ -1163,6 +1187,7 @@ namespace dlib
     struct matrix_traits<matrix_array2d_exp<M> >
     {
         typedef typename M::type type;
+        typedef const typename M::type& const_ret_type;
         typedef typename M::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 0;
@@ -1182,6 +1207,7 @@ namespace dlib
         !*/
     public:
         typedef typename matrix_traits<matrix_array2d_exp>::type type;
+        typedef typename matrix_traits<matrix_array2d_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_array2d_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_array2d_exp>::NR;
         const static long NC = matrix_traits<matrix_array2d_exp>::NC;
@@ -1201,12 +1227,12 @@ namespace dlib
         {
         }
 
-        const typename M::type& operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return m[r][c]; }
 
-        const typename M::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_array2d_exp>::operator()(i); }
 
         template <typename U>
@@ -1238,6 +1264,7 @@ namespace dlib
     struct matrix_traits<matrix_sub_exp<M> >
     {
         typedef typename M::type type;
+        typedef typename M::const_ret_type const_ret_type;
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const static long NR = 0;
@@ -1256,6 +1283,7 @@ namespace dlib
         !*/
     public:
         typedef typename matrix_traits<matrix_sub_exp>::type type;
+        typedef typename matrix_traits<matrix_sub_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_sub_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_sub_exp>::NR;
         const static long NC = matrix_traits<matrix_sub_exp>::NC;
@@ -1283,12 +1311,12 @@ namespace dlib
         {
         }
 
-        const typename M::type operator() (
+        const const_ret_type operator() (
             long r, 
             long c
         ) const { return m(r+r_,c+c_); }
 
-        const typename M::type operator() ( long i ) const 
+        const const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_sub_exp>::operator()(i); }
 
         template <typename U>
@@ -1321,6 +1349,7 @@ namespace dlib
     struct matrix_traits<matrix_range_exp<T> >
     {
         typedef T type;
+        typedef T const_ret_type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 1;
@@ -1333,6 +1362,7 @@ namespace dlib
     {
     public:
         typedef typename matrix_traits<matrix_range_exp>::type type;
+        typedef typename matrix_traits<matrix_range_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_range_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_range_exp>::NR;
         const static long NC = matrix_traits<matrix_range_exp>::NC;
@@ -1387,12 +1417,12 @@ namespace dlib
 
         }
 
-        T operator() (
+        const const_ret_type operator() (
             long, 
             long c
         ) const { return start + c*inc;  }
 
-        T operator() (
+        const const_ret_type operator() (
             long c
         ) const { return start + c*inc;  }
 
@@ -1426,6 +1456,7 @@ namespace dlib
     struct matrix_traits<matrix_log_range_exp<T> >
     {
         typedef T type;
+        typedef T const_ret_type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 1;
@@ -1438,6 +1469,7 @@ namespace dlib
     {
     public:
         typedef typename matrix_traits<matrix_log_range_exp>::type type;
+        typedef typename matrix_traits<matrix_log_range_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_log_range_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_log_range_exp>::NR;
         const static long NC = matrix_traits<matrix_log_range_exp>::NC;
@@ -1465,12 +1497,12 @@ namespace dlib
 
         }
 
-        T operator() (
+        const const_ret_type operator() (
             long,
             long c
         ) const { return std::pow((T)10,start + c*inc);  }
 
-        T operator() (
+        const const_ret_type operator() (
             long c
         ) const { return std::pow(10,start + c*inc);  }
 
@@ -1504,6 +1536,7 @@ namespace dlib
     struct matrix_traits<matrix_range_static_exp<start,inc_,end> >
     {
         typedef long type;
+        typedef long const_ret_type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
         const static long NR = 1;
         const static long NC = tabs<(end - start)>::value/inc_ + 1;
@@ -1516,6 +1549,7 @@ namespace dlib
     {
     public:
         typedef typename matrix_traits<matrix_range_static_exp>::type type;
+        typedef typename matrix_traits<matrix_range_static_exp>::const_ret_type const_ret_type;
         typedef typename matrix_traits<matrix_range_static_exp>::mem_manager_type mem_manager_type;
         const static long NR = matrix_traits<matrix_range_static_exp>::NR;
         const static long NC = matrix_traits<matrix_range_static_exp>::NC;
@@ -1528,12 +1562,12 @@ namespace dlib
         matrix_range_static_exp (
         ) {}
 
-        long operator() (
+        const const_ret_type operator() (
             long , 
             long c
         ) const { return start + c*inc;  }
 
-        long operator() (
+        const const_ret_type operator() (
             long c
         ) const { return start + c*inc;  }
 

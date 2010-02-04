@@ -49,10 +49,17 @@ namespace dlib
                 are going to be accessing the same element over and over it might 
                 be faster to assign the matrix_exp to a temporary matrix and then 
                 use that temporary.
+
+
+                const_ret_type typedef (defined below)
+                    The purpose of the const_ret_type typedef is to allow matrix expressions
+                    to return their elements by reference when appropriate.  So const_ret_type 
+                    should either be of the same type as "type" or be of type "const type&".
         !*/
 
     public:
         typedef typename EXP::type type;
+        typedef typename EXP::const_ret_type const_ret_type;
         typedef typename EXP::mem_manager_type mem_manager_type;
         typedef typename EXP::layout_type layout_type;
         const static long cost = EXP::cost;
@@ -61,7 +68,7 @@ namespace dlib
         typedef matrix<type,NR,NC, mem_manager_type,layout_type> matrix_type;
         typedef EXP exp_type;
 
-        const type operator() (
+        const const_ret_type operator() (
             long r,
             long c
         ) const;
@@ -75,7 +82,7 @@ namespace dlib
                   the matrix represented by this matrix expression)
         !*/
 
-        const type operator() (
+        const const_ret_type operator() (
             long i
         ) const;
         /*!
