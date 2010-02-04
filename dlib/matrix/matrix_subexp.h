@@ -161,7 +161,7 @@ namespace dlib
             typedef typename EXP::const_ret_type const_ret_type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long row, long, long c)
+            static const_ret_type apply ( const M& m, long row, long, long c)
             { return m(row,c); }
 
             template <typename M>
@@ -205,7 +205,7 @@ namespace dlib
             typedef typename EXP::const_ret_type const_ret_type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long row, long , long , long c)
+            static const_ret_type apply ( const M& m, long row, long , long , long c)
             { return m(row,c); }
 
             template <typename M>
@@ -253,7 +253,7 @@ namespace dlib
             const static long NC = EXP1::NC;
 
             template <typename M1, typename M2>
-            static const const_ret_type apply ( const M1& m1, const M2& rows , long r, long c)
+            static const_ret_type apply ( const M1& m1, const M2& rows , long r, long c)
             { return m1(rows(r),c); }
 
             template <typename M1, typename M2>
@@ -304,7 +304,7 @@ namespace dlib
             typedef typename EXP::const_ret_type const_ret_type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long col, long r, long)
+            static const_ret_type apply ( const M& m, long col, long r, long)
             { return m(r,col); }
 
             template <typename M>
@@ -348,7 +348,7 @@ namespace dlib
             typedef typename EXP::const_ret_type const_ret_type;
             typedef typename EXP::mem_manager_type mem_manager_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long col, long , long r, long )
+            static const_ret_type apply ( const M& m, long col, long , long r, long )
             { return m(r,col); }
 
             template <typename M>
@@ -396,7 +396,7 @@ namespace dlib
             const static long cost = EXP1::cost+EXP2::cost;
 
             template <typename M1, typename M2>
-            static const const_ret_type apply ( const M1& m1, const M2& cols , long r, long c)
+            static const_ret_type apply ( const M1& m1, const M2& cols , long r, long c)
             { return m1(r,cols(c)); }
 
             template <typename M1, typename M2>

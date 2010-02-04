@@ -23,9 +23,9 @@ namespace dlib
     {                                                                           \
         const static long cost = EXP::cost+(extra_cost);                        \
         typedef typename EXP::type type;                                        \
-        typedef typename EXP::type const_ret_type;                                    \
+        typedef const typename EXP::type const_ret_type;                        \
         template <typename M>                                                   \
-        static const const_ret_type apply ( const M& m, long r, long c)               \
+        static const_ret_type apply ( const M& m, long r, long c)               \
         { return static_cast<type>(std::name(m(r,c))); }                        \
     };};                                                                        \
     template < typename EXP >                                                   \
@@ -66,9 +66,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 return static_cast<type>(1/(1 + std::exp(-m(r,c))));
             }
@@ -94,9 +94,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M, typename T>
-            static const const_ret_type apply ( const M& m, const T& eps, long r, long c)
+            static const_ret_type apply ( const M& m, const T& eps, long r, long c)
             { 
                 const type temp = m(r,c);
                 if (temp >= eps || temp <= -eps)
@@ -142,9 +142,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 const type temp = m(r,c);
                 return temp*temp*temp; 
@@ -171,9 +171,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+6;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 const type temp = m(r,c);
                 return temp*temp; 
@@ -200,9 +200,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M, typename S>
-            static const const_ret_type apply ( const M& m, const S& s, long r, long c)
+            static const_ret_type apply ( const M& m, const S& s, long r, long c)
             { return static_cast<type>(std::pow(m(r,c),s)); }
         };
     };
@@ -234,9 +234,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M, typename S>
-            static const const_ret_type apply ( const M& m, const S& s, long r, long c)
+            static const_ret_type apply ( const M& m, const S& s, long r, long c)
             { return static_cast<type>(std::pow(s,m(r,c))); }
         };
     };
@@ -268,9 +268,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+6;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 const type temp = m(r,c);
                 if (temp != static_cast<type>(0))
@@ -309,9 +309,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+6;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 const type temp = m(r,c);
                 if (temp != static_cast<type>(0))
@@ -347,9 +347,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+5;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, const type& s, long r, long c)
+            static const_ret_type apply ( const M& m, const type& s, long r, long c)
             { 
                 return m(r,c)*s;
             }
@@ -387,9 +387,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 return static_cast<type>(std::floor(m(r,c)+0.5)); 
             }
@@ -403,7 +403,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
             typedef typename EXP::type type;
             typedef typename EXP::const_ret_type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 return m(r,c);
             }
@@ -432,9 +432,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+7;
             typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
+            typedef const typename EXP::type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 return static_cast<type>(std::abs(m(r,c))); 
             }
@@ -445,9 +445,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost;
             typedef T type;
-            typedef T const_ret_type;
+            typedef const T const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 return static_cast<type>(std::abs(m(r,c))); 
             }
@@ -474,9 +474,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+1;
             typedef std::complex<typename EXP::type> type;
-            typedef std::complex<typename EXP::type> const_ret_type;
+            typedef const std::complex<typename EXP::type> const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { 
                 return type(m(r,c));
             }
@@ -502,10 +502,10 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP1::cost+EXP2::cost+1;
             typedef std::complex<typename EXP1::type> type;
-            typedef std::complex<typename EXP1::type> const_ret_type;
+            typedef const std::complex<typename EXP1::type> const_ret_type;
 
             template <typename M1, typename M2>
-            static const const_ret_type apply ( const M1& m1, const M2& m2 , long r, long c)
+            static const_ret_type apply ( const M1& m1, const M2& m2 , long r, long c)
             { return type(m1(r,c),m2(r,c)); }
         };
     };
@@ -545,9 +545,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost+6;
             typedef typename EXP::type::value_type type;
-            typedef typename EXP::type::value_type const_ret_type;
+            typedef const typename EXP::type::value_type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { return std::norm(m(r,c)); }
         };
     };
@@ -572,9 +572,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost;
             typedef typename EXP::type::value_type type;
-            typedef typename EXP::type::value_type const_ret_type;
+            typedef const typename EXP::type::value_type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { return std::real(m(r,c)); }
         };
     };
@@ -599,9 +599,9 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         {
             const static long cost = EXP::cost;
             typedef typename EXP::type::value_type type;
-            typedef typename EXP::type::value_type const_ret_type;
+            typedef const typename EXP::type::value_type const_ret_type;
             template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
+            static const_ret_type apply ( const M& m, long r, long c)
             { return std::imag(m(r,c)); }
         };
     };

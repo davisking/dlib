@@ -54,7 +54,9 @@ namespace dlib
                 const_ret_type typedef (defined below)
                     The purpose of the const_ret_type typedef is to allow matrix expressions
                     to return their elements by reference when appropriate.  So const_ret_type 
-                    should either be of the same type as "type" or be of type "const type&".
+                    should be one of the following types:
+                        - const type
+                        - const type& 
         !*/
 
     public:
@@ -68,7 +70,7 @@ namespace dlib
         typedef matrix<type,NR,NC, mem_manager_type,layout_type> matrix_type;
         typedef EXP exp_type;
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r,
             long c
         ) const;
@@ -82,7 +84,7 @@ namespace dlib
                   the matrix represented by this matrix expression)
         !*/
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long i
         ) const;
         /*!

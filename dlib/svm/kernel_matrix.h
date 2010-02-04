@@ -22,7 +22,7 @@ namespace dlib
     struct matrix_traits<kernel_matrix_exp<kernel_type,alloc> >
     {
         typedef typename kernel_type::scalar_type type;
-        typedef typename kernel_type::scalar_type const_ret_type;
+        typedef const type const_ret_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 0;
@@ -116,7 +116,7 @@ namespace dlib
 
             const static long cost = EXP::cost+100;
             typedef typename kernel_type::scalar_type type;
-            typedef typename kernel_type::scalar_type const_ret_type;
+            typedef const type const_ret_type;
             template <typename M>
             static const const_ret_type apply ( const M& m, const kernel_type& kern, const long r, long c)
             { 
@@ -164,7 +164,7 @@ namespace dlib
     struct matrix_traits<kernel_matrix_exp1<kernel_type,lhs_type> >
     {
         typedef typename kernel_type::scalar_type type;
-        typedef typename kernel_type::scalar_type const_ret_type;
+        typedef const type const_ret_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 0;
@@ -281,7 +281,7 @@ namespace dlib
     struct matrix_traits<kernel_matrix_exp2<kernel_type,lhs_type> >
     {
         typedef typename kernel_type::scalar_type type;
-        typedef typename kernel_type::scalar_type const_ret_type;
+        typedef const type const_ret_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 1;
@@ -398,7 +398,7 @@ namespace dlib
     struct matrix_traits<kernel_matrix_exp3<kernel_type,lhs_type,rhs_type> >
     {
         typedef typename kernel_type::scalar_type type;
-        typedef typename kernel_type::scalar_type const_ret_type;
+        typedef const type const_ret_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 0;

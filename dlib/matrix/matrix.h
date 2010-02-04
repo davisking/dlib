@@ -95,7 +95,7 @@ namespace dlib
         typedef matrix<type,NR,NC,mem_manager_type,layout_type> matrix_type;
         typedef EXP exp_type;
 
-        inline const const_ret_type operator() (
+        inline const_ret_type operator() (
             long r,
             long c
         ) const 
@@ -112,7 +112,7 @@ namespace dlib
             return ref()(r,c); 
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long i
         ) const 
         {
@@ -1768,12 +1768,12 @@ namespace dlib
             ref_(item)
         {}
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return ref_(r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return ref_(i); }
 
         template <typename U>

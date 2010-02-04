@@ -255,12 +255,12 @@ namespace dlib
             m(m_)
         {}
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m,r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_unary_exp>::operator()(i); }
 
         template <typename U>
@@ -339,12 +339,12 @@ namespace dlib
             COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m,s,r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_scalar_binary_exp>::operator()(i); }
 
         template <typename U>
@@ -426,12 +426,12 @@ namespace dlib
             COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m,s1,s2,r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_scalar_ternary_exp>::operator()(i); }
 
         template <typename U>
@@ -510,12 +510,12 @@ namespace dlib
             m2(m2_)
         {}
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m1,m2,r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_binary_exp>::operator()(i); }
 
         template <typename U>
@@ -597,12 +597,12 @@ namespace dlib
             m3(m3_)
         {}
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m1,m2,m3,r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_ternary_exp>::operator()(i); }
 
         template <typename U>
@@ -688,12 +688,12 @@ namespace dlib
             m4(m4_)
         {}
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(m1,m2,m3,m4,r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_fourary_exp>::operator()(i); }
 
         template <typename U>
@@ -769,12 +769,12 @@ namespace dlib
             COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(s,r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<dynamic_matrix_scalar_unary_exp>::operator()(i); }
 
         template <typename U>
@@ -845,12 +845,12 @@ namespace dlib
             COMPILE_TIME_ASSERT(is_matrix<S>::value == false);
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(s,r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_scalar_unary_exp>::operator()(i); }
 
         template <typename U>
@@ -909,12 +909,12 @@ namespace dlib
         matrix_zeroary_exp (
         ) {}
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return OP::apply(r,c); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_zeroary_exp>::operator()(i); }
 
         template <typename U>
@@ -993,12 +993,12 @@ namespace dlib
         {
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return m(rows(r),cols(c)); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_sub_range_exp>::operator()(i); }
 
         template <typename U>
@@ -1073,12 +1073,12 @@ namespace dlib
         {
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long 
         ) const { return m[r]; }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return m[i]; }
 
         template <typename U>
@@ -1150,12 +1150,12 @@ namespace dlib
         {
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long 
         ) const { return m[r]; }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return m[i]; }
 
         template <typename U>
@@ -1227,12 +1227,12 @@ namespace dlib
         {
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return m[r][c]; }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_array2d_exp>::operator()(i); }
 
         template <typename U>
@@ -1311,12 +1311,12 @@ namespace dlib
         {
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long r, 
             long c
         ) const { return m(r+r_,c+c_); }
 
-        const const_ret_type operator() ( long i ) const 
+        const_ret_type operator() ( long i ) const 
         { return matrix_exp<matrix_sub_exp>::operator()(i); }
 
         template <typename U>
@@ -1349,7 +1349,7 @@ namespace dlib
     struct matrix_traits<matrix_range_exp<T> >
     {
         typedef T type;
-        typedef T const_ret_type;
+        typedef const T const_ret_type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 1;
@@ -1417,12 +1417,12 @@ namespace dlib
 
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long, 
             long c
         ) const { return start + c*inc;  }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long c
         ) const { return start + c*inc;  }
 
@@ -1456,7 +1456,7 @@ namespace dlib
     struct matrix_traits<matrix_log_range_exp<T> >
     {
         typedef T type;
-        typedef T const_ret_type;
+        typedef const T const_ret_type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 1;
@@ -1497,12 +1497,12 @@ namespace dlib
 
         }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long,
             long c
         ) const { return std::pow((T)10,start + c*inc);  }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long c
         ) const { return std::pow(10,start + c*inc);  }
 
@@ -1536,7 +1536,7 @@ namespace dlib
     struct matrix_traits<matrix_range_static_exp<start,inc_,end> >
     {
         typedef long type;
-        typedef long const_ret_type;
+        typedef const long const_ret_type;
         typedef memory_manager<char>::kernel_1a mem_manager_type;
         const static long NR = 1;
         const static long NC = tabs<(end - start)>::value/inc_ + 1;
@@ -1562,12 +1562,12 @@ namespace dlib
         matrix_range_static_exp (
         ) {}
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long , 
             long c
         ) const { return start + c*inc;  }
 
-        const const_ret_type operator() (
+        const_ret_type operator() (
             long c
         ) const { return start + c*inc;  }
 
