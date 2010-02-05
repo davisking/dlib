@@ -356,8 +356,8 @@ namespace dlib
             scalar_type bias;
 
             const decision_function<kernel_type>& dec_funct;
-            mutable matrix<scalar_type,0,1,mem_manager_type>& b;
-            mutable matrix<sample_type,0,1,mem_manager_type>& out_vectors;
+            matrix<scalar_type,0,1,mem_manager_type>& b;
+            matrix<sample_type,0,1,mem_manager_type>& out_vectors;
 
         };
 
@@ -475,8 +475,8 @@ namespace dlib
             mutable sample_type temp;
 
             const decision_function<kernel_type>& dec_funct;
-            mutable matrix<scalar_type,0,1,mem_manager_type>& b;
-            mutable matrix<sample_type,0,1,mem_manager_type>& out_vectors;
+            matrix<scalar_type,0,1,mem_manager_type>& b;
+            matrix<sample_type,0,1,mem_manager_type>& out_vectors;
 
         };
 
