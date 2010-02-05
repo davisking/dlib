@@ -82,6 +82,14 @@ makedocs ()
         echo Getting a copy of the source from subversion
         svn export -r $REVISION $DLIB_REPOS/examples docs/cache/examples > /dev/null || report_failure
         svn export -r $REVISION $DLIB_REPOS/dlib docs/cache/dlib > /dev/null || report_failure
+
+        echo "#ifndef DLIB_REVISION_H"           > docs/cache/dlib/revision.h
+        echo "// Version: " $RELEASE            >> docs/cache/dlib/revision.h
+        echo "// Date:    " `date`              >> docs/cache/dlib/revision.h
+        echo "// Subversion Revision Number"    >> docs/cache/dlib/revision.h
+        echo "#define DLIB_REVISION " $REVISION >> docs/cache/dlib/revision.h
+        echo "#endif"                           >> docs/cache/dlib/revision.h
+
     fi;
 
     rm -rf docs/web/*

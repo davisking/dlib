@@ -57,6 +57,7 @@ cp -r ../../docs/cache/dlib . || report_failure
 cp -r ../../docs/cache/examples . || report_failure
 
 echo Version: $RELEASE >> dlib/README.txt
+echo "Date:    `date`" >> dlib/README.txt
 echo Subversion Revision Number: $REVISION >> dlib/README.txt
 
 
