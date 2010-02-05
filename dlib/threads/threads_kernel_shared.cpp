@@ -109,6 +109,13 @@ namespace dlib
                 data_mutex.unlock();
                 delete this;
             }
+            else
+            {
+                // There are still some user threads running so there isn't
+                // much we can really do.  Just let the program end without
+                // cleaning up threading resources.  
+                data_mutex.unlock();
+            }
         }
 
 // ----------------------------------------------------------------------------------------
