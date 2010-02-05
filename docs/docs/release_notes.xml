@@ -18,7 +18,6 @@ New Stuff:
    - Added the random_subset_selector object.
    - Added the compute_mean_squared_distance() function.
 
-
 Non-Backwards Compatible Changes:
    - Modified the logger's hook implementation so that it uses a special stream  
      buffer instead of an std::ostringstream.  This way logging doesn't cause 
