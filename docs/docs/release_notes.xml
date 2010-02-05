@@ -12,12 +12,40 @@
 
 <current>
 New Stuff:
+   - Added the ability to compute transformation matrices that map between
+     the representations used by different empirical_kernel_maps.  Also added
+     the ability to compute projection error.
+   - Added the random_subset_selector object.
+   - Added the compute_mean_squared_distance() function.
+
 
 Non-Backwards Compatible Changes:
+   - Modified the logger's hook implementation so that it uses a special stream  
+     buffer instead of an std::ostringstream.  This way logging doesn't cause 
+     memory allocations.  This breaks backwards compatibility with the previous
+     hook function API but only slightly.  The new hook functions must take a
+     const char* instead of std::string.
+   - Added the const_ret_type typedef to the matrix_exp.  It is now required that 
+     all matrix expressions define this type.  This enables the expressions to 
+     return elements by constant reference when appropriate rather than always 
+     returning by value.  
 
 Bug fixes:
+   - Fixed a bug in the matrix BLAS bindings that caused BLAS to return an invalid
+     argument error.  The error occurred when general matrix multiply expressions
+     were transposed and didn't result in a square matrix.  E.g. mat = trans(a*b)
+     where mat isn't square.
+   - Fixed potential compile time bugs in the comparison operators for futures.
+   - Added a missing check for division by zero in the SURF feature extractor.
+   - Modified the find_min_single_variable() function so that it is more 
+     robust when working with functions that are made up of a bunch of
+     constant value strips.  Previously, these kinds of functions could
+     cause the optimization to fail.
 
 Other:
+   - Changed the regression test suite so that when it sets the logging level 
+     it now sets it for all loggers.  Not just ones that start with "test."
+
 
 </current>
 
