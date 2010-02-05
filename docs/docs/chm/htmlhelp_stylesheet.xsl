@@ -50,7 +50,7 @@
                </OBJECT>
             </LI>
             <UL>
-               <xsl:for-each select="item">  
+               <xsl:for-each select="item | chm/item">  
                <xsl:sort select="translate(concat(name,.),$lcletters, $ucletters)"/> 
                   <xsl:apply-templates select=".">					
                      <xsl:with-param name="xml_file" select="$xml_file"/>
@@ -60,7 +60,7 @@
             </UL>
          </xsl:when>
          <xsl:otherwise>
-            <xsl:for-each select="item">  
+            <xsl:for-each select="item | chm/item">  
             <xsl:sort select="translate(concat(name,.),$lcletters, $ucletters)"/> 
                <xsl:apply-templates select=".">					
                   <xsl:with-param name="xml_file" select="$xml_file"/>
