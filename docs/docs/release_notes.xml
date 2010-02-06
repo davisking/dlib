@@ -12,6 +12,20 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.25" date="Feb 05, 2010">
+New Stuff:
    - Added the ability to compute transformation matrices that map between
      the representations used by different empirical_kernel_maps.  Also added
      the ability to compute projection error.
@@ -46,7 +60,7 @@ Other:
      it now sets it for all loggers.  Not just ones that start with "test."
 
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
