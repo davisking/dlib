@@ -60,7 +60,7 @@ namespace dlib
                     - right points to the right subtree or NIL if there is no right 
                       subtree                                                             
                     - parent points to the parent node or NIL if the node is the root     
-                    - ordering of nodes is determined by comparing each node's d memeber  
+                    - ordering of nodes is determined by comparing each node's d member  
                     - all elements in a left subtree are <= the node                      
                     - all elements in a right subtree are >= the node                     
                     - color == red or black                                               
