@@ -75,6 +75,12 @@ namespace
             DLIB_TEST(a.contains<std::string>() == false);
             DLIB_TEST(a.contains<long>() == false);
 
+            DLIB_TEST(a.get_type_id<int>() == -1);
+            DLIB_TEST(a.get_type_id<float>() == 1);
+            DLIB_TEST(a.get_type_id<double>() == 2);
+            DLIB_TEST(a.get_type_id<char>() == 3);
+            DLIB_TEST(a.get_type_id<std::string>() == 4);
+            DLIB_TEST(a.get_type_id<tsu>() == -1);
 
 
             f_val = 4.345f;

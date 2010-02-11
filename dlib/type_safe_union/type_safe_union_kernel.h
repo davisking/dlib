@@ -42,7 +42,7 @@ namespace dlib
         /*!
             CONVENTION
                 - is_empty() ==  (type_identity == 0)
-                - contains<T>() == (type_identity == get_id<T>())
+                - contains<T>() == (type_identity == get_type_id<T>())
                 - mem.get() == the block of memory on the stack which is
                   where objects in the union are stored
         !*/
@@ -71,10 +71,14 @@ namespace dlib
                                                         sizeof(T19)>::value,
                                                         sizeof(T20)>::value;
 
+        // --------------------------------------------
+
+        // member data
         stack_based_memory_block<max_size> mem;
-
-
         int type_identity;
+
+        // --------------------------------------------
+
 
         struct destruct_helper
         {
@@ -100,8 +104,41 @@ namespace dlib
         }
 
         template <typename T>
-        int get_id (
-        ) const
+        void construct (
+        )  
+        { 
+            if (type_identity != get_type_id<T>())
+            {
+                destruct(); 
+                new(mem.get()) T(); 
+                type_identity = get_type_id<T>();
+            }
+        }
+
+        template <typename T>
+        void operator() (T& item) 
+        /*
+            This function is used by the swap function of this class.  See that
+            function to see how this works.
+        */
+        {
+            exchange(get<T>(), item);
+        }
+
+    public:
+
+        type_safe_union() : type_identity(0) 
+        { 
+        }
+
+        ~type_safe_union()
+        {
+            destruct();
+        }
+
+        template <typename T>
+        static int get_type_id (
+        ) 
         {
             if (is_same_type<T,T1>::value) return 1;
             if (is_same_type<T,T2>::value) return 2;
@@ -129,47 +166,14 @@ namespace dlib
 
             // return a number that doesn't match any of the
             // valid states of type_identity
-            return 10000;
-        }
-
-        template <typename T>
-        void construct (
-        )  
-        { 
-            if (type_identity != get_id<T>())
-            {
-                destruct(); 
-                new(mem.get()) T(); 
-                type_identity = get_id<T>();
-            }
-        }
-
-        template <typename T>
-        void operator() (T& item) 
-        /*
-            This function is used by the swap function of this class.  See that
-            function to see how this works.
-        */
-        {
-            exchange(get<T>(), item);
-        }
-
-    public:
-
-        type_safe_union() : type_identity(0) 
-        { 
-        }
-
-        ~type_safe_union()
-        {
-            destruct();
+            return -1;
         }
 
         template <typename T>
         bool contains (
         ) const
         {
-            return type_identity == get_id<T>();
+            return type_identity == get_type_id<T>();
         }
 
         bool is_empty (

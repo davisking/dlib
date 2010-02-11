@@ -76,6 +76,18 @@ namespace dlib
         !*/
 
         template <typename T>
+        static int get_type_id (
+        );
+        /*!
+           ensures
+              - if (T is the same type as one of the template arguments) then
+                 - returns a number indicating which template argument it is.
+                   (e.g. if T is the same type as T3 then this function returns 3)
+               - else
+                  - returns -1
+        !*/
+
+        template <typename T>
         bool contains (
         ) const;
         /*!
@@ -175,6 +187,13 @@ namespace dlib
     );   
     /*!
         provides serialization support 
+
+        Note that type_safe_union objects are serialized as follows:
+         - if (item.is_empty()) then
+            - perform: serialize(0, out)
+         - else
+            - perform: serialize(item.get_type_id<type_of_object_in_item>(), out);
+                       serialize(item.get<type_of_object_in_item>(), out);
     !*/
 
     template < ...  >
