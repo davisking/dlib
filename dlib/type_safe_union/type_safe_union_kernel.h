@@ -24,7 +24,18 @@ namespace dlib
         typename T7 = T1,
         typename T8 = T1,
         typename T9 = T1,
-        typename T10 = T1
+        typename T10 = T1,
+
+        typename T11 = T1,
+        typename T12 = T1,
+        typename T13 = T1,
+        typename T14 = T1,
+        typename T15 = T1,
+        typename T16 = T1,
+        typename T17 = T1,
+        typename T18 = T1,
+        typename T19 = T1,
+        typename T20 = T1
         >
     class type_safe_union : noncopyable
     {
@@ -38,7 +49,8 @@ namespace dlib
 
     private:
 
-        const static size_t max_size = tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<sizeof(T1),
+        const static size_t max_size = tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<
+                                       tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<sizeof(T1),
                                                         sizeof(T2)>::value,
                                                         sizeof(T3)>::value,
                                                         sizeof(T4)>::value,
@@ -47,7 +59,17 @@ namespace dlib
                                                         sizeof(T7)>::value,
                                                         sizeof(T8)>::value,
                                                         sizeof(T9)>::value,
-                                                        sizeof(T10)>::value; 
+                                                        sizeof(T10)>::value,
+                                                        sizeof(T11)>::value,
+                                                        sizeof(T12)>::value,
+                                                        sizeof(T13)>::value,
+                                                        sizeof(T14)>::value,
+                                                        sizeof(T15)>::value,
+                                                        sizeof(T16)>::value,
+                                                        sizeof(T17)>::value,
+                                                        sizeof(T18)>::value,
+                                                        sizeof(T19)>::value,
+                                                        sizeof(T20)>::value;
 
         stack_based_memory_block<max_size> mem;
 
@@ -92,6 +114,18 @@ namespace dlib
             if (is_same_type<T,T8>::value) return 8;
             if (is_same_type<T,T9>::value) return 9;
             if (is_same_type<T,T10>::value) return 10;
+
+            if (is_same_type<T,T11>::value) return 11;
+            if (is_same_type<T,T12>::value) return 12;
+            if (is_same_type<T,T13>::value) return 13;
+            if (is_same_type<T,T14>::value) return 14;
+            if (is_same_type<T,T15>::value) return 15;
+
+            if (is_same_type<T,T16>::value) return 16;
+            if (is_same_type<T,T17>::value) return 17;
+            if (is_same_type<T,T18>::value) return 18;
+            if (is_same_type<T,T19>::value) return 19;
+            if (is_same_type<T,T20>::value) return 20;
 
             // return a number that doesn't match any of the
             // valid states of type_identity
@@ -204,6 +238,18 @@ namespace dlib
                     case 9: deserialize(item.get<T9>(), in);  break;
                     case 10: deserialize(item.get<T10>(), in);  break;
 
+                    case 11: deserialize(item.get<T11>(), in);  break;
+                    case 12: deserialize(item.get<T12>(), in);  break;
+                    case 13: deserialize(item.get<T13>(), in);  break;
+                    case 14: deserialize(item.get<T14>(), in);  break;
+                    case 15: deserialize(item.get<T15>(), in);  break;
+
+                    case 16: deserialize(item.get<T16>(), in);  break;
+                    case 17: deserialize(item.get<T17>(), in);  break;
+                    case 18: deserialize(item.get<T18>(), in);  break;
+                    case 19: deserialize(item.get<T19>(), in);  break;
+                    case 20: deserialize(item.get<T20>(), in);  break;
+
                     default: throw serialization_error("Corrupt data detected while deserializing type_safe_union");
                 }
             }
@@ -236,6 +282,18 @@ namespace dlib
                 case 8: obj(get<T8>());  break;
                 case 9: obj(get<T9>());  break;
                 case 10: obj(get<T10>());  break;
+
+                case 11: obj(get<T11>());  break;
+                case 12: obj(get<T12>());  break;
+                case 13: obj(get<T13>());  break;
+                case 14: obj(get<T14>());  break;
+                case 15: obj(get<T15>());  break;
+
+                case 16: obj(get<T16>());  break;
+                case 17: obj(get<T17>());  break;
+                case 18: obj(get<T18>());  break;
+                case 19: obj(get<T19>());  break;
+                case 20: obj(get<T20>());  break;
             }
         }
 
@@ -262,6 +320,18 @@ namespace dlib
                 case 8: obj(get<T8>());  break;
                 case 9: obj(get<T9>());  break;
                 case 10: obj(get<T10>());  break;
+
+                case 11: obj(get<T11>());  break;
+                case 12: obj(get<T12>());  break;
+                case 13: obj(get<T13>());  break;
+                case 14: obj(get<T14>());  break;
+                case 15: obj(get<T15>());  break;
+
+                case 16: obj(get<T16>());  break;
+                case 17: obj(get<T17>());  break;
+                case 18: obj(get<T18>());  break;
+                case 19: obj(get<T19>());  break;
+                case 20: obj(get<T20>());  break;
             }
         }
 
@@ -318,7 +388,18 @@ namespace dlib
                                  is_same_type<T,T7>::value ||
                                  is_same_type<T,T8>::value ||
                                  is_same_type<T,T9>::value ||
-                                 is_same_type<T,T10>::value 
+                                 is_same_type<T,T10>::value ||
+
+                                 is_same_type<T,T11>::value ||
+                                 is_same_type<T,T12>::value ||
+                                 is_same_type<T,T13>::value ||
+                                 is_same_type<T,T14>::value ||
+                                 is_same_type<T,T15>::value ||
+                                 is_same_type<T,T16>::value ||
+                                 is_same_type<T,T17>::value ||
+                                 is_same_type<T,T18>::value ||
+                                 is_same_type<T,T19>::value ||
+                                 is_same_type<T,T20>::value 
                                     ));
 
             construct<T>();  
@@ -331,11 +412,13 @@ namespace dlib
 
     template <
         typename T1, typename T2, typename T3, typename T4, typename T5,
-        typename T6, typename T7, typename T8, typename T9, typename T10
+        typename T6, typename T7, typename T8, typename T9, typename T10,
+        typename T11, typename T12, typename T13, typename T14, typename T15,
+        typename T16, typename T17, typename T18, typename T19, typename T20
         >
     inline void swap (
-        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>& a, 
-        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>& b 
+        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& a, 
+        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& b 
     ) { a.swap(b); }   
 
 // ----------------------------------------------------------------------------------------
