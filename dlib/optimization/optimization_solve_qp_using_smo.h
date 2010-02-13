@@ -87,6 +87,7 @@ namespace dlib
                      is_col_vector(alpha) &&
                      b.size() == alpha.size() &&
                      b.size() == Q.nr() &&
+                     alpha.size() > 0 &&
                      min(alpha) >= 0 &&
                      eps > 0,
                      "\t void solve_qp_using_smo()"

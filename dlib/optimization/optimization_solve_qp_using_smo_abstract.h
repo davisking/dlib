@@ -27,6 +27,7 @@ namespace dlib
             - is_col_vector(b) == true
             - is_col_vector(alpha) == true
             - b.size() == alpha.size() == Q.nr()
+            - alpha.size() > 0
             - min(alpha) >= 0
             - eps > 0
         ensures
