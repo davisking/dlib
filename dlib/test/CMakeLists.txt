@@ -57,6 +57,7 @@ set (tests
    metaprogramming.cpp
    multithreaded_object.cpp
    optimization.cpp
+   opt_qp_solver.cpp
    pipe.cpp
    pixel.cpp
    queue.cpp

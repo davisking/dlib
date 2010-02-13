@@ -5,6 +5,7 @@
 
 #include "optimization/optimization.h"
 #include "optimization/optimization_bobyqa.h"
+#include "optimization/optimization_solve_qp_using_smo.h"
 
 #endif // DLIB_OPTIMIZATIOn_HEADER
 

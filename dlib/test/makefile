@@ -67,6 +67,7 @@ SRC += member_function_pointer.cpp
 SRC += metaprogramming.cpp
 SRC += multithreaded_object.cpp
 SRC += optimization.cpp
+SRC += opt_qp_solver.cpp
 SRC += pipe.cpp
 SRC += pixel.cpp
 SRC += queue.cpp
