@@ -41,6 +41,7 @@
          <term file="algorithms.html" name="find_min_single_variable"/>
          <term file="algorithms.html" name="find_min_using_approximate_derivatives"/>
          <term file="algorithms.html" name="find_min_bobyqa"/>
+         <term file="algorithms.html" name="solve_qp_using_smo"/>
          <term link="algorithms.html#find_min_bobyqa" name="BOBYQA"/>
          <term file="algorithms.html" name="find_max"/>
          <term file="algorithms.html" name="find_max_single_variable"/>

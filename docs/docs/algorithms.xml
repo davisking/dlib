@@ -42,6 +42,7 @@
                <item>find_min_single_variable</item> 
                <item>find_min_using_approximate_derivatives</item> 
                <item>find_min_bobyqa</item> 
+               <item>solve_qp_using_smo</item> 
                <item>find_max</item> 
                <item>find_max_single_variable</item> 
                <item>find_max_using_approximate_derivatives</item> 
@@ -349,6 +350,26 @@
       </component>
 
    <!-- ************************************************************************* -->
+
+      <component>
+         <name>solve_qp_using_smo</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_solve_qp_using_smo_abstract.h</spec_file>
+         <description>
+             This function solves the following quadratic program:
+<pre>
+   Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b
+   subject to the following constraints:
+      sum(alpha) == C 
+      min(alpha) >= 0 
+</pre>
+
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
       
       <component>
          <name>find_min_bobyqa</name>
