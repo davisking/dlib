@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+    <title>Suggested Reading</title>
+
+
+
+    <!-- ************************************************************************* -->
+
+    <body>
+        <br/><br/>
+        
+
+      <h2>General Programming</h2>
+      <ul>
+        <h3>C++</h3>
+         <ul>
+            <li> <i>Programming: Principles and Practice Using C++</i> by Bjarne Stroustrup  </li>
+            <li> <i>Effective C++: 55 Specific Ways to Improve Your Programs and Designs</i> (3rd Edition) by Scott Meyers  </li>
+            <li> <i>More Effective C++: 35 New Ways to Improve Your Programs and Designs</i> by Scott Meyers  </li>
+            <li> <i>The C++ Standard Library: A Tutorial and Reference</i> by Nicolai M. Josuttis   </li>
+            <li> <a href="http://stdcxx.apache.org/doc/stdlibref/index.html">Apache C++ Standard Library Reference</a></li>
+         </ul>
+
+
+         <h3>Multithreading</h3>
+         <ul>
+            <li> <i>Programming with POSIX(R) Threads</i> by  David R. Butenhof  </li>
+         </ul>
+
+        <h3>Network Programming</h3>
+         <ul>
+            <li> <i>Unix Network Programming, Volume 1: The Sockets Networking API</i> (3rd Edition) 
+                by  W. Richard Stevens</li>
+         </ul>
+
+        <h3>WIN32 Programming</h3>
+         <ul>
+            <li>  <i>Win32 Programming</i> by Brent E. Rector and Joseph M. Newcomer
+             </li>
+            <li> 
+               <i>Programming Windows</i> by  Charles Petzold
+            </li>
+            <li> <a href="http://msdn.microsoft.com/en-us/library/default.aspx">MSDN Library</a> is great </li>
+         </ul>
+      </ul>
+
+
+
+
+
+        <h2>Computer Science: Algorithms and Data Structures</h2>
+         <ul>
+            <li>  <i>Introduction to Algorithms</i> by  Cormen, Leiserson, Rivest and Stein
+            </li>
+            <li>  <i>Algorithms in C++, Parts 1-4: Fundamentals, Data Structure, Sorting, Searching</i> (3rd Edition) by Robert Sedgewick   </li>
+         </ul>
+        
+
+
+        <h2>Lossless Data Compression</h2>
+         <ul>
+            <li> <i>Text Compression</i> by Bell, Cleary, and Witten </li>
+         </ul>
+
+
+
+
+        <h2>General Math</h2>
+         <ul>
+            <li> <i>Calculus: Single and Multivariable</i> by Hughes-Hallett, Gleason, and McCallum </li>
+            <li> <i>Linear Algebra Done Right</i> by Sheldon Jay Axler  </li>
+            <li> <i>Numerical Linear Algebra</i> by Trefethen and Bau </li>
+            <li> <i>Introduction to Real Analysis</i> (third edition) by Bartle and Sherbert  </li>
+         </ul>
+
+
+
+
+
+        <h2>Optimization</h2>
+         <ul>
+            <li> <i>Practical Methods of Optimization</i> (second edition) by R. Fletcher  1987 </li>
+            <li> <i>Numerical Optimization</i>  by Jorge Nocedal and Stephen Wright 2006  </li>
+            <li> <i>Introduction to Derivative-Free Optimization</i>  by Conn, Scheinberg, and Vicente  </li>
+         </ul>
+
+
+
+
+        <h2>Machine Learning</h2>
+         <ul>
+            <li> <i>Artificial Intelligence: A Modern Approach </i> (3rd Edition) by Stuart Russell and Peter Norvig</li>
+            <li> <i>Learning with Kernels: Support Vector Machines, Regularization, Optimization, and Beyond </i> by Bernhard Schlkopf and Alexander J. Smola</li>
+            <li> <i>Kernel Methods for Pattern Analysis </i> by John Shawe-Taylor and Nello Cristianini 
+               <ul> asdfsdf alskd flaksjd flaskdj flskaj flaskd flkjs flk sadfl asdflkj as
+               df aslkdfj asldkfj asldkf lkds flkajs dflkja sdflkj asdlkjf alsdkj flsakjd fasdjl f
+               aslkdfj alskdf alsdkjf lksjadklajsd fklsadj fljkas dfklja sdlfkj asdlkfj asdlkj sadlkjf </ul> <br/> </li>
+
+             <li> The Journal of Machine Learning Research and NIPS </li>
+         </ul>
+
+
+
+
+
+        <h2>Image Processing</h2>
+         <ul>
+            <li> <i>Digital Image Processing</i> by Rafael C. Gonzalez and Richard E. Woods  </li>
+         </ul>
+    
+    </body>
+
+
+
+    <!-- ************************************************************************* -->
+
+</doc>
+

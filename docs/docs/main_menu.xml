@@ -88,6 +88,10 @@
             <link>compile.html</link>
          </item>
          <item>
+            <name>Suggested Reading</name>
+            <link>books.html</link>
+         </item>
+         <item>
             <name>License</name>
             <link>license.html</link>
          </item>
