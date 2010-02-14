@@ -808,6 +808,7 @@
          <term file="imaging.html" name="save_bmp"/>
          <term file="imaging.html" name="save_dng"/>
          <term file="imaging.html" name="spatially_filter_image"/>
+         <term file="imaging.html" name="pyramid_down"/>
          <term file="imaging.html" name="threshold_image"/>
          <term file="imaging.html" name="auto_threshold_image"/>
          <term file="imaging.html" name="png_loader"/>
@@ -816,6 +817,7 @@
          <term file="imaging.html" name="hessian_pyramid"/>
          <term file="imaging.html" name="compute_dominant_angle"/>
          <term file="imaging.html" name="compute_surf_descriptor"/>
+         <term file="imaging.html" name="hog_image"/>
          <term file="imaging.html" name="haar_x"/>
          <term file="imaging.html" name="haar_y"/>
          <term file="imaging.html" name="get_interest_points"/>

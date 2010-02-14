@@ -52,6 +52,7 @@
          <item>hessian_pyramid</item>
          <item>compute_dominant_angle</item>
          <item>compute_surf_descriptor</item>
+         <item>hog_image</item>
          <item>haar_x</item>
          <item>haar_y</item>
          <item>get_interest_points</item>
@@ -80,6 +81,7 @@
          <item>equalize_histogram</item> 
          <item>get_histogram</item> 
          <item>spatially_filter_image</item> 
+         <item>pyramid_down</item> 
          <item>zero_border_pixels</item> 
 
          <item>binary_dilation</item>
@@ -196,6 +198,23 @@
             Computes the 64 dimensional SURF descriptor vector of a box centered
               at a given center point, tilted at a given angle, and sized according to 
               a given scale.  
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>hog_image</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/hog_abstract.h</spec_file>
+         <description>
+                This object is a tool for performing the image feature extraction algorithm
+                described in the following paper:
+                <blockquote>
+                    Histograms of Oriented Gradients for Human Detection
+                    by Navneet Dalal and Bill Triggs
+                </blockquote>
          </description>
                                  
       </component>
@@ -633,6 +652,18 @@
          <description>        
             This global function performs spatial filtering on an image with a user
             supplied filter.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>pyramid_down</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
+         <description>        
+               This is a simple function object to help create image pyramids.
          </description>
                                  
       </component>
