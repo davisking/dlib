@@ -51,12 +51,35 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    class test_smo_derivative
+    {
+    public:
+        double penalty;
+        double C;
+
+        matrix<double,0,1> operator() (
+            const matrix<double,0,1>& alpha
+        ) const
+        {
+
+            matrix<double,0,1> obj =  Q*alpha - b;
+            matrix<double,0,1> c1 = uniform_matrix<double>(alpha.size(),1, 2*(sum(alpha)-C));
+            matrix<double,0,1> c2 = 2*pointwise_multiply(alpha, alpha<0);
+            
+            return obj + penalty*(c1 + c2);
+        }
+
+        matrix<double> Q, b;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     class opt_qp_solver_tester : public tester
     {
         /*
             The idea here is just to solve the same problem with two different
             methods and check that they basically agree.  The SMO solver should be
-            very accurate but for this problem the BOBYQA solver is relatively
+            very accurate but for this problem the BFGS solver is relatively
             inaccurate.  So this test is really just a sanity check on the SMO
             solver.
         */
@@ -101,7 +124,7 @@ namespace
             dlog << LINFO << "disagreement mean: " << rs.mean();
             dlog << LINFO << "disagreement stddev: " << rs.stddev();
             DLIB_TEST_MSG(rs.mean() < 0.001, rs.mean());
-            DLIB_TEST_MSG(rs.stddev() < 0.01, rs.stddev());
+            DLIB_TEST_MSG(rs.stddev() < 0.001, rs.stddev());
         }
 
         double do_the_test (
@@ -119,13 +142,17 @@ namespace
             test.b = randm(dims,1, rnd);
             test.C = C;
 
+            test_smo_derivative der;
+            der.Q = test.Q;
+            der.b = test.b;
+            der.C = test.C;
 
-            matrix<double,0,1> x(dims), lower(dims), upper(dims), alpha(dims);
 
-            lower = 0;
-            upper = C;
+            matrix<double,0,1> x(dims), alpha(dims);
 
-            test.penalty = 1000;
+
+            test.penalty = 20000;
+            der.penalty = test.penalty;
 
             alpha = C/alpha.size();
             x = alpha;
@@ -136,16 +163,16 @@ namespace
             dlog << LINFO << "SMO: true objective: "<< 0.5*trans(alpha)*test.Q*alpha - trans(alpha)*test.b;
 
 
-            double obj = find_min_bobyqa( test, x, 2*x.size()+1, 
-                                          lower,
-                                          upper,
-                                          C/3.0,
-                                          1e-6,
-                                          10000);
+            double obj = find_min(bfgs_search_strategy(),
+                                  objective_delta_stop_strategy(1e-13, 1000),
+                                  test,
+                                  der,
+                                  x,
+                                  -10);
 
 
-            dlog << LINFO << "BOBYQA: objective: " << obj;
-            dlog << LINFO << "BOBYQA: true objective: "<< 0.5*trans(x)*test.Q*x - trans(x)*test.b;
+            dlog << LINFO << "BFGS: objective: " << obj;
+            dlog << LINFO << "BFGS: true objective: "<< 0.5*trans(x)*test.Q*x - trans(x)*test.b;
             dlog << LINFO << "sum(x): " << sum(x);
             dlog << LINFO << x;
 
