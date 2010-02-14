@@ -3,8 +3,8 @@
 #undef DLIB_IMAGE_PYRaMID_ABSTRACT_H__
 #ifdef DLIB_IMAGE_PYRaMID_ABSTRACT_H__
 
-#include "dlib/pixel.h"
-#include "dlib/array2d.h"
+#include "../pixel.h"
+#include "../array2d.h"
 
 namespace dlib
 {
