@@ -35,7 +35,7 @@ namespace dlib
         ensures
             - #roots == a queue containing directories that represent all the roots 
               of the filesystem on this machine.   (e.g. in windows you have c:\, d:\ 
-              etc...)
+              etc.)
         throws
             - std::bad_alloc
     !*/

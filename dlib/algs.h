@@ -515,7 +515,7 @@ namespace dlib
     /*!A is_built_in_scalar_type
         
         This is a template that allows you to determine if the given type is a built
-        in scalar type such as an int, char, float, short, etc...
+        in scalar type such as an int, char, float, short, etc.
 
         For example, is_built_in_scalar_type<char>::value == true
         For example, is_built_in_scalar_type<std::string>::value == false 

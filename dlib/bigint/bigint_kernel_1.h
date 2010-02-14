@@ -354,7 +354,7 @@ namespace dlib
                 - rhs != 0 
                 - result->size >= lhs->digits_used 
                 - remainder->size >= lhs->digits_used 
-                - each parameter is unique (i.e. lhs != result, lhs != remainder, etc...)
+                - each parameter is unique (i.e. lhs != result, lhs != remainder, etc.)
             ensures
                 - result == lhs / rhs
                 - remainder == lhs % rhs

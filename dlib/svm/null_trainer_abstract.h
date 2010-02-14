@@ -19,7 +19,7 @@ namespace dlib
         /*!
             REQUIREMENTS ON dec_funct_type
                 dec_funct_type can be any copyable type that provides the needed 
-                typedefs used below (e.g. kernel_type, scalar_type, etc...).
+                typedefs used below (e.g. kernel_type, scalar_type, etc.).
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a simple tool for turning a decision function 

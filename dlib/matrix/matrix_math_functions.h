@@ -114,7 +114,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         const matrix_exp<EXP>& m
     )
     {
-        // you can only round matrices that contain built in scalar types like double, long, float, etc...
+        // you can only round matrices that contain built in scalar types like double, long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
         typedef matrix_scalar_binary_exp<EXP,typename EXP::type, op_round_zeros> exp;
         return exp(m.ref(),10*std::numeric_limits<typename EXP::type>::epsilon());
@@ -128,7 +128,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         typename EXP::type eps 
     )
     {
-        // you can only round matrices that contain built in scalar types like double, long, float, etc...
+        // you can only round matrices that contain built in scalar types like double, long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
         return matrix_scalar_binary_exp<EXP,typename EXP::type, op_round_zeros>(m.ref(),eps);
     }
@@ -417,7 +417,7 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
         const matrix_exp<EXP>& m
     )
     {
-        // you can only round matrices that contain built in scalar types like double, long, float, etc...
+        // you can only round matrices that contain built in scalar types like double, long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
         typedef matrix_unary_exp<EXP,op_round> exp;
         return exp(m.ref());

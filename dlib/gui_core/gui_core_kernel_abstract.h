@@ -730,7 +730,7 @@ namespace dlib
                   typematic action begins (note that some keys might not have any 
                   typematic action on some platforms).
                 - if (is_printable) then
-                    - key == the character that was pressed. (e.g. 'a', 'b', '1' etc...)
+                    - key == the character that was pressed. (e.g. 'a', 'b', '1' etc.)
                     - this is a printable character.  Note that ' ', '\t', and 
                       '\n' (this is the return/enter key) are all considered printable.
                 - else

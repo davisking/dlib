@@ -234,7 +234,7 @@ namespace dlib
     /*!
         requires
             - is_built_in_scalar_type<matrix_exp::type>::value == true
-              (i.e. m must contain a type like int, float, double, long, etc...)
+              (i.e. m must contain a type like int, float, double, long, etc.)
         ensures
             - if (m contains integers) then
                 - returns m unmodified
@@ -282,7 +282,7 @@ namespace dlib
     /*!
         requires
             - is_built_in_scalar_type<matrix_exp::type>::value == true
-              (i.e. m must contain a type like int, float, double, long, etc...)
+              (i.e. m must contain a type like int, float, double, long, etc.)
         ensures
             - if (m contains integers) then
                 - returns m unmodified
@@ -307,7 +307,7 @@ namespace dlib
     /*!
         requires
             - is_built_in_scalar_type<matrix_exp::type>::value == true
-              (i.e. m must contain a type like int, float, double, long, etc...)
+              (i.e. m must contain a type like int, float, double, long, etc.)
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m

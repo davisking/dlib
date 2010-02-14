@@ -179,7 +179,7 @@ namespace dlib
                 - argv == an array of strings that was obtained from the second argument 
                           of the function main().
                           (i.e. argv[0] should be the <program> token, argv[1] should be
-                          an <options> or <arg> token, etc...)
+                          an <options> or <arg> token, etc.)
                 - argc == the number of strings in argv
             ensures
                 - parses the command line given by argc and argv 

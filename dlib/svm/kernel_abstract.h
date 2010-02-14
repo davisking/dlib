@@ -431,7 +431,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T must be a kernel object (e.g. radial_basis_kernel, polynomial_kernel, etc...) 
+                T must be a kernel object (e.g. radial_basis_kernel, polynomial_kernel, etc.) 
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a kernel with a fixed value offset

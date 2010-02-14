@@ -87,7 +87,7 @@ namespace dlib
             ensures
                 - updates the prediction for the current context.
                   (the current context is the last few symbols seen. i.e. (*this)[0], 
-                   (*this)[1], etc...)
+                   (*this)[1], etc.)
                 - if (*this can generate a prediction) then
                     - #index == the predicted location of a match in the history buffer.
                       (i.e. (*this)[#index] is the first symbol of the predicted match)

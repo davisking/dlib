@@ -106,7 +106,7 @@ namespace dlib
 
             // loop over all the addrinfo structures and add them to the set.  the reason for doing
             // this dumb crap is because different platforms return all kinds of weird garbage.  many
-            // return the same ip multiple times, etc...
+            // return the same ip multiple times, etc.
             while (result != 0)
             {
                 char temp[16];

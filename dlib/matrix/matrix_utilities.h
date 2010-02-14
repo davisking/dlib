@@ -982,7 +982,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_lessthan>(m.ref(),s);
@@ -998,7 +998,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_lessthan>(m.ref(),s);
@@ -1035,7 +1035,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_lessthan_eq>(m.ref(),s);
@@ -1051,7 +1051,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_lessthan_eq>(m.ref(),s);
@@ -1088,7 +1088,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_greaterthan>(m.ref(),s);
@@ -1104,7 +1104,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_greaterthan>(m.ref(),s);
@@ -1141,7 +1141,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_greaterthan_eq>(m.ref(),s);
@@ -1157,7 +1157,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_greaterthan_eq>(m.ref(),s);
@@ -1194,7 +1194,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_equal_to>(m.ref(),s);
@@ -1210,7 +1210,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT( is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_equal_to>(m.ref(),s);
@@ -1247,7 +1247,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_not_equal_to>(m.ref(),s);
@@ -1263,7 +1263,7 @@ namespace dlib
     )
     {
         // you can only use this relational operator with the built in scalar types like
-        // long, float, etc...
+        // long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
 
         return matrix_scalar_binary_exp<EXP,S, op_not_equal_to>(m.ref(),s);
