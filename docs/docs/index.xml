@@ -107,7 +107,7 @@
                   <li>Numerous linear algebra and mathematical operations are defined for the matrix object such as the 
                      <a href="dlib/matrix/matrix_la_abstract.h.html#svd">singular value decomposition</a>, 
                      <a href="dlib/matrix/matrix_utilities_abstract.h.html#trans">transpose</a>, 
-                     <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc...</li>
+                     <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc.</li>
                   <li>Unconstrained non-linear optimization algorithms using the  
                       <a href="algorithms.html#cg_search_strategy">conjugate gradient</a>, 
                       <a href="algorithms.html#bfgs_search_strategy">BFGS</a>, and

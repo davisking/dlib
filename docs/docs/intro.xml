@@ -34,7 +34,7 @@
 
         <p>
          Generally speaking, there is no focus on any specific domain in the library. It contains a variety 
-         of software objects for dealing with networking, threads (message passing, futures, etc...), 
+         of software objects for dealing with networking, threads (message passing, futures, etc.), 
          graphical interfaces, complex data structures, linear algebra, machine learning, XML and text 
          parsing, numerical optimization, Bayesian networks, and numerous other tasks.
         </p>
@@ -120,7 +120,7 @@
 
                <br/><br/><u>throws</u>:     This defines what exceptions may be thrown by this function.  It generally
                 tells you why the exception might be thrown.  It also tells you what the function does in this event: 
-                Does it have no effect at all? Does it corrupt any objects?  etc...  
+                Does it have no effect at all? Does it corrupt any objects?  etc.  
 
                 <br/>
                 <br/>
@@ -247,7 +247,7 @@
 
                     <li/> <a href="dlib/queue.h.html">queue.h</a> 
                     <ul> This file does not contain any executable code.  All it does is define the typedefs such as 
-                    kernel_1a, kernel_1a_c, etc... for the queue object.  See the <a href="#creating_objects">Creating Objects</a>
+                    kernel_1a, kernel_1a_c, etc. for the queue object.  See the <a href="#creating_objects">Creating Objects</a>
                     section to learn what these typedefs are for.
                     </ul>
                     

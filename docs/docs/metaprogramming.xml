@@ -281,7 +281,7 @@
          <spec_file link="true">dlib/algs.h</spec_file>
          <description>
             This is a template where is_built_in_scalar_type&lt;T&gt;::value == true when T
-            is a built in scalar type such as int, char, float, etc...
+            is a built in scalar type such as int, char, float, etc.
          </description>
          
       </component>

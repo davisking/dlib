@@ -13,7 +13,7 @@
             This page documents library components that are all basically just implementations of 
             mathematical functions or algorithms that don't fit in any of the other pages
             of the dlib documentation.  So this includes things like checksums, cryptographic hashes, 
-            optimization, sorting, etc...
+            optimization, sorting, etc.
          </p>
 
    </body>

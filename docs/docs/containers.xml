@@ -35,7 +35,7 @@
          <p>
          Note that it is assumed by these containers that swap() and operator&lt; do not throw.  They
          may not function correctly if this assumption is broken.  Also note that the built in types (int, long,
-         char, etc...) and std::string will not cause operator&lt; or swap() to throw.
+         char, etc.) and std::string will not cause operator&lt; or swap() to throw.
          </p>
 
          <p>
@@ -1051,7 +1051,7 @@
          <spec_file>dlib/interfaces/map_pair.h</spec_file>
          <description>
             This object is an abstract class which represents an interface for accessing a 
-            pair from a container such as the map, hash_table, etc... 
+            pair from a container such as the map, hash_table, etc. 
          </description>
          
                
@@ -1498,7 +1498,7 @@
                <description> 
                   This extension gives sequences the ability to compare themselves using 
                   operator&lt; and operator==.  Thus they can be used in the other container classes 
-                  that require this ability. (maps, sets, etc...)
+                  that require this ability. (maps, sets, etc.)
                </description> 
 
                <implementations>
@@ -1575,7 +1575,7 @@
                <description> 
                   This extension gives sets the ability to compare themselves using operator&lt; and 
                   operator==.  Thus they can be used in the other container classes that require 
-                  this ability. (maps, sets, etc...)
+                  this ability. (maps, sets, etc.)
                </description> 
 
                <implementations>
@@ -1717,7 +1717,7 @@
                <description> 
                   This extension gives static_sets the ability to compare themselves using operator&lt; and 
                   operator==.  Thus they can be used in the other container classes that require 
-                  this ability. (maps, static_sets, etc...)
+                  this ability. (maps, static_sets, etc.)
                </description> 
 
                <implementations>
