@@ -88,15 +88,15 @@ namespace dlib
                 So for example, suppose you had a picture containing black and white stripes.  
                 Then the magnitude of the gradient at each point in the image tells you if you 
                 are on the edge of a stripe and the gradient's orientation tells you which 
-                direction you have to move in to go into the white stripe.   
+                direction you have to move get into the white stripe.   
 
                 Signed gradients preserve this direction information while unsigned gradients
                 do not.  An unsigned gradient will only tell you the orientation of the stripe
                 but not which direction leads to the white stripe.   
 
                 Finally, the cell_stride parameter controls how much overlap you get between
-                blocks.  The maximum amount of overlap is obtained when cell_stride == 1 
-                and you would have no overlap if cell_stride == block_size. 
+                blocks.  The maximum amount of overlap is obtained when cell_stride == 1.
+                At the other extreme, you would have no overlap if cell_stride == block_size. 
         !*/
 
     public:
