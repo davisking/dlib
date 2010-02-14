@@ -5,6 +5,7 @@
 
 #include "image_keypoint/surf.h"
 #include "image_keypoint/hessian_pyramid.h"
+#include "image_keypoint/hog.h"
 
 #endif // DLIB_IMAGE_KEYPOINt_H_
 

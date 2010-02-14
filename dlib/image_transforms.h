@@ -11,6 +11,7 @@
 #include "image_transforms/edge_detector.h"
 #include "image_transforms/draw.h"
 #include "image_transforms/integral_image.h"
+#include "image_transforms/image_pyramid.h"
 
 #endif // DLIB_IMAGE_TRANSFORMs_
 
