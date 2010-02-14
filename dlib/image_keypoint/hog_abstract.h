@@ -6,6 +6,7 @@
 #include "../algs.h"
 #include "../matrix.h"
 #include "../array2d.h"
+#include "../geometry.h"
 #include <cmath>
 
 namespace dlib
@@ -170,8 +171,23 @@ namespace dlib
                 - 0 <= col < nc()
             ensures
                 - returns the descriptor for the HOG block at the given row and column.  This descriptor 
-                  will include information from a window that is cell_size*block_size pixels wide and tall.
+                  will include information from a window that is located at get_block_rect(row,col) in
+                  the original image given to load().
                 - The returned descriptor vector will have block_size*block_size*num_orientation_bins elements.
+        !*/
+
+        const rectangle get_block_rect (
+            long row,
+            long col
+        ) const;
+        /*!
+            requires
+                - 0 <= row < nr()
+                - 0 <= col < nc()
+            ensures
+                - returns a rectangle that tells you what part of the original image is associated
+                  with a particular HOG block.
+                - The returned rectangle will be cell_size*block_size pixels wide and tall.
         !*/
     };
 

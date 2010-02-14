@@ -7,6 +7,7 @@
 #include "../algs.h"
 #include "../matrix.h"
 #include "../array2d.h"
+#include "../geometry.h"
 #include <cmath>
 
 namespace dlib
@@ -87,6 +88,18 @@ namespace dlib
             long col
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( 0 <= row && row < nr() &&
+                         0 <= col && col < nc(),
+                "\t descriptor_type hog_image::operator()()"
+                << "\n\t invalid row or col argument"
+                << "\n\t row:  " << row
+                << "\n\t col:  " << col 
+                << "\n\t nr(): " << nr() 
+                << "\n\t nc(): " << nc() 
+                << "\n\t this: " << this
+                );
+
             row *= cell_stride;
             col *= cell_stride;
             ++row;
@@ -107,6 +120,36 @@ namespace dlib
             des /= length(des) + 1e-8;
 
             return des;
+        }
+
+        const rectangle get_block_rect (
+            long row,
+            long col
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( 0 <= row && row < nr() &&
+                         0 <= col && col < nc(),
+                "\t rectangle hog_image::get_block_rect()"
+                << "\n\t invalid row or col argument"
+                << "\n\t row:  " << row
+                << "\n\t col:  " << col 
+                << "\n\t nr(): " << nr() 
+                << "\n\t nc(): " << nc() 
+                << "\n\t this: " << this
+                );
+
+            row *= cell_stride;
+            col *= cell_stride;
+
+            row *= cell_size;
+            col *= cell_size;
+
+            // do this to account for the 1 pixel padding we use all around the image
+            ++row;
+            ++col;
+
+            return rectangle(col, row, col+cell_size*block_size-1, row+cell_size*block_size-1);
         }
 
     private:
