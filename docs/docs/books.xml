@@ -240,7 +240,8 @@
                <ul> This book is about the much broader field of AI but it contains an excellent introduction
                   to machine learning and it also covers other useful topics like <a href="bayes.html">bayesian networks</a>.  
                   Moreover, it is very well written and self-contained.  So you don't need any particular 
-                  background to be able to learn from it. 
+                  background to be able to learn from it apart from a typical undergraduate background
+                  in computer science. 
                </ul><br/>
             </li>
             <li> <i>Learning with Kernels: Support Vector Machines, Regularization, Optimization, and Beyond </i> 
