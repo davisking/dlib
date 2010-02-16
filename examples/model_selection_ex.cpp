@@ -177,7 +177,7 @@ int main()
         cout << "Doing a grid search" << endl;
         matrix<double> best_result(2,1);
         best_result = 0;
-        double best_gamma, best_nu;
+        double best_gamma = 0.1, best_nu;
         for (long col = 0; col < params.nc(); ++col)
         {
             // pull out the current set of model parameters
