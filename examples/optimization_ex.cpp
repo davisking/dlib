@@ -1,8 +1,8 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example illustrating the use the optimization routines from 
-    the dlib C++ Library.
+    This is an example illustrating the use the general purpose non-linear 
+    optimization routines from the dlib C++ Library.
 
     The library provides implementations of the conjugate gradient,  
     BFGS, L-BFGS, and BOBYQA optimization algorithms.  These algorithms allow 
@@ -117,7 +117,6 @@ int main()
         column_vector starting_point;
         starting_point.set_size(2);
 
-        cout << "Find the minimum of the rosen function()" << endl;
 
         // Set the starting point to (4,8).  This is the point the optimization algorithm
         // will start out from and it will move it closer and closer to the function's 
@@ -125,9 +124,20 @@ int main()
         // somewhat near the actual optimum value.
         starting_point = 4, 8;
 
+        // The first example below finds the minimum of the rosen() function and uses the
+        // analytical derivative computed by rosen_derivative().  Since it is very easy to
+        // make a mistake while coding a function like rosen_derivative() it is a good idea
+        // to compare your derivative function against a numerical approximation and see if
+        // the results are similar.  If they are very different then you probably made a 
+        // mistake.  So the first thing we do is compare the results at a test point: 
+        cout << "Difference between analytic derivative and numerical approximation of derivative: " 
+              << length(derivative(&rosen)(starting_point) - rosen_derivative(starting_point)) << endl;
+
+
+        cout << "Find the minimum of the rosen function()" << endl;
         // Now we use the find_min() function to find the minimum point.  The first argument
         // to this routine is the search strategy we want to use.  The second argument is the 
-        // stopping strategy.  Below I'm using the objective_delta_stop_strategy() which just 
+        // stopping strategy.  Below I'm using the objective_delta_stop_strategy which just 
         // says that the search should stop when the change in the function being optimized 
         // is small enough.
 
