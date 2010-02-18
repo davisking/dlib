@@ -134,6 +134,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>find_gamma_with_big_centroid_gap</item> 
          <item>compute_mean_squared_distance</item> 
          <item>kernel_matrix</item> 
+         <item>find_clusters_using_kmeans</item> 
       </section>
 
     </top>  
@@ -145,6 +146,18 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
 
    <components>
    
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_clusters_using_kmeans</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/kkmeans_abstract.h</spec_file>
+         <description>
+            This is just a simple linear kmeans clustering implementation.
+         </description>
+                                 
+      </component>
+
    <!-- ************************************************************************* -->
       
       <component>
