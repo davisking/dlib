@@ -107,6 +107,7 @@
          <term file="algorithms.html" name="rotate_point"/>
          <term file="algorithms.html" name="point_rotator"/>
          <term file="algorithms.html" name="running_stats"/>
+         <term file="algorithms.html" name="running_covariance"/>
          <term file="algorithms.html" name="random_subset_selector"/>
 
          <term file="dlib/svm/pegasos_abstract.h.html" name="replicate_settings"/>

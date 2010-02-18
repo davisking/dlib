@@ -28,6 +28,7 @@
          <item>crc32</item> 
          <item>rand</item> 
          <item>running_stats</item> 
+         <item>running_covariance</item> 
          <item>random_subset_selector</item> 
          <item nolink="true">
             <name>Optimization</name>
@@ -692,6 +693,20 @@
             <example>kcentroid_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>running_covariance</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object is a simple tool for computing the mean and
+                covariance of a sequence of vectors.  
+         </description>
+
       </component>
       
       
