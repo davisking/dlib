@@ -237,6 +237,36 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename vector_type, 
+        typename sample_type,
+        typename alloc
+        >
+    void find_clusters_using_kmeans (
+        const vector_type& samples,
+        std::vector<sample_type, alloc>& centers,
+        unsigned long max_iter = 1000
+    );
+    /*!
+        requires
+            - samples.size() > 0
+            - samples == a bunch of row or column vectors and they all must be of the
+              same length.
+            - centers.size() > 0
+            - vector_type == something with an interface compatible with std::vector
+              and it must contain row or column vectors capable of being stored in 
+              sample_type objects
+            - sample_type == a dlib::matrix capable of representing vectors
+        ensures
+            - performs regular old linear kmeans clustering on the samples.  The clustering
+              begins with the initial set of centers given as an argument to this function.
+              When it finishes #centers will contain the resulting centers.
+            - no more than max_iter iterations will be performed before this function
+              terminates.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_KKMEANs_ABSTRACT_
