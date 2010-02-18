@@ -162,6 +162,115 @@ namespace dlib
     template <
         typename matrix_type
         >
+    class running_covariance
+    {
+        /*!
+            REQUIREMENTS ON matrix_type
+                Must be some type of dlib::matrix.
+
+            INITIAL VALUE
+                - in_vector_size() == 0
+                - current_n() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple tool for computing the mean and
+                covariance of a sequence of vectors.  
+        !*/
+    public:
+
+        typedef typename matrix_type::mem_manager_type mem_manager_type;
+        typedef typename matrix_type::type scalar_type;
+        typedef typename matrix_type::layout_type layout_type;
+        typedef matrix<scalar_type,0,0,mem_manager_type,layout_type> general_matrix;
+        typedef matrix<scalar_type,0,1,mem_manager_type,layout_type> column_matrix;
+
+        running_covariance(
+        );
+        /*!
+            ensures
+                - this object is properly initialized
+        !*/
+
+        void clear(
+        );
+        /*!
+            ensures
+                - this object has its initial value
+                - clears all memory of any previous data points
+        !*/
+
+        long current_n (
+        ) const;
+        /*!
+            ensures
+                - returns the number of samples that have been presented to this object
+        !*/
+
+        long in_vector_size (
+        ) const;
+        /*!
+            ensures
+                - if (this object has been presented with any input vectors) then
+                    - returns the dimension of the column vectors used with this object
+                - else
+                    - returns 0
+        !*/
+
+        void add (
+            const matrix_exp& val
+        );
+        /*!
+            requires
+                - is_col_vector(val) == true
+                - if (in_vector_size() != 0) then
+                    - val.size() == in_vector_size()
+            ensures
+                - updates the mean and covariance stored in this object so that
+                  the new value is factored into them.
+                - #in_vector_size() == val.size()
+        !*/
+
+        const column_matrix mean (
+        ) const;
+        /*!
+            requires
+                - in_vector_size() != 0 
+            ensures
+                - returns the mean of all the vectors presented to this object 
+                  so far.
+        !*/
+
+        const general_matrix covariance (
+        ) const;
+        /*!
+            requires
+                - in_vector_size() != 0 
+                - current_n() > 1
+            ensures
+                - returns the unbiased sample covariance matrix for all the vectors 
+                  presented to this object so far.
+        !*/
+
+        const running_covariance operator+ (
+            const running_covariance& item
+        ) const;
+        /*!
+            requires
+                - in_vector_size() == 0 || item.in_vector_size() == 0 || in_vector_size() == item.in_vector_size()
+                  (i.e. the in_vector_size() of *this and item must match or one must be zero)
+            ensures
+                - returns a new running_covariance object that represents the combination of all 
+                  the vectors given to *this and item.  That is, this function returns a
+                  running_covariance object, R, that is equivalent to what you would obtain if all
+                  calls to this->add() and item.add() had instead been done to R.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_type
+        >
     class vector_normalizer
     {
         /*!

@@ -172,6 +172,167 @@ namespace dlib
     template <
         typename matrix_type
         >
+    class running_covariance
+    {
+        /*!
+            INITIAL VALUE
+                - vect_size == 0
+                - total_count == 0
+
+            CONVENTION
+                - vect_size == in_vector_size()
+                - total_count == current_n() 
+
+                - if (total_count != 0)
+                    - total_sum == the sum of all vectors given to add()
+                    - the covariance of all the elements given to add() is given
+                      by:
+                        - let avg == total_sum/total_count
+                        - covariance == total_cov/total_count - avg*trans(avg)
+        !*/
+    public:
+
+        typedef typename matrix_type::mem_manager_type mem_manager_type;
+        typedef typename matrix_type::type scalar_type;
+        typedef typename matrix_type::layout_type layout_type;
+        typedef matrix<scalar_type,0,0,mem_manager_type,layout_type> general_matrix;
+        typedef matrix<scalar_type,0,1,mem_manager_type,layout_type> column_matrix;
+
+        running_covariance(
+        )
+        {
+            clear();
+        }
+
+        void clear(
+        )
+        {
+            total_count = 0;
+
+            vect_size = 0;
+
+            total_sum.set_size(0);
+            total_cov.set_size(0,0);
+        }
+
+        long in_vector_size (
+        ) const
+        {
+            return vect_size;
+        }
+
+        long current_n (
+        ) const
+        {
+            return total_count;
+        }
+
+        template <typename EXP>
+        void add (
+            const matrix_exp<EXP>& val
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_col_vector(val) && (in_vector_size() == 0 || val.size() == in_vector_size()),
+                "\t void running_covariance::add()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t is_col_vector(val): " << is_col_vector(val) 
+                << "\n\t in_vector_size():   " << in_vector_size() 
+                << "\n\t val.size():         " << val.size() 
+                << "\n\t this:               " << this
+                );
+
+            vect_size = val.size();
+            if (total_count == 0)
+            {
+                total_cov = val*trans(val);
+                total_sum = val;
+            }
+            else
+            {
+                total_cov += val*trans(val);
+                total_sum += val;
+            }
+            ++total_count;
+        }
+
+        const column_matrix mean (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( in_vector_size() != 0,
+                "\t running_covariance::mean()"
+                << "\n\t This object can not execute this function in its current state."
+                << "\n\t in_vector_size(): " << in_vector_size() 
+                << "\n\t current_n():      " << current_n() 
+                << "\n\t this:             " << this
+                );
+
+            return total_sum/total_count;
+        }
+
+        const general_matrix covariance (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( in_vector_size() != 0 && current_n() > 1,
+                "\t running_covariance::covariance()"
+                << "\n\t This object can not execute this function in its current state."
+                << "\n\t in_vector_size(): " << in_vector_size() 
+                << "\n\t current_n():      " << current_n() 
+                << "\n\t this:             " << this
+                );
+
+            return (total_cov - total_sum*trans(total_sum)/total_count)/(total_count-1);
+        }
+
+        const running_covariance operator+ (
+            const running_covariance& item
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT((in_vector_size() == 0 || item.in_vector_size() == 0 || in_vector_size() == item.in_vector_size()),
+                "\t running_covariance running_covariance::operator+()"
+                << "\n\t The two running_covariance objects being added must have compatible parameters"
+                << "\n\t in_vector_size():            " << in_vector_size() 
+                << "\n\t item.in_vector_size():       " << item.in_vector_size() 
+                << "\n\t this:                        " << this
+                );
+
+            running_covariance temp(item);
+
+            // make sure we ignore empty matrices
+            if (total_count != 0 && temp.total_count != 0)
+            {
+                temp.total_cov += total_cov;
+                temp.total_sum += total_sum;
+                temp.total_count += total_count;
+            }
+            else if (total_count != 0)
+            {
+                temp.total_cov = total_cov;
+                temp.total_sum = total_sum;
+                temp.total_count = total_count;
+            }
+
+            return temp;
+        }
+
+
+    private:
+
+        general_matrix total_cov;
+        column_matrix total_sum;
+        scalar_type total_count;
+
+        long vect_size;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_type
+        >
     class vector_normalizer
     {
     public:

@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <dlib/statistics.h>
+#include <dlib/rand.h>
 
 #include "tester.h"
 
@@ -99,11 +100,73 @@ namespace
             }
         }
 
+        void test_running_covariance (
+        )
+        {
+            dlib::rand::float_1a rnd;
+            std::vector<matrix<double,0,1> > vects;
+
+            running_covariance<matrix<double,0,1> > cov, cov2;
+            DLIB_TEST(cov.in_vector_size() == 0);
+
+            for (unsigned long dims = 1; dims < 5; ++dims)
+            {
+                for (unsigned long samps = 2; samps < 10; ++samps)
+                {
+                    vects.clear();
+                    cov.clear();
+                    DLIB_TEST(cov.in_vector_size() == 0);
+                    for (unsigned long i = 0; i < samps; ++i)
+                    {
+                        vects.push_back(randm(dims,1,rnd));
+                        cov.add(vects.back());
+
+                    }
+                    DLIB_TEST(cov.in_vector_size() == dims);
+
+                    DLIB_TEST(equal(mean(vector_to_matrix(vects)), cov.mean()));
+                    DLIB_TEST_MSG(equal(covariance(vector_to_matrix(vects)), cov.covariance()),
+                              max(abs(covariance(vector_to_matrix(vects)) - cov.covariance()))
+                              << "   dims = " << dims << "   samps = " << samps
+                              );
+                }
+            }
+
+            for (unsigned long dims = 1; dims < 5; ++dims)
+            {
+                for (unsigned long samps = 2; samps < 10; ++samps)
+                {
+                    vects.clear();
+                    cov.clear();
+                    cov2.clear();
+                    DLIB_TEST(cov.in_vector_size() == 0);
+                    for (unsigned long i = 0; i < samps; ++i)
+                    {
+                        vects.push_back(randm(dims,1,rnd));
+                        if ((i%2) == 0)
+                            cov.add(vects.back());
+                        else
+                            cov2.add(vects.back());
+
+                    }
+                    DLIB_TEST((cov+cov2).in_vector_size() == dims);
+
+                    DLIB_TEST(equal(mean(vector_to_matrix(vects)), (cov+cov2).mean()));
+                    DLIB_TEST_MSG(equal(covariance(vector_to_matrix(vects)), (cov+cov2).covariance()),
+                              max(abs(covariance(vector_to_matrix(vects)) - (cov+cov2).covariance()))
+                              << "   dims = " << dims << "   samps = " << samps
+                              );
+                }
+            }
+
+        }
+
         void perform_test (
         )
         {
             test_random_subset_selector();
             test_random_subset_selector2();
+            test_running_covariance();
         }
     } a;
 
