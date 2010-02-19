@@ -46,7 +46,7 @@
             <chm_sub>parsing.xml</chm_sub>
          </item>
          <item>
-            <name>Imaging</name>
+            <name>Image Processing</name>
             <link>imaging.html</link>
             <chm_sub>imaging.xml</chm_sub>
          </item>
