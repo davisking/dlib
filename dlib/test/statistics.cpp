@@ -122,7 +122,7 @@ namespace
                         cov.add(vects.back());
 
                     }
-                    DLIB_TEST(cov.in_vector_size() == dims);
+                    DLIB_TEST(cov.in_vector_size() == (long)dims);
 
                     DLIB_TEST(equal(mean(vector_to_matrix(vects)), cov.mean()));
                     DLIB_TEST_MSG(equal(covariance(vector_to_matrix(vects)), cov.covariance()),
@@ -149,7 +149,7 @@ namespace
                             cov2.add(vects.back());
 
                     }
-                    DLIB_TEST((cov+cov2).in_vector_size() == dims);
+                    DLIB_TEST((cov+cov2).in_vector_size() == (long)dims);
 
                     DLIB_TEST(equal(mean(vector_to_matrix(vects)), (cov+cov2).mean()));
                     DLIB_TEST_MSG(equal(covariance(vector_to_matrix(vects)), (cov+cov2).covariance()),

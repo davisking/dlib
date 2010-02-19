@@ -107,7 +107,7 @@ namespace
 
             for (int i = 0; i < 40; ++i)
             {
-                for (long dims = 2; dims < 6; ++dims)
+                for (long dims = 1; dims < 6; ++dims)
                 {
                     rs.add(do_the_test(dims, 1.0));
                 }
@@ -115,7 +115,7 @@ namespace
 
             for (int i = 0; i < 40; ++i)
             {
-                for (long dims = 2; dims < 6; ++dims)
+                for (long dims = 1; dims < 6; ++dims)
                 {
                     rs.add(do_the_test(dims, 5.0));
                 }
