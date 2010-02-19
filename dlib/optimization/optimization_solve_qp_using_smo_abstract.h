@@ -15,11 +15,12 @@ namespace dlib
         typename EXP2,
         typename T, long NR, long NC, typename MM, typename L
         >
-    void solve_qp_using_smo ( 
+    unsigned long solve_qp_using_smo ( 
         const matrix_exp<EXP1>& Q,
         const matrix_exp<EXP2>& b,
         matrix<T,NR,NC,MM,L>& alpha,
-        T eps
+        T eps,
+        unsigned long max_iter
     );
     /*!
         requires
@@ -30,6 +31,7 @@ namespace dlib
             - alpha.size() > 0
             - min(alpha) >= 0
             - eps > 0
+            - max_iter > 0
         ensures
             - Let C == sum(alpha) (i.e. C is the sum of the alpha values you 
               supply to this function)
@@ -44,6 +46,9 @@ namespace dlib
               and it works on the problem until the KKT violation is less than eps.  
               So eps controls how accurate the solution is and smaller values result 
               in better solutions.
+            - At most max_iter iterations of optimization will be performed.  
+            - returns the number of iterations performed.  If this method fails to
+              converge to eps accuracy then the number returned will be max_iter+1.
     !*/
 
 // ----------------------------------------------------------------------------------------

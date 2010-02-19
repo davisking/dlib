@@ -74,11 +74,12 @@ namespace dlib
         typename EXP2,
         typename T, long NR, long NC, typename MM, typename L
         >
-    void solve_qp_using_smo ( 
+    unsigned long solve_qp_using_smo ( 
         const matrix_exp<EXP1>& Q,
         const matrix_exp<EXP2>& b,
         matrix<T,NR,NC,MM,L>& alpha,
-        T eps
+        T eps,
+        unsigned long max_iter
     )
     {
         // make sure requires clause is not broken
@@ -89,7 +90,8 @@ namespace dlib
                      b.size() == Q.nr() &&
                      alpha.size() > 0 &&
                      min(alpha) >= 0 &&
-                     eps > 0,
+                     eps > 0 &&
+                     max_iter > 0,
                      "\t void solve_qp_using_smo()"
                      << "\n\t Invalid arguments were given to this function"
                      << "\n\t Q.nr():               " << Q.nr()
@@ -101,6 +103,7 @@ namespace dlib
                      << "\n\t Q.nr():               " << Q.nr() 
                      << "\n\t min(alpha):           " << min(alpha) 
                      << "\n\t eps:                  " << eps 
+                     << "\n\t max_iter:             " << max_iter 
         );
 
         // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.  
@@ -108,7 +111,8 @@ namespace dlib
 
         const T tau = 1000*std::numeric_limits<T>::epsilon();
 
-        while (true)
+        unsigned long iter = 0;
+        for (; iter < max_iter; ++iter)
         {
             // Find the two elements of df that satisfy the following:
             //    - small_idx == index_of_min(df)
@@ -163,13 +167,26 @@ namespace dlib
                 alpha(small_idx) = old_alpha_big + old_alpha_small;
             }
 
-            // Now update the gradient. We will perform the equivalent of: df = Q*alpha - b;
-            const T delta_alpha_big   = alpha(big_idx) - old_alpha_big;
-            const T delta_alpha_small = alpha(small_idx) - old_alpha_small;
 
-            for(long k = 0; k < df.nr(); ++k)
-                df(k) += Q(big_idx,k)*delta_alpha_big + Q(small_idx,k)*delta_alpha_small;
+            if ((iter%(max_iter/10)) == (max_iter/10 -1))
+            {
+                // Perform this form of the update every so often because doing so can help
+                // avoid the buildup of numerical errors you get with the alternate update
+                // below.
+                df = Q*alpha - b;
+            }
+            else
+            {
+                // Now update the gradient. We will perform the equivalent of: df = Q*alpha - b;
+                const T delta_alpha_big   = alpha(big_idx) - old_alpha_big;
+                const T delta_alpha_small = alpha(small_idx) - old_alpha_small;
+
+                for(long k = 0; k < df.nr(); ++k)
+                    df(k) += Q(big_idx,k)*delta_alpha_big + Q(small_idx,k)*delta_alpha_small;
+            }
         }
+
+        return iter+1;
     }
 
 // ----------------------------------------------------------------------------------------

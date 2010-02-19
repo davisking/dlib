@@ -157,7 +157,8 @@ namespace
             alpha = C/alpha.size();
             x = alpha;
 
-            solve_qp_using_smo(test.Q, test.b, alpha, 0.00001);
+            const unsigned long max_iter = 100000;
+            solve_qp_using_smo(test.Q, test.b, alpha, 0.00001, max_iter);
             DLIB_TEST_MSG(abs(sum(alpha) - C) < 1e-13, abs(sum(alpha) - C) );
             dlog << LTRACE << "alpha: " << alpha;
             dlog << LINFO << "SMO: true objective: "<< 0.5*trans(alpha)*test.Q*alpha - trans(alpha)*test.b;
