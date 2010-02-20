@@ -167,8 +167,7 @@ namespace dlib
                 alpha(small_idx) = old_alpha_big + old_alpha_small;
             }
 
-
-            if ((iter%(max_iter/10)) == (max_iter/10 -1))
+            if ((iter%(max_iter/100)) == (max_iter/100 -1))
             {
                 // Perform this form of the update every so often because doing so can help
                 // avoid the buildup of numerical errors you get with the alternate update
