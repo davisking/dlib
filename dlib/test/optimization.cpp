@@ -693,7 +693,7 @@ namespace
         const double p
     )
     {
-        const double eps = 1e-9;
+        const double eps = 1e-7;
 
 
         dlog << LINFO << "testing with single_variable_function and the start point: " << p;
