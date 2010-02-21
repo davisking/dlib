@@ -11,6 +11,11 @@
             <chm_sub>algorithms.xml</chm_sub>
          </item>
          <item>
+            <name>Optimization</name>
+            <link>optimization.html</link>
+            <chm_sub>optimization.xml</chm_sub>
+         </item>
+         <item>
             <name>Machine Learning</name>
             <link>ml.html</link>
             <chm_sub>ml.xml</chm_sub>
@@ -31,7 +36,7 @@
             <chm_sub>api.xml</chm_sub>
          </item>
          <item>
-            <name>Network</name>
+            <name>Networking</name>
             <link>network.html</link>
             <chm_sub>network.xml</chm_sub>
          </item>

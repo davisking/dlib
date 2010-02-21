@@ -222,7 +222,7 @@
                </ul><br/>
             </li>
             <li> <i>Introduction to Derivative-Free Optimization</i>  by Conn, Scheinberg, and Vicente  
-            <ul>  If you want to understand algorithms like <a href="algorithms.html#find_min_bobyqa">BOBYQA</a>
+            <ul>  If you want to understand algorithms like <a href="optimization.html#find_min_bobyqa">BOBYQA</a>
             then this is a good recent book on the subject.  Note that a book like <i>Practical Methods of Optimization</i>
                  is almost certainly a prerequisite for reading this book.  As an aside, BOBYQA is not discussed in this book but 
                  its predecessor, NEWUOA is.  
