@@ -115,14 +115,14 @@ namespace dlib
         for (; iter < max_iter; ++iter)
         {
             // Find the two elements of df that satisfy the following:
-            //    - small_idx == index_of_min(df)
+            //    - little_idx == index_of_min(df)
             //    - big_idx   == the index of the largest element in df such that alpha(big_idx) > 0
             // These two indices will tell us which two alpha values are most in violation of the KKT 
             // optimality conditions.  
             T big = -std::numeric_limits<T>::max();
             long big_idx = 0;
-            T small = std::numeric_limits<T>::max();
-            long small_idx = 0;
+            T little = std::numeric_limits<T>::max();
+            long little_idx = 0;
             for (long i = 0; i < df.nr(); ++i)
             {
                 if (df(i) > big && alpha(i) > 0)
@@ -130,32 +130,32 @@ namespace dlib
                     big = df(i);
                     big_idx = i;
                 }
-                if (df(i) < small)
+                if (df(i) < little)
                 {
-                    small = df(i);
-                    small_idx = i;
+                    little = df(i);
+                    little_idx = i;
                 }
             }
 
             // Check if the KKT conditions are still violated.  Note that this rule isn't
             // one of the KKT conditions itself but is derived from them.  See the top of
             // this file for a derivation of this stopping rule.
-            if (alpha(small_idx) > 0 && (big - small) < eps)
+            if (alpha(little_idx) > 0 && (big - little) < eps)
                 break;
 
 
             // Save these values, we will need them later.
             const T old_alpha_big = alpha(big_idx);
-            const T old_alpha_small = alpha(small_idx);
+            const T old_alpha_little = alpha(little_idx);
 
 
             // Now optimize the two variables we just picked. 
-            T quad_coef = Q(big_idx,big_idx) + Q(small_idx,small_idx) - 2*Q(big_idx, small_idx);
+            T quad_coef = Q(big_idx,big_idx) + Q(little_idx,little_idx) - 2*Q(big_idx, little_idx);
             if (quad_coef <= tau)
                 quad_coef = tau;
-            const T delta = (big - small)/quad_coef;
+            const T delta = (big - little)/quad_coef;
             alpha(big_idx) -= delta;
-            alpha(small_idx) += delta;
+            alpha(little_idx) += delta;
 
             // Make sure alpha stays feasible.  That is, make sure the updated alpha doesn't
             // violate the non-negativity constraint.  
@@ -164,7 +164,7 @@ namespace dlib
                 // Since an alpha can't be negative we will just set it to 0 and shift all the
                 // weight to the other alpha.
                 alpha(big_idx) = 0;
-                alpha(small_idx) = old_alpha_big + old_alpha_small;
+                alpha(little_idx) = old_alpha_big + old_alpha_little;
             }
 
             if ((iter%(max_iter/100)) == (max_iter/100 -1))
@@ -178,10 +178,10 @@ namespace dlib
             {
                 // Now update the gradient. We will perform the equivalent of: df = Q*alpha - b;
                 const T delta_alpha_big   = alpha(big_idx) - old_alpha_big;
-                const T delta_alpha_small = alpha(small_idx) - old_alpha_small;
+                const T delta_alpha_little = alpha(little_idx) - old_alpha_little;
 
                 for(long k = 0; k < df.nr(); ++k)
-                    df(k) += Q(big_idx,k)*delta_alpha_big + Q(small_idx,k)*delta_alpha_small;
+                    df(k) += Q(big_idx,k)*delta_alpha_big + Q(little_idx,k)*delta_alpha_little;
             }
         }
 
