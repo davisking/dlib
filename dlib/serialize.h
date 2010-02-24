@@ -510,7 +510,7 @@ namespace dlib
 
     template <typename T, typename alloc>
     void deserialize (
-        std::vector<T>& item,
+        std::vector<T,alloc>& item,
         std::istream& in
     );
 
