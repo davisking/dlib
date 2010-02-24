@@ -91,9 +91,9 @@ namespace
         {
             mut.lock();
             ++num_read;
+            max_read = max(num_read, max_read);
             mut.unlock();
 
-            max_read = max(num_read, max_read);
             if (num_write != 0)
             {
                 failure = true;
@@ -102,7 +102,6 @@ namespace
 
             dlib::sleep(300);
 
-            max_read = max(num_read, max_read);
             if (num_write != 0)
             {
                 failure = true;
@@ -110,6 +109,7 @@ namespace
             }
 
             mut.lock();
+            max_read = max(num_read, max_read);
             --num_read;
             mut.unlock();
 
