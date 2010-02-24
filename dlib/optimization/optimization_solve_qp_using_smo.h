@@ -167,7 +167,8 @@ namespace dlib
                 alpha(little_idx) = old_alpha_big + old_alpha_little;
             }
 
-            if ((iter%(max_iter/100)) == (max_iter/100 -1))
+            // Every 100 iterations
+            if ((iter%100) == 99)
             {
                 // Perform this form of the update every so often because doing so can help
                 // avoid the buildup of numerical errors you get with the alternate update
