@@ -145,8 +145,8 @@
                   <li>Windows BMP <a href="imaging.html#load_bmp">read</a> and <a href="imaging.html#save_bmp">write</a> support</li>
                   <li>Automatic color space conversion between various pixel types</li>  
                   <li>Common image operations such as edge finding and morphological operations</li>
-                  <li>An implementation of the <a href="imaging.html#get_surf_points">SURF</a> feature 
-                     extraction algorithm.</li>
+                  <li>Implementations of the <a href="imaging.html#get_surf_points">SURF</a>
+                  and <a href="imaging.html#hog_image">HOG</a> feature extraction algorithms.</li>
                </ul>
             </li>
 

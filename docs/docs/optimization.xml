@@ -11,7 +11,9 @@
 
          <p>
             This page documents library components that attempt to find the 
-            minimum or maximum of a user supplied function.  
+            minimum or maximum of a user supplied function.   An introduction
+            general purpose non-linear optimizers in this section can be
+            found <a href="optimization_ex.cpp.html">here</a>.
          </p>
 
    </body>
