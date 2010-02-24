@@ -36,8 +36,8 @@ namespace dlib
             ensures
                 - #down will contain an image that is roughly half the size of the original
                   image.  To be specific, this function performs the following steps:
-                    - 1. applies a 5x5 gaussian filter to the orignal image to smooth it a little.
-                    - 2. ever other row and column is discarded to create an image half the size
+                    - 1. Applies a 5x5 Gaussian filter to the original image to smooth it a little.
+                    - 2. Every other row and column is discarded to create an image half the size
                          of the original.  This smaller image is stored in #down.
         !*/
     };
