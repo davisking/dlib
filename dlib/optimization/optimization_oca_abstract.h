@@ -109,7 +109,8 @@ namespace dlib
                     Where R(w) is a convex function and C > 0
 
 
-                For a detailed discussion you should consult the following papers:
+                For a detailed discussion you should consult the following papers
+                from the Journal of Machine Learning Research:
                     Optimized Cutting Plane Algorithm for Large-Scale Risk Minimization
                         Vojtěch Franc, Sören Sonnenburg; 10(Oct):2157--2192, 2009. 
 
