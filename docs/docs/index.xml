@@ -114,6 +114,7 @@
                       <a href="optimization.html#lbfgs_search_strategy">L-BFGS</a> techniques</li>
                   <li>Box-constrained derivative-free optimization via the 
                       <a href="optimization.html#find_min_bobyqa">BOBYQA</a> algorithm</li> 
+                  <li>An implementation of the <a href="optimization.html#oca">Optimized Cutting Plane Algorithm</a></li> 
                   <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
                   <li>A <a href="algorithms.html#rand">random number</a> object</li>
                </ul>

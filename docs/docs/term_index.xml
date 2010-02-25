@@ -31,6 +31,7 @@
          <term file="dlib/optimization/optimization_abstract.h.html" name="line_search_funct"/>
          <term file="dlib/optimization/optimization_line_search_abstract.h.html" name="optimize_single_variable_failure"/>
          <term file="dlib/optimization/optimization_bobyqa_abstract.h.html" name="bobyqa_failure"/>
+         <term file="dlib/optimization/optimization_oca_abstract.h.html" name="oca_problem"/>
 
          <term file="optimization.html" name="derivative"/>
          <term file="optimization.html" name="make_line_search_function"/>
@@ -42,6 +43,7 @@
          <term file="optimization.html" name="find_min_using_approximate_derivatives"/>
          <term file="optimization.html" name="find_min_bobyqa"/>
          <term file="optimization.html" name="solve_qp_using_smo"/>
+         <term file="optimization.html" name="oca"/>
          <term link="optimization.html#find_min_bobyqa" name="BOBYQA"/>
          <term file="optimization.html" name="find_max"/>
          <term file="optimization.html" name="find_max_single_variable"/>

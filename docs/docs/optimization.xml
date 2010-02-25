@@ -12,7 +12,7 @@
          <p>
             This page documents library components that attempt to find the 
             minimum or maximum of a user supplied function.   An introduction
-            general purpose non-linear optimizers in this section can be
+            to the general purpose non-linear optimizers in this section can be
             found <a href="optimization_ex.cpp.html">here</a>.
          </p>
 
@@ -29,6 +29,7 @@
          <item>find_min_using_approximate_derivatives</item> 
          <item>find_min_bobyqa</item> 
          <item>solve_qp_using_smo</item> 
+         <item>oca</item> 
          <item>find_max</item> 
          <item>find_max_single_variable</item> 
          <item>find_max_using_approximate_derivatives</item> 
@@ -299,6 +300,37 @@
       sum(alpha) == C 
       min(alpha) >= 0 
 </pre>
+
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>oca</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_oca_abstract.h</spec_file>
+         <description>
+                This object is a tool for solving the following optimization problem:   
+<pre>
+   Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
+
+   Where R(w) is a convex function and C > 0
+</pre>
+<br/>
+<br/>
+
+                For a detailed discussion you should consult the following papers
+                from the Journal of Machine Learning Research:
+                <blockquote>
+                    Optimized Cutting Plane Algorithm for Large-Scale Risk Minimization
+                        Vojtech Franc, Soren Sonnenburg; 10(Oct):2157--2192, 2009. 
+                </blockquote>
+                <blockquote>
+                    Bundle Methods for Regularized Risk Minimization
+                        Choon Hui Teo, S.V.N. Vishwanthan, Alex J. Smola, Quoc V. Le; 11(Jan):311-365, 2010. 
+                </blockquote>
 
          </description>
                                  
