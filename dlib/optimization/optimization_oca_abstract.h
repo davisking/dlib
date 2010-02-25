@@ -112,10 +112,10 @@ namespace dlib
                 For a detailed discussion you should consult the following papers
                 from the Journal of Machine Learning Research:
                     Optimized Cutting Plane Algorithm for Large-Scale Risk Minimization
-                        Vojtěch Franc, Sören Sonnenburg; 10(Oct):2157--2192, 2009. 
+                        Vojtech Franc, Soren Sonnenburg; 10(Oct):2157--2192, 2009. 
 
                     Bundle Methods for Regularized Risk Minimization
-                        Choon Hui Teo, S.V.N. Vishwanthan, Alex J. Smola, Quoc V. Le; 11(Jan):311−365, 2010. 
+                        Choon Hui Teo, S.V.N. Vishwanthan, Alex J. Smola, Quoc V. Le; 11(Jan):311-365, 2010. 
         !*/
     public:
 
