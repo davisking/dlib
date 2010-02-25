@@ -34,7 +34,7 @@ namespace dlib
         virtual scalar_type get_C (
         ) const = 0;
 
-        virtual long num_dimensions (
+        virtual long get_num_dimensions (
         ) const = 0;
 
         virtual void get_risk (
@@ -144,11 +144,21 @@ namespace dlib
         template <
             typename matrix_type
             >
-        void operator() (
+        typename matrix_type::type operator() (
             const oca_problem<matrix_type>& problem,
             matrix_type& w
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(problem.get_C() > 0 &&
+                        problem.get_num_dimensions() > 0,
+                "\t void oca::operator()"
+                << "\n\t The oca_problem is invalid"
+                << "\n\t problem.get_C():              " << problem.get_C() 
+                << "\n\t problem.get_num_dimensions(): " << problem.get_num_dimensions() 
+                << "\n\t this: " << this
+                );
+
             typedef typename matrix_type::type scalar_type;
             typedef typename matrix_type::layout_type layout_type;
             typedef typename matrix_type::mem_manager_type mem_manager_type;
@@ -161,7 +171,7 @@ namespace dlib
 
             vect_type temp, alpha, w_cur;
 
-            w.set_size(problem.num_dimensions(), 1);
+            w.set_size(problem.get_num_dimensions(), 1);
             w = 0;
             w_cur = w;
 
@@ -274,6 +284,7 @@ namespace dlib
             // report current status
             problem.optimization_status(best_obj, best_obj - cp_obj, planes.size());
 
+            return best_obj;
         }
 
     private:

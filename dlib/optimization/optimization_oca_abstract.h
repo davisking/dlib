@@ -59,7 +59,7 @@ namespace dlib
                 - returns the C parameter
         !*/
 
-        virtual long num_dimensions (
+        virtual long get_num_dimensions (
         ) const = 0;
         /*!
             ensures
@@ -74,7 +74,7 @@ namespace dlib
         /*!
             requires
                 - is_col_vector(current_solution) == true
-                - current_solution.size() == num_dimensions()
+                - current_solution.size() == get_num_dimensions()
             ensures
                 - #current_solution will be set to one of the following:
                     - current_solution (i.e. it won't be modified at all)
@@ -129,13 +129,17 @@ namespace dlib
         template <
             typename matrix_type
             >
-        void operator() (
+        typename matrix_type::type operator() (
             const oca_problem<matrix_type>& problem,
             matrix_type& w
         ) const;
         /*!
+            requires
+                - problem.get_C() > 0
+                - problem.get_num_dimensions() > 0
             ensures
                 - solves the given oca problem and stores the solution in #w
+                - returns the objective value at the soltuion #w
         !*/
 
         void set_epsilon (
