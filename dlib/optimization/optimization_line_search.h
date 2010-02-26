@@ -301,7 +301,7 @@ namespace dlib
         double last_val = f0;
         double last_val_der = d0;
 
-        // the bracketing stage will find a find a range of points [a,b]
+        // The bracketing stage will find a range of points [a,b]
         // that contains a reasonable solution to the line search
         double a, b;
 
