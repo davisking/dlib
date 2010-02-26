@@ -17,14 +17,15 @@
          you would read a short description of something, understand it immediately,
          and begin using it in your application without any difficulty.  Obviously, this
          depends partly on the background of the user.  For example, if you have 
-         never written software before then it probably isn't going to be this easy.
+         never written C++ software before then it probably isn't going to be this easy.
         </p>
         <p>
-          This page contains references to books, along with my commentary, which explain most of 
-          the subjects needed to understand the various parts of the library.   In most cases these are 
-          the books I learned from during the process
-          of creating dlib.  As always, if you disagree with anything or think I have left out an important
-          text then shoot me an <a href="mailto:davis@dlib.net">email</a>. 
+          This page is meant to complement the main library documentation by providing 
+          references to books, along with my commentary, which explain most of 
+          the background material needed to understand the various parts of the library.   
+          In most cases these are the books I learned from during the process
+          of creating dlib.  As always, if you disagree with anything or think I have left out 
+          an important text then shoot me an <a href="mailto:davis@dlib.net">email</a>. 
         </p>
         <br/><br/>
         
@@ -35,7 +36,7 @@
          <ul>
             <li> <i>Programming: Principles and Practice Using C++</i> by Bjarne Stroustrup 
                <ul>  This is the sort of book you would use in a freshman introduction-to-programming class.  
-                  So if you are just beginning to study programming and interested in C++ then I think
+                  So if you are just beginning to study programming and are interested in C++ then I think
                it is probably safe to say this is one of the best books you could read.   It is both
                recent (2009) and written by the creator of C++. </ul> <br/>
             </li>
@@ -43,9 +44,9 @@
                <ul>  This is a great intermediate level C++ book.  Most people have heard the jokes about 
                   how easy it is to shoot yourself in the foot with C++.  This book explains many things you
                   need to know about the language to avoid doing so on a regular basis.  So if you are
-                  writing C++ software then this is a MUST read.  I would go as far as to claim that
+                  writing C++ software then this is a must-read.  I would even claim that
                   you are a danger to the C++ software you touch unless you know what is in this book.   
-                  I'm not kidding.  However, the book isn't just about the quirks of C++. It also discusses many general 
+                  I'm not kidding.  Finally, the book isn't just about the quirks of C++. It also discusses many general 
                  software engineering ideas which have wide applicability.  So in this
                   respect it is a great book for any software developer to read.  
                </ul><br/>
@@ -74,7 +75,7 @@
          <ul>
             <li> <i>Programming with POSIX Threads</i> by  David R. Butenhof  
                <ul> When I was an undergrad, this book was my main resource for learning about multithreading.  
-                  It was enjoyable to read (as are all the books on this list I think) and covered everything
+                  It was enjoyable to read, as are all the books on this list, and covered everything
                   in great depth without becoming overbearing.  Also, despite what the title may suggest,
                   this book is useful for understanding multithreading broadly, not just multithreading
                   on POSIX systems.
@@ -89,7 +90,7 @@
                <ul> A lot of people call this book the network programming Bible and  
                   this praise is well deserved.  If you want a deep understanding of how computer networks
                   function, including the Internet, then this is the book to read.  As with 
-                   the Butenhof book above, this is excellent even for people who do not
+                   the Butenhof book above, this is excellent choice even for people who do not
                    intend to write software for Unix systems.   
                </ul><br/>
             </li>
@@ -97,7 +98,7 @@
 
         <h3>WIN32 Programming</h3>
               It has been a long time since I needed to refer to these two books.  However,
-              they contained information that I couldn't find elsewhere no matter
+              they contained information I couldn't find elsewhere no matter
               how hard I looked.  So I recommend them in case you need to create or understand
               some low level win32 code. 
               <br/>
@@ -143,7 +144,7 @@
          <ul>
             <li> <i>Text Compression</i> by Bell, Cleary, and Witten 
                <ul> When I was studying data compression this was my most useful
-                  resource.  So if you are looking to understand how lossless data compression
+                  resource.  If you are looking to understand how lossless data compression
                   algorithms work then this is the book you want.  It is completely self-contained 
                   and an absolute joy to read.  Note that contrary to one of the reviews on
                   amazon.com, the book <i>Managing Gigabytes</i> is not the second edition of this book;
@@ -189,7 +190,7 @@
                <ul> At some level real analysis is like a really rigorous repeat of calculus.  
                   So if you already have an undergraduate education in calculus and 
                   you are reading things that seem reminiscent of calculus but involve
-                  stuff you haven't seen before (e.g. sup, inf, "sets of numbers") 
+                  stuff you haven't seen before (e.g. sup, inf, "sets of numbers", sequences of points) 
                   then you may be in need of a real analysis book.  This one is quite good and should
                   be accessible to someone with the usual undergraduate computer science math background.
                </ul><br/>
@@ -213,7 +214,8 @@
             <li> <i>Practical Methods of Optimization</i> (second edition) by R. Fletcher  1987 
                <ul> I love this book.  When I got it I literally spent my weekends sitting around
                   reading it for hours.  It is a fascinating and well written introduction to 
-                  the subject of optimization.  I cannot recommend it highly enough.    
+                  the subject of optimization.  This has been my most valuable resource for
+                  learning the fundamentals of optimization and I cannot recommend it highly enough.    
                </ul><br/>
             </li>
             <li> <i>Numerical Optimization</i>  by Jorge Nocedal and Stephen Wright 2006  
@@ -255,7 +257,7 @@
                     mention the KKT conditions, duality, "primal variables", or quadratic programming it
                     is talking about ideas from optimization.  A good book which will explain all this to you
                     is <i>Practical Methods of Optimization</i>.  Note that this book calls the KKT conditions
-                    just the "KT" conditions.  They are talking about the same thing.  Also, duality 
+                    just the "KT" conditions.  It is talking about the same thing.  Also, duality 
                     is something that comes up a lot in optimization but in the context of machine learning
                     usually people are talking about a particular form known as the Wolfe Dual.  
                     </p>
@@ -275,8 +277,7 @@
         <h2>Image Processing</h2>
          <ul>
             <li> <i>Digital Image Processing</i> by Rafael C. Gonzalez and Richard E. Woods  
-               <ul> This is a terrific introduction to digital image processing if you are looking 
-                  for a place to start learning about this subject.
+               <ul> This is a terrific introduction to digital image processing.
                   By and large this book doesn't require any special prerequisites.  Sometimes
                   calculus shows up, but not too much.
                </ul><br/>
