@@ -162,7 +162,7 @@ namespace dlib
             typedef typename matrix_type::type scalar_type;
             typedef typename matrix_type::layout_type layout_type;
             typedef typename matrix_type::mem_manager_type mem_manager_type;
-            typedef matrix<scalar_type,0,1,mem_manager_type, layout_type> vect_type;
+            typedef matrix_type vect_type;
 
             const scalar_type C = problem.get_C();
 
