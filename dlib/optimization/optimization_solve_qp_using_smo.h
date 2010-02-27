@@ -63,8 +63,8 @@ namespace dlib
         The important thing to take away is the final rule.  It tells us that at the
         optimal solution all elements of the gradient of f have the same value if 
         their corresponding alpha is non-zero.  It also tells us that all the other
-        gradient values are bigger than y.  So using this rule we can easily check
-        to see if the algorithm has found the optimal point. 
+        gradient values are bigger than y.  We can use this information to help us
+        pick which alpha variables to optimize at each iteration. 
     */
 
 // ----------------------------------------------------------------------------------------
@@ -106,11 +106,17 @@ namespace dlib
                      << "\n\t max_iter:             " << max_iter 
         );
 
+        const T C = sum(alpha);
+
         // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.  
         matrix<T,NR,NC,MM,L> df = Q*alpha - b;
 
+        // This variable should always contain the current value of trans(alpha)*df 
+        T alpha_df = trans(alpha)*df;
+
         const T tau = 1000*std::numeric_limits<T>::epsilon();
 
+        T big, little;
         unsigned long iter = 0;
         for (; iter < max_iter; ++iter)
         {
@@ -119,9 +125,9 @@ namespace dlib
             //    - big_idx   == the index of the largest element in df such that alpha(big_idx) > 0
             // These two indices will tell us which two alpha values are most in violation of the KKT 
             // optimality conditions.  
-            T big = -std::numeric_limits<T>::max();
+            big = -std::numeric_limits<T>::max();
             long big_idx = 0;
-            T little = std::numeric_limits<T>::max();
+            little = std::numeric_limits<T>::max();
             long little_idx = 0;
             for (long i = 0; i < df.nr(); ++i)
             {
@@ -137,10 +143,17 @@ namespace dlib
                 }
             }
 
-            // Check if the KKT conditions are still violated.  Note that this rule isn't
-            // one of the KKT conditions itself but is derived from them.  See the top of
-            // this file for a derivation of this stopping rule.
-            if (alpha(little_idx) > 0 && (big - little) < eps)
+            // Check if the KKT conditions are still violated and stop if so.  
+            //if (alpha(little_idx) > 0 && (big - little) < eps)
+            //    break;
+
+            // Check how big the duality gap is and stop when it goes below eps.  
+            // The duality gap is the gap between the objective value of the function
+            // we are optimizing and the value of it's primal form.  This value is always 
+            // greater than or equal to the distance to the optimum solution so it is a 
+            // good way to decide if we should stop.   See the book referenced above for 
+            // more information.  In particular, see the part about the Wolfe Dual.
+            if (alpha_df - C*little < eps)
                 break;
 
 
@@ -167,13 +180,15 @@ namespace dlib
                 alpha(little_idx) = old_alpha_big + old_alpha_little;
             }
 
-            // Every 100 iterations
-            if ((iter%100) == 99)
+            // Every 300 iterations
+            if ((iter%300) == 299)
             {
                 // Perform this form of the update every so often because doing so can help
                 // avoid the buildup of numerical errors you get with the alternate update
                 // below.
                 df = Q*alpha - b;
+
+                alpha_df = trans(alpha)*df;
             }
             else
             {
@@ -181,10 +196,27 @@ namespace dlib
                 const T delta_alpha_big   = alpha(big_idx) - old_alpha_big;
                 const T delta_alpha_little = alpha(little_idx) - old_alpha_little;
 
+                alpha_df += delta_alpha_big*df(big_idx) + delta_alpha_little*df(little_idx);
+
                 for(long k = 0; k < df.nr(); ++k)
-                    df(k) += Q(big_idx,k)*delta_alpha_big + Q(little_idx,k)*delta_alpha_little;
+                {
+                    T temp = Q(big_idx,k)*delta_alpha_big + Q(little_idx,k)*delta_alpha_little;
+                    df(k) += temp;
+
+                    alpha_df += alpha(k)*temp;
+                }
+
             }
         }
+
+        /*
+        using namespace std;
+        cout << "SMO: " << endl;
+        cout << "   duality gap: "<< trans(alpha)*df - C*min(df) << endl;
+        cout << "   KKT gap:     "<< big-little << endl;
+        cout << "   iter:        "<< iter+1 << endl;
+        cout << "   eps:         "<< eps << endl;
+        */
 
         return iter+1;
     }

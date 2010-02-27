@@ -43,9 +43,9 @@ namespace dlib
             - The solution to the above QP will be stored in #alpha.
             - This function uses a simple implementation of the sequential minimal
               optimization algorithm.  It starts the algorithm with the given alpha
-              and it works on the problem until the KKT violation is less than eps.  
-              So eps controls how accurate the solution is and smaller values result 
-              in better solutions.
+              and it works on the problem until the duality gap (i.e. how far away
+              we are from the optimum solution) is less than eps.  So eps controls 
+              how accurate the solution is and smaller values result in better solutions.
             - At most max_iter iterations of optimization will be performed.  
             - returns the number of iterations performed.  If this method fails to
               converge to eps accuracy then the number returned will be max_iter+1.
