@@ -46,10 +46,12 @@ namespace dlib
         const static long NC = matrix_traits<kernel_matrix_exp>::NC;
         const static long cost = matrix_traits<kernel_matrix_exp>::cost;
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2>
         kernel_matrix_exp (T1,T2); 
+    public:
 
         kernel_matrix_exp (
             const kernel_type& kern_,
@@ -188,10 +190,12 @@ namespace dlib
         const static long NC = matrix_traits<kernel_matrix_exp1>::NC;
         const static long cost = matrix_traits<kernel_matrix_exp1>::cost;
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2, typename T3>
         kernel_matrix_exp1 (T1,T2,T3); 
+    public:
 
         kernel_matrix_exp1 (
             const kernel_type& kern_,
@@ -305,10 +309,12 @@ namespace dlib
         const static long NC = matrix_traits<kernel_matrix_exp2>::NC;
         const static long cost = matrix_traits<kernel_matrix_exp2>::cost;
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2, typename T3>
         kernel_matrix_exp2 (T1,T2,T3); 
+    public:
 
         kernel_matrix_exp2 (
             const kernel_type& kern_,
@@ -423,10 +429,12 @@ namespace dlib
         const static long NC = matrix_traits<kernel_matrix_exp3>::NC;
         const static long cost = matrix_traits<kernel_matrix_exp3>::cost;
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2, typename T3>
         kernel_matrix_exp3 (T1,T2,T3); 
+    public:
 
         kernel_matrix_exp3 (
             const kernel_type& kern_,
