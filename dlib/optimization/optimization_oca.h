@@ -27,11 +27,11 @@ namespace dlib
             unsigned long 
         ) const {}
 
-        virtual bool R_has_lower_bound (
+        virtual bool r_has_lower_bound (
             scalar_type& 
         ) const { return false; }
 
-        virtual scalar_type get_C (
+        virtual scalar_type get_c (
         ) const = 0;
 
         virtual long get_num_dimensions (
@@ -150,11 +150,11 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(problem.get_C() > 0 &&
+            DLIB_ASSERT(problem.get_c() > 0 &&
                         problem.get_num_dimensions() > 0,
                 "\t void oca::operator()"
                 << "\n\t The oca_problem is invalid"
-                << "\n\t problem.get_C():              " << problem.get_C() 
+                << "\n\t problem.get_c():              " << problem.get_c() 
                 << "\n\t problem.get_num_dimensions(): " << problem.get_num_dimensions() 
                 << "\n\t this: " << this
                 );
@@ -164,7 +164,7 @@ namespace dlib
             typedef typename matrix_type::mem_manager_type mem_manager_type;
             typedef matrix_type vect_type;
 
-            const scalar_type C = problem.get_C();
+            const scalar_type C = problem.get_c();
 
             std::list<vect_type> planes;
             std::vector<scalar_type> bs, miss_count;
@@ -184,7 +184,7 @@ namespace dlib
             scalar_type cp_obj = 0;
 
             scalar_type R_lower_bound;
-            if (problem.R_has_lower_bound(R_lower_bound))
+            if (problem.r_has_lower_bound(R_lower_bound))
             {
                 // The flat lower bounding plane is always good to have if we know
                 // what it is.

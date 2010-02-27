@@ -40,7 +40,7 @@ namespace dlib
             exists to allow the user to monitor the progress of the optimization.
         !*/
 
-        virtual bool R_has_lower_bound (
+        virtual bool r_has_lower_bound (
             scalar_type& lower_bound
         ) const { return false; }
         /*!
@@ -52,7 +52,7 @@ namespace dlib
                     - returns false
         !*/
 
-        virtual scalar_type get_C (
+        virtual scalar_type get_c (
         ) const = 0;
         /*!
             ensures
@@ -82,7 +82,7 @@ namespace dlib
                 - #risk_value == R(#current_solution) 
                 - #risk_subgradient == an element of the subgradient of R() at the 
                   point #current_solution
-                - Note that risk_value and risk_subgradient are NOT multiplied by get_C()
+                - Note that risk_value and risk_subgradient are NOT multiplied by get_c()
         !*/
 
     };
@@ -135,11 +135,11 @@ namespace dlib
         ) const;
         /*!
             requires
-                - problem.get_C() > 0
+                - problem.get_c() > 0
                 - problem.get_num_dimensions() > 0
             ensures
                 - solves the given oca problem and stores the solution in #w
-                - returns the objective value at the soltuion #w
+                - returns the objective value at the solution #w
         !*/
 
         void set_epsilon (
