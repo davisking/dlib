@@ -244,10 +244,12 @@ namespace dlib
         const static long NC = matrix_traits<matrix_unary_exp>::NC;
         const static long cost = matrix_traits<matrix_unary_exp>::cost;
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1>
         matrix_unary_exp (T1); 
+    public:
 
         matrix_unary_exp (
             const M& m_
@@ -324,10 +326,12 @@ namespace dlib
         typedef typename matrix_traits<matrix_scalar_binary_exp>::layout_type layout_type;
 
  
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1>
         matrix_scalar_binary_exp (T1,const S&); 
+    public:
 
         matrix_scalar_binary_exp (
             const M& m_,
@@ -409,10 +413,12 @@ namespace dlib
         typedef typename matrix_traits<matrix_scalar_ternary_exp>::layout_type layout_type;
 
  
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1>
         matrix_scalar_ternary_exp (T1, const S&, const S&); 
+    public:
 
         matrix_scalar_ternary_exp (
             const M& m_,
@@ -497,10 +503,12 @@ namespace dlib
         typedef typename matrix_traits<matrix_binary_exp>::layout_type layout_type;
 
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2>
         matrix_binary_exp (T1,T2); 
+    public:
 
         matrix_binary_exp (
             const M1& m1_,
@@ -582,10 +590,12 @@ namespace dlib
         typedef typename matrix_traits<matrix_ternary_exp>::layout_type layout_type;
 
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2, typename T3>
         matrix_ternary_exp ( T1, T2, T3 ); 
+    public:
 
         matrix_ternary_exp (
             const M1& m1_,
@@ -671,10 +681,12 @@ namespace dlib
         typedef typename matrix_traits<matrix_fourary_exp>::layout_type layout_type;
 
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2, typename T3, typename T4>
         matrix_fourary_exp (T1,T2,T3,T4); 
+    public:
 
         matrix_fourary_exp (
             const M1& m1_,
@@ -977,10 +989,12 @@ namespace dlib
         typedef typename matrix_traits<matrix_sub_range_exp>::layout_type layout_type;
 
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1, typename T2, typename T3>
         matrix_sub_range_exp (T1,T2,T3); 
+    public:
 
         matrix_sub_range_exp (
             const M& m_,
@@ -1061,10 +1075,12 @@ namespace dlib
         typedef typename matrix_traits<matrix_std_vector_exp>::layout_type layout_type;
 
 
+    private:
         // This constructor exists simply for the purpose of causing a compile time error if
         // someone tries to create an instance of this object with the wrong kind of objects.
         template <typename T1>
         matrix_std_vector_exp (T1); 
+    public:
 
         matrix_std_vector_exp (
             const M& m_
