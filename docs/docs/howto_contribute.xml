@@ -190,7 +190,7 @@
 
         <!--   ****************************  -->
             <anchor>3</anchor>
-           <li><h3> Never use capitol letters in the names of variables, functions, or
+           <li><h3> Don't use capitol letters in the names of variables, functions, or
               classes.  Use the _ character to separate words.  </h3>
             <ul>
                <p>
