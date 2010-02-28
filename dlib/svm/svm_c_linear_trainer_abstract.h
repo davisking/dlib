@@ -28,8 +28,8 @@ namespace dlib
                 In particular, it is implemented using the OCAS algorithm
                 described in the following paper:
                     Optimized Cutting Plane Algorithm for Large-Scale Risk Minimization
-                        Vojtech Franc, Soren Sonnenburg; 10(Oct):2157--2192, 2009. 
-
+                        Vojtech Franc, Soren Sonnenburg; Journal of Machine Learning 
+                        Research, 10(Oct):2157--2192, 2009. 
         !*/
 
     public:
