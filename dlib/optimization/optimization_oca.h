@@ -21,15 +21,16 @@ namespace dlib
 
         virtual ~oca_problem() {}
 
-        virtual void optimization_status (
-            scalar_type ,
-            scalar_type ,
-            unsigned long 
-        ) const {}
-
         virtual bool r_has_lower_bound (
             scalar_type& 
         ) const { return false; }
+
+        virtual bool optimization_status (
+            scalar_type ,
+            scalar_type ,
+            unsigned long,
+            unsigned long
+        ) const = 0;
 
         virtual scalar_type get_c (
         ) const = 0;
@@ -53,50 +54,11 @@ namespace dlib
 
         oca () 
         {
-            eps = 0.001;
-            max_iter = 1000000;
+            sub_eps = 1e-2;
+            sub_max_iter = 200000;
 
-            sub_eps = 1e-5;
-            sub_max_iter = 20000;
-
-            inactive_thresh = 15;
+            inactive_thresh = 10;
         }
-
-        void set_epsilon (
-            double eps_
-        ) 
-        { 
-            // make sure requires clause is not broken
-            DLIB_ASSERT(eps_ > 0,
-                "\t void oca::set_epsilon"
-                << "\n\t epsilon must be greater than 0"
-                << "\n\t eps_: " << eps_ 
-                << "\n\t this: " << this
-                );
-
-            eps = eps_; 
-        }
-
-        double get_epsilon (
-        ) const { return eps; }
-
-        void set_max_iterations (
-            unsigned long max_iter_
-        ) 
-        { 
-            // make sure requires clause is not broken
-            DLIB_ASSERT(max_iter_ > 0,
-                "\t void oca::set_max_iterations"
-                << "\n\t max iterations must be greater than 0"
-                << "\n\t max_iter_: " << max_iter_
-                << "\n\t this: " << this
-                );
-
-            max_iter = max_iter_; 
-        }
-
-        unsigned long get_max_iterations (
-        ) const { return max_iter; }
 
         void set_subproblem_epsilon (
             double eps_
@@ -195,8 +157,10 @@ namespace dlib
 
             matrix<scalar_type,0,0,mem_manager_type, layout_type> K;
 
-            for (unsigned long iter = 0; iter < max_iter; ++iter)
+            unsigned long counter = 0;
+            while (true)
             {
+                ++counter;
 
                 // add the next cutting plane
                 scalar_type cur_risk;
@@ -213,10 +177,6 @@ namespace dlib
                     best_obj = cur_obj;
                     w = w_cur;
                 }
-
-                // check stopping condition and stop if we can
-                if (best_obj - cp_obj <= eps)
-                    break;
 
 
                 // compute kernel matrix for all the planes
@@ -236,8 +196,13 @@ namespace dlib
 
                 alpha = uniform_matrix<scalar_type>(planes.size(),1, C/planes.size());
 
-                // solve the cutting plane subproblem for the next w_cur
-                solve_qp_using_smo(K, vector_to_matrix(bs), alpha, static_cast<scalar_type>(sub_eps), sub_max_iter); 
+                // solve the cutting plane subproblem for the next w_cur.   We solve it to an
+                // accuracy that is related to how big the error gap is
+                scalar_type eps = std::min<scalar_type>(sub_eps, 0.1*(best_obj-cp_obj)) ;
+                // just a sanaty check
+                if (eps < 1e-7)
+                    eps = 1e-7;
+                solve_qp_using_smo(K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
 
                 // construct the w_cur that minimized the subproblem.
                 w_cur = 0;
@@ -260,12 +225,9 @@ namespace dlib
                 // plane subproblem.
                 cp_obj = -0.5*trans(w_cur)*w_cur + trans(alpha)*vector_to_matrix(bs);
 
-                // check stopping condition and stop if we can
-                if (best_obj - cp_obj <= eps)
-                    break;
-
                 // report current status
-                problem.optimization_status(best_obj, best_obj - cp_obj, planes.size());
+                if (problem.optimization_status(best_obj, best_obj - cp_obj, planes.size(), counter))
+                    break;
 
                 // If it has been a while since a cutting plane was an active constraint then
                 // we should throw it away.
@@ -281,18 +243,13 @@ namespace dlib
 
             }
 
-            // report current status
-            problem.optimization_status(best_obj, best_obj - cp_obj, planes.size());
-
             return best_obj;
         }
 
     private:
 
-        double eps;
         double sub_eps;
 
-        unsigned long max_iter;
         unsigned long sub_max_iter;
 
         unsigned long inactive_thresh;

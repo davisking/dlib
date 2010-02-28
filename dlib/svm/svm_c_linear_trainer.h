@@ -66,10 +66,11 @@ namespace dlib
             return num_dimensions_in_samples(samples) + 1;
         }
 
-        virtual void optimization_status (
+        virtual bool optimization_status (
             scalar_type current_objective_value,
             scalar_type current_error_gap,
-            unsigned long num_cutting_planes
+            unsigned long num_cutting_planes,
+            unsigned long num_iterations
         ) const 
         {
             if (be_verbose)
@@ -78,8 +79,17 @@ namespace dlib
                 cout << "svm objective: " << current_objective_value << endl;
                 cout << "gap: " << current_error_gap << endl;
                 cout << "num planes: " << num_cutting_planes << endl;
+                cout << "iter: " << num_iterations << endl;
                 cout << endl;
             }
+
+            if (current_error_gap/current_objective_value < 0.001)
+                return true;
+
+            if (num_iterations > 10000)
+                return true;
+
+            return false;
         }
 
         virtual bool r_has_lower_bound (

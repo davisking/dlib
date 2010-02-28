@@ -22,6 +22,10 @@ namespace dlib
                     Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
 
                     Where R(w) is a convex function and C > 0
+
+
+                Note that the stopping condition must be provided by the user
+                in the form of the optimization_status() function.
         !*/
 
     public:
@@ -29,16 +33,6 @@ namespace dlib
         typedef typename matrix_type::type scalar_type;
 
         virtual ~oca_problem() {}
-
-        virtual void optimization_status (
-            scalar_type current_objective_value,
-            scalar_type current_error_gap,
-            unsigned long num_cutting_planes
-        ) const {}
-        /*!
-            This function is called by the OCA optimizer each iteration.  It
-            exists to allow the user to monitor the progress of the optimization.
-        !*/
 
         virtual bool r_has_lower_bound (
             scalar_type& lower_bound
@@ -50,6 +44,27 @@ namespace dlib
                     - #lower_bound == the constant that lower bounds R(w)
                 - else
                     - returns false
+        !*/
+
+        virtual bool optimization_status (
+            scalar_type current_objective_value,
+            scalar_type current_error_gap,
+            unsigned long num_cutting_planes,
+            unsigned long num_iterations
+        ) const = 0;
+        /*!
+            requires
+                - This function is called by the OCA optimizer each iteration.  
+                - current_objective_value == the current value of the objective function f(w)
+                - current_error_gap == the bound on how much lower the objective function
+                  can drop before we reach the optimal point
+                - num_cutting_planes == the number of cutting planes the algorithm is currently
+                  using
+                - num_iterations == A count of the total number of iterations that have executed
+                  since we started running the optimization.
+            ensures
+                - If it is appropriate to terminate the optimization then this function returns true
+                  and false otherwise.
         !*/
 
         virtual scalar_type get_c (
@@ -93,11 +108,9 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                - get_epsilon() == 0.001
-                - get_max_iterations() == 1000000
-                - get_subproblem_epsilon() == 1e-5
-                - get_subproblem_max_iterations() == 20000
-                - get_inactive_plane_threshold() == 15
+                - get_subproblem_epsilon() == 1e-2
+                - get_subproblem_max_iterations() == 200000
+                - get_inactive_plane_threshold() == 10
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for solving the optimization problem defined above
@@ -139,44 +152,9 @@ namespace dlib
                 - problem.get_num_dimensions() > 0
             ensures
                 - solves the given oca problem and stores the solution in #w
+                - The optimization algorithm runs until problem.optimization_status() 
+                  indicates it is time to stop.
                 - returns the objective value at the solution #w
-        !*/
-
-        void set_epsilon (
-            double eps_
-        );
-        /*!
-            requires
-                - eps > 0
-            ensures
-                - #get_epsilon() == eps 
-        !*/
-
-        double get_epsilon (
-        ) const; 
-        /*!
-            ensures
-                - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but may cause
-                  the algorithm to take longer to execute.
-        !*/
-
-        void set_max_iterations (
-            unsigned long max_iter
-        ); 
-        /*!
-            requires
-                - max_iter > 0
-            ensures
-                - #get_max_iterations() == max_iter
-        !*/
-
-        unsigned long get_max_iterations (
-        ) const;
-        /*!
-            ensures
-                - returns the maximum number of iterations this object will perform
-                  while attempting to solve an oca_problem.
         !*/
 
         void set_subproblem_epsilon (
