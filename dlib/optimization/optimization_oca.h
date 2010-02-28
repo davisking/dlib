@@ -175,7 +175,8 @@ namespace dlib
                 if (cur_obj < best_obj)
                 {
                     best_obj = cur_obj;
-                    w = w_cur;
+                    // move w_cur into w
+                    w.swap(w_cur);
                 }
 
 
@@ -200,8 +201,8 @@ namespace dlib
                 // accuracy that is related to how big the error gap is
                 scalar_type eps = std::min<scalar_type>(sub_eps, 0.1*(best_obj-cp_obj)) ;
                 // just a sanaty check
-                if (eps < 1e-7)
-                    eps = 1e-7;
+                if (eps < 1e-16)
+                    eps = 1e-16;
                 solve_qp_using_smo(K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
 
                 // construct the w_cur that minimized the subproblem.
