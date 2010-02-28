@@ -70,6 +70,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>empirical_kernel_map</item>
          <item>kkmeans</item>
          <item>svm_nu_trainer</item> 
+         <item>svm_c_linear_trainer</item> 
          <item>rvm_trainer</item> 
          <item>rvm_regression_trainer</item> 
          <item>rbf_network_trainer</item> 
@@ -609,6 +610,28 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>svm_ex.cpp.html</example>
             <example>model_selection_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>svm_c_linear_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_c_linear_trainer_abstract.h</spec_file>
+         <description>
+                This object represents a tool for training the C formulation of 
+                a support vector machine and is optimized for the case where
+                linear kernels are used.   
+
+                It is implemented using the <a href="optimization.html#oca">oca</a>  
+                optimizer and uses the exact line search described in the 
+                following paper:
+                <blockquote>
+                    Optimized Cutting Plane Algorithm for Large-Scale Risk Minimization
+                      by  Vojtech Franc, Soren Sonnenburg; 10(Oct):2157--2192, 2009. 
+                </blockquote>
+         </description>
                                  
       </component>
       
