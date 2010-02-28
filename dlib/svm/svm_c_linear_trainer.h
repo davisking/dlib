@@ -372,6 +372,7 @@ namespace dlib
         const scalar_type eps;
     };
 
+// ----------------------------------------------------------------------------------------
 
     template <
         typename matrix_type, 
@@ -390,6 +391,7 @@ namespace dlib
     {
         return oca_problem_c_svm<matrix_type, in_sample_vector_type, in_scalar_vector_type>(C_pos, C_neg, samples, labels, be_verbose, eps);
     }
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -397,12 +399,6 @@ namespace dlib
         >
     class svm_c_linear_trainer
     {
-        /*!
-            REQUIREMENTS ON K 
-                is either linear_kernel or sparse_linear_kernel
-
-            WHAT THIS OBJECT REPRESENTS
-        !*/
 
     public:
         typedef K kernel_type;
@@ -413,16 +409,6 @@ namespace dlib
 
         svm_c_linear_trainer (
         )
-        /*!
-            ensures
-                - This object is properly initialized and ready to be used
-                  to train a support vector machine.
-                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
-                - #get_c_class1() == 1
-                - #get_c_class2() == 1
-                - #get_epsilon() == 0.001
-                - this object will not be verbose unless be_verbose() is called
-        !*/
         {
             Cpos = 1;
             Cneg = 1;
@@ -433,16 +419,6 @@ namespace dlib
         explicit svm_c_linear_trainer (
             const scalar_type& C 
         )
-        /*!
-            requires
-                - C > 0
-            ensures
-                - This object is properly initialized and ready to be used
-                  to train a support vector machine.
-                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
-                - #get_c_class1() == C
-                - #get_c_class2() == C
-        !*/
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
@@ -459,12 +435,6 @@ namespace dlib
         void set_epsilon (
             scalar_type eps_
         )
-        /*!
-            requires
-                - eps > 0
-            ensures
-                - #get_epsilon() == eps 
-        !*/
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(eps_ > 0,
@@ -479,30 +449,15 @@ namespace dlib
 
         const scalar_type get_epsilon (
         ) const { return eps; }
-        /*!
-            ensures
-                - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but take longer 
-                  to execute.
-        !*/
 
         void be_verbose (
         )
-        /*!
-            ensures
-                - This object will print status messages to standard out so that a 
-                  user can observe the progress of the algorithm.
-        !*/
         {
             verbose = true;
         }
 
         void be_quiet (
         )
-        /*!
-            ensures
-                - this object will not print anything to standard out
-        !*/
         {
             verbose = false;
         }
@@ -510,30 +465,18 @@ namespace dlib
         void set_oca (
             const oca& item
         )
-        /*!
-            ensures
-                - #get_oca() == item 
-        !*/
         {
             solver = item;
         }
 
         const oca get_oca (
         ) const
-        /*!
-            ensures
-                - returns a copy of the optimizer used to solve the SVM problem.  
-        !*/
         {
             return solver;
         }
 
         const kernel_type get_kernel (
         ) const
-        /*!
-            ensures
-                - returns a copy of the kernel function in use by this object
-        !*/
         {
             return kernel_type();
         }
@@ -541,13 +484,6 @@ namespace dlib
         void set_c (
             scalar_type C 
         )
-        /*!
-            requires
-                - C > 0
-            ensures
-                - #get_c_class1() == C 
-                - #get_c_class2() == C 
-        !*/
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
@@ -563,30 +499,12 @@ namespace dlib
 
         const scalar_type get_c_class1 (
         ) const
-        /*!
-            ensures
-                - returns the SVM regularization parameter for the +1 class.  
-                  It is the parameter that determines the trade off between
-                  trying to fit the +1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization ability of the 
-                  resulting classifier.  Larger values encourage exact fitting 
-                  while smaller values of C may encourage better generalization. 
-        !*/
         {
             return Cpos;
         }
 
         const scalar_type get_c_class2 (
         ) const
-        /*!
-            ensures
-                - returns the SVM regularization parameter for the -1 class.  
-                  It is the parameter that determines the trade off between
-                  trying to fit the -1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization ability of the 
-                  resulting classifier.  Larger values encourage exact fitting 
-                  while smaller values of C may encourage better generalization. 
-        !*/
         {
             return Cneg;
         }
@@ -594,12 +512,6 @@ namespace dlib
         void set_c_class1 (
             scalar_type C
         )
-        /*!
-            requires
-                - C > 0
-            ensures
-                - #get_c_class1() == C
-        !*/
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
@@ -615,12 +527,6 @@ namespace dlib
         void set_c_class2 (
             scalar_type C
         )
-        /*!
-            requires
-                - C > 0
-            ensures
-                - #get_c_class2() == C
-        !*/
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
@@ -641,22 +547,6 @@ namespace dlib
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y
         ) const
-        /*!
-            requires
-                - is_binary_classification_problem(x,y) == true
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
-                  Also, x should contain sample_type objects.
-                - y == a matrix or something convertible to a matrix via vector_to_matrix().
-                  Also, y should contain scalar_type objects.
-            ensures
-                - trains a C support vector classifier given the training samples in x and 
-                  labels in y.  
-                - returns a decision function F with the following properties:
-                    - if (new_x is a sample predicted have +1 label) then
-                        - F(new_x) >= 0
-                    - else
-                        - F(new_x) < 0
-        !*/
         {
             scalar_type obj;
             return do_train(vector_to_matrix(x),vector_to_matrix(y),obj);
@@ -672,23 +562,6 @@ namespace dlib
             const in_scalar_vector_type& y,
             scalar_type& svm_objective
         ) const
-        /*!
-            requires
-                - is_binary_classification_problem(x,y) == true
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
-                  Also, x should contain sample_type objects.
-                - y == a matrix or something convertible to a matrix via vector_to_matrix().
-                  Also, y should contain scalar_type objects.
-            ensures
-                - trains a C support vector classifier given the training samples in x and 
-                  labels in y.  
-                - #svm_objective == the final value of the SVM objective function
-                - returns a decision function F with the following properties:
-                    - if (new_x is a sample predicted have +1 label) then
-                        - F(new_x) >= 0
-                    - else
-                        - F(new_x) < 0
-        !*/
         {
             return do_train(vector_to_matrix(x),vector_to_matrix(y),svm_objective);
         }
