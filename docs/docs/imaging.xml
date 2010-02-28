@@ -174,7 +174,7 @@
              the SURF algorithm does you should read the following paper:
              <blockquote>
                SURF: Speeded Up Robust Features
-               By Herbert Bay1 , Tinne Tuytelaars2 , and Luc Van Gool12
+               By Herbert Bay, Tinne Tuytelaars, and Luc Van Gool
              </blockquote>
              <p>
                 Also note that there are numerous flavors of the SURF algorithm
