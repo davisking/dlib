@@ -633,6 +633,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                       Research, 10(Oct):2157--2192, 2009. 
                 </blockquote>
          </description>
+         <examples>
+            <example>svm_sparse_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
