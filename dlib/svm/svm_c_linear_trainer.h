@@ -268,11 +268,9 @@ namespace dlib
                 - for all i: #dot_prods[i] == dot(colm(#w,0,w.size()-1), samples(i)) - #w(w.size()-1)
         !*/
         {
-            const scalar_type mu = 0.1;
 
             for (long i = 0; i < samples.size(); ++i)
                 dot_prods[i] = dot_helper(w,samples(i)) - w(w.size()-1);
-
 
             if (is_first_call)
             {
@@ -313,18 +311,23 @@ namespace dlib
                         f0 += B;
                 }
 
+                scalar_type opt_k = 1;
                 // ks.size() == 0 shouldn't happen but check anyway
                 if (f0 >= 0 || ks.size() == 0)
                 {
-                    // getting here means that we aren't searching in a descent direction.  So don't
-                    // move the best_so_far position.
+                    // Getting here means that we aren't searching in a descent direction.  
+                    // We could take a zero step but instead lets just assign w to the new best
+                    // so far point just to make sure we don't get stuck coming back to this 
+                    // case over and over.  This might happen if we never move the best point 
+                    // seen so far.
+
+                    // So we let opt_k be 1
                 }
                 else
                 {
                     std::sort(ks.begin(), ks.end());
 
                     // figure out where f0 goes positive.
-                    scalar_type opt_k = 1;
                     for (unsigned long i = 0; i < ks.size(); ++i)
                     {
                         f0 += ks[i].B;
@@ -335,17 +338,21 @@ namespace dlib
                         }
                     }
 
-                    // take the step suggested by the line search
-                    best_so_far = (1-opt_k)*best_so_far + opt_k*w;
-
-                    // update best_so_far dot products
-                    for (unsigned long i = 0; i < dot_prods_best.size(); ++i)
-                        dot_prods_best[i] = (1-opt_k)*dot_prods_best[i] + opt_k*dot_prods[i];
                 }
 
-                // Put the best_so_far point into w but also take a little bit of w as well.  We do
-                // this since it is possible that some steps won't advance the best_so_far point. 
-                // So this ensures we always make some progress each iteration.
+                // take the step suggested by the line search
+                best_so_far = (1-opt_k)*best_so_far + opt_k*w;
+
+                // update best_so_far dot products
+                for (unsigned long i = 0; i < dot_prods_best.size(); ++i)
+                    dot_prods_best[i] = (1-opt_k)*dot_prods_best[i] + opt_k*dot_prods[i];
+
+
+                const scalar_type mu = 0.1;
+                // Make sure we always take a little bit of a step twoards w regardless of what the
+                // line search says to do.  We do this since it is possible that some steps won't 
+                // advance the best_so_far point. So this ensures we always make some progress each 
+                // iteration.
                 w = (1-mu)*best_so_far + mu*w;
 
                 // update dot products
