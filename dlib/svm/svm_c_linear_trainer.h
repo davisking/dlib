@@ -11,6 +11,7 @@
 #include "kernel.h"
 #include <iostream>
 #include <vector>
+#include "sparse_vector.h"
 
 namespace dlib
 {
@@ -170,8 +171,8 @@ namespace dlib
             const scalar_type& C
         ) const
         {
-            for (unsigned long i = 0; i < sample.size(); ++i)
-                subgradient(sample[i].first) += C*sample[i].second;
+            for (typename T::const_iterator i = sample.begin(); i != sample.end(); ++i)
+                subgradient(i->first) += C*i->second;
         }
 
         template <typename EXP>
@@ -192,8 +193,8 @@ namespace dlib
             const scalar_type& C
         ) const
         {
-            for (unsigned long i = 0; i < sample.size(); ++i)
-                subgradient(sample[i].first) -= C*sample[i].second;
+            for (typename T::const_iterator i = sample.begin(); i != sample.end(); ++i)
+                subgradient(i->first) -= C*i->second;
         }
 
         template <typename EXP>
@@ -213,8 +214,9 @@ namespace dlib
         {
             // compute a dot product between a dense column vector and a sparse vector
             scalar_type temp = 0;
-            for (unsigned long i = 0; i < sample.size(); ++i)
-                temp += w(sample[i].first) * sample[i].second;
+            for (typename T::const_iterator i = sample.begin(); i != sample.end(); ++i)
+                temp += w(i->first) * i->second;
+            return temp;
         }
 
         template <typename T>
@@ -241,7 +243,7 @@ namespace dlib
             for (long i = 0; i < samples.size(); ++i)
             {
                 if (samples(i).size() > 0)
-                    max_dim = std::max<unsigned long>(max_dim, samples(i).back().first + 1);
+                    max_dim = std::max<unsigned long>(max_dim, (--samples(i).end())->first + 1);
             }
 
             return max_dim;
@@ -601,7 +603,9 @@ namespace dlib
             decision_function<kernel_type> df;
             df.b = static_cast<scalar_type>(w(w.size()-1));
             df.basis_vectors.set_size(1);
-            df.basis_vectors(0) = matrix_cast<scalar_type>(colm(w, 0, w.size()-1));
+            // Copy the plane normal into the output basis vector.  The output vector might be a
+            // sparse vector container so we need to use this special kind of copy to handle that case.
+            sparse_vector::assign_dense_to_sparse(df.basis_vectors(0), matrix_cast<scalar_type>(colm(w, 0, w.size()-1)));
             df.alpha.set_size(1);
             df.alpha(0) = 1;
 

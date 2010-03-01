@@ -149,6 +149,44 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        template <typename T, typename EXP>
+        typename enable_if<is_matrix<T> >::type assign_dense_to_sparse (
+            T& dest,
+            const matrix_exp<EXP>& src
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(src),
+                "\t void assign_dense_to_sparse(dest,src)"
+                << "\n\t the src matrix must be a row or column vector"
+                );
+
+            dest = src;
+        }
+
+        template <typename T, typename EXP>
+        typename disable_if<is_matrix<T> >::type assign_dense_to_sparse (
+            T& dest,
+            const matrix_exp<EXP>& src
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(src),
+                "\t void assign_dense_to_sparse(dest,src)"
+                << "\n\t the src matrix must be a row or column vector"
+                );
+
+            dest.clear();
+            typedef typename T::value_type item_type;
+            for (long i = 0; i < src.size(); ++i)
+            {
+                if (src(i) != 0)
+                    dest.insert(dest.end(),item_type(i, src(i)));
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
         template <typename T, typename U>
         typename T::value_type::second_type dot_product (
             const T& a,
