@@ -1,10 +1,8 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example illustrating the use of the dlib C++ library's
-    implementation of the pegasos algorithm for online training of support 
-    vector machines.  This example exists primarily to show you how to
-    use sparse vectors with the library's machine learning algorithms.
+    This is an example showing how to use sparse feature vectors with
+    the dlib C++ library's machine learning tools.
 
     This example creates a simple binary classification problem and shows
     you how to train a support vector machine on that data.
@@ -30,8 +28,8 @@ int main()
     // one of the containers from the STL to represent our sample vectors.  In particular, we 
     // can use the std::map to represent sparse vectors.  (Note that you don't have to use std::map.
     // Any STL container of std::pair objects that is sorted can be used.  So for example, you could 
-    // use a std::vector<std::pair<long,double> > here so long as you took care to sort every vector)
-    typedef std::map<long,double> sample_type;
+    // use a std::vector<std::pair<unsigned long,double> > here so long as you took care to sort every vector)
+    typedef std::map<unsigned long,double> sample_type;
 
 
     // This is a typedef for the type of kernel we are going to use in this example.
@@ -46,6 +44,10 @@ int main()
     // Here we setup a parameter to this object.  See the dlib documentation for a 
     // description of what this parameter does. 
     trainer.set_lambda(0.00001);
+
+    // Lets also use the svm trainer specially optimized for the linear_kernel and
+    // sparse_linear_kernel.
+    svm_c_linear_trainer<kernel_type> linear_trainer;
 
     std::vector<sample_type> samples;
     std::vector<double> labels;
@@ -73,29 +75,43 @@ int main()
             sample[idx] = label*value;
         }
 
-        // let the svm_pegasos learn about this sample
+        // let the svm_pegasos learn about this sample.  
         trainer.train(sample,label);
+
+        // Also save the samples we are generating so we can let the svm_c_linear_trainer
+        // learn from them below.  
+        samples.push_back(sample);
+        labels.push_back(label);
     }
 
-    // Now we have trained our SVM.  Lets test it out a bit.  
-    // Each of these statements prints out the output of the SVM given a particular sample.  
-    // The SVM outputs a number > 0 if a sample is predicted to be in the +1 class and < 0 
+    // In addition to the rule we learned with the pegasos trainer lets also use our linear_trainer
+    // to learn a decision rule.
+    decision_function<kernel_type> df = linear_trainer.train(samples, labels);
+
+    // Now we have trained our SVMs.  Lets test them out a bit.  
+    // Each of these statements prints the output of the SVMs given a particular sample.  
+    // Each SVM outputs a number > 0 if a sample is predicted to be in the +1 class and < 0 
     // if a sample is predicted to be in the -1 class.
+
 
     sample.clear();
     sample[4] = 0.3;
     sample[10] = 0.9;
     cout << "This is a +1 example, its SVM output is: " << trainer(sample) << endl;
+    cout << "df: " << df(sample) << endl;
 
     sample.clear();
     sample[83] = -0.3;
     sample[26] = -0.9;
     sample[58] = -0.7;
     cout << "This is a -1 example, its SVM output is: " << trainer(sample) << endl;
+    cout << "df: " << df(sample) << endl;
 
     sample.clear();
     sample[0] = -0.2;
     sample[9] = -0.8;
     cout << "This is a -1 example, its SVM output is: " << trainer(sample) << endl;
+    cout << "df: " << df(sample) << endl;
+
 }
 
