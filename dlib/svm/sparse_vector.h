@@ -187,6 +187,14 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        template <typename T>
+        struct has_unsigned_keys
+        {
+            static const bool value = is_unsigned_type<typename T::value_type::first_type>::value;
+        };
+
+    // ------------------------------------------------------------------------------------
+
         template <typename T, typename U>
         typename T::value_type::second_type dot_product (
             const T& a,

@@ -238,6 +238,13 @@ namespace dlib
             T must be a sparse vector with an integral key type
         !*/
         {
+            typedef typename T::type sample_type;
+            // You are getting this error because you are attempting to use sparse sample vectors with
+            // the svm_c_linear_trainer object but you aren't using an unsigned integer as your key type
+            // in the sparse vectors.
+            COMPILE_TIME_ASSERT(sparse_vector::has_unsigned_keys<sample_type>::value);
+
+
             // these should be sparse samples so look over all them to find the max dimension.
             unsigned long max_dim = 0;
             for (long i = 0; i < samples.size(); ++i)

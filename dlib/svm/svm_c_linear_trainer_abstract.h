@@ -17,7 +17,8 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON K 
-                is either linear_kernel or sparse_linear_kernel
+                Is either linear_kernel or sparse_linear_kernel.  If you use a sparse_linear_kernel
+                then it must operate on sparse vectors that use unsigned integral keys.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a tool for training the C formulation of 

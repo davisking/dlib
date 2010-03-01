@@ -184,6 +184,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A has_unsigned_keys
+
+        This is a template where has_unsigned_keys<T>::value == true when T is a
+        sparse vector that contains unsigned integral keys and false otherwise.
+    !*/
+
+    template <typename T>
+    struct has_unsigned_keys
+    {
+        static const bool value = is_unsigned_type<typename T::value_type::first_type>::value;
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_SPARSE_VECTOR_ABSTRACT_
