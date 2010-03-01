@@ -200,7 +200,7 @@ namespace dlib
                 // solve the cutting plane subproblem for the next w_cur.   We solve it to an
                 // accuracy that is related to how big the error gap is
                 scalar_type eps = std::min<scalar_type>(sub_eps, 0.1*(best_obj-cp_obj)) ;
-                // just a sanaty check
+                // just a sanity check
                 if (eps < 1e-16)
                     eps = 1e-16;
                 solve_qp_using_smo(K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
