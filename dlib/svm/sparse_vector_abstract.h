@@ -16,12 +16,12 @@ namespace dlib
         In dlib, sparse vectors are represented using the container objects
         in the C++ STL.  In particular, a sparse vector is any container that 
         contains a sorted range of std::pair<key, scalar_value> objects where:
-            - key is any type that can serve as a unique index or identifier (e.g. long)
+            - key is any type that can serve as a unique index or identifier (e.g. unsigned long)
             - scalar_value is float, double, or long double
 
         So examples of valid sparse vectors are:    
-            - std::map<long, double>
-            - std::vector<std::pair<long, float> > where the vector is sorted.
+            - std::map<unsigned long, double>
+            - std::vector<std::pair<unsigned long, float> > where the vector is sorted.
               (you could make sure it was sorted by applying std::sort to it)
 
 
