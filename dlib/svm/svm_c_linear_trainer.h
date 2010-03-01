@@ -349,7 +349,7 @@ namespace dlib
 
 
                 const scalar_type mu = 0.1;
-                // Make sure we always take a little bit of a step twoards w regardless of what the
+                // Make sure we always take a little bit of a step towards w regardless of what the
                 // line search says to do.  We do this since it is possible that some steps won't 
                 // advance the best_so_far point. So this ensures we always make some progress each 
                 // iteration.
