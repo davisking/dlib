@@ -306,6 +306,8 @@
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="dot_product"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="distance_squared"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="distance"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="has_unsigned_keys"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="assign_dense_to_sparse"/>
 
          <term file="containers.html" name="remover"/>
          <term file="containers.html" name="scoped_ptr"/>
