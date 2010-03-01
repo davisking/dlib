@@ -1271,7 +1271,7 @@ namespace dlib
             else
             {
                 // first compute w = cscale*alpha*w
-                for (typename std::map<long,scalar_type>::iterator i = w.begin(); i != w.end(); ++i)
+                for (typename std::map<unsigned long,scalar_type>::iterator i = w.begin(); i != w.end(); ++i)
                 {
                     i->second *= cscale*alpha;
                 }
@@ -1292,7 +1292,7 @@ namespace dlib
 
         kernel_type kernel;
 
-        std::map<long,scalar_type> w;
+        std::map<unsigned long,scalar_type> w;
         scalar_type alpha;
 
         scalar_type w_extra;
