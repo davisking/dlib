@@ -111,9 +111,6 @@ namespace dlib
         // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.  
         matrix<T,NR,NC,MM,L> df = Q*alpha - b;
 
-        // This variable should always contain the current value of trans(alpha)*df 
-        T alpha_df = trans(alpha)*df;
-
         const T tau = 1000*std::numeric_limits<T>::epsilon();
 
         T big, little;
@@ -153,7 +150,7 @@ namespace dlib
             // greater than or equal to the distance to the optimum solution so it is a 
             // good way to decide if we should stop.   See the book referenced above for 
             // more information.  In particular, see the part about the Wolfe Dual.
-            if (alpha_df - C*little < eps)
+            if (trans(alpha)*df - C*little < eps)
                 break;
 
 
@@ -187,8 +184,6 @@ namespace dlib
                 // avoid the buildup of numerical errors you get with the alternate update
                 // below.
                 df = Q*alpha - b;
-
-                alpha_df = trans(alpha)*df;
             }
             else
             {
@@ -196,16 +191,8 @@ namespace dlib
                 const T delta_alpha_big   = alpha(big_idx) - old_alpha_big;
                 const T delta_alpha_little = alpha(little_idx) - old_alpha_little;
 
-                alpha_df += delta_alpha_big*df(big_idx) + delta_alpha_little*df(little_idx);
-
                 for(long k = 0; k < df.nr(); ++k)
-                {
-                    T temp = Q(big_idx,k)*delta_alpha_big + Q(little_idx,k)*delta_alpha_little;
-                    df(k) += temp;
-
-                    alpha_df += alpha(k)*temp;
-                }
-
+                    df(k) += Q(big_idx,k)*delta_alpha_big + Q(little_idx,k)*delta_alpha_little;;
             }
         }
 
