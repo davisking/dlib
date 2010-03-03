@@ -131,7 +131,7 @@ namespace dlib
             return false;
         }
 
-        virtual bool r_has_lower_bound (
+        virtual bool risk_has_lower_bound (
             scalar_type& lower_bound
         ) const 
         { 

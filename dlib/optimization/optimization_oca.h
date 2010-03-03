@@ -21,7 +21,7 @@ namespace dlib
 
         virtual ~oca_problem() {}
 
-        virtual bool r_has_lower_bound (
+        virtual bool risk_has_lower_bound (
             scalar_type& 
         ) const { return false; }
 
@@ -146,7 +146,7 @@ namespace dlib
             scalar_type cp_obj = 0;
 
             scalar_type R_lower_bound;
-            if (problem.r_has_lower_bound(R_lower_bound))
+            if (problem.risk_has_lower_bound(R_lower_bound))
             {
                 // The flat lower bounding plane is always good to have if we know
                 // what it is.
