@@ -48,6 +48,9 @@ int main()
     // Lets also use the svm trainer specially optimized for the linear_kernel and
     // sparse_linear_kernel.
     svm_c_linear_trainer<kernel_type> linear_trainer;
+    // This trainer solves the "C" formulation of the SVM.  See the documentation for
+    // details.
+    linear_trainer.set_c(10);
 
     std::vector<sample_type> samples;
     std::vector<double> labels;
