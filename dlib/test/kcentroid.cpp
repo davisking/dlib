@@ -106,8 +106,8 @@ namespace
     template <typename K>
     double dist (
         const K& k,
-        std::map<long,double> a,
-        std::map<long,double> b
+        std::map<unsigned long,double> a,
+        std::map<unsigned long,double> b
     )
     /*!
         ensures
@@ -357,7 +357,7 @@ namespace
     )
     /*!
         requires
-            - kernel_type::sample_type == a std::map<long,double> 
+            - kernel_type::sample_type == a std::map<unsigned long,double> 
             - kernel_type == a kernel that just computes a dot product
               between its inputs.  I.e. a linear kernel
         ensures
@@ -536,7 +536,7 @@ namespace
     )
     /*!
         requires
-            - kernel_type::sample_type == a std::map<long,double> 
+            - kernel_type::sample_type == a std::map<unsigned long,double> 
             - kernel_type == a kernel that just computes a dot product
               between its inputs + some constant.  I.e. a linear kernel
               wrapped by offset_kernel
@@ -553,7 +553,7 @@ namespace
 
         sample_type temp, temp2, temp3;
 
-        std::map<long,double> val, val2;
+        std::map<unsigned long,double> val, val2;
 
         const double b = std::sqrt(k.offset);
 
@@ -674,10 +674,10 @@ namespace
             test_kcentroid_with_offset_linear_kernel<offset_kernel<linear_kernel<matrix<double,4,1> > > >();
             test_kcentroid_with_linear_kernel<unopt_linear_kernel<matrix<double,5,1> > >();
             test_kcentroid_with_offset_linear_kernel<offset_kernel<unopt_linear_kernel<matrix<double,4,1> > > >();
-            test_kcentroid_with_sparse_linear_kernel<sparse_linear_kernel<std::map<long,double> > >();
-            test_kcentroid_with_offset_sparse_linear_kernel<offset_kernel<sparse_linear_kernel<std::map<long,double> > > >();
-            test_kcentroid_with_sparse_linear_kernel<unopt_sparse_linear_kernel<std::map<long,double> > >();
-            test_kcentroid_with_offset_sparse_linear_kernel<offset_kernel<unopt_sparse_linear_kernel<std::map<long,double> > > >();
+            test_kcentroid_with_sparse_linear_kernel<sparse_linear_kernel<std::map<unsigned long,double> > >();
+            test_kcentroid_with_offset_sparse_linear_kernel<offset_kernel<sparse_linear_kernel<std::map<unsigned long,double> > > >();
+            test_kcentroid_with_sparse_linear_kernel<unopt_sparse_linear_kernel<std::map<unsigned long,double> > >();
+            test_kcentroid_with_offset_sparse_linear_kernel<offset_kernel<unopt_sparse_linear_kernel<std::map<unsigned long,double> > > >();
         }
     } a;
 
