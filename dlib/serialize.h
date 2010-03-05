@@ -52,6 +52,7 @@
         - std::map
         - std::complex
         - dlib::uint64
+        - dlib::int64
         - enumerable<T> where T is a serializable type
         - map_pair<D,R> where D and R are both serializable types.
         - C style arrays of serializable types
@@ -64,6 +65,7 @@
         - std::map
         - std::complex
         - dlib::uint64
+        - dlib::int64
         - C style arrays of serializable types
 
     Support for deserialization of objects which implement the enumerable or
@@ -374,6 +376,7 @@ namespace dlib
     USE_DEFAULT_INT_SERIALIZATION_FOR(unsigned int)
     USE_DEFAULT_INT_SERIALIZATION_FOR(unsigned long)
     USE_DEFAULT_INT_SERIALIZATION_FOR(uint64)
+    USE_DEFAULT_INT_SERIALIZATION_FOR(int64)
 
     USE_DEFAULT_BYTE_SERIALIZATION_FOR(char)
     USE_DEFAULT_BYTE_SERIALIZATION_FOR(signed char)

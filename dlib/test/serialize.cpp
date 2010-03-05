@@ -32,6 +32,7 @@ namespace
         unsigned short i5;
         unsigned long i6;
         uint64 i7;
+        int64 i8;
 
         signed char i1_0;
         signed short i2_0;
@@ -40,6 +41,7 @@ namespace
         unsigned short i5_0;
         unsigned long i6_0;
         uint64 i7_0;
+        int64 i8_0;
 
         signed char i1_n;
         signed short i2_n;
@@ -81,6 +83,7 @@ namespace
             i5 = 5;
             i6 = 6;
             i7 = 7;
+            i8 = 8;
 
             i1_0 = 0;
             i2_0 = 0;
@@ -89,6 +92,7 @@ namespace
             i5_0 = 0;
             i6_0 = 0;
             i7_0 = 0;
+            i8_0 = 0;
 
             i1_n = -1;
             i2_n = -2;
@@ -131,6 +135,7 @@ namespace
             i5 = 50;
             i6 = 60;
             i7 = 70;
+            i8 = 80;
 
             i1_0 = 5;
             i2_0 = 6;
@@ -139,6 +144,7 @@ namespace
             i5_0 = 9;
             i6_0 = 10;
             i7_0 = 11;
+            i8_0 = 12;
 
             i1_n = -13;
             i2_n = -25;
@@ -181,6 +187,7 @@ namespace
             DLIB_TEST (i5 == 5);
             DLIB_TEST (i6 == 6);
             DLIB_TEST (i7 == 7);
+            DLIB_TEST (i8 == 8);
 
             DLIB_TEST (i1_0 == 0);
             DLIB_TEST (i2_0 == 0);
@@ -189,6 +196,7 @@ namespace
             DLIB_TEST (i5_0 == 0);
             DLIB_TEST (i6_0 == 0);
             DLIB_TEST (i7_0 == 0);
+            DLIB_TEST (i8_0 == 0);
 
             DLIB_TEST (i1_n == -1);
             DLIB_TEST (i2_n == -2);
@@ -234,6 +242,7 @@ namespace
             DLIB_TEST (i5 == 50);
             DLIB_TEST (i6 == 60);
             DLIB_TEST (i7 == 70);
+            DLIB_TEST (i8 == 80);
 
             DLIB_TEST (i1_0 == 5);
             DLIB_TEST (i2_0 == 6);
@@ -242,6 +251,7 @@ namespace
             DLIB_TEST (i5_0 == 9);
             DLIB_TEST (i6_0 == 10);
             DLIB_TEST (i7_0 == 11);
+            DLIB_TEST (i8_0 == 12);
 
             DLIB_TEST (i1_n == -13);
             DLIB_TEST (i2_n == -25);
@@ -292,6 +302,7 @@ namespace
         dlib::serialize(item.i5,out);
         dlib::serialize(item.i6,out);
         dlib::serialize(item.i7,out);
+        dlib::serialize(item.i8,out);
 
         dlib::serialize(item.i1_0,out);
         dlib::serialize(item.i2_0,out);
@@ -300,6 +311,7 @@ namespace
         dlib::serialize(item.i5_0,out);
         dlib::serialize(item.i6_0,out);
         dlib::serialize(item.i7_0,out);
+        dlib::serialize(item.i8_0,out);
 
         dlib::serialize(item.i1_n,out);
         dlib::serialize(item.i2_n,out);
@@ -346,6 +358,7 @@ namespace
         dlib::deserialize(item.i5,in);
         dlib::deserialize(item.i6,in);
         dlib::deserialize(item.i7,in);
+        dlib::deserialize(item.i8,in);
 
         dlib::deserialize(item.i1_0,in);
         dlib::deserialize(item.i2_0,in);
@@ -354,6 +367,7 @@ namespace
         dlib::deserialize(item.i5_0,in);
         dlib::deserialize(item.i6_0,in);
         dlib::deserialize(item.i7_0,in);
+        dlib::deserialize(item.i8_0,in);
 
         dlib::deserialize(item.i1_n,in);
         dlib::deserialize(item.i2_n,in);
@@ -398,11 +412,11 @@ namespace
 
 
         // The base64 encoded data from the file 'stuff.bin' we want to decode and return.
-        sout << "AVaifX9zEbXbpgarAlucU9BNkSZXOyTKOGxr7taGvaQqrWOaCnaFVnAkSoI4sZ3Va8+I4DqkUa10";
-        sout << "6im2LoQqVlfhtRzCgI93x19uWen15Lk+zylZTc34P6aBwSuYMo957IjLhCcBsxIqIbXnWN/7zQSv";
-        sout << "c7Anq5STW+yvKzSohWor56pGXDTtZrm9bFTsaztlavtnauYvgn7RZkp4a9MrbgnDzdzmzAnE7+w1";
-        sout << "hl94IKktATHIBtMUJsrENvx+np3m01ygEPIftRmEa4KpW1JkZORjqUR/j211oUweh+LYIMR+s4cX";
-        sout << "0L7bwPBmULwA";
+        sout << "AVaifX9zEbXa9aocsrcRuvnNrR3WLuuU5eLWiy0UeXmnKXGLKZz8V44gzT4CM6wnCmAHFQug8G3C";
+        sout << "4cuLdNgp2ApkeLcvwFNJRENE0ShrRaxEBFEA8nah7vm8B2VmgImNblCejuP5IcDt60EaCKlqiit8";
+        sout << "+JGrzYxqBm3xFS4P+qlOROdbxc7pXBmUdh0rqNSEvn0FBPdoqY/5SpHgA2yAcH8XFrM1cdu0xS3P";
+        sout << "8PBcmLMJ7bFdzplwhrjuxtm4NfEOi6Rl9sU44AXycYgJd0+uH+dyoI9X3co5b3YWJtjvdVeztNAr";
+        sout << "BfSPfR6oAVNfiMBG7QA=";
 
 
         // Put the data into the istream sin
