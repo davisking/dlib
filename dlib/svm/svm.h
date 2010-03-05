@@ -545,7 +545,7 @@ namespace dlib
                 
                 Probabilistic Outputs for Support Vector Machines and
                 Comparisons to Regularized Likelihood Methods by 
-                John C. Platt.  Match 26, 1999
+                John C. Platt.  March 26, 1999
         */
 
         // make sure requires clause is not broken
