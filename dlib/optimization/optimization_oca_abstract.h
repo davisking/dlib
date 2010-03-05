@@ -56,8 +56,9 @@ namespace dlib
             requires
                 - This function is called by the OCA optimizer each iteration.  
                 - current_objective_value == the current value of the objective function f(w)
-                - current_error_gap == the bound on how much lower the objective function
-                  can drop before we reach the optimal point
+                - current_error_gap == The bound on how much lower the objective function
+                  can drop before we reach the optimal point.  At the optimal solution the
+                  error gap is equal to 0.
                 - num_cutting_planes == the number of cutting planes the algorithm is currently
                   using
                 - num_iterations == A count of the total number of iterations that have executed
@@ -97,7 +98,7 @@ namespace dlib
                 - #risk_value == R(#current_solution) 
                 - #risk_subgradient == an element of the subgradient of R() at the 
                   point #current_solution
-                - Note that risk_value and risk_subgradient are NOT multiplied by get_c()
+                - Note that #risk_value and #risk_subgradient are NOT multiplied by get_c()
         !*/
 
     };
