@@ -7,6 +7,7 @@
 #include "../algs.h"
 #include "function_abstract.h"
 #include "kernel_abstract.h"
+#include "sparse_kernel_abstract.h"
 
 namespace dlib
 {
@@ -17,8 +18,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON K 
-                Is either linear_kernel or sparse_linear_kernel.  If you use a sparse_linear_kernel
-                then it must operate on sparse vectors that use unsigned integral keys.
+                Is either linear_kernel or sparse_linear_kernel.  
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a tool for training the C formulation of 
