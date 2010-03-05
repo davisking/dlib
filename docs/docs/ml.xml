@@ -136,6 +136,11 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>compute_mean_squared_distance</item> 
          <item>kernel_matrix</item> 
          <item>find_clusters_using_kmeans</item> 
+         <item>
+               <name>sparse vectors</name>
+               <link>dlib/svm/sparse_vector_abstract.h.html#sparse_vectors</link>
+         </item>
+
       </section>
 
     </top>  
