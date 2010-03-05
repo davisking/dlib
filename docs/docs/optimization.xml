@@ -316,7 +316,7 @@
 <pre>
    Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
 
-   Where R(w) is a convex function and C > 0
+   Where R(w) is a user-supplied convex function and C > 0
 </pre>
 <br/>
 <br/>

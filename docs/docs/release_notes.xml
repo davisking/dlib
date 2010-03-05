@@ -12,13 +12,38 @@
 
 <current>
 New Stuff:
+   - Added the solve_qp_using_smo() function to solve certain quadratic
+     programs.
+   - Added the oca object.  It is an implementation of the Optimized Cutting 
+     Plane Algorithm.
+   - Added a linear SVM trainer that uses oca.
+   - Added an implementation of the Histogram of Oriented Gradients algorithm
+   - Added a simple tool for making image pyramids
+   - Added the running_covariance object 
+   - Added a simple linear (i.e. non-kernelized) kmeans implementation
+   - Added support for serializing dlib::int64
 
 Non-Backwards Compatible Changes:
+   - Changed the definition of dlib's sparse vector format to require
+     unsigned integral keys.  Having this requirement is nice because it 
+     creates a simple correspondence between dense vector index values and 
+     sparse vector keys.  The previous sparse vector definition was  
+     excessively generic.
+   - Renamed sparse_vector::dot_product() to sparse_vector::dot() so that 
+     both dense and sparse vectors have a global function with the same 
+     name (i.e. dot()).
 
 Bug fixes:
+   - Fixed a bug discovered by Mitchell Peabody.  In some instances trying to
+     deserialize a std::vector would fail to compile.  
 
 Other:
-
+   - Increased the number of template arguments of the type_safe_union from 10 
+     to 20.  Additionally, I made the get_id() function public and renamed it 
+     to get_type_id().  I also added a comment explaining the serialization 
+     format of type_safe_union objects.
+   - Moved the optimization algorithms into their own page in the documentation.
+   - Added a Suggested Books page to the documentation
 
 </current>
 
