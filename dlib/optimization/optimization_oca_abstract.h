@@ -21,7 +21,7 @@ namespace dlib
                 OCA solves optimization problems with the following form:
                     Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
 
-                    Where R(w) is a convex function and C > 0
+                    Where R(w) is a user-supplied convex function and C > 0
 
 
                 Note that the stopping condition must be provided by the user
@@ -119,7 +119,7 @@ namespace dlib
                 For reference, OCA solves optimization problems with the following form:
                     Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
 
-                    Where R(w) is a convex function and C > 0
+                    Where R(w) is a user-supplied convex function and C > 0
 
 
                 For a detailed discussion you should consult the following papers
