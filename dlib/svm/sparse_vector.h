@@ -196,7 +196,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <typename T, typename U>
-        typename T::value_type::second_type dot_product (
+        typename T::value_type::second_type dot (
             const T& a,
             const U& b
         )

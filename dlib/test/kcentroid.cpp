@@ -42,7 +42,8 @@ namespace
             const sample_type& b
         ) const
         { 
-            return sparse_vector::dot_product(a,b);
+            using namespace sparse_vector;
+            return dot(a,b);
         }
 
         bool operator== (

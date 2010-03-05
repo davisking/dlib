@@ -746,7 +746,7 @@ namespace dlib
             const sample_type& x
         ) const
         {
-            return alpha*sparse_vector::dot_product(w,x);
+            return alpha*sparse_vector::dot(w,x);
         }
 
         scalar_type inner_product (
@@ -760,7 +760,7 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
 
-            return alpha*x.alpha*sparse_vector::dot_product(w,x.w);
+            return alpha*x.alpha*sparse_vector::dot(w,x.w);
         }
 
         scalar_type squared_norm (
@@ -1039,7 +1039,7 @@ namespace dlib
         ) const
         {
             if (samples_seen > 0)
-                return alpha*(sparse_vector::dot_product(w,x) + w_extra*x_extra);
+                return alpha*(sparse_vector::dot(w,x) + w_extra*x_extra);
             else 
                 return 0;
         }
@@ -1056,7 +1056,7 @@ namespace dlib
                 );
 
             if (samples_seen > 0 && x.samples_seen > 0)
-                return alpha*x.alpha*(sparse_vector::dot_product(w,x.w) + w_extra*x.w_extra);
+                return alpha*x.alpha*(sparse_vector::dot(w,x.w) + w_extra*x.w_extra);
             else
                 return 0;
         }
