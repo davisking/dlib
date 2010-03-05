@@ -223,6 +223,8 @@ namespace dlib
             - vector_type1 == something with an interface compatible with std::vector
             - vector_type2 == something with an interface compatible with std::vector
             - k(samples[0],samples[0]) must be a valid expression that returns a double
+            - both centers and samples must be able to contain kernel_type::sample_type 
+              objects
         ensures
             - finds num_centers candidate cluster centers in the data in the samples 
               vector.  Assumes that k is the kernel that will be used during clustering 
