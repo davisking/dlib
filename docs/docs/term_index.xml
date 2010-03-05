@@ -217,7 +217,12 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diagm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="trans"/>
-         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="dot"/>
+
+         <term name="dot">
+            <term link="dlib/matrix/matrix_utilities_abstract.h.html#dot" name="for matrix objects"/>
+            <term link="dlib/svm/sparse_vector_abstract.h.html#dot" name="for sparse vectors"/>
+         </term>
+
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="lowerm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="upperm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="zeros_matrix"/>
@@ -305,7 +310,6 @@
 
 
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="scale_by"/>
-         <term file="dlib/svm/sparse_vector_abstract.h.html" name="dot_product"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="distance_squared"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="distance"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="has_unsigned_keys"/>
