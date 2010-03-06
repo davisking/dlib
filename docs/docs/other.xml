@@ -888,7 +888,7 @@
          <description>
             This is actually a set of overloaded functions which provide the ability to restore an object's state
             from an input stream.  Currently all dlib container classes, non pointer C++ intrinsics, std::string, 
-            std::vector, std::map, std::complex, dlib::bigint, dlib::uint64, C style arrays, and dlib::vector objects are serializable.  
+            std::vector, std::map, std::complex, dlib::bigint, dlib::uint64, dlib::int64, C style arrays, and dlib::vector objects are serializable.  
          </description>
                                  
       </component>
@@ -902,7 +902,7 @@
          <description>
             This is actually a set of overloaded functions which provide the ability to save an object's state
             to an output stream.  Currently all dlib container classes, non pointer C++ intrinsics, std::string, 
-            std::vector, std::map, std::complex, dlib::bigint, dlib::uint64, C style arrays, and dlib::vector objects are serializable.   
+            std::vector, std::map, std::complex, dlib::bigint, dlib::uint64, dlib::int64, C style arrays, and dlib::vector objects are serializable.   
          </description>
                                  
       </component>
