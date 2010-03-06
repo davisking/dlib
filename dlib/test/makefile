@@ -89,6 +89,7 @@ SRC += statistics.cpp
 SRC += std_vector_c.cpp
 SRC += string.cpp
 SRC += svm.cpp
+SRC += svm_c_linear.cpp
 SRC += thread_pool.cpp
 SRC += threads.cpp
 SRC += timer.cpp

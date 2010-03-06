@@ -79,6 +79,7 @@ set (tests
    std_vector_c.cpp
    string.cpp
    svm.cpp
+   svm_c_linear.cpp
    thread_pool.cpp
    threads.cpp
    timer.cpp
