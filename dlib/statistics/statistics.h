@@ -224,7 +224,7 @@ namespace dlib
         long current_n (
         ) const
         {
-            return total_count;
+            return static_cast<long>(total_count);
         }
 
         template <typename EXP>
