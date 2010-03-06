@@ -327,6 +327,7 @@ namespace
         typedef matrix<scalar_type,2,1> sample_type;
 
         std::vector<sample_type> x;
+        std::vector<matrix<double,0,1> > x_linearized;
         std::vector<scalar_type> y;
 
         get_checkerboard_problem(x,y, 300, 3);
@@ -350,12 +351,23 @@ namespace
         trainer.set_kernel(kernel_type(gamma));
         trainer.set_nu(0.05);
 
+        svm_c_linear_trainer<linear_kernel<matrix<double,0,1> > > lin_trainer;
+        lin_trainer.set_c(100000);
+        // use an ekm to linearize this dataset so we can use it with the lin_trainer
+        empirical_kernel_map<kernel_type> ekm;
+        ekm.load(kernel_type(gamma), x);
+        for (unsigned long i = 0; i < x.size(); ++i)
+            x_linearized.push_back(ekm.project(x[i]));
+
+
         print_spinner();
         matrix<scalar_type> rvm_cv = cross_validate_trainer_threaded(rvm_trainer, x,y, 4, 2);
         print_spinner();
         matrix<scalar_type> svm_cv = cross_validate_trainer(trainer, x,y, 4);
         print_spinner();
         matrix<scalar_type> rbf_cv = cross_validate_trainer_threaded(rbf_trainer, x,y, 4, 2);
+        print_spinner();
+        matrix<scalar_type> lin_cv = cross_validate_trainer_threaded(lin_trainer, x_linearized, y, 4, 2);
         print_spinner();
         matrix<scalar_type> peg_cv = cross_validate_trainer_threaded(batch(pegasos_trainer,1.0), x,y, 4, 2);
         print_spinner();
@@ -365,6 +377,7 @@ namespace
         dlog << LDEBUG << "rvm cv: " << rvm_cv;
         dlog << LDEBUG << "svm cv: " << svm_cv;
         dlog << LDEBUG << "rbf cv: " << rbf_cv;
+        dlog << LDEBUG << "lin cv: " << lin_cv;
         dlog << LDEBUG << "peg cv: " << peg_cv;
         dlog << LDEBUG << "peg cached cv: " << peg_c_cv;
 
@@ -375,6 +388,7 @@ namespace
         DLIB_TEST_MSG(mean(rvm_cv) > 0.9, rvm_cv);
         DLIB_TEST_MSG(mean(svm_cv) > 0.9, svm_cv);
         DLIB_TEST_MSG(mean(rbf_cv) > 0.9, rbf_cv);
+        DLIB_TEST_MSG(mean(lin_cv) > 0.9, lin_cv);
         DLIB_TEST_MSG(mean(peg_cv) > 0.9, peg_cv);
         DLIB_TEST_MSG(mean(peg_c_cv) > 0.9, peg_c_cv);
 
