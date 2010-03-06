@@ -85,7 +85,7 @@ int main()
     // Now that we have some data we want to train on it.  However, there are two parameters to the 
     // training.  These are the nu and gamma parameters.  Our choice for these parameters will 
     // influence how good the resulting decision function is.  To test how good a particular choice 
-    // of these parameters are we can use the cross_validate_trainer() function to perform n-fold cross
+    // of these parameters is we can use the cross_validate_trainer() function to perform n-fold cross
     // validation on our training data.  However, there is a problem with the way we have sampled 
     // our distribution above.  The problem is that there is a definite ordering to the samples.  
     // That is, the first half of the samples look like they are from a different distribution 
