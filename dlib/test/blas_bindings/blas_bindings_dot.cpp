@@ -37,7 +37,7 @@ namespace
         ) :
             tester (
                 "test_dot", // the command line argument name for this test
-                "Run example tests.", // the command line argument description
+                "Run test for DOT routines.", // the command line argument description
                 0                     // the number of command line arguments for this test
             )
         {}

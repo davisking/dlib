@@ -40,7 +40,7 @@ namespace
         ) :
             tester (
                 "test_vector", // the command line argument name for this test
-                "Run example tests.", // the command line argument description
+                "Run tests on dlib::vector.", // the command line argument description
                 0                     // the number of command line arguments for this test
             )
         {}

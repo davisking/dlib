@@ -37,7 +37,7 @@ namespace
         ) :
             tester (
                 "test_gemv", // the command line argument name for this test
-                "Run example tests.", // the command line argument description
+                "Run tests for GEMV routines.", // the command line argument description
                 0                     // the number of command line arguments for this test
             )
         {}
