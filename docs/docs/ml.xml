@@ -122,6 +122,13 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       </section>
 
       <section>
+         <name>Data IO</name>
+         <item>load_libsvm_formatted_data</item> 
+         <item>save_libsvm_formatted_data</item> 
+         <item>sparse_to_dense</item>
+      </section>
+
+      <section>
          <name>Miscellaneous</name>
          <item>vector_normalizer</item> 
          <item>vector_normalizer_pca</item> 
@@ -903,6 +910,49 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>rank_features_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>load_libsvm_formatted_data</name>
+         <file>dlib/data_io.h</file>
+         <spec_file link="true">dlib/data_io/libsvm_io_abstract.h</spec_file>
+         <description>
+            This is a function that loads the data from a file that uses
+            the LIBSVM format.  It loads the data into a std::vector of
+            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
+            If you want to load data into dense vectors (i.e.
+            dlib::matrix objects) then you can use the <a href="#sparse_to_dense">sparse_to_dense</a>
+            function to perform the conversion.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>save_libsvm_formatted_data</name>
+         <file>dlib/data_io.h</file>
+         <spec_file link="true">dlib/data_io/libsvm_io_abstract.h</spec_file>
+         <description>
+            This is actually a pair of overloaded functions.  Between the two of them
+            they let you save <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse</a> 
+            or dense data vectors to file using the LIBSVM format.  
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>sparse_to_dense</name>
+         <file>dlib/data_io.h</file>
+         <spec_file link="true">dlib/data_io/libsvm_io_abstract.h</spec_file>
+         <description>
+            This is a simple function that takes a std::vector of 
+            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a> 
+            and returns to you the equivalent std::vector of dense vectors. 
+         </description>
       </component>
       
    <!-- ************************************************************************* -->

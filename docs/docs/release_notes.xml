@@ -22,6 +22,7 @@ New Stuff:
    - Added the running_covariance object 
    - Added a simple linear (i.e. non-kernelized) kmeans implementation
    - Added support for serializing dlib::int64
+   - Added some functions to load and save LIBSVM formatted data files.
 
 Non-Backwards Compatible Changes:
    - Changed the definition of dlib's sparse vector format to require
