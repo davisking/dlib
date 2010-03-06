@@ -28,6 +28,10 @@ namespace dlib
                 So you should be able to use cv_image objects with many of the image
                 processing functions in dlib as well as the GUI tools for displaying
                 images on the screen.
+
+                Note that this object does NOT take ownership of the IplImage pointer
+                you give to it.  This means you must still remember to free this pointer
+                yourself.
         !*/
 
     public:
