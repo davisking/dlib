@@ -6,8 +6,8 @@
 #include <fstream>
 #include <string>
 #include <utility>
-#include "dlib/algs.h"
-#include "dlib/matrix.h"
+#include "../algs.h"
+#include "../matrix.h"
 #include <vector>
 
 namespace dlib
