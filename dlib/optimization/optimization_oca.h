@@ -145,6 +145,8 @@ namespace dlib
             // a lower bound on the true optimal objective value.
             scalar_type cp_obj = 0;
 
+            matrix<scalar_type,0,0,mem_manager_type, layout_type> K, Ktmp;
+
             scalar_type R_lower_bound;
             if (problem.risk_has_lower_bound(R_lower_bound))
             {
@@ -153,9 +155,11 @@ namespace dlib
                 bs.push_back(R_lower_bound);
                 planes.push_back(zeros_matrix<scalar_type>(w.size(),1));
                 miss_count.push_back(0);
+
+                K.set_size(1,1);
+                K(0,0) = 0;
             }
 
-            matrix<scalar_type,0,0,mem_manager_type, layout_type> K;
 
             unsigned long counter = 0;
             while (true)
@@ -181,17 +185,17 @@ namespace dlib
 
 
                 // compute kernel matrix for all the planes
+                K.swap(Ktmp);
                 K.set_size(planes.size(), planes.size());
+                // copy over the old K matrix
+                set_subm(K, 0,0, Ktmp.nr(), Ktmp.nc()) = Ktmp;
+
+                // now add the new row and column to K
                 long rr = 0;
                 for (typename std::list<vect_type>::iterator r = planes.begin(); r != planes.end(); ++r)
                 {
-                    long cc = rr;
-                    for (typename std::list<vect_type>::iterator c = r; c != planes.end(); ++c)
-                    {
-                        K(rr,cc) = dot(*r, *c);
-                        K(cc,rr) = K(rr,cc);
-                        ++cc;
-                    }
+                    K(rr, Ktmp.nc()) = dot(*r, planes.back());
+                    K(Ktmp.nc(), rr) = K(rr,Ktmp.nc());
                     ++rr;
                 }
 
@@ -234,12 +238,13 @@ namespace dlib
                 // we should throw it away.
                 while (max(vector_to_matrix(miss_count)) >= inactive_thresh)
                 {
-                    long idx = index_of_max(vector_to_matrix(miss_count));
+                    const long idx = index_of_max(vector_to_matrix(miss_count));
                     typename std::list<vect_type>::iterator i0 = planes.begin();
                     advance(i0, idx);
                     planes.erase(i0);
                     bs.erase(bs.begin()+idx);
                     miss_count.erase(miss_count.begin()+idx);
+                    K = removerc(K, idx, idx);
                 }
 
             }
