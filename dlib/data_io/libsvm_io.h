@@ -10,6 +10,7 @@
 #include <utility>
 #include "../algs.h"
 #include "../matrix.h"
+#include "../string.h"
 #include <vector>
 
 namespace dlib
@@ -56,8 +57,10 @@ namespace dlib
         value_type value;
         label_type label;
         sample_type sample;
+        long line_num = 0;
         while (fin.peek() != EOF)
         {
+            ++line_num;
             getline(fin, line);
 
             string::size_type pos = line.find_first_not_of(" \t\r\n");
@@ -73,7 +76,7 @@ namespace dlib
             sin >> label;
 
             if (!sin)
-                throw sample_data_io_error("Error while reading file " + file_name);
+                throw sample_data_io_error("On line: " + cast_to_string(line_num) + ", error while reading file " + file_name );
 
             // eat whitespace
             sin >> ws;
@@ -85,7 +88,7 @@ namespace dlib
 
                 // ignore what should be a : character
                 if (sin.get() != ':')
-                    throw sample_data_io_error("Error while reading file " + file_name);
+                    throw sample_data_io_error("On line: " + cast_to_string(line_num) + ", error while reading file " + file_name);
 
                 sin >> value >> ws;
 
@@ -94,9 +97,6 @@ namespace dlib
                     sample.insert(sample.end(), make_pair(key, value));
                 }
             }
-
-            if (sample.size() == 0)
-                throw sample_data_io_error("Error while reading file " + file_name + ". One sample had zero elements.");
 
             samples.push_back(sample);
             labels.push_back(label);
