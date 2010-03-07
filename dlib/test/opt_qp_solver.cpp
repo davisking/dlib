@@ -100,8 +100,8 @@ namespace
         {
             ++thetime;
             typedef matrix<double,0,1> sample_type;
-            dlog << LINFO << "time seed: " << thetime;
-            rnd.set_seed(cast_to_string(thetime));
+            //dlog << LINFO << "time seed: " << thetime;
+            //rnd.set_seed(cast_to_string(thetime));
 
             running_stats<double> rs;
 
@@ -157,15 +157,15 @@ namespace
             alpha = C/alpha.size();
             x = alpha;
 
-            const unsigned long max_iter = 100000;
-            solve_qp_using_smo(test.Q, test.b, alpha, 0.00001, max_iter);
+            const unsigned long max_iter = 400000;
+            solve_qp_using_smo(test.Q, test.b, alpha, 0.00000001, max_iter);
             DLIB_TEST_MSG(abs(sum(alpha) - C) < 1e-13, abs(sum(alpha) - C) );
             dlog << LTRACE << "alpha: " << alpha;
             dlog << LINFO << "SMO: true objective: "<< 0.5*trans(alpha)*test.Q*alpha - trans(alpha)*test.b;
 
 
             double obj = find_min(bfgs_search_strategy(),
-                                  objective_delta_stop_strategy(1e-13, 1000),
+                                  objective_delta_stop_strategy(1e-13, 5000),
                                   test,
                                   der,
                                   x,
