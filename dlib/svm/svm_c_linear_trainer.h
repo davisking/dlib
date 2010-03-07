@@ -342,6 +342,13 @@ namespace dlib
 
                 }
 
+                // Don't let the step size get too big.  Otherwise we might pick huge steps
+                // over and over that don't improve the cutting plane approximation.  
+                if (opt_k > 1.0)
+                {
+                    opt_k = 1.0;
+                }
+
                 // take the step suggested by the line search
                 best_so_far = (1-opt_k)*best_so_far + opt_k*w;
 
