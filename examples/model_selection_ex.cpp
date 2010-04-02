@@ -25,7 +25,7 @@
 using namespace std;
 using namespace dlib;
 
-// The svm functions use column vectors to contain a lot of the data on which they they 
+// The svm functions use column vectors to contain a lot of the data on which they 
 // operate. So the first thing we do here is declare a convenient typedef.  
 
 // This typedef declares a matrix with 2 rows and 1 column.  It will be the
