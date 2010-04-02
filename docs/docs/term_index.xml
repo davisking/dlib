@@ -696,6 +696,8 @@
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="menu_bar"/>
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="image_display"/>
          <term file="dlib/gui_widgets/widgets_abstract.h.html" name="image_window"/>
+         <term link="dlib/gui_widgets/widgets_abstract.h.html#overlay_line" name="overlay_line"/>
+         <term link="dlib/gui_widgets/widgets_abstract.h.html#overlay_rect" name="overlay_rect"/>
 
          <term file="dlib/gui_widgets/fonts_abstract.h.html" name="letter"/>
          <term file="dlib/gui_widgets/fonts_abstract.h.html" name="font"/>
