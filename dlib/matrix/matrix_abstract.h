@@ -611,10 +611,13 @@ namespace dlib
         /*!
             requires
                 - matrix_exp<EXP>::type == T
-                - nr() == m.nr()
-                - nc() == m.nc()
             ensures
-                - #(*this) == *this + m
+                - if (nr() == m.nr() && nc() == m.nc()) then
+                    - #(*this) == *this + m
+                - else
+                    - #(*this) == m
+                      (i.e. if the dimensions don't match then this function performs a 
+                      normal assignment)
                 - returns *this
         !*/
 
@@ -625,10 +628,11 @@ namespace dlib
         /*!
             requires
                 - matrix_exp<EXP>::type == T
-                - nr() == m.nr()
-                - nc() == m.nc()
             ensures
-                - #(*this) == *this - m
+                - if (nr() == m.nr() && nc() == m.nc()) then
+                    - #(*this) == *this - m
+                - else
+                    - #(*this) == -m
                 - returns *this
         !*/
 
@@ -672,6 +676,9 @@ namespace dlib
             exactly m.size() or 1 values so that the matrix is fully initialized.  Supplying 
             fewer or more than that is an error that will cause a dlib::fatal_error to be 
             thrown.
+
+            Note also that using an expression of the form m = scalar; when m.size() == 0
+            is legal but has no effect on m.
         !*/
 
         void swap (

@@ -1387,28 +1387,26 @@ namespace dlib
             // m's dimensions don't match that of *this. 
             COMPILE_TIME_ASSERT(EXP::NR == NR || NR == 0 || EXP::NR == 0);
             COMPILE_TIME_ASSERT(EXP::NC == NC || NC == 0 || EXP::NC == 0);
-            DLIB_ASSERT(this->nr() == m.nr() && this->nc() == m.nc(), 
-                "\tmatrix& matrix::operator+=(const matrix_exp& m)"
-                << "\n\tYou are trying to add a dynamically sized matrix to a statically sized matrix with the wrong size"
-                << "\n\tthis->nr(): " << nr()
-                << "\n\tthis->nc(): " << nc()
-                << "\n\tm.nr():     " << m.nr()
-                << "\n\tm.nc():     " << m.nc()
-                << "\n\tthis:       " << this
-                );
             COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true));
-            if (m.destructively_aliases(*this) == false)
+            if (nr() == m.nr() && nc() == m.nc())
             {
-                matrix_assign(*this, *this + m);
+                if (m.destructively_aliases(*this) == false)
+                {
+                    matrix_assign(*this, *this + m);
+                }
+                else
+                {
+                    // we have to use a temporary matrix object here because
+                    // this->data is aliased inside the matrix_exp m somewhere.
+                    matrix temp;
+                    temp.set_size(m.nr(),m.nc());
+                    matrix_assign(temp, *this + m);
+                    temp.swap(*this);
+                }
             }
             else
             {
-                // we have to use a temporary matrix object here because
-                // this->data is aliased inside the matrix_exp m somewhere.
-                matrix temp;
-                temp.set_size(m.nr(),m.nc());
-                matrix_assign(temp, *this + m);
-                temp.swap(*this);
+                *this = m;
             }
             return *this;
         }
@@ -1423,28 +1421,26 @@ namespace dlib
             // m's dimensions don't match that of *this. 
             COMPILE_TIME_ASSERT(EXP::NR == NR || NR == 0 || EXP::NR == 0);
             COMPILE_TIME_ASSERT(EXP::NC == NC || NC == 0 || EXP::NC == 0);
-            DLIB_ASSERT(this->nr() == m.nr() && this->nc() == m.nc(), 
-                "\tmatrix& matrix::operator-=(const matrix_exp& m)"
-                << "\n\tYou are trying to subtract a dynamically sized matrix from a statically sized matrix with the wrong size"
-                << "\n\tthis->nr(): " << nr()
-                << "\n\tthis->nc(): " << nc()
-                << "\n\tm.nr():     " << m.nr()
-                << "\n\tm.nc():     " << m.nc()
-                << "\n\tthis:       " << this
-                );
             COMPILE_TIME_ASSERT((is_same_type<typename EXP::type,type>::value == true));
-            if (m.destructively_aliases(*this) == false)
+            if (nr() == m.nr() && nc() == m.nc())
             {
-                matrix_assign(*this, *this - m);
+                if (m.destructively_aliases(*this) == false)
+                {
+                    matrix_assign(*this, *this - m);
+                }
+                else
+                {
+                    // we have to use a temporary matrix object here because
+                    // this->data is aliased inside the matrix_exp m somewhere.
+                    matrix temp;
+                    temp.set_size(m.nr(),m.nc());
+                    matrix_assign(temp, *this - m);
+                    temp.swap(*this);
+                }
             }
             else
             {
-                // we have to use a temporary matrix object here because
-                // this->data is aliased inside the matrix_exp m somewhere.
-                matrix temp;
-                temp.set_size(m.nr(),m.nc());
-                matrix_assign(temp, *this - m);
-                temp.swap(*this);
+                *this = -m;
             }
             return *this;
         }
@@ -1454,8 +1450,17 @@ namespace dlib
         )
         {
             const long size = m.nr()*m.nc();
-            for (long i = 0; i < size; ++i)
-                data(i) += m.data(i);
+            if (nr() == m.nr() && nc() == m.nc())
+            {
+                for (long i = 0; i < size; ++i)
+                    data(i) += m.data(i);
+            }
+            else
+            {
+                set_size(m.nr(), m.nc());
+                for (long i = 0; i < size; ++i)
+                    data(i) = m.data(i);
+            }
             return *this;
         }
 
@@ -1464,8 +1469,17 @@ namespace dlib
         )
         {
             const long size = m.nr()*m.nc();
-            for (long i = 0; i < size; ++i)
-                data(i) -= m.data(i);
+            if (nr() == m.nr() && nc() == m.nc())
+            {
+                for (long i = 0; i < size; ++i)
+                    data(i) -= m.data(i);
+            }
+            else
+            {
+                set_size(m.nr(), m.nc());
+                for (long i = 0; i < size; ++i)
+                    data(i) = -m.data(i);
+            }
             return *this;
         }
 

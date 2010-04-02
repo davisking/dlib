@@ -776,6 +776,39 @@ namespace
             DLIB_TEST((1>=a) == b);
         }
 
+        {
+            matrix<double> a, b, c;
+            a = randm(4,2);
+
+            b += a;
+            c -= a;
+
+            DLIB_TEST(equal(a, b));
+            DLIB_TEST(equal(-a, c));
+
+            b += a;
+            c -= a;
+
+            DLIB_TEST(equal(2*a, b));
+            DLIB_TEST(equal(-2*a, c));
+
+            b += a + a;
+            c -= a + a;
+
+            DLIB_TEST(equal(4*a, b));
+            DLIB_TEST(equal(-4*a, c));
+
+            b.set_size(0,0);
+            c.set_size(0,0);
+
+
+            b += a + a;
+            c -= a + a;
+
+            DLIB_TEST(equal(2*a, b));
+            DLIB_TEST(equal(-2*a, c));
+        }
+
     }
 
 
