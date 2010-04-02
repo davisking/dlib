@@ -188,11 +188,9 @@ namespace dlib
 
             temp1 = kernel_matrix(kernel, basis, samp);
             temp2 = weights*temp1;
+            // This value should never be negative (it measures squared distance) but I'm putting the abs() 
+            // here just for good measure since rounding error might push it slightly negative.
             projection_error = std::abs( kernel(samp,samp) - dot(temp2,temp2));
-            // Rounding error could make the expression slightly negative which is an impossible result
-            // since it measures a distance.  Just force it to be zero in that case.
-            if (projection_error < 0)
-                projection_error = 0;
 
             return temp2;
         }
