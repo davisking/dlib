@@ -11,16 +11,11 @@
 
 
       <p>
-         <web>Welcome to the dlib C++ library homepage. </web>
-         <chm>Welcome to the dlib C++ library documentation.</chm>
 
-      Dlib is a modern C++ library with a focus on portability
-      and program correctness.  It strives to be easy to use right and hard to use wrong. 
-      Thus, it comes with extensive documentation and thorough debugging modes. 
-      </p>
+      Dlib is a general purpose cross-platform C++ library designed using contract programming
+      and modern C++ techniques.  
 
-      <p>
-      The library is open source software and is licensed
+      It is open source software and licensed
       under the <a href="license.html">Boost Software License</a>.
 
       The <a href="intro.html">introduction</a> contains everything you need to know to get
