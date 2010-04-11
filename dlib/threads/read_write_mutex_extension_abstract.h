@@ -76,6 +76,9 @@ namespace dlib
         void lock (
         ) const;
         /*!
+            requires
+                - The thread calling this function does not have any kind of lock on this 
+                  object
             ensures
                 - if (there is any kind of lock on *this) then 
                     - the calling thread is put to sleep until a write lock becomes available. 
@@ -105,6 +108,9 @@ namespace dlib
         void lock_readonly (
         ) const;
         /*!
+            requires
+                - The thread calling this function does not already have a write
+                  lock on this object
             ensures
                 - if (there is a write lock on *this or there are no free readonly locks) then
                     - the calling thread is put to sleep until there is no longer a write lock
