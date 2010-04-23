@@ -77,16 +77,16 @@ class test_function
         In this example, our test_function object contains a column_vector 
         as its state and it computes the mean squared error between this 
         stored column_vector and the arguments to its operator() function.
-        This is a very simple function.  However, in general you could compute
+
+        This is a very simple function, however, in general you could compute
         any function you wanted here.  An example of a typical use would be 
-        to find the parameters to some regression function that minimized 
+        to find the parameters of some regression function that minimized 
         the mean squared error on a set of data.  In this case the arguments
         to the operator() function would be the parameters of your regression
-        function and you would use those parameters to loop over all your data
-        samples, compute the output of the regression function given those 
-        parameters, and finally return a measure of the error.   The dlib 
-        optimization functions would then be used to find the parameters that 
-        minimized the error.
+        function.  You would loop over all your data samples and compute the output 
+        of the regression function for each data sample given the parameters and 
+        return a measure of the total error.   The dlib optimization functions 
+        could then be used to find the parameters that minimized the error.
     */
 public:
 
