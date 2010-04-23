@@ -68,6 +68,17 @@ namespace dlib
         const uint64 thread_id
     );
 
+    template <
+        typename T
+        >
+    void set_all_logging_output_hooks (
+        T& object,
+        void (T::*hook_)(const std::string& logger_name, 
+                         const log_level& l,
+                         const uint64 thread_id,
+                         const char* message_to_log)
+    );
+
 // ----------------------------------------------------------------------------------------
 
     class logger 
@@ -586,7 +597,7 @@ namespace dlib
         )
         {
             logger::hook_mfp hook;
-            hook.set(object, hook_);
+            hook.set<T>(object, hook_);
 
             logger::global_data& gd = logger::get_global_data();
             auto_mutex M(gd.m);
@@ -622,6 +633,8 @@ namespace dlib
     };    
 
 // ----------------------------------------------------------------------------------------
+
+
 
 
 }
