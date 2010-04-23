@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.26" date="Mar 07, 2010">
+New Stuff:
    - Added the solve_qp_using_smo() function to solve certain quadratic
      programs.
    - Added the oca object.  It is an implementation of the Optimized Cutting 
@@ -46,7 +59,7 @@ Other:
    - Moved the optimization algorithms into their own page in the documentation.
    - Added a Suggested Books page to the documentation
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
