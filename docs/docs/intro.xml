@@ -68,8 +68,7 @@
         <p>
          Much of the organization and notation used in this library I learned from the 
          <a href="http://www.cse.ohio-state.edu/~weide/sce/now/">Software Component Engineering</a>
-         course sequence at OSU.  As such, this library is heavily influenced by the Design by Contract and 
-         generic programming methodologies.
+         course sequence at OSU.  
         </p>
 
 
