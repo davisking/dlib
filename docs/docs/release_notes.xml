@@ -12,6 +12,7 @@
 
 <current>
 New Stuff:
+   - Added the svm_c_ekm_trainer 
 
 Non-Backwards Compatible Changes:
 

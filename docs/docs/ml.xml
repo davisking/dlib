@@ -71,6 +71,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>kkmeans</item>
          <item>svm_nu_trainer</item> 
          <item>svm_c_linear_trainer</item> 
+         <item>svm_c_ekm_trainer</item> 
          <item>rvm_trainer</item> 
          <item>rvm_regression_trainer</item> 
          <item>rbf_network_trainer</item> 
@@ -648,6 +649,26 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>svm_sparse_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>svm_c_ekm_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_c_ekm_trainer_abstract.h</spec_file>
+         <description>
+                This object represents a tool for training the C formulation of 
+                a support vector machine.   It is implemented using the <a href="#empirical_kernel_map">empirical_kernel_map</a>
+                to kernelize the <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a>.  This makes it a very fast algorithm
+                but means the user must supply a set of basis vectors.  
+
+               <p>
+                For details about the "basis vectors" see the empirical_kernel_map 
+                documentation.  In particular, see it's <a href="empirical_kernel_map_ex.cpp.html">example program</a>.
+               </p>
+         </description>
                                  
       </component>
       
