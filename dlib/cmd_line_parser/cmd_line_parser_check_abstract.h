@@ -56,7 +56,7 @@ namespace dlib
                 - option_is_defined(option_name) == true
                 - T is not a pointer type
             ensures
-                - all the arguments for the given option are convertable
+                - all the arguments for the given option are convertible
                   by string_cast<T>() to an object of type T.
             throws
                 - std::bad_alloc
@@ -83,8 +83,8 @@ namespace dlib
                 - first <= last
                 - T is not a pointer type
             ensures
-                - all the arguments for the given option are convertable
-                  by string_cast<T>() to an object of type T and the resuting value is
+                - all the arguments for the given option are convertible
+                  by string_cast<T>() to an object of type T and the resulting value is
                   in the range first to last inclusive.
             throws
                 - std::bad_alloc
@@ -111,7 +111,7 @@ namespace dlib
                 - T is not a pointer type
             ensures
                 - for each argument to the given option:
-                    - this argument is convertable by string_cast<T>() to an object of
+                    - this argument is convertible by string_cast<T>() to an object of
                       type T and the resulting value is equal to some element in the
                       arg_set array.
             throws
