@@ -153,7 +153,7 @@ namespace dlib
             requires
                 - current_n() > 1
             ensures
-                - return (val-mean())/std::sqrt(variance());
+                - return (val-mean())/stddev();
         !*/
     };
 
