@@ -41,7 +41,7 @@ namespace dlib
 
               
                 At the end of the for loop you will have your random subset of 1000 samples.  And by
-                random I mean that each of the 1000000 data samples has an equal change of ending
+                random I mean that each of the 1000000 data samples has an equal chance of ending
                 up in the rand_subset object.
 
 
@@ -61,7 +61,12 @@ namespace dlib
                 In the above example we only actually fetch the data sample into memory if we
                 know that the rand_subset would include it into the random subset.  Otherwise,
                 we can just call the empty add().
+                
 
+                Finally, note that the random_subset_selector uses a deterministic pseudo-random
+                number generator under the hood.  Moreover, the default constructor always seeds
+                the random number generator in the same way.  So unless you call set_seed() 
+                each instance of the random_subset_selector will function identically.
         !*/
     public:
         typedef T type;
