@@ -597,7 +597,17 @@ namespace dlib
         )
         {
             logger::hook_mfp hook;
+
+            // There is a bug in one of the versions (but not all apparently) of 
+            // Visual studio 2005 that causes it to error out if <T> isn't in the
+            // following line of code.  However, there is also a bug in gcc-3.3 
+            // that causes it to error out if <T> is present.  So this works around
+            // this problem.
+#if _MSC_VER == 1400
             hook.set<T>(object, hook_);
+#else
+            hook.set(object, hook_);
+#endif
 
             logger::global_data& gd = logger::get_global_data();
             auto_mutex M(gd.m);
