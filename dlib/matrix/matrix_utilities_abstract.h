@@ -716,7 +716,7 @@ namespace dlib
     );
     /*!
         requires
-            - a.nr() == b.nr()
+            - a.nc() == b.nc()
             - a and b both contain the same type of element
         ensures
             - This function joins two matrices together by concatenating their columns.
