@@ -809,6 +809,79 @@ namespace
             DLIB_TEST(equal(-2*a, c));
         }
 
+        {
+            matrix<int> a, b, c;
+
+            a.set_size(2, 3);
+            b.set_size(2, 6);
+            c.set_size(4, 3);
+
+            a = 1, 2, 3,
+                4, 5, 6;
+
+            b = 1, 2, 3, 1, 2, 3,
+                4, 5, 6, 4, 5, 6;
+
+            c = 1, 2, 3,
+                4, 5, 6,
+                1, 2, 3,
+                4, 5, 6;
+
+            DLIB_TEST(join_rows(a,a) == b);
+            DLIB_TEST(join_cols(trans(a), trans(a)) == trans(b));
+            DLIB_TEST(join_cols(a,a) == c)
+            DLIB_TEST(join_rows(trans(a),trans(a)) == trans(c))
+        }
+
+        {
+            matrix<int, 2, 3> a;
+            matrix<int, 2, 6> b;
+            matrix<int, 4, 3> c;
+
+            a = 1, 2, 3,
+                4, 5, 6;
+
+            b = 1, 2, 3, 1, 2, 3,
+                4, 5, 6, 4, 5, 6;
+
+            c = 1, 2, 3,
+                4, 5, 6,
+                1, 2, 3,
+                4, 5, 6;
+
+            DLIB_TEST(join_rows(a,a) == b);
+            DLIB_TEST(join_cols(trans(a), trans(a)) == trans(b));
+            DLIB_TEST(join_cols(a,a) == c)
+            DLIB_TEST(join_rows(trans(a),trans(a)) == trans(c))
+        }
+
+        {
+            matrix<int, 2, 3> a;
+            matrix<int> a2;
+            matrix<int, 2, 6> b;
+            matrix<int, 4, 3> c;
+
+            a = 1, 2, 3,
+                4, 5, 6;
+
+            a2 = a;
+
+            b = 1, 2, 3, 1, 2, 3,
+                4, 5, 6, 4, 5, 6;
+
+            c = 1, 2, 3,
+                4, 5, 6,
+                1, 2, 3,
+                4, 5, 6;
+
+            DLIB_TEST(join_rows(a,a2) == b);
+            DLIB_TEST(join_rows(a2,a) == b);
+            DLIB_TEST(join_cols(trans(a2), trans(a)) == trans(b));
+            DLIB_TEST(join_cols(a2,a) == c)
+            DLIB_TEST(join_cols(a,a2) == c)
+            DLIB_TEST(join_rows(trans(a2),trans(a)) == trans(c))
+        }
+
     }
 
 

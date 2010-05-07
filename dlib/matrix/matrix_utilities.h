@@ -2739,6 +2739,116 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct op_join_rows
+    {
+        template <typename EXP1, typename EXP2>
+        struct op : public has_destructive_aliasing
+        {
+            const static long cost = EXP1::cost + EXP2::cost + 1;
+            const static long NR = tmax<EXP1::NR, EXP2::NR>::value;
+            const static long NC = (EXP1::NC*EXP2::NC != 0)? (EXP1::NC+EXP2::NC) : (0);
+            typedef typename EXP1::type type;
+            typedef typename EXP1::const_ret_type const_ret_type;
+            typedef typename EXP1::mem_manager_type mem_manager_type;
+
+            template <typename M1, typename M2>
+            static const_ret_type apply ( const M1& m1, const M2& m2 , long r, long c)
+            { 
+                if (c < m1.nc())
+                    return m1(r,c);
+                else
+                    return m2(r,c-m1.nc());
+            }
+
+            template <typename M1, typename M2>
+            static long nr (const M1& m1, const M2& ) { return m1.nr(); }
+            template <typename M1, typename M2>
+            static long nc (const M1& m1, const M2& m2 ) { return m1.nc()+m2.nc(); }
+        };
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    inline const matrix_binary_exp<EXP1,EXP2,op_join_rows> join_rows (
+        const matrix_exp<EXP1>& a,
+        const matrix_exp<EXP2>& b 
+    )
+    {
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+        // You are getting an error on this line because you are trying to join two matrices that
+        // don't have the same number of rows
+        COMPILE_TIME_ASSERT(EXP1::NR == EXP2::NR || (EXP1::NR*EXP2::NR == 0));
+
+        DLIB_ASSERT(a.nr() == b.nr(),
+            "\tconst matrix_exp join_rows(const matrix_exp& a, const matrix_exp& b)"
+            << "\n\tYou can only use join_rows() if both matrices have the same number of rows"
+            << "\n\ta.nr(): " << a.nr()
+            << "\n\tb.nr(): " << b.nr()
+            );
+
+        typedef matrix_binary_exp<EXP1,EXP2,op_join_rows> exp;
+        return exp(a.ref(),b.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_join_cols
+    {
+        template <typename EXP1, typename EXP2>
+        struct op : public has_destructive_aliasing
+        {
+            const static long cost = EXP1::cost + EXP2::cost + 1;
+            const static long NC = tmax<EXP1::NC, EXP2::NC>::value;
+            const static long NR = (EXP1::NR*EXP2::NR != 0)? (EXP1::NR+EXP2::NR) : (0);
+            typedef typename EXP1::type type;
+            typedef typename EXP1::const_ret_type const_ret_type;
+            typedef typename EXP1::mem_manager_type mem_manager_type;
+
+            template <typename M1, typename M2>
+            static const_ret_type apply ( const M1& m1, const M2& m2 , long r, long c)
+            { 
+                if (r < m1.nr())
+                    return m1(r,c);
+                else
+                    return m2(r-m1.nr(),c);
+            }
+
+            template <typename M1, typename M2>
+            static long nr (const M1& m1, const M2& m2 ) { return m1.nr()+m2.nr(); }
+            template <typename M1, typename M2>
+            static long nc (const M1& m1, const M2&  ) { return m1.nc(); }
+        };
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    inline const matrix_binary_exp<EXP1,EXP2,op_join_cols> join_cols (
+        const matrix_exp<EXP1>& a,
+        const matrix_exp<EXP2>& b 
+    )
+    {
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+        // You are getting an error on this line because you are trying to join two matrices that
+        // don't have the same number of columns 
+        COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || (EXP1::NC*EXP2::NC == 0));
+
+        DLIB_ASSERT(a.nc() == b.nc(),
+            "\tconst matrix_exp join_cols(const matrix_exp& a, const matrix_exp& b)"
+            << "\n\tYou can only use join_cols() if both matrices have the same number of columns"
+            << "\n\ta.nc(): " << a.nc()
+            << "\n\tb.nc(): " << b.nc()
+            );
+
+        typedef matrix_binary_exp<EXP1,EXP2,op_join_cols> exp;
+        return exp(a.ref(),b.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_UTILITIES_

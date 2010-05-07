@@ -634,6 +634,52 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp join_rows (
+        const matrix_exp& a,
+        const matrix_exp& b 
+    );
+    /*!
+        requires
+            - a.nr() == b.nr()
+            - a and b both contain the same type of element
+        ensures
+            - This function joins two matrices together by concatenating their rows.
+            - returns a matrix R such that:
+                - R::type == the same type that was in a and b.
+                - R.nr() == a.nr() == b.nr()
+                - R.nc() == a.nr() + b.nc()
+                - for all valid r and c:
+                    - if (c < a.nc()) then
+                        - R(r,c) == a(r,c) 
+                    - else
+                        - R(r,c) == b(r, c-a.nc()) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp join_cols (
+        const matrix_exp& a,
+        const matrix_exp& b 
+    );
+    /*!
+        requires
+            - a.nr() == b.nr()
+            - a and b both contain the same type of element
+        ensures
+            - This function joins two matrices together by concatenating their columns.
+            - returns a matrix R such that:
+                - R::type == the same type that was in a and b.
+                - R.nr() == a.nr() + b.nr()
+                - R.nc() == a.nr() == b.nc()
+                - for all valid r and c:
+                    - if (r < a.nr()) then
+                        - R(r,c) == a(r,c) 
+                    - else
+                        - R(r,c) == b(r-a.nr(), c) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp tensor_product (
         const matrix_exp& a,
         const matrix_exp& b 
