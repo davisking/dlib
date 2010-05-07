@@ -280,6 +280,8 @@
 
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointwise_multiply"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="join_rows"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="join_cols"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="equal"/>
 
 

@@ -452,6 +452,14 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#pointwise_multiply</link>
                      </item>
                      <item>
+                        <name>join_rows</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#join_rows</link>
+                     </item>
+                     <item>
+                        <name>join_cols</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#join_cols</link>
+                     </item>
+                     <item>
                         <name>tensor_product</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#tensor_product</link>
                      </item>
