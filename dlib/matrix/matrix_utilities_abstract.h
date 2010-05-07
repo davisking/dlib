@@ -369,6 +369,33 @@ namespace dlib
     template <
         typename T
         >
+    const matrix_exp pointer_to_matrix (
+        const T* ptr,
+        long nr,
+        long nc
+    );
+    /*!
+        requires
+            - nr > 0
+            - nc > 0
+            - ptr == a pointer to at least nr*nc T objects
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == nr
+                - m.nc() == nc 
+                - for all valid r and c:
+                  M(r,c) == ptr[r*nc + c]
+                  (i.e. the pointer is interpreted as a matrix laid out in memory
+                  in row major order)
+            - Note that the returned matrix doesn't take "ownership" of
+              the pointer and thus will not delete or free it.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
     const matrix_exp pointer_to_column_vector (
         const T* ptr,
         long nr
@@ -389,6 +416,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp reshape (
+        const matrix_exp& m,
+        long rows,
+        long cols
+    );
+    /*!
+        requires
+            - m.size() == rows*cols
+            - rows > 0
+            - cols > 0
+        ensures
+            - returns a matrix M such that: 
+                - M.nr() == rows
+                - M.nc() == cols
+                - M.size() == m.size()
+                - for all valid r and c:
+                    - let IDX = r*cols + c
+                    - M(r,c) == m(IDX/m.nc(), IDX%m.nc())
+
+            - i.e. The matrix m is reshaped into a new matrix of rows by cols
+              dimension.  Additionally, the elements of m are laid into M in row major 
+              order.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp reshape_to_column_vector (
         const matrix_exp& m
     );
@@ -400,7 +453,7 @@ namespace dlib
                 - for all valid r and c:
                     - m(r,c) == M(r*m.nc() + c)
 
-            - i.e. the matrix m is reshaped into a column vector.  Note that
+            - i.e. The matrix m is reshaped into a column vector.  Note that
               the elements are pulled out in row major order.
     !*/
 

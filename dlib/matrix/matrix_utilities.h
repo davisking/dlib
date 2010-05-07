@@ -349,7 +349,7 @@ namespace dlib
         typedef typename memory_manager<char>::kernel_1a mem_manager_type;
         typedef T type;
         typedef const T& const_ret_type;
-        static const_ret_type apply (const T* val, long r, long )
+        static const_ret_type apply (const T* val, long r, long, long, long )
         { return val[r]; }
     };
 
@@ -368,6 +368,42 @@ namespace dlib
         );
         typedef dynamic_matrix_scalar_unary_exp<const T*,op_pointer_to_col_vect<T> > exp;
         return exp(nr,1,ptr);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T 
+        >
+    struct op_pointer_to_mat : has_nondestructive_aliasing 
+    {
+        const static long cost = 1;
+        const static long NR = 0;
+        const static long NC = 0;
+        typedef typename memory_manager<char>::kernel_1a mem_manager_type;
+        typedef T type;
+        typedef const T& const_ret_type;
+        static const_ret_type apply (const T* val, long r, long c, long , long nc )
+        { return val[r*nc + c]; }
+    };
+
+    template <
+        typename T
+        >
+    const dynamic_matrix_scalar_unary_exp<const T*,op_pointer_to_mat<T> > pointer_to_matrix (
+        const T* ptr,
+        long nr,
+        long nc
+    )
+    {
+        DLIB_ASSERT(nr > 0 && nc > 0 , 
+                    "\tconst matrix_exp pointer_to_matrix(ptr, nr, nc)"
+                    << "\n\t nr and nc must be bigger than 0"
+                    << "\n\t nr: " << nr
+                    << "\n\t nc: " << nc
+        );
+        typedef dynamic_matrix_scalar_unary_exp<const T*,op_pointer_to_mat<T> > exp;
+        return exp(nr,nc,ptr);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1545,7 +1581,7 @@ namespace dlib
         typedef typename memory_manager<char>::kernel_1a mem_manager_type;
         typedef T type;
         typedef const T& const_ret_type;
-        static const_ret_type apply (const T& val, long , long )
+        static const_ret_type apply (const T& val, long , long, long, long )
         { return val; }
     };
 
@@ -1689,7 +1725,7 @@ namespace dlib
         typedef typename memory_manager<char>::kernel_1a mem_manager_type;
         typedef T type;
         typedef const T const_ret_type;
-        static const_ret_type apply (const T&, long r, long c)
+        static const_ret_type apply (const T&, long r, long c, long, long)
         { return static_cast<type>(r == c); }
     };
 
@@ -2189,6 +2225,56 @@ namespace dlib
     {
         typedef matrix_scalar_ternary_exp<EXP,typename EXP::type, op_clamp2> exp;
         return exp(m.ref(),lower, upper);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_reshape
+    {
+        template <typename EXP>
+        struct op : public has_destructive_aliasing
+        {
+            const static long cost = EXP::cost+1;
+            const static long NR = 0;
+            const static long NC = 0;
+            typedef typename EXP::type type;
+            typedef typename EXP::const_ret_type const_ret_type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+
+            template <typename M>
+            static const_ret_type apply ( const M& m, const long& , const long& cols, long r, long c)
+            { 
+                const long idx = r*cols + c;
+                return m(idx/m.nc(), idx%m.nc());
+            }
+
+            template <typename M1 >
+            static long nr (const M1& , const long& rows, const long& ) { return rows; }
+            template <typename M1>
+            static long nc (const M1& , const long&, const long& cols ) { return cols; }
+        };
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_scalar_ternary_exp<EXP, long, op_reshape> reshape (
+        const matrix_exp<EXP>& m,
+        const long& rows,
+        const long& cols 
+    )
+    {
+        DLIB_ASSERT(m.size() == rows*cols && rows > 0 && cols > 0, 
+            "\tconst matrix_exp reshape(m, rows, cols)"
+            << "\n\t The size of m must match the dimensions you want to reshape it into."
+            << "\n\t m.size():  " << m.size()
+            << "\n\t rows*cols: " << rows*cols 
+            << "\n\t rows:      " << rows 
+            << "\n\t cols:      " << cols 
+            );
+
+        typedef matrix_scalar_ternary_exp<EXP, long, op_reshape> exp;
+        return exp(m.ref(), rows, cols);
     }
 
 // ----------------------------------------------------------------------------------------

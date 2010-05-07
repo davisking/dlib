@@ -784,7 +784,7 @@ namespace dlib
         const_ret_type operator() (
             long r, 
             long c
-        ) const { return OP::apply(s,r,c); }
+        ) const { return OP::apply(s,r,c, nr_, nc_); }
 
         const_ret_type operator() ( long i ) const 
         { return matrix_exp<dynamic_matrix_scalar_unary_exp>::operator()(i); }

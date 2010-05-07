@@ -882,6 +882,62 @@ namespace
             DLIB_TEST(join_rows(trans(a2),trans(a)) == trans(c))
         }
 
+        {
+            matrix<int> a, b;
+
+            a.set_size(2,3);
+
+            a = 1, 2, 3,
+                4, 5, 6;
+
+            b.set_size(3,2);
+            b = 1, 2,
+                3, 4,
+                5, 6;
+
+            DLIB_TEST(reshape(a, 3, 2) == b);
+
+            b.set_size(2,3);
+            b = 1, 4, 2,
+                5, 3, 6;
+
+            DLIB_TEST(reshape(trans(a), 2, 3) == b);
+
+        }
+
+        {
+            matrix<int,2,3> a;
+            matrix<int> b;
+
+            a = 1, 2, 3,
+                4, 5, 6;
+
+            b.set_size(3,2);
+            b = 1, 2,
+                3, 4,
+                5, 6;
+
+            DLIB_TEST(reshape(a, 3, 2) == b);
+
+            b.set_size(2,3);
+            b = 1, 4, 2,
+                5, 3, 6;
+
+            DLIB_TEST(reshape(trans(a), 2, 3) == b);
+
+        }
+
+        {
+            std::vector<int> v(6);
+            for (unsigned long i = 0; i < v.size(); ++i)
+                v[i] = i;
+
+            matrix<int,2,3> a;
+            a = 0, 1, 2, 
+                3, 4, 5;
+
+            DLIB_TEST(pointer_to_matrix(&v[0], 2, 3) == a);
+        }
     }
 
 
