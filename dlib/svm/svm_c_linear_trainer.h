@@ -125,6 +125,9 @@ namespace dlib
                 cout << endl;
             }
 
+            if (current_objective_value == 0)
+                return true;
+
             if (current_error_gap/current_objective_value < eps)
                 return true;
 
