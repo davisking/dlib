@@ -1563,7 +1563,11 @@ namespace dlib
                 DLIB_CASSERT(r < m->nr() && c < m->nc(),
                              "You have used the matrix comma based assignment incorrectly by attempting to\n" <<
                              "supply more values than there are elements in the matrix object being assigned to.\n\n" <<
-                             "Did you forget to call set_size()?\n");
+                             "Did you forget to call set_size()?" 
+                             << "\n\t r: " << r 
+                             << "\n\t c: " << c 
+                             << "\n\t m->nr(): " << m->nr()
+                             << "\n\t m->nc(): " << m->nc());
                 (*m)(r,c) = val;
                 next();
                 has_been_used = true;
