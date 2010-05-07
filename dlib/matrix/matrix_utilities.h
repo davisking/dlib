@@ -1816,7 +1816,7 @@ namespace dlib
         COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || EXP1::NC == 0 || EXP2::NC == 0);
         DLIB_ASSERT(a.nr() == b.nr() &&
                a.nc() == b.nc(), 
-            "\tconst matrix_exp::type pointwise_multiply(const matrix_exp& a, const matrix_exp& b)"
+            "\tconst matrix_exp pointwise_multiply(const matrix_exp& a, const matrix_exp& b)"
             << "\n\tYou can only make a do a pointwise multiply with two equally sized matrices"
             << "\n\ta.nr(): " << a.nr()
             << "\n\ta.nc(): " << a.nc() 
@@ -1866,7 +1866,7 @@ namespace dlib
                a.nc() == b.nc() &&
                b.nr() == c.nr() &&
                b.nc() == c.nc(), 
-            "\tconst matrix_exp::type pointwise_multiply(a,b,c)"
+            "\tconst matrix_exp pointwise_multiply(a,b,c)"
             << "\n\tYou can only make a do a pointwise multiply between equally sized matrices"
             << "\n\ta.nr(): " << a.nr()
             << "\n\ta.nc(): " << a.nc() 
@@ -1925,7 +1925,7 @@ namespace dlib
                b.nc() == c.nc() &&
                c.nr() == d.nr() &&
                c.nc() == d.nc(), 
-            "\tconst matrix_exp::type pointwise_multiply(a,b,c,d)"
+            "\tconst matrix_exp pointwise_multiply(a,b,c,d)"
             << "\n\tYou can only make a do a pointwise multiply between equally sized matrices"
             << "\n\ta.nr(): " << a.nr()
             << "\n\ta.nc(): " << a.nc() 
