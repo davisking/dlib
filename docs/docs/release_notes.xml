@@ -13,8 +13,8 @@
 <current>
 New Stuff:
    - Added the svm_c_ekm_trainer 
-   - Added the join_rows(), join_cols(), reshape(), and pointer_to_matrix() 
-     functions.
+   - Added the sum_rows(), sum_cols(), join_rows(), join_cols(), reshape(), 
+     and pointer_to_matrix() functions.
 
 Non-Backwards Compatible Changes:
 

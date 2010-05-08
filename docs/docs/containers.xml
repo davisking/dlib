@@ -299,6 +299,14 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#sum</link>
                      </item>
                      <item>
+                        <name>sum_rows</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#sum_rows</link>
+                     </item>
+                     <item>
+                        <name>sum_cols</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#sum_cols</link>
+                     </item>
+                     <item>
                         <name>prod</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#prod</link>
                      </item>
