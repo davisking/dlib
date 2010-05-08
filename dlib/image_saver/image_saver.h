@@ -241,13 +241,13 @@ namespace dlib
         template <
             typename image_type,
             int pixel_type = static_switch <
-                pixel_traits<typename image_type::type>::grayscale && sizeof(typename image_type::type) != 2,
+                pixel_traits<typename image_type::type>::grayscale && sizeof(typename image_type::type) == 1,
                 pixel_traits<typename image_type::type>::rgb,
                 pixel_traits<typename image_type::type>::hsi,
                 false,
                 pixel_traits<typename image_type::type>::rgb_alpha,
                 false,
-                pixel_traits<typename image_type::type>::grayscale && sizeof(typename image_type::type) == 2
+                pixel_traits<typename image_type::type>::grayscale && sizeof(typename image_type::type) != 1
                 >::value
             >
         struct save_dng_helper;

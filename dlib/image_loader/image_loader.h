@@ -588,11 +588,6 @@ namespace dlib
             switch (type)
             {
                 case rgb_alpha_paeth:
-                    if (get_pixel_type<image_type>() != rgb_alpha)
-                    {
-                        image.clear();
-                        throw image_load_error("You have tried to load a dng file that contains rgb_alpha_pixel data into an incompatible pixel type");
-                    }
 
                     for (long r = 0; r < image.nr(); ++r)
                     {
@@ -617,11 +612,6 @@ namespace dlib
                     break;
 
                 case rgb_alpha:
-                    if (get_pixel_type<image_type>() != rgb_alpha)
-                    {
-                        image.clear();
-                        throw image_load_error("You have tried to load a dng file that contains rgb_alpha_pixel data into an incompatible pixel type");
-                    }
 
                     for (long r = 0; r < image.nr(); ++r)
                     {
@@ -646,11 +636,6 @@ namespace dlib
                     break;
 
                 case rgb_paeth:
-                    if (get_pixel_type<image_type>() != rgb)
-                    {
-                        image.clear();
-                        throw image_load_error("You have tried to load a dng file that contains rgb_pixel data into an incompatible pixel type");
-                    }
 
                     for (long r = 0; r < image.nr(); ++r)
                     {
@@ -672,11 +657,6 @@ namespace dlib
                     break;
 
                 case rgb:
-                    if (get_pixel_type<image_type>() != rgb)
-                    {
-                        image.clear();
-                        throw image_load_error("You have tried to load a dng file that contains rgb_pixel data into an incompatible pixel type");
-                    }
 
                     for (long r = 0; r < image.nr(); ++r)
                     {
@@ -698,11 +678,6 @@ namespace dlib
                     break;
 
                 case hsi:
-                    if (get_pixel_type<image_type>() != hsi)
-                    {
-                        image.clear();
-                        throw image_load_error("You have tried to load a dng file that contains hsi_pixel data into an incompatible pixel type");
-                    }
 
                     for (long r = 0; r < image.nr(); ++r)
                     {
@@ -725,10 +700,6 @@ namespace dlib
 
                 case grayscale:
                     {
-                        // An 8bit grayscale image should load successfully into any type of pixel since 
-                        // the assign_pixel() function converts perfectly between this pixel type and all
-                        // others.
-
                         unsigned char p;
                         for (long r = 0; r < image.nr(); ++r)
                         {
@@ -745,12 +716,6 @@ namespace dlib
 
                 case grayscale_16bit:
                     {
-                        if (get_pixel_type<image_type>() != grayscale_16bit)
-                        {
-                            image.clear();
-                            throw image_load_error("You have tried to load a dng file that contains 16bit grayscale data into an incompatible pixel type");
-                        }
-
                         uint16 p;
                         for (long r = 0; r < image.nr(); ++r)
                         {

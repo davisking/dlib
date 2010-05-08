@@ -37,6 +37,9 @@ namespace dlib
             - #image[0][0] will be the upper left corner of the image 
             - #image[image.nr()-1][image.nc()-1] will be the lower right
               corner of the image
+            - Performs any color space conversion necessairy to convert the
+              BMP image data into the pixel type used by the given image
+              object.
         throws
             - image_load_error
                 This exception is thrown if there is an error that prevents us
@@ -73,6 +76,9 @@ namespace dlib
             - #image[0][0] will be the upper left corner of the image 
             - #image[image.nr()-1][image.nc()-1] will be the lower right
               corner of the image
+            - Performs any color space conversion necessairy to convert the
+              dng image data into the pixel type used by the given image
+              object.
         throws
             - image_load_error
                 This exception is thrown if there is an error that prevents us

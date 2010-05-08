@@ -20,23 +20,8 @@ namespace dlib
             rgb_paeth,
             rgb_alpha,
             rgb_alpha_paeth,
-            grayscale_16bit,
+            grayscale_16bit
         };
-
-        template <typename image_type>
-        int get_pixel_type()
-        {
-            if (pixel_traits<typename image_type::type>::grayscale == true && sizeof(typename image_type::type) == 2)
-                return grayscale_16bit;
-            else if (pixel_traits<typename image_type::type>::grayscale == true && sizeof(typename image_type::type) == 1)
-                return grayscale_16bit;
-            else if (pixel_traits<typename image_type::type>::rgb == true)
-                return rgb;
-            else if (pixel_traits<typename image_type::type>::hsi == true)
-                return hsi;
-            else if (pixel_traits<typename image_type::type>::rgb_alpha == true)
-                return rgb_alpha;
-        }
 
         const unsigned long dng_magic_byte = 100;
 
