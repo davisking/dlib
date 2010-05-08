@@ -1419,6 +1419,96 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct op_sumr 
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long cost = EXP::cost;
+            const static long NR = 1;
+            const static long NC = EXP::NC;
+            typedef typename EXP::type type;
+            typedef const typename EXP::type const_ret_type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static const_ret_type apply ( const M& m, long , long c)
+            { 
+                type temp = m(0,c);
+                for (long r = 1; r < m.nr(); ++r)
+                    temp += m(r,c);
+                return temp; 
+            }
+
+            template <typename M>
+            static long nr (const M& ) { return 1; }
+            template <typename M>
+            static long nc (const M& m) { return m.nc(); }
+        }; 
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_unary_exp<EXP,op_sumr> sum_rows (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.size() > 0 , 
+                    "\tconst matrix_exp sum_rows(m)"
+                    << "\n\t The matrix can't be empty"
+                    << "\n\t m.size(): " << m.size() 
+        );
+        typedef matrix_unary_exp<EXP,op_sumr> exp;
+        return exp(m.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_sumc 
+    {
+        template <typename EXP>
+        struct op : has_destructive_aliasing
+        {
+            const static long cost = EXP::cost;
+            const static long NR = EXP::NR;
+            const static long NC = 1;
+            typedef typename EXP::type type;
+            typedef const typename EXP::type const_ret_type;
+            typedef typename EXP::mem_manager_type mem_manager_type;
+            template <typename M>
+            static const_ret_type apply ( const M& m, long r, long )
+            { 
+                type temp = m(r,0);
+                for (long c = 1; c < m.nc(); ++c)
+                    temp += m(r,c);
+                return temp; 
+            }
+
+            template <typename M>
+            static long nr (const M& m) { return m.nr(); }
+            template <typename M>
+            static long nc (const M& ) { return 1; }
+        }; 
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_unary_exp<EXP,op_sumc> sum_cols (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.size() > 0 , 
+                    "\tconst matrix_exp sum_cols(m)"
+                    << "\n\t The matrix can't be empty"
+                    << "\n\t m.size(): " << m.size() 
+        );
+        typedef matrix_unary_exp<EXP,op_sumc> exp;
+        return exp(m.ref());
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename EXP
         >

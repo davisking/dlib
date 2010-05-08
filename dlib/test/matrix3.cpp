@@ -938,6 +938,50 @@ namespace
 
             DLIB_TEST(pointer_to_matrix(&v[0], 2, 3) == a);
         }
+
+        {
+            matrix<int> a(3,4);
+            matrix<int> b(3,1), c(1,4);
+
+            a = 1, 2, 3, 6,
+                4, 5, 6, 9,
+                1, 1, 1, 3;
+
+            b(0) = sum(rowm(a,0));
+            b(1) = sum(rowm(a,1));
+            b(2) = sum(rowm(a,2));
+
+            c(0) = sum(colm(a,0));
+            c(1) = sum(colm(a,1));
+            c(2) = sum(colm(a,2));
+            c(3) = sum(colm(a,3));
+
+            DLIB_TEST(sum_cols(a) == b);
+            DLIB_TEST(sum_rows(a) == c);
+
+        }
+
+        {
+            matrix<int,3,4> a;
+            matrix<int> b(3,1), c(1,4);
+
+            a = 1, 2, 3, 6,
+                4, 5, 6, 9,
+                1, 1, 1, 3;
+
+            b(0) = sum(rowm(a,0));
+            b(1) = sum(rowm(a,1));
+            b(2) = sum(rowm(a,2));
+
+            c(0) = sum(colm(a,0));
+            c(1) = sum(colm(a,1));
+            c(2) = sum(colm(a,2));
+            c(3) = sum(colm(a,3));
+
+            DLIB_TEST(sum_cols(a) == b);
+            DLIB_TEST(sum_rows(a) == c);
+
+        }
     }
 
 

@@ -1269,6 +1269,42 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp sum_rows (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.size() > 0
+        ensures
+            - returns a row matrix that contains the sum of all the rows in m. 
+            - returns a matrix M such that
+                - M::type == the same type that was in m
+                - M.nr() == 1
+                - M.nc() == m.nc()
+                - for all valid i:
+                    - M(i) == sum(colm(m,i)) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp sum_cols (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.size() > 0
+        ensures
+            - returns a column matrix that contains the sum of all the columns in m. 
+            - returns a matrix M such that
+                - M::type == the same type that was in m
+                - M.nr() == m.nr() 
+                - M.nc() == 1
+                - for all valid i:
+                    - M(i) == sum(rowm(m,i)) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp::type prod (
         const matrix_exp& m
     );
