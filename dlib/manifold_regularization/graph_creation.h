@@ -144,7 +144,7 @@ namespace dlib
         //   [begin_j, end_j) == the range in edges that contains neighbors of samples[j]
         for (unsigned long i = 0; i < samples.size(); ++i)
         {
-            begin_j = begin_i + 1;
+            begin_j = begin_i + k;
             end_j = begin_j + k;
 
             for (unsigned long j = i+1; j < samples.size(); ++j)
