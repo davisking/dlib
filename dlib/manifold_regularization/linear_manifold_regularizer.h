@@ -3,7 +3,7 @@
 #ifndef DLIB_LINEAR_MANIFOLD_ReGULARIZER_H__
 #define DLIB_LINEAR_MANIFOLD_ReGULARIZER_H__
 
-#include "linear_manifold_regularizer.h"
+#include "linear_manifold_regularizer_abstract.h"
 #include <limits>
 #include <vector>
 #include "../serialize.h"
@@ -41,6 +41,10 @@ namespace dlib
 
             unsigned long size (
             ) const
+            /*!
+                ensures
+                    - returns the number of vertices in this graph
+            !*/
             {
                 return _size;
             }
@@ -51,6 +55,9 @@ namespace dlib
             /*!
                 requires
                     - idx < size()
+                ensures
+                    - returns an iterator that points to the first neighbor of 
+                      the idx'th vertex.
             !*/
             {
                 return blocks[idx];
@@ -62,6 +69,9 @@ namespace dlib
             /*!
                 requires
                     - idx < size()
+                ensures
+                    - returns an iterator that points one past the last neighbor
+                      of the idx'th vertex.
             !*/
             {
                 return blocks[idx+1];
@@ -78,11 +88,14 @@ namespace dlib
                     - vector_type == a type with an interface compatible with std::vector and 
                       it must in turn contain objects with an interface compatible with dlib::sample_pair
                     - edges.size() > 0
-                    - all the elements of edges are unique.  That is:
-                        - for all valid i and j where i != j:
-                          it must be true that edges[i] != edges[j]
+                    - contains_duplicate_pairs(edges) == false
                     - weight_funct(edges[i]) must be a valid expression that evaluates to a
-                      floating point number
+                      floating point number >= 0
+                ensures
+                    - #size() == one greater than the max index in edges.
+                    - builds the adjacency list so that it contains all the given edges.
+                    - The weight in each neighbor is set to the output of the weight_funct()
+                      for the associated edge.
             !*/
             {
 
@@ -160,15 +173,6 @@ namespace dlib
         >
     class linear_manifold_regularizer
     {
-        /*!
-            REQUIREMENTS ON matrix_type
-                Must be some type of dlib::matrix.
-
-            WHAT THIS OBJECT REPRESENTS
-                This object computes the inv(T) matrix described in the following paper:
-                    Linear Manifold Regularization for Large Scale Semi-supervised Learning
-                    by Vikas Sindhwani, Partha Niyogi, and Mikhail Belkin
-        !*/
 
     public:
         typedef typename matrix_type::mem_manager_type mem_manager_type;
@@ -194,14 +198,18 @@ namespace dlib
             make_mr_matrix(samples, graph);
         }
 
+        long dimensionality (
+        ) const { return reg_mat.nr(); }
+
         general_matrix get_transformation_matrix (
             scalar_type intrinsic_regularization_strength
         ) const
-        /*!
-            requires
-                - intrinsic_regularization_strength >= 0
-        !*/
         {
+            if (dimensionality() == 0)
+                return general_matrix();
+
+            // TODO: should we divide intrinsic_regularization_strength by the number of edges?  That maybe a more 
+            // reasonable interface.
             return inv_lower_triangular(chol(identity_matrix<scalar_type>(reg_mat.nr()) + intrinsic_regularization_strength*reg_mat));
         }
 
@@ -215,15 +223,17 @@ namespace dlib
         /*!
             requires
                 - samples.size() == graph.size()
+            ensures
+                - computes trans(X)*lap(graph)*X where X is the data matrix 
+                  (i.e. the matrix that contains all the samples in its rows)
+                  and lap(graph) is the laplacian matrix of the graph.  The
+                  resulting matrix is stored in reg_mat.
         !*/
         {
             const unsigned long dims = samples[0].size();
             reg_mat.set_size(dims,dims);
             reg_mat = 0;
 
-            // Compute trans(X)*lap(graph)*X where X is the data matrix 
-            // (i.e. the matrix that contains all the samples in its rows)
-            // and lap(graph) is the laplacian matrix of the graph.
 
             typename impl::undirected_adjacency_list::const_iterator beg, end;
 

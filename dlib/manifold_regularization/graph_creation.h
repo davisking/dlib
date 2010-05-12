@@ -180,13 +180,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename alloc
+        typename vector_type
         >
     bool contains_duplicate_pairs (
-        const std::vector<sample_pair, alloc>& pairs
+        const vector_type& pairs
     )
     {
-        std::vector<sample_pair, alloc> temp(pairs);
+        vector_type temp(pairs);
         std::sort(temp.begin(), temp.end(), &order_by_index);
 
         for (unsigned long i = 1; i < temp.size(); ++i)
@@ -197,6 +197,34 @@ namespace dlib
         }
 
         return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename vector_type 
+        >
+    unsigned long max_index_value_plus_one (
+        const vector_type& pairs
+    )
+    {
+        if (pairs.size() == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            unsigned long max_idx = 0;
+            for (unsigned long i = 0; i < pairs.size(); ++i)
+            {
+                if (pairs[i].index1() > max_idx)
+                    max_idx = pairs[i].index1();
+                if (pairs[i].index2() > max_idx)
+                    max_idx = pairs[i].index2();
+            }
+
+            return max_idx + 1;
+        }
     }
 
 // ----------------------------------------------------------------------------------------

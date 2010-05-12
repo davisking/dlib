@@ -80,17 +80,41 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename alloc
+        typename vector_type 
         >
     bool contains_duplicate_pairs (
-        const std::vector<sample_pair, alloc>& pairs
+        const vector_type& pairs
     );
     /*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and 
+              it must in turn contain objects with an interface compatible with dlib::sample_pair
         ensures
             - if (pairs contains any elements that are equal according to operator==) then
                 - returns true
             - else
                 - returns false
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename vector_type 
+        >
+    unsigned long max_index_value_plus_one (
+        const vector_type& pairs
+    );
+    /*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and 
+              it must in turn contain objects with an interface compatible with dlib::sample_pair
+        ensures
+            - if (pairs.size() == 0) then
+                - returns 0
+            - else
+                - returns a number N such that: 
+                    - for all i:  pairs[i].index1()   <  N && pairs[i].index2()   <  N
+                    - for some j: pairs[j].index1()+1 == N || pairs[j].index2()+1 == N
     !*/
 
 // ----------------------------------------------------------------------------------------
