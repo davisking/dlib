@@ -42,6 +42,12 @@ namespace dlib
     struct use_gaussian_weights 
     {
         use_gaussian_weights (
+        ) 
+        {
+            gamma = 0.1;
+        }
+
+        use_gaussian_weights (
             double g
         )
         {
