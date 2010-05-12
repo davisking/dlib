@@ -130,7 +130,7 @@ int main()
 
 
     // Here we create an empirical_kernel_map using all of our data samples as basis samples.  
-    cout << "\n\nBuilding an empirical_kernel_map " << samples.size() << " basis samples." << endl;
+    cout << "\n\nBuilding an empirical_kernel_map with " << samples.size() << " basis samples." << endl;
     ekm.load(kern, samples);
     cout << "Test the empirical_kernel_map when loaded with every sample." << endl;
     test_empirical_kernel_map(samples, labels, ekm);
