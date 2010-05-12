@@ -12,8 +12,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct sample_pair 
+    class sample_pair 
     {
+    public:
         sample_pair(
         ) : 
             _index1(0),
