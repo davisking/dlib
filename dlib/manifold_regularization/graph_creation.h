@@ -9,6 +9,7 @@
 #include "../string.h"
 #include "../rand.h"
 #include <algorithm>
+#include "sample_pair.h"
 
 namespace dlib
 {
@@ -24,8 +25,8 @@ namespace dlib
         ) 
         /*!
             ensures
-                - returns an iterator that points to the element in the given range that has the biggest
-                  distance 
+                - returns an iterator that points to the element in the given range 
+                  that has the biggest distance 
         !*/
         {
             float dist = begin->distance();
@@ -60,13 +61,6 @@ namespace dlib
         const T& random_seed,
         std::vector<sample_pair, alloc>& out
     )
-    /*!
-        requires
-            - samples.size() > 1
-        - 0 < percent <= 1
-        - num > 0
-        - random_seed must be convertible to a string by dlib::cast_to_string()
-    !*/
     {
         std::vector<sample_pair, alloc> edges;
         edges.reserve(num);
@@ -121,11 +115,6 @@ namespace dlib
         const unsigned long k,
         std::vector<sample_pair, alloc>& out
     )
-    /*!
-        requires
-            - samples.size() > k
-        - k > 0
-    !*/
     {
         using namespace impl;
         std::vector<sample_pair> edges;
@@ -186,6 +175,28 @@ namespace dlib
             }
         }
 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename alloc
+        >
+    bool contains_duplicate_pairs (
+        const std::vector<sample_pair, alloc>& pairs
+    )
+    {
+        std::vector<sample_pair, alloc> temp(pairs);
+        std::sort(temp.begin(), temp.end(), &order_by_index);
+
+        for (unsigned long i = 1; i < temp.size(); ++i)
+        {
+            // if we found a duplicate
+            if (temp[i-1] == temp[i])
+                return true;
+        }
+
+        return false;
     }
 
 // ----------------------------------------------------------------------------------------
