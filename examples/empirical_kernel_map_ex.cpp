@@ -53,8 +53,7 @@
     subspaces that are relatively low dimensional.  So for these datasets, using the 
     empirical_kernel_map is practical assuming an appropriate set of basis samples can be 
     selected by the user.  To help with this dlib supplies the linearly_independent_subset_finder.  
-    Some people also find that just picking a random subset of their data and using that 
-    as a basis set is fine as well.    
+    I also often find that just picking a random subset of the data as a basis works well.
 
 
 
