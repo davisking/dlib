@@ -35,29 +35,27 @@ namespace dlib
                 measure of complexity.  This strategy of penalizing complexity is 
                 usually called regularization.
 
-                In the above setting all the training data consists of labeled samples.  
-                However, it would be nice to be able to benefit from unlabeled data 
-                (see the example program for this object for an example where unlabeled 
-                data is useful).  The idea of manifold regularization is to extract useful 
-                information from unlabeled data by defining which data samples are "close" 
-                to each other (perhaps by using their 3 nearest neighbors) and then adding 
-                a term to the loss function that penalizes any decision rule which produces 
-                different output on data samples that we have designated as being close.
+                In the above setting, all the training data consists of labeled samples.  
+                However, it would be nice to be able to benefit from unlabeled data.  
+                The idea of manifold regularization is to extract useful information from 
+                unlabeled data by defining which data samples are "close" to each other 
+                (perhaps by using their 3 nearest neighbors) and then adding a term to 
+                the loss function that penalizes any decision rule which produces 
+                different outputs on data samples which we have designated as being close.
                 
-                It turns out that it is possible to turn these manifold regularized loss
-                functions into the normal form shown above by applying a certain kind
-                of processing to all of our data samples.  Once this is done we can use
-                a normal learning algorithm, such as the svm_c_linear_trainer, on just the
+                It turns out that it is possible to transform these manifold regularized loss
+                functions into the normal form shown above by applying a certain kind of 
+                preprocessing to all our data samples.  Once this is done we can use a 
+                normal learning algorithm, such as the svm_c_linear_trainer, on just the
                 labeled data samples and obtain the same output as the manifold regularized
-                learner would have produced.  Therefore, the linear_manifold_regularizer is 
-                a tool for creating this preprocessing transformation.  In particular, the
-                transformation is linear.  That is, it is just a matrix you multiply with
-                all your samples.
-
-
-                For a more detailed discussion of this topic you should consult the following
-                paper.  In particular, see section 4.2.  This object computes the inverse T 
-                matrix described in that section.
+                learner would have produced.  
+                
+                The linear_manifold_regularizer is a tool for creating this preprocessing 
+                transformation.  In particular, the transformation is linear.  That is, it 
+                is just a matrix you multiply with all your samples.  For a more detailed 
+                discussion of this topic you should consult the following paper.  In 
+                particular, see section 4.2.  This object computes the inverse T matrix 
+                described in that section.
 
                     Linear Manifold Regularization for Large Scale Semi-supervised Learning
                     by Vikas Sindhwani, Partha Niyogi, and Mikhail Belkin
@@ -106,7 +104,7 @@ namespace dlib
         /*!
             ensures
                 - returns the number of rows and columns in the transformation matrix
-                  produced by this object
+                  produced by this object.
         !*/
 
         general_matrix get_transformation_matrix (
@@ -118,14 +116,14 @@ namespace dlib
             ensures
                 - returns a matrix that represents the preprocessing transformation described above.
                 - You must choose how important the manifold regularizer is relative to the basic
-                  "don't be complex" regularizer describe above.  The intrinsic_regularization_strength
+                  "don't be complex" regularizer described above.  The intrinsic_regularization_strength
                   is the parameter that controls this trade-off.  A large value of 
                   intrinsic_regularization_strength means that more emphasis should be placed on
                   finding decision rules which produce the same output on similar samples.  On 
                   the other hand, a small value would mean that we don't care much about the 
                   manifold regularizer.  For example, using 0 will cause this function to return the 
                   identity matrix.
-                - The returned matrix will have dimensionality() rows and columns
+                - The returned matrix will have dimensionality() rows and columns.
         !*/
 
     };
