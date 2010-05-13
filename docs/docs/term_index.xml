@@ -366,6 +366,7 @@
          <term file="metaprogramming.html" name="_dT"/>
          <term file="metaprogramming.html" name="is_pointer_type"/>
          <term file="metaprogramming.html" name="is_const_type"/>
+         <term file="metaprogramming.html" name="is_reference_type"/>
          <term file="metaprogramming.html" name="is_same_type"/>
          <term file="metaprogramming.html" name="is_convertible"/>
          <term file="metaprogramming.html" name="is_complex"/>
