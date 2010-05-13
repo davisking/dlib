@@ -556,39 +556,40 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 usually called regularization.
                </p>
 
-               <p>
-                In the above setting all the training data consists of labeled samples.  
-                However, it would be nice to be able to benefit from unlabeled data 
-                (see the <a href="linear_manifold_regularizer_ex.cpp.html">example program</a> 
-                for this object for an example where unlabeled 
-                data is useful).  The idea of manifold regularization is to extract useful 
-                information from unlabeled data by defining which data samples are "close" 
-                to each other (perhaps by using their 3 <a href="#find_k_nearest_neighbors">nearest neighbors</a>) 
-                and then adding a term to the loss function that penalizes any decision rule which produces 
-                different output on data samples that we have designated as being close.
+                <p>
+                In the above setting, all the training data consists of labeled samples.  
+                However, it would be nice to be able to benefit from unlabeled data.  
+                The idea of manifold regularization is to extract useful information from 
+                unlabeled data by defining which data samples are "close" to each other 
+                (perhaps by using their 3 <a href="#find_k_nearest_neighbors">nearest neighbors</a>) 
+                and then adding a term to 
+                the loss function that penalizes any decision rule which produces 
+                different outputs on data samples which we have designated as being close.
                </p>
                 
                 <p>
-                It turns out that it is possible to turn these manifold regularized loss
-                functions into the normal form shown above by applying a certain kind
-                of processing to all of our data samples.  Once this is done we can use
-                a normal learning algorithm, such as the <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a>, 
-                on just the labeled data samples and obtain the same output as the manifold regularized
-                learner would have produced.  Therefore, the linear_manifold_regularizer is 
-                a tool for creating this preprocessing transformation.  In particular, the
-                transformation is linear.  That is, it is just a matrix you multiply with
-                all your samples.
-                </p>
-
-               <p>
-                For a more detailed discussion of this topic you should consult the following
-                paper.  In particular, see section 4.2.  This object computes the inverse T 
-                matrix described in that section.
+                It turns out that it is possible to transform these manifold regularized loss
+                functions into the normal form shown above by applying a certain kind of 
+                preprocessing to all our data samples.  Once this is done we can use a 
+                normal learning algorithm, such as the <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a>, 
+                on just the
+                labeled data samples and obtain the same output as the manifold regularized
+                learner would have produced.  
+               </p>
+                
+                <p>
+                The linear_manifold_regularizer is a tool for creating this preprocessing 
+                transformation.  In particular, the transformation is linear.  That is, it 
+                is just a matrix you multiply with all your samples.  For a more detailed 
+                discussion of this topic you should consult the following paper.  In 
+                particular, see section 4.2.  This object computes the inverse T matrix 
+                described in that section.
                <blockquote>
                     Linear Manifold Regularization for Large Scale Semi-supervised Learning
                     by Vikas Sindhwani, Partha Niyogi, and Mikhail Belkin
                </blockquote>
                </p>
+
          </description>
          <examples>
             <example>linear_manifold_regularizer_ex.cpp.html</example>
