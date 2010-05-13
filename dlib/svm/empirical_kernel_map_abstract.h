@@ -75,8 +75,8 @@ namespace dlib
                 Regarding methods to select a set of basis samples, if you are working with only a 
                 few thousand samples then you can just use all of them as basis samples.  
                 Alternatively, the linearly_independent_subset_finder often works well for 
-                selecting a basis set.  Some people also find that picking a random subset 
-                works fine.
+                selecting a basis set.  I also find that picking a random subset typically works 
+                well.
 
 
                 The empirical kernel map is something that has been around in the kernel methods
