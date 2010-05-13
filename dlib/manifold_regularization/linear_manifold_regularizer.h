@@ -195,6 +195,8 @@ namespace dlib
             impl::undirected_adjacency_list graph;
             graph.build(edges, weight_funct);
 
+            num_edges = edges.size();
+
             make_mr_matrix(samples, graph);
         }
 
@@ -208,8 +210,13 @@ namespace dlib
             if (dimensionality() == 0)
                 return general_matrix();
 
-            // TODO: should we divide intrinsic_regularization_strength by the number of edges?  That maybe a more 
-            // reasonable interface.
+
+            // This isn't how it's defined in the referenced paper but normalizing these kinds of
+            // sums is typical of most machine learning algorithms.  Moreover, doing this makes
+            // the argument to this function more invariant to the size of the edge set.  So it
+            // should make it easier for the user.
+            intrinsic_regularization_strength /= num_edges;
+
             return inv_lower_triangular(chol(identity_matrix<scalar_type>(reg_mat.nr()) + intrinsic_regularization_strength*reg_mat));
         }
 
@@ -269,6 +276,7 @@ namespace dlib
         }
 
         general_matrix reg_mat;
+        unsigned long num_edges;
     };
 
 }
