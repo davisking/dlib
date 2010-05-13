@@ -331,7 +331,7 @@ namespace dlib
     /*!A is_pointer_type
 
         This is a template where is_pointer_type<T>::value == true when T is a pointer 
-        type ane false otherwise.
+        type and false otherwise.
     !*/
 
     template <
@@ -361,7 +361,7 @@ namespace dlib
     /*!A is_const_type
 
         This is a template where is_const_type<T>::value == true when T is a const 
-        type ane false otherwise.
+        type and false otherwise.
     !*/
 
     template <typename T>
@@ -374,6 +374,23 @@ namespace dlib
     {
         static const bool value = true;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    /*!A is_reference_type 
+
+        This is a template where is_reference_type<T>::value == true when T is a reference 
+        type and false otherwise.
+    !*/
+
+    template <typename T>
+    struct is_reference_type
+    {
+        static const bool value = false;
+    };
+
+    template <typename T> struct is_reference_type<const T&> { static const bool value = true; };
+    template <typename T> struct is_reference_type<T&> { static const bool value = true; };
 
 // ----------------------------------------------------------------------------------------
 
