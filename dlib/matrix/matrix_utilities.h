@@ -2920,11 +2920,24 @@ namespace dlib
         template <typename EXP1, typename EXP2>
         struct op : public has_destructive_aliasing
         {
+            template <typename T, typename U, bool selection>
+            struct type_selector;
+            template <typename T, typename U>
+            struct type_selector<T,U,true> { typedef T type; };
+            template <typename T, typename U>
+            struct type_selector<T,U,false> { typedef U type; };
+
+            // If both const_ret_types are references then we should use them as the const_ret_type type
+            // but otherwise we should use the normal type.  
+            typedef typename EXP1::const_ret_type T1;
+            typedef typename EXP1::type T2;
+            typedef typename EXP2::const_ret_type T3;
+            typedef typename type_selector<T1, T2, is_reference_type<T1>::value && is_reference_type<T3>::value>::type const_ret_type;
+
             const static long cost = EXP1::cost + EXP2::cost + 1;
             const static long NR = tmax<EXP1::NR, EXP2::NR>::value;
             const static long NC = (EXP1::NC*EXP2::NC != 0)? (EXP1::NC+EXP2::NC) : (0);
             typedef typename EXP1::type type;
-            typedef typename EXP1::const_ret_type const_ret_type;
             typedef typename EXP1::mem_manager_type mem_manager_type;
 
             template <typename M1, typename M2>
@@ -2975,11 +2988,26 @@ namespace dlib
         template <typename EXP1, typename EXP2>
         struct op : public has_destructive_aliasing
         {
+            template <typename T, typename U, bool selection>
+            struct type_selector;
+            template <typename T, typename U>
+            struct type_selector<T,U,true> { typedef T type; };
+            template <typename T, typename U>
+            struct type_selector<T,U,false> { typedef U type; };
+
+            // If both const_ret_types are references then we should use them as the const_ret_type type
+            // but otherwise we should use the normal type.  
+            typedef typename EXP1::const_ret_type T1;
+            typedef typename EXP1::type T2;
+            typedef typename EXP2::const_ret_type T3;
+            typedef typename type_selector<T1, T2, is_reference_type<T1>::value && is_reference_type<T3>::value>::type const_ret_type;
+
+
+
             const static long cost = EXP1::cost + EXP2::cost + 1;
             const static long NC = tmax<EXP1::NC, EXP2::NC>::value;
             const static long NR = (EXP1::NR*EXP2::NR != 0)? (EXP1::NR+EXP2::NR) : (0);
             typedef typename EXP1::type type;
-            typedef typename EXP1::const_ret_type const_ret_type;
             typedef typename EXP1::mem_manager_type mem_manager_type;
 
             template <typename M1, typename M2>

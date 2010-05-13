@@ -828,8 +828,10 @@ namespace
                 4, 5, 6;
 
             DLIB_TEST(join_rows(a,a) == b);
+            DLIB_TEST(join_rows(a,abs(a)) == b);
             DLIB_TEST(join_cols(trans(a), trans(a)) == trans(b));
             DLIB_TEST(join_cols(a,a) == c)
+            DLIB_TEST(join_cols(a,abs(a)) == c)
             DLIB_TEST(join_rows(trans(a),trans(a)) == trans(c))
         }
 
@@ -850,8 +852,10 @@ namespace
                 4, 5, 6;
 
             DLIB_TEST(join_rows(a,a) == b);
+            DLIB_TEST(join_rows(a,abs(a)) == b);
             DLIB_TEST(join_cols(trans(a), trans(a)) == trans(b));
             DLIB_TEST(join_cols(a,a) == c)
+            DLIB_TEST(join_cols(a,abs(a)) == c)
             DLIB_TEST(join_rows(trans(a),trans(a)) == trans(c))
         }
 
