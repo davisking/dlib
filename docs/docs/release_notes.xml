@@ -15,6 +15,8 @@ New Stuff:
    - Added the svm_c_ekm_trainer 
    - Added the sum_rows(), sum_cols(), join_rows(), join_cols(), reshape(), 
      and pointer_to_matrix() functions.
+   - Added the linear_manifold_regularizer and some supporting tools.
+   - Added the randomly_subsample() function.
 
 Non-Backwards Compatible Changes:
 

@@ -124,6 +124,10 @@
                   <link>empirical_kernel_map_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Linear_Manifold_Regularizer</name>
+                  <link>linear_manifold_regularizer_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Kernel_RLS_Regression</name>
                   <link>krls_ex.cpp.html</link>
                </item>

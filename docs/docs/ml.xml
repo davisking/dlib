@@ -67,6 +67,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>krls</item>
          <item>kcentroid</item>
          <item>linearly_independent_subset_finder</item>
+         <item>linear_manifold_regularizer</item>
          <item>empirical_kernel_map</item>
          <item>kkmeans</item>
          <item>svm_nu_trainer</item> 
@@ -149,6 +150,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                <link>dlib/svm/sparse_vector_abstract.h.html#sparse_vectors</link>
          </item>
 
+         
+         <item nolink="true">
+            <name>manifold_regularization_tools</name>
+            <sub>
+               <item>sample_pair</item>
+               <item>find_percent_shortest_edges_randomly</item>
+               <item>find_k_nearest_neighbors</item>
+               <item>squared_euclidean_distance</item>
+               <item>use_weights_of_one</item>
+               <item>use_gaussian_weights</item>
+            </sub>
+         </item>
+
       </section>
 
     </top>  
@@ -163,6 +177,104 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>use_gaussian_weights</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/function_objects_abstract.h</spec_file>
+         <description>
+                This is a simple function object that takes a single argument
+                which should be an object similar to <a href="#sample_pair">sample_pair</a>.  
+         </description>
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>use_weights_of_one</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/function_objects_abstract.h</spec_file>
+         <description>
+                This is a simple function object that takes a single argument
+                and always returns 1 
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
+         <name>squared_euclidean_distance</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/function_objects_abstract.h</spec_file>
+         <description>
+                This is a simple function object that computes squared euclidean distance
+                between two <a href="containers.html#matrix">matrix</a> objects.
+         </description>
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_k_nearest_neighbors</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a function which finds all the k nearest neighbors of a set of points and outputs
+            the result as a vector of <a href="#sample_pair">sample_pair</a> objects.  It takes O(n^2) where
+            n is the number of data samples.  A faster approximate version is provided by 
+            <a href="#find_percent_shortest_edges_randomly">find_percent_shortest_edges_randomly</a>.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_percent_shortest_edges_randomly</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This function is a simple approximate form <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
+            Instead of checking all possible edges it randomly samples a large number of them and
+            then returns the best ones.  
+         </description>
+
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      
+      <component>
+         <name>sample_pair</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/sample_pair_abstract.h</spec_file>
+         <description>
+            This object is intended to represent an edge in an undirected graph 
+                that has data samples in its vertices.  
+         </description>
+
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      
+      <component>
          <name>find_clusters_using_kmeans</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/kkmeans_abstract.h</spec_file>
@@ -173,7 +285,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       </component>
 
    <!-- ************************************************************************* -->
-      
+
       <component>
          <name>pick_initial_centers</name>
          <file>dlib/svm.h</file>
@@ -425,6 +537,68 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>linear_manifold_regularizer</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/linear_manifold_regularizer_abstract.h</spec_file>
+         <description>
+            <p>
+                Many learning algorithms attempt to minimize a loss function that,
+                at a high level, looks like this:   
+<pre>
+   loss(w) == complexity + training_set_error
+</pre>
+            </p>
+
+               <p>
+                The idea is to find the set of parameters, w, that gives low error on 
+                your training data but also is not "complex" according to some particular
+                measure of complexity.  This strategy of penalizing complexity is 
+                usually called regularization.
+               </p>
+
+               <p>
+                In the above setting all the training data consists of labeled samples.  
+                However, it would be nice to be able to benefit from unlabeled data 
+                (see the <a href="linear_manifold_regularizer_ex.cpp.html">example program</a> 
+                for this object for an example where unlabeled 
+                data is useful).  The idea of manifold regularization is to extract useful 
+                information from unlabeled data by defining which data samples are "close" 
+                to each other (perhaps by using their 3 <a href="#find_k_nearest_neighbors">nearest neighbors</a>) 
+                and then adding a term to the loss function that penalizes any decision rule which produces 
+                different output on data samples that we have designated as being close.
+               </p>
+                
+                <p>
+                It turns out that it is possible to turn these manifold regularized loss
+                functions into the normal form shown above by applying a certain kind
+                of processing to all of our data samples.  Once this is done we can use
+                a normal learning algorithm, such as the <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a>, 
+                on just the labeled data samples and obtain the same output as the manifold regularized
+                learner would have produced.  Therefore, the linear_manifold_regularizer is 
+                a tool for creating this preprocessing transformation.  In particular, the
+                transformation is linear.  That is, it is just a matrix you multiply with
+                all your samples.
+                </p>
+
+               <p>
+                For a more detailed discussion of this topic you should consult the following
+                paper.  In particular, see section 4.2.  This object computes the inverse T 
+                matrix described in that section.
+               <blockquote>
+                    Linear Manifold Regularization for Large Scale Semi-supervised Learning
+                    by Vikas Sindhwani, Partha Niyogi, and Mikhail Belkin
+               </blockquote>
+               </p>
+         </description>
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>empirical_kernel_map</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/empirical_kernel_map_abstract.h</spec_file>
@@ -457,12 +631,13 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 few thousand samples then you can just use all of them as basis samples.  
                 Alternatively, the 
                 <a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a> 
-                often works well for selecting a basis set.  Some people also find that picking a 
-                <a href="algorithms.html#random_subset_selector">random subset</a> works fine.
+                often works well for selecting a basis set.  I also find that picking a 
+                <a href="algorithms.html#random_subset_selector">random subset</a> typically works well.
             </p>
          </description>
          <examples>
             <example>empirical_kernel_map_ex.cpp.html</example>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
          </examples>
       </component>
       
@@ -753,6 +928,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                this object are created using the 
                <a href="#empirical_kernel_map">empirical_kernel_map</a>.
          </description>
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       

@@ -30,6 +30,7 @@
          <item>running_stats</item> 
          <item>running_covariance</item> 
          <item>random_subset_selector</item> 
+         <item>randomly_subsample</item> 
          <item nolink="true">
             <name>Quantum Computing</name>
             <sub>
@@ -331,6 +332,19 @@
                                  
       </component>
       
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>randomly_subsample</name>
+         <file>dlib/statistics.h</file>
+         <spec_file>dlib/statistics/random_subset_selector_abstract.h</spec_file>
+         <description>
+            This is a pair of convenience functions for 
+            creating <a href="#random_subset_selector">random subsets</a> of data.
+         </description>
+                                 
+      </component>
       
    <!-- ************************************************************************* -->
 
