@@ -16,7 +16,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is intended to represent an edge in an undirected graph 
-                that has data samples in its vertices.  So it contains two integers
+                which has data samples at its vertices.  So it contains two integers
                 (index1 and index2) which represent the identifying indices of 
                 the samples at the ends of an edge.  Note that this object enforces
                 the constraint that index1 <= index2.  This has the effect of 
