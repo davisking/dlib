@@ -242,7 +242,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <file>dlib/manifold_regularization.h</file>
          <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
          <description>
-            This function is a simple approximate form <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
+            This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
             Instead of checking all possible edges it randomly samples a large number of them and
             then returns the best ones.  
          </description>
@@ -262,7 +262,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/manifold_regularization/sample_pair_abstract.h</spec_file>
          <description>
             This object is intended to represent an edge in an undirected graph 
-                that has data samples in its vertices.  
+                which has data samples at its vertices.  
          </description>
 
          <examples>
