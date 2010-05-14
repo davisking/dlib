@@ -234,9 +234,6 @@
          <description>
                 This component is a logging output stream in the style of the log4j
                 logger available for Java.                  
-                Note that unlike most other objects in this library there is only 
-                one implementation.  Thus, to create instances 
-                of the logger you would simply write logger my_logger("some_name");.
          </description>
          
          <examples>
