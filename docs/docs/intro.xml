@@ -205,17 +205,26 @@
         <h1>Organization</h1>
 
         <p>
-        The library can be thought of as a collection of components. 
-        Each component consists of one "kernel" specification that defines exactly what the 
-        component's interface looks like and what it does.   Additionally each component may 
-        have extensions to its kernel. Each kernel and extension specification can have many implementations.
-
+        The library can be thought of as a collection of components.  Each component always consists of
+        at least two separate files, a specification file and an implementation file.  The specification
+        files are the ones that end with _abstract.h.  Each of these specification files don't actually 
+        contain any code and they even have preprocessor directives that prevent any of their contents from 
+        being included.  Their purpose is purely to document a component's interface in a file that isn't
+        cluttered with implementation details the user shouldn't need to know about.  
         </p>
-
+        
+        <p>
+           The next important concept in dlib organization is multi-implementation components.  That is, 
+           some components provide more than one implementation of what is defined in their specification.  
+           When you use these components you have to identify them with names like <tt>dlib::component::kernel_1a</tt>.
+           Often these components will have just a debugging and non-debugging implementation.  However, many components
+           provide a large number of alternate implementations.  For example, the <a href="compression.html#entropy_encoder_model">entropy_encoder_model</a>
+           has 32 different implementations you can chose from.  
+        </p>
 
         <ul>
 
-            <li/> <b>File organization</b>
+            <li/> <b>File organization for multi-implementation components</b>
             <ul>
                 Each component gets its own folder and one file in the root of the directory tree.
                 <br/><br/>
@@ -322,17 +331,16 @@
         <a href="containers.html#queue">here</a>.
         </p>
         <p>
-        None of the above applies to the API components (or any global functions or objects that don't have an "implementations"
-        section in their documentation).  To use/create them you just need to include
-        the appropriate headers.  For example, to create a mutex object from the <a href="api.html#threads">
-        threads</a> component you would simply type <tt>dlib::mutex my_mutex;</tt>.  There is no 
-        need to specify which kernel implementation.  The correct kernel implementation 
-        is determined by which platform you compile under.  There are also no explicit checking versions
-        of these components.  However, there are 
+        None of the above applies to the single-implementation components, that is, anything that don't have an "implementations"
+        section in its documentation.  These tools are designed to have only one implementation and thus do not follow the
+        above naming convention.  For example, to create a 
+        <a href="other.html#logger">logger</a> object you would simply type <tt>dlib::logger mylog("name");</tt>. 
+        For the purposes of object creation the API components also appear to be single-implementation.  That is, there is no 
+        need to specify which implementation you want since it is automatically determined by which platform you compile under.
+        Note also that there are no explicit checking versions of these components.  However, there are 
         <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a> statements that perform checking and you can 
         enable them by #defining DEBUG or ENABLE_ASSERTS. 
         </p>
-
 
 
         <!--   ****************************   ASSUMPTIONS SECTION  ****************************    -->
