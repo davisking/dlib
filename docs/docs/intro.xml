@@ -331,7 +331,7 @@
         <a href="containers.html#queue">here</a>.
         </p>
         <p>
-        None of the above applies to the single-implementation components, that is, anything that don't have an "implementations"
+        None of the above applies to the single-implementation components, that is, anything that doesn't have an "implementations"
         section in its documentation.  These tools are designed to have only one implementation and thus do not follow the
         above naming convention.  For example, to create a 
         <a href="other.html#logger">logger</a> object you would simply type <tt>dlib::logger mylog("name");</tt>. 
