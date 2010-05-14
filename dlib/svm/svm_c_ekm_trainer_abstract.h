@@ -158,7 +158,7 @@ namespace dlib
                 - #basis_loaded() == true
         !*/
 
-        bool basis_size (
+        bool basis_loaded (
         ) const;
         /*!
             ensures
