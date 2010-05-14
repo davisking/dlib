@@ -137,11 +137,7 @@ namespace dlib
                 This object represents a logging output stream in the style of the log4j
                 logger available for Java.  
                 
-                Also note that unlike most other objects in this library there is only 
-                one implementation of this object at a time.  Thus, to create instances 
-                of the logger you would simply write logger my_logger("some_name");
-
-                Finally, note that the logger doesn't perform any memory allocations during
+                Additionally, the logger doesn't perform any memory allocations during
                 each logging action.  It just writes directly into the user supplied output
                 stream.  Alternatively, if you use a logging output hook no memory allocations
                 are performed either.  Logging just goes straight into a memory buffer
