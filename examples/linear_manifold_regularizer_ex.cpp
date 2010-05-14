@@ -20,25 +20,25 @@
 
     In this particular example we will generate 200,000 sample points of
     unlabeled data along with 2 samples of labeled data.  The sample points
-    will be drawn randomly from two concentric circles.  The labeled
-    points will be drawn from different circles.  The goal is to learn to
+    will be drawn randomly from two concentric circles.  One labeled data
+    point will be drawn from each circle.  The goal is to learn to
     correctly separate the two circles using only the 2 labeled points 
     and the unlabeled data.
 
     To do this we will first run an approximate form of k nearest neighbors
     to determine which of the unlabeled samples are closest together.  We will
-    also make the manifold assumption, that is, we will assume that points close
-    to each other should share the same classification labels.  
+    then make the manifold assumption, that is, we will assume that points close
+    to each other should share the same classification label.  
 
     Once we have determined which points are near neighbors we will use the 
     empirical_kernel_map and linear_manifold_regularizer to transform all the 
     data points into a new vector space where any linear rule will have similar 
-    outputs for points which we have decided are near neighbors.
+    output for points which we have decided are near neighbors.
 
-    Finally, to test that this all worked we will classify all the unlabeled data
-    according to which of the two labeled points are nearest.  Normally this
-    would be impossible but by using the manifold assumption we will
-    be successful.
+    Finally, we will classify all the unlabeled data according to which of 
+    the two labeled points are nearest.  Normally this would not work but by 
+    using the manifold assumption we will be able to successfully classify
+    all the unlabeled data.
 
 
     
@@ -47,13 +47,47 @@
 
         Beyond the Point Cloud: from Transductive to Semi-supervised Learning
         by Vikas Sindhwani, Partha Niyogi, and Mikhail Belkin
+
+
+
+
+                    ******** SAMPLE PROGRAM OUTPUT ********
+
+    Testing manifold regularization with an intrinsic_regularization_strength of 0.
+    number of edges generated: 49998
+    Running simple test...
+    error: 0.37022
+    error: 0.44036
+    error: 0.376715
+    error: 0.307545
+    error: 0.463455
+    error: 0.426065
+    error: 0.416155
+    error: 0.288295
+    error: 0.400115
+    error: 0.46347
+
+    Testing manifold regularization with an intrinsic_regularization_strength of 10000.
+    number of edges generated: 49998
+    Running simple test...
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+    error: 0
+
+
 */
 
 #include "dlib/manifold_regularization.h"
 #include "dlib/svm.h"
 #include "dlib/rand.h"
 #include "dlib/statistics.h"
-#include "dlib/string.h"
 #include <iostream>
 #include <vector>
 
@@ -128,8 +162,8 @@ void test_manifold_regularization (
 
     // create a large dataset with two concentric circles.  There will be 100000 points on each circle
     // for a total of 200000 samples.
-    generate_circle(samples, 1, num_points);  // circle of radius 1
-    generate_circle(samples, 5, num_points);  // circle of radius 5
+    generate_circle(samples, 2, num_points);  // circle of radius 2
+    generate_circle(samples, 4, num_points);  // circle of radius 4
 
     // Create a set of sample_pairs that tells us which samples are "close" and should thus 
     // be classified similarly.  These edges will be used to define the manifold regularizer.
@@ -143,12 +177,12 @@ void test_manifold_regularization (
     empirical_kernel_map<kernel_type> ekm;
 
     // Since the circles are not linearly separable we will use an empirical kernel map to 
-    // map them into a space where they are separable.  So we create an empirical_kernel_map 
+    // map them into a space where they are separable.  We create an empirical_kernel_map 
     // using a random subset of our data samples as basis samples.  Note, however, that even
     // though the circles are linearly separable in this new space given by the empirical_kernel_map
     // we still won't be able to correctly classify all the points given just the 2 labeled examples.
     // We will need to make use of the nearest neighbor information stored in edges.  To do that
-    // we will use the linear_manifold_regularizer next.
+    // we will use the linear_manifold_regularizer.
     ekm.load(kern, randomly_subsample(samples, 50));
 
     // Project all the samples into the span of our 50 basis samples
@@ -156,11 +190,11 @@ void test_manifold_regularization (
         samples[i] = ekm.project(samples[i]);
 
 
-    // Now create the manifold regularizer.   The result is a transformation matrix that
-    // embodies the manifold assumption discussed above. 
+    // Now create the manifold regularizer.  The result is a transformation matrix that
+    // embodies the manifold assumption discussed above.  
     linear_manifold_regularizer<sample_type> lmr;
     lmr.build(samples, edges, use_gaussian_weights(0.1));
-    matrix<double> T = lmr.get_transformation_matrix(intrinsic_regularization_strength);
+    const matrix<double> T = lmr.get_transformation_matrix(intrinsic_regularization_strength);
 
     // Apply the transformation generated by the linear_manifold_regularizer to 
     // all our samples.
@@ -169,7 +203,7 @@ void test_manifold_regularization (
 
 
     // For convenience, generate a projection_function and merge the transformation
-    // matrix T into it.  
+    // matrix T into it.  So proj(x) == T*ekm.project(x).
     projection_function<kernel_type> proj = ekm.get_projection_function();
     proj.weights = T*proj.weights;
 
@@ -177,15 +211,15 @@ void test_manifold_regularization (
 
     // Pick 2 different labeled points.  One on the inner circle and another on the outer.  
     // For each of these test points we will see if using the single plane that separates
-    // them is a good way to separate the concentric circles.  Also do this a bunch 
+    // them is a good way to separate the concentric circles.  We also do this a bunch 
     // of times with different randomly chosen points so we can see how robust the result is.
     for (int itr = 0; itr < 10; ++itr)
     {
         std::vector<sample_type> test_points;
-        // generate a random point from the radius 1 circle
-        generate_circle(test_points, 1, 1);
-        // generate a random point from the radius 5 circle
-        generate_circle(test_points, 5, 1);
+        // generate a random point from the radius 2 circle
+        generate_circle(test_points, 2, 1);
+        // generate a random point from the radius 4 circle
+        generate_circle(test_points, 4, 1);
 
         // project the two test points into kernel space.  Recall that this projection_function
         // has the manifold regularizer incorporated into it.  
