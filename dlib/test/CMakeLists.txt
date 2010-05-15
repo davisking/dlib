@@ -32,6 +32,7 @@ set (tests
    config_reader.cpp
    directed_graph.cpp
    discriminant_pca.cpp
+   ekm_and_lisf.cpp
    empirical_kernel_map.cpp
    entropy_coder.cpp
    entropy_encoder_model.cpp
