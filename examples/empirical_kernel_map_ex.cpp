@@ -153,7 +153,7 @@ int main()
     // Now reload the empirical_kernel_map but this time using only our 20 basis samples 
     // selected using the linearly_independent_subset_finder.
     cout << "\n\nBuilding an empirical_kernel_map with " << lisf.dictionary_size() << " basis samples." << endl;
-    ekm.load(kern, lisf.get_dictionary());
+    ekm.load(lisf);
     cout << "Test the empirical_kernel_map when loaded with samples from the lisf object." << endl;
     test_empirical_kernel_map(samples, labels, ekm);
 
