@@ -77,7 +77,10 @@ namespace
                 for (unsigned long i = 0; i < samples.size(); ++i)
                 {
                     if (lisf.add(samples[i]))
+                    {
+                        DLIB_TEST(equal(lisf[lisf.dictionary_size()-1], samples[i]));
                         ++count;
+                    }
                 }
                 DLIB_TEST(count == lisf.dictionary_size());
 
