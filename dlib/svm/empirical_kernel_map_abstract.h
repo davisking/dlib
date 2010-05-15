@@ -55,6 +55,7 @@ namespace dlib
 
             INITIAL VALUE
                 - out_vector_size() == 0
+                - basis_size() == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a map from objects of sample_type (the kind of object 
@@ -131,12 +132,16 @@ namespace dlib
                   expressions such as kernel(basis_samples(0), basis_samples(0)) should make sense.
             ensures
                 - 0 < #out_vector_size() <= basis_samples.size()
+                - #basis_size() == basis_samples.size()
                 - #get_kernel() == kernel
                 - This function constructs a map between normal sample_type objects and the 
                   subspace of the kernel feature space defined by the given kernel and the
                   given set of basis samples.  So after this function has been called you
                   will be able to project sample_type objects into kernel feature space
                   and obtain the resulting vector as a regular column matrix.
+                - The basis samples are loaded into this object in the order in which they
+                  are stored in basis_samples.  That is:
+                    - for all valid i: (*this)[i] == basis_samples(i)
             throws
                 - empirical_kernel_map_error
                     This exception is thrown if we are unable to create a kernel map.
@@ -151,6 +156,7 @@ namespace dlib
                 - lisf.dictionary_size() > 0
             ensures
                 - #out_vector_size() == lisf.dictionary_size() 
+                - #basis_size() == lisf.dictionary_size()
                 - #get_kernel() == lisf.get_kernel()
                 - Uses the dictionary vectors from lisf as a basis set.  Thus, this function 
                   constructs a map between normal sample_type objects and the subspace of 
@@ -158,6 +164,9 @@ namespace dlib
                   of basis samples.  So after this function has been called you will be 
                   able to project sample_type objects into kernel feature space and obtain 
                   the resulting vector as a regular column matrix.
+                - The basis samples are loaded into this object in the order in which they
+                  are stored in lisf.  That is:
+                    - for all valid i: (*this)[i] == lisf[i]
             throws
                 - empirical_kernel_map_error
                     This exception is thrown if we are unable to create a kernel map.
@@ -181,6 +190,26 @@ namespace dlib
                     - returns the dimensionality of the vectors output by the project() function.
                 - else
                     - returns 0
+        !*/
+
+        unsigned long basis_size (
+        ) const;
+        /*!
+            ensures
+                - returns the number of basis vectors in projection_functions created
+                  by this obect.  This is also equal to the number of basis vectors
+                  given to the load() function.
+        !*/
+
+        const sample_type& operator[] (
+            unsigned long idx
+        ) const;
+        /*!
+            requires
+                - idx < basis_size()
+            ensures
+                - returns a const reference to the idx'th basis vector contained inside 
+                  this object.
         !*/
 
         const matrix<scalar_type,0,1,mem_manager_type>& project (
@@ -242,6 +271,7 @@ namespace dlib
                     - DF.b == 0
                     - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
                       that it is possible for there to be fewer basis_vectors than basis samples given to load().  
+                    - DF.basis_vectors.size() == basis_size()
         !*/
 
         template <typename EXP>
@@ -273,6 +303,7 @@ namespace dlib
                     - DF.b == dot(vect,vect) 
                     - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
                       that it is possible for there to be fewer basis_vectors than basis samples given to load().  
+                    - DF.basis_vectors.size() == basis_size()
         !*/
 
         const projection_function<kernel_type> get_projection_function (
@@ -284,6 +315,7 @@ namespace dlib
                 - returns a projection_function, PF, that computes the same projection as project().
                   That is, calling PF() on any sample will produce the same output vector as calling
                   this->project() on that sample.
+                - PF.basis_vectors.size() == basis_size()
         !*/
 
         const matrix<scalar_type,0,0,mem_manager_type> get_transformation_to (

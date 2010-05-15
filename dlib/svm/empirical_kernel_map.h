@@ -110,6 +110,27 @@ namespace dlib
             return weights.nr();
         }
 
+        unsigned long basis_size (
+        ) const
+        {
+            return basis.size();
+        }
+
+        const sample_type& operator[] (
+            unsigned long idx
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( idx < basis_size(),
+                "\t const sample_type& empirical_kernel_map::operator[](idx)"
+                << "\n\t Invalid inputs to this function."
+                << "\n\t basis_size(): " << basis_size() 
+                << "\n\t this:         " << this
+                );
+
+            return basis[idx];
+        }
+
         template <typename EXP>
         const decision_function<kernel_type> convert_to_decision_function (
             const matrix_exp<EXP>& vect
