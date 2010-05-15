@@ -7,6 +7,7 @@
 #include "../matrix.h"
 #include "kernel_abstract.h"
 #include "function_abstract.h"
+#include "linearly_independent_subset_finder_abstract.h"
 #include <vector>
 
 namespace dlib
@@ -136,6 +137,27 @@ namespace dlib
                   given set of basis samples.  So after this function has been called you
                   will be able to project sample_type objects into kernel feature space
                   and obtain the resulting vector as a regular column matrix.
+            throws
+                - empirical_kernel_map_error
+                    This exception is thrown if we are unable to create a kernel map.
+                    If this happens then this object will revert back to its initial value.
+        !*/
+
+        void load(
+            const linearly_independent_subset_finder<kernel_type>& lisf
+        );
+        /*!
+            requires
+                - lisf.dictionary_size() > 0
+            ensures
+                - #out_vector_size() == lisf.dictionary_size() 
+                - #get_kernel() == lisf.get_kernel()
+                - Uses the dictionary vectors from lisf as a basis set.  Thus, this function 
+                  constructs a map between normal sample_type objects and the subspace of 
+                  the kernel feature space defined by the given kernel and the given set 
+                  of basis samples.  So after this function has been called you will be 
+                  able to project sample_type objects into kernel feature space and obtain 
+                  the resulting vector as a regular column matrix.
             throws
                 - empirical_kernel_map_error
                     This exception is thrown if we are unable to create a kernel map.

@@ -108,7 +108,7 @@ namespace dlib
             K.set_size(0,0);
         }
 
-        void add (
+        bool add (
             const sample_type& x
         )
         {
@@ -126,7 +126,9 @@ namespace dlib
                     K(0,0) = kx;
 
                     dictionary.push_back(x);
+                    return true;
                 }
+                return false;
             }
             else
             {
@@ -220,6 +222,11 @@ namespace dlib
                         dictionary.push_back(x);
 
                     }
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
         }
@@ -283,6 +290,18 @@ namespace dlib
         ) const
         {
             return dictionary[index];
+        }
+
+        const matrix<scalar_type,0,0,mem_manager_type>& get_kernel_matrix (
+        ) const
+        {
+            return K;
+        }
+
+        const matrix<scalar_type,0,0,mem_manager_type>& get_inv_kernel_marix (
+        ) const
+        {
+            return K_inv;
         }
 
     private:

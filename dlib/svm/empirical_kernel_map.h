@@ -5,6 +5,7 @@
 
 #include "../matrix.h"
 #include "empirical_kernel_map_abstract.h"
+#include "linearly_independent_subset_finder.h"
 #include <vector>
 #include "../algs.h"
 #include "kernel_matrix.h"
@@ -69,6 +70,25 @@ namespace dlib
         )
         {
             load_impl(kernel_, vector_to_matrix(basis_samples));
+        }
+
+        void load(
+            const linearly_independent_subset_finder<kernel_type>& lisf
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(lisf.dictionary_size() > 0,
+                "\tvoid empirical_kernel_map::load(linearly_independent_subset_finder)"
+                << "\n\t You have to give a non-empty set of basis_samples"
+                << "\n\t this: " << this
+                );
+
+            kernel = lisf.get_kernel();
+            weights = trans(chol(lisf.get_inv_kernel_marix()));
+            basis.resize(lisf.dictionary_size());
+            for (unsigned long i = 0; i < basis.size(); ++i)
+                basis[i] = lisf[i];
+
         }
 
         const kernel_type get_kernel (

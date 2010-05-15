@@ -112,19 +112,22 @@ namespace dlib
                 - clears out all the data (e.g. #dictionary_size() == 0)
         !*/
 
-        void add (
+        bool add (
             const sample_type& x
         );
         /*!
             ensures
                 - if (x is linearly independent of the vectors already in this object) then
                     - adds x into the dictionary
+                    - returns true
                     - if (dictionary_size() < max_dictionary_size()) then
                         - #dictionary_size() == dictionary_size() + 1
                     - else
                         - #dictionary_size() == dictionary_size() 
                           (i.e. the number of vectors in this object doesn't change)
                         - the least linearly independent vector in this object is removed
+                - else
+                    - returns false
         !*/
 
         void swap (
@@ -161,6 +164,25 @@ namespace dlib
                   vectors in this object.
         !*/
 
+        const matrix<scalar_type,0,0,mem_manager_type>& get_kernel_matrix (
+        ) const;
+        /*!
+            ensures
+                - returns a matrix K such that:
+                    - K.nr() == K.nc() == dictionary_size()
+                    - K == kernel_matrix(get_kernel(), get_dictionary())
+                      i.e. K == the kernel matrix for the dictionary vectors
+        !*/
+
+        const matrix<scalar_type,0,0,mem_manager_type>& get_inv_kernel_marix (
+        ) const;
+        /*!
+            ensures
+                - if (dictionary_size() != 0)
+                    - returns inv(get_kernel_matrix())
+                - else
+                    - returns an empty matrix
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
