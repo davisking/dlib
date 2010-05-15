@@ -119,6 +119,7 @@ namespace dlib
             ensures
                 - if (x is linearly independent of the vectors already in this object) then
                     - adds x into the dictionary
+                    - (*this)[#dictionary_size()-1] == x
                     - returns true
                     - if (dictionary_size() < max_dictionary_size()) then
                         - #dictionary_size() == dictionary_size() + 1
