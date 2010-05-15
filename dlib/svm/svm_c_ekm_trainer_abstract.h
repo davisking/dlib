@@ -24,10 +24,7 @@ namespace dlib
                 This object represents a tool for training the C formulation of 
                 a support vector machine.   It is implemented using the empirical_kernel_map
                 to kernelize the svm_c_linear_trainer.  This makes it a very fast algorithm
-                but means the user must supply a set of basis vectors.  
-
-                For details about the "basis vectors" see the empirical_kernel_map 
-                documentation.  In particular, see it's example program.
+                capable of learning from very large datasets.
         !*/
 
     public:
@@ -48,6 +45,9 @@ namespace dlib
                 - #get_c_class2() == 1
                 - #get_epsilon() == 0.001
                 - #basis_loaded() == false
+                - #get_initial_basis_size() == 5
+                - #get_basis_size_increment() == 5
+                - #get_max_basis_size() == 300
                 - this object will not be verbose unless be_verbose() is called
         !*/
 
@@ -65,6 +65,9 @@ namespace dlib
                 - #get_c_class2() == C
                 - #get_epsilon() == 0.001
                 - #basis_loaded() == false
+                - #get_initial_basis_size() == 5
+                - #get_basis_size_increment() == 5
+                - #get_max_basis_size() == 300
                 - this object will not be verbose unless be_verbose() is called
         !*/
 
@@ -162,7 +165,78 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if this object has been loaded with basis vectors and false otherwise.
+                - returns true if this object has been loaded with user supplied basis vectors and false otherwise.
+        !*/
+
+        void clear_basis (
+        );
+        /*!
+            ensures
+                - #basis_loaded() == false
+        !*/
+
+        unsigned long get_max_basis_size (
+        ) const;
+        /*!
+            ensures
+                - returns the maximum number of basis vectors this object is allowed
+                  to use.  This parameter only matters when the user has not supplied 
+                  a basis via set_basis().
+        !*/
+
+        void set_max_basis_size (
+            unsigned long max_basis_size
+        );
+        /*!
+            requires
+                - max_basis_size > 0
+            ensures
+                - #get_max_basis_size() == max_basis_size 
+                - if (get_initial_basis_size() < max_basis_size) then
+                    - #get_initial_basis_size() == max_basis_size
+        !*/
+
+        unsigned long get_initial_basis_size (
+        ) const;
+        /*!
+            ensures
+                - If the user does not supply a basis via set_basis() then this object
+                  will generate one automatically.  It does this by starting with
+                  a small basis of size N and repeatedly adds basis vectors to it
+                  until a stopping condition is reached.  This function returns that
+                  initial size N.
+        !*/
+
+        void set_initial_basis_size (
+            unsigned long initial_basis_size
+        );
+        /*!
+            requires
+                - initial_basis_size > 0
+            ensures
+                - #get_initial_basis_size() == initial_basis_size
+                - if (initial_basis_size > get_max_basis_size()) then
+                    - #get_max_basis_size() == initial_basis_size
+        !*/
+
+        unsigned long get_basis_size_increment (
+        ) const;
+        /*!
+            ensures
+                - If the user does not supply a basis via set_basis() then this object
+                  will generate one automatically.  It does this by starting with a small 
+                  basis and repeatedly adds sets of N basis vectors to it until a stopping 
+                  condition is reached.  This function returns that increment size N.
+        !*/
+
+        void set_basis_size_increment (
+            unsigned long basis_size_increment
+        );
+        /*!
+            requires
+                - basis_size_increment > 0
+            ensures
+                - #get_basis_size_increment() == basis_size_increment
         !*/
 
         void set_c (
@@ -230,7 +304,6 @@ namespace dlib
         ) const;
         /*!
             requires
-                - basis_loaded() == true
                 - is_binary_classification_problem(x,y) == true
                 - x == a matrix or something convertible to a matrix via vector_to_matrix().
                   Also, x should contain sample_type objects.
@@ -239,6 +312,11 @@ namespace dlib
             ensures
                 - trains a C support vector classifier given the training samples in x and 
                   labels in y.  
+                - if (basis_loaded()) then
+                    - training will be carried out in the span of the user supplied basis vectors
+                - else
+                    - this object will attempt to automatically select an appropriate basis
+
                 - returns a decision function F with the following properties:
                     - if (new_x is a sample predicted have +1 label) then
                         - F(new_x) >= 0
@@ -257,7 +335,6 @@ namespace dlib
         ) const;
         /*!
             requires
-                - basis_loaded() == true
                 - is_binary_classification_problem(x,y) == true
                 - x == a matrix or something convertible to a matrix via vector_to_matrix().
                   Also, x should contain sample_type objects.
@@ -266,6 +343,11 @@ namespace dlib
             ensures
                 - trains a C support vector classifier given the training samples in x and 
                   labels in y.  
+                - if (basis_loaded()) then
+                    - training will be carried out in the span of the user supplied basis vectors
+                - else
+                    - this object will attempt to automatically select an appropriate basis
+
                 - #svm_objective == the final value of the SVM objective function
                 - returns a decision function F with the following properties:
                     - if (new_x is a sample predicted have +1 label) then
