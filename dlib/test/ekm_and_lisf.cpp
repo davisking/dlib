@@ -95,6 +95,7 @@ namespace
 
                 empirical_kernel_map<kernel_type> ekm;
                 ekm.load(lisf);
+                DLIB_TEST(ekm.basis_size() == lisf.dictionary_size());
 
                 std::vector<sample_type> proj_samples;
                 for (unsigned long i = 0; i < samples.size(); ++i)

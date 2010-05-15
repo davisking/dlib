@@ -60,6 +60,7 @@ namespace
 
 
                 ekm.load(kern, samples);
+                DLIB_TEST(ekm.basis_size() == samples.size());
 
                 double err;
 
@@ -154,6 +155,10 @@ namespace
                 samples.front()(0) += 0.001;
 
                 ekm2.load(kern, samples);
+                DLIB_TEST(ekm2.basis_size() == samples.size());
+                for (unsigned long i = 0; i < samples.size(); ++i)
+                    DLIB_TEST(dlib::equal(ekm2[i] , samples[i]));
+
                 // test serialization
                 ostringstream sout;
                 serialize(ekm2, sout);
@@ -279,7 +284,11 @@ namespace
                 samples2.front()(0) += 0.001;
 
                 ekm.load(kern, samples1);
+                for (unsigned long i = 0; i < samples1.size(); ++i)
+                    DLIB_TEST(dlib::equal(ekm[i] , samples1[i]));
+                DLIB_TEST(ekm.basis_size() == samples1.size());
                 ekm2.load(kern, samples2);
+                DLIB_TEST(ekm2.basis_size() == samples2.size());
                  
                 dlog << LTRACE << "ekm.out_vector_size(): " << ekm.out_vector_size();
                 dlog << LTRACE << "ekm2.out_vector_size(): " << ekm2.out_vector_size();
