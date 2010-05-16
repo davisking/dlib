@@ -199,6 +199,55 @@ namespace dlib
             return target.weights * kernel_matrix(target.get_kernel(),target.basis, basis)*trans(weights);
         }
 
+        void get_transformation_to (
+            const empirical_kernel_map& target,
+            matrix<scalar_type, 0, 0, mem_manager_type>& tmat,
+            projection_function<kernel_type>& partial_projection
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(out_vector_size() != 0 && 
+                        target.out_vector_size() != 0 &&
+                        get_kernel() == target.get_kernel() &&
+                        basis_size() < target.basis_size(),
+                "\t void empirical_kernel_map::get_transformation_to(target, tmat, partial_projection)"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t out_vector_size():                 " << out_vector_size() 
+                << "\n\t target.out_vector_size():          " << target.out_vector_size() 
+                << "\n\t basis_size():                      " << basis_size() 
+                << "\n\t target.basis_size():               " << target.basis_size() 
+                << "\n\t get_kernel()==target.get_kernel(): " << (get_kernel()==target.get_kernel())
+                << "\n\t this: " << this
+                );
+
+#ifdef ENABLE_ASSERTS
+            for (unsigned long i = 0; i < basis_size(); ++i)
+            {
+                DLIB_ASSERT(dlib::equal((*this)[i], target[i]), 
+                    "\t const matrix empirical_kernel_map::get_transformation_to(target, tmat, partial_projection)"
+                    << "\n\t target must contain a superset of the basis vectors in *this"
+                    << "\n\t i: " << i
+                    << "\n\t this: " << this
+                    );
+            }
+#endif
+
+            const unsigned long num1 = basis.size();
+            const unsigned long num2 = target.basis.size();
+
+            tmat = colm(target.weights, range(0,num1-1))*kernel_matrix(kernel, basis)*trans(weights);
+
+            empirical_kernel_map temp_ekm;
+            temp_ekm.load(kernel, rowm(vector_to_matrix(target.basis), range(num1,num2-1)));
+
+            partial_projection = temp_ekm.get_projection_function();
+
+            partial_projection.weights = colm(target.weights,range(num1,num2-1))*
+                                   kernel_matrix(kernel, temp_ekm.basis)*
+                                   trans(temp_ekm.weights)*
+                                   partial_projection.weights;
+        }
+
         const matrix<scalar_type,0,1,mem_manager_type>& project (
             const sample_type& samp
         ) const

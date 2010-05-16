@@ -197,7 +197,7 @@ namespace dlib
         /*!
             ensures
                 - returns the number of basis vectors in projection_functions created
-                  by this obect.  This is also equal to the number of basis vectors
+                  by this object.  This is also equal to the number of basis vectors
                   given to the load() function.
         !*/
 
@@ -330,7 +330,7 @@ namespace dlib
                 - A point in the kernel feature space defined by the kernel get_kernel() typically
                   has different representations with respect to different empirical_kernel_maps.
                   This function lets you obtain a transformation matrix that will allow you
-                  to map between these different representations. That is, this function returns 
+                  to project between these different representations. That is, this function returns 
                   a matrix M with the following properties:    
                     - M maps vectors represented according to *this into the representation used by target. 
                     - M.nr() == target.out_vector_size()
@@ -347,6 +347,35 @@ namespace dlib
                       equality is approximate.  However, if it is in their span then the equality will
                       be exact.  For example, if target's basis samples are a superset of the basis samples
                       used by *this then the equality will always be exact (within rounding error).
+        !*/
+
+        void get_transformation_to (
+            const empirical_kernel_map& target,
+            matrix<scalar_type, 0, 0, mem_manager_type>& tmat,
+            projection_function<kernel_type>& partial_projection
+        ) const;
+        /*!
+            requires
+                - get_kernel() == target.get_kernel()
+                - out_vector_size() != 0
+                - target.out_vector_size() != 0
+                - basis_size() < target.basis_size()
+                - for all i < basis_size(): (*this)[i] == target[i]
+                  i.e. target must contain a superset of the basis vectors contained in *this.  Moreover,
+                  it must contain them in the same order.
+            ensures
+                - The single argument version of get_transformation_to() allows you to project 
+                  vectors from one empirical_kernel_map representation to another.  This version
+                  provides a somewhat different capability.  Assuming target's basis vectors form a
+                  superset of *this's basis vectors then this form of get_transformation_to() allows
+                  you to reuse a vector from *this ekm to speed up the projection performed by target.
+                  The defining relation is given below.
+                - for any sample S: 
+                    - target.project(S) == #tmat * this->project(S) + #partial_projection(S)
+                      (this is always true to within rounding error for any S)
+                - #partial_projection.basis_vectors.size() == target.basis_vectors.size() - this->basis_vectors.size()
+                - #tmat.nr() == target.out_vector_size()
+                - #tmat.nc() == this->out_vector_size()
         !*/
 
         void swap (
