@@ -193,6 +193,9 @@ void test_manifold_regularization (
     // Now create the manifold regularizer.  The result is a transformation matrix that
     // embodies the manifold assumption discussed above.  
     linear_manifold_regularizer<sample_type> lmr;
+    // use_gaussian_weights is a function object that tells lmr how to weight each edge.  In this
+    // case we let the weight decay as edges get longer.  So shorter edges are more important than
+    // longer edges.
     lmr.build(samples, edges, use_gaussian_weights(0.1));
     const matrix<double> T = lmr.get_transformation_matrix(intrinsic_regularization_strength);
 
@@ -203,7 +206,7 @@ void test_manifold_regularization (
 
 
     // For convenience, generate a projection_function and merge the transformation
-    // matrix T into it.  So proj(x) == T*ekm.project(x).
+    // matrix T into it.  That is, we will have: proj(x) == T*ekm.project(x).
     projection_function<kernel_type> proj = ekm.get_projection_function();
     proj.weights = T*proj.weights;
 
