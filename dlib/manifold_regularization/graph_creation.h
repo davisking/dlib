@@ -151,13 +151,16 @@ namespace dlib
         // within the inner for loop we have:
         //   [begin_i, end_i) == the range in edges that contains neighbors of samples[i]
         //   [begin_j, end_j) == the range in edges that contains neighbors of samples[j]
-        for (unsigned long i = 0; i < samples.size(); ++i)
+        for (unsigned long i = 0; i+1 < samples.size(); ++i)
         {
-            begin_j = begin_i + k;
-            end_j = begin_j + k;
+            begin_j = begin_i;
+            end_j = end_i;
 
             for (unsigned long j = i+1; j < samples.size(); ++j)
             {
+                begin_j += k;
+                end_j += k;
+
                 const float dist = dist_funct(samples[i], samples[j]);
 
                 if (dist < worst_dists[i])
@@ -171,9 +174,6 @@ namespace dlib
                     *iterator_of_worst(begin_j, end_j) = sample_pair(i, j, dist);
                     worst_dists[j] = iterator_of_worst(begin_j, end_j)->distance();
                 }
-
-                begin_j += k;
-                end_j += k;
             }
 
             begin_i += k;

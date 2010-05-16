@@ -188,6 +188,54 @@ namespace
         }
 
 
+        void test_knn1()
+        {
+            std::vector<matrix<double,2,1> > samples;
+
+            matrix<double,2,1> test;
+            
+            test = 0,0;  samples.push_back(test);
+            test = 1,1;  samples.push_back(test);
+            test = 1,-1;  samples.push_back(test);
+            test = -1,1;  samples.push_back(test);
+            test = -1,-1;  samples.push_back(test);
+
+            std::vector<sample_pair> edges;
+            find_k_nearest_neighbors(samples, squared_euclidean_distance(), 1, edges);
+            DLIB_TEST(edges.size() == 4);
+
+            std::sort(edges.begin(), edges.end(), &order_by_index);
+
+            DLIB_TEST(edges[0] == sample_pair(0,1,0));
+            DLIB_TEST(edges[1] == sample_pair(0,2,0));
+            DLIB_TEST(edges[2] == sample_pair(0,3,0));
+            DLIB_TEST(edges[3] == sample_pair(0,4,0));
+
+        }
+
+        void test_knn2()
+        {
+            std::vector<matrix<double,2,1> > samples;
+
+            matrix<double,2,1> test;
+            
+            test = 1,1;  samples.push_back(test);
+            test = 1,-1;  samples.push_back(test);
+            test = -1,1;  samples.push_back(test);
+            test = -1,-1;  samples.push_back(test);
+
+            std::vector<sample_pair> edges;
+            find_k_nearest_neighbors(samples, squared_euclidean_distance(), 2, edges);
+            DLIB_TEST(edges.size() == 4);
+
+            std::sort(edges.begin(), edges.end(), &order_by_index);
+
+            DLIB_TEST(edges[0] == sample_pair(0,1,0));
+            DLIB_TEST(edges[1] == sample_pair(0,2,0));
+            DLIB_TEST(edges[2] == sample_pair(1,3,0));
+            DLIB_TEST(edges[3] == sample_pair(2,3,0));
+
+        }
 
         void perform_test (
         )
@@ -195,7 +243,10 @@ namespace
             for (int i = 0; i < 5; ++i)
             {
                 do_the_test();
+
             }
+            test_knn1();
+            test_knn2();
 
         }
     };
