@@ -46,7 +46,7 @@ namespace dlib
                 - #get_epsilon() == 0.001
                 - #basis_loaded() == false
                 - #get_initial_basis_size() == 5
-                - #get_basis_size_increment() == 5
+                - #get_basis_size_increment() == 10 
                 - #get_max_basis_size() == 300
                 - this object will not be verbose unless be_verbose() is called
         !*/
@@ -66,7 +66,7 @@ namespace dlib
                 - #get_epsilon() == 0.001
                 - #basis_loaded() == false
                 - #get_initial_basis_size() == 5
-                - #get_basis_size_increment() == 5
+                - #get_basis_size_increment() == 10
                 - #get_max_basis_size() == 300
                 - this object will not be verbose unless be_verbose() is called
         !*/
@@ -192,7 +192,7 @@ namespace dlib
                 - max_basis_size > 0
             ensures
                 - #get_max_basis_size() == max_basis_size 
-                - if (get_initial_basis_size() < max_basis_size) then
+                - if (get_initial_basis_size() > max_basis_size) then
                     - #get_initial_basis_size() == max_basis_size
         !*/
 

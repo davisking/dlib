@@ -35,7 +35,7 @@ namespace dlib
             ekm_stale = true;
 
             initial_basis_size = 5;
-            basis_size_increment = 5;
+            basis_size_increment = 10;
             max_basis_size = 300;
         }
 
@@ -57,7 +57,7 @@ namespace dlib
             ekm_stale = true;
 
             initial_basis_size = 5;
-            basis_size_increment = 5;
+            basis_size_increment = 10;
             max_basis_size = 300;
         }
 
@@ -181,6 +181,8 @@ namespace dlib
                 );
 
             max_basis_size = max_basis_size_;
+            if (initial_basis_size > max_basis_size)
+                initial_basis_size = max_basis_size;
         }
 
         unsigned long get_initial_basis_size (
@@ -202,6 +204,9 @@ namespace dlib
                 );
 
             initial_basis_size = initial_basis_size_;
+
+            if (initial_basis_size > max_basis_size)
+                max_basis_size = initial_basis_size;
         }
 
         unsigned long get_basis_size_increment (
