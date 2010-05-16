@@ -39,6 +39,173 @@ namespace
         time_t thetime;
         dlib::rand::float_1a rnd;
 
+        template <typename T>
+        void validate (
+            const T& ekm_small,
+            const T& ekm_big
+        )
+        {
+            matrix<double> tmat;
+            projection_function<typename T::kernel_type> proj;
+
+            ekm_small.get_transformation_to(ekm_big, tmat, proj);
+            DLIB_TEST(tmat.nr() == ekm_big.out_vector_size());
+            DLIB_TEST(tmat.nc() == ekm_small.out_vector_size());
+            DLIB_TEST((unsigned long)proj.basis_vectors.size() == ekm_big.basis_size() - ekm_small.basis_size());
+            for (unsigned long i = 0; i < 6; ++i)
+            {
+                const typename T::sample_type temp = randm(4,1,rnd);
+                DLIB_TEST(length(ekm_big.project(temp) - (tmat*ekm_small.project(temp) + proj(temp))) < 1e-10);
+            }
+        }
+
+
+        void test_transformation_stuff()
+        {
+            typedef matrix<double,0,1> sample_type;
+            typedef radial_basis_kernel<sample_type> kernel_type;
+            const kernel_type kern(1);
+
+
+            for (unsigned long n = 1; n < 6; ++n)
+            {
+                print_spinner();
+                for (unsigned long extra = 1; extra < 10; ++extra)
+                {
+                    std::vector<sample_type> samps_small, samps_big;
+                    linearly_independent_subset_finder<kernel_type> lisf_small(kern, 1000);
+                    linearly_independent_subset_finder<kernel_type> lisf_big(kern, 1000);
+                    for (unsigned long i = 0; i < n; ++i)
+                    {
+                        samps_small.push_back(randm(4,1,rnd));
+                        samps_big.push_back(samps_small.back());
+                        lisf_big.add(samps_small.back());
+                        lisf_small.add(samps_small.back());
+                    }
+                    for (unsigned long i = 0; i < extra; ++i)
+                    {
+                        samps_big.push_back(randm(4,1,rnd));
+                        lisf_big.add(samps_big.back());
+                    }
+
+
+                    // test no lisf
+                    {
+                        empirical_kernel_map<kernel_type> ekm_small, ekm_big;
+                        ekm_small.load(kern, samps_small);
+                        ekm_big.load(kern, samps_big);
+
+                        validate(ekm_small, ekm_big);
+                    }
+
+                    // test with lisf
+                    {
+                        empirical_kernel_map<kernel_type> ekm_small, ekm_big;
+                        ekm_small.load(lisf_small);
+                        ekm_big.load(lisf_big);
+
+                        validate(ekm_small, ekm_big);
+                    }
+
+                    // test with partly lisf
+                    {
+                        empirical_kernel_map<kernel_type> ekm_small, ekm_big;
+                        ekm_small.load(kern, samps_small);
+                        ekm_big.load(lisf_big);
+
+                        validate(ekm_small, ekm_big);
+                    }
+
+                    // test with partly lisf
+                    {
+                        empirical_kernel_map<kernel_type> ekm_small, ekm_big;
+                        ekm_small.load(lisf_small);
+                        ekm_big.load(kern, samps_big);
+
+                        validate(ekm_small, ekm_big);
+                    }
+
+                }
+            }
+
+
+            // test what happens if the bigger ekm only has repeated basis vectors
+            {
+                empirical_kernel_map<kernel_type> ekm_big, ekm_small;
+                std::vector<sample_type> samps_big, samps_small;
+
+                sample_type temp = randm(4,1,rnd);
+
+                samps_small.push_back(temp);
+                samps_big.push_back(temp);
+                samps_big.push_back(temp);
+
+                ekm_big.load(kern, samps_big);
+                ekm_small.load(kern, samps_small);
+
+                validate(ekm_small, ekm_big);
+
+            }
+            {
+                empirical_kernel_map<kernel_type> ekm_big, ekm_small;
+                linearly_independent_subset_finder<kernel_type> lisf_small(kern, 1000);
+                std::vector<sample_type> samps_big;
+
+                sample_type temp = randm(4,1,rnd);
+
+                lisf_small.add(temp);
+                samps_big.push_back(temp);
+                samps_big.push_back(temp);
+
+                ekm_big.load(kern, samps_big);
+                ekm_small.load(lisf_small);
+
+                validate(ekm_small, ekm_big);
+
+            }
+            {
+                empirical_kernel_map<kernel_type> ekm_big, ekm_small;
+                std::vector<sample_type> samps_big, samps_small;
+
+                sample_type temp = randm(4,1,rnd);
+                sample_type temp2 = randm(4,1,rnd);
+
+                samps_small.push_back(temp);
+                samps_small.push_back(temp2);
+                samps_big.push_back(temp);
+                samps_big.push_back(temp2);
+                samps_big.push_back(randm(4,1,rnd));
+
+                ekm_big.load(kern, samps_big);
+                ekm_small.load(kern, samps_small);
+
+                validate(ekm_small, ekm_big);
+
+            }
+            {
+                empirical_kernel_map<kernel_type> ekm_big, ekm_small;
+                linearly_independent_subset_finder<kernel_type> lisf_small(kern, 1000);
+                std::vector<sample_type> samps_big;
+
+                sample_type temp = randm(4,1,rnd);
+                sample_type temp2 = randm(4,1,rnd);
+
+                lisf_small.add(temp);
+                lisf_small.add(temp2);
+                samps_big.push_back(temp);
+                samps_big.push_back(temp2);
+                samps_big.push_back(temp);
+
+                ekm_big.load(kern, samps_big);
+                ekm_small.load(lisf_small);
+
+                validate(ekm_small, ekm_big);
+
+            }
+
+
+        }
+
 
 
         void perform_test (
@@ -110,6 +277,7 @@ namespace
             }
 
 
+            test_transformation_stuff();
 
         }
     };
