@@ -560,7 +560,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 In the above setting, all the training data consists of labeled samples.  
                 However, it would be nice to be able to benefit from unlabeled data.  
                 The idea of manifold regularization is to extract useful information from 
-                unlabeled data by defining which data samples are "close" to each other 
+                unlabeled data by first defining which data samples are "close" to each other 
                 (perhaps by using their 3 <a href="#find_k_nearest_neighbors">nearest neighbors</a>) 
                 and then adding a term to 
                 the loss function that penalizes any decision rule which produces 
