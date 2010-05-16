@@ -38,7 +38,7 @@ namespace dlib
                 In the above setting, all the training data consists of labeled samples.  
                 However, it would be nice to be able to benefit from unlabeled data.  
                 The idea of manifold regularization is to extract useful information from 
-                unlabeled data by defining which data samples are "close" to each other 
+                unlabeled data by first defining which data samples are "close" to each other 
                 (perhaps by using their 3 nearest neighbors) and then adding a term to 
                 the loss function that penalizes any decision rule which produces 
                 different outputs on data samples which we have designated as being close.
@@ -91,8 +91,8 @@ namespace dlib
             ensures
                 - #dimensionality() == samples[0].size()
                 - This function sets up the transformation matrix describe above.  The manifold
-                  regularization is done assuming that the following samples are meant to
-                  be "close" according to the graph defined by the given edges.  I.e:
+                  regularization is done assuming that the samples are meant to be "close" 
+                  according to the graph defined by the given edges.  I.e:
                     - for all valid i:  samples[edges[i].index1()] is close to samples[edges[i].index2()].
                       How much we care about these two samples having similar outputs according
                       to the learned rule is given by weight_funct(edges[i]).  Bigger weights mean
