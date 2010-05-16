@@ -214,10 +214,8 @@ void test_empirical_kernel_map (
 
     // Now lets do something more interesting.  The following loop finds the centroids
     // of the two classes of data.
-    sample_type class1_center(ekm.out_vector_size()); 
-    sample_type class2_center(ekm.out_vector_size()); 
-    class1_center = 0;
-    class2_center = 0;
+    sample_type class1_center; 
+    sample_type class2_center; 
     for (unsigned long i = 0; i < projected_samples.size(); ++i)
     {
         if (labels[i] == 1)
@@ -234,9 +232,8 @@ void test_empirical_kernel_map (
     // Now classify points by which center they are nearest.  Recall that the data
     // is made up of two concentric circles.  Normally you can't separate two concentric
     // circles by checking which points are nearest to each center since they have the same
-    // centers.  All the points would just associate to the smallest circle.  However,
-    // the kernel trick makes the data separable and the loop below will perfectly
-    // classify each data point.
+    // centers.  However, the kernel trick makes the data separable and the loop below will 
+    // perfectly classify each data point.
     for (unsigned long i = 0; i < projected_samples.size(); ++i)
     {
         double distance_to_class1 = length(projected_samples[i] - class1_center);
