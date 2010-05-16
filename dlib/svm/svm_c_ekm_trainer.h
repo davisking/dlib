@@ -296,17 +296,6 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const
         {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
-                "\t decision_function svm_c_ekm_trainer::train(x,y)"
-                << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t y.nr(): " << y.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t y.nc(): " << y.nc() 
-                << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
-                );
-
             scalar_type obj;
             if (basis_loaded())
                 return do_train_user_basis(vector_to_matrix(x),vector_to_matrix(y),obj);
@@ -324,17 +313,6 @@ namespace dlib
             scalar_type& svm_objective
         ) const
         {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
-                "\t decision_function svm_c_ekm_trainer::train(x,y)"
-                << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t y.nr(): " << y.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t y.nc(): " << y.nc() 
-                << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
-                );
-
             if (basis_loaded())
                 return do_train_user_basis(vector_to_matrix(x),vector_to_matrix(y),svm_objective);
             else
@@ -360,6 +338,17 @@ namespace dlib
                 - trains an SVM with the user supplied basis
         !*/
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
+                "\t decision_function svm_c_ekm_trainer::train(x,y)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t x.nr(): " << x.nr() 
+                << "\n\t y.nr(): " << y.nr() 
+                << "\n\t x.nc(): " << x.nc() 
+                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
+                );
+
             if (ekm_stale)
             {
                 ekm.load(kern, basis);
@@ -415,6 +404,17 @@ namespace dlib
             scalar_type& svm_objective
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
+                "\t decision_function svm_c_ekm_trainer::train(x,y)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t x.nr(): " << x.nr() 
+                << "\n\t y.nr(): " << y.nr() 
+                << "\n\t x.nc(): " << x.nc() 
+                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
+                );
+
 
             std::vector<matrix<scalar_type,0,1, mem_manager_type> > proj_samples(x.size());
             decision_function<linear_kernel<matrix<scalar_type,0,1, mem_manager_type> > > df;
@@ -492,7 +492,7 @@ namespace dlib
                     break;
 
                 prev_svm_objective = svm_objective;
-                std::vector<sample_type> new_basis_elements;
+                std::vector<matrix<scalar_type,0,1, mem_manager_type> > new_basis_elements;
 
                 // now add more elements to the basis
                 unsigned long count = 0;
@@ -534,7 +534,7 @@ namespace dlib
                 prev_ekm.get_transformation_to(ekm, prev_to_new, proj_part);
 
                 
-                sample_type temp;
+                matrix<scalar_type,0,1, mem_manager_type> temp;
                 for (long i = 0; i < x.size(); ++i)
                 {
                     // assign to temporary to avoid memory allocation that would result if we
