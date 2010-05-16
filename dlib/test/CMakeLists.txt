@@ -44,6 +44,7 @@ set (tests
    image.cpp
    kcentroid.cpp
    kernel_matrix.cpp
+   linear_manifold_regularizer.cpp
    lz77_buffer.cpp
    map.cpp
    matrix2.cpp

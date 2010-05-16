@@ -54,6 +54,7 @@ SRC += hash_table.cpp
 SRC += image.cpp
 SRC += kcentroid.cpp
 SRC += kernel_matrix.cpp
+SRC += linear_manifold_regularizer.cpp
 SRC += lz77_buffer.cpp
 SRC += map.cpp
 SRC += matrix2.cpp
