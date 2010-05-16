@@ -136,6 +136,14 @@ namespace dlib
                 for (unsigned long i = 0; i < edges.size(); ++i)
                 {
                     const float weight = weight_funct(edges[i]);
+
+                    // make sure requires clause is not broken
+                    DLIB_ASSERT(weight >= 0,
+                        "\t void linear_manifold_regularizer::build()"
+                        << "\n\t You supplied a weight_funct() that generated a negative weight."
+                        << "\n\t weight: " << weight 
+                        );
+
                     *mutable_blocks[edges[i].index1()]++ = neighbor(edges[i].index2(), weight);
                     *mutable_blocks[edges[i].index2()]++ = neighbor(edges[i].index1(), weight);
                 }
@@ -192,6 +200,19 @@ namespace dlib
             const weight_function_type& weight_funct
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(edges.size() > 0 &&
+                        contains_duplicate_pairs(edges) == false &&
+                        max_index_value_plus_one(edges) <= samples.size(),
+                "\t void linear_manifold_regularizer::build()"
+                << "\n\t Invalid inputs were given to this function."
+                << "\n\t edges.size():                    " << edges.size()
+                << "\n\t samples.size():                  " << samples.size()
+                << "\n\t contains_duplicate_pairs(edges): " << contains_duplicate_pairs(edges) 
+                << "\n\t max_index_value_plus_one(edges): " << max_index_value_plus_one(edges) 
+                );
+
+
             impl::undirected_adjacency_list graph;
             graph.build(edges, weight_funct);
 
@@ -207,6 +228,13 @@ namespace dlib
             scalar_type intrinsic_regularization_strength
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(intrinsic_regularization_strength >= 0,
+                "\t matrix linear_manifold_regularizer::get_transformation_matrix()"
+                << "\n\t This value must not be negative"
+                << "\n\t intrinsic_regularization_strength: " << intrinsic_regularization_strength 
+                );
+
             if (dimensionality() == 0)
                 return general_matrix();
 

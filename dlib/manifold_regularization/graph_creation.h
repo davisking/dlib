@@ -62,6 +62,18 @@ namespace dlib
         std::vector<sample_pair, alloc>& out
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(samples.size() > 1 &&
+                    0 < percent && percent <= 1 &&
+                    num > 0,
+            "\t void find_percent_shortest_edges_randomly()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t samples.size(): " << samples.size()
+            << "\n\t percent:        " << percent 
+            << "\n\t num:            " << num 
+            );
+
+
         std::vector<sample_pair, alloc> edges;
         edges.reserve(num);
 
@@ -116,6 +128,14 @@ namespace dlib
         std::vector<sample_pair, alloc>& out
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(samples.size() > k && k > 0,
+            "\t void find_k_nearest_neighbors()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t samples.size(): " << samples.size()
+            << "\n\t k:              " << k 
+            );
+
         using namespace impl;
         std::vector<sample_pair> edges;
 

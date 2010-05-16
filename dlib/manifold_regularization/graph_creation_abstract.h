@@ -33,7 +33,7 @@ namespace dlib
             - num > 0
             - random_seed must be convertible to a string by dlib::cast_to_string()
             - dist_funct(samples[i], samples[j]) must be a valid expression that evaluates
-              to a floating point number >= 0
+              to a floating point number 
         ensures
             - This function randomly samples the space of pairs of integers between
               0 and samples.size()-1 inclusive.  For each of these pairs, (i,j), a
@@ -68,7 +68,7 @@ namespace dlib
             - samples.size() > k
             - k > 0
             - dist_funct(samples[i], samples[j]) must be a valid expression that evaluates
-              to a floating point number >= 0
+              to a floating point number 
         ensures
             - #out == a set of sample_pair objects that represent all the k nearest
               neighbors in samples according to the given distance function dist_funct.
