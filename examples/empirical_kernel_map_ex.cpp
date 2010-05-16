@@ -141,7 +141,7 @@ int main()
 
     // create a new dataset with two concentric circles.  There will be 1000 points on each circle.
     generate_concentric_circles(samples, labels, 1000);
-    // Rather than using all 2000 samples as basis samples we are going to use the 
+    // Rather than use all 2000 samples as basis samples we are going to use the 
     // linearly_independent_subset_finder to pick out 20 good basis samples.  The idea behind this 
     // object is to try and find the 20 samples that best span the subspace which contains all the 
     // data.  
