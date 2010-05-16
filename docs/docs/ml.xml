@@ -838,12 +838,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 This object represents a tool for training the C formulation of 
                 a support vector machine.   It is implemented using the <a href="#empirical_kernel_map">empirical_kernel_map</a>
                 to kernelize the <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a>.  This makes it a very fast algorithm
-                but means the user must supply a set of basis vectors.  
+                capable of learning from very large datasets.
 
-               <p>
-                For details about the "basis vectors" see the empirical_kernel_map 
-                documentation.  In particular, see it's <a href="empirical_kernel_map_ex.cpp.html">example program</a>.
-               </p>
          </description>
                                  
       </component>
