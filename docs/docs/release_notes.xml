@@ -12,17 +12,26 @@
 
 <current>
 New Stuff:
-   - Added the svm_c_ekm_trainer 
+   - Added the svm_c_ekm_trainer.  It is a kernelized version of the fast
+     linear trainer svm_c_linear_trainer.
+   - Added the linear_manifold_regularizer and some supporting tools.
    - Added the sum_rows(), sum_cols(), join_rows(), join_cols(), reshape(), 
      and pointer_to_matrix() functions.
-   - Added the linear_manifold_regularizer and some supporting tools.
    - Added the randomly_subsample() function.
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed some minor compile time bugs on certain older compilers.
 
 Other:
+   - Updated the += and -= matrix operators to be a little more flexible.  Now
+     if you try to apply them to a matrix of the wrong size it will automatically
+     resize the target matrix and just do a normal assignment.
+   - Removed the requirement that you load dng files into an image of the exact
+     pixel type that created the file.  Now you can use any pixel type.  I also
+     changed the code so that grayscale pixels with more than 16 bits get saved as
+     16 bit grayscale images instead of 8 bit images.
 
 </current>
 
