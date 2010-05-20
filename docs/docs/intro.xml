@@ -219,7 +219,7 @@
            When you use these components you have to identify them with names like <tt>dlib::component::kernel_1a</tt>.
            Often these components will have just a debugging and non-debugging implementation.  However, many components
            provide a large number of alternate implementations.  For example, the <a href="compression.html#entropy_encoder_model">entropy_encoder_model</a>
-           has 32 different implementations you can chose from.  
+           has 32 different implementations you can choose from.  
         </p>
 
         <ul>
