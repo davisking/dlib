@@ -343,7 +343,8 @@ namespace dlib
                 // Make a kcentroid and find out what the gap is at the current gamma.  Try to pick a reasonable
                 // tolerance.
                 const double tolerance = std::min(gamma*0.01, 0.01);
-                kcentroid<kernel_type> kc(kernel_type(gamma), tolerance, num_sv);
+                const kernel_type kern(gamma);
+                kcentroid<kernel_type> kc(kern, tolerance, num_sv);
                 scalar_type temp = centroid_gap(kc, samples, labels);
 
                 if (verbose)
