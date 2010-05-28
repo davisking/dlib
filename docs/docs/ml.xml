@@ -542,10 +542,10 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/manifold_regularization/linear_manifold_regularizer_abstract.h</spec_file>
          <description>
             <p>
-                Many learning algorithms attempt to minimize a loss function that,
-                at a high level, looks like this:   
+                Many learning algorithms attempt to minimize a function that, at a high 
+                level, looks like this:   
 <pre>
-   loss(w) == complexity + training_set_error
+   f(w) == complexity + training_set_error
 </pre>
             </p>
 
@@ -563,13 +563,13 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 unlabeled data by first defining which data samples are "close" to each other 
                 (perhaps by using their 3 <a href="#find_k_nearest_neighbors">nearest neighbors</a>) 
                 and then adding a term to 
-                the loss function that penalizes any decision rule which produces 
+                the above function that penalizes any decision rule which produces 
                 different outputs on data samples which we have designated as being close.
                </p>
                 
                 <p>
-                It turns out that it is possible to transform these manifold regularized loss
-                functions into the normal form shown above by applying a certain kind of 
+                It turns out that it is possible to transform these manifold regularized learning
+                problems into the normal form shown above by applying a certain kind of 
                 preprocessing to all our data samples.  Once this is done we can use a 
                 normal learning algorithm, such as the <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a>, 
                 on just the
