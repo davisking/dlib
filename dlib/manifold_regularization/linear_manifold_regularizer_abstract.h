@@ -26,9 +26,9 @@ namespace dlib
                 - dimensionality() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                Many learning algorithms attempt to minimize a loss function that,
-                at a high level, looks like this:   
-                    loss(w) == complexity + training_set_error
+                Many learning algorithms attempt to minimize a function that, at a high 
+                level, looks like this:   
+                    f(w) == complexity + training_set_error
 
                 The idea is to find the set of parameters, w, that gives low error on 
                 your training data but also is not "complex" according to some particular
@@ -40,12 +40,12 @@ namespace dlib
                 The idea of manifold regularization is to extract useful information from 
                 unlabeled data by first defining which data samples are "close" to each other 
                 (perhaps by using their 3 nearest neighbors) and then adding a term to 
-                the loss function that penalizes any decision rule which produces 
+                the above function that penalizes any decision rule which produces 
                 different outputs on data samples which we have designated as being close.
                 
-                It turns out that it is possible to transform these manifold regularized loss
-                functions into the normal form shown above by applying a certain kind of 
-                preprocessing to all our data samples.  Once this is done we can use a 
+                It turns out that it is possible to transform these manifold regularized 
+                learning problems into the normal form shown above by applying a certain kind 
+                of preprocessing to all our data samples.  Once this is done we can use a 
                 normal learning algorithm, such as the svm_c_linear_trainer, on just the
                 labeled data samples and obtain the same output as the manifold regularized
                 learner would have produced.  
