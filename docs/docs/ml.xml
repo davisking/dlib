@@ -132,6 +132,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
 
       <section>
          <name>Miscellaneous</name>
+         <item>simplify_linear_decision_function</item> 
          <item>vector_normalizer</item> 
          <item>vector_normalizer_pca</item> 
          <item>discriminant_pca</item> 
@@ -1076,6 +1077,18 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>simplify_linear_decision_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/simplify_linear_decision_function_abstract.h</spec_file>
+         <description>
+            This is a set of functions that takes various forms of linear <a href="#decision_function">decision functions</a>
+            and collapses them down so that they only compute a single dot product when invoked. 
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
       <component>
          <name>randomize_samples</name>
          <file>dlib/svm.h</file>

@@ -144,6 +144,7 @@
          <term file="ml.html" name="verbose_batch_cached"/>
          <term file="ml.html" name="batch_trainer"/>
          <term file="ml.html" name="randomize_samples"/>
+         <term file="ml.html" name="simplify_linear_decision_function"/>
          <term file="ml.html" name="is_binary_classification_problem"/>
          <term file="ml.html" name="svm_nu_trainer"/>
          <term file="ml.html" name="svm_c_linear_trainer"/>
