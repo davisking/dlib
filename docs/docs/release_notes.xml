@@ -12,6 +12,20 @@
 
 <current>
 New Stuff:
+   - Added the simplify_linear_decision_function() routines.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.27" date="May 16, 2010">
+New Stuff:
    - Added the svm_c_ekm_trainer.  It is a kernelized version of the fast
      linear trainer svm_c_linear_trainer.
    - Added the linear_manifold_regularizer and some supporting tools.
@@ -33,7 +47,7 @@ Other:
      changed the code so that grayscale pixels with more than 16 bits get saved as
      16 bit grayscale images instead of 8 bit images.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
