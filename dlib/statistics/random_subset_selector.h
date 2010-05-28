@@ -269,6 +269,43 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    random_subset_selector<T> randomly_subsample (
+        const random_subset_selector<T>& samples,
+        unsigned long num
+    )
+    {
+        random_subset_selector<T> subset;
+        subset.set_max_size(num);
+        for (unsigned long i = 0; i < samples.size(); ++i)
+            subset.add(samples[i]);
+        return subset;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U
+        >
+    random_subset_selector<T> randomly_subsample (
+        const random_subset_selector<T>& samples,
+        unsigned long num,
+        const U& random_seed
+    )
+    {
+        random_subset_selector<T> subset;
+        subset.set_seed(cast_to_string(random_seed));
+        subset.set_max_size(num);
+        for (unsigned long i = 0; i < samples.size(); ++i)
+            subset.add(samples[i]);
+        return subset;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RANDOM_SUBSeT_SELECTOR_H_

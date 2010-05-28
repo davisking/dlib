@@ -285,6 +285,49 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    random_subset_selector<T> randomly_subsample (
+        const random_subset_selector<T>& samples,
+        unsigned long num
+    );
+    /*!
+        ensures
+            - returns a random subset R such that:
+                - R contains a random subset of the given samples
+                - R.size() == min(num, samples.size())
+                - R.max_size() == num
+            - The random number generator used by this function will always be
+              initialized in the same way.  I.e. this function will always pick
+              the same random subsample if called multiple times.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U
+        >
+    random_subset_selector<T> randomly_subsample (
+        const random_subset_selector<T>& samples,
+        unsigned long num,
+        const U& random_seed
+    );
+    /*!
+        requires
+            - random_seed must be convertible to a string by dlib::cast_to_string()
+        ensures
+            - returns a random subset R such that:
+                - R contains a random subset of the given samples
+                - R.size() == min(num, samples.size())
+                - R.max_size() == num
+            - The given random_seed will be used to initialize the random number
+              generator used by this function.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RANDOM_SUBSeT_SELECTOR_ABSTRACT_H_
