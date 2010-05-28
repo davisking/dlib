@@ -46,13 +46,17 @@ namespace dlib
                 typename matrix_type
                 >
             void operator()(
-                const job<trainer_type>& j,
+                job<trainer_type>& j,
                 matrix_type& result
             )
             {
                 try
                 {
                     result = test_binary_decision_function(j.trainer.train(j.x_train, j.y_train), j.x_test, j.y_test);
+
+                    // Do this just to make j release it's memory since people might run threaded cross validation
+                    // on very large datasets.  Every bit of freed memory helps out.
+                    j = job<trainer_type>();
                 }
                 catch (invalid_svm_nu_error&)
                 {
