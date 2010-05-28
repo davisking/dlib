@@ -21,6 +21,7 @@
 #include "svm/empirical_kernel_map.h"
 #include "svm/svm_c_linear_trainer.h"
 #include "svm/svm_c_ekm_trainer.h"
+#include "svm/simplify_linear_decision_function.h"
 
 #endif // DLIB_SVm_HEADER
 
