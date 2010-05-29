@@ -55,6 +55,47 @@ namespace dlib
     template <
         typename vector_type,
         typename distance_function_type,
+        typename alloc,
+        typename T
+        >
+    void find_approximate_k_nearest_neighbors (
+        const vector_type& samples,
+        const distance_function_type& dist_funct,
+        const unsigned long k,
+        const unsigned long num,
+        const T& random_seed,
+        std::vector<sample_pair, alloc>& out
+    );
+    /*!
+        requires
+            - samples.size() > 1
+            - k > 0
+            - num > 0
+            - random_seed must be convertible to a string by dlib::cast_to_string()
+            - dist_funct(samples[i], samples[j]) must be a valid expression that evaluates
+              to a floating point number 
+        ensures
+            - This function computes an approximate form of k nearest neighbors. As num grows 
+              larger the output of this function converges to the output of the 
+              find_k_nearest_neighbors() function defined below.
+            - Specifically, this function randomly samples the space of pairs of integers between
+              0 and samples.size()-1 inclusive.  For each of these pairs, (i,j), a
+              sample_pair is created as follows:    
+                sample_pair(i, j, dist_funct(samples[i], samples[j]))
+              num such sample_pair objects are generated and then exact k-nearest-neighbors
+              is performed amongst these sample_pairs and the results are stored into #out.
+            - contains_duplicate_pairs(#out) == false
+            - for all valid i:
+                - #out[i].distance() == dist_funct(samples[#out[i].index1()], samples[#out[i].index2()])
+            - random_seed is used to seed the random number generator used by this 
+              function.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename vector_type,
+        typename distance_function_type,
         typename alloc
         >
     void find_k_nearest_neighbors (

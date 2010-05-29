@@ -116,6 +116,155 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl2
+    {
+        struct helper
+        {
+            /*
+                This is like the sample_pair but lets the edges be directional
+            */
+
+            helper(
+                unsigned long idx1,
+                unsigned long idx2,
+                float dist
+            ) : 
+                index1(idx1),
+                index2(idx2),
+                distance(dist) 
+            {}
+
+            unsigned long index1;
+            unsigned long index2;
+            float distance;
+        };
+
+        inline bool order_by_index (
+            const helper& a,
+            const helper& b
+        )
+        {
+            return a.index1 < b.index1 || (a.index1 == b.index1 && a.index2 < b.index2);
+        }
+
+        inline bool total_order_by_distance (
+            const helper& a,
+            const helper& b
+        )
+        {
+            return a.distance < b.distance || (a.distance == b.distance && order_by_index(a,b));
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename vector_type,
+        typename distance_function_type,
+        typename alloc,
+        typename T
+        >
+    void find_approximate_k_nearest_neighbors (
+        const vector_type& samples,
+        const distance_function_type& dist_funct,
+        const unsigned long k,
+        unsigned long num,
+        const T& random_seed,
+        std::vector<sample_pair, alloc>& out
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(samples.size() > 1 &&
+                    num > 0 && k > 0,
+            "\t void find_approximate_k_nearest_neighbors()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t samples.size(): " << samples.size()
+            << "\n\t k:              " << k  
+            << "\n\t num:            " << num 
+            );
+
+        // we add each edge twice in the following loop.  So multiply num by 2 to account for that.
+        num *= 2;
+
+        std::vector<impl2::helper> edges;
+        edges.reserve(num);
+        std::vector<sample_pair, alloc> temp;
+        temp.reserve(num);
+
+        dlib::rand::kernel_1a rnd;
+        rnd.set_seed(cast_to_string(random_seed));
+
+        // randomly sample a bunch of edges
+        while (edges.size() < num)
+        {
+            const unsigned long idx1 = rnd.get_random_32bit_number()%samples.size();
+            const unsigned long idx2 = rnd.get_random_32bit_number()%samples.size();
+            if (idx1 != idx2)
+            {
+                const float dist = dist_funct(samples[idx1], samples[idx2]);
+                edges.push_back(impl2::helper(idx1, idx2, dist));
+                edges.push_back(impl2::helper(idx2, idx1, dist));
+
+            }
+        }
+
+        std::sort(edges.begin(), edges.end(), &impl2::order_by_index);
+
+        std::vector<impl2::helper>::iterator beg, itr;
+        // now copy edges into temp when they aren't duplicates and also only move in the k shortest for
+        // each index.
+        itr = edges.begin();
+        while (itr != edges.end())
+        {
+            // first find the bounding range for all the edges connected to node itr->index1
+            beg = itr; 
+            while (itr != edges.end() && itr->index1 == beg->index1)
+                ++itr;
+
+            // If the node has more than k edges then sort them by distance so that
+            // we will end up with the k best.
+            if (static_cast<unsigned long>(itr - beg) > k)
+            {
+                std::sort(beg, itr, &impl2::total_order_by_distance);
+            }
+
+            // take the k best unique edges from the range [beg,itr)
+            temp.push_back(sample_pair(beg->index1, beg->index2, beg->distance));
+            unsigned long prev_index2 = beg->index2;
+            ++beg;
+            unsigned long count = 1;
+            for (; beg != itr && count < k; ++beg)
+            {
+                if (beg->index2 != prev_index2)
+                {
+                    temp.push_back(sample_pair(beg->index1, beg->index2, beg->distance));
+                    ++count;
+                }
+                prev_index2 = beg->index2;
+            }
+        }
+
+
+        // now sort temp so that we can avoid duplicates in the final loop below
+        std::sort(temp.begin(), temp.end(), &order_by_index);
+
+
+        // now put edges into out while avoiding duplicates
+        out.clear();
+        out.reserve(temp.size());
+        out.push_back(temp[0]);
+        for (unsigned long i = 1; i < temp.size(); ++i)
+        {
+            if (temp[i] != temp[i-1])
+            {
+                out.push_back(temp[i]);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename vector_type,
         typename distance_function_type,

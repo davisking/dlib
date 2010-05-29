@@ -34,9 +34,12 @@ namespace
                 0                     // the number of command line arguments for this test
             )
         {
+            seed = 1;
         }
 
         dlib::rand::float_1a rnd;
+
+        unsigned long seed;
 
         typedef matrix<double, 0, 1> sample_type;
         typedef radial_basis_kernel<sample_type> kernel_type;
@@ -213,6 +216,33 @@ namespace
 
         }
 
+        void test_knn1_approx()
+        {
+            std::vector<matrix<double,2,1> > samples;
+
+            matrix<double,2,1> test;
+            
+            test = 0,0;  samples.push_back(test);
+            test = 1,1;  samples.push_back(test);
+            test = 1,-1;  samples.push_back(test);
+            test = -1,1;  samples.push_back(test);
+            test = -1,-1;  samples.push_back(test);
+
+            std::vector<sample_pair> edges;
+            // For this simple graph and high number of samples we will do we should obtain the exact 
+            // knn solution.
+            find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(), 1, 10000, seed, edges);
+            DLIB_TEST(edges.size() == 4);
+
+            std::sort(edges.begin(), edges.end(), &order_by_index);
+
+            DLIB_TEST(edges[0] == sample_pair(0,1,0));
+            DLIB_TEST(edges[1] == sample_pair(0,2,0));
+            DLIB_TEST(edges[2] == sample_pair(0,3,0));
+            DLIB_TEST(edges[3] == sample_pair(0,4,0));
+
+        }
+
         void test_knn2()
         {
             std::vector<matrix<double,2,1> > samples;
@@ -237,6 +267,32 @@ namespace
 
         }
 
+        void test_knn2_approx()
+        {
+            std::vector<matrix<double,2,1> > samples;
+
+            matrix<double,2,1> test;
+            
+            test = 1,1;  samples.push_back(test);
+            test = 1,-1;  samples.push_back(test);
+            test = -1,1;  samples.push_back(test);
+            test = -1,-1;  samples.push_back(test);
+
+            std::vector<sample_pair> edges;
+            // For this simple graph and high number of samples we will do we should obtain the exact 
+            // knn solution.
+            find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(), 2, 10000, seed,  edges);
+            DLIB_TEST(edges.size() == 4);
+
+            std::sort(edges.begin(), edges.end(), &order_by_index);
+
+            DLIB_TEST(edges[0] == sample_pair(0,1,0));
+            DLIB_TEST(edges[1] == sample_pair(0,2,0));
+            DLIB_TEST(edges[2] == sample_pair(1,3,0));
+            DLIB_TEST(edges[3] == sample_pair(2,3,0));
+
+        }
+
         void perform_test (
         )
         {
@@ -244,6 +300,9 @@ namespace
             {
                 do_the_test();
 
+                ++seed;
+                test_knn1_approx();
+                test_knn2_approx();
             }
             test_knn1();
             test_knn2();
