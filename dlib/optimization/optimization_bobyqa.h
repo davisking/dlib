@@ -278,7 +278,7 @@ namespace dlib
             doublereal den = 0, one = 0, ten = 0, dsq = 0, rho = 0, sum = 0, two = 0, diff = 0, half = 0, beta = 0, gisq = 0;
             integer knew = 0;
             doublereal temp, suma, sumb, bsum, fopt;
-            integer kopt, nptm;
+            integer kopt = 0, nptm;
             doublereal zero, curv;
             integer ksav;
             doublereal gqsq = 0, dist = 0, sumw = 0, sumz = 0, diffa = 0, diffb = 0, diffc = 0, hdiag = 0;
