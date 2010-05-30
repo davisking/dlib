@@ -128,6 +128,10 @@
          <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_distance"/>
          <term file="ml.html" name="find_percent_shortest_edges_randomly"/>
          <term file="ml.html" name="find_k_nearest_neighbors"/>
+         <term file="ml.html" name="remove_short_edges"/>
+         <term file="ml.html" name="remove_long_edges"/>
+         <term file="ml.html" name="remove_percent_longest_edges"/>
+         <term file="ml.html" name="remove_percent_shortest_edges"/>
          <term file="ml.html" name="find_approximate_k_nearest_neighbors"/>
          <term file="dlib/manifold_regularization/graph_creation_abstract.h.html" name="contains_duplicate_pairs"/>
          <term file="dlib/manifold_regularization/graph_creation_abstract.h.html" name="max_index_value_plus_one"/>

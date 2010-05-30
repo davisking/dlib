@@ -159,6 +159,10 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                <item>find_percent_shortest_edges_randomly</item>
                <item>find_k_nearest_neighbors</item>
                <item>find_approximate_k_nearest_neighbors</item>
+               <item>remove_short_edges</item>
+               <item>remove_long_edges</item>
+               <item>remove_percent_longest_edges</item>
+               <item>remove_percent_shortest_edges</item>
                <item>squared_euclidean_distance</item>
                <item>use_weights_of_one</item>
                <item>use_gaussian_weights</item>
@@ -233,6 +237,58 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             the result as a vector of <a href="#sample_pair">sample_pair</a> objects.  It takes O(n^2) where
             n is the number of data samples.  A faster approximate version is provided by 
             <a href="#find_approximate_k_nearest_neighbors">find_approximate_k_nearest_neighbors</a>.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_short_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing edges with a small distance value from
+            a vector of <a href="#sample_pair">sample_pairs</a>.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_percent_shortest_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing edges with a small distance value from
+            a vector of <a href="#sample_pair">sample_pairs</a>.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_long_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing edges with a large distance value from
+            a vector of <a href="#sample_pair">sample_pairs</a>.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_percent_longest_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing edges with a large distance value from
+            a vector of <a href="#sample_pair">sample_pairs</a>.
          </description>
 
       </component>
