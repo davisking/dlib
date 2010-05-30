@@ -20,7 +20,7 @@ namespace dlib
             _index1(0),
             _index2(0)
         {
-            _distance = std::numeric_limits<float>::max();
+            _distance = std::numeric_limits<float>::infinity();
         }
 
         sample_pair (
