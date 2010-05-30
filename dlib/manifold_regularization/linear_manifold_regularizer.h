@@ -26,6 +26,7 @@ namespace dlib
             )
             {
                 _size = 0;
+                sum_edge_weights = 0;
             }
 
             struct neighbor 
@@ -132,10 +133,12 @@ namespace dlib
                     mutable_blocks[i+1] = mutable_blocks[i] + num_neighbors[i];
                 }
 
+                sum_edge_weights = 0;
                 // finally, put the edges into data
                 for (unsigned long i = 0; i < edges.size(); ++i)
                 {
                     const float weight = weight_funct(edges[i]);
+                    sum_edge_weights += weight;
 
                     // make sure requires clause is not broken
                     DLIB_ASSERT(weight >= 0,
@@ -150,6 +153,12 @@ namespace dlib
 
             }
 
+            double sum_of_edge_weights (
+            ) const
+            {
+                return sum_edge_weights;
+            }
+
         private:
 
             /*!
@@ -157,10 +166,12 @@ namespace dlib
                     - _size == 0
                     - data.size() == 0
                     - blocks.size() == 0
+                    - sum_edge_weights == 0
 
                 CONVENTION
                     - size() == _size
                     - blocks.size() == _size + 1
+                    - sum_of_edge_weights() == sum_edge_weights
                     - blocks == a vector of iterators that point into data.  
                       For all valid i:
                         - The iterator range [blocks[i], blocks[i+1]) contains all the edges
@@ -170,6 +181,8 @@ namespace dlib
             std::vector<neighbor> data;
             std::vector<const_iterator> blocks; 
             unsigned long _size;
+
+            double sum_edge_weights;
         };
 
     }
@@ -216,7 +229,7 @@ namespace dlib
             impl::undirected_adjacency_list graph;
             graph.build(edges, weight_funct);
 
-            num_edges = edges.size();
+            sum_edge_weights = graph.sum_of_edge_weights();
 
             make_mr_matrix(samples, graph);
         }
@@ -243,7 +256,7 @@ namespace dlib
             // sums is typical of most machine learning algorithms.  Moreover, doing this makes
             // the argument to this function more invariant to the size of the edge set.  So it
             // should make it easier for the user.
-            intrinsic_regularization_strength /= num_edges;
+            intrinsic_regularization_strength /= sum_edge_weights;
 
             return inv_lower_triangular(chol(identity_matrix<scalar_type>(reg_mat.nr()) + intrinsic_regularization_strength*reg_mat));
         }
@@ -304,7 +317,7 @@ namespace dlib
         }
 
         general_matrix reg_mat;
-        unsigned long num_edges;
+        double sum_edge_weights;
     };
 
 }
