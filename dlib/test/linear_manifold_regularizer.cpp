@@ -54,29 +54,17 @@ namespace
 
             const unsigned long num_points = 200;
 
-            // create a large dataset with two concentric circles.  There will be 100000 points on each circle
-            // for a total of 200000 samples.
+            // create a large dataset with two concentric circles.  
             generate_circle(samples, 1, num_points);  // circle of radius 1
             generate_circle(samples, 5, num_points);  // circle of radius 5
 
-            // Create a set of sample_pairs that tells us which samples are "close" and should thus 
-            // be classified similarly.  These edges will be used to define the manifold regularizer.
-            // To find these edges we use a simple function that samples point pairs randomly and 
-            // returns the top 5% with the shortest edges.
             std::vector<sample_pair> edges;
-            find_k_nearest_neighbors(samples, squared_euclidean_distance(), 2, edges);
+            find_percent_shortest_edges_randomly(samples, squared_euclidean_distance(0.1, 4), 1, 10000, "random seed", edges);
 
             dlog << LTRACE << "number of edges generated: " << edges.size();
 
             empirical_kernel_map<kernel_type> ekm;
 
-            // Since the circles are not linearly separable we will use an empirical kernel map to 
-            // map them into a space where they are separable.  So we create an empirical_kernel_map 
-            // using a random subset of our data samples as basis samples.  Note, however, that even
-            // though the circles are linearly separable in this new space given by the empirical_kernel_map
-            // we still won't be able to correctly classify all the points given just the 2 labeled examples.
-            // We will need to make use of the nearest neighbor information stored in edges.  To do that
-            // we will use the linear_manifold_regularizer next.
             ekm.load(kern, randomly_subsample(samples, 100));
 
             // Project all the samples into the span of our 50 basis samples
@@ -108,7 +96,7 @@ namespace
                 W(edges[i].index2(), edges[i].index1()) = use_gaussian_weights(0.1)(edges[i]);
             }
             matrix<double> L = diagm(sum_rows(W)) - W;
-            matrix<double> trueT = inv_lower_triangular(chol(identity_matrix<double>(X.nr()) + 10000.0/edges.size()*X*L*trans(X)));
+            matrix<double> trueT = inv_lower_triangular(chol(identity_matrix<double>(X.nr()) + (10000.0/sum(lowerm(W)))*X*L*trans(X)));
 
             dlog << LTRACE << "T error: "<< max(abs(T - trueT));
             DLIB_TEST(max(abs(T - trueT)) < 1e-7);
@@ -214,6 +202,21 @@ namespace
             DLIB_TEST(edges[2] == sample_pair(0,3,0));
             DLIB_TEST(edges[3] == sample_pair(0,4,0));
 
+            find_k_nearest_neighbors(samples, squared_euclidean_distance(), 3, edges);
+            DLIB_TEST(edges.size() == 8);
+
+            find_k_nearest_neighbors(samples, squared_euclidean_distance(3.9, 4.1), 3, edges);
+            DLIB_TEST(edges.size() == 4);
+
+            std::sort(edges.begin(), edges.end(), &order_by_index);
+
+            DLIB_TEST(edges[0] == sample_pair(1,2,0));
+            DLIB_TEST(edges[1] == sample_pair(1,3,0));
+            DLIB_TEST(edges[2] == sample_pair(2,4,0));
+            DLIB_TEST(edges[3] == sample_pair(3,4,0));
+
+            find_k_nearest_neighbors(samples, squared_euclidean_distance(30000, 4.1), 3, edges);
+            DLIB_TEST(edges.size() == 0);
         }
 
         void test_knn1_approx()
@@ -229,8 +232,6 @@ namespace
             test = -1,-1;  samples.push_back(test);
 
             std::vector<sample_pair> edges;
-            // For this simple graph and high number of samples we will do we should obtain the exact 
-            // knn solution.
             find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(), 1, 10000, seed, edges);
             DLIB_TEST(edges.size() == 4);
 
@@ -241,6 +242,21 @@ namespace
             DLIB_TEST(edges[2] == sample_pair(0,3,0));
             DLIB_TEST(edges[3] == sample_pair(0,4,0));
 
+            find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(), 3, 10000, seed, edges);
+            DLIB_TEST(edges.size() == 8);
+
+            find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(3.9, 4.1), 3, 10000, seed, edges);
+            DLIB_TEST(edges.size() == 4);
+
+            std::sort(edges.begin(), edges.end(), &order_by_index);
+
+            DLIB_TEST(edges[0] == sample_pair(1,2,0));
+            DLIB_TEST(edges[1] == sample_pair(1,3,0));
+            DLIB_TEST(edges[2] == sample_pair(2,4,0));
+            DLIB_TEST(edges[3] == sample_pair(3,4,0));
+
+            find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(30000, 4.1), 3, 10000, seed, edges);
+            DLIB_TEST(edges.size() == 0);
         }
 
         void test_knn2()
@@ -265,6 +281,8 @@ namespace
             DLIB_TEST(edges[2] == sample_pair(1,3,0));
             DLIB_TEST(edges[3] == sample_pair(2,3,0));
 
+            find_k_nearest_neighbors(samples, squared_euclidean_distance(), 200, edges);
+            DLIB_TEST(edges.size() == 4*3/2);
         }
 
         void test_knn2_approx()
@@ -291,6 +309,9 @@ namespace
             DLIB_TEST(edges[2] == sample_pair(1,3,0));
             DLIB_TEST(edges[3] == sample_pair(2,3,0));
 
+
+            find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(), 200, 10000, seed,  edges);
+            DLIB_TEST(edges.size() == 4*3/2);
         }
 
         void perform_test (
