@@ -34,7 +34,7 @@ namespace dlib
             ensures
                 - #index1() == 0
                 - #index2() == 0
-                - #distance() == std::numeric_limits<float>::max()
+                - #distance() == std::numeric_limits<float>::infinity()
         !*/
 
         sample_pair (
