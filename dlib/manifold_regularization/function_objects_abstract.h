@@ -16,8 +16,29 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is a simple function object that computes squared euclidean distance
-                between two dlib::matrix objects.
+                between two dlib::matrix objects. 
         !*/
+
+        squared_euclidean_distance (
+        );
+        /*!
+            ensures
+                - #lower == 0
+                - #upper == std::numeric_limits<double>::infinity()
+        !*/
+
+        squared_euclidean_distance (
+            const double l,
+            const double u
+        );
+        /*!
+            ensures
+                - #lower == l
+                - #upper == u  
+        !*/
+
+        const double lower;
+        const double upper;
 
         template <typename sample_type>
         double operator() (
@@ -28,7 +49,11 @@ namespace dlib
             requires
                 - sample_type should be a kind of dlib::matrix 
             ensures
-                - returns length_squared(a-b);
+                - let LEN = length_squared(a-b)
+                - if (lower <= LEN <= upper) then
+                    - returns LEN
+                - else
+                    - returns std::numeric_limits<double>::infinity()
         !*/
     };
 
