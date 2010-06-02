@@ -24,19 +24,24 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of an online algorithm for recursively finding a
-                set of linearly independent vectors in a kernel induced feature space.  To 
-                use it you decide how large you would like the set to be and then you feed it 
-                sample points.  
-                
-                Each time you present it with a new sample point (via this->add()) it either 
-                keeps the current set of independent points unchanged, or if the new point 
-                is "more linearly independent" than one of the points it already has,  
-                it replaces the weakly linearly independent point with the new one.
+                set (aka dictionary) of linearly independent vectors in a kernel induced 
+                feature space.  To use it you decide how large you would like the dictionary 
+                to be and then you feed it sample points.  
 
-                
-                This object uses the Approximately Linearly Dependent metric described in the paper 
-                The Kernel Recursive Least Squares Algorithm by Yaakov Engel to decide which
-                points are more linearly independent than others.
+                The implementation uses the Approximately Linearly Dependent metric described 
+                in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel to 
+                decide which points are more linearly independent than others.  The metric is 
+                simply the squared distance between a test point and the subspace spanned by 
+                the current set of dictionary vectors.
+
+                Each time you present this object with a new sample point (via this->add()) 
+                it calculates the projection distance and if it is sufficiently large then this 
+                new point is included into the current dictionary.  Note that this object can
+                be configured to have a maximum size.  Once the max dictionary size is reached
+                each new point kicks out a previous point.  This is done by selecting the current
+                dictionary vector that has the smallest projection error onto the others.  That 
+                is, the "least linearly independent" vector is removed to make room for the 
+                new one.
         !*/
 
     public:
@@ -92,7 +97,7 @@ namespace dlib
                 - returns the minimum tolerance to use for the approximately linearly dependent 
                   test used for dictionary vector selection (see KRLS paper for ALD details).  
                   In other words, this is the minimum threshold for how linearly independent 
-                  a sample must be for it to even be considered for addition to the dictionary.  
+                  a sample must be for it to be considered for addition to the dictionary.  
                   Moreover, bigger values of this field will make the algorithm run faster but 
                   might give less accurate results.
                 - The exact meaning of the tolerance parameter is the following: 
@@ -103,6 +108,16 @@ namespace dlib
                   object basically just computes the projection error for that new sample 
                   and if it is larger than the tolerance then that new sample becomes part 
                   of the dictionary.  
+        !*/
+
+        void set_minimum_tolerance (
+            scalar_type min_tolerance 
+        );
+        /*!
+            requires
+                - min_tolerance > 0
+            ensures
+                - #minimum_tolerance() == min_tol
         !*/
 
         void clear_dictionary (
@@ -117,7 +132,7 @@ namespace dlib
         );
         /*!
             ensures
-                - if (x is linearly independent of the vectors already in this object) then
+                - if (x is sufficiently linearly independent of the vectors already in this object) then
                     - adds x into the dictionary
                     - (*this)[#dictionary_size()-1] == x
                     - returns true

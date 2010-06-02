@@ -98,6 +98,20 @@ namespace dlib
             return min_tolerance;
         }
 
+        void set_minimum_tolerance (
+            scalar_type min_tol
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(min_tol > 0,
+                "\tlinearly_independent_subset_finder::set_minimum_tolerance()"
+                << "\n\tinvalid argument to this function"
+                << "\n\tmin_tol: " << min_tol
+                << "\n\tthis:    " << this
+                );
+            min_tolerance = min_tol;
+        }
+
         void clear_dictionary ()
         {
             dictionary.clear();
