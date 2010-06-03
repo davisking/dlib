@@ -591,7 +591,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 the set of dictionary vectors.
             </p>
             <p>
-                Each time you present this object with a new sample point (via this->add()) 
+                Each time you present this object with a new sample point  
                 it calculates the projection distance and if it is sufficiently large then this 
                 new point is included into the dictionary.  Note that this object can be configured 
                 to have a maximum size.  Once the max dictionary size is reached each new point 
