@@ -21,6 +21,7 @@ namespace dlib
                 - is_running_ == false
                 - is_alive_ == false 
                 - should_stop_ == false
+                - should_respawn_ == false
 
 #ifdef ENABLE_ASSERTS
                 - id_valid == false 
@@ -31,6 +32,7 @@ namespace dlib
                 - is_running() == is_running_
                 - is_alive() == is_alive_
                 - should_stop() == should_stop_
+                - should_respawn() == should_respawn_
 
 
 #ifdef ENABLE_ASSERTS
@@ -66,6 +68,15 @@ namespace dlib
         void start (
         );
 
+        void restart (
+        );
+
+        void set_respawn (
+        );
+
+        bool should_respawn (
+        ) const;
+
         void pause (
         );
 
@@ -91,6 +102,7 @@ namespace dlib
         bool is_running_;
         bool is_alive_;
         bool should_stop_;
+        bool should_respawn_;
         bool id_valid;
 
         // restricted functions

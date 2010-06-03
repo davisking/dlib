@@ -16,6 +16,7 @@ namespace dlib
             INITIAL VALUE
                 - is_running() == false
                 - is_alive() == false 
+                - should_respawn() == false
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a simple threaded object.  To use it you inherit
@@ -96,6 +97,48 @@ namespace dlib
                     #is_alive() == false and #is_running() == false
         !*/
 
+        void set_respawn (
+        );
+        /*!
+            requires
+                - is not called from this->thread()
+            ensures
+                - #should_respawn() == true
+        !*/
+
+        bool should_respawn (
+        ) const;
+        /*!
+            requires
+                - is not called from this->thread()
+            ensures
+                - returns true if the thread will automatically restart upon termination and
+                  false otherwise.  Note that every time a thread starts it sets should_respawn() 
+                  back to false.  Therefore, a single call to set_respawn() can cause at most
+                  one respawn to occur. 
+        !*/
+
+        void restart (
+        );
+        /*!
+            requires
+                - is not called from this->thread()
+            ensures
+                - This function atomically executes set_respawn() and start().  The precise meaning of this
+                  is defined below.
+                - if (is_alive()) then
+                    - #should_respawn() == true
+                - else
+                    - #should_respawn() == false 
+                - #is_alive() == true
+                - #is_running() == true
+                - #should_stop() == false
+            throws
+                - std::bad_alloc or dlib::thread_error
+                    If either of these exceptions are thrown then 
+                    #is_alive() == false and #is_running() == false
+        !*/
+
         void pause (
         );
         /*!
@@ -113,6 +156,7 @@ namespace dlib
             ensures
                 - #should_stop() == true
                 - #is_running() == false
+                - #should_respawn() == false
         !*/
 
     protected:
@@ -123,8 +167,7 @@ namespace dlib
             requires
                 - is only called from the thread that executes this->thread()
             ensures
-                - if (is_running() == false && should_stop() == false) then
-                    - blocks until (#is_running() == true || #should_stop() == true) 
+                - calls to this function block until (#is_running() == true || #should_stop() == true) 
                 - if (this thread is supposed to terminate) then
                     - returns true
                 - else

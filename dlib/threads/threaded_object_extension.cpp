@@ -119,6 +119,73 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void threaded_object::
+    restart (
+    )
+    {
+        auto_mutex M(m_);
+
+        DLIB_ASSERT(id1 != get_thread_id() || id_valid == false,
+               "\tvoid threaded_object::restart()"
+               << "\n\tYou can NOT call this function from the thread that executes threaded_object::thread"
+               << "\n\tthis: " << this
+        );
+
+        if (is_alive_ == false)
+        {
+            if (create_new_thread<threaded_object,&threaded_object::thread_helper>(*this) == false)
+            {
+                is_running_ = false;
+                throw thread_error();
+            }
+            should_respawn_ = false;
+        }
+        else
+        {
+            should_respawn_ = true;
+        }
+        is_alive_ = true;
+        is_running_ = true;
+        should_stop_ = false;
+        s.broadcast();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void threaded_object::
+    set_respawn (
+    )
+    {
+        auto_mutex M(m_);
+
+        DLIB_ASSERT(id1 != get_thread_id() || id_valid == false,
+               "\tvoid threaded_object::set_respawn()"
+               << "\n\tYou can NOT call this function from the thread that executes threaded_object::thread"
+               << "\n\tthis: " << this
+        );
+
+        should_respawn_ = true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    bool threaded_object::
+    should_respawn (
+    ) const
+    {
+        auto_mutex M(m_);
+
+        DLIB_ASSERT(id1 != get_thread_id() || id_valid == false,
+               "\tbool threaded_object::should_respawn()"
+               << "\n\tYou can NOT call this function from the thread that executes threaded_object::thread"
+               << "\n\tthis: " << this
+        );
+
+        return should_respawn_;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void threaded_object::
     pause (
     )
     {
@@ -149,6 +216,7 @@ namespace dlib
 
         should_stop_ = true;
         is_running_ = false;
+        should_respawn_ = false;
         s.broadcast();
     }
 
@@ -179,18 +247,30 @@ namespace dlib
         id1 = get_thread_id();
         id_valid = true;
 #endif
+        while (true)
+        {
+            m_.lock();
+            should_respawn_ = false;
+            m_.unlock();
 
-        thread();
-        auto_mutex M(m_);
+            thread();
+
+            auto_mutex M(m_);
+
+            if (should_respawn_)
+                continue;
 
 #ifdef ENABLE_ASSERTS
-        id_valid = false;
+            id_valid = false;
 #endif
 
-        is_alive_ = false;
-        is_running_ = false;
-        should_stop_ = false;
-        s.broadcast();
+            is_alive_ = false;
+            is_running_ = false;
+            should_stop_ = false;
+            s.broadcast();
+
+            return;
+        }
     }
 
 // ----------------------------------------------------------------------------------------
