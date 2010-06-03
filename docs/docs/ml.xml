@@ -588,17 +588,16 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 in the paper The Kernel Recursive Least Squares Algorithm by Yaakov Engel to 
                 decide which points are more linearly independent than others.  The metric is 
                 simply the squared distance between a test point and the subspace spanned by 
-                the current set of dictionary vectors.
+                the set of dictionary vectors.
             </p>
             <p>
-                Each time you present this object with a new sample point   
+                Each time you present this object with a new sample point (via this->add()) 
                 it calculates the projection distance and if it is sufficiently large then this 
-                new point is included into the current dictionary.  Note that this object can
-                be configured to have a maximum size.  Once the max dictionary size is reached
-                each new point kicks out a previous point.  This is done by selecting the current
-                dictionary vector that has the smallest projection error onto the others.  That 
-                is, the "least linearly independent" vector is removed to make room for the 
-                new one.
+                new point is included into the dictionary.  Note that this object can be configured 
+                to have a maximum size.  Once the max dictionary size is reached each new point 
+                kicks out a previous point.  This is done by removing the dictionary vector that 
+                has the smallest projection distance onto the others.  That is, the "least linearly 
+                independent" vector is removed to make room for the new one.
             </p>
          </description>
          <examples>
