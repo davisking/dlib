@@ -25,12 +25,13 @@ namespace
     public:
         mutex m;
         int count;
+        dlib::uint64 timestamp;
+        dlib::timestamper ts;
 
-        timer_test_helper():count(0){}
+        timer_test_helper():count(0), timestamp(0){}
         void add() 
         { 
             m.lock(); 
-            print_spinner();
             ++count; 
             m.unlock(); 
         }
@@ -40,7 +41,47 @@ namespace
             dlib::sleep(1000);
             add();
         }
+
+        void set_timestamp()
+        {
+            m.lock();
+            timestamp = ts.get_timestamp();
+            m.unlock();
+        }
     };
+
+    template <
+        typename timer_t
+        >
+    void timer_test2 (
+    )
+    /*!
+        requires
+            - timer_t is an implementation of timer/timer_kernel_aseqract.h is instantiated 
+              timer_test_helper
+        ensures
+            - runs tests on timer_t for compliance with the specs 
+    !*/
+    {        
+        for (int j = 0; j < 4; ++j)
+        {
+            print_spinner();
+            timer_test_helper h;
+
+            timer_t t1(h,&timer_test_helper::set_timestamp);
+            t1.set_delay_time(0);
+            t1.start();
+
+            dlib::sleep(3000);
+            t1.stop();
+
+            dlib::uint64 cur_time = h.ts.get_timestamp();
+
+            // make sure the action function has been called recently
+            DLIB_TEST_MSG((cur_time-h.timestamp)/1000 < 10, (cur_time-h.timestamp)/1000);
+
+        }
+    }
 
     template <
         typename timer_t
@@ -272,8 +313,10 @@ namespace
         {
             dlog << LINFO << "testing kernel_1a";
             timer_test<timer<timer_test_helper>::kernel_1a>  ();
+            timer_test2<timer<timer_test_helper>::kernel_1a>  ();
             dlog << LINFO << "testing kernel_2a";
             timer_test<timer<timer_test_helper>::kernel_2a>  ();
+            timer_test2<timer<timer_test_helper>::kernel_2a>  ();
         }
     } a;
 

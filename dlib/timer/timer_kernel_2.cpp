@@ -163,7 +163,7 @@ namespace dlib
                     // if this timer is still "running" then start its action function
                     if (r->running)
                     {
-                        r->start();
+                        r->restart();
                     }
                 }
                 else
