@@ -375,8 +375,8 @@ namespace dlib
 
             if (verbose)
             {
-                std::cout << "\nMean EKM projection error:                 " << rs.mean() << std::endl;
-                std::cout << "Standard deviaion of EKM projection error: " << rs.stddev() << std::endl;
+                std::cout << "\nMean EKM projection error:                  " << rs.mean() << std::endl;
+                std::cout << "Standard deviation of EKM projection error: " << rs.stddev() << std::endl;
             }
             
             // now do the training
@@ -546,7 +546,7 @@ namespace dlib
             // Reproject all the data samples using the final basis.  We could just use what we 
             // already have but the recursive thing done above to compute the proj_samples 
             // might have accumulated a little numerical error.  So lets just be safe.
-            running_stats<scalar_type> rs;
+            running_stats<scalar_type> rs, rs_margin;
             for (long i = 0; i < x.size(); ++i)
             {
                 if (verbose)
@@ -554,6 +554,9 @@ namespace dlib
                     scalar_type err;
                     proj_samples[i] = ekm.project(x(i),err);
                     rs.add(err);
+                    // if this point is within the margin 
+                    if (df(proj_samples[i])*y(i) < 1)
+                        rs_margin.add(err);
                 }
                 else
                 {
@@ -568,8 +571,11 @@ namespace dlib
 
             if (verbose)
             {
-                std::cout << "\nMean EKM projection error:                 " << rs.mean() << std::endl;
-                std::cout << "Standard deviaion of EKM projection error: " << rs.stddev() << std::endl;
+                std::cout << "\nMean EKM projection error:                  " << rs.mean() << std::endl;
+                std::cout << "Standard deviation of EKM projection error: " << rs.stddev() << std::endl;
+                std::cout << "Mean EKM projection error for margin violators:                  " << rs_margin.mean() << std::endl;
+                std::cout << "Standard deviation of EKM projection error for margin violators: " << ((rs_margin.current_n()>1)?rs_margin.stddev():0) << std::endl;
+
                 std::cout << "Final svm objective: " << svm_objective << std::endl;
             }
 
