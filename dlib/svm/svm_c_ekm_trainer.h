@@ -492,7 +492,6 @@ namespace dlib
                     break;
 
                 prev_svm_objective = svm_objective;
-                std::vector<matrix<scalar_type,0,1, mem_manager_type> > new_basis_elements;
 
                 // now add more elements to the basis
                 unsigned long count = 0;
@@ -509,7 +508,6 @@ namespace dlib
                         // vectors already in the basis set.  
                         if (lisf.add(x(idx)))
                         {
-                            new_basis_elements.push_back(x(idx));
                             ++count;
                         }
                     }
