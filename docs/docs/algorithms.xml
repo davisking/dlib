@@ -340,7 +340,7 @@
          <file>dlib/statistics.h</file>
          <spec_file link="true">dlib/statistics/random_subset_selector_abstract.h</spec_file>
          <description>
-            This is a pair of convenience functions for 
+            This is a set of convenience functions for 
             creating <a href="#random_subset_selector">random subsets</a> of data.
          </description>
                                  
