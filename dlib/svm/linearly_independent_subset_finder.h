@@ -122,6 +122,31 @@ namespace dlib
             K.set_size(0,0);
         }
 
+        scalar_type projection_error (
+            const sample_type& x
+        ) const
+        {
+            const scalar_type kx = kernel(x,x);
+            if (dictionary.size() == 0)
+            {
+                return kx;
+            }
+            else
+            {
+                // fill in k
+                k.set_size(dictionary.size());
+                for (long r = 0; r < k.nr(); ++r)
+                    k(r) = kernel(x,dictionary[r]);
+
+                // compute the error we would have if we approximated the new x sample
+                // with the dictionary.  That is, do the ALD test from the KRLS paper.
+                a = K_inv*k;
+                scalar_type delta = kx - trans(k)*a;
+
+                return delta;
+            }
+        }
+
         bool add (
             const sample_type& x
         )
@@ -157,7 +182,7 @@ namespace dlib
                 scalar_type delta = kx - trans(k)*a;
 
                 // if this new vector is approximately linearly independent of the vectors
-                // in our dictionary.  Or if our dictionary just isn't full yet.
+                // in our dictionary.  
                 if (delta > min_strength && delta > min_tolerance)
                 {
                     if (dictionary.size() == my_max_dictionary_size)
@@ -366,9 +391,9 @@ namespace dlib
 
         // temp variables here just so we don't have to reconstruct them over and over.  Thus, 
         // they aren't really part of the state of this object.
-        matrix<scalar_type,0,1,mem_manager_type> a, a2;
-        matrix<scalar_type,0,1,mem_manager_type> k, k2;
-        matrix<scalar_type,0,0,mem_manager_type> temp;
+        mutable matrix<scalar_type,0,1,mem_manager_type> a, a2;
+        mutable matrix<scalar_type,0,1,mem_manager_type> k, k2;
+        mutable matrix<scalar_type,0,0,mem_manager_type> temp;
 
     };
 

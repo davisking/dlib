@@ -145,6 +145,20 @@ namespace dlib
                     - returns false
         !*/
 
+        scalar_type projection_error (
+            const sample_type& x
+        ) const;
+        /*!
+            ensures
+                - returns the squared distance between x and the subspace spanned by 
+                  the set of dictionary vectors.  (e.g. this is the same number that
+                  gets returned by the empirical_kernel_map::project() function's 
+                  projection_error argument when the ekm is loaded with the dictionary
+                  vectors.)
+                - Note that if the dictionary is empty then the return value is
+                  equal to get_kernel(x,x).
+        !*/
+
         void swap (
             linearly_independent_subset_finder& item
         );
