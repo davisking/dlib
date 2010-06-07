@@ -93,20 +93,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the minimum tolerance to use for the approximately linearly dependent 
-                  test used for dictionary vector selection (see KRLS paper for ALD details).  
-                  In other words, this is the minimum threshold for how linearly independent 
-                  a sample must be for it to be considered for addition to the dictionary.  
-                  Moreover, bigger values of this field will make the algorithm run faster but 
-                  might give less accurate results.
-                - The exact meaning of the tolerance parameter is the following: 
-                  Imagine that we have an empirical_kernel_map that contains all the current 
-                  dictionary vectors.  Then the tolerance is the minimum projection error 
-                  (as given by empirical_kernel_map::project()) required to cause us to 
-                  include a new vector in the dictionary.  So each time you call add() this 
-                  object basically just computes the projection error for that new sample 
-                  and if it is larger than the tolerance then that new sample becomes part 
-                  of the dictionary.  
+                - returns the minimum projection error necessary to include a sample point
+                  into the dictionary.   
         !*/
 
         void set_minimum_tolerance (
@@ -131,18 +119,34 @@ namespace dlib
         );
         /*!
             ensures
-                - if (x is sufficiently linearly independent of the vectors already in this object) then
-                    - adds x into the dictionary
-                    - (*this)[#dictionary_size()-1] == x
-                    - returns true
-                    - if (dictionary_size() < max_dictionary_size()) then
+                - if (dictionary_size() < max_dictionary_size() then
+                    - if (projection_error(x) > minimum_tolerance()) then 
+                        - adds x into the dictionary
+                        - (*this)[#dictionary_size()-1] == x
                         - #dictionary_size() == dictionary_size() + 1
+                        - returns true
                     - else
-                        - #dictionary_size() == dictionary_size() 
-                          (i.e. the number of vectors in this object doesn't change)
-                        - the least linearly independent vector in this object is removed
+                        - the dictionary is not changed
+                        - returns false
                 - else
-                    - returns false
+                    - #dictionary_size() == dictionary_size() 
+                      (i.e. the number of vectors in this object doesn't change)
+                    - since the dictionary is full adding a new element means we have to 
+                      remove one of the current ones.  So let proj_error[i] be equal to the 
+                      projection error obtained when projecting dictionary vector (*this)[i] 
+                      onto the other elements of the dictionary.  Then let min_proj_error 
+                      be equal to the minimum value in proj_error.  The dictionary element
+                      with the minimum projection error is the "least linearly independent"
+                      vector in the dictionary and is the one which will be removed to make
+                      room for a new element.
+                    - if (projection_error(x) > minimum_tolerance() && projection_error(x) > min_proj_error)
+                        - the least linearly independent vector in this object is removed
+                        - adds x into the dictionary
+                        - (*this)[#dictionary_size()-1] == x
+                        - returns true
+                    - else
+                        - the dictionary is not changed
+                        - returns false
         !*/
 
         scalar_type projection_error (
@@ -156,7 +160,7 @@ namespace dlib
                   projection_error argument when the ekm is loaded with the dictionary
                   vectors.)
                 - Note that if the dictionary is empty then the return value is
-                  equal to get_kernel(x,x).
+                  equal to get_kernel()(x,x).
         !*/
 
         void swap (
