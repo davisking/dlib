@@ -136,6 +136,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>vector_normalizer</item> 
          <item>vector_normalizer_pca</item> 
          <item>discriminant_pca</item> 
+         <item>fill_lisf</item> 
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
          <item>test_binary_decision_function</item> 
@@ -599,6 +600,24 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 has the smallest projection distance onto the others.  That is, the "least linearly 
                 independent" vector is removed to make room for the new one.
             </p>
+         </description>
+         <examples>
+            <example>empirical_kernel_map_ex.cpp.html</example>
+         </examples>
+
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>fill_lisf</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/linearly_independent_subset_finder_abstract.h</spec_file>
+         <description>
+               This is a simple function for filling a 
+               <a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a>
+               with data points by using random sampling.   
          </description>
          <examples>
             <example>empirical_kernel_map_ex.cpp.html</example>
