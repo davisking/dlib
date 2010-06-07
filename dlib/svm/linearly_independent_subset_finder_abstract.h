@@ -116,7 +116,7 @@ namespace dlib
             requires
                 - min_tolerance > 0
             ensures
-                - #minimum_tolerance() == min_tol
+                - #minimum_tolerance() == min_tolerance
         !*/
 
         void clear_dictionary (
@@ -247,6 +247,54 @@ namespace dlib
     );
     /*!
         provides serialization support for linearly_independent_subset_finder objects
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename kernel_type,
+        typename vector_type,
+        typename rand_type
+        >
+    void fill_lisf (
+        linearly_independent_subset_finder<kernel_type>& lisf,
+        const vector_type& samples,
+        rand_type& rnd,
+        int sampling_size = 2000
+    );
+    /*!
+        requires
+            - vector_type == a dlib::matrix or something convertible to one via 
+              vector_to_matrix()
+            - is_vector(vector_to_matrix(samples)) == true
+            - rand_type == an implementation of rand/rand_kernel_abstract.h or a type
+              convertible to a string via cast_to_string()
+            - sampling_size > 0
+        ensures
+            - The purpose of this function is to fill lisf with points from samples.  It does
+              this by randomly sampling elements of samples until no more can be added.  The
+              precise stopping condition is when sampling_size additions to lisf have failed
+              or the max dictionary size has been reached.
+            - This function employs a random number generator.  If rand_type is a random 
+              number generator then it uses the instance given.  Otherwise it uses cast_to_string(rnd)
+              to seed a new random number generator.
+    !*/
+
+    template <
+        typename kernel_type,
+        typename vector_type
+        >
+    void fill_lisf (
+        linearly_independent_subset_finder<kernel_type>& lisf,
+        const vector_type& samples
+    );
+    /*!
+        requires
+            - vector_type == a dlib::matrix or something convertible to one via 
+              vector_to_matrix()
+            - is_vector(vector_to_matrix(samples)) == true
+        ensures
+            - performs fill_lisf(lisf, samples, default_rand_generator, 2000)
     !*/
 
 // ----------------------------------------------------------------------------------------

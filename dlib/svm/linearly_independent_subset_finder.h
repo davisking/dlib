@@ -11,6 +11,9 @@
 #include "../std_allocator.h"
 #include "../algs.h"
 #include "../serialize.h"
+#include "../is_kind.h"
+#include "../string.h"
+#include "../rand.h"
 
 namespace dlib
 {
@@ -402,6 +405,118 @@ namespace dlib
     template <typename kernel_type>
     void swap(linearly_independent_subset_finder<kernel_type>& a, linearly_independent_subset_finder<kernel_type>& b)
     { a.swap(b); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <
+            typename kernel_type,
+            typename vector_type,
+            typename rand_type
+            >
+        void fill_lisf (
+            linearly_independent_subset_finder<kernel_type>& lisf,
+            const vector_type& samples,
+            rand_type& rnd,
+            int sampling_size 
+        )
+        {   
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(samples) && sampling_size > 0,
+                "\t void fill_lisf()"
+                << "\n\t invalid arguments to this function"
+                << "\n\t is_vector(samples): " << is_vector(samples) 
+                << "\n\t sampling_size: " << sampling_size
+                );
+
+            // no need to do anything if there aren't any samples
+            if (samples.size() == 0)
+                return;
+
+            typedef typename kernel_type::scalar_type scalar_type;
+
+            // Start out by guessing what a reasonable projection error tolerance is. We will use
+            // the biggest projection error we see in a small sample.
+            scalar_type tol = 0;
+            for (int i = 0; i < sampling_size; ++i)
+            {
+                const unsigned long idx = rnd.get_random_32bit_number()%samples.size();
+                const scalar_type temp = lisf.projection_error(samples(idx)); 
+                if (temp > tol)
+                    tol = temp;
+            }
+
+            const scalar_type min_tol = lisf.minimum_tolerance();
+
+            // run many rounds of random sampling.  In each round we drop the tolerance lower.
+            while (tol >= min_tol && lisf.dictionary_size() < lisf.max_dictionary_size())
+            {
+                tol *= 0.5;
+                lisf.set_minimum_tolerance(std::max(tol, min_tol));
+                int add_failures = 0;
+
+                // Keep picking random samples and adding them into the lisf.  Stop when we either
+                // fill it up or can't find any more samples with projection error larger than the
+                // current tolerance.
+                while (lisf.dictionary_size() < lisf.max_dictionary_size() && add_failures < sampling_size) 
+                {
+                    if (lisf.add(samples(rnd.get_random_32bit_number()%samples.size())) == false)
+                    {
+                        ++add_failures;
+                    }
+                }
+            }
+
+            // set this back to its original value
+            lisf.set_minimum_tolerance(min_tol);
+        }
+    }
+
+    template <
+        typename kernel_type,
+        typename vector_type
+        >
+    void fill_lisf (
+        linearly_independent_subset_finder<kernel_type>& lisf,
+        const vector_type& samples
+    )
+    {   
+        dlib::rand::float_1a rnd;
+        impl::fill_lisf(lisf, vector_to_matrix(samples),rnd, 2000);
+    }
+
+    template <
+        typename kernel_type,
+        typename vector_type,
+        typename rand_type
+        >
+    typename enable_if<is_rand<rand_type> >::type fill_lisf (
+        linearly_independent_subset_finder<kernel_type>& lisf,
+        const vector_type& samples,
+        rand_type& rnd,
+        const int sampling_size = 2000
+    )
+    {   
+        impl::fill_lisf(lisf, vector_to_matrix(samples),rnd, sampling_size);
+    }
+
+    template <
+        typename kernel_type,
+        typename vector_type,
+        typename rand_type
+        >
+    typename disable_if<is_rand<rand_type> >::type fill_lisf (
+        linearly_independent_subset_finder<kernel_type>& lisf,
+        const vector_type& samples,
+        rand_type random_seed,
+        const int sampling_size = 2000
+    )
+    {   
+        dlib::rand::float_1a rnd;
+        rnd.set_seed(cast_to_string(random_seed));
+        impl::fill_lisf(lisf, vector_to_matrix(samples), rnd, sampling_size);
+    }
 
 // ----------------------------------------------------------------------------------------
 
