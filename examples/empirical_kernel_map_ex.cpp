@@ -142,15 +142,16 @@ int main()
     // create a new dataset with two concentric circles.  There will be 1000 points on each circle.
     generate_concentric_circles(samples, labels, 1000);
     // Rather than use all 2000 samples as basis samples we are going to use the 
-    // linearly_independent_subset_finder to pick out 20 good basis samples.  The idea behind this 
-    // object is to try and find the 20 samples that best span the subspace which contains all the 
+    // linearly_independent_subset_finder to pick out a good basis set.  The idea behind this 
+    // object is to try and find the 40 or so samples that best spans the subspace containing all the 
     // data.  
-    linearly_independent_subset_finder<kernel_type> lisf(kern, 20);
-    // We have to let the linearly_independent_subset_finder look at all the data first. 
-    for (unsigned long i = 0; i < samples.size(); ++i)
-        lisf.add(samples[i]);
+    linearly_independent_subset_finder<kernel_type> lisf(kern, 40);
+    // populate lisf with samples.  We have configured it to allow at most 40 samples but this function 
+    // may determine that fewer samples are necessary to form a good basis.  In this example program
+    // it will select only 26.
+    fill_lisf(lisf, samples);
 
-    // Now reload the empirical_kernel_map but this time using only our 20 basis samples 
+    // Now reload the empirical_kernel_map but this time using only our small basis  
     // selected using the linearly_independent_subset_finder.
     cout << "\n\nBuilding an empirical_kernel_map with " << lisf.dictionary_size() << " basis samples." << endl;
     ekm.load(lisf);
@@ -194,19 +195,19 @@ void test_empirical_kernel_map (
     /*
         Example outputs from these cout statements.
         For the case where we use all samples as basis samples:
-            Max kernel matrix error: 2.73115e-14
-            Mean kernel matrix error: 6.19125e-15
+            Max kernel matrix error: 7.32747e-15
+            Mean kernel matrix error: 7.47789e-16
 
-        For the case where we use only 20 samples as basis samples:
-            Max kernel matrix error: 0.0154466
-            Mean kernel matrix error: 0.000753427
+        For the case where we use only 26 samples as basis samples:
+            Max kernel matrix error: 0.000953573
+            Mean kernel matrix error: 2.26008e-05
 
 
         Note that if we use enough basis samples we can perfectly span the space of input samples.
         In that case we get errors that are essentially just rounding noise (Moreover, using all the 
         samples is always enough since they are always within their own span).  Once we start 
         to use fewer basis samples we may begin to get approximation error.  In the second case we 
-        used 20 and we can see that the data doesn't really lay exactly in a 20 dimensional subspace.  
+        used 26 and we can see that the data doesn't really lay exactly in a 26 dimensional subspace.  
         But it is pretty close.  
     */
 
