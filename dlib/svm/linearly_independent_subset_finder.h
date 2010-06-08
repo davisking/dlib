@@ -75,10 +75,11 @@ namespace dlib
             min_tolerance(min_tolerance_)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(min_tolerance_ > 0,
+            DLIB_ASSERT(min_tolerance_ > 0 && max_dictionary_size_ > 1,
                 "\tlinearly_independent_subset_finder()"
                 << "\n\tinvalid argument to constructor"
                 << "\n\tmin_tolerance_: " << min_tolerance_
+                << "\n\tmax_dictionary_size_: " << max_dictionary_size_
                 << "\n\tthis:           " << this
                 );
             clear_dictionary();

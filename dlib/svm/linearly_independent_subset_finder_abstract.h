@@ -60,12 +60,13 @@ namespace dlib
 
         linearly_independent_subset_finder (
             const kernel_type& kernel_, 
-            unsigned long max_dictionary_size,
+            unsigned long max_dictionary_size_,
             scalar_type min_tolerance = 0.001
         );
         /*!
             requires
                 - min_tolerance > 0
+                - max_dictionary_size > 1
             ensures
                 - #minimum_tolerance() == min_tolerance
                 - this object is properly initialized
