@@ -270,6 +270,19 @@ namespace
                     double err;
                     proj_samples.push_back(ekm.project(samples[i], err));
                     DLIB_TEST(err <= 1e-4);
+                    const double error_agreement = std::abs(err - lisf.projection_error(samples[i]));
+                    dlog << LTRACE << "err: " << err << "    error_agreement: "<< error_agreement;
+                    DLIB_TEST(error_agreement < 1e-11);
+                }
+
+                for (int i = 0; i < 5; ++i)
+                {
+                    sample_type temp = randm(4,1,rnd);
+                    double err;
+                    ekm.project(temp, err);
+                    const double error_agreement = std::abs(err - lisf.projection_error(temp));
+                    dlog << LTRACE << "err: " << err << "    error_agreement: "<< error_agreement;
+                    DLIB_TEST(error_agreement < 1e-11);
                 }
 
                 // make sure the EKM did the projection correctly
