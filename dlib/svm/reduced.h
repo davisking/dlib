@@ -80,53 +80,27 @@ namespace dlib
         ) const
         {
             // get the decision function object we are going to try and approximate
-            const decision_function<kernel_type> dec_funct = trainer.train(x,y);
+            const decision_function<kernel_type>& dec_funct = trainer.train(x,y);
             
             // now find a linearly independent subset of the training points of num_bv points.
             linearly_independent_subset_finder<kernel_type> lisf(dec_funct.kernel_function, num_bv);
-            for (long i = 0; i < x.nr(); ++i)
-            {
-                lisf.add(x(i));
-            }
+            fill_lisf(lisf, x);
 
-            // make num be the number of points in the lisf object.  Just do this so we don't have
-            // to write out lisf.dictionary_size() all over the place.
-            const long num = lisf.dictionary_size();
-
-            // The next few blocks of code just find the best weights with which to approximate 
+            // The next few statements just find the best weights with which to approximate 
             // the dec_funct object with the smaller set of vectors in the lisf dictionary.  This
             // is really just a simple application of some linear algebra.  For the details 
             // see page 554 of Learning with kernels by Scholkopf and Smola where they talk 
             // about "Optimal Expansion Coefficients."
-            matrix<scalar_type, 0, 0, mem_manager_type> K_inv(num, num); 
-            matrix<scalar_type, 0, 0, mem_manager_type> K(num, dec_funct.alpha.size()); 
 
-            const kernel_type kernel(dec_funct.kernel_function);
+            const kernel_type kern(dec_funct.kernel_function);
 
-            for (long r = 0; r < K_inv.nr(); ++r)
-            {
-                for (long c = 0; c < K_inv.nc(); ++c)
-                {
-                    K_inv(r,c) = kernel(lisf[r], lisf[c]);
-                }
-            }
-            K_inv = pinv(K_inv);
+            matrix<scalar_type,0,1,mem_manager_type> alpha;
 
+            alpha = lisf.get_inv_kernel_marix()*(kernel_matrix(kern,lisf.get_dictionary(),dec_funct.basis_vectors)*dec_funct.alpha);
 
-            for (long r = 0; r < K.nr(); ++r)
-            {
-                for (long c = 0; c < K.nc(); ++c)
-                {
-                    K(r,c) = kernel(lisf[r], dec_funct.basis_vectors(c));
-                }
-            }
-
-
-            // Now we compute the approximate decision function.  Note that the weights come out
-            // of the expression K_inv*K*dec_funct.alpha.
-            decision_function<kernel_type> new_df(K_inv*K*dec_funct.alpha, 
+            decision_function<kernel_type> new_df(alpha, 
                                                   0,
-                                                  kernel, 
+                                                  kern, 
                                                   lisf.get_dictionary());
 
             // now we have to figure out what the new bias should be.  It might be a little
@@ -492,49 +466,24 @@ namespace dlib
         ) const
         {
             // get the decision function object we are going to try and approximate
-            const decision_function<kernel_type> dec_funct = trainer.train(x,y);
+            const decision_function<kernel_type>& dec_funct = trainer.train(x,y);
             
             // now find a linearly independent subset of the training points of num_bv points.
             linearly_independent_subset_finder<kernel_type> lisf(dec_funct.kernel_function, num_bv);
-            for (long i = 0; i < x.nr(); ++i)
-            {
-                lisf.add(x(i));
-            }
+            fill_lisf(lisf,x);
 
-            // make num be the number of points in the lisf object.  Just do this so we don't have
-            // to write out lisf.dictionary_size() all over the place.
-            const long num = lisf.dictionary_size();
-
-            // The next few blocks of code just find the best weights with which to approximate 
+            // The next few statements just find the best weights with which to approximate 
             // the dec_funct object with the smaller set of vectors in the lisf dictionary.  This
             // is really just a simple application of some linear algebra.  For the details 
             // see page 554 of Learning with kernels by Scholkopf and Smola where they talk 
             // about "Optimal Expansion Coefficients."
-            matrix<scalar_type, 0, 0, mem_manager_type> K_inv(num, num); 
-            matrix<scalar_type, 0, 0, mem_manager_type> K(num, dec_funct.alpha.size()); 
 
-            const kernel_type kernel(dec_funct.kernel_function);
+            const kernel_type kern(dec_funct.kernel_function);
 
-            for (long r = 0; r < K_inv.nr(); ++r)
-            {
-                for (long c = 0; c < K_inv.nc(); ++c)
-                {
-                    K_inv(r,c) = kernel(lisf[r], lisf[c]);
-                }
-            }
-            K_inv = pinv(K_inv);
-
-
-            for (long r = 0; r < K.nr(); ++r)
-            {
-                for (long c = 0; c < K.nc(); ++c)
-                {
-                    K(r,c) = kernel(lisf[r], dec_funct.basis_vectors(c));
-                }
-            }
+            matrix<scalar_type,0,1,mem_manager_type> beta;
 
             // Now we compute the fist approximate decision function.  
-            matrix<scalar_type,0,1,mem_manager_type> beta(K_inv*K*dec_funct.alpha);
+            beta = lisf.get_inv_kernel_marix()*(kernel_matrix(kern,lisf.get_dictionary(),dec_funct.basis_vectors)*dec_funct.alpha);
             matrix<sample_type,0,1,mem_manager_type> out_vectors(lisf.get_dictionary());
 
 
@@ -554,29 +503,13 @@ namespace dlib
             // out_vectors matrices
             obj.vector_to_state(opt_starting_point);
 
-
             // Do a final reoptimization of beta just to make sure it is optimal given the new
             // set of basis vectors.
-            for (long r = 0; r < K_inv.nr(); ++r)
-            {
-                for (long c = 0; c < K_inv.nc(); ++c)
-                {
-                    K_inv(r,c) = kernel(out_vectors(r), out_vectors(c));
-                }
-            }
-            K_inv = pinv(K_inv);
-            for (long r = 0; r < K.nr(); ++r)
-            {
-                for (long c = 0; c < K.nc(); ++c)
-                {
-                    K(r,c) = kernel(out_vectors(r), dec_funct.basis_vectors(c));
-                }
-            }
+            beta = pinv(kernel_matrix(kern,out_vectors))*(kernel_matrix(kern,out_vectors,dec_funct.basis_vectors)*dec_funct.alpha);
 
-
-            decision_function<kernel_type> new_df(K_inv*K*dec_funct.alpha, 
+            decision_function<kernel_type> new_df(beta, 
                                                   0,
-                                                  kernel, 
+                                                  kern, 
                                                   out_vectors);
 
             // now we have to figure out what the new bias should be.  It might be a little
