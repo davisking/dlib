@@ -91,7 +91,7 @@ namespace dlib
             bias_is_stale(false)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(tolerance_ >= 0 && max_dictionary_size_ > 0,
+            DLIB_ASSERT(tolerance_ > 0 && max_dictionary_size_ > 1,
                 "\tkcentroid::kcentroid()"
                 << "\n\t You have to give a positive tolerance"
                 << "\n\t this:                 " << this

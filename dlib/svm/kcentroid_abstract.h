@@ -72,8 +72,8 @@ namespace dlib
         );
         /*!
             requires
-                - tolerance >= 0
-                - max_dictionary_size_ > 0
+                - tolerance > 0
+                - max_dictionary_size_ > 1
             ensures
                 - this object is properly initialized
                 - #tolerance() == tolerance_
