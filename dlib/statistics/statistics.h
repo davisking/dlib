@@ -585,6 +585,10 @@ namespace dlib
             deserialize(item.m, in);
             deserialize(item.sd, in);
             deserialize(item.pca, in);
+            if (item.pca.nc() != item.m.nr())
+                throw serialization_error("Error deserializing object of type vector_normalizer_pca\n"   
+                                          "It looks like a serialized vector_normalizer was accidentally deserialized into \n"
+                                          "a vector_normalizer_pca object.");
         }
 
         friend void serialize (
