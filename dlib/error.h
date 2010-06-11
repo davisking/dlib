@@ -247,9 +247,9 @@ namespace dlib
         static inline void dlib_fatal_error_terminate (
         )
         {
-            std::cerr << "\n****************** FATAL ERROR DETECTED ******************";
+            std::cerr << "\n**************************** FATAL ERROR DETECTED ****************************";
             std::cerr << message() << std::endl;
-            std::cerr << "**********************************************************\n" << std::endl;
+            std::cerr << "******************************************************************************\n" << std::endl;
         }
 
         void check_for_previous_fatal_errors()
