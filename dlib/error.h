@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cassert>
 #include <cstdlib>
+#include <exception>
 
 // -------------------------------
 // ------ exception classes ------
@@ -235,6 +236,22 @@ namespace dlib
         !*/
 
     private:
+
+        static inline char* message ()
+        { 
+            static char buf[2000];
+            buf[1999] = '\0'; // just to be extra safe
+            return buf;
+        }
+
+        static inline void dlib_fatal_error_terminate (
+        )
+        {
+            std::cerr << "\n****************** FATAL ERROR DETECTED ******************";
+            std::cerr << message() << std::endl;
+            std::cerr << "**********************************************************\n" << std::endl;
+        }
+
         void check_for_previous_fatal_errors()
         {
             static bool is_first_fatal_error = true;
@@ -250,6 +267,20 @@ namespace dlib
                 using namespace std;
                 assert(false);
                 abort();
+            }
+            else
+            {
+                // copy the message into the fixed message buffer so that it can be recalled by dlib_fatal_error_terminate
+                // if needed.
+                char* msg = message();
+                unsigned long i;
+                for (i = 0; i < 2000-1 && i < this->info.size(); ++i)
+                    msg[i] = info[i];
+                msg[i] = '\0';
+
+                // set this termination handler so that if the user doesn't catch this dlib::fatal_error that is being
+                // thrown then it will eventually be printed to standard error
+                std::set_terminate(&dlib_fatal_error_terminate);
             }
             is_first_fatal_error = false;
         }
