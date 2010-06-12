@@ -115,10 +115,7 @@ namespace dlib
             // use the linearly_independent_subset_finder object to select the centers.  So here
             // we show it all the data samples so it can find the best centers.
             linearly_independent_subset_finder<kernel_type> lisf(kernel, num_centers);
-            for (long i = 0; i < x.size(); ++i)
-            {
-                lisf.add(x(i));
-            }
+            fill_lisf(lisf, x);
 
             const long num_centers = lisf.dictionary_size();
 
