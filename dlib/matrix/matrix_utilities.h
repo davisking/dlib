@@ -1524,45 +1524,17 @@ namespace dlib
     template <
         typename EXP
         >
-    const typename lazy_disable_if<is_matrix<typename EXP::type>, EXP>::type variance (
+    const typename matrix_exp<EXP>::type variance (
         const matrix_exp<EXP>& m
     )
     {
-        const typename matrix_exp<EXP>::type avg = mean(m);
-
-        typedef typename matrix_exp<EXP>::type type;
-
-        type val = 0;
-        for (long r = 0; r < m.nr(); ++r)
-        {
-            for (long c = 0; c < m.nc(); ++c)
-            {
-                val += std::pow(m(r,c) - avg,2);
-            }
-        }
-
-        if (m.nr() * m.nc() == 1)
-            return val;
-        else
-            return val/(m.nr()*m.nc() - 1);
-    }
-
-    template <
-        typename EXP
-        >
-    const typename lazy_enable_if<is_matrix<typename EXP::type>, EXP >::type variance (
-        const matrix_exp<EXP>& m
-    )
-    {
+        using std::pow;
         const typename matrix_exp<EXP>::type avg = mean(m);
 
         typedef typename matrix_exp<EXP>::type type;
 
         type val;
-        if (m.size() > 0)
-            val.set_size(m(0,0).nr(), m(0,0).nc());
-
-        set_all_elements(val,0);
+        val = 0;
         for (long r = 0; r < m.nr(); ++r)
         {
             for (long c = 0; c < m.nc(); ++c)
@@ -1572,9 +1544,16 @@ namespace dlib
         }
 
         if (m.nr() * m.nc() <= 1)
+        {
             return val;
+        }
         else
-            return val/(m.nr()*m.nc() - 1);
+        {
+            // Note, for some reason, in gcc 4.1 performing this division using a
+            // double instead of a long value avoids a segmentation fault.  That is, 
+            // using 1.0 instead of 1 does the trick.
+            return val/(m.nr()*m.nc() - 1.0);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
