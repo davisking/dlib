@@ -507,6 +507,20 @@ namespace dlib
             // set of basis vectors.
             beta = pinv(kernel_matrix(kern,out_vectors))*(kernel_matrix(kern,out_vectors,dec_funct.basis_vectors)*dec_funct.alpha);
 
+            // It is possible that some of the beta weights will be very close to zero.  Lets remove
+            // the basis vectors with these essentially zero weights.
+            const scalar_type eps = max(abs(beta))*std::numeric_limits<scalar_type>::epsilon();
+            for (long i = 0; i < beta.size(); ++i)
+            {
+                // if beta(i) is zero
+                if (std::abs(beta(i)) < eps)
+                {
+                    beta = remove_row(beta, i);
+                    out_vectors = remove_row(out_vectors, i);
+                    --i;
+                }
+            }
+
             decision_function<kernel_type> new_df(beta, 
                                                   0,
                                                   kern, 
