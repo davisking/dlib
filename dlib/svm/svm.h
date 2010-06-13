@@ -1251,7 +1251,7 @@ namespace dlib
                     else 
                     {
                         has_slack = true;
-                        if (temp > num)
+                        if (num_total > num)
                         {
                             ++count;
                             alpha(i) = temp - std::floor(temp);
@@ -1282,7 +1282,7 @@ namespace dlib
                     else 
                     {
                         has_slack = true;
-                        if (temp > num)
+                        if (num_total > num)
                         {
                             ++count;
                             alpha(i) = temp - std::floor(temp);
