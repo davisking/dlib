@@ -369,7 +369,7 @@ namespace
         print_spinner();
         matrix<scalar_type> svm_cv = cross_validate_trainer(trainer, x,y, 4);
         print_spinner();
-        matrix<scalar_type> rbf_cv = cross_validate_trainer_threaded(rbf_trainer, x,y, 4, 2);
+        matrix<scalar_type> rbf_cv = cross_validate_trainer_threaded(rbf_trainer, x,y, 10, 2);
         print_spinner();
         matrix<scalar_type> lin_cv = cross_validate_trainer_threaded(lin_trainer, x_linearized, y, 4, 2);
         print_spinner();
