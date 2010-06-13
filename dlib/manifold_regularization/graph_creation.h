@@ -122,7 +122,7 @@ namespace dlib
             std::sort(out.begin(), out.end(), &order_by_distance);
             out.swap(edges);
 
-            const unsigned long out_size = std::min<unsigned long>((unsigned long)num*percent, edges.size());
+            const unsigned long out_size = std::min<unsigned long>((unsigned long)(num*percent), edges.size());
             out.assign(edges.begin(), edges.begin() + out_size);
         }
     }
