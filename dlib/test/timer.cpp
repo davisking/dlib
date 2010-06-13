@@ -78,7 +78,7 @@ namespace
             dlib::uint64 cur_time = h.ts.get_timestamp();
 
             // make sure the action function has been called recently
-            DLIB_TEST_MSG((cur_time-h.timestamp)/1000 < 10, (cur_time-h.timestamp)/1000);
+            DLIB_TEST_MSG((cur_time-h.timestamp)/1000 < 30, (cur_time-h.timestamp)/1000);
 
         }
     }
