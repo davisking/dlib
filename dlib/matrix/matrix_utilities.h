@@ -14,6 +14,7 @@
 #include <algorithm>
 #include "../std_allocator.h"
 #include "matrix_expressions.h"
+#include "matrix_math_functions.h"
 
 
 namespace dlib
@@ -1529,6 +1530,7 @@ namespace dlib
     )
     {
         using std::pow;
+        using dlib::pow;
         const typename matrix_exp<EXP>::type avg = mean(m);
 
         typedef typename matrix_exp<EXP>::type type;
