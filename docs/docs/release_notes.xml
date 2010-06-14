@@ -13,12 +13,25 @@
 <current>
 New Stuff:
    - Added the simplify_linear_decision_function() routines.
+   - Added the find_approximate_k_nearest_neighbors() function.
+   - Added the fill_lisf() function.
 
 Non-Backwards Compatible Changes:
+   - Made the sample_pair have a default distance of infinity instead of
+     the max floating point value.  I also reworked the graph creation functions 
+     to make them a little more versatile.  Now you can use infinite distances to 
+     indicate that certain nodes are not connected at all.
+   - Changed the linear_manifold_regularizer to normalize the regularization
+     parameter by the sum of edge weights instead of the sum of edges.
 
 Bug fixes:
+   - Fixed a bug in the timer_kernel_2 object.  In certain rare cases it would 
+     stop calling the action function and essentially shut down without being 
+     told to do so.
 
 Other:
+   - Made the reduced() and reduced2() functions more efficient.
+   - Many small usability improvements here and there.
 
 </current>
 
