@@ -433,7 +433,7 @@ namespace
         dlog << LDEBUG << "svm reduced cv: " << svm_cv;
         DLIB_TEST_MSG(mean(svm_cv) > 0.9, svm_cv);
 
-        DLIB_TEST(df.basis_vectors.size() == 19);
+        DLIB_TEST(df.basis_vectors.size() <= 19);
         dlog << LINFO << "   end test_binary_classification()";
     }
 
