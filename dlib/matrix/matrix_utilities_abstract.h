@@ -700,7 +700,7 @@ namespace dlib
             - returns a matrix R such that:
                 - R::type == the same type that was in a and b.
                 - R.nr() == a.nr() == b.nr()
-                - R.nc() == a.nr() + b.nc()
+                - R.nc() == a.nc() + b.nc()
                 - for all valid r and c:
                     - if (c < a.nc()) then
                         - R(r,c) == a(r,c) 
@@ -723,7 +723,7 @@ namespace dlib
             - returns a matrix R such that:
                 - R::type == the same type that was in a and b.
                 - R.nr() == a.nr() + b.nr()
-                - R.nc() == a.nr() == b.nc()
+                - R.nc() == a.nc() == b.nc()
                 - for all valid r and c:
                     - if (r < a.nr()) then
                         - R(r,c) == a(r,c) 
