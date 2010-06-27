@@ -22,44 +22,44 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename M>
     struct op_conj_trans 
     {
-        template <typename EXP>
-        struct op : has_destructive_aliasing
-        {
-            const static long cost = EXP::cost;
-            const static long NR = EXP::NC;
-            const static long NC = EXP::NR;
-            typedef typename EXP::type type;
-            typedef typename EXP::type const_ret_type;
-            typedef typename EXP::mem_manager_type mem_manager_type;
-            template <typename M>
-            static const const_ret_type apply ( const M& m, long r, long c)
-            { return std::conj(m(c,r)); }
+        op_conj_trans( const M& m_) : m(m_){}
+        const M& m;
 
-            template <typename M>
-            static long nr (const M& m) { return m.nc(); }
-            template <typename M>
-            static long nc (const M& m) { return m.nr(); }
-        }; 
-    };
+        const static long cost = M::cost;
+        const static long NR = M::NC;
+        const static long NC = M::NR;
+        typedef typename M::type type;
+        typedef typename M::type const_ret_type;
+        typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
+        const_ret_type apply (long r, long c) const { return std::conj(m(c,r)); }
+
+        long nr () const { return m.nc(); }
+        long nc () const { return m.nr(); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
+    }; 
 
     template <typename EXP>
-    const matrix_unary_exp<EXP,op_conj_trans> trans (
-        const matrix_unary_exp<EXP,op_conj>& m
+    const matrix_op<op_conj_trans<EXP> > trans (
+        const matrix_op<op_conj<EXP> >& m
     )
     {
-        typedef matrix_unary_exp<EXP,op_conj_trans> exp;
-        return exp(m.m);
+        typedef op_conj_trans<EXP> op;
+        return matrix_op<op>(op(m.op.m));
     }
 
     template <typename EXP>
-    const matrix_unary_exp<EXP,op_conj_trans> conj (
-        const matrix_unary_exp<EXP,op_trans>& m
+    const matrix_op<op_conj_trans<EXP> > conj (
+        const matrix_op<op_trans<EXP> >& m
     )
     {
-        typedef matrix_unary_exp<EXP,op_conj_trans> exp;
-        return exp(m.m);
+        typedef op_conj_trans<EXP> op;
+        return matrix_op<op>(op(m.op.m));
     }
 
 // ----------------------------------------------------------------------------------------

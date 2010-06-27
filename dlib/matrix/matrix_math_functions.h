@@ -4,6 +4,7 @@
 #define DLIB_MATRIx_MATH_FUNCTIONS 
 
 #include "matrix_math_functions_abstract.h"
+#include "matrix_op.h"
 #include "matrix_utilities.h"
 #include "matrix.h"
 #include "../algs.h"
@@ -17,349 +18,214 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#define DLIB_MATRIX_SIMPLE_STD_FUNCTION(name,extra_cost) struct op_##name {     \
-    template <typename EXP>                                                     \
-    struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>          \
-    {                                                                           \
-        const static long cost = EXP::cost+(extra_cost);                        \
-        typedef typename EXP::type type;                                        \
-        typedef const typename EXP::type const_ret_type;                        \
-        template <typename M>                                                   \
-        static const_ret_type apply ( const M& m, long r, long c)               \
-        { return static_cast<type>(std::name(m(r,c))); }                        \
-    };};                                                                        \
-    template < typename EXP >                                                   \
-    const matrix_unary_exp<EXP,op_##name> name (                                \
-        const matrix_exp<EXP>& m)                                               \
-    {                                                                           \
-        return matrix_unary_exp<EXP,op_##name>(m.ref());                        \
-    }                                                                           
+    DLIB_DEFINE_FUNCTION_M(op_sqrt, sqrt, std::sqrt ,7);
+    DLIB_DEFINE_FUNCTION_M(op_log, log, std::log ,7);
+    DLIB_DEFINE_FUNCTION_M(op_log10, log10, std::log10 ,7);
+    DLIB_DEFINE_FUNCTION_M(op_exp, exp, std::exp ,7);
+
+    DLIB_DEFINE_FUNCTION_M(op_conj, conj, std::conj ,1);
+
+    DLIB_DEFINE_FUNCTION_M(op_ceil, ceil, std::ceil ,7);
+    DLIB_DEFINE_FUNCTION_M(op_floor, floor, std::floor ,7);
+
+    DLIB_DEFINE_FUNCTION_M(op_sin, sin, std::sin ,7);
+    DLIB_DEFINE_FUNCTION_M(op_cos, cos, std::cos ,7);
+    DLIB_DEFINE_FUNCTION_M(op_tan, tan, std::tan ,7);
+    DLIB_DEFINE_FUNCTION_M(op_sinh, sinh, std::sinh ,7);
+    DLIB_DEFINE_FUNCTION_M(op_cosh, cosh, std::cosh ,7);
+    DLIB_DEFINE_FUNCTION_M(op_tanh, tanh, std::tanh ,7);
+    DLIB_DEFINE_FUNCTION_M(op_asin, asin, std::asin ,7);
+    DLIB_DEFINE_FUNCTION_M(op_acos, acos, std::acos ,7);
+    DLIB_DEFINE_FUNCTION_M(op_atan, atan, std::atan ,7);
 
 // ----------------------------------------------------------------------------------------
 
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(sqrt,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(log,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(log10,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(exp,7)
-
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(conj,1)
-
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(ceil,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(floor,7)
-
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(sin,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(cos,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(tan,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(sinh,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(cosh,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(tanh,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(asin,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(acos,7)
-DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
-
-// ----------------------------------------------------------------------------------------
-
-    struct op_sigmoid 
+    namespace impl
     {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
+        template <typename type>
+        inline type sigmoid (const type& val)
         {
-            const static long cost = EXP::cost+7;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                return static_cast<type>(1/(1 + std::exp(-m(r,c))));
-            }
-        };
-    };
+            return static_cast<type>(1/(1 + std::exp(-val)));
+        }
 
-    template <
-        typename EXP
-        >
-    const matrix_unary_exp<EXP,op_sigmoid> sigmoid (
-        const matrix_exp<EXP>& m
-    )
-    {
-        return matrix_unary_exp<EXP,op_sigmoid>(m.ref());
+        template <typename type, typename S>
+        inline type round_zeros_eps (const type& val, const S& eps)
+        {
+            // you can only round matrices that contain built in scalar types like double, long, float, etc.
+            COMPILE_TIME_ASSERT(is_built_in_scalar_type<type>::value);
+
+            if (val >= eps || val <= -eps)
+                return val;
+            else
+                return 0;
+        }
+
+        template <typename type>
+        inline type round_zeros (const type& val)
+        {
+            // you can only round matrices that contain built in scalar types like double, long, float, etc.
+            COMPILE_TIME_ASSERT(is_built_in_scalar_type<type>::value);
+
+            const type eps = 10*std::numeric_limits<type>::epsilon();
+            if (val >= eps || val <= -eps)
+                return val;
+            else
+                return 0;
+        }
+
+        template <typename type>
+        inline type squared (const type& val)
+        {
+            return val*val;
+        }
+
+        template <typename type>
+        type cubed (const type& val)
+        {
+            return val*val*val;
+        }
+
+        template <typename type, typename S>
+        inline type pow1 (const type& val, const S& s)
+        {
+            // you can only call pow() on matrices that contain floats, doubles or long doubles.
+            COMPILE_TIME_ASSERT((
+                    is_same_type<type,float>::value == true || 
+                    is_same_type<type,double>::value == true || 
+                    is_same_type<type,long double>::value == true 
+            ));
+
+            return std::pow(val,s);
+        }
+
+        template <typename type, typename S>
+        inline type pow2 (const S& s, const type& val)
+        {
+            // you can only call pow() on matrices that contain floats, doubles or long doubles.
+            COMPILE_TIME_ASSERT((
+                    is_same_type<type,float>::value == true || 
+                    is_same_type<type,double>::value == true || 
+                    is_same_type<type,long double>::value == true 
+            ));
+
+            return std::pow(s,val);
+        }
+
+        template <typename type>
+        inline type reciprocal (const type& val)
+        {
+            // you can only compute reciprocal matrices that contain floats, doubles or long doubles.
+            COMPILE_TIME_ASSERT((
+                    is_same_type<type,float>::value == true || 
+                    is_same_type<type,double>::value == true || 
+                    is_same_type<type,long double>::value == true  ||
+                    is_same_type<type,std::complex<float> >::value == true || 
+                    is_same_type<type,std::complex<double> >::value == true || 
+                    is_same_type<type,std::complex<long double> >::value == true 
+            ));
+
+            if (val != static_cast<type>(0))
+                return static_cast<type>((type)1.0/val);
+            else
+                return 0;
+        }
+
+        template <typename type>
+        inline type reciprocal_max (const type& val)
+        {
+            // you can only compute reciprocal_max matrices that contain floats, doubles or long doubles.
+            COMPILE_TIME_ASSERT((
+                    is_same_type<type,float>::value == true || 
+                    is_same_type<type,double>::value == true || 
+                    is_same_type<type,long double>::value == true 
+            ));
+
+            if (val != static_cast<type>(0))
+                return static_cast<type>((type)1.0/val);
+            else
+                return std::numeric_limits<type>::max();
+        }
+
     }
 
+    DLIB_DEFINE_FUNCTION_M(op_sigmoid, sigmoid, impl::sigmoid, 7);
+    DLIB_DEFINE_FUNCTION_MS(op_round_zeros, round_zeros, impl::round_zeros_eps, 7);
+    DLIB_DEFINE_FUNCTION_M(op_round_zeros2, round_zeros, impl::round_zeros, 7);
+    DLIB_DEFINE_FUNCTION_M(op_cubed, cubed, impl::cubed, 7);
+    DLIB_DEFINE_FUNCTION_M(op_squared, squared, impl::squared, 6);
+    DLIB_DEFINE_FUNCTION_MS(op_pow1, pow, impl::pow1, 7);
+    DLIB_DEFINE_FUNCTION_SM(op_pow2, pow, impl::pow2, 7);
+    DLIB_DEFINE_FUNCTION_M(op_reciprocal, reciprocal, impl::reciprocal, 6);
+    DLIB_DEFINE_FUNCTION_M(op_reciprocal_max, reciprocal_max, impl::reciprocal_max, 6);
+
 // ----------------------------------------------------------------------------------------
 
-    struct op_round_zeros 
+    template <typename M, typename enabled = void>
+    struct op_round : basic_op_m<M> 
     {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+7;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M, typename T>
-            static const_ret_type apply ( const M& m, const T& eps, long r, long c)
-            { 
-                const type temp = m(r,c);
-                if (temp >= eps || temp <= -eps)
-                    return temp;
-                else
-                    return 0;
-            }
-        };
+        op_round( const M& m_) : basic_op_m<M>(m_){}
+
+        const static long cost = M::cost+7;
+        typedef typename M::type type;
+        typedef const typename M::type const_ret_type;
+        const_ret_type apply (long r, long c) const
+        { 
+            return static_cast<type>(std::floor(this->m(r,c)+0.5)); 
+        }
+    };
+
+    template <typename M>
+    struct op_round<M,typename enable_if_c<std::numeric_limits<typename M::type>::is_integer>::type > 
+    : basic_op_m<M>
+    {
+        op_round( const M& m_) : basic_op_m<M>(m_){}
+
+        const static long cost = M::cost;
+        typedef typename M::type type;
+        typedef typename M::const_ret_type const_ret_type;
+        const_ret_type apply (long r, long c) const
+        { 
+            return this->m(r,c);
+        }
     };
 
     template <
         typename EXP
         >
-    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_round_zeros> round_zeros (
+    const matrix_op<op_round<EXP> > round (
         const matrix_exp<EXP>& m
     )
     {
         // you can only round matrices that contain built in scalar types like double, long, float, etc.
         COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
-        typedef matrix_scalar_binary_exp<EXP,typename EXP::type, op_round_zeros> exp;
-        return exp(m.ref(),10*std::numeric_limits<typename EXP::type>::epsilon());
-    }
 
-    template <
-        typename EXP
-        >
-    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_round_zeros> round_zeros (
-        const matrix_exp<EXP>& m,
-        typename EXP::type eps 
-    )
-    {
-        // you can only round matrices that contain built in scalar types like double, long, float, etc.
-        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
-        return matrix_scalar_binary_exp<EXP,typename EXP::type, op_round_zeros>(m.ref(),eps);
+        typedef op_round<EXP> op;
+        return matrix_op<op>(op(m.ref()));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    struct op_cubed 
+    template <typename M>
+    struct op_normalize : basic_op_m<M> 
     {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+7;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                const type temp = m(r,c);
-                return temp*temp*temp; 
-            }
-        };
+        typedef typename M::type type;
+
+        op_normalize( const M& m_, const type& s_) : basic_op_m<M>(m_), s(s_){}
+
+        const type s;
+
+        const static long cost = M::cost+5;
+        typedef const typename M::type const_ret_type;
+        const_ret_type apply (long r, long c) const
+        { 
+            return this->m(r,c)*s;
+        }
     };
 
     template <
         typename EXP
         >
-    const matrix_unary_exp<EXP,op_cubed> cubed (
-        const matrix_exp<EXP>& m
-    )
-    {
-        return matrix_unary_exp<EXP,op_cubed>(m.ref());
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    struct op_squared
-    {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+6;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                const type temp = m(r,c);
-                return temp*temp; 
-            }
-        };
-    };
-
-    template <
-        typename EXP
-        >
-    const matrix_unary_exp<EXP,op_squared> squared (
-        const matrix_exp<EXP>& m
-    )
-    {
-        return matrix_unary_exp<EXP,op_squared>(m.ref());
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    struct op_pow
-    {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+7;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M, typename S>
-            static const_ret_type apply ( const M& m, const S& s, long r, long c)
-            { return static_cast<type>(std::pow(m(r,c),s)); }
-        };
-    };
-
-    template <
-        typename EXP,
-        typename S
-        >
-    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_pow> pow (
-        const matrix_exp<EXP>& m,
-        const S& s
-    )
-    {
-        // you can only round matrices that contain floats, doubles or long doubles.
-        COMPILE_TIME_ASSERT((
-                is_same_type<typename EXP::type,float>::value == true || 
-                is_same_type<typename EXP::type,double>::value == true || 
-                is_same_type<typename EXP::type,long double>::value == true 
-        ));
-        return matrix_scalar_binary_exp<EXP,typename EXP::type,op_pow>(m.ref(),s);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    struct op_pow2
-    {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+7;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M, typename S>
-            static const_ret_type apply ( const M& m, const S& s, long r, long c)
-            { return static_cast<type>(std::pow(s,m(r,c))); }
-        };
-    };
-
-    template <
-        typename EXP,
-        typename S
-        >
-    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_pow2> pow (
-        const S& s,
-        const matrix_exp<EXP>& m
-    )
-    {
-        // you can only round matrices that contain floats, doubles or long doubles.
-        COMPILE_TIME_ASSERT((
-                is_same_type<typename EXP::type,float>::value == true || 
-                is_same_type<typename EXP::type,double>::value == true || 
-                is_same_type<typename EXP::type,long double>::value == true 
-        ));
-        return matrix_scalar_binary_exp<EXP,typename EXP::type,op_pow2>(m.ref(),s);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    struct op_reciprocal
-    {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+6;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                const type temp = m(r,c);
-                if (temp != static_cast<type>(0))
-                    return static_cast<type>((type)1.0/temp);
-                else
-                    return 0;
-            }
-        };
-    };
-
-    template <
-        typename EXP
-        >
-    const matrix_unary_exp<EXP,op_reciprocal> reciprocal (
-        const matrix_exp<EXP>& m
-    )
-    {
-        // you can only compute reciprocal matrices that contain floats, doubles or long doubles.
-        COMPILE_TIME_ASSERT((
-                is_same_type<typename EXP::type,float>::value == true || 
-                is_same_type<typename EXP::type,double>::value == true || 
-                is_same_type<typename EXP::type,long double>::value == true  ||
-                is_same_type<typename EXP::type,std::complex<float> >::value == true || 
-                is_same_type<typename EXP::type,std::complex<double> >::value == true || 
-                is_same_type<typename EXP::type,std::complex<long double> >::value == true 
-        ));
-        return matrix_unary_exp<EXP,op_reciprocal>(m.ref());
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    struct op_reciprocal_max
-    {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+6;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                const type temp = m(r,c);
-                if (temp != static_cast<type>(0))
-                    return static_cast<type>((type)1.0/temp);
-                else
-                    return std::numeric_limits<type>::max();
-            }
-        };
-    };
-
-    template <
-        typename EXP
-        >
-    const matrix_unary_exp<EXP,op_reciprocal_max> reciprocal_max (
-        const matrix_exp<EXP>& m
-    )
-    {
-        // you can only compute reciprocal_max matrices that contain floats, doubles or long doubles.
-        COMPILE_TIME_ASSERT((
-                is_same_type<typename EXP::type,float>::value == true || 
-                is_same_type<typename EXP::type,double>::value == true || 
-                is_same_type<typename EXP::type,long double>::value == true 
-        ));
-        return matrix_unary_exp<EXP,op_reciprocal_max>(m.ref());
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    struct op_normalize
-    {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+5;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, const type& s, long r, long c)
-            { 
-                return m(r,c)*s;
-            }
-        };
-    };
-
-    template <
-        typename EXP
-        >
-    const matrix_scalar_binary_exp<EXP,typename EXP::type,op_normalize> normalize (
+    const matrix_op<op_normalize<EXP> > normalize (
         const matrix_exp<EXP>& m
     )
     {
@@ -369,152 +235,104 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
                 is_same_type<typename EXP::type,double>::value == true || 
                 is_same_type<typename EXP::type,long double>::value == true 
         ));
-        typedef matrix_scalar_binary_exp<EXP,typename EXP::type, op_normalize> exp;
 
+
+        typedef op_normalize<EXP> op;
         typename EXP::type temp = std::sqrt(sum(squared(m)));
         if (temp != 0.0)
             temp = 1.0/temp;
 
-        return exp(m.ref(),temp);
+        return matrix_op<op>(op(m.ref(),temp));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    struct op_round
+    template <typename M, typename return_type = typename M::type>
+    struct op_abs : basic_op_m<M>
     {
-        template <typename EXP, typename enabled = void>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+7;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                return static_cast<type>(std::floor(m(r,c)+0.5)); 
-            }
-        };
+        op_abs( const M& m_) : basic_op_m<M>(m_){}
 
-        template <typename EXP>
-        struct op<EXP,typename enable_if_c<std::numeric_limits<typename EXP::type>::is_integer>::type > 
-                : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost;
-            typedef typename EXP::type type;
-            typedef typename EXP::const_ret_type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                return m(r,c);
-            }
-        };
+        const static long cost = M::cost+7;
+        typedef typename M::type type;
+        typedef const typename M::type const_ret_type;
+        const_ret_type apply ( long r, long c) const
+        { 
+            return static_cast<type>(std::abs(this->m(r,c))); 
+        }
+    };
+
+    template <typename M, typename T>
+    struct op_abs<M, std::complex<T> > : basic_op_m<M>
+    {
+        op_abs( const M& m_) : basic_op_m<M>(m_){}
+
+        const static long cost = M::cost;
+        typedef T type;
+        typedef const T const_ret_type;
+        const_ret_type apply ( long r, long c) const
+        { 
+            return static_cast<type>(std::abs(this->m(r,c))); 
+        }
     };
 
     template <
         typename EXP
         >
-    const matrix_unary_exp<EXP,op_round> round (
+    const matrix_op<op_abs<EXP> > abs (
         const matrix_exp<EXP>& m
     )
     {
-        // you can only round matrices that contain built in scalar types like double, long, float, etc.
-        COMPILE_TIME_ASSERT(is_built_in_scalar_type<typename EXP::type>::value);
-        typedef matrix_unary_exp<EXP,op_round> exp;
-        return exp(m.ref());
+        typedef op_abs<EXP> op;
+        return matrix_op<op>(op(m.ref()));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    struct op_abs
+    template <typename M>
+    struct op_complex_matrix : basic_op_m<M>
     {
-        template <typename EXP, typename return_type = typename EXP::type>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+7;
-            typedef typename EXP::type type;
-            typedef const typename EXP::type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                return static_cast<type>(std::abs(m(r,c))); 
-            }
-        };
+        op_complex_matrix( const M& m_) : basic_op_m<M>(m_){}
 
-        template <typename EXP, typename T>
-        struct op<EXP, std::complex<T> > : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost;
-            typedef T type;
-            typedef const T const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                return static_cast<type>(std::abs(m(r,c))); 
-            }
-        };
+        const static long cost = M::cost+1;
+        typedef std::complex<typename M::type> type;
+        typedef const std::complex<typename M::type> const_ret_type;
+        const_ret_type apply ( long r, long c) const
+        { 
+            return type(this->m(r,c));
+        }
     };
 
     template <
         typename EXP
         >
-    const matrix_unary_exp<EXP,op_abs> abs (
+    const matrix_op<op_complex_matrix<EXP> > complex_matrix (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<EXP,op_abs> exp;
-        return exp(m.ref());
+        typedef op_complex_matrix<EXP> op;
+        return matrix_op<op>(op(m.ref()));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    struct op_complex_matrix 
+    template <typename M1, typename M2>
+    struct op_complex_matrix2 : basic_op_mm<M1,M2>
     {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+1;
-            typedef std::complex<typename EXP::type> type;
-            typedef const std::complex<typename EXP::type> const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { 
-                return type(m(r,c));
-            }
-        };
-    };
+        op_complex_matrix2( const M1& m1_, const M2& m2_) : basic_op_mm<M1,M2>(m1_,m2_){}
 
-    template <
-        typename EXP
-        >
-    const matrix_unary_exp<EXP,op_complex_matrix> complex_matrix (
-        const matrix_exp<EXP>& m
-    )
-    {
-        return matrix_unary_exp<EXP,op_complex_matrix>(m.ref());
-    }
+        const static long cost = M1::cost+M2::cost+1;
+        typedef std::complex<typename M1::type> type;
+        typedef const std::complex<typename M1::type> const_ret_type;
 
-// ----------------------------------------------------------------------------------------
-
-    struct op_complex_matrix2
-    {
-        template <typename EXP1, typename EXP2>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP1,EXP2>
-        {
-            const static long cost = EXP1::cost+EXP2::cost+1;
-            typedef std::complex<typename EXP1::type> type;
-            typedef const std::complex<typename EXP1::type> const_ret_type;
-
-            template <typename M1, typename M2>
-            static const_ret_type apply ( const M1& m1, const M2& m2 , long r, long c)
-            { return type(m1(r,c),m2(r,c)); }
-        };
+        const_ret_type apply ( long r, long c) const
+        { return type(this->m1(r,c), this->m2(r,c)); }
     };
 
     template <
         typename EXP1,
         typename EXP2
         >
-    const matrix_binary_exp<EXP1,EXP2,op_complex_matrix2> complex_matrix (
+    const matrix_op<op_complex_matrix2<EXP1,EXP2> > complex_matrix (
         const matrix_exp<EXP1>& real_part,
         const matrix_exp<EXP2>& imag_part 
     )
@@ -532,89 +350,84 @@ DLIB_MATRIX_SIMPLE_STD_FUNCTION(atan,7)
             << "\n\timag_part.nr(): " << imag_part.nr()
             << "\n\timag_part.nc(): " << imag_part.nc() 
             );
-        typedef matrix_binary_exp<EXP1,EXP2,op_complex_matrix2> exp;
-        return exp(real_part.ref(),imag_part.ref());
+
+        typedef op_complex_matrix2<EXP1,EXP2> op;
+        return matrix_op<op>(op(real_part.ref(),imag_part.ref()));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    struct op_norm
+    template <typename M>
+    struct op_norm : basic_op_m<M>
     {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost+6;
-            typedef typename EXP::type::value_type type;
-            typedef const typename EXP::type::value_type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { return std::norm(m(r,c)); }
-        };
+        op_norm( const M& m_) : basic_op_m<M>(m_){}
+
+        const static long cost = M::cost+6;
+        typedef typename M::type::value_type type;
+        typedef const typename M::type::value_type const_ret_type;
+        const_ret_type apply ( long r, long c) const
+        { return std::norm(this->m(r,c)); }
     };
 
     template <
         typename EXP
         >
-    const matrix_unary_exp<EXP,op_norm> norm (
+    const matrix_op<op_norm<EXP> > norm (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<EXP,op_norm> exp;
-        return exp(m.ref());
+        typedef op_norm<EXP> op;
+        return matrix_op<op>(op(m.ref()));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    struct op_real
+    template <typename M>
+    struct op_real : basic_op_m<M>
     {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost;
-            typedef typename EXP::type::value_type type;
-            typedef const typename EXP::type::value_type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { return std::real(m(r,c)); }
-        };
+        op_real( const M& m_) : basic_op_m<M>(m_){}
+
+        const static long cost = M::cost;
+        typedef typename M::type::value_type type;
+        typedef const typename M::type::value_type const_ret_type;
+        const_ret_type apply ( long r, long c) const
+        { return std::real(this->m(r,c)); }
     };
 
     template <
         typename EXP
         >
-    const matrix_unary_exp<EXP,op_real> real (
+    const matrix_op<op_real<EXP> > real (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<EXP,op_real> exp;
-        return exp(m.ref());
+        typedef op_real<EXP> op;
+        return matrix_op<op>(op(m.ref()));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    struct op_imag
+    template <typename M>
+    struct op_imag : basic_op_m<M>
     {
-        template <typename EXP>
-        struct op : has_nondestructive_aliasing, preserves_dimensions<EXP>
-        {
-            const static long cost = EXP::cost;
-            typedef typename EXP::type::value_type type;
-            typedef const typename EXP::type::value_type const_ret_type;
-            template <typename M>
-            static const_ret_type apply ( const M& m, long r, long c)
-            { return std::imag(m(r,c)); }
-        };
+        op_imag( const M& m_) : basic_op_m<M>(m_){}
+
+        const static long cost = M::cost;
+        typedef typename M::type::value_type type;
+        typedef const typename M::type::value_type const_ret_type;
+        const_ret_type apply (long r, long c) const
+        { return std::imag(this->m(r,c)); }
     };
 
     template <
         typename EXP
         >
-    const matrix_unary_exp<EXP,op_imag> imag (
+    const matrix_op<op_imag<EXP> > imag (
         const matrix_exp<EXP>& m
     )
     {
-        typedef matrix_unary_exp<EXP,op_imag> exp;
-        return exp(m.ref());
+        typedef op_imag<EXP> op;
+        return matrix_op<op>(op(m.ref()));
     }
 
 // ----------------------------------------------------------------------------------------

@@ -10,6 +10,7 @@
 #include "../enable_if.h"
 #include "matrix_assign_fwd.h"
 #include "matrix_default_mul.h"
+#include "matrix_conj_trans.h"
 
 namespace dlib
 {
@@ -70,8 +71,20 @@ namespace dlib
         struct has_matrix_multiply<matrix_div_scal_exp<T> >  
         { const static bool value = has_matrix_multiply<T>::value; };
 
-        template <typename T, typename OP> 
-        struct has_matrix_multiply<matrix_unary_exp<T,OP> >  
+        template <typename T> 
+        struct has_matrix_multiply<matrix_op<T> >  
+        { const static bool value = has_matrix_multiply<T>::value; };
+
+        template <typename T> 
+        struct has_matrix_multiply<op_trans<T> >  
+        { const static bool value = has_matrix_multiply<T>::value; };
+
+        template <typename T> 
+        struct has_matrix_multiply<op_conj_trans<T> >  
+        { const static bool value = has_matrix_multiply<T>::value; };
+
+        template <typename T> 
+        struct has_matrix_multiply<op_conj<T> >  
         { const static bool value = has_matrix_multiply<T>::value; };
 
     // ------------------------------------------------------------------------------------
@@ -112,31 +125,31 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        struct matrix_type_id<matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_colm> >
+        struct matrix_type_id<matrix_op<op_colm<matrix<T,NR,NC,MM,L> > > >
         {
             const static int value = column_matrix;
         };
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        struct matrix_type_id<matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm> >
+        struct matrix_type_id<matrix_op<op_rowm<matrix<T,NR,NC,MM,L> > > >
         {
             const static int value = row_matrix;
         };
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        struct matrix_type_id<matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,L>,long,op_colm2> >
+        struct matrix_type_id<matrix_op<op_colm2<matrix<T,NR,NC,MM,L> > > >
         {
             const static int value = column_matrix;
         };
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        struct matrix_type_id<matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm2> >
+        struct matrix_type_id<matrix_op<op_rowm2<matrix<T,NR,NC,MM,L> > > >
         {
             const static int value = row_matrix;
         };
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        struct matrix_type_id<matrix_sub_exp<matrix<T,NR,NC,MM,L> > >
+        struct matrix_type_id<matrix_op<op_subm<matrix<T,NR,NC,MM,L> > > >
         {
             const static int value = general_matrix;
         };
@@ -215,8 +228,16 @@ namespace dlib
         struct same_exp<matrix_div_scal_exp<T>, matrix_div_scal_exp<U>, layout > 
         { const static bool value = same_exp<T,U,layout>::value; };
 
-        template <typename T, typename U, typename OP, typename layout> 
-        struct same_exp<matrix_unary_exp<T,OP>, matrix_unary_exp<U,OP>, layout > 
+        template <typename T, typename U, typename layout> 
+        struct same_exp<matrix_op<op_trans<T> >, matrix_op<op_trans<U> >, layout > 
+        { const static bool value = same_exp<T,U,layout>::value; };
+
+        template <typename T, typename U, typename layout> 
+        struct same_exp<matrix_op<op_conj<T> >, matrix_op<op_conj<U> >, layout > 
+        { const static bool value = same_exp<T,U,layout>::value; };
+
+        template <typename T, typename U, typename layout> 
+        struct same_exp<matrix_op<op_conj_trans<T> >, matrix_op<op_conj_trans<U> >, layout > 
         { const static bool value = same_exp<T,U,layout>::value; };
 
     // ------------------------------------------------------------------------------------
@@ -410,7 +431,7 @@ namespace dlib
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
-            const matrix_unary_exp<src_exp,op_trans>& src,
+            const matrix_op<op_trans<src_exp> >& src,
             typename src_exp::type alpha,
             bool add_to,
             bool transpose
@@ -574,13 +595,13 @@ namespace dlib
             >
         void matrix_assign_blas_proxy (
             dest_exp& dest,
-            const matrix_unary_exp<src_exp,op_trans>& src,
+            const matrix_op<op_trans<src_exp> >& src,
             typename src_exp::type alpha,
             bool add_to,
             bool transpose
         )
         {
-            matrix_assign_blas_proxy(dest, src.m, alpha, add_to, !transpose);
+            matrix_assign_blas_proxy(dest, src.op.m, alpha, add_to, !transpose);
         }
             
     // ------------------------------------------------------------------------------------

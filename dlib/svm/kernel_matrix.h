@@ -15,516 +15,158 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    template < typename kernel_type, typename alloc >
-    class kernel_matrix_exp;
-
-    template < typename kernel_type, typename alloc >
-    struct matrix_traits<kernel_matrix_exp<kernel_type,alloc> >
+    namespace impl
     {
-        typedef typename kernel_type::scalar_type type;
-        typedef const type const_ret_type;
-        typedef typename kernel_type::mem_manager_type mem_manager_type;
-        typedef row_major_layout layout_type;
-        const static long NR = 0;
-        const static long NC = 0;
-        const static long cost = 100;
-    };
-
-    template <
-        typename kernel_type,
-        typename alloc
-        >
-    class kernel_matrix_exp : public matrix_exp<kernel_matrix_exp<kernel_type,alloc> >
-    {
-        typedef typename kernel_type::sample_type sample_type;
-    public:
-        typedef typename matrix_traits<kernel_matrix_exp>::type type;
-        typedef typename matrix_traits<kernel_matrix_exp>::const_ret_type const_ret_type;
-        typedef typename matrix_traits<kernel_matrix_exp>::mem_manager_type mem_manager_type;
-        typedef typename matrix_traits<kernel_matrix_exp>::layout_type layout_type;
-        const static long NR = matrix_traits<kernel_matrix_exp>::NR;
-        const static long NC = matrix_traits<kernel_matrix_exp>::NC;
-        const static long cost = matrix_traits<kernel_matrix_exp>::cost;
-
-    private:
-        // This constructor exists simply for the purpose of causing a compile time error if
-        // someone tries to create an instance of this object with the wrong kind of objects.
-        template <typename T1, typename T2>
-        kernel_matrix_exp (T1,T2); 
-    public:
-
-        kernel_matrix_exp (
-            const kernel_type& kern_,
-            const std::vector<sample_type,alloc>& m_
-        ) :
-            m(m_),
-            kern(kern_)
-        {}
-
-        const type operator() (
-            long r, 
-            long c
-        ) const { return kern(m[r],m[c]); }
-
-        template <typename U>
-        bool aliases (
-            const matrix_exp<U>& 
-        ) const { return false; }
-
-        template <typename U>
-        bool destructively_aliases (
-            const matrix_exp<U>& 
-        ) const { return false; }
-
-        long nr (
-        ) const { return m.size(); }
-
-        long nc (
-        ) const { return m.size(); }
-
-
-        const std::vector<sample_type,alloc>& m;
-        const kernel_type& kern;
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename kernel_type,
-        typename alloc
-        >
-    const kernel_matrix_exp<kernel_type,alloc> kernel_matrix (
-        const kernel_type& kern,
-        const std::vector<typename kernel_type::sample_type,alloc>& m
-        )
-    {
-        typedef kernel_matrix_exp<kernel_type,alloc> exp;
-        return exp(kern,m);
-    }
-    
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-    template <typename kernel_type>
-    struct op_kern_mat
-    {
-        template <typename EXP>
-        struct op : has_destructive_aliasing
+        template <typename kernel_type, typename T>
+        inline const typename T::type& access ( const matrix_exp<T>& m, long i)
         {
-            const static long NR = 0;
-            const static long NC = 0;
-            typedef typename EXP::mem_manager_type mem_manager_type;
+            return m(i);
+        }
 
-            const static long cost = EXP::cost+100;
-            typedef typename kernel_type::scalar_type type;
-            typedef const type const_ret_type;
-            template <typename M>
-            static const const_ret_type apply ( const M& m, const kernel_type& kern, const long r, long c)
-            { 
-                return kern(m(r),m(c));
-            }
+        template <typename kernel_type, typename T, typename alloc>
+        inline const T& access ( const std::vector<T,alloc>& m, long i)
+        {
+            return m[i];
+        }
 
-            template <typename M>
-            static long nr (const M& m) { return m.size(); }
-            template <typename M>
-            static long nc (const M& m) { return m.size(); }
-        };
-    };
+        template <typename kernel_type, typename T, typename alloc>
+        inline const T& access ( const std_vector_c<T,alloc>& m, long i)
+        {
+            return m[i];
+        }
 
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename EXP,
-        typename kernel_type
-        >
-    const matrix_scalar_binary_exp<EXP, kernel_type, op_kern_mat<kernel_type> > kernel_matrix (
-        const kernel_type& kernel,
-        const matrix_exp<EXP>& m
-        )
-    {
-        // make sure requires clause is not broken
-        DLIB_ASSERT(is_vector(m) == true,
-            "\tconst matrix_exp kernel_matrix(kernel,m)"
-            << "\n\t You have to supply this function with a row or column vector"
-            << "\n\t m.nr(): " << m.nr()
-            << "\n\t m.nc(): " << m.nc()
-            );
-
-        typedef matrix_scalar_binary_exp<EXP, kernel_type, op_kern_mat<kernel_type> > exp;
-        return exp(m.ref(),kernel);
-    }
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-    template < typename kernel_type, typename lhs_type >
-    class kernel_matrix_exp1;
-
-    template < typename kernel_type, typename lhs_type >
-    struct matrix_traits<kernel_matrix_exp1<kernel_type,lhs_type> >
-    {
-        typedef typename kernel_type::scalar_type type;
-        typedef const type const_ret_type;
-        typedef typename kernel_type::mem_manager_type mem_manager_type;
-        typedef row_major_layout layout_type;
-        const static long NR = 0;
-        const static long NC = 1;
-        const static long cost = 100;
-    };
-
-    template <
-        typename kernel_type,
-        typename lhs_type
-        >
-    class kernel_matrix_exp1 : public matrix_exp<kernel_matrix_exp1<kernel_type,lhs_type> >
-    {
-        typedef typename kernel_type::sample_type sample_type;
-    public:
-        typedef typename matrix_traits<kernel_matrix_exp1>::type type;
-        typedef typename matrix_traits<kernel_matrix_exp1>::type const_ret_type;
-        typedef typename matrix_traits<kernel_matrix_exp1>::mem_manager_type mem_manager_type;
-        typedef typename matrix_traits<kernel_matrix_exp1>::layout_type layout_type;
-        const static long NR = matrix_traits<kernel_matrix_exp1>::NR;
-        const static long NC = matrix_traits<kernel_matrix_exp1>::NC;
-        const static long cost = matrix_traits<kernel_matrix_exp1>::cost;
-
-    private:
-        // This constructor exists simply for the purpose of causing a compile time error if
-        // someone tries to create an instance of this object with the wrong kind of objects.
-        template <typename T1, typename T2, typename T3>
-        kernel_matrix_exp1 (T1,T2,T3); 
-    public:
-
-        kernel_matrix_exp1 (
-            const kernel_type& kern_,
-            const lhs_type& m_,
-            const sample_type& samp_
-        ) :
-            m(m_),
-            kern(kern_),
-            samp(samp_)
-        {}
-
-        const type operator() (
-            long r, 
+        template <typename kernel_type>
+        inline const typename kernel_type::sample_type& access ( 
+            const typename kernel_type::sample_type& samp, 
             long 
-        ) const { return kern(vector_to_matrix(m)(r),samp); }
-
-        template <typename U>
-        bool aliases (
-            const matrix_exp<U>& 
-        ) const { return false; }
-
-        template <typename U>
-        bool destructively_aliases (
-            const matrix_exp<U>& 
-        ) const { return false; }
-
-        long nr (
-        ) const { return m.size(); }
-
-        long nc (
-        ) const { return 1; }
-
-
-        const lhs_type& m;
-        const kernel_type& kern;
-        const sample_type& samp;
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename kernel_type,
-        typename alloc
-        >
-    const kernel_matrix_exp1<kernel_type,std::vector<typename kernel_type::sample_type,alloc> > kernel_matrix (
-        const kernel_type& kern,
-        const std::vector<typename kernel_type::sample_type,alloc>& m,
-        const typename kernel_type::sample_type& samp
         )
-    {
-        typedef kernel_matrix_exp1<kernel_type,std::vector<typename kernel_type::sample_type,alloc> > exp;
-        return exp(kern,m,samp);
-    }
-    
-// ----------------------------------------------------------------------------------------
+        {
+            return samp;
+        }
 
-    template <
-        typename kernel_type,
-        typename EXP 
-        >
-    const kernel_matrix_exp1<kernel_type,EXP> kernel_matrix (
-        const kernel_type& kern,
-        const matrix_exp<EXP>& m,
-        const typename kernel_type::sample_type& samp
+        // --------------------------------------------
+
+        template <typename kernel_type, typename T>
+        inline unsigned long size ( const matrix_exp<T>& m)
+        {
+            return m.size();
+        }
+
+        template <typename kernel_type, typename T, typename alloc>
+        inline unsigned long size ( const std::vector<T,alloc>& m)
+        {
+            return m.size();
+        }
+
+        template <typename kernel_type, typename T, typename alloc>
+        inline unsigned long size ( const std_vector_c<T,alloc>& m)
+        {
+            return m.size();
+        }
+
+        template <typename kernel_type>
+        inline unsigned long size ( 
+            const typename kernel_type::sample_type&  
         )
-    {
-        // make sure requires clause is not broken
-        DLIB_ASSERT(is_vector(m) == true,
-            "\tconst matrix_exp kernel_matrix(kernel,m, samp)"
-            << "\n\t You have to supply this function with a row or column vector"
-            << "\n\t m.nr(): " << m.nr()
-            << "\n\t m.nc(): " << m.nc()
-            );
+        {
+            return 1;
+        }
 
-        typedef kernel_matrix_exp1<kernel_type,EXP> exp;
-        return exp(kern,m.ref(),samp);
-    }
-    
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
+        // --------------------------------------------
 
-    template < typename kernel_type, typename lhs_type >
-    class kernel_matrix_exp2;
-
-    template < typename kernel_type, typename lhs_type >
-    struct matrix_traits<kernel_matrix_exp2<kernel_type,lhs_type> >
-    {
-        typedef typename kernel_type::scalar_type type;
-        typedef const type const_ret_type;
-        typedef typename kernel_type::mem_manager_type mem_manager_type;
-        typedef row_major_layout layout_type;
-        const static long NR = 1;
-        const static long NC = 0;
-        const static long cost = 100;
-    };
-
-    template <
-        typename kernel_type,
-        typename lhs_type
-        >
-    class kernel_matrix_exp2 : public matrix_exp<kernel_matrix_exp2<kernel_type,lhs_type> >
-    {
-        typedef typename kernel_type::sample_type sample_type;
-    public:
-        typedef typename matrix_traits<kernel_matrix_exp2>::type type;
-        typedef typename matrix_traits<kernel_matrix_exp2>::const_ret_type const_ret_type;
-        typedef typename matrix_traits<kernel_matrix_exp2>::mem_manager_type mem_manager_type;
-        typedef typename matrix_traits<kernel_matrix_exp2>::layout_type layout_type;
-        const static long NR = matrix_traits<kernel_matrix_exp2>::NR;
-        const static long NC = matrix_traits<kernel_matrix_exp2>::NC;
-        const static long cost = matrix_traits<kernel_matrix_exp2>::cost;
-
-    private:
-        // This constructor exists simply for the purpose of causing a compile time error if
-        // someone tries to create an instance of this object with the wrong kind of objects.
-        template <typename T1, typename T2, typename T3>
-        kernel_matrix_exp2 (T1,T2,T3); 
-    public:
-
-        kernel_matrix_exp2 (
-            const kernel_type& kern_,
-            const lhs_type& m_,
-            const sample_type& samp_
-        ) :
-            m(m_),
-            kern(kern_),
-            samp(samp_)
+        template <typename T>
+        typename disable_if<is_matrix<T> >::type assert_is_vector(const T&)
         {}
 
-        const type operator() (
-            long , 
-            long c
-        ) const { return kern(vector_to_matrix(m)(c),samp); }
+        template <typename T>
+        void assert_is_vector(const matrix_exp<T>& v)
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(v) == true,
+                "\tconst matrix_exp kernel_matrix()"
+                << "\n\t You have to supply this function with row or column vectors"
+                << "\n\t v.nr(): " << v.nr()
+                << "\n\t v.nc(): " << v.nc()
+                );
+        }
 
-        template <typename U>
-        bool aliases (
-            const matrix_exp<U>& 
-        ) const { return false; }
-
-        template <typename U>
-        bool destructively_aliases (
-            const matrix_exp<U>& 
-        ) const { return false; }
-
-        long nr (
-        ) const { return 1; }
-
-        long nc (
-        ) const { return m.size(); }
-
-
-        const lhs_type& m;
-        const kernel_type& kern;
-        const sample_type& samp;
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename kernel_type,
-        typename alloc
-        >
-    const kernel_matrix_exp2<kernel_type,std::vector<typename kernel_type::sample_type,alloc> > kernel_matrix (
-        const kernel_type& kern,
-        const typename kernel_type::sample_type& samp,
-        const std::vector<typename kernel_type::sample_type,alloc>& m
-        )
-    {
-        typedef kernel_matrix_exp2<kernel_type,std::vector<typename kernel_type::sample_type,alloc> > exp;
-        return exp(kern,m,samp);
     }
-    
-// ----------------------------------------------------------------------------------------
 
-    template <
-        typename kernel_type,
-        typename EXP 
-        >
-    const kernel_matrix_exp2<kernel_type,EXP> kernel_matrix (
-        const kernel_type& kern,
-        const typename kernel_type::sample_type& samp,
-        const matrix_exp<EXP>& m
-        )
+    template <typename K, typename vect_type1, typename vect_type2>
+    struct op_kern_mat : does_not_alias 
     {
-        // make sure requires clause is not broken
-        DLIB_ASSERT(is_vector(m) == true,
-            "\tconst matrix_exp kernel_matrix(kernel,samp,m)"
-            << "\n\t You have to supply this function with a row or column vector"
-            << "\n\t m.nr(): " << m.nr()
-            << "\n\t m.nc(): " << m.nc()
-            );
+        op_kern_mat( 
+            const K& kern_, 
+            const vect_type1& vect1_,
+            const vect_type2& vect2_
+        ) : 
+            kern(kern_), 
+            vect1(vect1_),
+            vect2(vect2_) 
+        {
+            // make sure the requires clauses get checked eventually
+            impl::assert_is_vector(vect1);
+            impl::assert_is_vector(vect2);
+        }
 
-        typedef kernel_matrix_exp2<kernel_type,EXP> exp;
-        return exp(kern,m.ref(),samp);
-    }
-    
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
+        const K& kern;
+        const vect_type1& vect1;
+        const vect_type2& vect2;
 
-    template < typename kernel_type, typename lhs_type, typename rhs_type >
-    class kernel_matrix_exp3;
+        typedef typename K::scalar_type type;
 
-    template < typename kernel_type, typename lhs_type, typename rhs_type >
-    struct matrix_traits<kernel_matrix_exp3<kernel_type,lhs_type,rhs_type> >
-    {
-        typedef typename kernel_type::scalar_type type;
-        typedef const type const_ret_type;
-        typedef typename kernel_type::mem_manager_type mem_manager_type;
-        typedef row_major_layout layout_type;
-        const static long NR = 0;
-        const static long NC = 0;
         const static long cost = 100;
-    };
+        const static long NR = (is_same_type<vect_type1,typename K::sample_type>::value) ? 1 : 0;
+        const static long NC = (is_same_type<vect_type2,typename K::sample_type>::value) ? 1 : 0;
 
-    template <
-        typename kernel_type,
-        typename lhs_type,
-        typename rhs_type
-        >
-    class kernel_matrix_exp3 : public matrix_exp<kernel_matrix_exp3<kernel_type,lhs_type,rhs_type> >
-    {
-        typedef typename kernel_type::sample_type sample_type;
-    public:
-        typedef typename matrix_traits<kernel_matrix_exp3>::type type;
-        typedef typename matrix_traits<kernel_matrix_exp3>::const_ret_type const_ret_type;
-        typedef typename matrix_traits<kernel_matrix_exp3>::mem_manager_type mem_manager_type;
-        typedef typename matrix_traits<kernel_matrix_exp3>::layout_type layout_type;
-        const static long NR = matrix_traits<kernel_matrix_exp3>::NR;
-        const static long NC = matrix_traits<kernel_matrix_exp3>::NC;
-        const static long cost = matrix_traits<kernel_matrix_exp3>::cost;
+        typedef const type const_ret_type;
+        typedef typename K::mem_manager_type mem_manager_type;
+        typedef row_major_layout layout_type;
 
-    private:
-        // This constructor exists simply for the purpose of causing a compile time error if
-        // someone tries to create an instance of this object with the wrong kind of objects.
-        template <typename T1, typename T2, typename T3>
-        kernel_matrix_exp3 (T1,T2,T3); 
-    public:
+        const_ret_type apply (long r, long c ) const 
+        { 
+            return kern(impl::access<K>(vect1,r), impl::access<K>(vect2,c)); 
+        }
 
-        kernel_matrix_exp3 (
-            const kernel_type& kern_,
-            const lhs_type& lhs_,
-            const rhs_type& rhs_
-        ) :
-            lhs(lhs_),
-            rhs(rhs_),
-            kern(kern_)
-        {}
-
-        const type operator() (
-            long r, 
-            long c
-        ) const { return kern(vector_to_matrix(lhs)(r),vector_to_matrix(rhs)(c)); }
-
-        template <typename U>
-        bool aliases (
-            const matrix_exp<U>& 
-        ) const { return false; }
-
-        template <typename U>
-        bool destructively_aliases (
-            const matrix_exp<U>& 
-        ) const { return false; }
-
-        long nr (
-        ) const { return lhs.size(); }
-
-        long nc (
-        ) const { return rhs.size(); }
-
-
-        const lhs_type& lhs;
-        const rhs_type& rhs;
-        const kernel_type& kern;
-    };
+        long nr () const { return impl::size<K>(vect1); }
+        long nc () const { return impl::size<K>(vect2); }
+    }; 
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename kernel_type,
-        typename alloc
+        typename K,
+        typename V1,
+        typename V2 
         >
-    const kernel_matrix_exp3<kernel_type,std::vector<typename kernel_type::sample_type,alloc>, std::vector<typename kernel_type::sample_type,alloc> > kernel_matrix (
-        const kernel_type& kern,
-        const std::vector<typename kernel_type::sample_type,alloc>& lhs,
-        const std::vector<typename kernel_type::sample_type,alloc>& rhs
-    )
+    const matrix_op<op_kern_mat<K,V1,V2> > kernel_matrix (
+        const K& kern,
+        const V1& v1,
+        const V2& v2
+        )
     {
-        typedef kernel_matrix_exp3<kernel_type, std::vector<typename kernel_type::sample_type,alloc>, std::vector<typename kernel_type::sample_type,alloc> > exp;
-        return exp(kern,lhs,rhs);
+        typedef op_kern_mat<K,V1,V2> op;
+        return matrix_op<op>(op(kern,v1,v2));
     }
     
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename kernel_type,
-        typename EXP1,
-        typename EXP2
+        typename K,
+        typename V
         >
-    const kernel_matrix_exp3<kernel_type,EXP1,EXP2> kernel_matrix (
-        const kernel_type& kern,
-        const matrix_exp<EXP1>& lhs,
-        const matrix_exp<EXP2>& rhs
-    )
+    const matrix_op<op_kern_mat<K,V,V> > kernel_matrix (
+        const K& kern,
+        const V& v
+        )
     {
-        // make sure requires clause is not broken
-        DLIB_ASSERT(is_vector(lhs) == true && is_vector(rhs) == true,
-            "\tconst matrix_exp kernel_matrix(kernel,lhs,rhs)"
-            << "\n\t You have to supply this function with row or column vectors"
-            << "\n\t lhs.nr(): " << lhs.nr()
-            << "\n\t lhs.nc(): " << lhs.nc()
-            << "\n\t rhs.nr(): " << rhs.nr()
-            << "\n\t rhs.nc(): " << rhs.nc()
-            );
-
-        typedef kernel_matrix_exp3<kernel_type,EXP1,EXP2> exp;
-        return exp(kern,lhs.ref(), rhs.ref());
+        typedef op_kern_mat<K,V,V> op;
+        return matrix_op<op>(op(kern,v,v));
     }
     
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }
 
 #endif // DLIB_SVm_KERNEL_MATRIX_
-
-
-
-
 

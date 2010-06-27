@@ -323,10 +323,10 @@ namespace dlib
 
 
         template <typename T, long NR, long NC, typename MM>
-        int get_ld (const matrix_sub_exp<matrix<T,NR,NC,MM,row_major_layout> >& m) { return m.m.nc(); }
+        int get_ld (const matrix_op<op_subm<matrix<T,NR,NC,MM,row_major_layout> > >& m) { return m.op.m.nc(); }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_ld (const matrix_sub_exp<matrix<T,NR,NC,MM,column_major_layout> >& m) { return m.m.nr(); }
+        int get_ld (const matrix_op<op_subm<matrix<T,NR,NC,MM,column_major_layout> > >& m) { return m.op.m.nr(); }
 
         template <typename T, long NR, long NC, typename MM>
         int get_ld (const assignable_sub_matrix<T,NR,NC,MM,row_major_layout>& m) { return m.m.nc(); }
@@ -340,25 +340,25 @@ namespace dlib
         int get_inc (const matrix<T,NR,NC,MM,L>& ) { return 1; }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_colm>& m)
+        int get_inc(const matrix_op<op_colm<matrix<T,NR,NC,MM,row_major_layout> > >& m)
         {
-            return m.m.nc();
+            return m.op.m.nc();
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_rowm>& )
+        int get_inc(const matrix_op<op_rowm<matrix<T,NR,NC,MM,row_major_layout> > >& )
         {
             return 1;
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_colm2>& m)
+        int get_inc(const matrix_op<op_colm2<matrix<T,NR,NC,MM,row_major_layout> > >& m)
         {
-            return m.m.nc();
+            return m.op.m.nc();
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,row_major_layout>,long,op_rowm2>& )
+        int get_inc(const matrix_op<op_rowm2<matrix<T,NR,NC,MM,row_major_layout> > >& )
         {
             return 1;
         }
@@ -366,27 +366,27 @@ namespace dlib
 
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_colm>& )
+        int get_inc(const matrix_op<op_colm<matrix<T,NR,NC,MM,column_major_layout> > >& )
         {
             return 1;
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_rowm>& m)
+        int get_inc(const matrix_op<op_rowm<matrix<T,NR,NC,MM,column_major_layout> > >& m)
         {
-            return m.m.nr();
+            return m.op.m.nr();
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_colm2>& )
+        int get_inc(const matrix_op<op_colm2<matrix<T,NR,NC,MM,column_major_layout> > >& )
         {
             return 1;
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc(const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,column_major_layout>,long,op_rowm2>& m)
+        int get_inc(const matrix_op<op_rowm2<matrix<T,NR,NC,MM,column_major_layout> > >& m)
         {
-            return m.m.nr();
+            return m.op.m.nr();
         }
 
 
@@ -424,19 +424,19 @@ namespace dlib
         T* get_ptr (matrix<T,NR,NC,MM,L>& m) { return &m(0,0); }
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        const T* get_ptr (const matrix_sub_exp<matrix<T,NR,NC,MM,L> >& m) { return &m.m(m.r_,m.c_); }
+        const T* get_ptr (const matrix_op<op_subm<matrix<T,NR,NC,MM,L> > >& m) { return &m.op.m(m.r_,m.c_); }
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        const T* get_ptr (const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_colm>& m) { return &m.m(0,m.s); }
+        const T* get_ptr (const matrix_op<op_colm<matrix<T,NR,NC,MM,L> > >& m) { return &m.op.m(0,m.op.col); }
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        const T* get_ptr (const matrix_scalar_binary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm>& m) { return &m.m(m.s,0); }
+        const T* get_ptr (const matrix_op<op_rowm<matrix<T,NR,NC,MM,L> > >& m) { return &m.op.m(m.op.row,0); }
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        const T* get_ptr (const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,L>,long,op_colm2>& m) { return &m.m(0,m.s1); }
+        const T* get_ptr (const matrix_op<op_colm2<matrix<T,NR,NC,MM,L> > >& m) { return &m.op.m(0,m.op.col); }
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        const T* get_ptr (const matrix_scalar_ternary_exp<matrix<T,NR,NC,MM,L>,long,op_rowm2>& m) { return &m.m(m.s1,0); }
+        const T* get_ptr (const matrix_op<op_rowm2<matrix<T,NR,NC,MM,L> > >& m) { return &m.op.m(m.op.row,0); }
 
 
         template <typename T, long NR, long NC, typename MM, typename L>
@@ -504,8 +504,8 @@ namespace dlib
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
             const T* B = get_ptr(src.rhs);
             const int ldb = get_ld(src.rhs);
 
@@ -534,8 +534,8 @@ namespace dlib
             const int K = static_cast<int>(src.lhs.nc());
             const T* A = get_ptr(src.lhs);
             const int lda = get_ld(src.lhs);
-            const T* B = get_ptr(src.rhs.m);
-            const int ldb = get_ld(src.rhs.m);
+            const T* B = get_ptr(src.rhs.op.m);
+            const int ldb = get_ld(src.rhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* C = get_ptr(dest);
@@ -558,10 +558,10 @@ namespace dlib
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
-            const T* B = get_ptr(src.rhs.m);
-            const int ldb = get_ld(src.rhs.m);
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
+            const T* B = get_ptr(src.rhs.op.m);
+            const int ldb = get_ld(src.rhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* C = get_ptr(dest);
@@ -587,8 +587,8 @@ namespace dlib
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
             const T* B = get_ptr(src.rhs);
             const int ldb = get_ld(src.rhs);
 
@@ -615,10 +615,10 @@ namespace dlib
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
-            const T* B = get_ptr(src.rhs.m);
-            const int ldb = get_ld(src.rhs.m);
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
+            const T* B = get_ptr(src.rhs.op.m);
+            const int ldb = get_ld(src.rhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* C = get_ptr(dest);
@@ -645,8 +645,8 @@ namespace dlib
             const int K = static_cast<int>(src.lhs.nc());
             const T* A = get_ptr(src.lhs);
             const int lda = get_ld(src.lhs);
-            const T* B = get_ptr(src.rhs.m);
-            const int ldb = get_ld(src.rhs.m);
+            const T* B = get_ptr(src.rhs.op.m);
+            const int ldb = get_ld(src.rhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* C = get_ptr(dest);
@@ -669,10 +669,10 @@ namespace dlib
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
-            const T* B = get_ptr(src.rhs.m);
-            const int ldb = get_ld(src.rhs.m);
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
+            const T* B = get_ptr(src.rhs.op.m);
+            const int ldb = get_ld(src.rhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* C = get_ptr(dest);
@@ -696,10 +696,10 @@ namespace dlib
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
             const int K = static_cast<int>(src.lhs.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
-            const T* B = get_ptr(src.rhs.m);
-            const int ldb = get_ld(src.rhs.m);
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
+            const T* B = get_ptr(src.rhs.op.m);
+            const int ldb = get_ld(src.rhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* C = get_ptr(dest);
@@ -775,8 +775,8 @@ namespace dlib
             const int N = static_cast<int>(src.rhs.nc());
             const T* A = get_ptr(src.rhs);
             const int lda = get_ld(src.rhs);
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* Y = get_ptr(dest);
@@ -797,8 +797,8 @@ namespace dlib
             const int N = static_cast<int>(src.lhs.nc());
             const T* A = get_ptr(src.lhs);
             const int lda = get_ld(src.lhs);
-            const T* X = get_ptr(src.rhs.m);
-            const int incX = get_inc(src.rhs.m);
+            const T* X = get_ptr(src.rhs.op.m);
+            const int incX = get_inc(src.rhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* Y = get_ptr(dest);
@@ -817,10 +817,10 @@ namespace dlib
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
-            const int M = static_cast<int>(src.lhs.m.nr());
-            const int N = static_cast<int>(src.lhs.m.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
+            const int M = static_cast<int>(src.lhs.op.m.nr());
+            const int N = static_cast<int>(src.lhs.op.m.nc());
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
             const T* X = get_ptr(src.rhs);
             const int incX = get_inc(src.rhs);
 
@@ -841,10 +841,10 @@ namespace dlib
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
-            const int M = static_cast<int>(src.rhs.m.nr());
-            const int N = static_cast<int>(src.rhs.m.nc());
-            const T* A = get_ptr(src.rhs.m);
-            const int lda = get_ld(src.rhs.m);
+            const int M = static_cast<int>(src.rhs.op.m.nr());
+            const int N = static_cast<int>(src.rhs.op.m.nc());
+            const T* A = get_ptr(src.rhs.op.m);
+            const int lda = get_ld(src.rhs.op.m);
             const T* X = get_ptr(src.lhs);
             const int incX = get_inc(src.lhs);
 
@@ -865,12 +865,12 @@ namespace dlib
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
-            const int M = static_cast<int>(src.rhs.m.nr());
-            const int N = static_cast<int>(src.rhs.m.nc());
-            const T* A = get_ptr(src.rhs.m);
-            const int lda = get_ld(src.rhs.m);
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
+            const int M = static_cast<int>(src.rhs.op.m.nr());
+            const int N = static_cast<int>(src.rhs.op.m.nc());
+            const T* A = get_ptr(src.rhs.op.m);
+            const int lda = get_ld(src.rhs.op.m);
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* Y = get_ptr(dest);
@@ -887,12 +887,12 @@ namespace dlib
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
-            const int M = static_cast<int>(src.lhs.m.nr());
-            const int N = static_cast<int>(src.lhs.m.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
-            const T* X = get_ptr(src.rhs.m);
-            const int incX = get_inc(src.rhs.m);
+            const int M = static_cast<int>(src.lhs.op.m.nr());
+            const int N = static_cast<int>(src.lhs.op.m.nc());
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
+            const T* X = get_ptr(src.rhs.op.m);
+            const int incX = get_inc(src.rhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* Y = get_ptr(dest);
@@ -912,12 +912,12 @@ namespace dlib
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
-            const int M = static_cast<int>(src.rhs.m.nr());
-            const int N = static_cast<int>(src.rhs.m.nc());
-            const T* A = get_ptr(src.rhs.m);
-            const int lda = get_ld(src.rhs.m);
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
+            const int M = static_cast<int>(src.rhs.op.m.nr());
+            const int N = static_cast<int>(src.rhs.op.m.nc());
+            const T* A = get_ptr(src.rhs.op.m);
+            const int lda = get_ld(src.rhs.op.m);
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* Y = get_ptr(dest);
@@ -935,10 +935,10 @@ namespace dlib
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
-            const int M = static_cast<int>(src.rhs.m.nr());
-            const int N = static_cast<int>(src.rhs.m.nc());
-            const T* A = get_ptr(src.rhs.m);
-            const int lda = get_ld(src.rhs.m);
+            const int M = static_cast<int>(src.rhs.op.m.nr());
+            const int N = static_cast<int>(src.rhs.op.m.nc());
+            const T* A = get_ptr(src.rhs.op.m);
+            const int lda = get_ld(src.rhs.op.m);
             const T* X = get_ptr(src.lhs);
             const int incX = get_inc(src.lhs);
 
@@ -957,10 +957,10 @@ namespace dlib
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
-            const int M = static_cast<int>(src.lhs.m.nr());
-            const int N = static_cast<int>(src.lhs.m.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
+            const int M = static_cast<int>(src.lhs.op.m.nr());
+            const int N = static_cast<int>(src.lhs.op.m.nc());
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
             const T* X = get_ptr(src.rhs);
             const int incX = get_inc(src.rhs);
 
@@ -979,12 +979,12 @@ namespace dlib
             const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
-            const int M = static_cast<int>(src.lhs.m.nr());
-            const int N = static_cast<int>(src.lhs.m.nc());
-            const T* A = get_ptr(src.lhs.m);
-            const int lda = get_ld(src.lhs.m);
-            const T* X = get_ptr(src.rhs.m);
-            const int incX = get_inc(src.rhs.m);
+            const int M = static_cast<int>(src.lhs.op.m.nr());
+            const int N = static_cast<int>(src.lhs.op.m.nc());
+            const T* A = get_ptr(src.lhs.op.m);
+            const int lda = get_ld(src.lhs.op.m);
+            const T* X = get_ptr(src.rhs.op.m);
+            const int incX = get_inc(src.rhs.op.m);
 
             const T beta = static_cast<T>(add_to?1:0);
             T* Y = get_ptr(dest);
@@ -1033,8 +1033,8 @@ namespace dlib
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
             const T* Y = get_ptr(src.rhs);
             const int incY = get_inc(src.rhs);
 
@@ -1061,8 +1061,8 @@ namespace dlib
             const int N = static_cast<int>(dest.nc());
             const T* X = get_ptr(src.lhs);
             const int incX = get_inc(src.lhs);
-            const T* Y = get_ptr(src.rhs.m);
-            const int incY = get_inc(src.rhs.m);
+            const T* Y = get_ptr(src.rhs.op.m);
+            const int incY = get_inc(src.rhs.op.m);
 
             if (add_to == false)
                 zero_matrix(dest);
@@ -1085,10 +1085,10 @@ namespace dlib
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
-            const T* Y = get_ptr(src.rhs.m);
-            const int incY = get_inc(src.rhs.m);
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
+            const T* Y = get_ptr(src.rhs.op.m);
+            const int incY = get_inc(src.rhs.op.m);
 
             if (add_to == false)
                 zero_matrix(dest);
@@ -1118,8 +1118,8 @@ namespace dlib
             const int N = static_cast<int>(dest.nc());
             const T* X = get_ptr(src.lhs);
             const int incX = get_inc(src.lhs);
-            const T* Y = get_ptr(src.rhs.m);
-            const int incY = get_inc(src.rhs.m);
+            const T* Y = get_ptr(src.rhs.op.m);
+            const int incY = get_inc(src.rhs.op.m);
 
             if (add_to == false)
                 zero_matrix(dest);
@@ -1145,8 +1145,8 @@ namespace dlib
             const int N = static_cast<int>(dest.nc());
             const T* X = get_ptr(src.lhs);
             const int incX = get_inc(src.lhs);
-            const T* Y = get_ptr(src.rhs.m);
-            const int incY = get_inc(src.rhs.m);
+            const T* Y = get_ptr(src.rhs.op.m);
+            const int incY = get_inc(src.rhs.op.m);
 
 
             if (transpose == false)
@@ -1175,10 +1175,10 @@ namespace dlib
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
-            const T* Y = get_ptr(src.rhs.m);
-            const int incY = get_inc(src.rhs.m);
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
+            const T* Y = get_ptr(src.rhs.op.m);
+            const int incY = get_inc(src.rhs.op.m);
 
 
             if (transpose == false)
@@ -1208,10 +1208,10 @@ namespace dlib
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
-            const T* Y = get_ptr(src.rhs.m);
-            const int incY = get_inc(src.rhs.m);
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
+            const T* Y = get_ptr(src.rhs.op.m);
+            const int incY = get_inc(src.rhs.op.m);
 
             if (add_to == false)
                 zero_matrix(dest);
@@ -1254,8 +1254,8 @@ namespace dlib
         {
             //cout << "BLAS DOT: trans(cv)*cv" << endl;
             const int N = static_cast<int>(src.lhs.size());
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
             const T* Y = get_ptr(src.rhs);
             const int incY = get_inc(src.rhs);
 
@@ -1274,8 +1274,8 @@ namespace dlib
             const int N = static_cast<int>(src.lhs.size());
             const T* X = get_ptr(src.lhs);
             const int incX = get_inc(src.lhs);
-            const T* Y = get_ptr(src.rhs.m);
-            const int incY = get_inc(src.rhs.m);
+            const T* Y = get_ptr(src.rhs.op.m);
+            const int incY = get_inc(src.rhs.op.m);
 
             if (add_to == false)
                 dest(0) = alpha*cblas_dot(N, X, incX, Y, incY);
@@ -1289,11 +1289,11 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(cv)*trans(rv))
         {
             //cout << "BLAS DOT: trans(cv)*trans(rv)" << endl;
-            const int N = static_cast<int>(src.lhs.m.size());
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
-            const T* Y = get_ptr(src.rhs.m);
-            const int incY = get_inc(src.rhs.m);
+            const int N = static_cast<int>(src.lhs.op.m.size());
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
+            const T* Y = get_ptr(src.rhs.op.m);
+            const int incY = get_inc(src.rhs.op.m);
 
             if (add_to == false)
                 dest(0) = alpha*cblas_dot(N, X, incX, Y, incY);
@@ -1311,9 +1311,9 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(conj(rv)*cv)
         {
             //cout << "BLAS DOTC: conj(rv)*cv" << endl;
-            const int N = static_cast<int>(src.lhs.m.size());
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
+            const int N = static_cast<int>(src.lhs.op.m.size());
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
             const T* Y = get_ptr(src.rhs);
             const int incY = get_inc(src.rhs);
 
@@ -1329,9 +1329,9 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(conj(trans(cv))*cv)
         {
             //cout << "BLAS DOTC: conj(trans(cv))*cv" << endl;
-            const int N = static_cast<int>(src.lhs.m.size());
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
+            const int N = static_cast<int>(src.lhs.op.m.size());
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
             const T* Y = get_ptr(src.rhs);
             const int incY = get_inc(src.rhs);
 
@@ -1347,11 +1347,11 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(conj(cv))*trans(rv))
         {
             //cout << "BLAS DOTC: trans(conj(cv))*trans(rv)" << endl;
-            const int N = static_cast<int>(src.lhs.m.size());
-            const T* X = get_ptr(src.lhs.m);
-            const int incX = get_inc(src.lhs.m);
-            const T* Y = get_ptr(src.rhs.m);
-            const int incY = get_inc(src.rhs.m);
+            const int N = static_cast<int>(src.lhs.op.m.size());
+            const T* X = get_ptr(src.lhs.op.m);
+            const int incX = get_inc(src.lhs.op.m);
+            const T* Y = get_ptr(src.rhs.op.m);
+            const int incY = get_inc(src.rhs.op.m);
 
             if (add_to == false)
                 dest(0) = alpha*cblas_dotc(N, X, incX, Y, incY);
