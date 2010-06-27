@@ -383,7 +383,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <description>
             This is a simple set of functions that makes it easy to turn a kernel 
             object and a set of samples into a kernel matrix.  It takes these two
-            things and returns a <a href="dlib/matrix/matrix_abstract.h.html#matrix_exp">matrix expression</a>
+            things and returns a <a href="dlib/matrix/matrix_exp_abstract.h.html#matrix_exp">matrix expression</a>
             that represents the kernel matrix.
          </description>
                                  
