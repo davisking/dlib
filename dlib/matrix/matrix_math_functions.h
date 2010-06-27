@@ -95,7 +95,7 @@ namespace dlib
                     is_same_type<type,long double>::value == true 
             ));
 
-            return std::pow(val,s);
+            return std::pow(val,static_cast<type>(s));
         }
 
         template <typename type, typename S>
@@ -108,7 +108,7 @@ namespace dlib
                     is_same_type<type,long double>::value == true 
             ));
 
-            return std::pow(s,val);
+            return std::pow(static_cast<type>(s),val);
         }
 
         template <typename type>
