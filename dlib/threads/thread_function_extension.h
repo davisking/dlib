@@ -28,89 +28,86 @@ namespace dlib
         class super_funct_4 : public base_funct
         {
         public:
-            super_funct_4 ( F funct, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+            super_funct_4 ( F funct, T1 arg1, T2 arg2, T3 arg3, T4 arg4) :
+                f(funct),
+                a1(arg1),
+                a2(arg2),
+                a3(arg3),
+                a4(arg4)
             {
-                a1 = arg1;
-                a2 = arg2;
-                a3 = arg3;
-                a4 = arg4;
-                f = funct;
             }
 
             void go() { f(a1, a2, a3, a4); }
 
 
+            F f;
             T1 a1;
             T2 a2;
             T3 a3;
             T4 a4;
-            F f;
         };
 
         template <typename F, typename T1, typename T2, typename T3>
         class super_funct_3 : public base_funct
         {
         public:
-            super_funct_3 ( F funct, T1 arg1, T2 arg2, T3 arg3)
+            super_funct_3 ( F funct, T1 arg1, T2 arg2, T3 arg3):
+                f(funct),
+                a1(arg1),
+                a2(arg2),
+                a3(arg3)
             {
-                a1 = arg1;
-                a2 = arg2;
-                a3 = arg3;
-                f = funct;
             }
 
             void go() { f(a1, a2, a3); }
 
 
+            F f;
             T1 a1;
             T2 a2;
             T3 a3;
-            F f;
         };
 
         template <typename F, typename T1, typename T2>
         class super_funct_2 : public base_funct
         {
         public:
-            super_funct_2 ( F funct, T1 arg1, T2 arg2)
+            super_funct_2 ( F funct, T1 arg1, T2 arg2) :
+                f(funct),
+                a1(arg1),
+                a2(arg2)
             {
-                a1 = arg1;
-                a2 = arg2;
-                f = funct;
             }
 
             void go() { f(a1, a2); }
 
 
+            F f;
             T1 a1;
             T2 a2;
-            F f;
         };
 
         template <typename F, typename T>
         class super_funct_1 : public base_funct
         {
         public:
-            super_funct_1 ( F funct, T arg)
+            super_funct_1 ( F funct, T arg) : f(funct), a(arg)
             {
-                a = arg;
-                f = funct;
             }
 
             void go() { f(a); }
 
 
-            T a;
             F f;
+            T a;
         };
 
         template <typename F>
         class super_funct_0 : public base_funct
         {
         public:
-            super_funct_0 ( F funct)
+            super_funct_0 ( F funct) : f(funct)
             {
-                f = funct;
             }
             
             void go() { f(); }
