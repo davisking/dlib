@@ -62,8 +62,9 @@ int main()
 
 
 
-    // we will wait for t3 to end here because the destructor for
-    // thread_function objects always waits for their thread to end
+    // At this point we will automatically wait for t3 to end because
+    // the destructor for thread_function objects always wait for their
+    // thread to terminate.
 }
 
 
