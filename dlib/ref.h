@@ -15,7 +15,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a simple object that just contains a reference to another object. 
+                This is a simple object that just holds a reference to another object. 
                 It is useful because it can serve as a kind of "copyable reference".  
         !*/
 
