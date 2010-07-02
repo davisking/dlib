@@ -538,6 +538,7 @@
          <item>static_map</item> 
          <item>sliding_buffer</item>
          <item>tuple</item>
+         <item>reference_wrapper</item>
          <item nolink="true">
             <name>smart pointers</name>
             <sub>
@@ -1198,6 +1199,22 @@
                <tt>dlib::tuple&lt;int,int,int&gt; t;</tt>  
             </p>
          </description>
+               
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>reference_wrapper</name>
+         <file>dlib/ref.h</file>
+         <spec_file>dlib/ref.h</spec_file>
+         <description>
+                This is a simple object that just holds a reference to another object. 
+                It is useful because it can serve as a kind of "copyable reference".  
+         </description>
+         <examples>
+            <example>thread_function_ex.cpp.html</example>
+         </examples>
                
       </component>
       

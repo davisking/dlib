@@ -795,6 +795,9 @@
 
 
 
+         <term file="dlib/ref.h.html" name="ref"/>
+         <term file="dlib/ref.h.html" name="cref"/>
+         <term file="containers.html" name="reference_wrapper"/>
          <term file="containers.html" name="tuple"/>
          <term file="containers.html" name="type_safe_union"/>
 
