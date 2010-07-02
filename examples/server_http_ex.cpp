@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 #include "dlib/server.h"
+#include "dlib/ref.h" // for ref()
 
 using namespace dlib;
 using namespace std;
@@ -91,28 +92,42 @@ class web_server : public server::http_1a_c
 
 };
 
-// create an instance of our web server
-web_server our_web_server;
-
-void thread()
+void thread(web_server& the_server)
 {
-    cout << "Press enter to end this program" << endl;
-    cin.get();
-    // this will cause the server to shut down which will in turn cause 
-    // our_web_server.start() to unblock and thus the main() function will terminate.
-    our_web_server.clear();
+    try
+    {
+        // Start the server.  start() blocks until the server is shutdown
+        // by a call to clear()
+        the_server.start();
+    }
+    catch (socket_error& e)
+    {
+        cout << "Socket error while starting server: " << e.what() << endl;
+    }
+    catch (exception& e)
+    {
+        cout << "Error while starting server: " << e.what() << endl;
+    }
 }
 
 int main()
 {
     try
     {
-        // create a thread that will listen for the user to end this program
-        thread_function t(thread);
+        // create an instance of our web server
+        web_server our_web_server;
 
         // make it listen on port 5000
         our_web_server.set_listening_port(5000);
-        our_web_server.start();
+
+        // create a thread that will start the server.   The ref() here allows us to pass 
+        // our_web_server into the threaded function by reference.
+        thread_function t(thread, ref(our_web_server));
+
+        cout << "Press enter to end this program" << endl;
+        cin.get();
+        // this will cause the server to shut down 
+        our_web_server.clear();
     }
     catch (exception& e)
     {

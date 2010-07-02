@@ -25,6 +25,7 @@
 #include "dlib/sockets.h"
 #include "dlib/server.h"
 #include "dlib/sockstreambuf.h"
+#include "dlib/ref.h"
 #include <iostream>
 
 using namespace dlib;
@@ -67,32 +68,44 @@ class serv : public server::kernel_1a_c
 
 };
 
-serv our_server;
 
-void thread()
+void thread(serv& our_server)
 {
-    cout << "Press enter to end this program" << endl;
-    cin.get();
-    // this will cause the server to shut down which will in turn cause 
-    // our_server.start() to unblock and thus the main() function will terminate.
-    our_server.clear();
+    try
+    {
+        // Start the server.  start() blocks until the server is shutdown
+        // by a call to clear()
+        our_server.start();
+    }
+    catch (socket_error& e)
+    {
+        cout << "Socket error while starting server: " << e.what() << endl;
+    }
+    catch (exception& e)
+    {
+        cout << "Error while starting server: " << e.what() << endl;
+    }
 }
+
 
 int main()
 {
     try
     {
-        // create a thread that will listen for the user to end this program
-        thread_function t(thread);
-
+        serv our_server;
 
         // set up the server object we have made
         our_server.set_listening_port(1234);
         our_server.set_max_connections(1000);
 
-        // start the server
-        our_server.start();
+        // create a thread that will start the server.   The ref() here allows us to pass 
+        // our_server into the threaded function by reference.
+        thread_function t(thread, ref(our_server));
 
+        cout << "Press enter to end this program" << endl;
+        cin.get();
+        // this will cause the server to shut down 
+        our_server.clear();
     }
     catch (exception& e)
     {
