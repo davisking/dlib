@@ -8,11 +8,13 @@
         45.6
         9.999
         I have no args!
+        val: 3
 */
 
 
 #include <iostream>
 #include "dlib/threads.h"
+#include "dlib/ref.h"
 
 using namespace dlib;
 using namespace std;
@@ -25,6 +27,11 @@ void thread_1(double a)
 void thread_2 ()
 {
     cout << "I have no args!" << endl;
+}
+
+void thread_increment(double& a)
+{
+    a += 1;
 }
 
 int main()
@@ -43,6 +50,15 @@ int main()
 
     // create a thread that will call thread_2()
     thread_function t3(thread_2);
+
+
+    // Note that we can also use the ref() function to pass a variable
+    // to a thread by reference.  For example, the thread below adds
+    // one to val.
+    double val = 2;
+    thread_function t4(thread_increment, ref(val));
+    t4.wait(); // wait for t4 to finish before printing val.
+    cout << "val: " << val << endl;
 
 
 
