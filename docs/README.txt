@@ -56,7 +56,7 @@ There are four scripts in the docs folder.
 
 ======================== License for documentation files ========================
 
-To the extent possible under law, Davis E King  has waived all copyright and 
+To the extent possible under law, Davis E King has waived all copyright and 
 related or neighboring rights to dlib documentation (XML, HTML, and XSLT files).
 This work is published from United States. 
 
