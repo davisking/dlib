@@ -8,9 +8,10 @@
 #include "dlib/queue.h"
 #include "dlib/misc_api.h"
 #include "dlib/dir_nav.h"
+#include "to_xml.h"
 
 
-const char* VERSION = "2.7";
+const char* VERSION = "3.0";
 
 using namespace std;
 using namespace dlib;
@@ -98,13 +99,15 @@ int main(int argc, char** argv)
         parser.add_option("index","Create an index.");
         parser.add_option("v","Display version.");
         parser.add_option("man","Display the manual.");
-        parser.add_option("f","Specifies a list of file extensions separated by spaces.  The default is \"cpp h c\".",1);
+        parser.add_option("f","Specifies a list of file extensions to process when using the -i option.  The list elements should be separated by spaces.  The default is \"cpp h c\".",1);
         parser.add_option("i","Specifies an input directory.",1);
         parser.add_option("cat","Puts all the output into a single html file with the given name.",1);
         parser.add_option("depth","Specifies how many directories deep to search when using the i option.  The default value is 30.",1);
         parser.add_option("o","This option causes all the output files to be created inside the given directory.  If this option is not given then all output goes to the current working directory.",1);
         parser.add_option("flatten","When this option is given it prevents the input directory structure from being replicated.");
         parser.add_option("title","This option specifies a string which is prepended onto the title of the generated HTML",1);
+        parser.add_option("to-xml","Instead of generating HTML output, create a single output file called output.xml that contains "
+                          "a simple XML database which lists all documented classes and functions.");
 
         
         parser.parse(argc,argv);
@@ -115,8 +118,15 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("cat","index");
         parser.check_option_arg_type<unsigned long>("depth");
 
+        parser.check_incompatible_options("to-xml", "b");
+        parser.check_incompatible_options("to-xml", "n");
+        parser.check_incompatible_options("to-xml", "index");
+        parser.check_incompatible_options("to-xml", "cat");
+        parser.check_incompatible_options("to-xml", "o");
+        parser.check_incompatible_options("to-xml", "flatten");
+        parser.check_incompatible_options("to-xml", "title");
 
-        const char* singles[] = {"b","n","h","index","v","man","f","cat","depth","o","flatten","title"};
+        const char* singles[] = {"b","n","h","index","v","man","f","cat","depth","o","flatten","title","to-xml"};
         parser.check_one_time_options(singles);
 
         const char* i_sub_ops[] = {"f","depth","flatten"};
@@ -135,6 +145,7 @@ int main(int argc, char** argv)
         const clp::option_type& flatten_opt = parser.option("flatten");
         const clp::option_type& depth_opt   = parser.option("depth");
         const clp::option_type& title_opt   = parser.option("title");
+        const clp::option_type& to_xml_opt  = parser.option("to-xml");
 
 
         string filter = "cpp h c";
@@ -160,7 +171,7 @@ int main(int argc, char** argv)
 
         if (h_opt)
         {
-            cout << "This program pretty prints C/C++ source code to HTML.\n";
+            cout << "This program pretty prints C or C++ source code to HTML.\n";
             cout << "Usage: htmlify [options] [file]...\n";
             parser.print_options(cout);
             cout << "\n\n";
@@ -189,6 +200,12 @@ int main(int argc, char** argv)
         if (depth_opt)
         {
             search_depth = string_cast<unsigned long>(depth_opt.argument());
+        }
+
+        if (to_xml_opt)
+        {
+            generate_xml_markup(parser, filter, search_depth);
+            return 0;
         }
 
         if (o_opt)
@@ -577,7 +594,7 @@ void print_manual (
 
 
     sout << "The colored style puts HTML anchors on class and function names.  This means "
-         << "you can link directly the part of the code that contains these names.  For example, "
+         << "you can link directly to the part of the code that contains these names.  For example, "
          << "if you had a source file bar.cpp with a function called foo in it you could link "
          << "directly to the function with a link address of \"bar.cpp.html#foo\".  It is also "
          << "possible to instruct Htmlify to place HTML anchors at arbitrary spots by using a "

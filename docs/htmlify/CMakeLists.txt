@@ -18,6 +18,7 @@ PROJECT(${target_name})
 # cmake that they are part of our target (which is the exectuable named htmlify)
 ADD_EXECUTABLE(${target_name} 
 htmlify.cpp
+to_xml.cpp
 )
 
 # add the folder containing the dlib folder to the include path
