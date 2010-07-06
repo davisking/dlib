@@ -64,18 +64,30 @@ void obtain_list_of_files (
     const cmd_line_parser<char>::check_1a_c& parser, 
     const std::string& filter, 
     const unsigned long search_depth,
-    std::vector<file>& files
+    std::vector<std::pair<string,string> >& files
 )
 {
     for (unsigned long i = 0; i < parser.option("i").count(); ++i)
     {
-        const std::vector<file>& temp = get_files_in_directory_tree(parser.option("i").argument(0,i), file_filter(filter), search_depth);
-        files.insert(files.begin(), temp.begin(), temp.end());
+        const directory dir(parser.option("i").argument(0,i));
+
+        const std::vector<file>& temp = get_files_in_directory_tree(dir, file_filter(filter), search_depth);
+
+        // figure out how many characters need to be removed from the path of each file
+        const string parent = dir.get_parent().full_name();
+        unsigned long strip = parent.size();
+        if (parent.size() > 0 && parent[parent.size()-1] != '\\' && parent[parent.size()-1] != '/')
+            strip += 1;
+
+        for (unsigned long i = 0; i < temp.size(); ++i)
+        {
+            files.push_back(make_pair(temp[i].full_name().substr(strip), temp[i].full_name()));
+        }
     }
 
     for (unsigned long i = 0; i < parser.number_of_arguments(); ++i)
     {
-        files.push_back(file(parser[i]));
+        files.push_back(make_pair(parser[i], parser[i]));
     }
 
     std::sort(files.begin(), files.end());
@@ -295,6 +307,7 @@ bool looks_like_function_declaration (
 // ----------------------------------------------------------------------------------------
 
 void process_file (
+    istream& fin,
     const string& file,
     std::vector<tok_function_record>& functions,
     std::vector<tok_class_record>& classes
@@ -306,7 +319,6 @@ void process_file (
 !*/
 {
     tok_type tok;
-    ifstream fin(file.c_str());
     tok.set_stream(fin);
 
     bool recently_seen_struct_keyword = false;
@@ -1174,7 +1186,7 @@ void generate_xml_markup(
 {
 
     // first figure out which files should be processed
-    std::vector<file> files; 
+    std::vector<std::pair<string,string> > files; 
     obtain_list_of_files(parser, filter, search_depth, files);
 
     cout << "files.size(): " << files.size() << endl;
@@ -1184,7 +1196,13 @@ void generate_xml_markup(
 
     for (unsigned long i = 0; i < files.size(); ++i)
     {
-        process_file(files[i].full_name(), tok_functions, tok_classes); 
+        ifstream fin(files[i].second.c_str());
+        if (!fin)
+        {
+            cout << "Error opening file: " << files[i].second << endl;
+            return;
+        }
+        process_file(fin, files[i].first, tok_functions, tok_classes); 
     }
 
     cout << "\ntok_functions.size(): " << tok_functions.size() << endl;
