@@ -7,6 +7,7 @@
 #include <fstream>
 #include <stack>
 #include "dlib/cpp_tokenizer.h"
+#include "dlib/string.h"
 
 using namespace dlib;
 using namespace std;
@@ -403,7 +404,6 @@ void process_file (
                     }
                     else if (token == "namespace")
                     {
-                        cout << "hit namespace" << endl;
                         recently_seen_namespace_keyword = true;
                         recently_seen_new_scope = true;
                     }
@@ -553,7 +553,6 @@ void process_file (
                             // if we are entering a new scope
                             if (recently_seen_new_scope)
                             {
-                                cout << "new scope" << endl;
                                 scopes.push(0);
                                 at_top_of_new_scope = true;
 
@@ -750,7 +749,11 @@ string get_function_name (
         {
             if (i != 0 && !seen_operator)
             {
-                name = declaration[i-1].second;
+                // if this is a destructor then include the ~
+                if (i > 1 && declaration[i-2].second == "~")
+                    name = "~" + declaration[i-1].second;
+                else
+                    name = declaration[i-1].second;
             }
 
             break;
@@ -785,15 +788,126 @@ string get_function_name (
 
 // ----------------------------------------------------------------------------------------
 
+string pretty_print_declaration (
+    const std::vector<std::pair<int,string> >& decl
+)
+{
+    string temp;
+
+    if (decl.size() == 0)
+        return temp;
+    else if (decl.size() >= 1)
+    {
+        temp = decl[0].second;
+        if (temp == "template")
+            temp += " ";
+    }
+
+    for (unsigned long i = 1; i < decl.size(); ++i)
+    {
+        bool add_trailing_space = false;
+
+        if (decl[i].first == tok_type::IDENTIFIER ||
+            decl[i].first == tok_type::KEYWORD)
+        {
+            if (decl[i-1].first == tok_type::IDENTIFIER ||
+                decl[i-1].first == tok_type::KEYWORD ||
+                decl[i-1].second == "," || 
+                decl[i-1].second == "&" || 
+                decl[i-1].second == "*" || 
+                decl[i-1].second == ">" 
+                )
+            {
+                temp += " ";
+            }
+        }
+        else if (i+1 < decl.size())
+        {
+            if(decl[i].first == tok_type::OTHER)
+            {
+                if (decl[i].second == ":" && decl[i-1].second != ":" && decl[i+1].second != ":")
+                {
+                    temp += " ";
+                    add_trailing_space = true;
+                }
+            }
+        }
+
+        temp += decl[i].second;
+
+        if (add_trailing_space)
+            temp += " ";
+    }
+
+    return temp;
+}
+
+// ----------------------------------------------------------------------------------------
+
+string format_comment (
+    const string& comment
+)
+{
+    if (comment.size() <= 6)
+        return "";
+
+    string temp = trim(trim(comment.substr(3,comment.size()-6), " \t"), "\n\r");
+
+    // now figure out what the smallest amount of leading white space is and remove it from each line.
+    unsigned long num_whitespace = 100000;
+    
+    string::size_type pos1 = 0, pos2 = 0;
+
+    while (pos1 != string::npos)
+    {
+        // find start of non-white-space
+        pos2 = temp.find_first_not_of(" \t",pos1);
+
+        // if this is a line of just white space then ignore it
+        if (pos2 != string::npos && temp[pos2] != '\n' && temp[pos2] != '\r')
+        {
+            if (pos2-pos1 < num_whitespace)
+                num_whitespace = pos2-pos1;
+        }
+
+        // find end-of-line
+        pos1 = temp.find_first_of("\n\r", pos2);
+        // find start of next line
+        pos2 = temp.find_first_not_of("\n\r", pos1);
+        pos1 = pos2;
+    }
+
+    // now remove the leading white space
+    string temp2;
+    bool seen_newline = true;
+    unsigned long counter = 0;
+    for (unsigned long i = 0; i < temp.size(); ++i)
+    {
+        // if we are looking at a new line
+        if (temp[i] == '\n' || temp[i] == '\r')
+        {
+            counter = 0;
+        }
+        else if (counter < num_whitespace)
+        {
+            ++counter;
+            continue;
+        }
+
+        temp2 += temp[i];
+    }
+
+    return temp2;
+}
+
+// ----------------------------------------------------------------------------------------
+
 typedef_record convert_tok_typedef_record (
     const tok_typedef_record& rec
 )
 {
     typedef_record temp;
-    for (unsigned long i = 0; i < rec.declaration.size(); ++i)
-    {
-        temp.declaration += rec.declaration[i].second + " ";
-    }
+    temp.declaration = pretty_print_declaration(rec.declaration);
     return temp;
 }
 
@@ -804,10 +918,7 @@ variable_record convert_tok_variable_record (
 )
 {
     variable_record temp;
-    for (unsigned long i = 0; i < rec.declaration.size(); ++i)
-    {
-        temp.declaration += rec.declaration[i].second + " ";
-    }
+    temp.declaration = pretty_print_declaration(rec.declaration);
     return temp;
 }
 
@@ -819,13 +930,9 @@ method_record convert_tok_method_record (
 {
     method_record temp;
 
-    temp.comment = rec.comment;
+    temp.comment = format_comment(rec.comment);
     temp.name = get_function_name(rec.declaration);
-
-    for (unsigned long i = 0; i < rec.declaration.size(); ++i)
-    {
-        temp.declaration += rec.declaration[i].second + " ";
-    }
+    temp.declaration = pretty_print_declaration(rec.declaration);
     return temp;
 }
 
@@ -840,7 +947,7 @@ class_record convert_tok_class_record (
 
     crec.scope = rec.scope;
     crec.file = rec.file;
-    crec.comment = rec.comment;
+    crec.comment = format_comment(rec.comment);
 
     crec.name.clear();
 
@@ -857,12 +964,7 @@ class_record convert_tok_class_record (
         }
     }
 
-    crec.declaration.clear();
-    for (unsigned long i = 0; i < rec.declaration.size(); ++i)
-    {
-        crec.declaration += rec.declaration[i].second + " ";
-    }
-
+    crec.declaration = pretty_print_declaration(rec.declaration);
 
     for (unsigned long i = 0; i < rec.public_typedefs.size(); ++i)
         crec.public_typedefs.push_back(convert_tok_typedef_record(rec.public_typedefs[i]));
@@ -890,13 +992,9 @@ function_record convert_tok_function_record (
 
     temp.scope = rec.scope;
     temp.file = rec.file;
-    temp.comment = rec.comment;
+    temp.comment = format_comment(rec.comment);
     temp.name = get_function_name(rec.declaration);
-
-    for (unsigned long i = 0; i < rec.declaration.size(); ++i)
-    {
-        temp.declaration += rec.declaration[i].second + " ";
-    }
+    temp.declaration = pretty_print_declaration(rec.declaration);
 
     return temp;
 }
@@ -930,17 +1028,36 @@ void convert_to_normal_records (
 
 // ----------------------------------------------------------------------------------------
 
+string add_entity_ref (const string& str)
+{
+    string temp;
+    for (unsigned long i = 0; i < str.size(); ++i)
+    {
+        if (str[i] == '&')
+            temp += "&amp;";
+        else if (str[i] == '<')
+            temp += "&lt;";
+        else if (str[i] == '>')
+            temp += "&gt;";
+        else
+            temp += str[i];
+    }
+    return temp;
+}
+
+// ----------------------------------------------------------------------------------------
+
 void write_as_xml (
     const function_record& rec,
     ostream& fout
 )
 {
     fout << "    <function>\n";
-    fout << "      <name>"        << rec.name        << "</name>\n";
-    fout << "      <scope>"       << rec.scope       << "</scope>\n";
-    fout << "      <declaration>" << rec.declaration << "</declaration>\n";
-    fout << "      <file>"        << rec.file        << "</file>\n";
-    fout << "      <comment>"     << rec.comment     << "</comment>\n";
+    fout << "      <name>"        << add_entity_ref(rec.name)        << "</name>\n";
+    fout << "      <scope>"       << add_entity_ref(rec.scope)       << "</scope>\n";
+    fout << "      <declaration>" << add_entity_ref(rec.declaration) << "</declaration>\n";
+    fout << "      <file>"        << add_entity_ref(rec.file)        << "</file>\n";
+    fout << "      <comment>"     << add_entity_ref(rec.comment)     << "</comment>\n";
     fout << "    </function>\n";
 }
 
@@ -948,54 +1065,69 @@ void write_as_xml (
 
 void write_as_xml (
     const class_record& rec,
-    ostream& fout
+    ostream& fout,
+    unsigned long indent 
 )
 {
-    fout << "    <class>\n";
-    fout << "      <name>"        << rec.name        << "</name>\n";
-    fout << "      <scope>"       << rec.scope       << "</scope>\n";
-    fout << "      <declaration>" << rec.declaration << "</declaration>\n";
-    fout << "      <file>"        << rec.file        << "</file>\n";
-    fout << "      <comment>"     << rec.comment     << "</comment>\n";
+    const string pad(indent, ' ');
+
+    fout << pad << "<class>\n";
+    fout << pad << "  <name>"        << add_entity_ref(rec.name)        << "</name>\n";
+    fout << pad << "  <scope>"       << add_entity_ref(rec.scope)       << "</scope>\n";
+    fout << pad << "  <declaration>" << add_entity_ref(rec.declaration) << "</declaration>\n";
+    fout << pad << "  <file>"        << add_entity_ref(rec.file)        << "</file>\n";
+    fout << pad << "  <comment>"     << add_entity_ref(rec.comment)     << "</comment>\n";
 
 
-    fout << "      <public_typedefs>\n";
-    for (unsigned long i = 0; i < rec.public_typedefs.size(); ++i)
+    if (rec.public_typedefs.size() > 0)
     {
-        fout << "        <typedef>"        << rec.public_typedefs[i].declaration        << "</typedef>\n";
+        fout << pad << "  <public_typedefs>\n";
+        for (unsigned long i = 0; i < rec.public_typedefs.size(); ++i)
+        {
+            fout << pad << "    <typedef>"        << add_entity_ref(rec.public_typedefs[i].declaration)        << "</typedef>\n";
+        }
+        fout << pad << "  </public_typedefs>\n";
     }
-    fout << "      </public_typedefs>\n";
 
 
-    fout << "      <public_variables>\n";
-    for (unsigned long i = 0; i < rec.public_variables.size(); ++i)
+    if (rec.public_variables.size() > 0)
     {
-        fout << "        <variable>"        << rec.public_variables[i].declaration        << "</variable>\n";
+        fout << pad << "  <public_variables>\n";
+        for (unsigned long i = 0; i < rec.public_variables.size(); ++i)
+        {
+            fout << pad << "    <variable>"        << add_entity_ref(rec.public_variables[i].declaration)        << "</variable>\n";
+        }
+        fout << pad << "  </public_variables>\n";
     }
-    fout << "      </public_variables>\n";
 
 
-    fout << "      <public_methods>\n";
-    for (unsigned long i = 0; i < rec.public_methods.size(); ++i)
+    if (rec.public_methods.size() > 0)
     {
-        fout << "        <method>\n";
-        fout << "          <name>"        << rec.public_methods[i].name        << "</name>\n";
-        fout << "          <declaration>" << rec.public_methods[i].declaration << "</declaration>\n";
-        fout << "          <comment>"     << rec.public_methods[i].comment     << "</comment>\n";
-        fout << "        </method>\n";
+        fout << pad << "  <public_methods>\n";
+        for (unsigned long i = 0; i < rec.public_methods.size(); ++i)
+        {
+            fout << pad << "    <method>\n";
+            fout << pad << "      <name>"        << add_entity_ref(rec.public_methods[i].name)        << "</name>\n";
+            fout << pad << "      <declaration>" << add_entity_ref(rec.public_methods[i].declaration) << "</declaration>\n";
+            fout << pad << "      <comment>"     << add_entity_ref(rec.public_methods[i].comment)     << "</comment>\n";
+            fout << pad << "    </method>\n";
+        }
+        fout << pad << "  </public_methods>\n";
     }
-    fout << "      </public_methods>\n";
 
 
-    fout << "      <public_subclasses>\n";
-    for (unsigned long i = 0; i < rec.public_subclasses.size(); ++i)
+    if (rec.public_subclasses.size() > 0)
     {
-        write_as_xml(rec.public_subclasses[i], fout);
+        fout << pad << "  <public_subclasses>\n";
+        for (unsigned long i = 0; i < rec.public_subclasses.size(); ++i)
+        {
+            write_as_xml(rec.public_subclasses[i], fout, indent+4);
+        }
+        fout << pad << "  </public_subclasses>\n";
     }
-    fout << "      </public_subclasses>\n";
 
 
-    fout << "    </class>\n";
+    fout << pad << "</class>\n";
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1012,7 +1144,7 @@ void save_to_xml_file (
     fout << "  <classes>" << endl;
     for (unsigned long i = 0; i < classes.size(); ++i)
     {
-        write_as_xml(classes[i], fout);
+        write_as_xml(classes[i], fout, 4);
         fout << "\n";
     }
     fout << "  </classes>\n\n" << endl;
@@ -1054,10 +1186,6 @@ void generate_xml_markup(
 
     cout << "\ntok_functions.size(): " << tok_functions.size() << endl;
     cout << "tok_classes.size(): " << tok_classes.size() << endl;
-    cout << "tok_classes[0].public_methods.size():    " << tok_classes[0].public_methods.size() << endl;
-    cout << "tok_classes[0].public_typedefs.size():   " << tok_classes[0].public_typedefs.size() << endl;
-    cout << "tok_classes[0].public_variables.size():  " << tok_classes[0].public_variables.size() << endl;
-    cout << "tok_classes[0].public_subclasses.size(): " << tok_classes[0].public_subclasses.size() << endl;
     cout << endl;
 
     //cout << tok_functions[0].comment << endl;
