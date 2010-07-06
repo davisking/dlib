@@ -689,7 +689,10 @@ void process_file (
                             if (paren_count == 0)
                             {
                                 recently_seen_paren_0 = true;
-                                last_full_declaration = token_accum;
+                                if (scopes.top() == 0)
+                                {
+                                    last_full_declaration = token_accum;
+                                }
                             }
 
                             recently_seen_new_scope = false;
