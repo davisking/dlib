@@ -118,7 +118,7 @@ struct tok_class_record
     std::vector<tok_method_record> public_methods;
     std::vector<tok_variable_record> public_variables;
     std::vector<tok_typedef_record> public_typedefs;
-    std::vector<tok_class_record> public_subclasses;
+    std::vector<tok_class_record> public_inner_classes;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -160,7 +160,7 @@ struct class_record
     std::vector<method_record> public_methods;
     std::vector<variable_record> public_variables;
     std::vector<typedef_record> public_typedefs;
-    std::vector<class_record> public_subclasses;
+    std::vector<class_record> public_inner_classes;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -608,13 +608,13 @@ void process_file (
                                 if (inside_public_scope.size() > 0)
                                     inside_public_scope.pop();
 
-                                // if this class is a subclass of another then push it into the
-                                // public_subclasses field of it's containing class
+                                // if this class is a inner_class of another then push it into the
+                                // public_inner_classes field of it's containing class
                                 if (class_stack.size() > 1)
                                 {
                                     tok_class_record temp = class_stack.top();
                                     class_stack.pop();
-                                    class_stack.top().public_subclasses.push_back(temp);
+                                    class_stack.top().public_inner_classes.push_back(temp);
                                 }
                                 else if (class_stack.size() > 0)
                                 {
@@ -975,8 +975,8 @@ class_record convert_tok_class_record (
     for (unsigned long i = 0; i < rec.public_methods.size(); ++i)
         crec.public_methods.push_back(convert_tok_method_record(rec.public_methods[i]));
 
-    for (unsigned long i = 0; i < rec.public_subclasses.size(); ++i)
-        crec.public_subclasses.push_back(convert_tok_class_record(rec.public_subclasses[i]));
+    for (unsigned long i = 0; i < rec.public_inner_classes.size(); ++i)
+        crec.public_inner_classes.push_back(convert_tok_class_record(rec.public_inner_classes[i]));
 
 
     return crec;
@@ -1116,14 +1116,14 @@ void write_as_xml (
     }
 
 
-    if (rec.public_subclasses.size() > 0)
+    if (rec.public_inner_classes.size() > 0)
     {
-        fout << pad << "  <public_subclasses>\n";
-        for (unsigned long i = 0; i < rec.public_subclasses.size(); ++i)
+        fout << pad << "  <public_inner_classes>\n";
+        for (unsigned long i = 0; i < rec.public_inner_classes.size(); ++i)
         {
-            write_as_xml(rec.public_subclasses[i], fout, indent+4);
+            write_as_xml(rec.public_inner_classes[i], fout, indent+4);
         }
-        fout << pad << "  </public_subclasses>\n";
+        fout << pad << "  </public_inner_classes>\n";
     }
 
 
