@@ -1283,8 +1283,6 @@ void generate_xml_markup(
         process_file(fin, files[i].first, tok_functions, tok_classes); 
     }
 
-    //cout << tok_functions[0].comment << endl;
-
     std::vector<function_record> functions;
     std::vector<class_record> classes;
 
