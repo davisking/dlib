@@ -1019,13 +1019,44 @@ string pretty_print_declaration (
 // ----------------------------------------------------------------------------------------
 
 string format_comment (
-    const string& comment
+    const string& comment,
+    const unsigned long expand_tabs
 )
 {
     if (comment.size() <= 6)
         return "";
 
     string temp = trim(trim(comment.substr(3,comment.size()-6), " \t"), "\n\r");
+
+
+    // if we should expand tabs to spaces
+    if (expand_tabs != 0)
+    {
+        unsigned long column = 0;
+        string str;
+        for (unsigned long i = 0; i < temp.size(); ++i)
+        {
+            if (temp[i] == '\t')
+            {
+                const unsigned long num_spaces = expand_tabs - column%expand_tabs;
+                column += num_spaces;
+                str.insert(str.end(), num_spaces, ' ');
+            }
+            else if (temp[i] == '\n' || temp[i] == '\r')
+            {
+                str += temp[i];
+                column = 0;
+            }
+            else
+            {
+                str += temp[i];
+                ++column;
+            }
+        }
+
+        // put str into temp
+        str.swap(temp);
+    }
 
     // now figure out what the smallest amount of leading white space is and remove it from each line.
     unsigned long num_whitespace = 100000;
@@ -1099,12 +1130,13 @@ variable_record convert_tok_variable_record (
 // ----------------------------------------------------------------------------------------
 
 method_record convert_tok_method_record (
-    const tok_method_record& rec
+    const tok_method_record& rec,
+    const unsigned long expand_tabs
 )
 {
     method_record temp;
 
-    temp.comment = format_comment(rec.comment);
+    temp.comment = format_comment(rec.comment, expand_tabs);
     temp.name = get_function_name(rec.declaration);
     temp.declaration = pretty_print_declaration(rec.declaration);
     return temp;
@@ -1113,7 +1145,8 @@ method_record convert_tok_method_record (
 // ----------------------------------------------------------------------------------------
 
 class_record convert_tok_class_record (
-    const tok_class_record& rec
+    const tok_class_record& rec,
+    const unsigned long expand_tabs
 )
 {
     class_record crec;
@@ -1121,7 +1154,7 @@ class_record convert_tok_class_record (
 
     crec.scope = rec.scope;
     crec.file = rec.file;
-    crec.comment = format_comment(rec.comment);
+    crec.comment = format_comment(rec.comment, expand_tabs);
 
     crec.name.clear();
 
@@ -1147,10 +1180,10 @@ class_record convert_tok_class_record (
         crec.public_variables.push_back(convert_tok_variable_record(rec.public_variables[i]));
 
     for (unsigned long i = 0; i < rec.public_methods.size(); ++i)
-        crec.public_methods.push_back(convert_tok_method_record(rec.public_methods[i]));
+        crec.public_methods.push_back(convert_tok_method_record(rec.public_methods[i], expand_tabs));
 
     for (unsigned long i = 0; i < rec.public_inner_classes.size(); ++i)
-        crec.public_inner_classes.push_back(convert_tok_class_record(rec.public_inner_classes[i]));
+        crec.public_inner_classes.push_back(convert_tok_class_record(rec.public_inner_classes[i], expand_tabs));
 
 
     return crec;
@@ -1159,14 +1192,15 @@ class_record convert_tok_class_record (
 // ----------------------------------------------------------------------------------------
 
 function_record convert_tok_function_record (
-    const tok_function_record& rec
+    const tok_function_record& rec,
+    const unsigned long expand_tabs
 )
 {
     function_record temp;
 
     temp.scope = rec.scope;
     temp.file = rec.file;
-    temp.comment = format_comment(rec.comment);
+    temp.comment = format_comment(rec.comment, expand_tabs);
     temp.name = get_function_name(rec.declaration);
     temp.declaration = pretty_print_declaration(rec.declaration);
 
@@ -1178,6 +1212,7 @@ function_record convert_tok_function_record (
 void convert_to_normal_records (
     const std::vector<tok_function_record>& tok_functions,
     const std::vector<tok_class_record>& tok_classes,
+    const unsigned long expand_tabs,
     std::vector<function_record>& functions,
     std::vector<class_record>& classes
 )
@@ -1188,13 +1223,13 @@ void convert_to_normal_records (
 
     for (unsigned long i = 0; i < tok_functions.size(); ++i)
     {
-        functions.push_back(convert_tok_function_record(tok_functions[i]));
+        functions.push_back(convert_tok_function_record(tok_functions[i], expand_tabs));
     }
 
 
     for (unsigned long i = 0; i < tok_classes.size(); ++i)
     {
-        classes.push_back(convert_tok_class_record(tok_classes[i]));
+        classes.push_back(convert_tok_class_record(tok_classes[i], expand_tabs));
     }
 
 
@@ -1341,7 +1376,8 @@ void save_to_xml_file (
 void generate_xml_markup(
     const cmd_line_parser<char>::check_1a_c& parser, 
     const std::string& filter, 
-    const unsigned long search_depth
+    const unsigned long search_depth,
+    const unsigned long expand_tabs
 )
 {
 
@@ -1367,7 +1403,7 @@ void generate_xml_markup(
     std::vector<function_record> functions;
     std::vector<class_record> classes;
 
-    convert_to_normal_records(tok_functions, tok_classes, functions, classes);
+    convert_to_normal_records(tok_functions, tok_classes, expand_tabs, functions, classes);
 
     save_to_xml_file(functions, classes);
 }

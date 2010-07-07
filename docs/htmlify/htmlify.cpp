@@ -11,7 +11,7 @@
 #include "to_xml.h"
 
 
-const char* VERSION = "3.0";
+const char* VERSION = "3.1";
 
 using namespace std;
 using namespace dlib;
@@ -108,6 +108,7 @@ int main(int argc, char** argv)
         parser.add_option("title","This option specifies a string which is prepended onto the title of the generated HTML",1);
         parser.add_option("to-xml","Instead of generating HTML output, create a single output file called output.xml that contains "
                           "a simple XML database which lists all documented classes and functions.");
+        parser.add_option("t", "When creating XML output, replace tabs in comments with <arg> spaces.", 1);
 
         
         parser.parse(argc,argv);
@@ -117,6 +118,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("cat","flatten");
         parser.check_incompatible_options("cat","index");
         parser.check_option_arg_type<unsigned long>("depth");
+        parser.check_option_arg_range("t", 1, 100);
 
         parser.check_incompatible_options("to-xml", "b");
         parser.check_incompatible_options("to-xml", "n");
@@ -126,11 +128,14 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("to-xml", "flatten");
         parser.check_incompatible_options("to-xml", "title");
 
-        const char* singles[] = {"b","n","h","index","v","man","f","cat","depth","o","flatten","title","to-xml"};
+        const char* singles[] = {"b","n","h","index","v","man","f","cat","depth","o","flatten","title","to-xml", "t"};
         parser.check_one_time_options(singles);
 
         const char* i_sub_ops[] = {"f","depth","flatten"};
         parser.check_sub_options("i",i_sub_ops);
+
+        const char* to_xml_sub_ops[] = {"t"};
+        parser.check_sub_options("to-xml",to_xml_sub_ops);
 
         const clp::option_type& b_opt       = parser.option("b");
         const clp::option_type& n_opt       = parser.option("n");
@@ -204,7 +209,11 @@ int main(int argc, char** argv)
 
         if (to_xml_opt)
         {
-            generate_xml_markup(parser, filter, search_depth);
+            unsigned long expand_tabs = 0;
+            if (parser.option("t"))
+                expand_tabs = string_cast<unsigned long>(parser.option("t").argument());
+
+            generate_xml_markup(parser, filter, search_depth, expand_tabs);
             return 0;
         }
 
