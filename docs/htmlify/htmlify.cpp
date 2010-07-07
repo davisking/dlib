@@ -608,8 +608,15 @@ void print_manual (
     sout << "Htmlify also has the ability to create a simple index of all the files it is given. "
          << "The --index option creates a file named index.html with a frame on the left side "
          << "that contains links to all the files.";
+    cout << "\n\n" << wrap_string(sout.str(),indent,indent);   sout.str("");
 
- 
+
+    sout << "Finally, Htmlify can produce annotated XML output instead of HTML.  The output will "
+         << "contain all functions which are immediately followed by comments of the form /*! comment body !*/. "
+         << "Similarly, all classes or structs that immediately contain one of these comments following their "
+         << "opening { will also be output as annotated XML.  Note also that if you wish to document a "
+         << "piece of code using one of these comments but don't want it to appear in the output XML then "
+         << "use either a comment like /* */ or /*!P !*/ to mark the code as \"private\".";
     cout << "\n\n" << wrap_string(sout.str(),indent,indent) << "\n\n";   sout.str("");
 }
 
