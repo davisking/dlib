@@ -17,6 +17,10 @@ There is also a stylesheet inside the docs/chm folder (htmlhelp_stylesheet.xsl)
 that knows how to look at the XML files and generate the table of contents 
 files needed by the htmlhelp tool (the thing that makes chm help files).  
 
+Also note that the first 80 or so lines of the stylesheet.xsl file contains
+stuff specific to the dlib project and thus should be changed or removed
+as appropriate for your specific project.
+
 ======================== Installing the required tools ========================
 
 To begin with, the XML and XSLT is usable on any operating system, however, 
