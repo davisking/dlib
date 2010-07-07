@@ -345,6 +345,9 @@ void process_file (
     bool recently_seen_pound_define = false;
         // true if we have seen a #define and haven't seen an unescaped newline
 
+    bool recently_seen_preprocessor = false;
+        // true if we have seen a preprocessor statement and haven't seen an unescaped newline
+
     bool recently_seen_typedef = false;
         // true if we have seen a typedef keyword and haven't seen a ;
 
@@ -403,6 +406,9 @@ void process_file (
             case tok_type::KEYWORD: // ------------------------------------------
                 {
                     token_accum.push_back(make_pair(type,token));
+
+                    if (token[0] == '#')
+                        recently_seen_preprocessor = true;
 
                     if (token == "class")
                     {
@@ -500,7 +506,37 @@ void process_file (
                                     looks_like_function_declaration(last_full_declaration))
                                 {
                                     tok_method_record temp;
-                                    temp.declaration = last_full_declaration;
+
+                                    // Check if there is an initialization list inside the declaration and if there is
+                                    // then find out where the starting : is located so we can avoid including it in 
+                                    // the output.
+                                    unsigned long pos = last_full_declaration.size();
+                                    long temp_paren_count = 0;
+                                    for (unsigned long i = 0; i < last_full_declaration.size(); ++i)
+                                    {
+                                        if (last_full_declaration[i].first == tok_type::OTHER)
+                                        {
+                                            if (last_full_declaration[i].second == "(")
+                                                ++temp_paren_count;
+                                            else if (last_full_declaration[i].second == ")")
+                                                --temp_paren_count;
+                                            else if (temp_paren_count == 0 && last_full_declaration[i].second == ":")
+                                            {
+                                                // if this is a :: then ignore it
+                                                if (i > 0 && last_full_declaration[i-1].second == ":")
+                                                    continue;
+                                                else if (i+1 < last_full_declaration.size() && last_full_declaration[i+1].second == ":")
+                                                    continue;
+                                                else 
+                                                {
+                                                    pos = i;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    temp.declaration.assign(last_full_declaration.begin(), last_full_declaration.begin()+pos);
                                     temp.comment = token;
                                     class_stack.top().public_methods.push_back(temp);
                                 }
@@ -512,7 +548,31 @@ void process_file (
                             if (looks_like_function_declaration(last_full_declaration))
                             {
                                 tok_function_record temp;
-                                temp.declaration = last_full_declaration;
+
+                                // make sure we never include anything beyond the first closing )
+                                unsigned long pos = last_full_declaration.size();
+                                long temp_paren_count = 0;
+                                for (unsigned long i = 0; i < last_full_declaration.size(); ++i)
+                                {
+                                    if (last_full_declaration[i].first == tok_type::OTHER)
+                                    {
+                                        if (last_full_declaration[i].second == "(")
+                                        {
+                                            ++temp_paren_count;
+                                        }
+                                        else if (last_full_declaration[i].second == ")")
+                                        {
+                                            --temp_paren_count;
+                                            if (temp_paren_count == 0)
+                                            {
+                                                pos = i+1;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                temp.declaration.assign(last_full_declaration.begin(), last_full_declaration.begin()+pos);
                                 temp.file = file;
                                 temp.scope = make_scope_string(namespaces);
                                 temp.comment = token;
@@ -615,24 +675,32 @@ void process_file (
                             else if (scopes.size() > 1)
                             {
                                 scopes.pop();
-                                namespaces.pop_back();
 
                                 if (inside_public_scope.size() > 0)
                                     inside_public_scope.pop();
 
-                                // if this class is a inner_class of another then push it into the
-                                // public_inner_classes field of it's containing class
-                                if (class_stack.size() > 1)
+                                // If the scope we are leaving is the top class on the class_stack
+                                // then we need to either pop it into its containing class or put it
+                                // into the classes output vector.
+                                if (namespaces.back() == class_stack.top().name)
                                 {
-                                    tok_class_record temp = class_stack.top();
-                                    class_stack.pop();
-                                    class_stack.top().public_inner_classes.push_back(temp);
+                                    // if this class is a inner_class of another then push it into the
+                                    // public_inner_classes field of it's containing class
+                                    if (class_stack.size() > 1)
+                                    {
+                                        tok_class_record temp = class_stack.top();
+                                        class_stack.pop();
+                                        class_stack.top().public_inner_classes.push_back(temp);
+                                    }
+                                    else if (class_stack.size() > 0)
+                                    {
+                                        classes.push_back(class_stack.top());
+                                        class_stack.pop();
+                                    }
                                 }
-                                else if (class_stack.size() > 0)
-                                {
-                                    classes.push_back(class_stack.top());
-                                    class_stack.pop();
-                                }
+
+                                namespaces.pop_back();
+                                last_full_declaration.clear();
                             }
 
                             token_accum.clear();
@@ -727,9 +795,21 @@ void process_file (
                         {
                             recently_seen_pound_define = false;
                             recently_seen_paren_0 = false;
+                            recently_seen_preprocessor = false;
 
                             // this is an end of a potential declaration
                             token_accum.swap(last_full_declaration);
+                            token_accum.clear();
+                        }
+                    }
+
+                    if (recently_seen_preprocessor)
+                    {
+                        if (contains_unescaped_newline(token))
+                        {
+                            recently_seen_preprocessor = false;
+
+                            last_full_declaration.clear();
                             token_accum.clear();
                         }
                     }
@@ -861,7 +941,7 @@ string pretty_print_declaration (
         }
         else if (decl[i].first == tok_type::OTHER && decl[i].second == ",")
         {
-            if (in_template || (paren_count != 0 && angle_count == 0))
+            if (in_template || (paren_count == 1 && angle_count == 0))
                 temp += ",\n   ";
             else
                 temp += ",";
