@@ -22,7 +22,7 @@
          <head>
             <title>
                <xsl:if test="title">
-               - <xsl:value-of select="title" />
+                 <xsl:value-of select="title" />
                </xsl:if>
             </title>
 
