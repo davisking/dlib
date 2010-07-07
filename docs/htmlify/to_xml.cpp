@@ -808,50 +808,129 @@ string pretty_print_declaration (
 )
 {
     string temp;
+    long angle_count = 0;
+    long paren_count = 0;
 
     if (decl.size() == 0)
         return temp;
-    else if (decl.size() >= 1)
-    {
-        temp = decl[0].second;
-        if (temp == "template")
-            temp += " ";
-    }
+
+    temp = decl[0].second;
+
+
+    bool just_closed_template = false;
+    bool in_template = false;
+    bool last_was_scope_res = false;
+    bool seen_operator = false;
+
+    if (temp == "operator")
+        seen_operator = true;
 
     for (unsigned long i = 1; i < decl.size(); ++i)
     {
-        bool add_trailing_space = false;
+        bool last_was_less_than = false;
+        if (decl[i-1].first == tok_type::OTHER && decl[i-1].second == "<")
+            last_was_less_than = true;
 
-        if (decl[i].first == tok_type::IDENTIFIER ||
-            decl[i].first == tok_type::KEYWORD)
+
+        if (decl[i].first == tok_type::OTHER && decl[i].second == "<")
+            ++angle_count;
+
+        if (decl[i-1].first == tok_type::KEYWORD && decl[i-1].second == "template" && 
+            decl[i].first == tok_type::OTHER && decl[i].second == "<")
         {
-            if (decl[i-1].first == tok_type::IDENTIFIER ||
-                decl[i-1].first == tok_type::KEYWORD ||
-                decl[i-1].second == "," || 
-                decl[i-1].second == "&" || 
-                decl[i-1].second == "*" || 
-                decl[i-1].second == ">" 
-                )
+            in_template = true;
+            temp += " <\n    ";
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == ">")
+        {
+            --angle_count;
+            if (angle_count == 0 && in_template)
             {
-                temp += " ";
+                temp += "\n>\n";
+                just_closed_template = true;
+                in_template = false;
+            }
+            else
+            {
+                temp += ">";
             }
         }
-        else if (i+1 < decl.size())
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == "<")
         {
-            if(decl[i].first == tok_type::OTHER)
-            {
-                if (decl[i].second == ":" && decl[i-1].second != ":" && decl[i+1].second != ":")
-                {
-                    temp += " ";
-                    add_trailing_space = true;
-                }
-            }
+            temp += "<";
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == ",")
+        {
+            if (in_template || (paren_count != 0 && angle_count == 0))
+                temp += ",\n   ";
+            else
+                temp += ",";
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == "&")
+        {
+            temp += "&";
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == "*")
+        {
+            temp += "*";
+        }
+        else if (decl[i].first == tok_type::KEYWORD && decl[i].second == "operator")
+        {
+            temp += "\noperator";
+            seen_operator = true;
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == ":" &&
+                 (decl[i-1].second == ":" || (i+1<decl.size() && decl[i+1].second == ":") ) )
+        {
+            temp += ":";
+            last_was_scope_res = true;
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == "(")
+        {
+            const bool next_is_paren = (i+1 < decl.size() && decl[i+1].first == tok_type::OTHER && decl[i+1].second == ")");
+
+            if (paren_count == 0 && next_is_paren == false)
+                temp += " (\n   ";
+            else
+                temp += "(";
+
+            ++paren_count;
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == ")")
+        {
+            --paren_count;
+            if (paren_count == 0 && decl[i-1].second != "(")
+                temp += "\n)";
+            else
+                temp += ")";
+        }
+        else if (decl[i].first == tok_type::IDENTIFIER && i+1 < decl.size() &&
+                 decl[i+1].first == tok_type::OTHER && decl[i+1].second == "(")
+        {
+            if (just_closed_template || paren_count != 0 || decl[i-1].second == "~")
+                temp += decl[i].second;
+            else if (seen_operator)
+                temp += " " + decl[i].second;
+            else
+                temp += "\n" + decl[i].second;
+
+            just_closed_template = false;
+            last_was_scope_res = false;
+        }
+        else
+        {
+            if (just_closed_template || last_was_scope_res || last_was_less_than || 
+                (seen_operator && paren_count == 0 && decl[i].first == tok_type::OTHER ))
+                temp += decl[i].second;
+            else
+                temp += " " + decl[i].second;
+
+            just_closed_template = false;
+            last_was_scope_res = false;
         }
 
-        temp += decl[i].second;
 
-        if (add_trailing_space)
-            temp += " ";
+
     }
 
     return temp;
