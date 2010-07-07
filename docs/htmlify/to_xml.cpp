@@ -1268,7 +1268,8 @@ void generate_xml_markup(
     std::vector<std::pair<string,string> > files; 
     obtain_list_of_files(parser, filter, search_depth, files);
 
-    cout << "files.size(): " << files.size() << endl;
+    cout << "Generating output.xml..." << endl;
+    cout << "Number of files: " << files.size() << endl;
 
     std::vector<tok_function_record> tok_functions;
     std::vector<tok_class_record> tok_classes;
@@ -1278,14 +1279,14 @@ void generate_xml_markup(
         ifstream fin(files[i].second.c_str());
         if (!fin)
         {
-            cout << "Error opening file: " << files[i].second << endl;
+            cerr << "Error opening file: " << files[i].second << endl;
             return;
         }
         process_file(fin, files[i].first, tok_functions, tok_classes); 
     }
 
-    cout << "\ntok_functions.size(): " << tok_functions.size() << endl;
-    cout << "tok_classes.size(): " << tok_classes.size() << endl;
+    cout << "\nNumber of functions found: " << tok_functions.size() << endl;
+    cout << "Number of classes found:   " << tok_classes.size() << endl;
     cout << endl;
 
     //cout << tok_functions[0].comment << endl;
