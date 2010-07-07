@@ -682,7 +682,7 @@ void process_file (
                                 // If the scope we are leaving is the top class on the class_stack
                                 // then we need to either pop it into its containing class or put it
                                 // into the classes output vector.
-                                if (namespaces.back() == class_stack.top().name)
+                                if (class_stack.size() > 0 && namespaces.back() == class_stack.top().name)
                                 {
                                     // if this class is a inner_class of another then push it into the
                                     // public_inner_classes field of it's containing class
