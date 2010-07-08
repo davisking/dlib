@@ -122,6 +122,45 @@
                }
 
             }
+            function BigToggle(node)
+            {
+               // Unfold the branch if it isn't visible
+               var next_node = node.nextSibling;
+               if (next_node.style.display == 'none')
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "bigminus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'block';
+               }
+               // Collapse the branch if it IS visible
+               else
+               {
+                  // Change the image (if there is an image)
+                  if (node.childNodes.length > 0)
+                  {
+                     if (node.childNodes.length > 0)
+                     { 
+                        if (node.childNodes.item(0).nodeName == "IMG")
+                        {
+                           node.childNodes.item(0).src = "bigplus.gif";
+                        }
+                     }
+                  }
+
+                  next_node.style.display = 'none';
+               }
+
+            }
             </script>
             
             <style type="text/css">
@@ -1022,9 +1061,22 @@
                <font color="#009900"><pre><xsl:value-of select="comment"/></pre></font> <br/>
                </div>
 
+               <xsl:if test="protected_typedefs">
+                  <a onclick="BigToggle(this)" style="cursor: pointer"><img src="bigplus.gif" border="0"/><font color="blue">
+                     <u style="font-size:2em">Protected Typedefs</u></font></a>
+                     <div style="display:none;">
+                        <ul>
+                           <xsl:for-each select="protected_typedefs/typedef">
+                              <li><xsl:value-of select="."/>;</li>
+                           </xsl:for-each>
+                        </ul>
+                     </div>
+                  <br/>
+               </xsl:if>
+
                <xsl:if test="public_typedefs">
-                  <a onclick="Toggle(this)" style="cursor: pointer"><img src="plus.gif" border="0"/><font color="blue">
-                     <u>Public typedefs</u></font></a>
+                  <a onclick="BigToggle(this)" style="cursor: pointer"><img src="bigplus.gif" border="0" style="size:2em"/><font color="blue">
+                     <u style="font-size:2em">Public Typedefs</u></font></a>
                      <div style="display:none;">
                         <ul>
                            <xsl:for-each select="public_typedefs/typedef">
@@ -1035,9 +1087,22 @@
                   <br/>
                </xsl:if>
 
+               <xsl:if test="protected_variables">
+                  <a onclick="BigToggle(this)" style="cursor: pointer"><img src="bigplus.gif" border="0"/><font color="blue">
+                     <u style="font-size:2em">Protected Variables</u></font></a>
+                  <div style="display:none;">
+                     <ul>
+                        <xsl:for-each select="protected_variables/variable">
+                           <li><xsl:value-of select="."/>;</li>
+                        </xsl:for-each>
+                     </ul>
+                  </div>
+                  <br/>
+               </xsl:if>
+
                <xsl:if test="public_variables">
-                  <a onclick="Toggle(this)" style="cursor: pointer"><img src="plus.gif" border="0"/><font color="blue">
-                     <u>Public Variables</u></font></a>
+                  <a onclick="BigToggle(this)" style="cursor: pointer"><img src="bigplus.gif" border="0"/><font color="blue">
+                     <u style="font-size:2em">Public Variables</u></font></a>
                   <div style="display:none;">
                      <ul>
                         <xsl:for-each select="public_variables/variable">
@@ -1048,9 +1113,26 @@
                   <br/>
                </xsl:if>
 
+               <xsl:if test="protected_methods">
+                  <a onclick="BigToggle(this)" style="cursor: pointer"><img src="bigplus.gif" border="0"/><font color="blue">
+                     <u style="font-size:2em">Protected Methods</u></font></a>
+                  <div style="display:none;">
+                  <xsl:for-each select="protected_methods/method">
+                     <div id="function">
+                        <u>Method Name</u>: <b><xsl:value-of select="name"/></b> <br/><br/>
+                        <div style="margin-left:1.5em">
+                           <pre style="font-size:1.1em;"><xsl:value-of select="declaration"/>;</pre> 
+                           <font color="#009900"><pre><xsl:value-of select="comment"/></pre></font> <br/>
+                        </div>
+                     </div>
+                  </xsl:for-each>
+                  </div>
+                  <br/>
+               </xsl:if>
+
                <xsl:if test="public_methods">
-                  <a onclick="Toggle(this)" style="cursor: pointer"><img src="plus.gif" border="0"/><font color="blue">
-                     <u>Public Methods</u></font></a>
+                  <a onclick="BigToggle(this)" style="cursor: pointer"><img src="bigplus.gif" border="0"/><font color="blue">
+                     <u style="font-size:2em">Public Methods</u></font></a>
                   <div style="display:none;">
                   <xsl:for-each select="public_methods/method">
                      <div id="function">
@@ -1065,9 +1147,20 @@
                   <br/>
                </xsl:if>
 
+               <xsl:if test="protected_inner_classes">
+                  <a onclick="BigToggle(this)" style="cursor: pointer"><img src="bigplus.gif" border="0"/><font color="blue">
+                     <u style="font-size:2em">Protected Inner Classes</u></font></a>
+                  <div style="display:none;">
+                  <xsl:for-each select="protected_inner_classes/class">
+                     <xsl:apply-templates select="."/>
+                  </xsl:for-each>
+                  </div>
+                  <br/>
+               </xsl:if>
+
                <xsl:if test="public_inner_classes">
-                  <a onclick="Toggle(this)" style="cursor: pointer"><img src="plus.gif" border="0"/><font color="blue">
-                     <u>Public Inner Classes</u></font></a>
+                  <a onclick="BigToggle(this)" style="cursor: pointer"><img src="bigplus.gif" border="0"/><font color="blue">
+                     <u style="font-size:2em">Public Inner Classes</u></font></a>
                   <div style="display:none;">
                   <xsl:for-each select="public_inner_classes/class">
                      <xsl:apply-templates select="."/>
