@@ -128,9 +128,13 @@ struct tok_class_record
     string comment;
 
     std::vector<tok_method_record> public_methods;
+    std::vector<tok_method_record> protected_methods;
     std::vector<tok_variable_record> public_variables;
     std::vector<tok_typedef_record> public_typedefs;
+    std::vector<tok_variable_record> protected_variables;
+    std::vector<tok_typedef_record> protected_typedefs;
     std::vector<tok_class_record> public_inner_classes;
+    std::vector<tok_class_record> protected_inner_classes;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -172,7 +176,13 @@ struct class_record
     std::vector<method_record> public_methods;
     std::vector<variable_record> public_variables;
     std::vector<typedef_record> public_typedefs;
+
+    std::vector<method_record> protected_methods;
+    std::vector<variable_record> protected_variables;
+    std::vector<typedef_record> protected_typedefs;
+
     std::vector<class_record> public_inner_classes;
+    std::vector<class_record> protected_inner_classes;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -306,6 +316,14 @@ bool looks_like_function_declaration (
 
 // ----------------------------------------------------------------------------------------
 
+enum scope_type
+{
+    public_scope,
+    protected_scope,
+    private_scope
+};
+
+
 void process_file (
     istream& fin,
     const string& file,
@@ -369,10 +387,9 @@ void process_file (
         // a stack to hold the names of the scopes we have entered.  This is the classes, structs, and namespaces we enter.
     namespaces.push_back(""); // this is the global namespace
 
-
-    std::stack<bool> inside_public_scope;
+    std::stack<scope_type> scope_access;
         // If the stack isn't empty then we are inside a class or struct and the top value
-        // in the stack tells if we are in a public region.
+        // in the stack tells if we are in a public, protected, or private region.
 
     std::stack<unsigned long> scopes; // a stack to hold current and old scope counts 
                              // the top of the stack counts the number of new scopes (i.e. unmatched { ) we have entered 
@@ -451,21 +468,21 @@ void process_file (
                             // eat the colon
                             tok.get_token(temp_type, temp_token);
 
-                            if (inside_public_scope.size() > 0 && token == "public")
+                            if (scope_access.size() > 0 && token == "public")
                             {
-                                inside_public_scope.top() = true;
+                                scope_access.top() = public_scope;
                                 token_accum.clear();
                                 last_full_declaration.clear();
                             }
-                            else if (inside_public_scope.size() > 0 && token == "protected")
+                            else if (scope_access.size() > 0 && token == "protected")
                             {
-                                inside_public_scope.top() = true;
+                                scope_access.top() = protected_scope;
                                 token_accum.clear();
                                 last_full_declaration.clear();
                             }
-                            else if (inside_public_scope.size() > 0 && token == "private")
+                            else if (scope_access.size() > 0 && token == "private")
                             {
-                                inside_public_scope.top() = false;
+                                scope_access.top() = private_scope;
                                 token_accum.clear();
                                 last_full_declaration.clear();
                             }
@@ -483,7 +500,7 @@ void process_file (
                     {
 
                         // if we are inside a class or struct
-                        if (inside_public_scope.size() > 0)
+                        if (scope_access.size() > 0)
                         {
                             // if we are looking at a comment at the top of a class
                             if (at_top_of_new_scope)
@@ -497,7 +514,7 @@ void process_file (
                                 temp.comment = token;
                                 class_stack.push(temp);
                             }
-                            else if (inside_public_scope.top())
+                            else if (scope_access.top() == public_scope || scope_access.top() == protected_scope)
                             {
                                 // This should be a member function.  
                                 // Only do anything if the class that contains this member function is
@@ -538,7 +555,10 @@ void process_file (
 
                                     temp.declaration.assign(last_full_declaration.begin(), last_full_declaration.begin()+pos);
                                     temp.comment = token;
-                                    class_stack.top().public_methods.push_back(temp);
+                                    if (scope_access.top() == public_scope)
+                                        class_stack.top().public_methods.push_back(temp);
+                                    else
+                                        class_stack.top().protected_methods.push_back(temp);
                                 }
                             }
                         }
@@ -635,12 +655,12 @@ void process_file (
                                 // if we are entering a class 
                                 if (last_class_name.size() > 0)
                                 {
-                                    inside_public_scope.push(false);
+                                    scope_access.push(private_scope);
                                     namespaces.push_back(last_class_name);
                                 }
                                 else if (last_struct_name.size() > 0)
                                 {
-                                    inside_public_scope.push(true);
+                                    scope_access.push(public_scope);
                                     namespaces.push_back(last_struct_name);
                                 }
                                 else if (last_namespace_name.size() > 0)
@@ -680,8 +700,8 @@ void process_file (
                             {
                                 scopes.pop();
 
-                                if (inside_public_scope.size() > 0)
-                                    inside_public_scope.pop();
+                                if (scope_access.size() > 0)
+                                    scope_access.pop();
 
                                 // If the scope we are leaving is the top class on the class_stack
                                 // then we need to either pop it into its containing class or put it
@@ -694,7 +714,10 @@ void process_file (
                                     {
                                         tok_class_record temp = class_stack.top();
                                         class_stack.pop();
-                                        class_stack.top().public_inner_classes.push_back(temp);
+                                        if (scope_access.size() > 0 && scope_access.top() == public_scope)
+                                            class_stack.top().public_inner_classes.push_back(temp);
+                                        else
+                                            class_stack.top().protected_inner_classes.push_back(temp);
                                     }
                                     else if (class_stack.size() > 0)
                                     {
@@ -723,8 +746,8 @@ void process_file (
 
                             // if we are inside the public area of a class and this ; might be the end
                             // of a typedef or variable declaration
-                            if (scopes.top() == 0 && inside_public_scope.size() > 0 && 
-                                inside_public_scope.top() == true &&
+                            if (scopes.top() == 0 && scope_access.size() > 0 && 
+                                (scope_access.top() == public_scope || scope_access.top() == protected_scope) &&
                                 recently_seen_closing_bracket == false)
                             {
                                 if (recently_seen_typedef)
@@ -735,7 +758,10 @@ void process_file (
                                     {
                                         tok_typedef_record temp;
                                         temp.declaration = last_full_declaration;
-                                        class_stack.top().public_typedefs.push_back(temp);
+                                        if (scope_access.top() == public_scope)
+                                            class_stack.top().public_typedefs.push_back(temp);
+                                        else
+                                            class_stack.top().protected_typedefs.push_back(temp);
                                     }
 
                                 }
@@ -747,7 +773,10 @@ void process_file (
                                     {
                                         tok_variable_record temp;
                                         temp.declaration = last_full_declaration;
-                                        class_stack.top().public_variables.push_back(temp);
+                                        if (scope_access.top() == public_scope)
+                                            class_stack.top().public_variables.push_back(temp);
+                                        else
+                                            class_stack.top().protected_variables.push_back(temp);
                                     }
 
                                 }
@@ -1229,11 +1258,23 @@ class_record convert_tok_class_record (
     for (unsigned long i = 0; i < rec.public_variables.size(); ++i)
         crec.public_variables.push_back(convert_tok_variable_record(rec.public_variables[i]));
 
+    for (unsigned long i = 0; i < rec.protected_typedefs.size(); ++i)
+        crec.protected_typedefs.push_back(convert_tok_typedef_record(rec.protected_typedefs[i]));
+
+    for (unsigned long i = 0; i < rec.protected_variables.size(); ++i)
+        crec.protected_variables.push_back(convert_tok_variable_record(rec.protected_variables[i]));
+
     for (unsigned long i = 0; i < rec.public_methods.size(); ++i)
         crec.public_methods.push_back(convert_tok_method_record(rec.public_methods[i], expand_tabs));
 
+    for (unsigned long i = 0; i < rec.protected_methods.size(); ++i)
+        crec.protected_methods.push_back(convert_tok_method_record(rec.protected_methods[i], expand_tabs));
+
     for (unsigned long i = 0; i < rec.public_inner_classes.size(); ++i)
         crec.public_inner_classes.push_back(convert_tok_class_record(rec.public_inner_classes[i], expand_tabs));
+
+    for (unsigned long i = 0; i < rec.protected_inner_classes.size(); ++i)
+        crec.protected_inner_classes.push_back(convert_tok_class_record(rec.protected_inner_classes[i], expand_tabs));
 
 
     return crec;
@@ -1359,6 +1400,27 @@ void write_as_xml (
         fout << pad << "  </public_variables>\n";
     }
 
+    if (rec.protected_typedefs.size() > 0)
+    {
+        fout << pad << "  <protected_typedefs>\n";
+        for (unsigned long i = 0; i < rec.protected_typedefs.size(); ++i)
+        {
+            fout << pad << "    <typedef>"        << add_entity_ref(rec.protected_typedefs[i].declaration)        << "</typedef>\n";
+        }
+        fout << pad << "  </protected_typedefs>\n";
+    }
+
+
+    if (rec.protected_variables.size() > 0)
+    {
+        fout << pad << "  <protected_variables>\n";
+        for (unsigned long i = 0; i < rec.protected_variables.size(); ++i)
+        {
+            fout << pad << "    <variable>"        << add_entity_ref(rec.protected_variables[i].declaration)        << "</variable>\n";
+        }
+        fout << pad << "  </protected_variables>\n";
+    }
+
 
     if (rec.public_methods.size() > 0)
     {
@@ -1375,6 +1437,21 @@ void write_as_xml (
     }
 
 
+    if (rec.protected_methods.size() > 0)
+    {
+        fout << pad << "  <protected_methods>\n";
+        for (unsigned long i = 0; i < rec.protected_methods.size(); ++i)
+        {
+            fout << pad << "    <method>\n";
+            fout << pad << "      <name>"        << add_entity_ref(rec.protected_methods[i].name)        << "</name>\n";
+            fout << pad << "      <declaration>" << add_entity_ref(rec.protected_methods[i].declaration) << "</declaration>\n";
+            fout << pad << "      <comment>"     << add_entity_ref(rec.protected_methods[i].comment)     << "</comment>\n";
+            fout << pad << "    </method>\n";
+        }
+        fout << pad << "  </protected_methods>\n";
+    }
+
+
     if (rec.public_inner_classes.size() > 0)
     {
         fout << pad << "  <public_inner_classes>\n";
@@ -1383,6 +1460,16 @@ void write_as_xml (
             write_as_xml(rec.public_inner_classes[i], fout, indent+4);
         }
         fout << pad << "  </public_inner_classes>\n";
+    }
+
+    if (rec.protected_inner_classes.size() > 0)
+    {
+        fout << pad << "  <protected_inner_classes>\n";
+        for (unsigned long i = 0; i < rec.protected_inner_classes.size(); ++i)
+        {
+            write_as_xml(rec.protected_inner_classes[i], fout, indent+4);
+        }
+        fout << pad << "  </protected_inner_classes>\n";
     }
 
 
