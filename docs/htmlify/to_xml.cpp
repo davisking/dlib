@@ -549,24 +549,28 @@ void process_file (
                             {
                                 tok_function_record temp;
 
-                                // make sure we never include anything beyond the first closing )
+                                // make sure we never include anything beyond the first closing ) 
+                                // if we are looking at a #defined function
                                 unsigned long pos = last_full_declaration.size();
-                                long temp_paren_count = 0;
-                                for (unsigned long i = 0; i < last_full_declaration.size(); ++i)
+                                if (last_full_declaration[0].second == "#define")
                                 {
-                                    if (last_full_declaration[i].first == tok_type::OTHER)
+                                    long temp_paren_count = 0;
+                                    for (unsigned long i = 0; i < last_full_declaration.size(); ++i)
                                     {
-                                        if (last_full_declaration[i].second == "(")
+                                        if (last_full_declaration[i].first == tok_type::OTHER)
                                         {
-                                            ++temp_paren_count;
-                                        }
-                                        else if (last_full_declaration[i].second == ")")
-                                        {
-                                            --temp_paren_count;
-                                            if (temp_paren_count == 0)
+                                            if (last_full_declaration[i].second == "(")
                                             {
-                                                pos = i+1;
-                                                break;
+                                                ++temp_paren_count;
+                                            }
+                                            else if (last_full_declaration[i].second == ")")
+                                            {
+                                                --temp_paren_count;
+                                                if (temp_paren_count == 0)
+                                                {
+                                                    pos = i+1;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -835,46 +839,64 @@ string get_function_name (
 {
     string name;
 
-    bool last_was_operator = false;
-    bool seen_operator = false;
+    bool contains_operator = false;
+    unsigned long operator_pos = 0;
     for (unsigned long i = 0; i < declaration.size(); ++i)
     {
-        if (declaration[i].first == tok_type::OTHER &&
-            declaration[i].second == "(" && !last_was_operator )
-        {
-            if (i != 0 && !seen_operator)
-            {
-                // if this is a destructor then include the ~
-                if (i > 1 && declaration[i-2].second == "~")
-                    name = "~" + declaration[i-1].second;
-                else
-                    name = declaration[i-1].second;
-            }
-
-            break;
-        }
-
         if (declaration[i].first == tok_type::KEYWORD &&
             declaration[i].second == "operator")
         {
-            last_was_operator = true;
-            seen_operator = true;
+            contains_operator = true;
+            operator_pos = i;
+            break;
         }
-        else
-        {
-            last_was_operator = false;
-        }
+    }
 
-        if (seen_operator)
+
+    // find the opening ( for the function
+    unsigned long paren_pos = 0;
+    long paren_count = 0;
+    for (long i = declaration.size()-1; i >= 0; --i)
+    {
+        if (declaration[i].first == tok_type::OTHER &&
+            declaration[i].second == ")")
         {
-            if (name.size() != 0 && 
-                (declaration[i].first == tok_type::IDENTIFIER || declaration[i].first == tok_type::KEYWORD) )
+            ++paren_count;
+        }
+        else if (declaration[i].first == tok_type::OTHER &&
+                 declaration[i].second == "(")
+        {
+            --paren_count;
+            if (paren_count == 0)
+            {
+                paren_pos = i;
+                break;
+            }
+        }
+    }
+
+
+    if (contains_operator)
+    {
+        name = declaration[operator_pos].second;
+        for (unsigned long i = operator_pos+1; i < paren_pos; ++i)
+        {
+            if (declaration[i].first == tok_type::IDENTIFIER || declaration[i].first == tok_type::KEYWORD) 
             {
                 name += " ";
             }
 
             name += declaration[i].second;
         }
+    }
+    else
+    {
+        // if this is a destructor then include the ~
+        if (paren_pos > 1 && declaration[paren_pos-2].second == "~")
+            name = "~" + declaration[paren_pos-1].second;
+        else
+            name = declaration[paren_pos-1].second;
+
 
     }
 
@@ -912,7 +934,8 @@ string pretty_print_declaration (
             last_was_less_than = true;
 
 
-        if (decl[i].first == tok_type::OTHER && decl[i].second == "<")
+        if (decl[i].first == tok_type::OTHER && decl[i].second == "<" && 
+            (decl[i-1].second != "operator" && (i>1 && decl[i-2].second != "operator" || decl[i-1].second != "<") ))
             ++angle_count;
 
         if (decl[i-1].first == tok_type::KEYWORD && decl[i-1].second == "template" && 
@@ -923,10 +946,13 @@ string pretty_print_declaration (
         }
         else if (decl[i].first == tok_type::OTHER && decl[i].second == ">")
         {
-            --angle_count;
+            // don't count angle brackets when they are part of an operator 
+            if (decl[i-1].second != "operator" && (i>1 && decl[i-2].second != "operator" || decl[i-1].second != ">"))
+                --angle_count;
+
             if (angle_count == 0 && in_template)
             {
-                temp += "\n>\n";
+                temp += "\n    >\n";
                 just_closed_template = true;
                 in_template = false;
             }
@@ -950,6 +976,29 @@ string pretty_print_declaration (
         {
             temp += "&";
         }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == ".")
+        {
+            temp += ".";
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == "[")
+        {
+            temp += "[";
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == "]")
+        {
+            temp += "]";
+        }
+        else if (decl[i].first == tok_type::OTHER && decl[i].second == "-")
+        {
+            temp += "-";
+        }
+        else if (decl[i].first == tok_type::NUMBER)
+        {
+            if (decl[i-1].second == "=")
+                temp += " " + decl[i].second;
+            else
+                temp += decl[i].second;
+        }
         else if (decl[i].first == tok_type::OTHER && decl[i].second == "*")
         {
             temp += "*";
@@ -969,8 +1018,8 @@ string pretty_print_declaration (
         {
             const bool next_is_paren = (i+1 < decl.size() && decl[i+1].first == tok_type::OTHER && decl[i+1].second == ")");
 
-            if (paren_count == 0 && next_is_paren == false)
-                temp += " (\n   ";
+            if (paren_count == 0 && next_is_paren == false && in_template == false)
+                temp += " (\n    ";
             else
                 temp += "(";
 
@@ -979,7 +1028,7 @@ string pretty_print_declaration (
         else if (decl[i].first == tok_type::OTHER && decl[i].second == ")")
         {
             --paren_count;
-            if (paren_count == 0 && decl[i-1].second != "(")
+            if (paren_count == 0 && decl[i-1].second != "(" && in_template == false)
                 temp += "\n)";
             else
                 temp += ")";
@@ -1000,7 +1049,8 @@ string pretty_print_declaration (
         else
         {
             if (just_closed_template || last_was_scope_res || last_was_less_than || 
-                (seen_operator && paren_count == 0 && decl[i].first == tok_type::OTHER ))
+                (seen_operator && paren_count == 0 && decl[i].first == tok_type::OTHER ) ||
+                ((decl[i].first == tok_type::KEYWORD || decl[i].first == tok_type::IDENTIFIER) && i>0 && decl[i-1].second == "("))
                 temp += decl[i].second;
             else
                 temp += " " + decl[i].second;
