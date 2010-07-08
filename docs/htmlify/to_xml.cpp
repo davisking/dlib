@@ -1009,6 +1009,22 @@ string pretty_print_declaration (
         {
             temp += ".";
         }
+        else if (decl[i].first == tok_type::SINGLE_QUOTED_TEXT)
+        {
+            temp += decl[i].second;
+        }
+        else if (decl[i].first == tok_type::DOUBLE_QUOTED_TEXT)
+        {
+            temp += decl[i].second;
+        }
+        else if (decl[i-1].first == tok_type::SINGLE_QUOTED_TEXT && decl[i].second == "'")
+        {
+            temp += decl[i].second;
+        }
+        else if (decl[i-1].first == tok_type::DOUBLE_QUOTED_TEXT && decl[i].second == "\"")
+        {
+            temp += decl[i].second;
+        }
         else if (decl[i].first == tok_type::OTHER && decl[i].second == "[")
         {
             temp += "[";
