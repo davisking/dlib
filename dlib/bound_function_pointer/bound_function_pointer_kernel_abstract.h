@@ -242,7 +242,7 @@ namespace dlib
                 - calls to this->operator() will call function_object(arg1,arg2)
         !*/
 
-        template < typename T, typename T1, typename A1
+        template < typename T, typename T1, typename A1,
                                typename T2, typename A2>
         void set (
             T& object,
@@ -258,7 +258,7 @@ namespace dlib
                 - calls to this->operator() will call (object.*funct)(arg1,arg2)
         !*/
 
-        template < typename T, typename T1, typename A1 
+        template < typename T, typename T1, typename A1, 
                                typename T2, typename A2>
         void set (
             const T& object,
@@ -306,7 +306,7 @@ namespace dlib
                 - calls to this->operator() will call function_object(arg1,arg2,arg3)
         !*/
 
-        template < typename T, typename T1, typename A1
+        template < typename T, typename T1, typename A1,
                                typename T2, typename A2,
                                typename T3, typename A3>
         void set (
@@ -324,7 +324,7 @@ namespace dlib
                 - calls to this->operator() will call (object.*funct)(arg1,arg2,arg3)
         !*/
 
-        template < typename T, typename T1, typename A1 
+        template < typename T, typename T1, typename A1,
                                typename T2, typename A2,
                                typename T3, typename A3>
         void set (
@@ -377,7 +377,7 @@ namespace dlib
                 - calls to this->operator() will call function_object(arg1,arg2,arg3,arg4)
         !*/
 
-        template < typename T, typename T1, typename A1
+        template < typename T, typename T1, typename A1,
                                typename T2, typename A2,
                                typename T3, typename A3,
                                typename T4, typename A4>
@@ -397,7 +397,7 @@ namespace dlib
                 - calls to this->operator() will call (object.*funct)(arg1,arg2,arg3,arg4)
         !*/
 
-        template < typename T, typename T1, typename A1 
+        template < typename T, typename T1, typename A1,
                                typename T2, typename A2,
                                typename T3, typename A3,
                                typename T4, typename A4>
