@@ -708,16 +708,19 @@ void process_file (
                                 // into the classes output vector.
                                 if (class_stack.size() > 0 && namespaces.back() == class_stack.top().name)
                                 {
-                                    // if this class is a inner_class of another then push it into the
-                                    // public_inner_classes field of it's containing class
+                                    // If this class is a inner_class of another then push it into the
+                                    // public_inner_classes or protected_inner_classes field of it's containing class.
                                     if (class_stack.size() > 1)
                                     {
                                         tok_class_record temp = class_stack.top();
                                         class_stack.pop();
-                                        if (scope_access.size() > 0 && scope_access.top() == public_scope)
-                                            class_stack.top().public_inner_classes.push_back(temp);
-                                        else
-                                            class_stack.top().protected_inner_classes.push_back(temp);
+                                        if (scope_access.size() > 0)
+                                        {
+                                            if (scope_access.top() == public_scope)
+                                                class_stack.top().public_inner_classes.push_back(temp);
+                                            else if (scope_access.top() == protected_scope)
+                                                class_stack.top().protected_inner_classes.push_back(temp);
+                                        }
                                     }
                                     else if (class_stack.size() > 0)
                                     {
