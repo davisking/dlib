@@ -153,6 +153,50 @@ namespace
         sout.str("");
 
 
+        // make sure the things can serialize right
+        {
+            r.clear();
+            r2.clear();
+
+
+            for (int i =0; i < 1000; ++i)
+                r.get_random_32bit_number();
+
+            ostringstream sout;
+            serialize(r, sout);
+
+            istringstream sin(sout.str());
+            deserialize(r2, sin);
+
+
+            for (int i =0; i < 1000; ++i)
+            {
+                DLIB_TEST(r.get_random_32bit_number() == r2.get_random_32bit_number());
+            }
+        }
+
+
+        // make sure calling clear() and set_seed("") do the same thing
+        {
+            r.clear();
+            r2.set_seed("");
+            rand r3;
+
+
+            DLIB_TEST(r.get_seed() == r2.get_seed());
+            DLIB_TEST(r.get_seed() == r3.get_seed());
+
+
+            for (int i =0; i < 1000; ++i)
+            {
+                const uint32 num1 = r.get_random_32bit_number();
+                const uint32 num2 = r2.get_random_32bit_number();
+                const uint32 num3 = r3.get_random_32bit_number();
+                DLIB_TEST( num1 == num2);
+                DLIB_TEST( num1 == num3);
+            }
+        }
+
     }
 
 

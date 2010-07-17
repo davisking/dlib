@@ -96,6 +96,24 @@ namespace dlib
 
             result_type operator()();
 
+            friend void serialize(
+                const mersenne_twister& item, 
+                std::ostream& out
+            )
+            {
+                serialize(item.x, out);
+                serialize(item.i, out);
+            }
+
+            friend void deserialize(
+                mersenne_twister& item, 
+                std::istream& in 
+            )
+            {
+                deserialize(item.x, in);
+                deserialize(item.i, in);
+            }
+
         private:
 
             void twist(int block);

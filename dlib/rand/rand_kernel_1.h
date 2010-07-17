@@ -8,6 +8,8 @@
 #include "rand_kernel_abstract.h"
 #include "mersenne_twister.h"
 #include "../is_kind.h"
+#include <iostream>
+#include "../serialize.h"
 
 namespace dlib
 {
@@ -61,12 +63,23 @@ namespace dlib
             )
             {
                 seed = value;
-                uint32 s = 0;
-                for (std::string::size_type i = 0; i < seed.size(); ++i)
+
+                // make sure we do the seeding so that using a seed of "" gives the same
+                // state as calling this->clear()
+                if (value.size() != 0)
                 {
-                    s = (s*37) + static_cast<uint32>(seed[i]);
+                    uint32 s = 0;
+                    for (std::string::size_type i = 0; i < seed.size(); ++i)
+                    {
+                        s = (s*37) + static_cast<uint32>(seed[i]);
+                    }
+                    mt.seed(s);
                 }
-                mt.seed(s);
+                else
+                {
+                    mt.seed();
+                }
+
                 // prime the generator a bit
                 for (int i = 0; i < 10000; ++i)
                     mt();
@@ -98,6 +111,23 @@ namespace dlib
                 exchange(seed, item.seed);
             }
     
+            friend void serialize(
+                const rand_kernel_1& item, 
+                std::ostream& out
+            )
+            {
+                serialize(item.mt, out);
+                serialize(item.seed, out);
+            }
+
+            friend void deserialize(
+                rand_kernel_1& item, 
+                std::istream& in 
+            )
+            {
+                deserialize(item.mt, in);
+                deserialize(item.seed, in);
+            }
 
         private:
             mt19937 mt;
