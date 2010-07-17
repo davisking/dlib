@@ -104,7 +104,7 @@ int main()
     // should look at the model_selection_ex.cpp program for examples of more sophisticated 
     // strategies for determining good parameter choices.
     cout << "doing cross validation" << endl;
-    for (double gamma = 0.00001; gamma <= 1; gamma += 0.1)
+    for (double gamma = 0.000001; gamma <= 1; gamma *= 5)
     {
         // tell the trainer the parameters we want to use
         trainer.set_kernel(kernel_type(gamma));
@@ -119,12 +119,12 @@ int main()
 
 
     // From looking at the output of the above loop it turns out that a good value for 
-    // gamma for this problem is 0.1.  So that is what we will use.
+    // gamma for this problem is 0.08.  So that is what we will use.
 
     // Now we train on the full set of data and obtain the resulting decision function.  We use the
-    // value of 0.1 for gamma.  The decision function will return values >= 0 for samples it predicts
+    // value of 0.08 for gamma.  The decision function will return values >= 0 for samples it predicts
     // are in the +1 class and numbers < 0 for samples it predicts to be in the -1 class.
-    trainer.set_kernel(kernel_type(0.1));
+    trainer.set_kernel(kernel_type(0.08));
     typedef decision_function<kernel_type> dec_funct_type;
     typedef normalized_function<dec_funct_type> funct_type;
 
