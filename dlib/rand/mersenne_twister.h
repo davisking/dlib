@@ -20,6 +20,7 @@
 #include <algorithm>     // std::copy
 #include <stdexcept>
 #include "../uintn.h"
+#include "../serialize.h"
 
 namespace dlib 
 {
