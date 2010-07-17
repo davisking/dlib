@@ -115,6 +115,21 @@ namespace dlib
         provides a global swap function
     !*/
 
+    void serialize (
+        const rand& item, 
+        std::ostream& out 
+    );   
+    /*!
+        provides deserialization support 
+    !*/
+
+    void deserialize (
+        rand& item, 
+        std::istream& in
+    );   
+    /*!
+        provides deserialization support 
+    !*/
 }
 
 #endif // DLIB_RAND_KERNEl_ABSTRACT_
