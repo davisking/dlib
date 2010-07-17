@@ -8,6 +8,7 @@
 #include <ctime>
 #include <dlib/statistics.h>
 #include <dlib/rand.h>
+#include <algorithm>
 
 #include "tester.h"
 
@@ -58,6 +59,35 @@ namespace
                 dlog << LDEBUG << "true sampled: " << rs2.mean();
                 double ratio = rs.mean()/rs2.mean();
                 DLIB_TEST_MSG(0.96 < ratio  && ratio < 1.04, " ratio: " << ratio);
+            }
+
+
+            {
+                random_subset_selector<int> r1, r2;
+                r1.set_max_size(300);
+                for (int i = 0; i < 4000; ++i)
+                    r1.add(i);
+
+                ostringstream sout;
+                serialize(r1, sout);
+                istringstream sin(sout.str());
+                deserialize(r2, sin);
+
+                DLIB_TEST(r1.size() == r2.size());
+                DLIB_TEST(r1.max_size() == r2.max_size());
+                DLIB_TEST(r1.next_add_accepts() == r2.next_add_accepts());
+                DLIB_TEST(std::equal(r1.begin(), r1.end(), r2.begin()));
+
+                for (int i = 0; i < 4000; ++i)
+                {
+                    r1.add(i);
+                    r2.add(i);
+                }
+
+                DLIB_TEST(r1.size() == r2.size());
+                DLIB_TEST(r1.max_size() == r2.max_size());
+                DLIB_TEST(r1.next_add_accepts() == r2.next_add_accepts());
+                DLIB_TEST(std::equal(r1.begin(), r1.end(), r2.begin()));
             }
         }
 

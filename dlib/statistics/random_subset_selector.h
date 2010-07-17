@@ -9,6 +9,8 @@
 #include "../algs.h"
 #include "../memory_manager.h"
 #include "../string.h"
+#include "../serialize.h"
+#include <iostream>
 
 namespace dlib
 {
@@ -171,6 +173,18 @@ namespace dlib
             std::swap(_next_add_accepts, a._next_add_accepts);
         }
 
+        template <typename T1, typename T2>
+        friend void serialize (
+            const random_subset_selector<T1,T2>& item,
+            std::ostream& out
+        );
+
+        template <typename T1, typename T2>
+        friend void deserialize (
+            random_subset_selector<T1,T2>& item,
+            std::istream& in 
+        );
+
     private:
 
         void update_next_add_accepts (
@@ -227,6 +241,34 @@ namespace dlib
         random_subset_selector<T,rand_type>& a,
         random_subset_selector<T,rand_type>& b
     ) { a.swap(b); }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T1, typename T2>
+    void serialize (
+        const random_subset_selector<T1,T2>& item,
+        std::ostream& out
+    )
+    {
+        serialize(item.items, out);
+        serialize(item._max_size, out);
+        serialize(item.count, out);
+        serialize(item.rnd, out);
+        serialize(item._next_add_accepts, out);
+    }
+
+    template <typename T1, typename T2>
+    void deserialize (
+        random_subset_selector<T1,T2>& item,
+        std::istream& in 
+    )
+    {
+        deserialize(item.items, in);
+        deserialize(item._max_size, in);
+        deserialize(item.count, in);
+        deserialize(item.rnd, in);
+        deserialize(item._next_add_accepts, in);
+    }
 
 // ----------------------------------------------------------------------------------------
 

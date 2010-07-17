@@ -238,6 +238,30 @@ namespace dlib
         provides global swap support
     !*/
 
+    template <
+        typename T,
+        typename rand_type 
+        >
+    void serialize (
+        const random_subset_selector<T,rand_type>& item,
+        std::ostream& out 
+    );   
+    /*!
+        provides serialization support 
+    !*/
+
+    template <
+        typename T,
+        typename rand_type 
+        >
+    void deserialize (
+        random_subset_selector<T,rand_type>& item,
+        std::istream& in
+    );   
+    /*!
+        provides deserialization support 
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
