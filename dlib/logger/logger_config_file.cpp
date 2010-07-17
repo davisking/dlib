@@ -146,7 +146,7 @@ namespace dlib
         ifstream fin(file_name.c_str());
 
         if (!fin)
-            throw error("logger_config: unable to open config file " + file_name);
+            throw logger_config_file_error("logger_config: unable to open config file " + file_name);
 
 
         cr_type main_cr;
@@ -181,7 +181,7 @@ namespace dlib
                     if (one == "file" && three.size() == 0)
                         set_all_logging_output_streams(get_file_stream(two));
                     else
-                        throw error("logger_config: invalid argument to output option: " + output);
+                        throw logger_config_file_error("logger_config: invalid argument to output option: " + output);
                 }
 
             } // if (cr.is_key_defined("output"))

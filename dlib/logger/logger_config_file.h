@@ -12,6 +12,16 @@
 
 namespace dlib
 {
+    class logger_config_file_error : public error 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception class used by the configure_loggers_from_file()
+                function defined below.
+        !*/
+    public: 
+        logger_config_file_error(const std::string& s):error(s){}
+    };
 
     void configure_loggers_from_file (
         const std::string& file_name
@@ -20,7 +30,7 @@ namespace dlib
         ensures
             - configures the loggers with the contents of the file_name file
         throws
-            - dlib::error
+            - dlib::logger_config_file_error
                 this exception is thrown if there is a problem reading the config file
     !*/
 
