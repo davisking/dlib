@@ -261,7 +261,8 @@
                     is something that comes up a lot in optimization but in the context of machine learning
                     usually people are talking about a particular form known as the Wolfe Dual.  
                     </p>
-                    It would also be good (but not critical) to be familiar with real analysis.  
+                    It would also be good (but maybe not critical depending on which parts you want to read) to 
+                    be familiar with real analysis.  
                </ul><br/>
             </li>
             <li> <i>Kernel Methods for Pattern Analysis </i> by John Shawe-Taylor and Nello Cristianini 
