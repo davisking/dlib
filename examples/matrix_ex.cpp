@@ -3,10 +3,6 @@
 /*
     This is an example illustrating the use of the matrix object 
     from the dlib C++ Library.
-
-    This file also contains a discussion of the template expression
-    technique and how it is used by this library.
-
 */
 
 
@@ -248,113 +244,6 @@ int main()
 
     // MATLAB: var = min(min(A))
     var = min(A);
-
-
-
-    // -------------------------  Template Expressions -----------------------------
-    // Now I will discuss the "template expressions" technique and how it is 
-    // used in the matrix object.  First consider the following expression:
-    x = y + y;
-
-    /*
-        Normally this expression results in machine code that looks, at a high 
-        level, like the following:
-            temp = y + y;
-            x = temp
-
-        Temp is a temporary matrix returned by the overloaded + operator.  
-        temp then contains the result of adding y to itself.  The assignment 
-        operator copies the value of temp into x and temp is then destroyed while 
-        the blissful C++ user never sees any of this.
-
-        This is, however, totally inefficient.  In the process described above 
-        you have to pay for the cost of constructing a temporary matrix object
-        and allocating its memory.  Then you pay the additional cost of copying
-        it over to x.  It also gets worse when you have more complex expressions
-        such as x = round(y + y + y + M*y) which would involve the creation and copying 
-        of 5 temporary matrices.  
-        
-        All these inefficiencies are removed by using the template expressions 
-        technique.  The exact details of how the technique is performed are well
-        outside the scope of this example but the basic idea is as follows.  Instead
-        of having operators and functions return temporary matrix objects you 
-        return a special object that represents the expression you wish to perform.
-
-        So consider the expression x = y + y again.  With dlib::matrix what happens
-        is the expression y+y returns a matrix_exp object instead of a temporary matrix.
-        The construction of a matrix_exp does not allocate any memory or perform any 
-        computations.  The matrix_exp however has an interface that looks just like a 
-        dlib::matrix object and when you ask it for the value of one of its elements 
-        it computes that value on the spot.  Only in the assignment operator does
-        someone ask the matrix_exp for these values so this avoids the use of any
-        temporary matrices.  Thus the statement x = y + y is equivalent to the following 
-        code:
-            // loop over all elements in y matrix
-            for (long r = 0; r < y.nr(); ++r)
-                for (long c = 0; c < y.nc(); ++c)
-                    x(r,c) = y(r,c) + y(r,c);  
-                
-       
-        This technique works for expressions of arbitrary complexity.  So if you 
-        typed x = round(y + y + y + M*y) it would involve no temporary matrices being 
-        created at all.  Each operator takes and returns only matrix_exp objects.
-        Thus, no computations are performed until the assignment operator requests
-        the values from the matrix_exp it receives as input. 
-            
-
-
-
-
-        There is, however, a slight complication in all of this.  It is for statements 
-        that involve the multiplication of a complex matrix_exp such as the following:
-    */
-        x = M*(M+M+M+M+M+M+M);
-    /*
-        According to the discussion above, this statement would compute the value of 
-        M*(M+M+M+M+M+M+M) totally without any temporary matrix objects.  This sounds 
-        good but we should take a closer look.  Consider that the + operator is 
-        invoked 6 times.  This means we have something like this:
-
-        x = M * (matrix_exp representing M+M+M+M+M+M+M);
-
-        M is being multiplied with a quite complex matrix_exp.  Now recall that when 
-        you ask a matrix_exp what the value of any of its elements are it computes 
-        their values *right then*.  
-        
-        If you think on what is involved in performing a matrix multiply you will 
-        realize that each element of a matrix is accessed M.nr() times.  In the 
-        case of our above expression the cost of accessing an element of the 
-        matrix_exp on the right hand side is the cost of doing 6 addition operations. 
-
-        Thus, it would be faster to assign M+M+M+M+M+M+M to a temporary matrix and then
-        multiply that by M.  This is exactly what the dlib::matrix does under the covers.  
-        This is because it is able to spot expressions where the introduction of a 
-        temporary is needed to speed up the computation and it will automatically do this 
-        for you.  
-
-
-
-        
-        Another complication that is dealt with automatically is aliasing.  Consider
-        the following expressions:
-           (1)  M = M + M
-           (2)  B = M * M. 
-           (3)  M = M * M. 
-
-        Expressions (1) and (3) are an example of aliasing and expression (3) is also
-        an example of destructive aliasing.  
-
-        Expression (1) can and does operate without introducing any temporaries even though
-        there is aliasing present in the expression.  The result is loaded straight into M 
-        using the template expression techniques described above.  Expression (2) also 
-        operates without any temporaries being introduced since there isn't any aliasing at all.
-        Expression (3) however contains destructive aliasing.  This is because we can't 
-        change any of the values in the M matrix without corrupting the ultimate result of
-        the matrix multiply.  So we need to introduce a temporary.  These situations are
-        dealt with by dlib::matrix automatically.  Moreover, it can tell the different between
-        simple aliasing and destructive aliasing and will only introduce temporaries when
-        they are necessary.
-    */
 }
 
 // ----------------------------------------------------------------------------------------
