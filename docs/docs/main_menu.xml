@@ -152,6 +152,10 @@
                   <link>matrix_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Matrix_Expressions</name>
+                  <link>matrix_expressions_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Image</name>
                   <link>image_ex.cpp.html</link>
                </item>

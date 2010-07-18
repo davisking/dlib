@@ -1795,7 +1795,7 @@
          <description>
            This is a 2D matrix object that enables you to write code that deals with
            matrices using a simple syntax similar to what can be written in MATLAB.  It is implemented using 
-           the expression templates technique which allows it to eliminate the 
+           the <a href="matrix_expressions_ex.cpp.html">expression templates</a> technique which allows it to eliminate the 
            temporary matrix objects that would normally be returned from expressions 
            such as M = A+B+C+D;  Normally each invocation of the + operator would 
            construct and return a temporary matrix object but using this technique 
@@ -1829,6 +1829,7 @@
          
          <examples>
             <example>matrix_ex.cpp.html</example>
+            <example>matrix_expressions_ex.cpp.html</example>
          </examples>
 
          <extensions>
