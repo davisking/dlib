@@ -32,6 +32,9 @@ namespace dlib
     class matrix_op : public matrix_exp<matrix_op<OP> >
     {
         /*!
+            WHAT THIS OBJECT REPRESENTS
+                The matrix_op is simply a tool for reducing the amount of boilerplate
+                you need to write when creating matrix expressions.  
         !*/
 
     public:
