@@ -46,6 +46,11 @@ namespace dlib
                 It is implemented using the empirical_kernel_map and thus allows you 
                 to run the algorithm on large datasets and obtain sparse outputs.  It is also
                 capable of estimating the lambda parameter using leave-one-out cross-validation.
+
+
+                The leave-one-out cross-validation implementation is based on the techniques
+                discussed in this paper:
+                    Notes on Regularized Least Squares by Ryan M. Rifkin and Ross A. Lippert.
         !*/
 
     public:
