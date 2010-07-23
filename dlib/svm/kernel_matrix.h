@@ -79,7 +79,13 @@ namespace dlib
         {}
 
         template <typename T>
+        // This funny #ifdef thing is here because gcc sometimes gives a warning 
+        // about v being unused otherwise.
+#ifdef ENABLE_ASSERTS
         void assert_is_vector(const matrix_exp<T>& v)
+#else
+        void assert_is_vector(const matrix_exp<T>& )
+#endif
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_vector(v) == true,
