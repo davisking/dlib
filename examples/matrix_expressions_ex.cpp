@@ -36,7 +36,6 @@ int main()
     // set all elements to 1
     y = 1;
     M = 1;
-    x = 1;
     
 
     // -------------------------  Template Expressions -----------------------------
