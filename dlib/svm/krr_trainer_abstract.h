@@ -181,7 +181,7 @@ namespace dlib
         !*/
 
         bool will_estimate_lambda_for_regression (
-        );
+        ) const;
         /*!
             ensures
                 - returns true if the automatic lambda estimation will attempt to estimate a lambda

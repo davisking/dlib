@@ -64,7 +64,7 @@ namespace dlib
         }
 
         bool will_estimate_lambda_for_regression (
-        )
+        ) const
         {
             return use_regression_loss;
         }
