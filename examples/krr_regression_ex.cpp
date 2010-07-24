@@ -68,10 +68,10 @@ int main()
 
     // The output is as follows:
     //using gamma of 0.075
-    //    0.239389   0.239388
-    //    0.998334   0.998363
+    //    0.239389   0.239389
+    //    0.998334   0.998362
     //    -0.189201   -0.189254
-    //    -0.191785   -0.186669
+    //    -0.191785   -0.186618
 
     // The first column is the true value of the sinc function and the second
     // column is the output from the krr estimate.  
@@ -84,7 +84,7 @@ int main()
     trainer.train(samples, labels, loo_error);
     cout << "mean squared LOO error: " << loo_error << endl;
     // Which outputs the following:
-    // mean squared LOO error: 8.29813e-07
+    // mean squared LOO error: 8.29563e-07
 
 
 
