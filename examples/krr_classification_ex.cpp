@@ -107,8 +107,8 @@ int main()
 
 
     // From looking at the output of the above loop it turns out that a good value for 
-    // gamma for this problem is 0.015.  So that is what we will use.
-    trainer.set_kernel(kernel_type(0.015));
+    // gamma for this problem is 0.000625.  So that is what we will use.
+    trainer.set_kernel(kernel_type(0.000625));
     typedef decision_function<kernel_type> dec_funct_type;
     typedef normalized_function<dec_funct_type> funct_type;
 
