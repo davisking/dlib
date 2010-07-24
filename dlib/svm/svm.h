@@ -15,6 +15,7 @@
 #include "function.h"
 #include "kernel.h"
 #include "../enable_if.h"
+#include "../optimization.h"
 
 namespace dlib
 {
@@ -520,6 +521,140 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace prob_impl
+    {
+        template <typename vect_type>
+        struct objective
+        {
+            objective (
+                const vect_type& f_,
+                const vect_type& t_
+            ) : f(f_), t(t_) {}
+
+            double operator() (
+                const matrix<double,2,1>& x
+            ) const
+            {
+                const double A = x(0);
+                const double B = x(1);
+
+                double res = 0;
+                for (unsigned long i = 0; i < f.size(); ++i)
+                {
+                    const double val = A*f[i]+B;
+                    // See the paper "A Note on Platt's Probabilistic Outputs for Support Vector Machines"
+                    // for an explanation of why this code looks the way it does (rather than being the 
+                    // obvious formula).
+                    if (val < 0)
+                        res += (t[i] - 1)*val + std::log(1 + std::exp(val));
+                    else
+                        res += t[i]*val + std::log(1 + std::exp(-val));
+                }
+
+                return res;
+            }
+
+            const vect_type& f;
+            const vect_type& t;
+        };
+
+        template <typename vect_type>
+        struct der
+        {
+            der (
+                const vect_type& f_,
+                const vect_type& t_
+            ) : f(f_), t(t_) {}
+
+            matrix<double,2,1> operator() (
+                const matrix<double,2,1>& x
+            ) const
+            {
+                const double A = x(0);
+                const double B = x(1);
+
+                double derA = 0;
+                double derB = 0;
+
+                for (unsigned long i = 0; i < f.size(); ++i)
+                {
+                    const double val = A*f[i]+B;
+                    double p;
+                    // compute p = 1/(1+exp(val)) 
+                    // but do so in a way that avoids numerical overflow.
+                    if (val < 0)
+                        p = 1.0/(1 + std::exp(val));
+                    else
+                        p = std::exp(-val)/(1 + std::exp(-val));
+
+                    derA += f[i]*(t[i] - p);
+                    derB +=      (t[i] - p);
+                }
+
+                matrix<double,2,1> res;
+                res = derA, derB;
+                return res;
+            }
+
+            const vect_type& f;
+            const vect_type& t;
+        };
+
+        template <typename vect_type>
+        struct hessian 
+        {
+            hessian (
+                const vect_type& f_,
+                const vect_type& t_
+            ) : f(f_), t(t_) {}
+
+            matrix<double,2,2> operator() (
+                const matrix<double,2,1>& x
+            ) const
+            {
+                const double A = x(0);
+                const double B = x(1);
+
+                matrix<double,2,2> h;
+                h = 0;
+
+                for (unsigned long i = 0; i < f.size(); ++i)
+                {
+                    const double val = A*f[i]+B;
+                    // compute pp = 1/(1+exp(val)) and
+                    // compute pn = 1 - pp
+                    // but do so in a way that avoids numerical overflow and catastrophic cancellation.
+                    double pp, pn;
+                    if (val < 0)
+                    {
+                        const double temp = std::exp(val);
+                        pp = 1.0/(1 + temp);
+                        pn = temp*pp; 
+                    }
+                    else
+                    {
+                        const double temp = std::exp(-val);
+                        pn = 1.0/(1 + temp);
+                        pp = temp*pn; 
+                    }
+
+                    h(0,0) += f[i]*f[i]*pp*pn;
+                    const double temp2 = f[i]*pp*pn;
+                    h(0,1) += temp2;
+                    h(1,0) += temp2;
+                    h(1,1) += pp*pn;
+                }
+
+                return h;
+            }
+
+            const vect_type& f;
+            const vect_type& t;
+        };
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename trainer_type,
         typename in_sample_vector_type,
@@ -541,11 +676,14 @@ namespace dlib
         /*
             This function fits a sigmoid function to the output of the 
             svm trained by svm_nu_trainer.  The technique used is the one
-            described in the paper:
+            described in the papers:
                 
                 Probabilistic Outputs for Support Vector Machines and
                 Comparisons to Regularized Likelihood Methods by 
                 John C. Platt.  March 26, 1999
+
+                A Note on Platt's Probabilistic Outputs for Support Vector Machines
+                by Hsuan-Tien Lin, Chih-Jen Lin, and Ruby C. Weng
         */
 
         // make sure requires clause is not broken
@@ -562,15 +700,8 @@ namespace dlib
             );
 
         // count the number of positive and negative examples
-        long num_pos = 0;
-        long num_neg = 0;
-        for (long r = 0; r < y.nr(); ++r)
-        {
-            if (y(r) == +1.0)
-                ++num_pos;
-            else
-                ++num_neg;
-        }
+        const long num_pos = sum(y > 0);
+        const long num_neg = sum(y < 0);
 
         // figure out how many positive and negative examples we will have in each fold
         const long num_pos_test_samples = num_pos/folds; 
@@ -588,14 +719,17 @@ namespace dlib
 
         typedef std_allocator<scalar_type, mem_manager_type> alloc_scalar_type_vector;
         typedef std::vector<scalar_type, alloc_scalar_type_vector > dvector;
-        typedef std_allocator<int, mem_manager_type> alloc_int_vector;
-        typedef std::vector<int, alloc_int_vector > ivector;
 
         dvector out;
-        ivector target;
+        dvector target;
 
         long pos_idx = 0;
         long neg_idx = 0;
+
+        const scalar_type prior0 = num_pos_test_samples*folds; 
+        const scalar_type prior1 = num_neg_test_samples*folds; 
+        const scalar_type hi_target = (prior1+1)/(prior1+2);
+        const scalar_type lo_target = 1.0/(prior0+2);
 
         for (long i = 0; i < folds; ++i)
         {
@@ -665,11 +799,11 @@ namespace dlib
                 // if this was a positive example
                 if (y_test(i) == +1.0)
                 {
-                    target.push_back(1);
+                    target.push_back(hi_target);
                 }
                 else if (y_test(i) == -1.0)
                 {
-                    target.push_back(0);
+                    target.push_back(lo_target);
                 }
                 else
                 {
@@ -679,109 +813,23 @@ namespace dlib
 
         } // for (long i = 0; i < folds; ++i)
 
-        // Now find the parameters of the sigmoid.  Do so using the method from the
-        // above referenced paper.
-        scalar_type prior0 = num_pos_test_samples*folds; 
-        scalar_type prior1 = num_neg_test_samples*folds; 
-        scalar_type A = 0;
-        scalar_type B = std::log((prior0+1)/(prior1+1));
+        // Now find the maximum likelihood parameters of the sigmoid.  
 
-        const scalar_type hiTarget = (prior1+1)/(prior1+2);
-        const scalar_type loTarget = 1.0/(prior0+2);
-        scalar_type lambda = 1e-3;
-        scalar_type olderr = std::numeric_limits<scalar_type>::max();;
-        dvector pp(out.size(),(prior1+1)/(prior1+prior0+2));
-        const scalar_type min_log = -200.0;
+        prob_impl::objective<dvector> obj(out, target);
+        prob_impl::der<dvector> obj_der(out, target);
+        prob_impl::hessian<dvector> obj_hessian(out, target);
 
-        scalar_type t = 0;
-        int count = 0;
-        for (int it = 0; it < 100; ++it)
-        {
-            scalar_type a = 0;
-            scalar_type b = 0;
-            scalar_type c = 0;
-            scalar_type d = 0;
-            scalar_type e = 0;
+        matrix<double,2,1> val;
+        val = 0;
+        find_min(newton_search_strategy(obj_hessian),
+                 gradient_norm_stop_strategy(),
+                 obj,
+                 obj_der,
+                 val,
+                 0);
 
-            // First, compute Hessian & gradient of error function with 
-            // respect to A & B
-            for (unsigned long i = 0; i < out.size(); ++i)
-            {
-                if (target[i])
-                    t = hiTarget;
-                else
-                    t = loTarget;
-
-                const scalar_type d1 = pp[i] - t;
-                const scalar_type d2 = pp[i]*(1-pp[i]);
-                a += out[i]*out[i]*d2;
-                b += d2;
-                c += out[i]*d2;
-                d += out[i]*d1;
-                e += d1;
-            }
-            
-            // If gradient is really tiny, then stop.
-            if (std::abs(d) < 1e-9 && std::abs(e) < 1e-9)
-                break;
-
-            scalar_type oldA = A;
-            scalar_type oldB = B;
-            scalar_type err = 0;
-
-            // Loop until goodness of fit increases
-            while (true)
-            {
-                scalar_type det = (a+lambda)*(b+lambda)-c*c;
-                // if determinant of Hessian is really close to zero then increase stabilizer.
-                if (std::abs(det) <= std::numeric_limits<scalar_type>::epsilon())
-                {
-                    lambda *= 10;
-                    continue;
-                }
-
-                A = oldA + ((b+lambda)*d-c*e)/det;
-                B = oldB + ((a+lambda)*e-c*d)/det;
-
-                // Now, compute the goodness of fit
-                err = 0;
-                for (unsigned long i = 0; i < out.size(); ++i)
-                {
-                    if (target[i])
-                        t = hiTarget;
-                    else
-                        t = loTarget;
-                    scalar_type p = 1.0/(1.0+std::exp(out[i]*A+B));
-                    pp[i] = p;
-                    // At this step, make sure log(0) returns min_log 
-                    err -= t*std::max(std::log(p),min_log) + (1-t)*std::max(std::log(1-p),min_log);
-                }
-
-                if (err < olderr*(1+1e-7))
-                {
-                    lambda *= 0.1;
-                    break;
-                }
-
-                // error did not decrease: increase stabilizer by factor of 10 
-                // & try again
-                lambda *= 10;
-                if (lambda >= 1e6) // something is broken. Give up
-                    break;
-            }
-
-            scalar_type diff = err-olderr;
-            scalar_type scale = 0.5*(err+olderr+1.0);
-            if (diff > -1e-3*scale && diff < 1e-7*scale)
-                ++count;
-            else
-                count = 0;
-
-            olderr = err;
-
-            if (count == 3)
-                break;
-        }
+        const double A = val(0);
+        const double B = val(1);
 
         return probabilistic_decision_function<K>( A, B, trainer.train(x,y) );
     }
