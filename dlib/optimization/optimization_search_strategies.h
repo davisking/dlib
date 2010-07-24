@@ -280,6 +280,44 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename hessian_funct>
+    class newton_search_strategy_obj
+    {
+    public:
+        newton_search_strategy_obj(
+            const hessian_funct& hess
+        ) : hessian(hess) {}
+
+        double get_wolfe_rho (
+        ) const { return 0.01; }
+
+        double get_wolfe_sigma (
+        ) const { return 0.9; }
+
+        unsigned long get_max_line_search_iterations (
+        ) const { return 100; }
+
+        template <typename T>
+        const matrix<double,0,1> get_next_direction (
+            const T& x,
+            const double ,
+            const T& funct_derivative
+        )
+        {
+            return -inv(hessian(x))*funct_derivative;
+        }
+
+    private:
+        hessian_funct hessian;
+    };
+
+    template <typename hessian_funct>
+    newton_search_strategy_obj<hessian_funct> newton_search_strategy (
+        const hessian_funct& hessian
+    ) { return newton_search_strategy_obj<hessian_funct>(hessian); }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_OPTIMIZATIOn_SEARCH_STRATEGIES_H_
