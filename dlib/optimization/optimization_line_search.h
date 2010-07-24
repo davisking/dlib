@@ -247,7 +247,8 @@ namespace dlib
         const double d0,
         double rho, 
         double sigma, 
-        double min_f
+        double min_f,
+        unsigned long max_iter 
     )
     {
         // You get an error on this line when you pass in a global function to this function.
@@ -259,11 +260,12 @@ namespace dlib
         COMPILE_TIME_ASSERT(is_function<funct_der>::value == false);
 
         DLIB_ASSERT (
-            0 < rho && rho < sigma && sigma < 1,
+            0 < rho && rho < sigma && sigma < 1 && max_iter > 0,
             "\tdouble line_search()"
             << "\n\tYou have given invalid arguments to this function"
-            << "\n\tsigma: " << sigma
-            << "\n\trho:   " << rho 
+            << "\n\t sigma:    " << sigma
+            << "\n\t rho:      " << rho 
+            << "\n\t max_iter: " << max_iter 
         );
 
         // The bracketing phase of this function is implemented according to block 2.6.2 from
@@ -311,9 +313,11 @@ namespace dlib
         // This thresh value represents the Wolfe curvature condition
         const double thresh = std::abs(sigma*d0);
 
+        unsigned long itr = 0;
         // do the bracketing stage to find the bracket range [a,b]
         while (true)
         {
+            ++itr;
             const double val = f(alpha);
             const double val_der = der(alpha);
 
@@ -338,7 +342,7 @@ namespace dlib
                 return alpha;
 
             // if we are stuck not making progress then quit with the current alpha
-            if (last_alpha == alpha)
+            if (last_alpha == alpha || itr >= max_iter)
                 return alpha;
 
             if (val_der >= 0)
@@ -391,6 +395,7 @@ namespace dlib
         // Now do the sectioning phase from 2.6.4
         while (true)
         {
+            ++itr;
             double first = a + tau2*(b-a);
             double last = b - tau3*(b-a);
 
@@ -402,8 +407,8 @@ namespace dlib
             const double val_der = der(alpha);
 
             // we are done with the line search since we found a value smaller
-            // than the minimum f value
-            if (val <= min_f)
+            // than the minimum f value or we ran out of iterations.
+            if (val <= min_f || itr >= max_iter)
                 return alpha;
 
             // stop if the interval gets so small that it isn't shrinking any more due to rounding error 

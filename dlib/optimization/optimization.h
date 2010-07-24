@@ -170,7 +170,8 @@ namespace dlib
                         f_value,
                         make_line_search_function(der,x,s, g),
                         dot(g,s), // compute initial gradient for the line search
-                        search_strategy.get_wolfe_rho(), search_strategy.get_wolfe_sigma(), min_f);
+                        search_strategy.get_wolfe_rho(), search_strategy.get_wolfe_sigma(), min_f,
+                        search_strategy.get_max_line_search_iterations());
 
             // Take the search step indicated by the above line search
             x += alpha*s;
@@ -230,7 +231,9 @@ namespace dlib
                         f_value,
                         negate_function(make_line_search_function(der,x,s, g)),
                         dot(g,s), // compute initial gradient for the line search
-                        search_strategy.get_wolfe_rho(), search_strategy.get_wolfe_sigma(), -max_f);
+                        search_strategy.get_wolfe_rho(), search_strategy.get_wolfe_sigma(), -max_f,
+                        search_strategy.get_max_line_search_iterations()
+                        );
 
             // Take the search step indicated by the above line search
             x += alpha*s;
@@ -292,7 +295,9 @@ namespace dlib
                         derivative(make_line_search_function(f,x,s),derivative_eps),
                         dot(g,s),  // Sometimes the following line is a better way of determining the initial gradient. 
                         //derivative(make_line_search_function(f,x,s),derivative_eps)(0),
-                        search_strategy.get_wolfe_rho(), search_strategy.get_wolfe_sigma(), min_f);
+                        search_strategy.get_wolfe_rho(), search_strategy.get_wolfe_sigma(), min_f,
+                        search_strategy.get_max_line_search_iterations()
+                        );
 
             // Take the search step indicated by the above line search
             x += alpha*s;

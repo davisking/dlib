@@ -137,7 +137,8 @@ namespace dlib
         const double d0,
         double rho, 
         double sigma, 
-        double min_f
+        double min_f,
+        unsigned long max_iter
     )
     /*!
         requires
@@ -147,11 +148,14 @@ namespace dlib
             - der is the derivative of f
             - f0 == f(0)
             - d0 == der(0)
+            - max_iter > 0
         ensures
             - Performs a line search and uses the strong Wolfe conditions to decide when
               the search can stop.  
                 - rho == the parameter of the Wolfe sufficient decrease condition
                 - sigma == the parameter of the Wolfe curvature condition
+                - max_iter == the maximum number of iterations allowable.  After this
+                  many evaluations of f() line_search() is guaranteed to terminate.
             - returns a value alpha such that f(alpha) is significantly closer to 
               the minimum of f than f(0).
             - It is assumed that the minimum possible value of f(x) is min_f.  So if
@@ -210,7 +214,7 @@ namespace dlib
         throws
             - optimize_single_variable_failure 
                 This exception is thrown if max_iter iterations are performed without 
-                determining the min point to the requsted accuracy of eps.
+                determining the min point to the requested accuracy of eps.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -245,7 +249,7 @@ namespace dlib
         throws
             - optimize_single_variable_failure 
                 This exception is thrown if max_iter iterations are performed without 
-                determining the max point to the requsted accuracy of eps.
+                determining the max point to the requested accuracy of eps.
     !*/
 
 // ----------------------------------------------------------------------------------------

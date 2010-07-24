@@ -26,6 +26,9 @@ namespace dlib
         double get_wolfe_sigma (
         ) const { return 0.01; }
 
+        unsigned long get_max_line_search_iterations (
+        ) const { return 100; }
+
         template <typename T>
         const matrix<double,0,1>& get_next_direction (
             const T& ,
@@ -77,6 +80,9 @@ namespace dlib
 
         double get_wolfe_sigma (
         ) const { return 0.9; }
+
+        unsigned long get_max_line_search_iterations (
+        ) const { return 100; }
 
         template <typename T>
         const matrix<double,0,1>& get_next_direction (
@@ -173,6 +179,9 @@ namespace dlib
 
         double get_wolfe_sigma (
         ) const { return 0.9; }
+
+        unsigned long get_max_line_search_iterations (
+        ) const { return 100; }
 
         template <typename T>
         const matrix<double,0,1>& get_next_direction (

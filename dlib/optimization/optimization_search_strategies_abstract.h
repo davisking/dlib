@@ -59,6 +59,14 @@ namespace dlib
                   this search strategy is used with the line_search() function.
         !*/
 
+        unsigned long get_max_line_search_iterations (
+        ) const; 
+        /*!
+            ensures
+                - returns the value of the max iterations parameter that should be used when 
+                  this search strategy is used with the line_search() function.
+        !*/
+
         template <typename T>
         const matrix<double,0,1>& get_next_direction (
             const T& x,
@@ -118,6 +126,14 @@ namespace dlib
         /*!
             ensures
                 - returns the value of the Wolfe sigma parameter that should be used when 
+                  this search strategy is used with the line_search() function.
+        !*/
+
+        unsigned long get_max_line_search_iterations (
+        ) const; 
+        /*!
+            ensures
+                - returns the value of the max iterations parameter that should be used when 
                   this search strategy is used with the line_search() function.
         !*/
 
@@ -184,6 +200,14 @@ namespace dlib
         /*!
             ensures
                 - returns the value of the Wolfe sigma parameter that should be used when 
+                  this search strategy is used with the line_search() function.
+        !*/
+
+        unsigned long get_max_line_search_iterations (
+        ) const; 
+        /*!
+            ensures
+                - returns the value of the max iterations parameter that should be used when 
                   this search strategy is used with the line_search() function.
         !*/
 
