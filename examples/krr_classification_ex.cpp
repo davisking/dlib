@@ -152,6 +152,11 @@ int main()
     typedef probabilistic_decision_function<kernel_type> probabilistic_funct_type;  
     typedef normalized_function<probabilistic_funct_type> pfunct_type;
 
+    // The train_probabilistic_decision_function() is going to perform 3-fold cross-validation.
+    // So it is important that the +1 and -1 samples be distributed uniformly across all the folds.
+    // calling randomize_samples() will make sure that is the case.   
+    randomize_samples(samples, labels);
+
     pfunct_type learned_pfunct; 
     learned_pfunct.normalizer = normalizer;
     learned_pfunct.function = train_probabilistic_decision_function(trainer, samples, labels, 3);
