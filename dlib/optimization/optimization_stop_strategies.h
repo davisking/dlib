@@ -140,7 +140,7 @@ namespace dlib
             if (_verbose)
             {
                 using namespace std;
-                cout << "iteration: " << _cur_iter << "   objective: " << funct_value << "   derivative norm: " << length(funct_derivative) << endl;
+                cout << "iteration: " << _cur_iter << "   objective: " << funct_value << "   gradient norm: " << length(funct_derivative) << endl;
             }
 
             ++_cur_iter;
