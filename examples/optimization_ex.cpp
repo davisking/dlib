@@ -174,12 +174,13 @@ int main()
         // The L-BFGS algorithm however uses only O(N) memory.  So if you have a 
         // function of a huge number of variables the L-BFGS algorithm is probably 
         // a better choice.
-        starting_point = 4, 8;
+        starting_point = 0.8, 1.3;
         find_min(lbfgs_search_strategy(10),  // The 10 here is basically a measure of how much memory L-BFGS will use.
-                 objective_delta_stop_strategy(1e-7),
+                 objective_delta_stop_strategy(1e-7).be_verbose(),  // Adding be_verbose() causes a message to be 
+                                                                    // printed for each iteration of optimization.
                  &rosen, &rosen_derivative, starting_point, -1);
 
-        cout << starting_point << endl;
+        cout << endl << starting_point << endl;
 
         starting_point = -94, 5.2;
         find_min_using_approximate_derivatives(lbfgs_search_strategy(10),
