@@ -27,7 +27,7 @@ namespace dlib
                 top of dlib/svm/kernel_abstract.h
 
             WHAT THIS OBJECT REPRESENTS 
-                This object represents a decision or regression function that was 
+                This object represents a classification or regression function that was 
                 learned by a kernel based learning algorithm.  
         !*/
 
