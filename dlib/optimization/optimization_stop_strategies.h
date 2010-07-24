@@ -8,6 +8,7 @@
 #include "../matrix.h"
 #include "../algs.h"
 #include "optimization_stop_strategies_abstract.h"
+#include <iostream>
 
 namespace dlib
 {
@@ -19,7 +20,7 @@ namespace dlib
     public:
         objective_delta_stop_strategy (
             double min_delta = 1e-7
-        ) : _been_used(false), _min_delta(min_delta), _max_iter(0), _cur_iter(0), _prev_funct_value(0) 
+        ) : _verbose(false), _been_used(false), _min_delta(min_delta), _max_iter(0), _cur_iter(0), _prev_funct_value(0) 
         {
             DLIB_ASSERT (
                 min_delta >= 0,
@@ -32,7 +33,7 @@ namespace dlib
         objective_delta_stop_strategy (
             double min_delta,
             unsigned long max_iter
-        ) : _been_used(false), _min_delta(min_delta), _max_iter(max_iter), _cur_iter(0), _prev_funct_value(0) 
+        ) : _verbose(false), _been_used(false), _min_delta(min_delta), _max_iter(max_iter), _cur_iter(0), _prev_funct_value(0) 
         {
             DLIB_ASSERT (
                 min_delta >= 0 && max_iter > 0,
@@ -43,6 +44,13 @@ namespace dlib
             );
         }
 
+        const objective_delta_stop_strategy& be_verbose( 
+        ) const
+        {
+            _verbose = true;
+            return *this;
+        }
+
         template <typename T>
         bool should_continue_search (
             const T& ,
@@ -50,6 +58,12 @@ namespace dlib
             const T& 
         ) 
         {
+            if (_verbose)
+            {
+                using namespace std;
+                cout << "iteration: " << _cur_iter << "   objective: " << funct_value << endl;
+            }
+
             ++_cur_iter;
             if (_been_used)
             {
@@ -69,6 +83,7 @@ namespace dlib
         }
 
     private:
+        mutable bool _verbose;
 
         bool _been_used;
         double _min_delta;
@@ -84,7 +99,7 @@ namespace dlib
     public:
         gradient_norm_stop_strategy (
             double min_norm = 1e-7
-        ) : _min_norm(min_norm), _max_iter(0), _cur_iter(0) 
+        ) : _verbose(false), _min_norm(min_norm), _max_iter(0), _cur_iter(0) 
         {
             DLIB_ASSERT (
                 min_norm >= 0,
@@ -97,7 +112,7 @@ namespace dlib
         gradient_norm_stop_strategy (
             double min_norm,
             unsigned long max_iter
-        ) : _min_norm(min_norm), _max_iter(max_iter), _cur_iter(0) 
+        ) : _verbose(false), _min_norm(min_norm), _max_iter(max_iter), _cur_iter(0) 
         {
             DLIB_ASSERT (
                 min_norm >= 0 && max_iter > 0,
@@ -108,13 +123,26 @@ namespace dlib
             );
         }
 
+        const gradient_norm_stop_strategy& be_verbose( 
+        ) const
+        {
+            _verbose = true;
+            return *this;
+        }
+
         template <typename T>
         bool should_continue_search (
             const T& ,
-            const double ,
+            const double funct_value,
             const T& funct_derivative
         ) 
         {
+            if (_verbose)
+            {
+                using namespace std;
+                cout << "iteration: " << _cur_iter << "   objective: " << funct_value << "   derivative norm: " << length(funct_derivative) << endl;
+            }
+
             ++_cur_iter;
 
             // Check if we have hit the max allowable number of iterations.  (but only
@@ -130,6 +158,7 @@ namespace dlib
         }
 
     private:
+        mutable bool _verbose;
 
         double _min_norm;
         unsigned long _max_iter;

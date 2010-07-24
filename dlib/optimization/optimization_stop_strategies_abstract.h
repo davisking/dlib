@@ -53,6 +53,15 @@ namespace dlib
                   executed.
         !*/
 
+        const objective_delta_stop_strategy& be_verbose( 
+        ) const;
+        /*!
+            ensures
+                - causes this object to print status messages to standard out 
+                  every time should_continue_search() is called.
+                - returns *this
+        !*/
+
         template <typename T>
         bool should_continue_search (
             const T& x,
@@ -109,6 +118,15 @@ namespace dlib
                 - This stop strategy object will only consider a search to be complete
                   if the current gradient norm is less than min_norm or more than 
                   max_iter iterations has been executed.
+        !*/
+
+        const gradient_norm_stop_strategy& be_verbose( 
+        ) const;
+        /*!
+            ensures
+                - causes this object to print status messages to standard out 
+                  every time should_continue_search() is called.
+                - returns *this
         !*/
 
         template <typename T>
