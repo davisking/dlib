@@ -36,7 +36,7 @@ namespace dlib
             ekm_stale(true)
         {
             // default lambda search list
-            lams = logspace(-9, 2, 40); 
+            lams = logspace(-9, 2, 50); 
         }
 
         void be_verbose (
@@ -349,6 +349,15 @@ namespace dlib
             const general_matrix_type V = eig.get_pseudo_v();
             const column_matrix_type  D = eig.get_real_eigenvalues();
 
+            // We can save some work by pre-multiplying the proj_x vectors by trans(V)
+            // and saving the result so we don't have to recompute it over and over later.
+            matrix<column_matrix_type,0,1,mem_manager_type > Vx;
+            if (lambda == 0 || output_looe)
+            {
+                Vx.set_size(proj_x.size());
+                for (long i = 0; i < proj_x.size(); ++i)
+                    Vx(i) = squared(trans(V)*proj_x(i));
+            }
 
             the_lambda = lambda;
 
@@ -372,7 +381,8 @@ namespace dlib
                     scalar_type looe = 0;
                     for (long i = 0; i < proj_x.size(); ++i)
                     {
-                        const scalar_type val = trans(proj_x(i))*G*proj_x(i);
+                        // perform equivalent of: val = trans(proj_x(i))*G*proj_x(i);
+                        const scalar_type val = dot(tempv, Vx(i));
                         const scalar_type temp = (1 - val);
                         scalar_type loov;
                         if (temp != 0)
@@ -419,7 +429,8 @@ namespace dlib
                 best_looe = 0;
                 for (long i = 0; i < proj_x.size(); ++i)
                 {
-                    const scalar_type val = trans(proj_x(i))*G*proj_x(i);
+                    // perform equivalent of: val = trans(proj_x(i))*G*proj_x(i);
+                    const scalar_type val = dot(tempv, Vx(i));
                     const scalar_type temp = (1 - val);
                     scalar_type loov;
                     if (temp != 0)

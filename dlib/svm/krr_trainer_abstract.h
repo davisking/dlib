@@ -24,7 +24,7 @@ namespace dlib
                 - basis_loaded() == false
                 - get_max_basis_size() == 400
                 - will_use_regression_loss_for_loo_cv() == true
-                - get_search_lambdas() == logspace(-9, 2, 40) 
+                - get_search_lambdas() == logspace(-9, 2, 50) 
                 - this object will not be verbose unless be_verbose() is called
 
             WHAT THIS OBJECT REPRESENTS
