@@ -232,15 +232,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename hessian_funct>
+    template <
+        typename hessian_funct
+        >
     class newton_search_strategy_obj
     {
         /*!
             REQUIREMENTS ON hessian_funct
-                Lets denote the function being optimized as f(x).  Then the 
-                hessian_funct must be a function object that takes in an x
-                and returns the hessian matrix at x.  hessian_funct must also
-                be copy constructable.
+                Objects of hessian_funct type must be function objects which
+                take a single argument and return a dlib::matrix of doubles.  The
+                single argument must be a dlib::matrix capable of representing
+                column vectors of doubles.  hessian_funct must also be copy 
+                constructable.  
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a strategy for determining which direction
@@ -258,6 +261,8 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to generate
                   search directions.
+                - hess will be used by this object to generate the needed hessian
+                  matrices every time get_next_direction() is called.
         !*/
 
         double get_wolfe_rho (
@@ -300,6 +305,8 @@ namespace dlib
                 - Assuming that a line search is going to be conducted starting from the 
                   point x, this function returns the direction in which the search should 
                   proceed.
+                - In particular, the search direction will be given by:
+                    - search_direction = -inv(hessian(x))*funct_derivative
         !*/
 
     };
