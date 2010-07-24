@@ -1019,7 +1019,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
          <description>
-                This object represents a decision or regression function that was 
+                This object represents a classification or regression function that was 
                 learned by a kernel based learning algorithm.  
          </description>
          <examples>
