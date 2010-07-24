@@ -61,6 +61,11 @@ int main()
     cout << "using gamma of " << gamma << endl;
     trainer.set_kernel(kernel_type(gamma));
 
+    // One thing you can do to reduce the RVM training time is to make its
+    // stopping epsilon bigger.  However, this might make the outputs less
+    // reliable.  But sometimes it works out well.  0.001 is the default.
+    trainer.set_epsilon(0.001);
+
     // now train a function based on our sample points
     decision_function<kernel_type> test = trainer.train(samples, labels);
 

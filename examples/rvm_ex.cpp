@@ -99,6 +99,11 @@ int main()
     // here we make an instance of the rvm_trainer object that uses our kernel type.
     rvm_trainer<kernel_type> trainer;
 
+    // One thing you can do to reduce the RVM training time is to make its
+    // stopping epsilon bigger.  However, this might make the outputs less
+    // reliable.  But sometimes it works out well.  0.001 is the default.
+    trainer.set_epsilon(0.001);
+
     // Now we loop over some different gamma values to see how good they are.  Note
     // that this is a very simple way to try out a few possible parameter choices.  You 
     // should look at the model_selection_ex.cpp program for examples of more sophisticated 
