@@ -74,6 +74,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>svm_c_linear_trainer</item> 
          <item>svm_c_ekm_trainer</item> 
          <item>rvm_trainer</item> 
+         <item>krr_trainer</item> 
          <item>rvm_regression_trainer</item> 
          <item>rbf_network_trainer</item> 
          <item>rank_features</item> 
@@ -863,6 +864,29 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          </description>
          <examples>
             <example>rvm_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>krr_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/krr_trainer_abstract.h</spec_file>
+         <description>
+            <p>
+               Performs kernel ridge regression and outputs a <a href="#decision_function">decision_function</a> that 
+               represents the learned function. 
+            </p>
+            The implementation is done using the <a href="#empirical_kernel_map">empirical_kernel_map</a> and 
+            <a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a> 
+            and thus allows you to run the algorithm on large datasets and obtain sparse outputs.  It is also
+            capable of automatically estimating its regularization parameter using leave-one-out cross-validation.
+         </description>
+         <examples>
+            <example>krr_regression_ex.cpp.html</example>
+            <example>krr_classification_ex.cpp.html</example>
          </examples>
                                  
       </component>

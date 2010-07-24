@@ -176,6 +176,14 @@
                   <link>rvm_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Kernel_Ridge_Regression</name>
+                  <link>krr_regression_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>KRR_Classification</name>
+                  <link>krr_classification_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Support_Vector_Machine</name>
                   <link>svm_ex.cpp.html</link>
                </item>

@@ -119,6 +119,8 @@
                <ul>
                   <li><a href="ml.html#mlp">Multi layer perceptrons</a> </li>  
                   <li><a href="ml.html#svm_nu_trainer">Support vector machines</a> for classification</li>
+                  <li>Reduced-rank methods for large-scale <a href="ml.html#svm_c_ekm_trainer">classification</a>
+                     and <a href="ml.html#krr_trainer">regression</a></li>
                   <li>Relevance vector machines for <a href="ml.html#rvm_trainer">classification</a> 
                       and <a href="ml.html#rvm_regression_trainer">regression</a> </li>
                   <li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li>
