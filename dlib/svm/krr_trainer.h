@@ -51,19 +51,19 @@ namespace dlib
             verbose = false;
         }
 
-        void estimate_lambda_for_regression (
+        void use_regression_loss_for_loo_cv (
         )
         {
             use_regression_loss = true;
         }
 
-        void estimate_lambda_for_classification (
+        void use_classification_loss_for_loo_cv (
         )
         {
             use_regression_loss = false;
         }
 
-        bool will_estimate_lambda_for_regression (
+        bool will_use_regression_loss_for_loo_cv (
         ) const
         {
             return use_regression_loss;
@@ -248,7 +248,7 @@ namespace dlib
                 );
 
 #ifdef ENABLE_ASSERTS
-            if (get_lambda() == 0 && will_estimate_lambda_for_regression() == false)
+            if (get_lambda() == 0 && will_use_regression_loss_for_loo_cv() == false)
             {
                 // make sure requires clause is not broken
                 DLIB_ASSERT(is_binary_classification_problem(x,y),
@@ -485,7 +485,7 @@ namespace dlib
                 - get_lambda() == lambda
                 - get_kernel() == kern
                 - get_max_basis_size() == max_basis_size
-                - will_estimate_lambda_for_regression() == use_regression_loss
+                - will_use_regression_loss_for_loo_cv() == use_regression_loss
                 - get_search_lambdas() == lams
 
                 - basis_loaded() == (basis.size() != 0)

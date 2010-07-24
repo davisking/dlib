@@ -352,7 +352,7 @@ namespace
         rvm_trainer.set_kernel(kernel_type(gamma));
 
         krr_trainer<kernel_type> krr_trainer;
-        krr_trainer.estimate_lambda_for_classification();
+        krr_trainer.use_classification_loss_for_loo_cv();
         krr_trainer.set_kernel(kernel_type(gamma));
 
         svm_pegasos<kernel_type> pegasos_trainer;

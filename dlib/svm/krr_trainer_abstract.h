@@ -23,7 +23,7 @@ namespace dlib
                 - get_lambda() == 0
                 - basis_loaded() == false
                 - get_max_basis_size() == 400
-                - will_estimate_lambda_for_regression() == true
+                - will_use_regression_loss_for_loo_cv() == true
                 - get_search_lambdas() == logspace(-9, 2, 40) 
                 - this object will not be verbose unless be_verbose() is called
 
@@ -171,21 +171,21 @@ namespace dlib
                   value.  This is done using leave-one-out cross-validation.
         !*/
 
-        void estimate_lambda_for_regression (
+        void use_regression_loss_for_loo_cv (
         );
         /*!
             ensures
-                - #will_estimate_lambda_for_regression() == true
+                - #will_use_regression_loss_for_loo_cv() == true
         !*/
 
-        void estimate_lambda_for_classification (
+        void use_classification_loss_for_loo_cv (
         );
         /*!
             ensures
-                - #will_estimate_lambda_for_regression() == false 
+                - #will_use_regression_loss_for_loo_cv() == false 
         !*/
 
-        bool will_estimate_lambda_for_regression (
+        bool will_use_regression_loss_for_loo_cv (
         ) const;
         /*!
             ensures
@@ -235,7 +235,7 @@ namespace dlib
                 - is_vector(x) == true
                 - is_vector(y) == true
                 - x.size() == y.size() > 0
-                - if (get_lambda() == 0 && will_estimate_lambda_for_regression() == false) then
+                - if (get_lambda() == 0 && will_use_regression_loss_for_loo_cv() == false) then
                     - is_binary_classification_problem(x,y) == true
                       (i.e. if you want this algorithm to estimate a lambda appropriate for
                       classification functions then you had better give a valid classification
@@ -254,7 +254,7 @@ namespace dlib
                     - This object will perform internal leave-one-out cross-validation to determine an 
                       appropriate lambda automatically.  It will compute the LOO error for each lambda
                       in get_search_lambdas() and select the best one.
-                    - if (will_estimate_lambda_for_regression()) then
+                    - if (will_use_regression_loss_for_loo_cv()) then
                         - the lambda selected will be the one that minimizes the mean squared error.
                     - else
                         - the lambda selected will be the one that minimizes the number classification 
@@ -284,8 +284,12 @@ namespace dlib
             ensures
                 - returns train(x,y)
                   (i.e. executes train(x,y) and returns its result)
-                - #looe == the average leave-one-out cross-validation error for the 
-                  round of training this function performed.
+                - if (will_use_regression_loss_for_loo_cv())
+                    - #looe == the mean squared error as determined by leave-one-out 
+                      cross-validation.  
+                - else
+                    - #looe == the fraction of samples misclassified as determined by
+                      leave-one-out cross-validation.
         !*/
 
         template <
@@ -304,8 +308,12 @@ namespace dlib
             ensures
                 - returns train(x,y)
                   (i.e. executes train(x,y) and returns its result)
-                - #looe == the average leave-one-out cross-validation error for the 
-                  round of training this function performed.
+                - if (will_use_regression_loss_for_loo_cv())
+                    - #looe == the mean squared error as determined by leave-one-out 
+                      cross-validation.  
+                - else
+                    - #looe == the fraction of samples misclassified as determined by
+                      leave-one-out cross-validation.
                 - #lambda_used == the value of lambda used to generate the 
                   decision_function.  Note that this lambda value is always 
                   equal to get_lambda() if get_lambda() isn't 0.
