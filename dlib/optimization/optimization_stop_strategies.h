@@ -18,7 +18,7 @@ namespace dlib
     class objective_delta_stop_strategy
     {
     public:
-        objective_delta_stop_strategy (
+        explicit objective_delta_stop_strategy (
             double min_delta = 1e-7
         ) : _verbose(false), _been_used(false), _min_delta(min_delta), _max_iter(0), _cur_iter(0), _prev_funct_value(0) 
         {
@@ -97,7 +97,7 @@ namespace dlib
     class gradient_norm_stop_strategy
     {
     public:
-        gradient_norm_stop_strategy (
+        explicit gradient_norm_stop_strategy (
             double min_norm = 1e-7
         ) : _verbose(false), _min_norm(min_norm), _max_iter(0), _cur_iter(0) 
         {

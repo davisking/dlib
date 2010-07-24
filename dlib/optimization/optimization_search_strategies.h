@@ -154,7 +154,7 @@ namespace dlib
     class lbfgs_search_strategy
     {
     public:
-        lbfgs_search_strategy(unsigned long max_size_) : max_size(max_size_), been_used(false) 
+        explicit lbfgs_search_strategy(unsigned long max_size_) : max_size(max_size_), been_used(false) 
         {
             DLIB_ASSERT (
                 max_size > 0,
@@ -284,7 +284,7 @@ namespace dlib
     class newton_search_strategy_obj
     {
     public:
-        newton_search_strategy_obj(
+        explicit newton_search_strategy_obj(
             const hessian_funct& hess
         ) : hessian(hess) {}
 

@@ -26,7 +26,7 @@ namespace dlib
         !*/
 
     public:
-        objective_delta_stop_strategy (
+        explicit objective_delta_stop_strategy (
             double min_delta = 1e-7
         ); 
         /*!
@@ -95,7 +95,7 @@ namespace dlib
         !*/
 
     public:
-        gradient_norm_stop_strategy (
+        explicit gradient_norm_stop_strategy (
             double min_norm = 1e-7
         ); 
         /*!

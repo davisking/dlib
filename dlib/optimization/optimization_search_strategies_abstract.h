@@ -172,7 +172,7 @@ namespace dlib
                 to use when an optimization problem has a large number of variables.
         !*/
     public:
-        lbfgs_search_strategy(
+        explicit lbfgs_search_strategy(
             unsigned long max_size
         ); 
         /*!
@@ -254,7 +254,7 @@ namespace dlib
                     search_direction = -inv(hessian(x))*derivative
         !*/
     public:
-        newton_search_strategy_obj(
+        explicit newton_search_strategy_obj(
             const hessian_funct& hess
         ); 
         /*!
