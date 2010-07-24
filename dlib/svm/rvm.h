@@ -147,8 +147,27 @@ namespace dlib
         typedef decision_function<kernel_type> trained_function_type;
 
         rvm_trainer (
-        ) : eps(0.0005)
+        ) : eps(0.001)
         {
+        }
+
+        void set_epsilon (
+            scalar_type eps_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(eps_ > 0,
+                "\tvoid rvm_trainer::set_epsilon(eps_)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t eps: " << eps_ 
+                );
+            eps = eps_;
+        }
+
+        const scalar_type get_epsilon (
+        ) const
+        { 
+            return eps;
         }
 
         void set_kernel (
@@ -600,8 +619,27 @@ namespace dlib
         typedef decision_function<kernel_type> trained_function_type;
 
         rvm_regression_trainer (
-        ) : eps(0.0005)
+        ) : eps(0.001)
         {
+        }
+
+        void set_epsilon (
+            scalar_type eps_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(eps_ > 0,
+                "\tvoid rvm_regression_trainer::set_epsilon(eps_)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t eps: " << eps_ 
+                );
+            eps = eps_;
+        }
+
+        const scalar_type get_epsilon (
+        ) const
+        { 
+            return eps;
         }
 
         void set_kernel (

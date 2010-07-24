@@ -49,6 +49,26 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used
                   to train a relevance vector machine.
+                - #get_epsilon() == 0.001
+        !*/
+
+        void set_epsilon (
+            scalar_type eps
+        );
+        /*!
+            requires
+                - eps > 0
+            ensures
+                - #get_epsilon() == eps 
+        !*/
+
+        const scalar_type get_epsilon (
+        ) const;
+        /*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Generally a good value for this is 0.001.  Smaller values may result
+                  in a more accurate solution but take longer to execute.
         !*/
 
         void set_kernel (
@@ -152,6 +172,26 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used
                   to train a relevance vector machine.
+                - #get_epsilon() == 0.001
+        !*/
+
+        void set_epsilon (
+            scalar_type eps
+        );
+        /*!
+            requires
+                - eps > 0
+            ensures
+                - #get_epsilon() == eps 
+        !*/
+
+        const scalar_type get_epsilon (
+        ) const;
+        /*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Generally a good value for this is 0.001.  Smaller values may result
+                  in a more accurate solution but take longer to execute.
         !*/
 
         void set_kernel (
