@@ -12,6 +12,18 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.29" date="Jul 25, 2010">
+New Stuff:
   - Added a reference_wrapper implementation and modified the thread_function 
     slightly so it works with it.
   - Added an implementation of kernel ridge regression.
@@ -35,7 +47,7 @@ Other:
     a more numerically stable method to perform its maximum likelihood optimization.
   - Added missing get/set epsilon functions to the RVM training objects.
     I also changed the default epsilon from 0.0005 to 0.001.
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
