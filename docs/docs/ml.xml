@@ -788,13 +788,17 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <p>
                Trains a <a href="#probabilistic_decision_function">probabilistic_decision_function</a> using 
                some sort of batch trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or
-               <a href="#rbf_network_trainer">rbf_network_trainer</a>.
+               <a href="#krr_trainer">krr_trainer</a>.
             </p>
-            The probability model is created by using the technique described in the paper:
+            The probability model is created by using the technique described in the following papers:
             <blockquote>
                 Probabilistic Outputs for Support Vector Machines and
                 Comparisons to Regularized Likelihood Methods by 
                 John C. Platt.  March 26, 1999
+            </blockquote>
+            <blockquote>
+                A Note on Platt's Probabilistic Outputs for Support Vector Machines
+                by Hsuan-Tien Lin, Chih-Jen Lin, and Ruby C. Weng
             </blockquote>
          </description>
          <examples>
@@ -811,6 +815,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/rbf_network_abstract.h</spec_file>
          <description>
                Trains a radial basis function network and outputs a <a href="#decision_function">decision_function</a>. 
+               It's worth pointing out that this object is essentially an unregularized version 
+               of <a href="#krr_trainer">kernel ridge regression</a>.  This means 
+               you should really prefer to use kernel ridge regression instead.
          </description>
       </component>
       

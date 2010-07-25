@@ -12,6 +12,35 @@
 
 <current>
 New Stuff:
+  - Added a reference_wrapper implementation and modified the thread_function 
+    slightly so it works with it.
+  - Added an implementation of kernel ridge regression.
+  - Added a simple newton search strategy for optimizing functions.
+
+Non-Backwards Compatible Changes:
+  - If you have created your own matrix expressions then its possible this
+    new release will cause them to not compile.  
+
+Bug fixes:
+  - Fixed a bug in scale_columns.  It said it didn't have any destructive aliasing 
+    when in fact it destructively aliased its second argument.
+  - Fixed a bug in the random number generator where setting the seed back to ""
+    didn't result in the object going back to it's initial state.
+
+Other:
+  - Reorganized the matrix expression code.  It's now much simpler and the
+    library includes a new example program which details the steps needed to
+    create new matrix expressions.
+  - Changed the train_probabilistic_decision_function() routine so that it uses
+    a more numerically stable method to perform its maximum likelihood optimization.
+  - Added missing get/set epsilon functions to the RVM training objects.
+    I also changed the default epsilon from 0.0005 to 0.001.
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.28" date="Jun 14, 2010">
+New Stuff:
    - Added the simplify_linear_decision_function() routines.
    - Added the find_approximate_k_nearest_neighbors() function.
    - Added the fill_lisf() function.
@@ -33,7 +62,7 @@ Other:
    - Made the reduced() and reduced2() functions more efficient.
    - Many small usability improvements here and there.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 

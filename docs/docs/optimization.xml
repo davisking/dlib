@@ -40,6 +40,7 @@
          <name>Strategies</name>
          <item>cg_search_strategy</item>
          <item>bfgs_search_strategy</item>
+         <item>newton_search_strategy</item>
          <item>lbfgs_search_strategy</item>
          <item>objective_delta_stop_strategy</item>
          <item>gradient_norm_stop_strategy</item>
@@ -196,6 +197,29 @@
          <examples>
             <example>optimization_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>newton_search_strategy</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_search_strategies_abstract.h</spec_file>
+         <description>
+                This object represents a strategy for determining which direction
+                a <a href="#line_search">line search</a> should be carried out along.  This particular routine 
+                is an implementation of the newton method for determining this direction.  
+                That means using it requires you to supply a method for
+                creating hessian matrices for the problem you are trying to optimize.
+
+               <p>
+               Note also that this is actually a helper function for creating 
+               <a href="dlib/optimization/optimization_search_strategies_abstract.h.html#newton_search_strategy_obj"
+                     >newton_search_strategy_obj</a> objects.  
+               </p>
+
+         </description>
                                  
       </component>
 

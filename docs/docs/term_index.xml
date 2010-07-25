@@ -54,6 +54,8 @@
          <term file="optimization.html" name="negate_function"/>
          <term file="optimization.html" name="cg_search_strategy"/>
          <term file="optimization.html" name="bfgs_search_strategy"/>
+         <term file="optimization.html" name="newton_search_strategy"/>
+         <term file="optimization.html" name="newton_search_strategy_obj"/>
          <term file="optimization.html" name="lbfgs_search_strategy"/>
 
          <term file="bayes.html" name="set_node_value"/>

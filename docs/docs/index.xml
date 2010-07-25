@@ -117,8 +117,7 @@
 
             <li><b>Machine Learning Algorithms</b>
                <ul>
-                  <li><a href="ml.html#mlp">Multi layer perceptrons</a> </li>  
-                  <li><a href="ml.html#svm_nu_trainer">Support vector machines</a> for classification</li>
+                  <li>Conventional SMO based <a href="ml.html#svm_nu_trainer">Support vector machines</a> for classification</li>
                   <li>Reduced-rank methods for large-scale <a href="ml.html#svm_c_ekm_trainer">classification</a>
                      and <a href="ml.html#krr_trainer">regression</a></li>
                   <li>Relevance vector machines for <a href="ml.html#rvm_trainer">classification</a> 
@@ -128,6 +127,7 @@
                   <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector</li>
                   <li>A kernelized <a href="ml.html#kkmeans">k-means</a> clustering algorithm</li>
                   <li><a href="ml.html#rbf_network_trainer">Radial Basis Function Networks</a></li>
+                  <li><a href="ml.html#mlp">Multi layer perceptrons</a> </li>  
                </ul>
             </li>
 
