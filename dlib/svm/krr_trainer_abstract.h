@@ -110,6 +110,7 @@ namespace dlib
                   expressions such as get_kernel()(basis_samples(0), basis_samples(0)) should make sense.
             ensures
                 - #basis_loaded() == true
+                - training will be carried out in the span of the given basis_samples
         !*/
 
         bool basis_loaded (
