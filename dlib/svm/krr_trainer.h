@@ -372,9 +372,12 @@ namespace dlib
             matrix<column_matrix_type,0,1,mem_manager_type > Vx;
             if (lambda == 0 || output_looe)
             {
+                // Save the transpose of V into a temporary because the subsequent matrix
+                // vector multiplies will be faster (because of better cache locality).
+                const general_matrix_type transV(trans(V));
                 Vx.set_size(proj_x.size());
                 for (long i = 0; i < proj_x.size(); ++i)
-                    Vx(i) = squared(trans(V)*proj_x(i));
+                    Vx(i) = squared(transV*proj_x(i));
             }
 
             the_lambda = lambda;
