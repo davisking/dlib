@@ -1196,6 +1196,22 @@ namespace
             DLIB_TEST(dot(trans(m1), m2)        == 1*4 + 2*5 + 3*6);
             DLIB_TEST(dot(trans(m1), trans(m2)) == 1*4 + 2*5 + 3*6);
         }
+
+        {
+            matrix<double> m1(3,3), m2(3,3);
+
+            m1 = 1;
+            m2 = 1;
+            m1 = m1*subm(m2,0,0,3,3);
+        }
+        {
+            matrix<double,3,1> m1;
+            matrix<double> m2(3,3);
+
+            m1 = 1;
+            m2 = 1;
+            m1 = subm(m2,0,0,3,3)*m1;
+        }
     }
 
 

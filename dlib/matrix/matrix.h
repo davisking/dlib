@@ -100,8 +100,8 @@ namespace dlib
 #ifdef DLIB_USE_BLAS
         // if there are BLAS functions to be called then we want to make sure we
         // always evaluate any complex expressions so that the BLAS bindings can happen.
-        const static bool lhs_is_costly = (LHS::cost > 1)&&(RHS::NC != 1 || LHS::cost >= 10000);
-        const static bool rhs_is_costly = (RHS::cost > 1)&&(LHS::NR != 1 || RHS::cost >= 10000);
+        const static bool lhs_is_costly = (LHS::cost > 2)&&(RHS::NC != 1 || LHS::cost >= 10000);
+        const static bool rhs_is_costly = (RHS::cost > 2)&&(LHS::NR != 1 || RHS::cost >= 10000);
 #else
         const static bool lhs_is_costly = (LHS::cost > 4)&&(RHS::NC != 1);
         const static bool rhs_is_costly = (RHS::cost > 4)&&(LHS::NR != 1);
@@ -287,7 +287,7 @@ namespace dlib
         typedef typename LHS::layout_type layout_type;
         const static long NR = (RHS::NR > LHS::NR) ? RHS::NR : LHS::NR;
         const static long NC = (RHS::NC > LHS::NC) ? RHS::NC : LHS::NC;
-        const static long cost = LHS::cost+RHS::cost;
+        const static long cost = LHS::cost+RHS::cost+1;
     };
 
     template <
@@ -394,7 +394,7 @@ namespace dlib
         typedef typename LHS::layout_type layout_type;
         const static long NR = (RHS::NR > LHS::NR) ? RHS::NR : LHS::NR;
         const static long NC = (RHS::NC > LHS::NC) ? RHS::NC : LHS::NC;
-        const static long cost = LHS::cost+RHS::cost;
+        const static long cost = LHS::cost+RHS::cost+1;
     };
 
     template <

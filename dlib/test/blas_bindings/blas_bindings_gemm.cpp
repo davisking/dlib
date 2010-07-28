@@ -58,7 +58,19 @@ namespace
             DLIB_TEST(counter_gemm() == 1);
 
             counter_gemm() = 0;
+            b = a/2*a;
+            DLIB_TEST(counter_gemm() == 1);
+
+            counter_gemm() = 0;
             b = a*trans(a) + a;
+            DLIB_TEST(counter_gemm() == 1);
+
+            counter_gemm() = 0;
+            b = (a+a)*(a+a);
+            DLIB_TEST(counter_gemm() == 1);
+
+            counter_gemm() = 0;
+            b = a*(a-a);
             DLIB_TEST(counter_gemm() == 1);
 
             counter_gemm() = 0;

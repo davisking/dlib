@@ -23,7 +23,7 @@ namespace dlib
     DLIB_DEFINE_FUNCTION_M(op_log10, log10, std::log10 ,7);
     DLIB_DEFINE_FUNCTION_M(op_exp, exp, std::exp ,7);
 
-    DLIB_DEFINE_FUNCTION_M(op_conj, conj, std::conj ,1);
+    DLIB_DEFINE_FUNCTION_M(op_conj, conj, std::conj ,2);
 
     DLIB_DEFINE_FUNCTION_M(op_ceil, ceil, std::ceil ,7);
     DLIB_DEFINE_FUNCTION_M(op_floor, floor, std::floor ,7);

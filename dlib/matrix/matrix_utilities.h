@@ -762,7 +762,7 @@ namespace dlib
         op_remove_col( const M& m_) : m(m_){}
         const M& m;
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         const static long NR = M::NR;
         const static long NC = (M::NC==0) ? 0 : (M::NC - 1);
         typedef typename M::type type;
@@ -795,7 +795,7 @@ namespace dlib
         const M& m;
         const long C;
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         const static long NR = M::NR;
         const static long NC = (M::NC==0) ? 0 : (M::NC - 1);
         typedef typename M::type type;
@@ -870,7 +870,7 @@ namespace dlib
         op_remove_row( const M& m_) : m(m_){}
         const M& m;
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         const static long NR = (M::NR==0) ? 0 : (M::NR - 1);
         const static long NC = M::NC;
         typedef typename M::type type;
@@ -903,7 +903,7 @@ namespace dlib
         const M& m;
         const long R;
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         const static long NR = (M::NR==0) ? 0 : (M::NR - 1);
         const static long NC = M::NC;
         typedef typename M::type type;
@@ -978,7 +978,7 @@ namespace dlib
         op_diagm( const M& m_) : m(m_){}
         const M& m;
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         const static long N = M::NC*M::NR;
         const static long NR = N;
         const static long NC = N;
@@ -1063,7 +1063,7 @@ namespace dlib
         op_cast( const M& m_) : m(m_){}
         const M& m;
 
-        const static long cost = M::cost;
+        const static long cost = M::cost+2;
         const static long NR = M::NR;
         const static long NC = M::NC;
         typedef target_type type;
@@ -1514,7 +1514,7 @@ namespace dlib
         op_sumr(const M& m_) : m(m_) {}
         const M& m;
 
-        const static long cost = M::cost;
+        const static long cost = M::cost+10;
         const static long NR = 1;
         const static long NC = M::NC;
         typedef typename M::type type;
@@ -1560,7 +1560,7 @@ namespace dlib
         op_sumc(const M& m_) : m(m_) {}
         const M& m;
 
-        const static long cost = M::cost;
+        const static long cost = M::cost + 10;
         const static long NR = M::NR;
         const static long NC = 1;
         typedef typename M::type type;
@@ -1975,7 +1975,7 @@ namespace dlib
         op_rotate(const M& m_) : m(m_) {}
         const M& m;
 
-        const static long cost = M::cost + 1;
+        const static long cost = M::cost + 2;
         const static long NR = M::NR;
         const static long NC = M::NC;
         typedef typename M::type type;
@@ -2350,7 +2350,7 @@ namespace dlib
 
         typedef typename M::type type;
         typedef const typename M::type const_ret_type;
-        const static long cost = M::cost + 1;
+        const static long cost = M::cost + 2;
 
         const_ret_type apply ( long r, long c) const
         { 
@@ -2428,7 +2428,7 @@ namespace dlib
         const long rows;
         const long cols;
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         const static long NR = 0;
         const static long NC = 0;
         typedef typename M::type type;
@@ -2739,7 +2739,7 @@ namespace dlib
     {
         op_lowerm( const M& m_) : basic_op_m<M>(m_){}
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         typedef typename M::type type;
         typedef const typename M::type const_ret_type;
         const_ret_type apply ( long r, long c) const
@@ -2759,7 +2759,7 @@ namespace dlib
 
         const type s;
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         typedef const typename M::type const_ret_type;
         const_ret_type apply ( long r, long c) const
         { 
@@ -2802,7 +2802,7 @@ namespace dlib
     {
         op_upperm( const M& m_) : basic_op_m<M>(m_){}
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         typedef typename M::type type;
         typedef const typename M::type const_ret_type;
         const_ret_type apply ( long r, long c) const
@@ -2822,7 +2822,7 @@ namespace dlib
 
         const type s;
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         typedef const typename M::type const_ret_type;
         const_ret_type apply ( long r, long c) const
         { 
@@ -3013,7 +3013,7 @@ namespace dlib
         op_mat_to_vect(const M& m_) : m(m_) {}
         const M& m;
 
-        const static long cost = M::cost+1;
+        const static long cost = M::cost+2;
         const static long NR = M::NC*M::NR;
         const static long NC = 1;
         typedef typename M::type type;

@@ -28,7 +28,7 @@ namespace dlib
         op_conj_trans( const M& m_) : m(m_){}
         const M& m;
 
-        const static long cost = M::cost;
+        const static long cost = M::cost+1;
         const static long NR = M::NC;
         const static long NC = M::NR;
         typedef typename M::type type;
