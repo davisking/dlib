@@ -8,6 +8,7 @@
 #include "kernel.h"
 #include "empirical_kernel_map.h"
 #include "linearly_independent_subset_finder.h"
+#include "../statistics.h"
 #include "krr_trainer_abstract.h"
 #include <vector>
 #include <iostream>
@@ -276,20 +277,37 @@ namespace dlib
 
             if (verbose)
             {
-                std::cout << "Number of basis vectors used: " << ekm.out_vector_size() << std::endl;
+                std::cout << "\nNumber of basis vectors used: " << ekm.out_vector_size() << std::endl;
             }
 
             typedef matrix<scalar_type,0,1,mem_manager_type> column_matrix_type;
             typedef matrix<scalar_type,0,0,mem_manager_type> general_matrix_type;
+
+            running_stats<scalar_type> rs;
 
             // Now we project all the x samples into kernel space using our EKM 
             matrix<column_matrix_type,0,1,mem_manager_type > proj_x;
             proj_x.set_size(x.size());
             for (long i = 0; i < proj_x.size(); ++i)
             {
+                scalar_type err;
                 // Note that we also append a 1 to the end of the vectors because this is
                 // a convenient way of dealing with the bias term later on.
-                proj_x(i) = join_cols(ekm.project(x(i)), ones_matrix<scalar_type>(1,1));
+                if (verbose == false)
+                {
+                    proj_x(i) = join_cols(ekm.project(x(i)), ones_matrix<scalar_type>(1,1));
+                }
+                else
+                {
+                    proj_x(i) = join_cols(ekm.project(x(i),err), ones_matrix<scalar_type>(1,1));
+                    rs.add(err);
+                }
+            }
+
+            if (verbose)
+            {
+                std::cout << "Mean EKM projection error:                  " << rs.mean() << std::endl;
+                std::cout << "Standard deviation of EKM projection error: " << rs.stddev() << std::endl;
             }
 
             /*
