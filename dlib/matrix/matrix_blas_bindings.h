@@ -424,7 +424,7 @@ namespace dlib
         T* get_ptr (matrix<T,NR,NC,MM,L>& m) { return &m(0,0); }
 
         template <typename T, long NR, long NC, typename MM, typename L>
-        const T* get_ptr (const matrix_op<op_subm<matrix<T,NR,NC,MM,L> > >& m) { return &m.op.m(m.r_,m.c_); }
+        const T* get_ptr (const matrix_op<op_subm<matrix<T,NR,NC,MM,L> > >& m) { return &m.op.m(m.op.r_,m.op.c_); }
 
         template <typename T, long NR, long NC, typename MM, typename L>
         const T* get_ptr (const matrix_op<op_colm<matrix<T,NR,NC,MM,L> > >& m) { return &m.op.m(0,m.op.col); }
