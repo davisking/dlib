@@ -822,7 +822,7 @@ namespace dlib
         matrix<double,2,1> val;
         val = 0;
         find_min(newton_search_strategy(obj_hessian),
-                 gradient_norm_stop_strategy(),
+                 objective_delta_stop_strategy(),
                  obj,
                  obj_der,
                  val,
