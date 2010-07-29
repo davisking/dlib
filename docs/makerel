@@ -82,3 +82,10 @@ rm -rf $RELDIR
 wine ../docs/chm/htmlhelp/hhc.exe ../docs/chm/lib.hhp 
 mv ../docs/chm/help.chm dlib_documentation-$RELEASE.chm || report_failure
 
+
+mkdir v$RELEASE
+mv dlib_documentation-$RELEASE.chm v$RELEASE
+mv $SOURCE_TAR.bz2 v$RELEASE
+mv $SOURCE_ZIP v$RELEASE
+
+
