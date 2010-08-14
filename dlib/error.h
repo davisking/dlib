@@ -133,8 +133,7 @@ namespace dlib
                 - returns a string that names the contents of the type member.
         !*/
         {
-            if (type == EOTHER) return "EOTHER";
-            else if ( type == EPORT_IN_USE) return "EPORT_IN_USE";
+            if ( type == EPORT_IN_USE) return "EPORT_IN_USE";
             else if ( type == ETIMEOUT) return "ETIMEOUT";
             else if ( type == ECONNECTION) return "ECONNECTION"; 
             else if ( type == ELISTENER) return "ELISTENER"; 
