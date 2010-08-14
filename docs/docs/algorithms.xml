@@ -28,6 +28,7 @@
          <item>crc32</item> 
          <item>rand</item> 
          <item>running_stats</item> 
+         <item>running_scalar_covariance</item> 
          <item>running_covariance</item> 
          <item>random_subset_selector</item> 
          <item>randomly_subsample</item> 
@@ -317,6 +318,18 @@
 
       </component>
       
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>running_scalar_covariance</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object is a simple tool for computing the covariance of a 
+                sequence of scalar values.  
+         </description>
+      </component>
       
    <!-- ************************************************************************* -->
 
