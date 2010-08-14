@@ -56,7 +56,7 @@ int main()
     // to a thread by reference.  For example, the thread below adds
     // one to val.
     double val = 2;
-    thread_function t4(thread_increment, ref(val));
+    thread_function t4(thread_increment, dlib::ref(val));
     t4.wait(); // wait for t4 to finish before printing val.
     // Print val.  It will now have a value of 3.
     cout << "val: " << val << endl;

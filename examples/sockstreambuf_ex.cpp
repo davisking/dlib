@@ -100,7 +100,7 @@ int main()
 
         // create a thread that will start the server.   The ref() here allows us to pass 
         // our_server into the threaded function by reference.
-        thread_function t(thread, ref(our_server));
+        thread_function t(thread, dlib::ref(our_server));
 
         cout << "Press enter to end this program" << endl;
         cin.get();
