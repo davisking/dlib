@@ -131,10 +131,10 @@ namespace
         {
             base* realp1 = new derived;
             derived* realp2 = new derived;
-            shared_ptr<base> p1(realp1);
-            shared_ptr<derived> p2(realp2,&deleter);
-            shared_ptr<base> p3;
-            shared_ptr<derived> p4;
+            dlib::shared_ptr<base> p1(realp1);
+            dlib::shared_ptr<derived> p2(realp2,&deleter);
+            dlib::shared_ptr<base> p3;
+            dlib::shared_ptr<derived> p4;
             DLIB_TEST(p4.get() == 0);
             DLIB_TEST(p1);
             DLIB_TEST(p2);
@@ -169,7 +169,7 @@ namespace
             DLIB_TEST(p3.use_count() == 0);
             DLIB_TEST(p4.use_count() == 0);
 
-            shared_ptr<base> p11(p1);
+            dlib::shared_ptr<base> p11(p1);
 
             DLIB_TEST(!p1.unique());
             DLIB_TEST(p2.unique());
@@ -181,7 +181,7 @@ namespace
             DLIB_TEST(p3.use_count() == 0);
             DLIB_TEST(p4.use_count() == 0);
 
-            shared_ptr<base> p22(p2);
+            dlib::shared_ptr<base> p22(p2);
 
             DLIB_TEST(!p1.unique());
             DLIB_TEST(!p2.unique());
@@ -274,19 +274,19 @@ namespace
         DLIB_TEST_MSG(counter == 0,counter);
         DLIB_TEST_MSG(deleter_called == 2,counter);
 
-        weak_ptr<base> wp4;
+        dlib::weak_ptr<base> wp4;
         {
-            shared_ptr<derived> p1(new derived, &deleter_base);
-            shared_ptr<derived> p2;
-            shared_ptr<base> p3;
+            dlib::shared_ptr<derived> p1(new derived, &deleter_base);
+            dlib::shared_ptr<derived> p2;
+            dlib::shared_ptr<base> p3;
 
-            weak_ptr<derived> wp1;
-            weak_ptr<base> wp2;
-            weak_ptr<base> wp3;
+            dlib::weak_ptr<derived> wp1;
+            dlib::weak_ptr<base> wp2;
+            dlib::weak_ptr<base> wp3;
 
-            weak_ptr<derived> wp1c(p1);
-            weak_ptr<base> wp2c(p1);
-            weak_ptr<base> wp3c(p2);
+            dlib::weak_ptr<derived> wp1c(p1);
+            dlib::weak_ptr<base> wp2c(p1);
+            dlib::weak_ptr<base> wp3c(p2);
 
             DLIB_TEST(wp1c.use_count() == 1);
             DLIB_TEST(wp1c.lock() == p1);
@@ -297,7 +297,7 @@ namespace
             DLIB_TEST(wp2c.expired() == false);
 
             DLIB_TEST(wp3c.use_count() == 0);
-            DLIB_TEST(wp3c.lock() == shared_ptr<base>());
+            DLIB_TEST(wp3c.lock() == dlib::shared_ptr<base>());
             DLIB_TEST(wp3c.expired() == true);
 
             DLIB_TEST(wp2.use_count() == 0);
@@ -333,7 +333,7 @@ namespace
             DLIB_TEST(wp3.expired() == true);
             DLIB_TEST(wp1.lock() == p1);
             DLIB_TEST(wp2.lock() == p1);
-            DLIB_TEST(wp3.lock() == shared_ptr<base>());
+            DLIB_TEST(wp3.lock() == dlib::shared_ptr<base>());
 
 
             p1.reset();
@@ -346,9 +346,9 @@ namespace
             DLIB_TEST(wp1.expired() == true);
             DLIB_TEST(wp2.expired() == true);
             DLIB_TEST(wp3.expired() == true);
-            DLIB_TEST(wp1.lock() == shared_ptr<base>());
-            DLIB_TEST(wp2.lock() == shared_ptr<base>());
-            DLIB_TEST(wp3.lock() == shared_ptr<base>());
+            DLIB_TEST(wp1.lock() == dlib::shared_ptr<base>());
+            DLIB_TEST(wp2.lock() == dlib::shared_ptr<base>());
+            DLIB_TEST(wp3.lock() == dlib::shared_ptr<base>());
 
             p1.reset(new derived);
 
@@ -360,12 +360,12 @@ namespace
             DLIB_TEST(wp1.expired() == true);
             DLIB_TEST(wp2.expired() == true);
             DLIB_TEST(wp3.expired() == true);
-            DLIB_TEST(wp1.lock() == shared_ptr<base>());
-            DLIB_TEST(wp2.lock() == shared_ptr<base>());
-            DLIB_TEST(wp3.lock() == shared_ptr<base>());
+            DLIB_TEST(wp1.lock() == dlib::shared_ptr<base>());
+            DLIB_TEST(wp2.lock() == dlib::shared_ptr<base>());
+            DLIB_TEST(wp3.lock() == dlib::shared_ptr<base>());
 
             DLIB_TEST(wp4.expired() == true);
-            DLIB_TEST(wp4.lock() == shared_ptr<base>());
+            DLIB_TEST(wp4.lock() == dlib::shared_ptr<base>());
             wp4 = p1;
             p3 = p1;
             DLIB_TEST(wp4.expired() == false);
@@ -374,15 +374,15 @@ namespace
 
             bool ok = false;
             try {
-                shared_ptr<base> bad_ptr(wp1);
-            } catch (bad_weak_ptr&)
+                dlib::shared_ptr<base> bad_ptr(wp1);
+            } catch (dlib::bad_weak_ptr&)
             {
                 ok = true;
             }
             DLIB_TEST(ok);
         }
         DLIB_TEST(wp4.expired() == true);
-        DLIB_TEST(wp4.lock() == shared_ptr<base>());
+        DLIB_TEST(wp4.lock() == dlib::shared_ptr<base>());
 
 
         DLIB_TEST_MSG(counter == 0,counter);

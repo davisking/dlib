@@ -358,7 +358,6 @@ namespace dlib
         else if (status == OTHER_ERROR)
         {
             throw dlib::socket_error(
-                EOTHER,
                 "error occurred in server_kernel_1::start()\nunable to crate listener"
                 );            
         }
@@ -563,7 +562,6 @@ namespace dlib
 
             // throw the exception
             throw dlib::socket_error(
-                EOTHER,
              "error occurred in server_kernel_1::start()\nlistening socket returned error"
                 );            
         }

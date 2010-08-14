@@ -20,8 +20,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     enum error_type
-    {
-        EOTHER,        
+    {       
         EPORT_IN_USE,  
         ETIMEOUT,     
         ECONNECTION, 
