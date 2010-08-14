@@ -191,12 +191,44 @@ namespace
 
         }
 
+        void test_running_stats()
+        {
+            print_spinner();
+
+            running_stats<double> rs;
+
+            running_scalar_covariance<double> rsc1, rsc2;
+
+            for (double i = 0; i < 100; ++i)
+            {
+                rs.add(i);
+
+                rsc1.add(i,i);
+                rsc2.add(i,i);
+                rsc2.add(i,-i);
+            }
+
+
+            // make sure the running_stats and running_scalar_covariance agree
+            DLIB_TEST_MSG(std::abs(rs.mean() - rsc1.mean_x()) < 1e-10, std::abs(rs.mean() - rsc1.mean_x()));
+            DLIB_TEST(std::abs(rs.mean() - rsc1.mean_y()) < 1e-10);
+            DLIB_TEST(std::abs(rs.stddev() - rsc1.stddev_x()) < 1e-10);
+            DLIB_TEST(std::abs(rs.stddev() - rsc1.stddev_y()) < 1e-10);
+            DLIB_TEST(std::abs(rs.variance() - rsc1.variance_x()) < 1e-10);
+            DLIB_TEST(std::abs(rs.variance() - rsc1.variance_y()) < 1e-10);
+            DLIB_TEST(rs.current_n() == rsc1.current_n());
+
+            DLIB_TEST(std::abs(rsc1.correlation() - 1) < 1e-10);
+            DLIB_TEST(std::abs(rsc2.correlation() - 0) < 1e-10);
+        }
+
         void perform_test (
         )
         {
             test_random_subset_selector();
             test_random_subset_selector2();
             test_running_covariance();
+            test_running_stats();
         }
     } a;
 

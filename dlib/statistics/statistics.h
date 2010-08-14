@@ -170,6 +170,182 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T
+        >
+    class running_scalar_covariance
+    {
+    public:
+
+        running_scalar_covariance()
+        {
+            clear();
+
+            COMPILE_TIME_ASSERT ((
+                    is_same_type<float,T>::value ||
+                    is_same_type<double,T>::value ||
+                    is_same_type<long double,T>::value 
+            ));
+        }
+
+        void clear()
+        {
+            sum_xy = 0;
+            sum_x = 0;
+            sum_y = 0;
+            sum_xx = 0;
+            sum_yy = 0;
+            n = 0;
+        }
+
+        void add (
+            const T& x,
+            const T& y
+        )
+        {
+            sum_xy += x*y;
+
+            sum_xx += x*x;
+            sum_yy += y*y;
+
+            sum_x  += x;
+            sum_y  += y;
+
+            n += 1;
+        }
+
+        T current_n (
+        ) const
+        {
+            return n;
+        }
+
+        T mean_x (
+        ) const
+        {
+            if (n != 0)
+                return sum_x/n;
+            else
+                return 0;
+        }
+
+        T mean_y (
+        ) const
+        {
+            if (n != 0)
+                return sum_y/n;
+            else
+                return 0;
+        }
+
+        T covariance (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_scalar_covariance::covariance()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            T temp = 1/(n-1) * (sum_xy - sum_y*sum_x/n);
+            // make sure the variance is never negative.  This might
+            // happen due to numerical errors.
+            if (temp >= 0)
+                return temp;
+            else
+                return 0;
+        }
+
+        T correlation (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_scalar_covariance::correlation()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return covariance() / std::sqrt(variance_x()*variance_y());
+        }
+
+        T variance_x (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_scalar_covariance::variance_x()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            T temp = 1/(n-1) * (sum_xx - sum_x*sum_x/n);
+            // make sure the variance is never negative.  This might
+            // happen due to numerical errors.
+            if (temp >= 0)
+                return temp;
+            else
+                return 0;
+        }
+
+        T variance_y (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_scalar_covariance::variance_y()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            T temp = 1/(n-1) * (sum_yy - sum_y*sum_y/n);
+            // make sure the variance is never negative.  This might
+            // happen due to numerical errors.
+            if (temp >= 0)
+                return temp;
+            else
+                return 0;
+        }
+
+        T stddev_x (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_scalar_covariance::stddev_x()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return std::sqrt(variance_x());
+        }
+
+        T stddev_y (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 1,
+                "\tT running_scalar_covariance::stddev_y()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return std::sqrt(variance_y());
+        }
+
+    private:
+
+        T sum_xy;
+        T sum_x;
+        T sum_y;
+        T sum_xx;
+        T sum_yy;
+        T n;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename matrix_type
         >
     class running_covariance

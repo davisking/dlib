@@ -160,6 +160,139 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T
+        >
+    class running_scalar_covariance
+    {
+        /*!
+            REQUIREMENTS ON T
+                - T must be a float, double, or long double type
+
+            INITIAL VALUE
+                - mean_x() == 0
+                - mean_y() == 0
+                - current_n() == 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents something that can compute the running covariance 
+                of a stream of real number pairs.
+        !*/
+
+    public:
+
+        running_scalar_covariance(
+        );
+        /*!
+            ensures
+                - this object is properly initialized
+        !*/
+
+        void clear(
+        );
+        /*!
+            ensures
+                - this object has its initial value
+                - clears all memory of any previous data points
+        !*/
+
+        void add (
+            const T& x,
+            const T& y
+        );
+        /*!
+            ensures
+                - updates the statistics stored in this object so that
+                  the new pair (x,y) is factored into them.
+                - #current_n() == current_n() + 1
+        !*/
+
+        T current_n (
+        ) const;
+        /*!
+            ensures
+                - returns the number of points given to this object so far. 
+        !*/
+
+        T mean_x (
+        ) const;
+        /*!
+            ensures
+                - returns the mean value of all x samples presented to this object
+                  via add().
+        !*/
+
+        T mean_y (
+        ) const;
+        /*!
+            ensures
+                - returns the mean value of all y samples presented to this object
+                  via add().
+        !*/
+
+        T covariance (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the covariance between all the x and y samples presented
+                  to this object via add()
+        !*/
+
+        T correlation (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the correlation coefficient between all the x and y samples 
+                  presented to this object via add()
+        !*/
+
+        T variance_x (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the unbiased sample variance value of all x samples presented 
+                  to this object via add().
+        !*/
+
+        T variance_y (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the unbiased sample variance value of all y samples presented 
+                  to this object via add().
+        !*/
+
+        T stddev_x (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the unbiased sample standard deviation of all x samples
+                  presented to this object via add().
+        !*/
+
+        T stddev_y (
+        ) const;
+        /*!
+            requires
+                - current_n() > 1
+            ensures
+                - returns the unbiased sample standard deviation of all y samples
+                  presented to this object via add().
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename matrix_type
         >
     class running_covariance
