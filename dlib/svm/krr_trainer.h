@@ -37,7 +37,7 @@ namespace dlib
             ekm_stale(true)
         {
             // default lambda search list
-            lams = logspace(-9, 2, 50); 
+            lams = matrix_cast<scalar_type>(logspace(-9, 2, 50)); 
         }
 
         void be_verbose (
