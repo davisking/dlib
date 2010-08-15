@@ -25,7 +25,8 @@ namespace dlib
         requires
             - kernel == a kernel function object as defined by the file dlib/svm/kernel_abstract.h.
               This kernel must also be capable of operating on the contents of v.
-            - V == dlib::matrix, std::vector, dlib::std_vector_c, or kernel_type::sample_type.
+            - V == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector, or 
+              kernel_type::sample_type.
             - if (V is a dlib::matrix) then
                 - is_vector(v) == true
         ensures
@@ -58,8 +59,10 @@ namespace dlib
         requires
             - kernel == a kernel function object as defined by the file dlib/svm/kernel_abstract.h
               This kernel must also be capable of operating on the contents of v1 and v2.
-            - V1 == dlib::matrix, std::vector, dlib::std_vector_c, or kernel_type::sample_type.
-            - V2 == dlib::matrix, std::vector, dlib::std_vector_c, or kernel_type::sample_type.
+            - V1 == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector, or 
+              kernel_type::sample_type.
+            - V2 == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector, or 
+              kernel_type::sample_type.
             - if (V1 is a dlib::matrix) then
                 - is_vector(v1) == true
             - if (V2 is a dlib::matrix) then
