@@ -432,146 +432,107 @@ namespace dlib
 
     namespace assign_pixel_helpers
     {
-        enum
-        {
-            grayscale = 1,
-            rgb,
-            hsi,
-            rgb_alpha
-        };
-
-        template <
-            typename P1,
-            typename P2,
-            int p1_type = static_switch<
-                pixel_traits<P1>::grayscale,
-                pixel_traits<P1>::rgb,
-                pixel_traits<P1>::hsi,  
-                pixel_traits<P1>::rgb_alpha >::value,
-            int p2_type = static_switch<
-                pixel_traits<P2>::grayscale,
-                pixel_traits<P2>::rgb,
-                pixel_traits<P2>::hsi,
-                pixel_traits<P2>::rgb_alpha  >::value
-            >
-        struct helper;
 
     // -----------------------------
         // all the same kind 
 
         template < typename P >
-        struct helper<P,P,grayscale,grayscale>
-        {
-            static void assign(P& dest, const P& src) 
-            { 
-                dest = src;
-            }
-        };
+        typename enable_if_c<pixel_traits<P>::grayscale>::type
+        assign(P& dest, const P& src) 
+        { 
+           dest = src;
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,grayscale,grayscale>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                if (src <= pixel_traits<P1>::max())
-                    dest = static_cast<P1>(src);
-                else
-                    dest = static_cast<P1>(pixel_traits<P1>::max());
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::grayscale>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           if (src <= pixel_traits<P1>::max())
+              dest = static_cast<P1>(src);
+           else
+              dest = static_cast<P1>(pixel_traits<P1>::max());
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,rgb,rgb>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                dest.red = src.red; 
-                dest.green = src.green; 
-                dest.blue = src.blue; 
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::rgb>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           dest.red = src.red; 
+           dest.green = src.green; 
+           dest.blue = src.blue; 
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,rgb_alpha,rgb_alpha>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                dest.red = src.red; 
-                dest.green = src.green; 
-                dest.blue = src.blue; 
-                dest.alpha = src.alpha; 
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::rgb_alpha>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           dest.red = src.red; 
+           dest.green = src.green; 
+           dest.blue = src.blue; 
+           dest.alpha = src.alpha; 
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,hsi,hsi>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                dest.h = src.h; 
-                dest.s = src.s; 
-                dest.i = src.i; 
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::hsi>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           dest.h = src.h; 
+           dest.s = src.s; 
+           dest.i = src.i; 
+        }
 
     // -----------------------------
         // dest is a grayscale
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,grayscale,rgb>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                dest = static_cast<P1>((static_cast<unsigned int>(src.red) +
-                        static_cast<unsigned int>(src.green) +  
-                        static_cast<unsigned int>(src.blue))/3); 
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::rgb>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           dest = static_cast<P1>((static_cast<unsigned int>(src.red) +
+                                   static_cast<unsigned int>(src.green) +  
+                                   static_cast<unsigned int>(src.blue))/3); 
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,grayscale,rgb_alpha>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
+        typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::rgb_alpha>::type
+        assign(P1& dest, const P2& src) 
+        { 
 
-                const unsigned char avg = static_cast<unsigned char>((static_cast<unsigned int>(src.red) +
-                                                           static_cast<unsigned int>(src.green) +  
-                                                           static_cast<unsigned int>(src.blue))/3); 
+           const unsigned char avg = static_cast<unsigned char>((static_cast<unsigned int>(src.red) +
+                                                                 static_cast<unsigned int>(src.green) +  
+                                                                 static_cast<unsigned int>(src.blue))/3); 
 
-                if (src.alpha == 255)
-                {
-                    dest = avg;
-                }
-                else
-                {
-                    // perform this assignment using fixed point arithmetic: 
-                    // dest = src*(alpha/255) + src*(1 - alpha/255);
-                    // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
-                    // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
-                    // dest = dest*1 + (src - dest)*(alpha/255);
-                    // dest += (src - dest)*(alpha/255);
+           if (src.alpha == 255)
+           {
+              dest = avg;
+           }
+           else
+           {
+              // perform this assignment using fixed point arithmetic: 
+              // dest = src*(alpha/255) + src*(1 - alpha/255);
+              // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
+              // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
+              // dest = dest*1 + (src - dest)*(alpha/255);
+              // dest += (src - dest)*(alpha/255);
 
-                    unsigned int temp = avg;
+              unsigned int temp = avg;
 
-                    temp -= dest;
+              temp -= dest;
 
-                    temp *= src.alpha;
+              temp *= src.alpha;
 
-                    temp >>= 8;
+              temp >>= 8;
 
-                    dest += static_cast<unsigned char>(temp&0xFF);
-                }
-            }
-        };
+              dest += static_cast<unsigned char>(temp&0xFF);
+           }
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,grayscale,hsi>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                dest = static_cast<P1>(src.i);
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::hsi>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           dest = static_cast<P1>(src.i);
+        }
 
 
     // -----------------------------
@@ -676,225 +637,202 @@ namespace dlib
         // dest is a color rgb_pixel
 
         template < typename P1 >
-        struct helper<P1,unsigned char,rgb,grayscale>
-        {
-            static void assign(P1& dest, const unsigned char& src) 
-            { 
-                dest.red = src; 
-                dest.green = src; 
-                dest.blue = src; 
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::rgb>::type
+        assign(P1& dest, const unsigned char& src) 
+        { 
+           dest.red = src; 
+           dest.green = src; 
+           dest.blue = src; 
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,rgb,grayscale>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                unsigned char p;
-                if (src <= 255)
-                    p = static_cast<unsigned char>(src);
-                else
-                    p = 255;
+        typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::grayscale>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           unsigned char p;
+           if (src <= 255)
+              p = static_cast<unsigned char>(src);
+           else
+              p = 255;
 
-                dest.red = p; 
-                dest.green = p; 
-                dest.blue = p; 
-            }
-        };
+           dest.red = p; 
+           dest.green = p; 
+           dest.blue = p; 
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,rgb,rgb_alpha>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                if (src.alpha == 255)
-                {
-                    dest.red = src.red;
-                    dest.green = src.green;
-                    dest.blue = src.blue;
-                }
-                else
-                {
-                    // perform this assignment using fixed point arithmetic: 
-                    // dest = src*(alpha/255) + src*(1 - alpha/255);
-                    // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
-                    // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
-                    // dest = dest*1 + (src - dest)*(alpha/255);
-                    // dest += (src - dest)*(alpha/255);
+        typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::rgb_alpha>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           if (src.alpha == 255)
+           {
+              dest.red = src.red;
+              dest.green = src.green;
+              dest.blue = src.blue;
+           }
+           else
+           {
+              // perform this assignment using fixed point arithmetic: 
+              // dest = src*(alpha/255) + src*(1 - alpha/255);
+              // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
+              // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
+              // dest = dest*1 + (src - dest)*(alpha/255);
+              // dest += (src - dest)*(alpha/255);
 
-                    unsigned int temp_r = src.red;
-                    unsigned int temp_g = src.green;
-                    unsigned int temp_b = src.blue;
+              unsigned int temp_r = src.red;
+              unsigned int temp_g = src.green;
+              unsigned int temp_b = src.blue;
 
-                    temp_r -= dest.red;
-                    temp_g -= dest.green;
-                    temp_b -= dest.blue;
+              temp_r -= dest.red;
+              temp_g -= dest.green;
+              temp_b -= dest.blue;
 
-                    temp_r *= src.alpha;
-                    temp_g *= src.alpha;
-                    temp_b *= src.alpha;
+              temp_r *= src.alpha;
+              temp_g *= src.alpha;
+              temp_b *= src.alpha;
 
-                    temp_r >>= 8;
-                    temp_g >>= 8;
-                    temp_b >>= 8;
+              temp_r >>= 8;
+              temp_g >>= 8;
+              temp_b >>= 8;
 
-                    dest.red += static_cast<unsigned char>(temp_r&0xFF);
-                    dest.green += static_cast<unsigned char>(temp_g&0xFF);
-                    dest.blue += static_cast<unsigned char>(temp_b&0xFF);
-                }
-            }
-        };
+              dest.red += static_cast<unsigned char>(temp_r&0xFF);
+              dest.green += static_cast<unsigned char>(temp_g&0xFF);
+              dest.blue += static_cast<unsigned char>(temp_b&0xFF);
+           }
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,rgb,hsi>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                COLOUR c;
-                HSL h;
-                h.h = src.h;
-                h.h = h.h/255.0*360;
-                h.s = src.s/255.0;
-                h.l = src.i/255.0;
-                c = HSL2RGB(h);
+        typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::hsi>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           COLOUR c;
+           HSL h;
+           h.h = src.h;
+           h.h = h.h/255.0*360;
+           h.s = src.s/255.0;
+           h.l = src.i/255.0;
+           c = HSL2RGB(h);
 
-                dest.red = static_cast<unsigned char>(c.r*255.0);
-                dest.green = static_cast<unsigned char>(c.g*255.0);
-                dest.blue = static_cast<unsigned char>(c.b*255.0);
-            }
-        };
+           dest.red = static_cast<unsigned char>(c.r*255.0);
+           dest.green = static_cast<unsigned char>(c.g*255.0);
+           dest.blue = static_cast<unsigned char>(c.b*255.0);
+        }
 
     // -----------------------------
         // dest is a color rgb_alpha_pixel
 
         template < typename P1 >
-        struct helper<P1,unsigned char,rgb_alpha,grayscale>
-        {
-            static void assign(P1& dest, const unsigned char& src) 
-            { 
-                dest.red = src; 
-                dest.green = src; 
-                dest.blue = src; 
-                dest.alpha = 255;
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::rgb_alpha>::type
+        assign(P1& dest, const unsigned char& src) 
+        { 
+           dest.red = src; 
+           dest.green = src; 
+           dest.blue = src; 
+           dest.alpha = 255;
+        }
 
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,rgb_alpha,grayscale>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                unsigned char p;
-                if (src <= 255)
-                    p = static_cast<unsigned char>(src);
-                else
-                    p = 255;
+        typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::grayscale>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           unsigned char p;
+           if (src <= 255)
+              p = static_cast<unsigned char>(src);
+           else
+              p = 255;
 
-                dest.red = p; 
-                dest.green = p; 
-                dest.blue = p; 
-                dest.alpha = 255;
-            }
-        };
+           dest.red = p; 
+           dest.green = p; 
+           dest.blue = p; 
+           dest.alpha = 255;
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,rgb_alpha,rgb>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                dest.red = src.red;
-                dest.green = src.green;
-                dest.blue = src.blue;
-                dest.alpha = 255;
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::rgb>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           dest.red = src.red;
+           dest.green = src.green;
+           dest.blue = src.blue;
+           dest.alpha = 255;
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,rgb_alpha,hsi>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                COLOUR c;
-                HSL h;
-                h.h = src.h;
-                h.h = h.h/255.0*360;
-                h.s = src.s/255.0;
-                h.l = src.i/255.0;
-                c = HSL2RGB(h);
+        typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::hsi>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           COLOUR c;
+           HSL h;
+           h.h = src.h;
+           h.h = h.h/255.0*360;
+           h.s = src.s/255.0;
+           h.l = src.i/255.0;
+           c = HSL2RGB(h);
 
-                dest.red = static_cast<unsigned char>(c.r*255.0);
-                dest.green = static_cast<unsigned char>(c.g*255.0);
-                dest.blue = static_cast<unsigned char>(c.b*255.0);
-                dest.alpha = 255;
-            }
-        };
+           dest.red = static_cast<unsigned char>(c.r*255.0);
+           dest.green = static_cast<unsigned char>(c.g*255.0);
+           dest.blue = static_cast<unsigned char>(c.b*255.0);
+           dest.alpha = 255;
+        }
 
     // -----------------------------
         // dest is an hsi pixel
 
         template < typename P1>
-        struct helper<P1,unsigned char,hsi,grayscale>
-        {
-            static void assign(P1& dest, const unsigned char& src) 
-            { 
-                dest.h = 0;
-                dest.s = 0;
-                dest.i = src;
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::hsi>::type
+        assign(P1& dest, const unsigned char& src) 
+        { 
+           dest.h = 0;
+           dest.s = 0;
+           dest.i = src;
+        }
 
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,hsi,grayscale>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                dest.h = 0;
-                dest.s = 0;
-                if (src <= 255)
-                    dest.i = static_cast<unsigned char>(src);
-                else
-                    dest.i = 255;
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::grayscale>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           dest.h = 0;
+           dest.s = 0;
+           if (src <= 255)
+              dest.i = static_cast<unsigned char>(src);
+           else
+              dest.i = 255;
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,hsi,rgb_alpha>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                rgb_pixel temp;
-                // convert target hsi pixel to rgb
-                helper<rgb_pixel,P1>::assign(temp,dest);
+        typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::rgb>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           COLOUR c1;
+           HSL c2;
+           c1.r = src.red/255.0;
+           c1.g = src.green/255.0;
+           c1.b = src.blue/255.0;
+           c2 = RGB2HSL(c1);
 
-                // now assign the rgb_alpha value to our temp rgb pixel
-                helper<rgb_pixel,P2>::assign(temp,src);
-
-                // now we can just go assign the new rgb value to the
-                // hsi pixel
-                helper<P1,rgb_pixel>::assign(dest,temp);
-            }
-        };
+           dest.h = static_cast<unsigned char>(c2.h/360.0*255.0);
+           dest.s = static_cast<unsigned char>(c2.s*255.0);
+           dest.i = static_cast<unsigned char>(c2.l*255.0);
+        }
 
         template < typename P1, typename P2 >
-        struct helper<P1,P2,hsi,rgb>
-        {
-            static void assign(P1& dest, const P2& src) 
-            { 
-                COLOUR c1;
-                HSL c2;
-                c1.r = src.red/255.0;
-                c1.g = src.green/255.0;
-                c1.b = src.blue/255.0;
-                c2 = RGB2HSL(c1);
-                
-                dest.h = static_cast<unsigned char>(c2.h/360.0*255.0);
-                dest.s = static_cast<unsigned char>(c2.s*255.0);
-                dest.i = static_cast<unsigned char>(c2.l*255.0);
-            }
-        };
+        typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::rgb_alpha>::type
+        assign(P1& dest, const P2& src) 
+        { 
+           rgb_pixel temp;
+           // convert target hsi pixel to rgb
+           assign(temp,dest);
+
+           // now assign the rgb_alpha value to our temp rgb pixel
+           assign(temp,src);
+
+           // now we can just go assign the new rgb value to the
+           // hsi pixel
+           assign(dest,temp);
+        }
+
     }
 
     // -----------------------------
@@ -903,7 +841,7 @@ namespace dlib
     inline void assign_pixel (
         P1& dest,
         const P2& src
-    ) { assign_pixel_helpers::helper<P1,P2>::assign(dest,src); }
+    ) { assign_pixel_helpers::assign(dest,src); }
 
     template < typename P1>
     inline void assign_pixel (

@@ -8,6 +8,7 @@
 #include "../gui_widgets.h"
 #include "../unicode.h"
 #include "../smart_pointers_thread_safe.h"
+#include "../uintn.h"
 
 #include <map>
 
@@ -34,12 +35,7 @@ namespace nativefont
 
     namespace font_renderer
     {
-#if defined(WIN32) && !defined(__MINGW32__)
-        typedef BYTE uint8_t;
-        typedef WORD uint16_t;
-        typedef DWORD uint32_t;
-#endif
-        typedef uint8_t byte;
+        typedef dlib::uint8 byte;
 
 
 #ifdef WIN32
@@ -62,7 +58,7 @@ namespace nativefont
             typedef char type_t;
         };
         template <> struct size2inner_trait<2>{
-            typedef uint16_t type_t;
+            typedef dlib::uint16 type_t;
         };
         template <> struct size2inner_trait<4>{
             typedef dlib::unichar type_t;
