@@ -700,8 +700,8 @@ namespace dlib
             );
 
         // count the number of positive and negative examples
-        const long num_pos = sum(y > 0);
-        const long num_neg = sum(y < 0);
+        const long num_pos = (long)sum(y > 0);
+        const long num_neg = (long)sum(y < 0);
 
         // figure out how many positive and negative examples we will have in each fold
         const long num_pos_test_samples = num_pos/folds; 
