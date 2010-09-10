@@ -101,8 +101,9 @@ int main()
     // you should try the same gamma that you are using for training.  But if you don't
     // have a particular gamma in mind then you can use the following function to
     // find a reasonable default gamma for your data.  Another reasonable way to pick a gamma
-    // is often to use 1.0/compute_mean_squared_distance(samples).  This second way has the
-    // bonus of being quite fast.  
+    // is often to use 1.0/compute_mean_squared_distance(randomly_subsample(samples, 2000)).  
+    // It computes the mean squared distance between 2000 randomly selected samples and often
+    // works quite well.
     const double gamma = verbose_find_gamma_with_big_centroid_gap(samples, labels);
 
     // Next we declare an instance of the kcentroid object.  It is used by rank_features() 

@@ -51,8 +51,9 @@ int main()
     // Here we set the kernel we want to use for training.   The radial_basis_kernel 
     // has a parameter called gamma that we need to determine.  As a rule of thumb, a good 
     // gamma to try is 1.0/(mean squared distance between your sample points).  So 
-    // below we are using a similar value.   
-    const double gamma = 3.0/compute_mean_squared_distance(samples);
+    // below we are using a similar value computed from at most 2000 randomly selected
+    // samples.
+    const double gamma = 3.0/compute_mean_squared_distance(randomly_subsample(samples, 2000));
     cout << "using gamma of " << gamma << endl;
     trainer.set_kernel(kernel_type(gamma));
 
