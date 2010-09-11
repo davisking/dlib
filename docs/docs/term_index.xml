@@ -257,6 +257,7 @@
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="lowerm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="upperm"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="make_symmetric"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="zeros_matrix"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="ones_matrix"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="uniform_matrix"/>

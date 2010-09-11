@@ -16,6 +16,19 @@ New Stuff:
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.30" date="Jul 28, 2010">
+New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
    - Fixed a compile-time bug in the matrix related to multiplication by 
      subm() expressions when the BLAS bindings were enabled.
    - Fixed a bug in train_probabilistic_decision_function() which could 
@@ -24,7 +37,7 @@ Bug fixes:
 
 Other:
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
