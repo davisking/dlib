@@ -205,13 +205,14 @@ namespace dlib
             typename T, 
             long NR1, long NR2, long NR3, long NR4, long NR5,
             long NC1, long NC2, long NC3, long NC4, long NC5,
-            typename MM
+            typename MM,
+            typename layout
             >
         int gees (
             const char jobz,
             matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<T,NR2,NC2,MM,column_major_layout>& wr,
-            matrix<T,NR3,NC3,MM,column_major_layout>& wi,
+            matrix<T,NR2,NC2,MM,layout>& wr,
+            matrix<T,NR3,NC3,MM,layout>& wi,
             matrix<T,NR4,NC4,MM,column_major_layout>& vs,
             matrix<T,NR5,NC5,MM,column_major_layout>& work
         )

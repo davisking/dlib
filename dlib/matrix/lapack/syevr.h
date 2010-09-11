@@ -350,6 +350,80 @@ namespace dlib
                                   &w(0,0), &z(0,0), z.nr(), &isuppz(0,0), &work(0,0), work.size(),
                                   &iwork(0,0), iwork.size());
 
+
+            return info;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T, 
+            long NR1, long NR2, long NR3, long NR4, long NR5, long NR6,
+            long NC1, long NC2, long NC3, long NC4, long NC5, long NC6,
+            typename MM
+            >
+        int syevr (
+            const char jobz,
+            const char range,
+            char uplo,
+            matrix<T,NR1,NC1,MM,row_major_layout>& a,
+            const double vl,
+            const double vu,
+            const integer il,
+            const integer iu,
+            const double abstol,
+            integer& num_eigenvalues_found,
+            matrix<T,NR2,NC2,MM,row_major_layout>& w,
+            matrix<T,NR3,NC3,MM,row_major_layout>& z,
+            matrix<integer,NR4,NC4,MM,row_major_layout>& isuppz,
+            matrix<T,NR5,NC5,MM,row_major_layout>& work,
+            matrix<integer,NR6,NC6,MM,row_major_layout>& iwork
+        )
+        {
+            if (uplo == 'L')
+                uplo = 'U';
+            else
+                uplo = 'L';
+
+            const long n = a.nr();
+
+            w.set_size(n,1);
+
+            isuppz.set_size(2*n, 1);
+
+            if (jobz == 'V')
+            {
+                z.set_size(n,n);
+            }
+            else
+            {
+                z.set_size(1,1);
+            }
+
+            // figure out how big the workspace needs to be.
+            T work_size = 1;
+            integer iwork_size = 1;
+            int info = binding::syevr(jobz, range, uplo, n, &a(0,0),
+                                      a.nc(), vl, vu, il, iu, abstol, &num_eigenvalues_found,
+                                      &w(0,0), &z(0,0), z.nc(), &isuppz(0,0), &work_size, -1,
+                                      &iwork_size, -1);
+
+            if (info != 0)
+                return info;
+
+            if (work.size() < work_size)
+                work.set_size(work_size, 1);
+            if (iwork.size() < iwork_size)
+                iwork.set_size(iwork_size, 1);
+
+            // compute the actual decomposition 
+            info = binding::syevr(jobz, range, uplo, n, &a(0,0),
+                                  a.nc(), vl, vu, il, iu, abstol, &num_eigenvalues_found,
+                                  &w(0,0), &z(0,0), z.nc(), &isuppz(0,0), &work(0,0), work.size(),
+                                  &iwork(0,0), iwork.size());
+
+            z = trans(z);
+
             return info;
         }
 

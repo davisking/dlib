@@ -154,6 +154,51 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        template <
+            typename T, 
+            long NR1, long NR2, long NR3, 
+            long NC1, long NC2, long NC3,
+            typename MM
+            >
+        int syev (
+            char jobz,
+            char uplo,
+            matrix<T,NR1,NC1,MM,row_major_layout>& a,
+            matrix<T,NR2,NC2,MM,row_major_layout>& w,
+            matrix<T,NR3,NC3,MM,row_major_layout>& work
+        )
+        {
+            if (uplo == 'L')
+                uplo = 'U';
+            else
+                uplo = 'L';
+
+            const long n = a.nr();
+
+            w.set_size(n,1);
+
+
+            // figure out how big the workspace needs to be.
+            T work_size = 1;
+            int info = binding::syev(jobz, uplo, n, &a(0,0),
+                                     a.nc(), &w(0,0), &work_size, -1);
+
+            if (info != 0)
+                return info;
+
+            if (work.size() < work_size)
+                work.set_size(work_size, 1);
+
+            // compute the actual decomposition 
+            info = binding::syev(jobz, uplo, n, &a(0,0),
+                                 a.nc(), &w(0,0), &work(0,0), work.size());
+
+
+            a = trans(a);
+        }
+
+    // ------------------------------------------------------------------------------------
+
     }
 
 }
