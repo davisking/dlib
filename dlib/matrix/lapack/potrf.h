@@ -101,7 +101,7 @@ namespace dlib
             long NC1, 
             typename MM
             >
-        int getrf (
+        int potrf (
             char uplo,
             matrix<T,NR1,NC1,MM,column_major_layout>& a
         )
@@ -130,7 +130,7 @@ namespace dlib
             long NC1, 
             typename MM
             >
-        int getrf (
+        int potrf (
             char uplo,
             matrix<T,NR1,NC1,MM,row_major_layout>& a
         )
