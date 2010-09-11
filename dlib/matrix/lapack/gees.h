@@ -203,8 +203,8 @@ namespace dlib
 
         template <
             typename T, 
-            long NR1, long NR2, long NR3, long NR4, long NR5,
-            long NC1, long NC2, long NC3, long NC4, long NC5,
+            long NR1, long NR2, long NR3, long NR4,
+            long NC1, long NC2, long NC3, long NC4,
             typename MM,
             typename layout
             >
@@ -213,10 +213,11 @@ namespace dlib
             matrix<T,NR1,NC1,MM,column_major_layout>& a,
             matrix<T,NR2,NC2,MM,layout>& wr,
             matrix<T,NR3,NC3,MM,layout>& wi,
-            matrix<T,NR4,NC4,MM,column_major_layout>& vs,
-            matrix<T,NR5,NC5,MM,column_major_layout>& work
+            matrix<T,NR4,NC4,MM,column_major_layout>& vs
         )
         {
+            matrix<T,0,1,MM,column_major_layout> work;
+
             const long n = a.nr();
 
             wr.set_size(n,1);

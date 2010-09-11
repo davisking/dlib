@@ -178,11 +178,10 @@ namespace dlib
             V = A;
 
 #ifdef DLIB_USE_LAPACK
-            matrix<type,0,1,mem_manager_type, layout_type> work;
             e = 0;
             // I would use syevr but the last time I checked there was a bug in the 
             // Intel MKL's implementation of syevr.
-            lapack::syev('V', 'L', V,  d, work);
+            lapack::syev('V', 'L', V,  d);
 #else
             // Tridiagonalize.
             tred2();
@@ -196,9 +195,9 @@ namespace dlib
         {
 
 #ifdef DLIB_USE_LAPACK
-            matrix<type,0,0,mem_manager_type, column_major_layout> temp, vl, vr, work;
+            matrix<type,0,0,mem_manager_type, column_major_layout> temp, vl, vr;
             temp = A;
-            lapack::geev('N', 'V', temp, d, e, vl, vr, work);
+            lapack::geev('N', 'V', temp, d, e, vl, vr);
             V = vr;
 #else
             H = A;
@@ -246,11 +245,10 @@ namespace dlib
         V = A;
 
 #ifdef DLIB_USE_LAPACK
-        matrix<type,0,1,mem_manager_type, layout_type> work;
         e = 0;
         // I would use syevr but the last time I checked there was a bug in the 
         // Intel MKL's implementation of syevr.
-        lapack::syev('V', 'L', V,  d, work);
+        lapack::syev('V', 'L', V,  d);
 #else
         // Tridiagonalize.
         tred2();

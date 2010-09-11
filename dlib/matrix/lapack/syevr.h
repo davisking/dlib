@@ -291,8 +291,8 @@ namespace dlib
 
         template <
             typename T, 
-            long NR1, long NR2, long NR3, long NR4, long NR5, long NR6,
-            long NC1, long NC2, long NC3, long NC4, long NC5, long NC6,
+            long NR1, long NR2, long NR3, long NR4,
+            long NC1, long NC2, long NC3, long NC4,
             typename MM
             >
         int syevr (
@@ -308,11 +308,12 @@ namespace dlib
             integer& num_eigenvalues_found,
             matrix<T,NR2,NC2,MM,column_major_layout>& w,
             matrix<T,NR3,NC3,MM,column_major_layout>& z,
-            matrix<integer,NR4,NC4,MM,column_major_layout>& isuppz,
-            matrix<T,NR5,NC5,MM,column_major_layout>& work,
-            matrix<integer,NR6,NC6,MM,column_major_layout>& iwork
+            matrix<integer,NR4,NC4,MM,column_major_layout>& isuppz
         )
         {
+            matrix<T,0,1,MM,column_major_layout> work;
+            matrix<integer,0,1,MM,column_major_layout> iwork;
+
             const long n = a.nr();
 
             w.set_size(n,1);
@@ -358,8 +359,8 @@ namespace dlib
 
         template <
             typename T, 
-            long NR1, long NR2, long NR3, long NR4, long NR5, long NR6,
-            long NC1, long NC2, long NC3, long NC4, long NC5, long NC6,
+            long NR1, long NR2, long NR3, long NR4,
+            long NC1, long NC2, long NC3, long NC4,
             typename MM
             >
         int syevr (
@@ -375,11 +376,12 @@ namespace dlib
             integer& num_eigenvalues_found,
             matrix<T,NR2,NC2,MM,row_major_layout>& w,
             matrix<T,NR3,NC3,MM,row_major_layout>& z,
-            matrix<integer,NR4,NC4,MM,row_major_layout>& isuppz,
-            matrix<T,NR5,NC5,MM,row_major_layout>& work,
-            matrix<integer,NR6,NC6,MM,row_major_layout>& iwork
+            matrix<integer,NR4,NC4,MM,row_major_layout>& isuppz
         )
         {
+            matrix<T,0,1,MM,row_major_layout> work;
+            matrix<integer,0,1,MM,row_major_layout> iwork;
+
             if (uplo == 'L')
                 uplo = 'U';
             else

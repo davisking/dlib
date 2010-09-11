@@ -117,18 +117,19 @@ namespace dlib
 
         template <
             typename T, 
-            long NR1, long NR2, long NR3, 
-            long NC1, long NC2, long NC3,
+            long NR1, long NR2, 
+            long NC1, long NC2,
             typename MM
             >
         int syev (
             const char jobz,
             const char uplo,
             matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<T,NR2,NC2,MM,column_major_layout>& w,
-            matrix<T,NR3,NC3,MM,column_major_layout>& work
+            matrix<T,NR2,NC2,MM,column_major_layout>& w
         )
         {
+            matrix<T,0,1,MM,column_major_layout> work;
+
             const long n = a.nr();
 
             w.set_size(n,1);
@@ -156,18 +157,19 @@ namespace dlib
 
         template <
             typename T, 
-            long NR1, long NR2, long NR3, 
-            long NC1, long NC2, long NC3,
+            long NR1, long NR2, 
+            long NC1, long NC2,
             typename MM
             >
         int syev (
             char jobz,
             char uplo,
             matrix<T,NR1,NC1,MM,row_major_layout>& a,
-            matrix<T,NR2,NC2,MM,row_major_layout>& w,
-            matrix<T,NR3,NC3,MM,row_major_layout>& work
+            matrix<T,NR2,NC2,MM,row_major_layout>& w
         )
         {
+            matrix<T,0,1,MM,row_major_layout> work;
+
             if (uplo == 'L')
                 uplo = 'U';
             else

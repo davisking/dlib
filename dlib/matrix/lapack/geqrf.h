@@ -121,16 +121,17 @@ namespace dlib
 
         template <
             typename T, 
-            long NR1, long NR2, long NR3,
-            long NC1, long NC2, long NC3,
+            long NR1, long NR2,
+            long NC1, long NC2,
             typename MM
             >
         int geqrf (
             matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<T,NR2,NC2,MM,column_major_layout>& tau,
-            matrix<T,NR3,NC3,MM,column_major_layout>& work 
+            matrix<T,NR2,NC2,MM,column_major_layout>& tau
         )
         {
+            matrix<T,0,1,MM,column_major_layout> work;
+
             tau.set_size(std::min(a.nr(), a.nc()), 1);
 
             // figure out how big the workspace needs to be.

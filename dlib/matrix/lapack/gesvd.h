@@ -181,8 +181,8 @@ namespace dlib
 
         template <
             typename T, 
-            long NR1, long NR2, long NR3, long NR4, long NR5,
-            long NC1, long NC2, long NC3, long NC4, long NC5,
+            long NR1, long NR2, long NR3, long NR4,
+            long NC1, long NC2, long NC3, long NC4,
             typename MM
             >
         int gesvd (
@@ -191,10 +191,11 @@ namespace dlib
             matrix<T,NR1,NC1,MM,column_major_layout>& a,
             matrix<T,NR2,NC2,MM,column_major_layout>& s,
             matrix<T,NR3,NC3,MM,column_major_layout>& u,
-            matrix<T,NR4,NC4,MM,column_major_layout>& vt,
-            matrix<T,NR5,NC5,MM,column_major_layout>& work
+            matrix<T,NR4,NC4,MM,column_major_layout>& vt
         )
         {
+            matrix<T,0,1,MM,column_major_layout> work;
+
             const long m = a.nr();
             const long n = a.nc();
             s.set_size(std::min(m,n), 1);
@@ -237,8 +238,8 @@ namespace dlib
 
         template <
             typename T, 
-            long NR1, long NR2, long NR3, long NR4, long NR5,
-            long NC1, long NC2, long NC3, long NC4, long NC5,
+            long NR1, long NR2, long NR3, long NR4,
+            long NC1, long NC2, long NC3, long NC4,
             typename MM
             >
         int gesvd (
@@ -247,10 +248,11 @@ namespace dlib
             matrix<T,NR1,NC1,MM,row_major_layout>& a,
             matrix<T,NR2,NC2,MM,row_major_layout>& s,
             matrix<T,NR3,NC3,MM,row_major_layout>& u_,
-            matrix<T,NR4,NC4,MM,row_major_layout>& vt_,
-            matrix<T,NR5,NC5,MM,row_major_layout>& work
+            matrix<T,NR4,NC4,MM,row_major_layout>& vt_
         )
         {
+            matrix<T,0,1,MM,row_major_layout> work;
+
             // Row major order matrices are transposed from LAPACK's point of view.
             matrix<T,NR3,NC3,MM,row_major_layout>& u = vt_;
             matrix<T,NR4,NC4,MM,row_major_layout>& vt = u_;
