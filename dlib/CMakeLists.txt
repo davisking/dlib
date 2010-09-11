@@ -51,6 +51,8 @@ set (DLIB_ENABLE_ASSERTS_STR
 "Enable this if you want to turn on the DLIB_ASSERT macro" )
 set (DLIB_USE_BLAS_STR
 "Disable this if you don't want to use a BLAS library" )
+set (DLIB_USE_LAPACK_STR
+"Disable this if you don't want to use a LAPACK library" )
 set (DLIB_LINK_WITH_LIBPNG_STR
 "Disable this if you don't want to link against libpng" )
 
@@ -59,6 +61,7 @@ option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
 option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
 option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
 option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
+option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
 option(DLIB_LINK_WITH_LIBPNG ${DLIB_LINK_WITH_LIBPNG_STR} ON)
 
 
@@ -148,13 +151,24 @@ if (NOT DLIB_ISO_CPP_ONLY)
    endif()
 
 
-   if (DLIB_USE_BLAS)
-      # Try to find a BLAS library
+   if (DLIB_USE_BLAS OR DLIB_USE_LAPACK)
+      # Try to find BLAS and LAPACK 
       include(cmake_find_blas.txt)
-      if (blas_found)
-         set (dlib_needed_libraries ${dlib_needed_libraries} ${blas_libraries})
-      else()
-         set(DLIB_USE_BLAS OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
+
+      if (DLIB_USE_BLAS)
+         if (blas_found)
+            set (dlib_needed_libraries ${dlib_needed_libraries} ${blas_libraries})
+         else()
+            set(DLIB_USE_BLAS OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
+         endif()
+      endif()
+
+      if (DLIB_USE_LAPACK)
+         if (lapack_found)
+            set (dlib_needed_libraries ${dlib_needed_libraries} ${lapack_libraries})
+         else()
+            set(DLIB_USE_LAPACK OFF CACHE STRING ${DLIB_USE_LAPACK_STR} FORCE )
+         endif()
       endif()
    endif()
 
@@ -181,6 +195,12 @@ if (DLIB_USE_BLAS AND blas_found)
    add_global_define(DLIB_USE_BLAS)
 else()
    remove_global_define(DLIB_USE_BLAS)
+endif()
+
+if (DLIB_USE_LAPACK AND lapack_found)
+   add_global_define(DLIB_USE_LAPACK)
+else()
+   remove_global_define(DLIB_USE_LAPACK)
 endif()
 
 

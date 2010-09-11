@@ -3,12 +3,14 @@
 # information about it at http://www.cmake.org
 #
 #
-# This cmake file tries to find an installed BLAS library.  It looks
-# for an installed copy of the Intel MKL library first and then
-# attempts to find some other BLAS library.
+# This cmake file tries to find an installed BLAS and LAPACK libraries.  
+# It looks for an installed copy of the Intel MKL library first and then
+# attempts to find some other BLAS and LAPACK libraries.
 #
 #  blas_found        - True if BLAS is available
+#  lapack_found      - True if LAPACK is available
 #  blas_libraries    - link against these to use BLAS library 
+#  lapack_libraries  - link against these to use LAPACK library 
 
 # setting this makes CMake allow normal looking if else statements
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
@@ -17,7 +19,7 @@ SET(blas_found 0)
 
 
 if (UNIX)
-    message(STATUS "Searching for a BLAS library")
+    message(STATUS "Searching for BLAS and LAPACK")
 
     include(CheckTypeSize)
     check_type_size( "void*" SIZE_OF_VOID_PTR)
@@ -48,8 +50,23 @@ if (UNIX)
    # if we found the MKL 
    if (mkl_mkl AND mkl_core AND mkl_guide AND mkl_pthread)
       set(blas_libraries ${mkl_mkl} ${mkl_core} ${mkl_guide} ${mkl_pthread})
+      set(lapack_libraries ${mkl_mkl} ${mkl_core} ${mkl_guide} ${mkl_pthread})
       set(blas_found 1)
-      message(STATUS "Found Intel MKL BLAS library")
+      set(lapack_found 1)
+      message(STATUS "Found Intel MKL BLAS/LAPACK library")
+   endif()
+
+
+   # try to find some other LAPACK libraries if we didn't find the MKL
+
+   if (NOT lapack_found)
+      find_library(lapack_lib lapack)
+      if (lapack_lib)
+         set(lapack_libraries ${lapack_lib})
+         set(lapack_found 1)
+         message(STATUS "Found LAPACK library")
+      endif()
+      mark_as_advanced( lapack_lib)
    endif()
 
    
