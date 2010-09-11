@@ -12,6 +12,12 @@
 #include <complex>
 #include <cmath>
 
+#ifdef DLIB_USE_LAPACK
+#include "lapack/geev.h"
+#include "lapack/syev.h"
+#include "lapack/syevr.h"
+#endif
+
 namespace dlib 
 {
 
@@ -171,16 +177,32 @@ namespace dlib
         {
             V = A;
 
+#ifdef DLIB_USE_LAPACK
+            matrix<type,0,1,mem_manager_type, layout_type> work;
+            e = 0;
+            // I would use syevr but the last time I checked there was a bug in the 
+            // Intel MKL's implementation of syevr.
+            lapack::syev('V', 'L', V,  d, work);
+#else
             // Tridiagonalize.
             tred2();
 
             // Diagonalize.
             tql2();
+#endif
 
         } 
         else 
         {
+
+#ifdef DLIB_USE_LAPACK
+            matrix<type,0,0,mem_manager_type, column_major_layout> temp, vl, vr, work;
+            temp = A;
+            lapack::geev('N', 'V', temp, d, e, vl, vr, work);
+            V = vr;
+#else
             H = A;
+
             ort.set_size(n);
 
             // Reduce to Hessenberg form.
@@ -188,6 +210,7 @@ namespace dlib
 
             // Reduce Hessenberg to real Schur form.
             hqr2();
+#endif
         }
     }
 
@@ -222,11 +245,19 @@ namespace dlib
 
         V = A;
 
+#ifdef DLIB_USE_LAPACK
+        matrix<type,0,1,mem_manager_type, layout_type> work;
+        e = 0;
+        // I would use syevr but the last time I checked there was a bug in the 
+        // Intel MKL's implementation of syevr.
+        lapack::syev('V', 'L', V,  d, work);
+#else
         // Tridiagonalize.
         tred2();
 
         // Diagonalize.
         tql2();
+#endif
 
     }
 

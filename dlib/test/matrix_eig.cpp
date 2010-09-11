@@ -28,11 +28,6 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename mat_type>
-    const matrix<typename mat_type::type> symm(const mat_type& m) { return m*trans(m); }
-
-// ----------------------------------------------------------------------------------------
-
     template <typename type>
     const matrix<type> randm(long r, long c)
     {
@@ -65,16 +60,14 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename matrix_type>
-    void test_eigenvalue ( const matrix_type& m)
+    template <typename matrix_type, typename U>
+    void test_eigenvalue_impl ( const matrix_type& m,  const eigenvalue_decomposition<U>& test )
     {
         typedef typename matrix_type::type type;
         const type eps = 10*max(abs(m))*sqrt(std::numeric_limits<type>::epsilon());
         dlog << LDEBUG << "test_eigenvalue():  " << m.nr() << " x " << m.nc() << "  eps: " << eps;
         print_spinner();
 
-
-        eigenvalue_decomposition<matrix_type> test(m);
 
         DLIB_TEST(test.dim() == m.nr());
 
@@ -130,6 +123,18 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename matrix_type>
+    void test_eigenvalue ( const matrix_type& m )
+    {
+        eigenvalue_decomposition<matrix_type> test(m);
+        test_eigenvalue_impl(m, test);
+
+        eigenvalue_decomposition<matrix_type> test_symm(make_symmetric(m));
+        test_eigenvalue_impl(make_symmetric(m), test_symm);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void matrix_test_double()
     {
 
@@ -143,14 +148,6 @@ namespace
         test_eigenvalue(10*randm<double,1,1>());
         test_eigenvalue(10*randm<double,2,2>());
         test_eigenvalue(10*randm<double,3,3>());
-
-        test_eigenvalue(10*symm(randm<double>(1,1)));
-        test_eigenvalue(10*symm(randm<double>(2,2)));
-        test_eigenvalue(10*symm(randm<double>(3,3)));
-        test_eigenvalue(10*symm(randm<double>(4,4)));
-        test_eigenvalue(10*symm(randm<double>(15,15)));
-        test_eigenvalue(10*symm(randm<double>(150,150)));
-
     }
 
 // ----------------------------------------------------------------------------------------
@@ -168,13 +165,6 @@ namespace
         test_eigenvalue(10*randm<float,1,1>());
         test_eigenvalue(10*randm<float,2,2>());
         test_eigenvalue(10*randm<float,3,3>());
-
-        test_eigenvalue(10*symm(randm<float>(1,1)));
-        test_eigenvalue(10*symm(randm<float>(2,2)));
-        test_eigenvalue(10*symm(randm<float>(3,3)));
-        test_eigenvalue(10*symm(randm<float>(4,4)));
-        test_eigenvalue(10*symm(randm<float>(15,15)));
-        test_eigenvalue(10*symm(randm<float>(50,50)));
     }
 
 // ----------------------------------------------------------------------------------------
