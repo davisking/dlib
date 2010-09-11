@@ -2735,6 +2735,43 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
+    struct op_make_symmetric : basic_op_m<M>
+    {
+        op_make_symmetric ( const M& m_) : basic_op_m<M>(m_){}
+
+        const static long cost = M::cost+1;
+        typedef typename M::type type;
+        typedef const typename M::const_ret_type const_ret_type;
+        const_ret_type apply ( long r, long c) const
+        { 
+            if (r >= c)
+                return this->m(r,c);
+            else
+                return this->m(c,r);
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_op<op_make_symmetric<EXP> > make_symmetric (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(m.nr() == m.nc(), 
+            "\tconst matrix make_symmetric(m)"
+            << "\n\t m must be a square matrix"
+            << "\n\t m.nr(): " << m.nr()
+            << "\n\t m.nc(): " << m.nc()
+            );
+
+        typedef op_make_symmetric<EXP> op;
+        return matrix_op<op>(op(m.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M>
     struct op_lowerm : basic_op_m<M>
     {
         op_lowerm( const M& m_) : basic_op_m<M>(m_){}

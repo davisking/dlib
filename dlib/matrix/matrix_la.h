@@ -1596,7 +1596,9 @@ convergence:
         }
         else
         {
-            return eigenvalue_decomposition<EXP>(m).get_real_eigenvalues();
+            // Call .ref() so that the symmetric matrix overload can take effect if m 
+            // has the appropriate type.
+            return eigenvalue_decomposition<EXP>(m.ref()).get_real_eigenvalues();
         }
     }
 

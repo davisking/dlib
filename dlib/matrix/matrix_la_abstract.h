@@ -675,6 +675,35 @@ namespace dlib
                 - #get_v() == all the eigenvectors of A
         !*/
 
+        template <typename EXP>
+        eigenvalue_decomposition(
+            const matrix_op<op_make_symmetric<EXP> >& A
+        ); 
+        /*!
+            requires
+                - A.nr() == A.nc() 
+                - A.size() > 0
+                - EXP::type == eigenvalue_decomposition::type 
+            ensures
+                - #dim() == A.nr()
+                - computes the eigenvalue decomposition of the symmetric matrix A.  Does so
+                  using a method optimized for symmetric matrices.
+                - #get_eigenvalues() == the eigenvalues of A
+                - #get_v() == all the eigenvectors of A
+                - moreover, since A is symmetric there won't be any imaginary eigenvalues. So 
+                  we will have:
+                    - #get_imag_eigenvalues() == 0
+                    - #get_real_eigenvalues() == the eigenvalues of A
+                    - #get_pseudo_v() == all the eigenvectors of A
+                    - diagm(#get_real_eigenvalues()) == #get_pseudo_d()
+
+                Note that the symmetric matrix operator is created by the
+                dlib::make_symmetric() function.  This function simply reflects
+                the lower triangular part of a square matrix into the upper triangular
+                part to create a symmetric matrix.  It can also be used to denote that a 
+                matrix is already symmetric using the C++ type system.
+        !*/
+
         long dim (
         ) const;
         /*!

@@ -47,6 +47,11 @@ namespace dlib
             const matrix_exp<EXP>& A
         ); 
 
+        template <typename EXP>
+        eigenvalue_decomposition(
+            const matrix_op<op_make_symmetric<EXP> >& A
+        ); 
+
         long dim (
         ) const;
 
@@ -184,6 +189,45 @@ namespace dlib
             // Reduce Hessenberg to real Schur form.
             hqr2();
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename matrix_exp_type>
+    template <typename EXP>
+    eigenvalue_decomposition<matrix_exp_type>::
+    eigenvalue_decomposition(
+        const matrix_op<op_make_symmetric<EXP> >& A
+    ) 
+    {
+        COMPILE_TIME_ASSERT((is_same_type<type, typename EXP::type>::value));
+
+
+        // make sure requires clause is not broken
+        DLIB_ASSERT(A.nr() == A.nc() && A.size() > 0,
+            "\teigenvalue_decomposition::eigenvalue_decomposition(A)"
+            << "\n\tYou can only use this on square matrices"
+            << "\n\tA.nr():   " << A.nr()
+            << "\n\tA.nc():   " << A.nc()
+            << "\n\tA.size(): " << A.size()
+            << "\n\tthis:     " << this
+            );
+
+
+        n = A.nc();
+        V.set_size(n,n);
+        d.set_size(n);
+        e.set_size(n);
+
+
+        V = A;
+
+        // Tridiagonalize.
+        tred2();
+
+        // Diagonalize.
+        tql2();
+
     }
 
 // ----------------------------------------------------------------------------------------

@@ -146,6 +146,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp make_symmetric (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - m.nr() == m.nc()
+              (i.e. m must be a square matrix)
+        ensures
+            - returns a matrix M such that:
+                - M::type == the same type that was in m
+                - M has the same dimensions as m
+                - M is a symmetric matrix, that is, M == trans(M) and
+                  it is constructed from the lower triangular part of m.  Specifically,
+                  we have:
+                    - lowerm(M) == lowerm(m)
+                    - upperm(M) == trans(lowerm(m))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T, 
         long NR, 
