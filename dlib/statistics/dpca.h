@@ -265,7 +265,7 @@ namespace dlib
                 cov += between_weight*between_cov/between_count; 
 
 
-            eigenvalue_decomposition<general_matrix> eig(cov);
+            eigenvalue_decomposition<general_matrix> eig(make_symmetric(cov));
 
             eigenvalues = eig.get_real_eigenvalues();
             dpca_mat = eig.get_pseudo_v();
