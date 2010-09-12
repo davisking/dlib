@@ -10,6 +10,10 @@
 #include "matrix_subexp.h"
 #include <cmath>
 
+#ifdef DLIB_USE_LAPACK
+#include "lapack/potrf.h"
+#endif
+
 namespace dlib 
 {
 
@@ -105,6 +109,32 @@ namespace dlib
             << "\n\tthis:      " << this
             );
 
+#ifdef DLIB_USE_LAPACK
+        L_ = A_;
+        const type eps = max(abs(diag(L_)))*std::sqrt(std::numeric_limits<type>::epsilon())/100;
+
+        // check if the matrix is actually symmetric
+        bool is_symmetric = true;
+        for (long r = 0; r < L_.nr() && is_symmetric; ++r)
+        {
+            for (long c = r+1; c < L_.nc() && is_symmetric; ++c)
+            {
+                // this is approximately doing: is_symmetric = is_symmetric && ( L_(k,j) == L_(j,k))
+                is_symmetric = is_symmetric && (std::abs(L_(r,c) - L_(c,r)) < eps ); 
+            }
+        }
+
+        // now compute the actual cholesky decomposition
+        int info = lapack::potrf('L', L_);
+
+        // check if its really SPD
+        if (info == 0 && is_symmetric && min(abs(diag(L_))) > eps*100)
+            isspd = true;
+        else
+            isspd = false;
+
+        L_ = lowerm(L_);
+#else
         const_temp_matrix<EXP> A(A_);
 
 
@@ -153,6 +183,7 @@ namespace dlib
                 L_(j,k) = 0.0;
             }
         }
+#endif
     }
 
 // ----------------------------------------------------------------------------------------

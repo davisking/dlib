@@ -96,7 +96,7 @@ namespace
         DLIB_TEST_MSG(equal(m*test.solve(col), col,eps),max(abs(m*test.solve(m2)- m2)));
 
         // now make us a non-spd matrix
-        if (m.nr() > 1)
+        if (m.nr() > 2)
         {
             matrix<type> sm(lowerm(m));
             sm(1,1) = 0;

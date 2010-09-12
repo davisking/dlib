@@ -181,6 +181,9 @@ namespace dlib
             - else
                 - returns a matrix with the same dimensions as A but it 
                   will have a bogus value.  I.e. it won't be a decomposition.
+
+            - If DLIB_USE_LAPACK is defined then the LAPACK routine xPOTRF 
+              is used to compute the cholesky decomposition.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -387,6 +390,9 @@ namespace dlib
                 If the matrix is not symmetric or positive definite, the function
                 computes only a partial decomposition.  This can be tested with
                 the is_spd() flag.
+            
+                If DLIB_USE_LAPACK is defined then the LAPACK routine xPOTRF 
+                is used to compute the cholesky decomposition.
         !*/
 
     public:

@@ -13,6 +13,10 @@
 #include "matrix_cholesky.h"
 #include "matrix_eigenvalue.h"
 
+#ifdef DLIB_USE_LAPACK
+#include "lapack/potrf.h"
+#endif
+
 namespace dlib
 {
 
@@ -1223,8 +1227,14 @@ convergence:
             << "\n\tA.nr(): " << A.nr()
             << "\n\tA.nc(): " << A.nc() 
             );
-
         typename matrix_exp<EXP>::matrix_type L(A.nr(),A.nc());
+
+#ifdef DLIB_USE_LAPACK
+        L = A;
+        lapack::potrf('L', L);
+        // mask out upper triangular area
+        return lowerm(L);
+#else
         typedef typename EXP::type T;
         set_all_elements(L,0);
 
@@ -1273,6 +1283,8 @@ convergence:
         }
 
         return L;
+#endif
+
     }
 
 // ----------------------------------------------------------------------------------------
