@@ -1319,61 +1319,6 @@ convergence:
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP
-        >
-    const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv_helper ( 
-        const matrix_exp<EXP>& m
-    )
-    /*!
-        ensures
-            - computes the results of pinv(m) but does so using a method that is fastest
-              when m.nc() <= m.nr().  So if m.nc() > m.nr() then it is best to use
-              trans(pinv_helper(trans(m))) to compute pinv(m).
-    !*/
-    { 
-        typename matrix_exp<EXP>::matrix_type u;
-        typedef typename EXP::mem_manager_type MM1;
-        matrix<typename EXP::type, EXP::NC, EXP::NC,MM1 > v;
-
-        typedef typename matrix_exp<EXP>::type T;
-
-        v.set_size(m.nc(),m.nc());
-
-        typedef typename matrix_exp<EXP>::type T;
-        u = m;
-
-        matrix<T,matrix_exp<EXP>::NC,1,MM1> w(m.nc(),1);
-        matrix<T,matrix_exp<EXP>::NC,1,MM1> rv1(m.nc(),1);
-
-        nric::svdcmp(u,w,v,rv1);
-
-        const double machine_eps = std::numeric_limits<typename EXP::type>::epsilon();
-        // compute a reasonable epsilon below which we round to zero before doing the
-        // reciprocal
-        const double eps = machine_eps*std::max(m.nr(),m.nc())*max(w);
-
-        // now compute the pseudoinverse
-        return tmp(scale_columns(v,reciprocal(round_zeros(w,eps))))*trans(u);
-    }
-
-    template <
-        typename EXP
-        >
-    const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv ( 
-        const matrix_exp<EXP>& m
-    )
-    { 
-        // if m has more columns then rows then it is more efficient to
-        // compute the pseudo-inverse of its transpose (given the way I'm doing it below).
-        if (m.nc() > m.nr())
-            return trans(pinv_helper(trans(m)));
-        else
-            return pinv_helper(m);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
         typename EXP,
         long uNR, 
         long uNC,
@@ -1403,8 +1348,6 @@ convergence:
         COMPILE_TIME_ASSERT(NC == 0 || vN == 0 || NC == vN);
         COMPILE_TIME_ASSERT(wX == 0 || wX == 1);
 
-        typedef typename matrix_exp<EXP>::type T;
-
 #ifdef DLIB_USE_LAPACK
         matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1> temp(m);
         lapack::gesvd('S','A', temp, w, u, v);
@@ -1424,6 +1367,56 @@ convergence:
         matrix<T,matrix_exp<EXP>::NC,1,MM1> rv1(m.nc(),1);
         nric::svdcmp(u,w,v,rv1);
 #endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv_helper ( 
+        const matrix_exp<EXP>& m
+    )
+    /*!
+        ensures
+            - computes the results of pinv(m) but does so using a method that is fastest
+              when m.nc() <= m.nr().  So if m.nc() > m.nr() then it is best to use
+              trans(pinv_helper(trans(m))) to compute pinv(m).
+    !*/
+    { 
+        typename matrix_exp<EXP>::matrix_type u;
+        typedef typename EXP::mem_manager_type MM1;
+        typedef typename EXP::layout_type layout_type;
+        matrix<typename EXP::type, EXP::NC, EXP::NC,MM1, layout_type > v;
+
+        typedef typename matrix_exp<EXP>::type T;
+
+        matrix<T,matrix_exp<EXP>::NC,1,MM1, layout_type> w;
+
+        svd3(m, u,w,v);
+
+        const double machine_eps = std::numeric_limits<typename EXP::type>::epsilon();
+        // compute a reasonable epsilon below which we round to zero before doing the
+        // reciprocal
+        const double eps = machine_eps*std::max(m.nr(),m.nc())*max(w);
+
+        // now compute the pseudoinverse
+        return tmp(scale_columns(v,reciprocal(round_zeros(w,eps))))*trans(u);
+    }
+
+    template <
+        typename EXP
+        >
+    const matrix<typename EXP::type,EXP::NC,EXP::NR,typename EXP::mem_manager_type> pinv ( 
+        const matrix_exp<EXP>& m
+    )
+    { 
+        // if m has more columns then rows then it is more efficient to
+        // compute the pseudo-inverse of its transpose (given the way I'm doing it below).
+        if (m.nc() > m.nr())
+            return trans(pinv_helper(trans(m)));
+        else
+            return pinv_helper(m);
     }
 
 // ----------------------------------------------------------------------------------------
