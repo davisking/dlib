@@ -205,14 +205,14 @@ namespace dlib
             else if (jobu == 'S')
                 u.set_size(m, std::min(m,n));
             else
-                u.set_size(1,1);
+                u.set_size(NR3?NR3:1, NC3?NC3:1);
 
             if (jobvt == 'A')
                 vt.set_size(n,n);
             else if (jobvt == 'S')
                 vt.set_size(std::min(m,n), n);
             else
-                vt.set_size(1,1);
+                vt.set_size(NR4?NR4:1, NC4?NC4:1);
 
 
             if (jobu == 'O' || jobvt == 'O')
@@ -261,8 +261,8 @@ namespace dlib
             matrix<T,0,1,MM,row_major_layout> work;
 
             // Row major order matrices are transposed from LAPACK's point of view.
-            matrix<T,NR3,NC3,MM,row_major_layout>& u = vt_;
-            matrix<T,NR4,NC4,MM,row_major_layout>& vt = u_;
+            matrix<T,NR4,NC4,MM,row_major_layout>& u = vt_;
+            matrix<T,NR3,NC3,MM,row_major_layout>& vt = u_;
             std::swap(jobu, jobvt);
 
             const long m = a.nc();
@@ -274,14 +274,14 @@ namespace dlib
             else if (jobu == 'S')
                 u.set_size(std::min(m,n), m);
             else
-                u.set_size(1,1);
+                u.set_size(NR4?NR4:1, NC4?NC4:1);
 
             if (jobvt == 'A')
                 vt.set_size(n,n);
             else if (jobvt == 'S')
                 vt.set_size(n, std::min(m,n));
             else
-                vt.set_size(1,1);
+                vt.set_size(NR3?NR3:1, NC3?NC3:1);
 
             if (jobu == 'O' || jobvt == 'O')
             {

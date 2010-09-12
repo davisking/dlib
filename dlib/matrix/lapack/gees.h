@@ -226,7 +226,7 @@ namespace dlib
             if (jobz == 'V')
                 vs.set_size(n,n);
             else
-                vs.set_size(1,1);
+                vs.set_size(NR4?NR4:1, NC4?NC4:1);
 
             // figure out how big the workspace needs to be.
             T work_size = 1;

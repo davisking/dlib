@@ -189,12 +189,12 @@ namespace dlib
             if (jobvl == 'V')
                 vl.set_size(n,n);
             else
-                vl.set_size(1,1);
+                vl.set_size(NR4?NR4:1, NC4?NC4:1);
 
             if (jobvr == 'V')
                 vr.set_size(n,n);
             else
-                vr.set_size(1,1);
+                vr.set_size(NR5?NR5:1, NC5?NC5:1);
 
 
             // figure out how big the workspace needs to be.

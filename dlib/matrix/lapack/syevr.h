@@ -326,7 +326,7 @@ namespace dlib
             }
             else
             {
-                z.set_size(1,1);
+                z.set_size(NR3?NR3:1, NC3?NC3:1);
             }
 
             // figure out how big the workspace needs to be.
@@ -399,7 +399,7 @@ namespace dlib
             }
             else
             {
-                z.set_size(1,1);
+                z.set_size(NR3?NR3:1, NC3?NC3:1);
             }
 
             // figure out how big the workspace needs to be.
