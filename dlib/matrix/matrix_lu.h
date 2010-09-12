@@ -281,7 +281,7 @@ namespace dlib
             );
 
         // Check if it is singular and if it is just return 0.  
-        // We ant to do this because a prod() operation can easily
+        // We want to do this because a prod() operation can easily
         // overcome a single diagonal element that is effectively 0 when
         // LU is a big enough matrix.
         if (is_singular())
