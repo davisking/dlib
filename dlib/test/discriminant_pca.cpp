@@ -16,6 +16,7 @@ namespace
     using namespace std;
     dlib::logger dlog("test.discriminant_pca");
 
+    using dlib::equal;
 
     class discriminant_pca_tester : public tester
     {
@@ -100,9 +101,9 @@ namespace
             DLIB_TEST(dpca2.in_vector_size() == 4);
             DLIB_TEST(dpca2.within_class_weight() == 5);
             DLIB_TEST(dpca2.between_class_weight() == 6);
-            DLIB_TEST(equal(dpca.dpca_matrix(), dpca2.dpca_matrix()));
-            DLIB_TEST(equal(mat, dpca2.dpca_matrix(1)));
-            DLIB_TEST(equal(dpca.dpca_matrix(1), mat));
+            DLIB_TEST(equal(dpca.dpca_matrix(), dpca2.dpca_matrix(), 1e-10));
+            DLIB_TEST(equal(mat, dpca2.dpca_matrix(1), 1e-10));
+            DLIB_TEST(equal(dpca.dpca_matrix(1), mat, 1e-10));
 
             // now test swap
             dpca2.swap(dpca3);
@@ -113,7 +114,7 @@ namespace
             DLIB_TEST(dpca3.in_vector_size() == 4);
             DLIB_TEST(dpca3.within_class_weight() == 5);
             DLIB_TEST(dpca3.between_class_weight() == 6);
-            DLIB_TEST(equal(mat, dpca3.dpca_matrix(1)));
+            DLIB_TEST(equal(mat, dpca3.dpca_matrix(1), 1e-10));
             DLIB_TEST((dpca3 + dpca3).in_vector_size() == 4);
             DLIB_TEST((dpca3 + dpca3).within_class_weight() == 5);
             DLIB_TEST((dpca3 + dpca3).between_class_weight() == 6);
@@ -240,7 +241,7 @@ namespace
                 add_dpca3.add_to_between_class_variance(samp1, samp2);
             }
 
-            matrix<double> mat;
+            matrix<double> mat, mat2;
 
             sum_dpca = dpca_type() + dpca_type() + add_dpca1 + dpca_type() + add_dpca2 + add_dpca3 + add_dpca4;
             dpca.set_within_class_weight(0);
@@ -248,7 +249,7 @@ namespace
             sum_dpca.set_within_class_weight(0);
             sum_dpca.set_between_class_weight(0);
             mat = dpca.dpca_matrix(1);
-            DLIB_TEST(equal(mat, sum_dpca.dpca_matrix(1)));
+            DLIB_TEST(equal(mat, sum_dpca.dpca_matrix(1), 1e-10));
             DLIB_TEST(equal(mat*trans(mat), identity_matrix<double>(4)));
             DLIB_TEST(dpca.dpca_matrix(1).nr() == 4);
             dpca.set_within_class_weight(10000);
@@ -262,7 +263,7 @@ namespace
 
             mat = dpca.dpca_matrix(1);
             DLIB_TEST(equal(mat*trans(mat), identity_matrix<double>(2)));
-            DLIB_TEST(equal(mat, sum_dpca.dpca_matrix(1)));
+            DLIB_TEST_MSG(equal(mat, mat2=sum_dpca.dpca_matrix(1), 1e-9), max(abs(mat - mat2)));
 
 
             // now add the variance back in using the between class weight

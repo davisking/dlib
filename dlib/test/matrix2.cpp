@@ -579,19 +579,20 @@ namespace
 
             svd2(true,true,a2+a2,u,q,v);
 
-            double err = sum(round(1e10*(a - subm(u,get_rect(a2+a2))*diagm(q)*trans(v))));
-            DLIB_TEST_MSG(  err == 0,"err: " << err);
-            DLIB_TEST((round(1e10*trans(u)*u)  == 1e10*identity_matrix<double,M>()));
-            DLIB_TEST((round(1e10*trans(v)*v)  == 1e10*identity_matrix<double,N>()));
+            double err = max(abs(a - subm(u,get_rect(a2+a2))*diagm(q)*trans(v)));
+            DLIB_TEST_MSG( err < 1e-11,"err: " << err);
+            using dlib::equal;
+            DLIB_TEST((equal(trans(u)*u , identity_matrix<double,M>(), 1e-10)));
+            DLIB_TEST((equal(trans(v)*v , identity_matrix<double,N>(), 1e-10)));
 
-            svd2(false,true,a2+a2,u2,q2,v2);
-            DLIB_TEST(equal(q2,q));
-            DLIB_TEST(equal(v2,v));
-            svd2(true,false,a2+a2,u2,q2,v2);
-            DLIB_TEST(equal(q2,q));
-            DLIB_TEST(equal(u2,u));
-            svd2(false,false,a2+a2,u2,q2,v2);
-            DLIB_TEST(equal(q2,q));
+            svd2(false,true,a2+a2,u,q,v2);
+            svd2(true,false,a2+a2,u2,q,v);
+            svd2(false,false,a2+a2,u,q2,v);
+
+            err = max(abs(a - subm(u2,get_rect(a2+a2))*diagm(q2)*trans(v2)));
+            DLIB_TEST_MSG( err < 1e-11,"err: " << err);
+            DLIB_TEST((equal(trans(u2)*u2 , identity_matrix<double,M>(), 1e-10)));
+            DLIB_TEST((equal(trans(v2)*v2 , identity_matrix<double,N>(), 1e-10)));
 
         }
 
@@ -620,19 +621,20 @@ namespace
 
             svd2(true,true,a2+a2,u,q,v);
 
-            double err = sum(round(1e10*(a - subm(u,get_rect(a2+a2))*diagm(q)*trans(v))));
-            DLIB_TEST_MSG(  err == 0,"err: " << err);
-            DLIB_TEST((round(1e10*trans(u)*u)  == 1e10*identity_matrix<double,M>()));
-            DLIB_TEST((round(1e10*trans(v)*v)  == 1e10*identity_matrix<double,N>()));
+            double err = max(abs(a - subm(u,get_rect(a2+a2))*diagm(q)*trans(v)));
+            DLIB_TEST_MSG( err < 1e-11,"err: " << err);
+            using dlib::equal;
+            DLIB_TEST((equal(trans(u)*u , identity_matrix<double,M>(), 1e-10)));
+            DLIB_TEST((equal(trans(v)*v , identity_matrix<double,N>(), 1e-10)));
 
-            svd2(false,true,a2+a2,u2,q2,v2);
-            DLIB_TEST(equal(q2,q));
-            DLIB_TEST(equal(v2,v));
-            svd2(true,false,a2+a2,u2,q2,v2);
-            DLIB_TEST(equal(q2,q));
-            DLIB_TEST(equal(u2,u));
-            svd2(false,false,a2+a2,u2,q2,v2);
-            DLIB_TEST(equal(q2,q));
+            svd2(false,true,a2+a2,u,q,v2);
+            svd2(true,false,a2+a2,u2,q,v);
+            svd2(false,false,a2+a2,u,q2,v);
+
+            err = max(abs(a - subm(u2,get_rect(a2+a2))*diagm(q2)*trans(v2)));
+            DLIB_TEST_MSG( err < 1e-11,"err: " << err);
+            DLIB_TEST((equal(trans(u2)*u2 , identity_matrix<double,M>(), 1e-10)));
+            DLIB_TEST((equal(trans(v2)*v2 , identity_matrix<double,N>(), 1e-10)));
 
         }
 
