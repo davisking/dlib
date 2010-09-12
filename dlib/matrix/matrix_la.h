@@ -1456,7 +1456,7 @@ convergence:
         COMPILE_TIME_ASSERT(NC == 0 || wN == 0 || NC == wN);
         COMPILE_TIME_ASSERT(NC == 0 || vN == 0 || NC == vN);
 
-        matrix<T,matrix_exp<EXP>::NC,1,MM1> W;
+        matrix<T,matrix_exp<EXP>::NC,1,MM1, L1> W;
         svd3(m,u,W,v);
         w = diagm(W);
     }
