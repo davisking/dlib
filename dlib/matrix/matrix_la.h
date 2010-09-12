@@ -15,6 +15,8 @@
 
 #ifdef DLIB_USE_LAPACK
 #include "lapack/potrf.h"
+#include "lapack/gesdd.h"
+#include "lapack/gesvd.h"
 #endif
 
 namespace dlib
@@ -567,17 +569,15 @@ namespace dlib
         typename MM1,
         typename MM2,
         typename MM3,
-        typename L1,
-        typename L2,
-        typename L3
+        typename L1
         >
     long svd2 (
         bool withu, 
         bool withv, 
         const matrix_exp<EXP>& a,
         matrix<typename EXP::type,uM,uM,MM1,L1>& u, 
-        matrix<typename EXP::type,qN,qX,MM2,L2>& q, 
-        matrix<typename EXP::type,vN,vN,MM3,L3>& v
+        matrix<typename EXP::type,qN,qX,MM2,L1>& q, 
+        matrix<typename EXP::type,vN,vN,MM3,L1>& v
     )
     {
         /*  
@@ -624,6 +624,34 @@ namespace dlib
 
         typedef typename EXP::type T;
 
+#ifdef DLIB_USE_LAPACK
+        matrix<typename EXP::type,0,0,MM1,L1> temp(a);
+
+        char jobu = 'A';
+        char jobvt = 'A';
+        if (withu == false)
+            jobu = 'N';
+        if (withv == false)
+            jobvt = 'N';
+
+        int info;
+        if (withu == withv)
+        {
+            info = lapack::gesdd(jobu, temp, q, u, v);
+        }
+        else
+        {
+            info = lapack::gesvd(jobu, jobvt, temp, q, u, v);
+        }
+
+        // pad q with zeros if it isn't the length we want
+        if (q.nr() < a.nc())
+            q = join_cols(q, zeros_matrix<T>(a.nc()-q.nr(),1));
+
+        v = trans(v);
+
+        return info;
+#else
         using std::abs;
         using std::sqrt;
 
@@ -944,6 +972,7 @@ convergence:
         } /* end k */
 
         return retval;
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1354,15 +1383,13 @@ convergence:
         typename MM1,
         typename MM2,
         typename MM3,
-        typename L1,
-        typename L2,
-        typename L3
+        typename L1
         >
     inline void svd3 (
         const matrix_exp<EXP>& m,
         matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1>& u,
-        matrix<typename matrix_exp<EXP>::type, wN, wX,MM2,L2>& w,
-        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3,L3>& v
+        matrix<typename matrix_exp<EXP>::type, wN, wX,MM2,L1>& w,
+        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3,L1>& v
     )
     {
         typedef typename matrix_exp<EXP>::type T;
@@ -1376,14 +1403,27 @@ convergence:
         COMPILE_TIME_ASSERT(NC == 0 || vN == 0 || NC == vN);
         COMPILE_TIME_ASSERT(wX == 0 || wX == 1);
 
+        typedef typename matrix_exp<EXP>::type T;
+
+#ifdef DLIB_USE_LAPACK
+        matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1> temp(m);
+        lapack::gesvd('S','A', temp, w, u, v);
+        v = trans(v);
+        // if u isn't the size we want then pad it (and v) with zeros
+        if (u.nc() < m.nc())
+        {
+            w = join_cols(w, zeros_matrix<T>(m.nc()-u.nc(),1));
+            u = join_rows(u, zeros_matrix<T>(u.nr(), m.nc()-u.nc()));
+        }
+#else
         v.set_size(m.nc(),m.nc());
 
-        typedef typename matrix_exp<EXP>::type T;
         u = m;
 
         w.set_size(m.nc(),1);
         matrix<T,matrix_exp<EXP>::NC,1,MM1> rv1(m.nc(),1);
         nric::svdcmp(u,w,v,rv1);
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1397,15 +1437,13 @@ convergence:
         typename MM1,
         typename MM2,
         typename MM3,
-        typename L1,
-        typename L2,
-        typename L3
+        typename L1
         >
     inline void svd (
         const matrix_exp<EXP>& m,
         matrix<typename matrix_exp<EXP>::type, uNR, uNC,MM1,L1>& u,
-        matrix<typename matrix_exp<EXP>::type, wN, wN,MM2,L2>& w,
-        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3,L3>& v
+        matrix<typename matrix_exp<EXP>::type, wN, wN,MM2,L1>& w,
+        matrix<typename matrix_exp<EXP>::type, vN, vN,MM3,L1>& v
     )
     {
         typedef typename matrix_exp<EXP>::type T;

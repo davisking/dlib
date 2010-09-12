@@ -62,6 +62,8 @@ namespace dlib
             - #w.nc() == m.nc()
             - #v.nr() == m.nc()
             - #v.nc() == m.nc()
+            - if DLIB_USE_LAPACK is #defined then the xGESVD routine
+              from LAPACK is used to compute the SVD.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -98,6 +100,11 @@ namespace dlib
                   output state is undefined.
             - returns an error code of 0, if no errors and 'k' if we fail to
               converge at the 'kth' singular value.
+            - if (DLIB_USE_LAPACK is #defined) then 
+                - if (withu == withv) then
+                    - the xGESDD routine from LAPACK is used to compute the SVD.
+                - else
+                    - the xGESVD routine from LAPACK is used to compute the SVD.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -122,6 +129,8 @@ namespace dlib
             - #w.nc() == 1 
             - #v.nr() == m.nc()
             - #v.nc() == m.nc()
+            - if DLIB_USE_LAPACK is #defined then the xGESVD routine
+              from LAPACK is used to compute the SVD.
     !*/
 
 // ----------------------------------------------------------------------------------------
