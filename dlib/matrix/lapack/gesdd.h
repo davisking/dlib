@@ -222,6 +222,10 @@ namespace dlib
                 u.set_size(m, std::min(m,n));
                 vt.set_size(std::min(m,n), n);
             }
+            else if (jobz == 'O')
+            {
+                DLIB_CASSERT(false, "jobz == 'O' not supported");
+            }
             else
             {
                 u.set_size(1,1);
@@ -289,6 +293,10 @@ namespace dlib
             {
                 u.set_size(std::min(m,n), m);
                 vt.set_size(n, std::min(m,n));
+            }
+            else if (jobz == 'O')
+            {
+                DLIB_CASSERT(false, "jobz == 'O' not supported");
             }
             else
             {

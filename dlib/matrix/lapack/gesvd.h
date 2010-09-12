@@ -214,6 +214,13 @@ namespace dlib
             else
                 vt.set_size(1,1);
 
+
+            if (jobu == 'O' || jobvt == 'O')
+            {
+                DLIB_CASSERT(false, "job == 'O' not supported");
+            }
+
+
             // figure out how big the workspace needs to be.
             T work_size = 1;
             int info = binding::gesvd(jobu, jobvt, a.nr(), a.nc(), &a(0,0), a.nr(),
@@ -243,8 +250,8 @@ namespace dlib
             typename MM
             >
         int gesvd (
-            const char jobu,
-            const char jobvt,
+            char jobu,
+            char jobvt,
             matrix<T,NR1,NC1,MM,row_major_layout>& a,
             matrix<T,NR2,NC2,MM,row_major_layout>& s,
             matrix<T,NR3,NC3,MM,row_major_layout>& u_,
@@ -256,6 +263,7 @@ namespace dlib
             // Row major order matrices are transposed from LAPACK's point of view.
             matrix<T,NR3,NC3,MM,row_major_layout>& u = vt_;
             matrix<T,NR4,NC4,MM,row_major_layout>& vt = u_;
+            std::swap(jobu, jobvt);
 
             const long m = a.nc();
             const long n = a.nr();
@@ -274,6 +282,12 @@ namespace dlib
                 vt.set_size(n, std::min(m,n));
             else
                 vt.set_size(1,1);
+
+            if (jobu == 'O' || jobvt == 'O')
+            {
+                DLIB_CASSERT(false, "job == 'O' not supported");
+            }
+
 
             // figure out how big the workspace needs to be.
             T work_size = 1;
