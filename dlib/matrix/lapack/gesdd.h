@@ -244,7 +244,7 @@ namespace dlib
                 return info;
 
             if (work.size() < work_size)
-                work.set_size(work_size, 1);
+                work.set_size(static_cast<long>(work_size), 1);
 
             // compute the actual SVD
             info = binding::gesdd(jobz, a.nr(), a.nc(), &a(0,0), a.nr(),
@@ -316,7 +316,7 @@ namespace dlib
                 return info;
 
             if (work.size() < work_size)
-                work.set_size(work_size, 1);
+                work.set_size(static_cast<long>(work_size), 1);
 
             // compute the actual SVD
             info = binding::gesdd(jobz, m, n, &a(0,0), a.nc(),

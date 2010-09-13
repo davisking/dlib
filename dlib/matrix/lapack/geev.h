@@ -210,7 +210,7 @@ namespace dlib
                 return info;
 
             if (work.size() < work_size)
-                work.set_size(work_size, 1);
+                work.set_size(static_cast<long>(work_size), 1);
 
             // compute the actual decomposition 
             info = binding::geev(jobvl, jobvr, n, &a(0,0),

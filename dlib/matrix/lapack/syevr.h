@@ -343,7 +343,7 @@ namespace dlib
                 return info;
 
             if (work.size() < work_size)
-                work.set_size(work_size, 1);
+                work.set_size(static_cast<long>(work_size), 1);
             if (iwork.size() < iwork_size)
                 iwork.set_size(iwork_size, 1);
 
@@ -416,7 +416,7 @@ namespace dlib
                 return info;
 
             if (work.size() < work_size)
-                work.set_size(work_size, 1);
+                work.set_size(static_cast<long>(work_size), 1);
             if (iwork.size() < iwork_size)
                 iwork.set_size(iwork_size, 1);
 
