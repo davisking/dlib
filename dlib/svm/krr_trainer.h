@@ -363,7 +363,7 @@ namespace dlib
                 L += y(i)*proj_x(i);
             }
 
-            eigenvalue_decomposition<general_matrix_type> eig(C);
+            eigenvalue_decomposition<general_matrix_type> eig(make_symmetric(C));
             const general_matrix_type V = eig.get_pseudo_v();
             const column_matrix_type  D = eig.get_real_eigenvalues();
 
