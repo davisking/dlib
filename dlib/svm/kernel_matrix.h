@@ -185,6 +185,46 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename matrix_dest_type,
+        typename K,
+        typename V
+        >
+    inline void matrix_assign (
+        matrix_dest_type& dest,
+        const matrix_exp<matrix_op<op_kern_mat<K,V,V> > >& src
+    )
+    /*!
+        Overload matrix assignment so that when a kernel_matrix expression
+        gets assigned it only evaluates half the kernel matrix (since it is symmetric)
+    !*/
+    {
+        // if this is a symmetric kernel matrix
+        if (&src.ref().op.vect1 == &src.ref().op.vect2)
+        {
+            for (long r = 0; r < src.nr(); ++r)
+            {
+                for (long c = r; c < src.nc(); ++c)
+                {
+                    dest(r,c) = dest(c,r) = src(r,c);
+                }
+            }
+        }
+        else
+        {
+            // This isn't a symmetric kernel matrix so just do a normal assignment loop
+            for (long r = 0; r < src.nr(); ++r)
+            {
+                for (long c = 0; c < src.nc(); ++c)
+                {
+                    dest(r,c) = src(r,c);
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_KERNEL_MATRIX_
