@@ -1,3 +1,5 @@
+// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_BOOST_NUMERIC_BINDINGS_TRAITS_FORTRAN_H
 #define DLIB_BOOST_NUMERIC_BINDINGS_TRAITS_FORTRAN_H
 

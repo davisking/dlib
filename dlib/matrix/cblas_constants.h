@@ -1,3 +1,5 @@
+// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_CBLAS_CONSTAnTS_H__
 #define DLIB_CBLAS_CONSTAnTS_H__
 
