@@ -1,5 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
+#ifndef DLIB_MATRiX_TRSM_H__
+#define DLIB_MATRiX_TRSM_H__
 #include "lapack/fortran_id.h"
 #include "cblas_constants.h"
 
@@ -615,4 +617,6 @@ namespace dlib
 
     }
 }
+
+#endif // DLIB_MATRiX_TRSM_H__
 

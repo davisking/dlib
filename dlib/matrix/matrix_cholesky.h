@@ -14,6 +14,8 @@
 #include "lapack/potrf.h"
 #endif
 
+#include "matrix_trsm.h"
+
 namespace dlib 
 {
 
@@ -208,32 +210,11 @@ namespace dlib
 
         matrix<type, NR, EXP::NC, mem_manager_type, layout_type>  X(B); 
 
-        const long nx = B.nc();
-
-        const long n = L_.nr();
-
+        using namespace blas_bindings;
         // Solve L*y = b;
-        for (long j=0; j< nx; j++)
-        {
-            for (long k = 0; k < n; k++) 
-            {
-                for (long i = 0; i < k; i++) 
-                    X(k,j) -= X(i,j)*L_(k,i);
-                X(k,j) /= L_(k,k);
-            }
-        }
-
+        triangular_solver(CblasLeft, CblasLower, CblasNoTrans, CblasNonUnit, L_, X);
         // Solve L'*X = Y;
-        for (long j=0; j<nx; j++)
-        {
-            for (long k = n-1; k >= 0; k--) 
-            {
-                for (long i = k+1; i < n; i++) 
-                    X(k,j) -= X(i,j)*L_(i,k);
-                X(k,j) /= L_(k,k);
-            }
-        }
-
+        triangular_solver(CblasLeft, CblasLower, CblasTrans, CblasNonUnit, L_, X);
         return X;
     }
 
