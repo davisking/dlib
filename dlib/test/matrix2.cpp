@@ -25,6 +25,8 @@ namespace
 
     logger dlog("test.matrix2");
 
+    dlib::rand::float_1a rnd;
+
     void matrix_test (
     )
     /*!
@@ -370,16 +372,11 @@ namespace
 
         matrix<double, 7, 7,MM,column_major_layout> m7;
         matrix<double> dm7(7,7);
-        for (long r= 0; r< dm7.nr(); ++r)
-        {
-            for (long c = 0; c < dm7.nc(); ++c)
-            {
-                dm7(r,c) = r*c/3.3;
-            }
-        }
+        dm7 = randm(7,7, rnd);
         m7 = dm7;
 
-        DLIB_TEST(inv(dm7) == inv(m7));
+        DLIB_TEST_MSG(max(abs(dm7*inv(dm7) - identity_matrix<double>(7))) < 1e-12, max(abs(dm7*inv(dm7) - identity_matrix<double>(7))));
+        DLIB_TEST(equal(inv(dm7),  inv(m7)));
         DLIB_TEST(det(dm7) == det(m7));
         DLIB_TEST(min(dm7) == min(m7));
         DLIB_TEST(max(dm7) == max(m7));

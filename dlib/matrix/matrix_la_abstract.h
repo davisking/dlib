@@ -255,6 +255,9 @@ namespace dlib
                 LU decomposition is in the solution of square systems of simultaneous
                 linear equations.  This will fail if is_singular() returns true (or
                 if A is very nearly singular).
+
+                If DLIB_USE_LAPACK is defined then the LAPACK routine xGETRF 
+                is used to compute the LU decomposition.
         !*/
 
     public:

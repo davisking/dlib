@@ -393,166 +393,6 @@ namespace dlib
             return true;
         }
 
-
-        template <
-            typename T,
-            long N,
-            long NX,
-            typename MM1,
-            typename MM2,
-            typename MM3,
-            typename L1,
-            typename L2,
-            typename L3
-            >
-        bool ludcmp (
-            matrix<T,N,N,MM1,L1>& a,
-            matrix<long,N,NX,MM2,L2>& indx,
-            T& d,
-            matrix<T,N,NX,MM3,L3>& vv
-        )
-        /*!
-            ( this function is derived from the one in numerical recipes in C chapter 2.3)
-            ensures
-                - #a == both the L and U matrices
-                - #indx == the permutation vector (see numerical recipes in C)
-                - #d == some other thing (see numerical recipes in C)
-                - #vv == some undefined value.  this is just used for scratch space
-                - if (the matrix is singular and we can't do anything) then
-                    - returns false
-                - else
-                    - returns true
-        !*/
-        {
-            DLIB_ASSERT(indx.nc() == 1,"in dlib::nric::ludcmp() the indx matrix must be a column vector");
-            DLIB_ASSERT(vv.nc() == 1,"in dlib::nric::ludcmp() the vv matrix must be a column vector");
-            const long n = a.nr();
-            long imax = 0;
-            T big, dum, sum, temp;
-
-            d = 1.0;
-            for (long i = 0; i < n; ++i)
-            {
-                big = 0;
-                for (long j = 0; j < n; ++j)
-                {
-                    if ((temp=std::abs(a(i,j))) > big)
-                        big = temp;
-                }
-                if (big == 0.0)
-                {
-                    return false;
-                }
-                vv(i) = 1/big;
-            }
-
-            for (long j = 0; j < n; ++j)
-            {
-                for (long i = 0; i < j; ++i)
-                {
-                    sum = a(i,j);
-                    for (long k = 0; k < i; ++k)
-                        sum -= a(i,k)*a(k,j);
-                    a(i,j) = sum;
-                }
-                big = 0;
-                for (long i = j; i < n; ++i)
-                {
-                    sum = a(i,j);
-                    for (long k = 0; k < j; ++k)
-                        sum -= a(i,k)*a(k,j);
-                    a(i,j) = sum;
-                    if ( (dum=vv(i)*std::abs(sum)) >= big)
-                    {
-                        big = dum;
-                        imax = i;
-                    }
-                }
-                if (j != imax)
-                {
-                    for (long k = 0; k < n; ++k)
-                    {
-                        dum = a(imax,k);
-                        a(imax,k) = a(j,k);
-                        a(j,k) = dum;
-                    }
-                    d = -d;
-                    vv(imax) = vv(j);
-                }
-                indx(j) = imax;
-
-                if (j < n-1)
-                {
-                    if (a(j,j) == 0)
-                        return false;
-                    dum = 1/a(j,j);
-                    for (long i = j+1; i < n; ++i)
-                        a(i,j) *= dum;
-                }
-            }
-            return true;
-        }
-
-// ----------------------------------------------------------------------------------------
-
-        template <
-            typename T,
-            long N,
-            long NX,
-            typename MM1,
-            typename MM2,
-            typename MM3,
-            typename L1,
-            typename L2,
-            typename L3
-            >
-        void lubksb (
-            const matrix<T,N,N,MM1,L1>& a,
-            const matrix<long,N,NX,MM2,L2>& indx,
-            matrix<T,N,NX,MM3,L3>& b
-        )
-        /*!
-            ( this function is derived from the one in numerical recipes in C chapter 2.3)
-            requires
-                - a == the LU decomposition you get from ludcmp()
-                - indx == the indx term you get out of ludcmp()
-                - b == the right hand side vector from the expression a*x = b
-            ensures
-                - #b == the solution vector x from the expression a*x = b
-                  (basically, this function solves for x given b and a)
-        !*/
-        {
-            DLIB_ASSERT(indx.nc() == 1,"in dlib::nric::lubksb() the indx matrix must be a column vector");
-            DLIB_ASSERT(b.nc() == 1,"in dlib::nric::lubksb() the b matrix must be a column vector");
-            const long n = a.nr();
-            long i, ii = -1, ip, j;
-            T sum;
-
-            for (i = 0; i < n; ++i)
-            {
-                ip = indx(i);
-                sum=b(ip);
-                b(ip) = b(i);
-                if (ii != -1)
-                {
-                    for (j = ii; j < i; ++j)
-                        sum -= a(i,j)*b(j);
-                }
-                else if (sum)
-                {
-                    ii = i;
-                }
-                b(i) = sum;
-            }
-            for (i = n-1; i >= 0; --i)
-            {
-                sum = b(i);
-                for (j = i+1; j < n; ++j)
-                    sum -= a(i,j)*b(j);
-                b(i) = sum/a(i,i);
-            }
-        }
-
     // ------------------------------------------------------------------------------------
 
     }
@@ -1001,31 +841,8 @@ convergence:
                 );
             typedef typename matrix_exp<EXP>::type type;
 
-            matrix<type, N, N,MM> a(m), y(m.nr(),m.nr());
-            matrix<long,N,1,MM> indx(m.nr(),1);
-            matrix<type,N,1,MM> col(m.nr(),1);
-            matrix<type,N,1,MM> vv(m.nr(),1);
-            type d;
-            long i, j;
-            if (ludcmp(a,indx,d,vv))
-            {
-                for (j = 0; j < m.nr(); ++j)
-                {
-                    for (i = 0; i < m.nr(); ++i)
-                        col(i) = 0;
-                    col(j) = 1;
-                    lubksb(a,indx,col);
-                    for (i = 0; i < m.nr(); ++i)
-                        y(i,j) = col(i);
-                }
-            }
-            else
-            {
-                // m is singular so lets just set y equal to m just so that 
-                // it has some value
-                y = m;
-            }
-            return y;
+            lu_decomposition<EXP> lu(m);
+            return lu.solve(identity_matrix<type>(m.nr()));
         }
     };
 
@@ -1502,17 +1319,7 @@ convergence:
             typedef typename matrix_exp<EXP>::type type;
             typedef typename matrix_exp<EXP>::mem_manager_type MM;
 
-            matrix<type, N, N,MM> lu(m);
-            matrix<long,N,1,MM> indx(m.nr(),1);
-            matrix<type,N,1,MM> vv(m.nr(),1);
-            type d;
-            if (ludcmp(lu,indx,d,vv) == false)
-            {
-                // the matrix is singular so its det is 0
-                return 0;
-            }
-
-            return prod(diag(lu))*d;
+            return lu_decomposition<EXP>(m).det();
         }
     };
 

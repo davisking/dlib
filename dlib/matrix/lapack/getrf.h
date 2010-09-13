@@ -1,3 +1,5 @@
+// Copyright (C) 2010  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_LAPACk_GETRF_H__
 #define DLIB_LAPACk_GETRF_H__
 
@@ -106,28 +108,16 @@ namespace dlib
             >
         int getrf (
             matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<long,NR2,NC2,MM,layout>& ipiv 
+            matrix<integer,NR2,NC2,MM,layout>& ipiv 
         )
         {
             const long m = a.nr();
             const long n = a.nc();
 
-            matrix<integer,NR2,NC2,MM,column_major_layout> ipiv_temp(std::min(m,n), 1);
+            ipiv.set_size(std::min(m,n), 1);
 
             // compute the actual decomposition 
-            int info = binding::getrf(m, n, &a(0,0), a.nr(), &ipiv_temp(0,0));
-
-            // Turn the P vector into a more useful form.  This way we will have the identity
-            // a == rowm(L*U, ipiv).  The permutation vector that comes out of LAPACK is somewhat
-            // different.
-            ipiv = trans(range(0, a.nr()-1));
-            for (long i = ipiv_temp.size()-1; i >= 0; --i)
-            {
-                // -1 because FORTRAN is indexed starting with 1 instead of 0
-                std::swap(ipiv(i), ipiv(ipiv_temp(i)-1));
-            }
-
-            return info;
+            return binding::getrf(m, n, &a(0,0), a.nr(), &ipiv(0,0));
         }
 
     // ------------------------------------------------------------------------------------

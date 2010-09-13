@@ -8,7 +8,13 @@
 #include "matrix.h" 
 #include "matrix_utilities.h"
 #include "matrix_subexp.h"
+#include "matrix_trsm.h"
 #include <algorithm>
+
+#ifdef DLIB_USE_LAPACK 
+#include "lapack/getrf.h"
+#endif
+
 
 namespace dlib 
 {
@@ -72,7 +78,7 @@ namespace dlib
     private:
 
         /* Array for internal storage of decomposition.  */
-        matrix_type  LU;
+        matrix<type,0,0,mem_manager_type,column_major_layout>  LU;
         long m, n, pivsign; 
         pivot_column_vector_type piv;
 
@@ -107,6 +113,28 @@ namespace dlib
             << "\n\tA.size(): " << A.size()
             << "\n\tthis:     " << this
             );
+
+#ifdef DLIB_USE_LAPACK
+        matrix<lapack::integer,0,1,mem_manager_type,layout_type> piv_temp;
+        lapack::getrf(LU, piv_temp);
+
+        pivsign = 1;
+
+        // Turn the piv_temp vector into a more useful form.  This way we will have the identity
+        // rowm(A,piv) == L*U.  The permutation vector that comes out of LAPACK is somewhat
+        // different.
+        piv = trans(range(0,m-1));
+        for (long i = 0; i < piv_temp.size(); ++i)
+        {
+            // -1 because FORTRAN is indexed starting with 1 instead of 0
+            if (piv(piv_temp(i)-1) != piv(i))
+            {
+                std::swap(piv(i), piv(piv_temp(i)-1));
+                pivsign = -pivsign;
+            }
+        }
+
+#else
 
         // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
 
@@ -170,6 +198,8 @@ namespace dlib
                 }
             }
         }
+
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -311,67 +341,15 @@ namespace dlib
             << "\n\tthis:          " << this
             );
 
-        const long nx = B.nc();
-        // if there are multiple columns in B
-        if (nx > 1)
-        {
+        // Copy right hand side with pivoting
+        matrix<type,0,0,mem_manager_type,column_major_layout> X(rowm(B, piv));
 
-            // Copy right hand side with pivoting
-            matrix_type X(rowm(B, piv));
-
-            // Solve L*Y = B(piv,:)
-            for (long k = 0; k < n; k++) 
-            {
-                for (long i = k+1; i < n; i++) 
-                {
-                    for (long j = 0; j < nx; j++) 
-                    {
-                        X(i,j) -= X(k,j)*LU(i,k);
-                    }
-                }
-            }
-            // Solve U*X = Y;
-            for (long k = n-1; k >= 0; k--) 
-            {
-                for (long j = 0; j < nx; j++) 
-                {
-                    X(k,j) /= LU(k,k);
-                }
-                for (long i = 0; i < k; i++) 
-                {
-                    for (long j = 0; j < nx; j++) 
-                    {
-                        X(i,j) -= X(k,j)*LU(i,k);
-                    }
-                }
-            }
-            return X;
-        }
-        else
-        {
-            column_vector_type x(rowm(B, piv));
-
-            // Solve L*Y = B(piv)
-            for (long k = 0; k < n; k++) 
-            {
-                for (long i = k+1; i < n; i++) 
-                {
-                    x(i) -= x(k)*LU(i,k);
-                }
-            }
-
-            // Solve U*X = Y;
-            for (long k = n-1; k >= 0; k--) 
-            {
-                x(k) /= LU(k,k);
-                for (long i = 0; i < k; i++) 
-                    x(i) -= x(k)*LU(i,k);
-            }
-
-
-            return x;
-
-        }
+        using namespace blas_bindings;
+        // Solve L*Y = B(piv,:)
+        triangular_solver(CblasLeft, CblasLower, CblasNoTrans, CblasUnit, LU, X);
+        // Solve U*X = Y;
+        triangular_solver(CblasLeft, CblasUpper, CblasNoTrans, CblasNonUnit, LU, X);
+        return X;
     }
 
 // ----------------------------------------------------------------------------------------

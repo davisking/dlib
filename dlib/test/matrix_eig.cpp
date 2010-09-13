@@ -110,6 +110,17 @@ namespace
             DLIB_TEST(max(abs(test.get_imag_eigenvalues())) < eps); 
             DLIB_TEST(diagm(diag(D)) == D);
 
+            // only check the determinant against the eigenvalues for small matrices
+            // because for huge ones the determinant might be so big it overflows a floating point number.
+            if (m.nr() < 50) 
+            {
+                const type mdet = det(m);
+                DLIB_TEST_MSG(std::abs(prod(test.get_real_eigenvalues()) - mdet) < std::abs(mdet)*sqrt(std::numeric_limits<type>::epsilon()),
+                              std::abs(prod(test.get_real_eigenvalues()) - mdet) <<"    eps: " << std::abs(mdet)*sqrt(std::numeric_limits<type>::epsilon())
+                              << "  mdet: "<< mdet << "   prod(eig): " << prod(test.get_real_eigenvalues())
+                );
+            }
+
             // V is orthogonal
             DLIB_TEST(equal(V*trans(V), identity_matrix<type>(test.dim()), eps));
             DLIB_TEST(equal(m , V*D*trans(V), eps));
