@@ -1805,13 +1805,13 @@
            construct and return a temporary matrix object but using this technique 
            we can avoid creating all these temporary objects and receive a large speed boost.
            <p>
-           This object is also capable of using BLAS libraries such as ATLAS or the Intel
-           MKL when available.   To enable this feature all you have to do is #define 
+           This object is also capable of using BLAS and LAPACK libraries such as ATLAS or the Intel
+           MKL when available.   To enable BLAS support all you have to do is #define 
            DLIB_USE_BLAS and then make sure you link your application with your 
-           BLAS library.  Additionally, the use of BLAS is transparent to the user, that is, the
-           dlib matrix object uses BLAS internally to optimize all the various forms 
-           of matrix multiplication while still allowing the user to use a simple MATLAB
-           like syntax.  
+           BLAS library.  Similarly, to enable LAPACK support just #define DLIB_USE_LAPACK and 
+           link to your LAPACK library.  Finally, the use of BLAS and LAPACK is transparent to 
+           the user, that is, the dlib matrix object uses BLAS and LAPACK internally to optimize 
+           various operations while still allowing the user to use a simple MATLAB like syntax.  
            </p>
            <p>
            Note that the cmake files that come with dlib know how to link a project with ATLAS or
