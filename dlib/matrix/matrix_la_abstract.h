@@ -504,6 +504,9 @@ namespace dlib
                 The Q and R factors can be retrieved via the get_q() and get_r()
                 methods. Furthermore, a solve() method is provided to find the
                 least squares solution of Ax=b using the QR factors.  
+
+                If DLIB_USE_LAPACK is #defined then the xGEQRF routine
+                from LAPACK is used to compute the QR decomposition.
         !*/
 
     public:
@@ -515,7 +518,6 @@ namespace dlib
         typedef typename matrix_exp_type::layout_type layout_type;
 
         typedef matrix<type,0,0,mem_manager_type,layout_type> matrix_type;
-        typedef matrix<type,0,1,mem_manager_type,layout_type> column_vector_type;
 
         template <typename EXP>
         qr_decomposition(
@@ -554,17 +556,6 @@ namespace dlib
         /*!
             ensures
                 - returns the number of columns in the input matrix
-        !*/
-
-        const matrix_type get_householder (
-        )  const;
-        /*!
-            ensures
-                - returns a matrix H such that:
-                    - H is the lower trapezoidal matrix whose columns define the 
-                      Householder reflection vectors from QR factorization 
-                    - H.nr() == nr()
-                    - H.nc() == nc()
         !*/
 
         const matrix_type get_r (

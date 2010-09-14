@@ -9,6 +9,13 @@
 #include "matrix_utilities.h"
 #include "matrix_subexp.h"
 
+#ifdef DLIB_USE_LAPACK
+#include "lapack/geqrf.h"
+#include "lapack/ormqr.h"
+#endif
+
+#include "matrix_trsm.h"
+
 namespace dlib 
 {
 
@@ -27,7 +34,6 @@ namespace dlib
         typedef typename matrix_exp_type::layout_type layout_type;
 
         typedef matrix<type,0,0,mem_manager_type,layout_type>  matrix_type;
-        typedef matrix<type,0,1,mem_manager_type,layout_type> column_vector_type;
 
         // You have supplied an invalid type of matrix_exp_type.  You have
         // to use this object with matrices that contain float or double type data.
@@ -50,9 +56,6 @@ namespace dlib
         long nc(
         ) const;
 
-        const matrix_type get_householder (
-        )  const;
-
         const matrix_type get_r (
         ) const;
 
@@ -66,6 +69,7 @@ namespace dlib
 
     private:
 
+#ifndef DLIB_USE_LAPACK
         template <typename EXP>
         const matrix_type solve_mat (
             const matrix_exp<EXP>& B
@@ -75,12 +79,13 @@ namespace dlib
         const matrix_type solve_vect (
             const matrix_exp<EXP>& B
         ) const;
+#endif
 
 
         /** Array for internal storage of decomposition.
         @serial internal array storage.
         */
-        matrix_type QR_;
+        matrix<type,0,0,mem_manager_type,column_major_layout> QR_;
 
         /** Row and column dimensions.
         @serial column dimension.
@@ -91,6 +96,8 @@ namespace dlib
         /** Array for internal storage of diagonal of R.
         @serial diagonal of R.
         */
+        typedef matrix<type,0,1,mem_manager_type,column_major_layout> column_vector_type;
+        column_vector_type tau;
         column_vector_type Rdiag;
 
 
@@ -125,6 +132,13 @@ namespace dlib
         QR_ = A;
         m = A.nr();
         n = A.nc();
+
+#ifdef DLIB_USE_LAPACK
+
+        lapack::geqrf(QR_, tau);
+        Rdiag = diag(QR_);
+
+#else
         Rdiag.set_size(n);
         long i=0, j=0, k=0;
 
@@ -168,6 +182,7 @@ namespace dlib
             }
             Rdiag(k) = -nrm;
         }
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -211,16 +226,6 @@ namespace dlib
 
     template <typename matrix_exp_type>
     const typename qr_decomposition<matrix_exp_type>::matrix_type qr_decomposition<matrix_exp_type>::
-    get_householder (
-    )  const
-    {
-        return lowerm(QR_);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename matrix_exp_type>
-    const typename qr_decomposition<matrix_exp_type>::matrix_type qr_decomposition<matrix_exp_type>::
     get_r(
     ) const
     {
@@ -253,6 +258,17 @@ namespace dlib
     get_q(
     ) const
     {
+#ifdef DLIB_USE_LAPACK
+        matrix<type,0,0,mem_manager_type,column_major_layout> X;
+        // Take only the first n columns of an identity matrix.  This way
+        // X ends up being an m by n matrix.
+        X = colm(identity_matrix<type>(m), range(0,n-1));
+
+        // Compute Y = Q*X 
+        lapack::ormqr('L','N', QR_, tau, X);
+        return X;
+
+#else
         long i=0, j=0, k=0;
 
         matrix_type Q(m,n);
@@ -281,6 +297,7 @@ namespace dlib
             }
         }
         return Q;
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -303,11 +320,25 @@ namespace dlib
             << "\n\tthis:           " << this
             );
 
+#ifdef DLIB_USE_LAPACK
+
+        using namespace blas_bindings;
+        matrix<type,0,0,mem_manager_type,column_major_layout> X(B);
+        // Compute Y = transpose(Q)*B
+        lapack::ormqr('L','T',QR_, tau, X);
+        // Solve R*X = Y;
+        triangular_solver(CblasLeft, CblasUpper, CblasNoTrans, CblasNonUnit, QR_, X, n);
+
+        /* return n x nx portion of X */
+        return subm(X,0,0,n,B.nc());
+
+#else
         // just call the right version of the solve function
         if (B.nc() == 1)
             return solve_vect(B);
         else
             return solve_mat(B);
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -315,6 +346,8 @@ namespace dlib
 //                           Private member functions
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
+
+#ifndef DLIB_USE_LAPACK
 
     template <typename matrix_exp_type>
     template <typename EXP>
@@ -407,6 +440,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+#endif // DLIB_USE_LAPACK not defined
 
 } 
 

@@ -597,6 +597,29 @@ namespace dlib
             typename T,
             long NR1, long NR2,
             long NC1, long NC2,
+            typename MM
+            >
+        inline void triangular_solver (
+            const enum CBLAS_SIDE Side,
+            const enum CBLAS_UPLO Uplo, 
+            const enum CBLAS_TRANSPOSE TransA,
+            const enum CBLAS_DIAG Diag,
+            const matrix<T,NR1,NC1,MM,column_major_layout>& A,
+            matrix<T,NR2,NC2,MM,column_major_layout>& B,
+            long rows_of_B
+        )
+        {
+            const T alpha = 1;
+            cblas_trsm(CblasColMajor, Side,  Uplo, TransA, Diag, rows_of_B, B.nc(),
+                       alpha, &A(0,0), A.nr(), &B(0,0), B.nr());
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename T,
+            long NR1, long NR2,
+            long NC1, long NC2,
             typename MM,
             typename layout
             >
