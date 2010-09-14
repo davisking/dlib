@@ -2741,7 +2741,7 @@ namespace dlib
 
         const static long cost = M::cost+1;
         typedef typename M::type type;
-        typedef const typename M::const_ret_type const_ret_type;
+        typedef typename M::const_ret_type const_ret_type;
         const_ret_type apply ( long r, long c) const
         { 
             if (r >= c)
