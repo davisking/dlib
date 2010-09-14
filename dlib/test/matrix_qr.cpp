@@ -149,6 +149,9 @@ namespace
         test_qr(10*randmat<double,15,15>());
         test_qr(10*randmat<double,100,100>());
 
+        typedef matrix<double,0,0,memory_manager<char>::kernel_1a, column_major_layout> mat;
+        test_qr(mat(3*randmat<double>(9,4)));
+        test_qr(mat(3*randmat<double>(9,9)));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -169,6 +172,9 @@ namespace
         test_qr(3*randmat<float,4,4>());
         test_qr(3*randmat<float,9,4>());
 
+        typedef matrix<float,0,0,memory_manager<char>::kernel_1a, column_major_layout> mat;
+        test_qr(mat(3*randmat<float>(9,4)));
+        test_qr(mat(3*randmat<float>(9,9)));
     }
 
 // ----------------------------------------------------------------------------------------

@@ -137,11 +137,26 @@ namespace
     template <typename matrix_type>
     void test_eigenvalue ( const matrix_type& m )
     {
-        eigenvalue_decomposition<matrix_type> test(m);
-        test_eigenvalue_impl(m, test);
+        typedef typename matrix_type::type type;
+        typedef typename matrix_type::mem_manager_type MM;
+        matrix<type,matrix_type::NR, matrix_type::NC, MM, row_major_layout> mr(m); 
+        matrix<type,matrix_type::NR, matrix_type::NC, MM, column_major_layout> mc(m); 
 
-        eigenvalue_decomposition<matrix_type> test_symm(make_symmetric(m));
-        test_eigenvalue_impl(make_symmetric(m), test_symm);
+        {
+        eigenvalue_decomposition<matrix_type> test(mr);
+        test_eigenvalue_impl(mr, test);
+
+        eigenvalue_decomposition<matrix_type> test_symm(make_symmetric(mr));
+        test_eigenvalue_impl(make_symmetric(mr), test_symm);
+        }
+
+        {
+        eigenvalue_decomposition<matrix_type> test(mc);
+        test_eigenvalue_impl(mc, test);
+
+        eigenvalue_decomposition<matrix_type> test_symm(make_symmetric(mc));
+        test_eigenvalue_impl(make_symmetric(mc), test_symm);
+        }
     }
 
 // ----------------------------------------------------------------------------------------

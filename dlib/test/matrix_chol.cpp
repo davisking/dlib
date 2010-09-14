@@ -129,6 +129,8 @@ namespace
         test_cholesky(uniform_matrix<double>(15,15,1) + 10*symm(randmat<double>(15,15)));
         test_cholesky(uniform_matrix<double>(101,101,1) + 10*symm(randmat<double>(101,101)));
 
+        typedef matrix<double,0,0,memory_manager<char>::kernel_1a, column_major_layout> mat;
+        test_cholesky(mat(uniform_matrix<double>(101,101,1) + 10*symm(randmat<double>(101,101))));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -140,6 +142,8 @@ namespace
         test_cholesky(uniform_matrix<float>(2,2,1) + 2*symm(randmat<float>(2,2)));
         test_cholesky(uniform_matrix<float>(3,3,1) + 2*symm(randmat<float>(3,3)));
 
+        typedef matrix<float,0,0,memory_manager<char>::kernel_1a, column_major_layout> mat;
+        test_cholesky(mat(uniform_matrix<float>(3,3,1) + 2*symm(randmat<float>(3,3))));
     }
 
 // ----------------------------------------------------------------------------------------

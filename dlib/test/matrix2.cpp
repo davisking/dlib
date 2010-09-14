@@ -635,6 +635,50 @@ namespace
 
         }
 
+        {
+            srand(423452);
+            const long M = 3;
+            const long N = 3;
+
+            typedef matrix<double,0,0> mat;
+
+            matrix<double,0,0,memory_manager<char>::kernel_1a, column_major_layout> a(M,N);  
+            for (long r = 0; r < a.nr(); ++r)
+            {
+                for (long c = 0; c < a.nc(); ++c)
+                {
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
+                }
+            }
+
+            matrix<double,M,M,memory_manager<char>::kernel_1a, column_major_layout> u, u2;  
+            matrix<double,0,0,memory_manager<char>::kernel_1a, column_major_layout> q, q2;
+            matrix<double,N,N,memory_manager<char>::kernel_1a, column_major_layout> v, v2;
+
+            matrix<double,M,N,MM, column_major_layout> a2;  
+            a2 = tmp(a/2);
+
+
+            svd2(true,true,a2+a2,u,q,v);
+
+            double err = max(abs(a - subm(u,get_rect(a2+a2))*diagm(q)*trans(v)));
+            DLIB_TEST_MSG( err < 1e-11,"err: " << err);
+            using dlib::equal;
+            DLIB_TEST((equal(trans(u)*u , identity_matrix<double,M>(), 1e-10)));
+            DLIB_TEST((equal(trans(v)*v , identity_matrix<double,N>(), 1e-10)));
+
+            svd2(false,true,a2+a2,u,q,v2);
+            svd2(true,false,a2+a2,u2,q,v);
+            svd2(false,false,a2+a2,u,q2,v);
+
+            err = max(abs(a - subm(u2,get_rect(a2+a2))*diagm(q2)*trans(v2)));
+            DLIB_TEST_MSG( err < 1e-11,"err: " << err);
+            DLIB_TEST((equal(trans(u2)*u2 , identity_matrix<double,M>(), 1e-10)));
+            DLIB_TEST((equal(trans(v2)*v2 , identity_matrix<double,N>(), 1e-10)));
+
+        }
+
+
 
         {
             srand(423452);
@@ -820,6 +864,30 @@ namespace
             matrix<double> u;  
             matrix<double> w;
             matrix<double> v;
+
+            svd(a,u,w,v);
+
+            DLIB_TEST(  sum(round(1e10*(a - u*w*trans(v)))) == 0);
+        }
+
+        {
+            srand(53234);
+            const long M = 9;
+            const long N = 40;
+
+            typedef matrix<double,0,0,memory_manager<char>::kernel_1a, column_major_layout> mat;
+            mat a(M,N);  
+            for (long r = 0; r < a.nr(); ++r)
+            {
+                for (long c = 0; c < a.nc(); ++c)
+                {
+                    a(r,c) = 10*((double)::rand())/RAND_MAX;
+                }
+            }
+
+            mat u;  
+            mat w;
+            mat v;
 
             svd(a,u,w,v);
 
