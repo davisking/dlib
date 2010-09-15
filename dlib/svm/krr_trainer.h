@@ -414,7 +414,9 @@ namespace dlib
                         looe += loss(loov, y(i));
                     }
 
-                    if (looe < best_looe)
+                    // Keep track of the lambda which gave the lowest looe.  If two lambdas
+                    // have the same looe then pick the biggest lambda.
+                    if (looe < best_looe || (looe == best_looe && lams(idx) > the_lambda))
                     {
                         best_looe = looe;
                         the_lambda = lams(idx);
