@@ -966,6 +966,18 @@ namespace
         }
 
         {
+            matrix<int> m(3,3);
+
+            m = 1, 2, 3,
+                4, 5, 6,
+                7, 8, 9;
+
+            DLIB_TEST(make_symmetric(m) == trans(make_symmetric(m)));
+            DLIB_TEST(lowerm(make_symmetric(m)) == lowerm(m));
+            DLIB_TEST(upperm(make_symmetric(m)) == trans(lowerm(m)));
+        }
+
+        {
             matrix<int,3,4> a;
             matrix<int> b(3,1), c(1,4);
 
