@@ -12,12 +12,25 @@
 
 <current>
 New Stuff:
+   - Added the running_scalar_covariance object.
+   - All the matrix decomposition routines now use LAPACK when DLIB_USE_LAPACK
+     is #defined.   
 
 Non-Backwards Compatible Changes:
+   - Removed the dlib::EOTHER constant since it conflicts with visual
+     studio 2010.
+   - Changed the svd functions so you can't supply output matrices which use 
+     both column and row major layouts.  Now all the output matrices need to 
+     use the same memory layout.
+   - Removed the qr_decomposition::get_householder() function.
 
 Bug fixes:
+   - Minor fixes so that dlib compiles in Visual Studio 2010
 
 Other:
+   - Added an overloaded matrix_assign() that handles symmetric kernel_matrix()
+     expressions more efficiently by only evaluating the upper triangular part
+     of the matrix.
 
 </current>
 
