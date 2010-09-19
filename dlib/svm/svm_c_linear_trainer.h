@@ -435,6 +435,12 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef decision_function<kernel_type> trained_function_type;
 
+        // You are getting a compiler error on this line because you supplied a non-linear kernel
+        // to the svm_c_linear_trainer object.  You have to use one of the linear kernels with this
+        // trainer.
+        COMPILE_TIME_ASSERT((is_same_type<K, linear_kernel<sample_type> >::value ||
+                             is_same_type<K, sparse_linear_kernel<sample_type> >::value ));
+
         svm_c_linear_trainer (
         )
         {
