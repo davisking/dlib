@@ -182,8 +182,10 @@ namespace dlib
                 try
                 {
 
-/*
-                    // causes dead-lock when using with XIM
+                    // You are supposed to call this if using XLib in a threaded program.  Note
+                    // however that at one point I nocied that calling this causes a dead-lock 
+                    // when using XIM.  But I can't reproduce that anymore and not calling it 
+                    // sometimes causes XCloseDisplay() to hang.
                     if (XInitThreads() == 0)
                     {
                         dlog << LFATAL << "Unable to initialize threading support.";
@@ -194,7 +196,6 @@ namespace dlib
                         window_table.get_mutex().unlock();
                         return;
                     }
-*/
 
                     window_table.get_mutex().lock();
                     disp = XOpenDisplay(NULL);
@@ -1675,6 +1676,14 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
         close_window();
+
+        if (x11_stuff.globals->xim != NULL)
+        {
+            XDestroyIC(x11_stuff.xic);
+            x11_stuff.xic = 0;
+            XFreeFontSet(x11_stuff.globals->disp,x11_stuff.fs);
+        }
+
         delete &x11_stuff;
     }
 
@@ -1691,12 +1700,6 @@ namespace dlib
             has_been_destroyed = true;
 
             x11_stuff.globals->window_table.destroy(x11_stuff.hwnd);           
-            if (x11_stuff.globals->xim != NULL)
-            {
-                XDestroyIC(x11_stuff.xic);
-                x11_stuff.xic = 0;
-                XFreeFontSet(x11_stuff.globals->disp,x11_stuff.fs);
-            }
 
             XDestroyWindow(x11_stuff.globals->disp,x11_stuff.hwnd);
             x11_stuff.hwnd = 0;
