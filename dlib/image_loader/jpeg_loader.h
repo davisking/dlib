@@ -1,4 +1,4 @@
-// Copyright (C) 2008  Davis E. King (davis@dlib.net), Nils Labugt
+// Copyright (C) 2010  Davis E. King (davis@dlib.net), Nils Labugt
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_JPEG_IMPORT
 #define DLIB_JPEG_IMPORT
