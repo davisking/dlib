@@ -60,7 +60,7 @@ if (UNIX)
    # try to find some other LAPACK libraries if we didn't find the MKL
 
    if (NOT lapack_found)
-      find_library(lapack_lib lapack)
+      find_library(lapack_lib NAMES lapack lapack-3)
       if (lapack_lib)
          set(lapack_libraries ${lapack_lib})
          set(lapack_found 1)
@@ -71,17 +71,6 @@ if (UNIX)
 
    
    # try to find some other BLAS libraries if we didn't find the MKL
-
-   if (NOT blas_found)
-      find_library(cblas_lib cblas)
-      if (cblas_lib)
-         set(blas_libraries ${cblas_lib})
-         set(blas_found 1)
-         message(STATUS "Found CBLAS library")
-      endif()
-      mark_as_advanced( cblas_lib)
-   endif()
-
    
    if (NOT blas_found)
       find_library(atlas_lib atlas)
@@ -91,6 +80,17 @@ if (UNIX)
          message(STATUS "Found ATLAS BLAS library")
       endif()
       mark_as_advanced( atlas_lib)
+   endif()
+
+
+   if (NOT blas_found)
+      find_library(cblas_lib cblas)
+      if (cblas_lib)
+         set(blas_libraries ${cblas_lib})
+         set(blas_found 1)
+         message(STATUS "Found CBLAS library")
+      endif()
+      mark_as_advanced( cblas_lib)
    endif()
 
    
