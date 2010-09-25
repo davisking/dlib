@@ -55,6 +55,8 @@ set (DLIB_USE_LAPACK_STR
 "Disable this if you don't want to use a LAPACK library" )
 set (DLIB_LINK_WITH_LIBPNG_STR
 "Disable this if you don't want to link against libpng" )
+set (DLIB_LINK_WITH_LIBJPEG_STR
+"Disable this if you don't want to link against libjpeg" )
 
 option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
 option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
@@ -63,6 +65,7 @@ option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
 option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
 option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
 option(DLIB_LINK_WITH_LIBPNG ${DLIB_LINK_WITH_LIBPNG_STR} ON)
+option(DLIB_LINK_WITH_LIBJPEG ${DLIB_LINK_WITH_LIBJPEG_STR} ON)
 
 
 add_library(dlib STATIC all/source.cpp )
@@ -143,10 +146,21 @@ if (NOT DLIB_ISO_CPP_ONLY)
       set(PNG_FIND_QUIETLY ON)
       include(FindPNG)
       if (PNG_FOUND)
-         include_directories(${PNG_PNG_INCLUDE_DIR})
+         include_directories(${PNG_INCLUDE_DIR})
          set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
       else()
          set(DLIB_LINK_WITH_LIBPNG OFF CACHE STRING ${DLIB_LINK_WITH_LIBPNG_STR} FORCE )
+      endif()
+   endif()
+
+   if (DLIB_LINK_WITH_LIBJPEG)
+      # try to find libjpeg 
+      include(FindJPEG)
+      if (JPEG_FOUND)
+         include_directories(${JPEG_INCLUDE_DIR})
+         set (dlib_needed_libraries ${dlib_needed_libraries} ${JPEG_LIBRARY})
+      else()
+         set(DLIB_LINK_WITH_LIBJPEG OFF CACHE STRING ${DLIB_LINK_WITH_LIBJPEG_STR} FORCE )
       endif()
    endif()
 
@@ -188,6 +202,12 @@ if (DLIB_LINK_WITH_LIBPNG)
    add_global_define(DLIB_PNG_SUPPORT)
 else()
    remove_global_define(DLIB_PNG_SUPPORT)
+endif()
+
+if (DLIB_LINK_WITH_LIBJPEG)
+   add_global_define(DLIB_JPEG_SUPPORT)
+else()
+   remove_global_define(DLIB_JPEG_SUPPORT)
 endif()
 
 

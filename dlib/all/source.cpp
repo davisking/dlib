@@ -49,6 +49,10 @@
 #include "../image_loader/png_loader.cpp"
 #endif
 
+#ifdef DLIB_JPEG_SUPPORT
+#include "../image_loader/jpeg_loader.cpp"
+#endif
+
 #ifndef DLIB_NO_GUI_SUPPORT
 
 #include "../gui_widgets/fonts.cpp"
