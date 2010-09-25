@@ -870,6 +870,7 @@
          <term file="imaging.html" name="threshold_image"/>
          <term file="imaging.html" name="auto_threshold_image"/>
          <term file="imaging.html" name="png_loader"/>
+         <term file="imaging.html" name="jpeg_loader"/>
 
          <term file="imaging.html" name="integral_image"/>
          <term file="imaging.html" name="hessian_pyramid"/>

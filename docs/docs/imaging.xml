@@ -39,6 +39,7 @@
       <section>
          <name>Image I/O</name>
          <item>png_loader</item>
+         <item>jpeg_loader</item>
          <item>load_bmp</item> 
          <item>save_bmp</item> 
          <item>load_dng</item> 
@@ -435,7 +436,28 @@
             an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
             <p>
                Note that you must define DLIB_PNG_SUPPORT if you want to use this object.  You
-               must also set your build environment to link to the libpng library.
+               must also set your build environment to link to the libpng library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>jpeg_loader</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_loader/jpeg_loader_abstract.h</spec_file>
+         <description>        
+            This object loads a JPEG image file into 
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_JPEG_SUPPORT if you want to use this object.  You
+               must also set your build environment to link to the libjpeg library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
             </p>
          </description>
                                  
