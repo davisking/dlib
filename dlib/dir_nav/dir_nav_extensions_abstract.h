@@ -93,6 +93,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    directory get_parent_directory (
+        const directory& dir
+    );
+    /*!
+        ensures
+            - returns the parent directory of dir.  In particular, this
+              function returns the value of dir.get_parent()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    directory get_parent_directory (
+        const file& f
+    );
+    /*!
+        ensures
+            - if (f.full_name() != "") then
+                - returns the directory which contains the given file
+            - else
+                - returns a default initialized directory (i.e. directory())
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DIR_NAV_EXTENSIONs_ABSTRACT_

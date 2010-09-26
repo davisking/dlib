@@ -101,7 +101,7 @@ namespace dlib
         );
         /*!
             ensures
-                - this function is idential to file(const std::string& name)
+                - this function is identical to file(const std::string& name)
         !*/
 
         file (
@@ -243,7 +243,7 @@ namespace dlib
         );
         /*!
             ensures
-                - this function is idential to directory(const std::string& name)
+                - this function is identical to directory(const std::string& name)
         !*/
 
         directory (

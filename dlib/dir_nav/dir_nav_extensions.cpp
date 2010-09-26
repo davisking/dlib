@@ -36,6 +36,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    directory get_parent_directory (
+        const directory& dir
+    )
+    {
+        return dir.get_parent();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    directory get_parent_directory (
+        const file& f
+    )
+    {
+        if (f.full_name().size() == 0)
+            return directory();
+
+        std::string::size_type pos = f.full_name().find_last_of("\\/");
+        
+        if (pos == std::string::npos)
+            return directory();
+
+        return directory(f.full_name().substr(0,pos));
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DIR_NAV_EXTENSIONs_CPP_
