@@ -576,6 +576,10 @@
                   <name>get_files_in_directory_tree</name>
                   <link>dlib/dir_nav/dir_nav_extensions_abstract.h.html#get_files_in_directory_tree</link>
                </item>
+               <item>
+                  <name>get_parent_directory</name>
+                  <link>dlib/dir_nav/dir_nav_extensions_abstract.h.html#get_parent_directory</link>
+               </item>
             </sub>
          </item>
          <item>

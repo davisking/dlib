@@ -494,6 +494,8 @@
          <term file="dlib/dir_nav/dir_nav_kernel_abstract.h.html" name="listing_error"/>
          <term link="dlib/dir_nav/dir_nav_extensions_abstract.h.html#get_files_in_directory_tree" 
             name="get_files_in_directory_tree"/>
+         <term link="dlib/dir_nav/dir_nav_extensions_abstract.h.html#get_parent_directory" 
+            name="get_parent_directory"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_ending"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_all"/>
 
