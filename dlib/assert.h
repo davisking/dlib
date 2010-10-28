@@ -59,7 +59,14 @@ namespace dlib
 // -----------------------------
 
 #ifdef __GNUC__
-#define DLIB_FUNCTION_NAME __PRETTY_FUNCTION__
+// There is a bug in version 4.4.5 of GCC on Ubuntu which causes GCC to segfault
+// when __PRETTY_FUNCTION__ is used within certain templated functions.  So just
+// don't use it with this version of GCC.
+#  if !(__GNUC__ == 4 && __GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ == 5)
+#    define DLIB_FUNCTION_NAME __PRETTY_FUNCTION__
+#  else
+#    define DLIB_FUNCTION_NAME "unknown function" 
+#  endif
 #elif _MSC_VER
 #define DLIB_FUNCTION_NAME __FUNCSIG__
 #else
