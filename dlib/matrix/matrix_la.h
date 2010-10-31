@@ -1097,7 +1097,8 @@ convergence:
         // compute the first column
         for (long r = 1; r < A.nr(); ++r)
         {
-            if (L(0,0) > eps*A(r,0))
+            // if (L(0,0) > 0)
+            if (L(0,0) > eps*std::abs(A(r,0)))
                 L(r,0) = A(r,0)/L(0,0);
             else
                 return L;
@@ -1123,7 +1124,9 @@ convergence:
                 {
                     temp -= L(r,i)*L(c,i);
                 }
-                if (L(c,c) > eps*temp)
+
+                // if (L(c,c) > 0)
+                if (L(c,c) > eps*std::abs(temp))
                     L(r,c) = temp/L(c,c);
                 else
                     return L;
