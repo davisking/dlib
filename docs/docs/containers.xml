@@ -488,6 +488,10 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#scale_columns</link>
                      </item>
                      <item>
+                        <name>scale_rows</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#scale_rows</link>
+                     </item>
+                     <item>
                         <name>sort_columns</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#sort_columns</link>
                      </item>

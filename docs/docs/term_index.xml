@@ -317,6 +317,7 @@
 
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="scale_columns"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="scale_rows"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="sort_columns"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="rsort_columns"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="tensor_product"/>

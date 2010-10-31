@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.31" date="Sep 15, 2010">
+New Stuff:
    - Added the running_scalar_covariance object.
    - All the matrix decomposition routines now use LAPACK when DLIB_USE_LAPACK
      is #defined.   
@@ -32,7 +45,7 @@ Other:
      expressions more efficiently by only evaluating the upper triangular part
      of the matrix.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
