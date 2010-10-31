@@ -2600,7 +2600,6 @@ namespace dlib
         const matrix_exp<matrix_op<op_diagm<EXP2> > >& v 
     )
     {
-        std::cout << "yay" << std::endl;
         return scale_columns(m,v.ref().op.m);
     }
 
@@ -2676,7 +2675,6 @@ namespace dlib
         const matrix_exp<EXP1>& m
     )
     {
-        std::cout << "yay" << std::endl;
         return scale_rows(m,v.ref().op.m);
     }
 
