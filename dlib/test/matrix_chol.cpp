@@ -82,6 +82,11 @@ namespace
         type temp;
         DLIB_TEST_MSG( (temp= max(abs(test.get_l()*trans(test.get_l()) - m))) < eps,temp);
 
+        {
+            matrix<type> mat = chol(m);
+            DLIB_TEST_MSG( (temp= max(abs(mat*trans(mat) - m))) < eps,temp);
+        }
+
 
         matrix<type> m2;
         matrix<type,0,1> col;

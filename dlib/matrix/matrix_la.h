@@ -1088,6 +1088,8 @@ convergence:
         if (A.size() == 0)
             return L;
 
+        const T eps = std::numeric_limits<T>::epsilon();
+
         // compute the upper left corner
         if (A(0,0) > 0)
             L(0,0) = std::sqrt(A(0,0));
@@ -1095,10 +1097,10 @@ convergence:
         // compute the first column
         for (long r = 1; r < A.nr(); ++r)
         {
-            if (L(0,0) > 0)
+            if (L(0,0) > eps*A(r,0))
                 L(r,0) = A(r,0)/L(0,0);
             else
-                L(r,0) = A(r,0);
+                return L;
         }
 
         // now compute all the other columns
@@ -1121,10 +1123,10 @@ convergence:
                 {
                     temp -= L(r,i)*L(c,i);
                 }
-                if (L(c,c) > 0)
+                if (L(c,c) > eps*temp)
                     L(r,c) = temp/L(c,c);
                 else
-                    L(r,c) = temp;
+                    return L;
             }
         }
 
