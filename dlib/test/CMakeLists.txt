@@ -66,6 +66,7 @@ set (tests
    rand.cpp
    read_write_mutex.cpp
    reference_counter.cpp
+   scale_rows_columns.cpp
    sequence.cpp
    serialize.cpp
    set.cpp

@@ -806,7 +806,7 @@ namespace dlib
     );
     /*!
         requires
-            - is_col_vector(v) == true
+            - is_vector(v) == true
             - v.size() == m.nc()
             - m and v both contain the same type of element
         ensures
@@ -817,6 +817,35 @@ namespace dlib
                   R(r,c) == m(r,c) * v(c)
                 - i.e. R is the result of multiplying each of m's columns by
                   the corresponding scalar in v.
+
+            - Note that this function is identical to the expression m*diagm(v).  
+              That is, the * operator is overloaded for this case and will invoke
+              scale_columns() automatically as appropriate.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp scale_rows (
+        const matrix_exp& m,
+        const matrix_exp& v
+    );
+    /*!
+        requires
+            - is_vector(v) == true
+            - v.size() == m.nr()
+            - m and v both contain the same type of element
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m and v.
+                - R has the same dimensions as m. 
+                - for all valid r and c:
+                  R(r,c) == m(r,c) * v(r)
+                - i.e. R is the result of multiplying each of m's rows by
+                  the corresponding scalar in v.
+
+            - Note that this function is identical to the expression diagm(v)*m.  
+              That is, the * operator is overloaded for this case and will invoke
+              scale_rows() automatically as appropriate.
     !*/
 
 // ----------------------------------------------------------------------------------------

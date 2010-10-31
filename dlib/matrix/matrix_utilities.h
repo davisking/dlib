@@ -2565,13 +2565,20 @@ namespace dlib
         const matrix_exp<EXP2>& v 
     )
     {
+        // Both arguments to this function must contain the same type of element
         COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
-        COMPILE_TIME_ASSERT(EXP2::NC == 1 || EXP2::NC == 0);
-        COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NR || EXP1::NC == 0 || EXP2::NR == 0);
+        // The v argument must be a row or column vector.
+        COMPILE_TIME_ASSERT((EXP2::NC == 1 || EXP2::NC == 0) || (EXP2::NR == 1 || EXP2::NR == 0));
 
-        DLIB_ASSERT(is_col_vector(v) == true && v.size() == m.nc(), 
+        // figure out the compile time known length of v
+        const long v_len = ((EXP2::NR)*(EXP2::NC) == 0)? 0 : (tmax<EXP2::NR,EXP2::NC>::value);
+
+        // the length of v must match the number of columns in m
+        COMPILE_TIME_ASSERT(EXP1::NC == v_len || EXP1::NC == 0 || v_len == 0);
+
+        DLIB_ASSERT(is_vector(v) == true && v.size() == m.nc(), 
             "\tconst matrix_exp scale_columns(m, v)"
-            << "\n\tv must be a column vector and its length must match the number of columns in m"
+            << "\n\tv must be a row or column vector and its length must match the number of columns in m"
             << "\n\tm.nr(): " << m.nr()
             << "\n\tm.nc(): " << m.nc() 
             << "\n\tv.nr(): " << v.nr()
@@ -2579,6 +2586,98 @@ namespace dlib
             );
         typedef op_scale_columns<EXP1,EXP2> op;
         return matrix_op<op>(op(m.ref(),v.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+// turn expressions of the form mat*diagm(v) into scale_columns(mat, v)
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    const matrix_op<op_scale_columns<EXP1,EXP2> > operator* (
+        const matrix_exp<EXP1>& m,
+        const matrix_exp<matrix_op<op_diagm<EXP2> > >& v 
+    )
+    {
+        std::cout << "yay" << std::endl;
+        return scale_columns(m,v.ref().op.m);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M1, typename M2>
+    struct op_scale_rows  
+    {
+        op_scale_rows(const M1& m1_, const M2& m2_) : m1(m1_), m2(m2_) {}
+        const M1& m1;
+        const M2& m2;
+
+        const static long cost = M1::cost + M2::cost + 1;
+        typedef typename M1::type type;
+        typedef const typename M1::type const_ret_type;
+        typedef typename M1::mem_manager_type mem_manager_type;
+        typedef typename M1::layout_type layout_type;
+        const static long NR = M1::NR;
+        const static long NC = M1::NC;
+
+        const_ret_type apply ( long r, long c) const { return m1(r,c)*m2(r); }
+
+        long nr () const { return m1.nr(); }
+        long nc () const { return m1.nc(); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        { return m1.aliases(item) || m2.aliases(item) ; }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        { return m1.destructively_aliases(item) || m2.aliases(item); }
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    const matrix_op<op_scale_rows<EXP1,EXP2> > scale_rows (
+        const matrix_exp<EXP1>& m,
+        const matrix_exp<EXP2>& v 
+    )
+    {
+        // Both arguments to this function must contain the same type of element
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+        // The v argument must be a row or column vector.
+        COMPILE_TIME_ASSERT((EXP2::NC == 1 || EXP2::NC == 0) || (EXP2::NR == 1 || EXP2::NR == 0));
+
+        // figure out the compile time known length of v
+        const long v_len = ((EXP2::NR)*(EXP2::NC) == 0)? 0 : (tmax<EXP2::NR,EXP2::NC>::value);
+
+        // the length of v must match the number of rows in m
+        COMPILE_TIME_ASSERT(EXP1::NR == v_len || EXP1::NR == 0 || v_len == 0);
+
+        DLIB_ASSERT(is_vector(v) == true && v.size() == m.nr(), 
+            "\tconst matrix_exp scale_rows(m, v)"
+            << "\n\tv must be a row or column vector and its length must match the number of rows in m"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tv.nr(): " << v.nr()
+            << "\n\tv.nc(): " << v.nc() 
+            );
+        typedef op_scale_rows<EXP1,EXP2> op;
+        return matrix_op<op>(op(m.ref(),v.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+// turn expressions of the form diagm(v)*mat into scale_rows(mat, v)
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    const matrix_op<op_scale_rows<EXP1,EXP2> > operator* (
+        const matrix_exp<matrix_op<op_diagm<EXP2> > >& v, 
+        const matrix_exp<EXP1>& m
+    )
+    {
+        std::cout << "yay" << std::endl;
+        return scale_rows(m,v.ref().op.m);
     }
 
 // ----------------------------------------------------------------------------------------
