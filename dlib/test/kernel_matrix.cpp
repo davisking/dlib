@@ -46,6 +46,7 @@ namespace
             std::vector<sample_type> vect2;
 
             const sample_type samp = randm(4,1);
+            sample_type samp2, samp3;
 
             vect1.push_back(randm(4,1));
             vect1.push_back(randm(4,1));
@@ -121,6 +122,17 @@ namespace
             DLIB_TEST(equal(K, kernel_matrix(kern, samp, vect1)));
             DLIB_TEST(equal(K, kernel_matrix(kern, samp, vector_to_matrix(vect1))));
 
+
+
+            samp2 = samp;
+            samp3 = samp;
+
+            // test the alias detection
+            samp2 = kernel_matrix(kern, vect1, samp2);
+            DLIB_TEST(equal(samp2, kernel_matrix(kern, vect1, samp)));
+
+            samp3 = trans(kernel_matrix(kern, samp3, vect2));
+            DLIB_TEST(equal(samp3, trans(kernel_matrix(kern, samp, vect2))));
 
         }
     };

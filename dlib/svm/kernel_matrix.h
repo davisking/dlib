@@ -112,7 +112,7 @@ namespace dlib
     }
 
     template <typename K, typename vect_type1, typename vect_type2>
-    struct op_kern_mat : does_not_alias 
+    struct op_kern_mat  
     {
         op_kern_mat( 
             const K& kern_, 
@@ -149,6 +149,18 @@ namespace dlib
 
         long nr () const { return impl::size<K>(vect1); }
         long nc () const { return impl::size<K>(vect2); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item ) const { return alias_helper(item.ref()); }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item ) const { return alias_helper(item.ref()); }
+
+        template <typename U> bool alias_helper  ( const U& ) const { return false; }
+
+        typedef typename K::sample_type samp_type;
+
+        // Say we destructively alias if one of the vect* objects is actually item.
+        bool alias_helper                   (const samp_type& item ) const { return are_same(item, vect1) || are_same(item, vect2); }
+        template <typename U> bool are_same (const samp_type& a, const U& b)         const { return false; }
+        bool are_same                       (const samp_type& a, const samp_type& b) const { return (&a == &b); }
     }; 
 
 // ----------------------------------------------------------------------------------------
