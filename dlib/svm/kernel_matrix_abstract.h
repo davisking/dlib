@@ -94,6 +94,17 @@ namespace dlib
                     - R.nc() == v2.size()
                     - for all valid r and c:
                         - R(r,c) == kernel(v1(r), v2(c))
+
+
+            A note about aliasing (see the examples/matrix_expressions_ex.cpp example program
+            for a discussion of what aliasing is in the context of the dlib::matrix): 
+                kernel_matrix() expressions can detect aliasing of an argument if that 
+                argument is of type kernel_type::sample_type.  However, it can't detect
+                aliasing though std::vectors or other "list of sample type" container class
+                arguments.  This means that it is safe to assign a kernel_matrix() expression
+                to a sample_type if V1 or V2 are of sample_type but not safe otherwise.  However,
+                since the latter case results in a general n by m matrix rather than a column
+                or row vector you shouldn't ever be doing it anyway.
     !*/
 
 // ----------------------------------------------------------------------------------------
