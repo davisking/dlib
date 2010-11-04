@@ -159,7 +159,7 @@ namespace dlib
 
         // Say we destructively alias if one of the vect* objects is actually item.
         bool alias_helper                   (const samp_type& item ) const { return are_same(item, vect1) || are_same(item, vect2); }
-        template <typename U> bool are_same (const samp_type& a, const U& b)         const { return false; }
+        template <typename U> bool are_same (const samp_type& , const U& )         const { return false; }
         bool are_same                       (const samp_type& a, const samp_type& b) const { return (&a == &b); }
     }; 
 
