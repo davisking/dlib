@@ -373,6 +373,10 @@ void process_file (
         // true if we have seen paren_count transition to zero but haven't yet seen a ; or { or 
         // a new line if recently_seen_pound_define is true.
 
+    bool recently_seen_slots = false;
+        // true if we have seen the identifier "slots" at a zero scope but haven't seen any
+        // other identifiers or the ';' or ':' characters.
+
     bool recently_seen_closing_bracket = false;
         // true if we have seen a } and haven't yet seen an IDENTIFIER or ;
 
@@ -392,7 +396,7 @@ void process_file (
         // in the stack tells if we are in a public, protected, or private region.
 
     std::stack<unsigned long> scopes; // a stack to hold current and old scope counts 
-                             // the top of the stack counts the number of new scopes (i.e. unmatched { ) we have entered 
+                             // the top of the stack counts the number of new scopes (i.e. unmatched { } we have entered 
                              // since we were at a scope where functions can be defined.
                              // We also maintain the invariant that scopes.size() == namespaces.size()
     scopes.push(0);
@@ -632,6 +636,11 @@ void process_file (
                         last_struct_name.clear();
                     }
 
+                    if (scopes.top() == 0 && token == "slots")
+                        recently_seen_slots = true;
+                    else
+                        recently_seen_slots = false;
+
                     recently_seen_class_keyword = false;
                     recently_seen_struct_keyword = false;
                     recently_seen_namespace_keyword = false;
@@ -789,7 +798,17 @@ void process_file (
                             recently_seen_typedef = false;
                             recently_seen_paren_0 = false;
                             recently_seen_closing_bracket = false;
+                            recently_seen_slots = false;
                             at_top_of_new_scope = false;
+                            break;
+
+                        case ':':
+                            if (recently_seen_slots)
+                            {
+                                token_accum.clear();
+                                last_full_declaration.clear();
+                                recently_seen_slots = false;
+                            }
                             break;
 
                         case '(':
@@ -926,7 +945,7 @@ string get_function_name (
         // if this is a destructor then include the ~
         if (paren_pos > 1 && declaration[paren_pos-2].second == "~")
             name = "~" + declaration[paren_pos-1].second;
-        else
+        else if (paren_pos > 0)
             name = declaration[paren_pos-1].second;
 
 
