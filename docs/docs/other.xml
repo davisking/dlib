@@ -38,6 +38,7 @@
          <item>member_function_pointer</item>
          <item>bound_function_pointer</item>
          <item>error</item>
+         <item>console_progress_indicator</item>
          <item>pipe</item>
          <item>copy_functor</item>
          <item>logger</item>
@@ -269,6 +270,19 @@
          <description>
             This is the base exception class from which all exceptions in this 
             library inherit.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>console_progress_indicator</name>
+         <file>dlib/console_progress_indicator.h</file>
+         <spec_file link="true">dlib/console_progress_indicator.h</spec_file>
+         <description>
+               This object is a tool for reporting how long a task will take
+               to complete.   
          </description>
          
       </component>
