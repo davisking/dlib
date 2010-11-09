@@ -211,7 +211,7 @@ int main()
         find_min_using_approximate_derivatives(bfgs_search_strategy(),
                                                objective_delta_stop_strategy(1e-7),
                                                test_function(target), starting_point, -1);
-        // At this point the correct value of (3,6,1,7) should be found and stored in starting_point
+        // At this point the correct value of (3,5,1,7) should be found and stored in starting_point
         cout << starting_point << endl;
 
         // Now lets try it again with the conjugate gradient algorithm.
