@@ -338,6 +338,36 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class string_assign
+    {
+        class string_assign_helper
+        {
+        public:
+            string_assign_helper (const std::string& str_) : str(str_) {}
+
+            template <typename T>
+            operator T () const
+            {
+                return string_cast<T>(str);
+            }
+
+        private:
+
+            const std::string& str;
+        };
+
+    public:
+
+        string_assign_helper operator=(
+            const std::string& str
+        ) const
+        {
+            return string_assign_helper(str);
+        }
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename charT,
         typename traits,

@@ -40,6 +40,29 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class string_assign
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple tool which provides an alternative syntax for using
+                the string_cast() function.  It can be understood by considering
+                the following example:
+
+                    string_assign sa;
+                    int val;
+                    double dval;
+
+                    val  = sa = "1234";   // executes: val = string_cast<int>("1234");
+                    dval = sa = "3.141";  // executes: val = string_cast<double>("3.141");
+
+                After executing, val will be equal to 1234 and dval will be 3.141.
+                Note that you can use string_assign to assign to any type which you could
+                use with string_cast().  You aren't just limited to ints and doubles.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     class cast_to_string_error : public error
     {
     public:
