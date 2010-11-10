@@ -11,7 +11,7 @@
 #include "to_xml.h"
 
 
-const char* VERSION = "3.3";
+const char* VERSION = "3.4";
 
 using namespace std;
 using namespace dlib;

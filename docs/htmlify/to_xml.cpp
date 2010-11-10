@@ -1385,17 +1385,29 @@ string add_entity_ref (const string& str)
 
 // ----------------------------------------------------------------------------------------
 
+string flip_slashes (string str)
+{
+    for (unsigned long i = 0; i < str.size(); ++i)
+    {
+        if (str[i] == '\\')
+            str[i] = '/';
+    }
+    return str;
+}
+
+// ----------------------------------------------------------------------------------------
+
 void write_as_xml (
     const function_record& rec,
     ostream& fout
 )
 {
     fout << "    <function>\n";
-    fout << "      <name>"        << add_entity_ref(rec.name)        << "</name>\n";
-    fout << "      <scope>"       << add_entity_ref(rec.scope)       << "</scope>\n";
-    fout << "      <declaration>" << add_entity_ref(rec.declaration) << "</declaration>\n";
-    fout << "      <file>"        << add_entity_ref(rec.file)        << "</file>\n";
-    fout << "      <comment>"     << add_entity_ref(rec.comment)     << "</comment>\n";
+    fout << "      <name>"        << add_entity_ref(rec.name)               << "</name>\n";
+    fout << "      <scope>"       << add_entity_ref(rec.scope)              << "</scope>\n";
+    fout << "      <declaration>" << add_entity_ref(rec.declaration)        << "</declaration>\n";
+    fout << "      <file>"        << flip_slashes(add_entity_ref(rec.file)) << "</file>\n";
+    fout << "      <comment>"     << add_entity_ref(rec.comment)            << "</comment>\n";
     fout << "    </function>\n";
 }
 
@@ -1410,11 +1422,11 @@ void write_as_xml (
     const string pad(indent, ' ');
 
     fout << pad << "<class>\n";
-    fout << pad << "  <name>"        << add_entity_ref(rec.name)        << "</name>\n";
-    fout << pad << "  <scope>"       << add_entity_ref(rec.scope)       << "</scope>\n";
-    fout << pad << "  <declaration>" << add_entity_ref(rec.declaration) << "</declaration>\n";
-    fout << pad << "  <file>"        << add_entity_ref(rec.file)        << "</file>\n";
-    fout << pad << "  <comment>"     << add_entity_ref(rec.comment)     << "</comment>\n";
+    fout << pad << "  <name>"        << add_entity_ref(rec.name)               << "</name>\n";
+    fout << pad << "  <scope>"       << add_entity_ref(rec.scope)              << "</scope>\n";
+    fout << pad << "  <declaration>" << add_entity_ref(rec.declaration)        << "</declaration>\n";
+    fout << pad << "  <file>"        << flip_slashes(add_entity_ref(rec.file)) << "</file>\n";
+    fout << pad << "  <comment>"     << add_entity_ref(rec.comment)            << "</comment>\n";
 
 
     if (rec.public_typedefs.size() > 0)
