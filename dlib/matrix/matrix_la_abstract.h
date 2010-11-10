@@ -641,7 +641,7 @@ namespace dlib
                     - V*trans(V) should be equal to the identity matrix.  That is, all the
                       eigenvectors in V should be orthonormal. 
                         - So A == V*D*trans(V)
-                    - If DLIB_USE_LAPACK is #defined then this object uses the xSYEV LAPACK
+                    - If DLIB_USE_LAPACK is #defined then this object uses the xSYEVR LAPACK
                       routine.
 
                 On the other hand, if A is not symmetric then:
