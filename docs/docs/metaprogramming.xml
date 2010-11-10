@@ -474,7 +474,7 @@
       <p>
          Note that when this macro fails and throws an exception it also calls the global
          C function dlib_assert_breakpoint().  This behavior makes it easy to set a debugging
-         tool to break when DLIB_CASSERT fails by setting a breakpoint on dlib_assert_breakpoint().
+         tool to break when DLIB_ASSERT fails by setting a breakpoint on dlib_assert_breakpoint().
       </p>
          </description>
                                  
