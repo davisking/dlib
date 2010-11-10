@@ -41,6 +41,7 @@
       <section>
          <name>Global Functions</name>
          <item>string_cast</item>
+         <item>string_assign</item>
          <item>cast_to_string</item>
          <item>cast_to_wstring</item>
          <item>wrap_string</item>
@@ -264,9 +265,24 @@
          <file>dlib/string.h</file>
          <spec_file link="true">dlib/string/string_abstract.h</spec_file>
          <description>        
-            string_cast is a templated function which make it easy to convert strings to 
+            string_cast is a templated function which makes it easy to convert strings to 
             other types.  The types supported are any types that can be read by the basic_istream operator>>.  It
             also supports casting between wstring, string, and ustring objects.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>string_assign</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>        
+            string_assign is an object which makes it easy to convert strings to 
+            other types.  The types supported are any types that can be read by the basic_istream operator>>.  It
+            also supports casting between wstring, string, and ustring objects.  Since
+            string_assign is a simple stateless object there is a global instance of it
+            called dlib::sa.  
          </description>
          <examples>
             <example>config_reader_ex.cpp.html</example>

@@ -951,6 +951,8 @@
          <term file="parsing.html" name="cpp_tokenizer"/>
          <term file="parsing.html" name="narrow"/>
          <term file="parsing.html" name="string_cast"/>
+         <term file="parsing.html" name="string_assign"/>
+         <term link="parsing.html#string_assign" name="sa"/>
          <term file="parsing.html" name="tokenizer"/>
          <term file="parsing.html" name="wrap_string"/>
          <term file="parsing.html" name="xml_parser"/>
