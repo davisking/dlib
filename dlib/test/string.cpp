@@ -35,19 +35,27 @@ namespace
 
         dlog << LTRACE << 1;
 
+        double dval;
+        int ival;
+        bool bval;
+
         DLIB_TEST_MSG(string_cast<int>("5") == 5,string_cast<int>("5"));
         DLIB_TEST_MSG(string_cast<int>("0x5") == 5,string_cast<int>("0x5"));
         DLIB_TEST_MSG(string_cast<int>("0xA") == 10,string_cast<int>("0xA"));
         DLIB_TEST(string_cast<float>("0.5") == 0.5);
+        DLIB_TEST((dval = sa ="0.5") == 0.5);
         DLIB_TEST(string_cast<std::string>("0.5 !") == "0.5 !");
         DLIB_TEST(string_cast<bool>("true") == true);
+        DLIB_TEST((bval = sa = "true") == true);
         DLIB_TEST(string_cast<bool>("false") == false);
         DLIB_TEST(string_cast<bool>("TRUE") == true);
         DLIB_TEST(string_cast<bool>("FALSE") == false);
+        DLIB_TEST((bval = sa = "FALSE") == false);
 
         dlog << LTRACE << 2;
 
         DLIB_TEST_MSG(string_cast<int>(L"5") == 5,string_cast<int>("5"));
+        DLIB_TEST_MSG((ival = sa = L"5") == 5,string_cast<int>("5"));
         dlog << LTRACE << 2.1;
         DLIB_TEST_MSG(string_cast<int>(L"0x5") == 5,string_cast<int>("0x5"));
         DLIB_TEST_MSG(string_cast<int>(L"0xA") == 10,string_cast<int>("0xA"));
@@ -56,6 +64,7 @@ namespace
         DLIB_TEST(string_cast<bool>(L"true") == true);
         DLIB_TEST(string_cast<bool>(L"false") == false);
         DLIB_TEST(string_cast<bool>(L"TRUE") == true);
+        DLIB_TEST((bval = sa = L"TRUE") == true);
         DLIB_TEST(string_cast<bool>(L"FALSE") == false);
 
         dlog << LTRACE << 3;
