@@ -340,10 +340,17 @@ namespace dlib
 
     class string_assign
     {
+        template <
+            typename charT,
+            typename traits,
+            typename alloc
+            >
         class string_assign_helper
         {
         public:
-            string_assign_helper (const std::string& str_) : str(str_) {}
+            string_assign_helper (
+                const std::basic_string<charT,traits,alloc>& str_
+            ) : str(str_) {}
 
             template <typename T>
             operator T () const
@@ -353,18 +360,81 @@ namespace dlib
 
         private:
 
-            const std::string& str;
+            const std::basic_string<charT,traits,alloc>& str;
         };
+
+    // -------------
+
+        class char_assign_helper
+        {
+        public:
+            char_assign_helper (
+                const char* str_
+            ) : str(str_) {}
+
+            template <typename T>
+            operator T () const
+            {
+                return string_cast<T>(str);
+            }
+
+        private:
+
+            const char* str;
+        };
+
+    // -------------
+
+        class wchar_t_assign_helper
+        {
+        public:
+            wchar_t_assign_helper (
+                const wchar_t* str_
+            ) : str(str_) {}
+
+            template <typename T>
+            operator T () const
+            {
+                return string_cast<T>(str);
+            }
+
+        private:
+
+            const wchar_t* str;
+        };
+
+    // -------------
 
     public:
 
-        string_assign_helper operator=(
-            const std::string& str
+        template <
+            typename charT,
+            typename traits,
+            typename alloc
+            >
+        string_assign_helper<charT,traits,alloc> operator=(
+            const std::basic_string<charT,traits,alloc>& str
         ) const
         {
-            return string_assign_helper(str);
+            return string_assign_helper<charT,traits,alloc>(str);
+        }
+
+        char_assign_helper operator= (
+            const char* str
+        ) const 
+        {
+            return char_assign_helper(str);
+        }
+
+        wchar_t_assign_helper operator= (
+            const wchar_t* str
+        ) const 
+        {
+            return wchar_t_assign_helper(str);
         }
     };
+
+    const string_assign sa = string_assign();
 
 // ----------------------------------------------------------------------------------------
 

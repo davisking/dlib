@@ -58,8 +58,14 @@ namespace dlib
                 After executing, val will be equal to 1234 and dval will be 3.141.
                 Note that you can use string_assign to assign to any type which you could
                 use with string_cast().  You aren't just limited to ints and doubles.
+
+                Additionally, note that there is a global instance of this object, dlib::sa. 
+                So you never have to create a string_assign object yourself.  Finally, this 
+                object is totally stateless and threadsafe.   
         !*/
     };
+
+    const string_assign sa = string_assign();
 
 // ----------------------------------------------------------------------------------------
 
