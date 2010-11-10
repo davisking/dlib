@@ -661,7 +661,7 @@ on_sel_node_evidence_modified (
     {
         // get the numerical value of the new evidence value.  Here we are taking
         // the string from the text field and casting it to an unsigned long.
-        value = string_cast<unsigned long>(trim(sel_node_evidence.text()));
+        value = sa = trim(sel_node_evidence.text());
     }
     catch (string_cast_error&)
     {
@@ -704,7 +704,7 @@ on_sel_node_num_values_modified (
     try
     {
         // get the number of values out of the text field.  
-        num_values = string_cast<unsigned long>(trim(sel_node_num_values.text()));
+        num_values = sa = trim(sel_node_num_values.text());
     }
     catch (string_cast_error&)
     {
@@ -756,7 +756,7 @@ on_cpt_grid_modified(unsigned long row, unsigned long col)
     try
     {
         // get the new value out of the table
-        prob = string_cast<double>(cpt_grid.text(row,col));
+        prob = sa = cpt_grid.text(row,col);
     }
     catch (string_cast_error&)
     {

@@ -84,7 +84,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "d");
 
         // Here I'm checking that the argument to the l option is an integer in the range 1 to 3.  
-        // That is, it should be convertible to an int by dlib::string_cast<int>() and be either 
+        // That is, it should be convertible to an int by dlib::string_assign and be either 
         // 1, 2, or 3.  Note that if you wanted to allow floating point values in the range 1 to 
         // 3 then you could give a range 1.0 to 3.0 or explicitly supply a type of float or double 
         // to the template argument of the check_option_arg_range() function.
@@ -119,8 +119,10 @@ int main(int argc, char** argv)
         // Figure out what the compression level should be.  The default is 2.
         int compression_level = 2;
         // If the user supplied the -l option then use whatever value they gave for the level.
+        // Note that we use the string_assign object, sa, to convert the string returned
+        // by argument() to an int.
         if (parser.option("l"))
-            compression_level = string_cast<int>(parser.option("l").argument());
+            compression_level = sa = parser.option("l").argument();
 
 
 

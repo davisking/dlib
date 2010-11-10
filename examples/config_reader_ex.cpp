@@ -99,11 +99,13 @@ int main()
         cout << cr.block("user1").block("details")["editor"] << endl;
 
         
-        // Note that you can use the string_cast function to easily convert fields 
+        // Note that you can use the string_assign object, sa, to easily convert fields 
         // into non-string types.  For example, the config file has an integer id 
         // field that could be converted into an int like so:
-        int id = string_cast<int>(cr.block("user2")["id"]);
-        cout << "user2's id is " << id << endl;
+        int id1 = sa = cr.block("user1")["id"];
+        int id2 = sa = cr.block("user2")["id"];
+        cout << "user1's id is " << id1 << endl;
+        cout << "user2's id is " << id2 << endl;
 
     }
     catch (exception& e)
