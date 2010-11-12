@@ -23,6 +23,7 @@
 #include "svm/svm_c_ekm_trainer.h"
 #include "svm/simplify_linear_decision_function.h"
 #include "svm/krr_trainer.h"
+#include "svm/sort_basis_vectors.h"
 
 #endif // DLIB_SVm_HEADER
 
