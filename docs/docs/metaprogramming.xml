@@ -66,6 +66,7 @@
          <item>ASSERT_ARE_NOT_SAME_TYPE</item> 
          <item>_dT</item> 
          <item>TIME_THIS</item> 
+         <item>is_same_object</item> 
          <item>assign_zero_if_built_in_scalar_type</item>
          <item>wrap_function</item>
       </section>
@@ -216,6 +217,19 @@
          <description>
             This is a template where is_same_type&lt;T,U&gt;::value == true when T and U are 
             the same type and false otherwise. 
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_same_object</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a templated function which checks if both of its arguments are actually
+            references to the same object.  It returns true if they are and false otherwise.
          </description>
          
       </component>
