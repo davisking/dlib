@@ -35,7 +35,7 @@ namespace dlib
                 - max_dictionary_size() == my_max_dictionary_size
                 - get_kernel() == kernel
                 - minimum_tolerance() == min_tolerance
-                - dictionary_size() == dictionary.size()
+                - size() == dictionary.size()
                 - get_dictionary() == vector_to_matrix(dictionary)
                 - K.nr() == dictionary.size()
                 - K.nc() == dictionary.size()
@@ -55,6 +55,7 @@ namespace dlib
     public:
         typedef typename kernel_type::scalar_type scalar_type;
         typedef typename kernel_type::sample_type sample_type;
+        typedef typename kernel_type::sample_type type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
         linearly_independent_subset_finder (
@@ -295,7 +296,7 @@ namespace dlib
             temp.swap(item.temp);
         }
 
-        unsigned long dictionary_size (
+        unsigned long size (
         ) const { return dictionary.size(); }
 
         const matrix<sample_type,0,1,mem_manager_type> get_dictionary (
@@ -451,7 +452,7 @@ namespace dlib
             const scalar_type min_tol = lisf.minimum_tolerance();
 
             // run many rounds of random sampling.  In each round we drop the tolerance lower.
-            while (tol >= min_tol && lisf.dictionary_size() < lisf.max_dictionary_size())
+            while (tol >= min_tol && lisf.size() < lisf.max_dictionary_size())
             {
                 tol *= 0.5;
                 lisf.set_minimum_tolerance(std::max(tol, min_tol));
@@ -460,7 +461,7 @@ namespace dlib
                 // Keep picking random samples and adding them into the lisf.  Stop when we either
                 // fill it up or can't find any more samples with projection error larger than the
                 // current tolerance.
-                while (lisf.dictionary_size() < lisf.max_dictionary_size() && add_failures < sampling_size) 
+                while (lisf.size() < lisf.max_dictionary_size() && add_failures < sampling_size) 
                 {
                     if (lisf.add(samples(rnd.get_random_32bit_number()%samples.size())) == false)
                     {

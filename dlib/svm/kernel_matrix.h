@@ -7,7 +7,6 @@
 #include "kernel_matrix_abstract.h"
 #include "../matrix.h"
 #include "../algs.h"
-#include "../statistics/random_subset_selector.h"
 
 namespace dlib
 {
@@ -24,8 +23,9 @@ namespace dlib
             return m(i);
         }
 
-        template <typename kernel_type, typename T, typename Rand_type>
-        inline const T& access ( const random_subset_selector<T,Rand_type>& m, long i)
+        // bind to anything that looks like an array and isn't a matrix
+        template <typename kernel_type, typename T>
+        inline const typename disable_if<is_matrix<T>,typename T::type>::type& access ( const T& m, long i)
         {
             return m[i];
         }
@@ -54,25 +54,7 @@ namespace dlib
         // --------------------------------------------
 
         template <typename kernel_type, typename T>
-        inline unsigned long size ( const matrix_exp<T>& m)
-        {
-            return m.size();
-        }
-
-        template <typename kernel_type, typename T, typename Rand_type>
-        inline unsigned long size ( const random_subset_selector<T,Rand_type>& m)
-        {
-            return m.size();
-        }
-
-        template <typename kernel_type, typename T, typename alloc>
-        inline unsigned long size ( const std::vector<T,alloc>& m)
-        {
-            return m.size();
-        }
-
-        template <typename kernel_type, typename T, typename alloc>
-        inline unsigned long size ( const std_vector_c<T,alloc>& m)
+        inline unsigned long size ( const T& m)
         {
             return m.size();
         }

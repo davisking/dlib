@@ -245,24 +245,24 @@ namespace
                 {
                     if (lisf.add(samples[i]))
                     {
-                        DLIB_TEST(equal(lisf[lisf.dictionary_size()-1], samples[i]));
+                        DLIB_TEST(equal(lisf[lisf.size()-1], samples[i]));
                         ++count;
                     }
                 }
-                DLIB_TEST(count == lisf.dictionary_size());
+                DLIB_TEST(count == lisf.size());
 
-                DLIB_TEST(lisf.dictionary_size() == (unsigned int)n);
+                DLIB_TEST(lisf.size() == (unsigned int)n);
 
 
-                dlog << LINFO << "lisf.dictionary_size(): "<< lisf.dictionary_size();
+                dlog << LINFO << "lisf.size(): "<< lisf.size();
 
                 // make sure the kernel matrices coming out of the lisf are correct
-                DLIB_TEST(dlib::equal(lisf.get_kernel_matrix(), kernel_matrix(kern, lisf.get_dictionary()), 1e-8));
+                DLIB_TEST(dlib::equal(lisf.get_kernel_matrix(), kernel_matrix(kern, lisf), 1e-8));
                 DLIB_TEST(dlib::equal(lisf.get_inv_kernel_marix(), inv(kernel_matrix(kern, lisf.get_dictionary())), 1e-8));
 
                 empirical_kernel_map<kernel_type> ekm;
                 ekm.load(lisf);
-                DLIB_TEST(ekm.basis_size() == lisf.dictionary_size());
+                DLIB_TEST(ekm.basis_size() == lisf.size());
 
                 std::vector<sample_type> proj_samples;
                 for (unsigned long i = 0; i < samples.size(); ++i)

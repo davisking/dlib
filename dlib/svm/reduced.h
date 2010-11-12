@@ -96,7 +96,7 @@ namespace dlib
 
             matrix<scalar_type,0,1,mem_manager_type> alpha;
 
-            alpha = lisf.get_inv_kernel_marix()*(kernel_matrix(kern,lisf.get_dictionary(),dec_funct.basis_vectors)*dec_funct.alpha);
+            alpha = lisf.get_inv_kernel_marix()*(kernel_matrix(kern,lisf,dec_funct.basis_vectors)*dec_funct.alpha);
 
             decision_function<kernel_type> new_df(alpha, 
                                                   0,
@@ -483,7 +483,7 @@ namespace dlib
             matrix<scalar_type,0,1,mem_manager_type> beta;
 
             // Now we compute the fist approximate decision function.  
-            beta = lisf.get_inv_kernel_marix()*(kernel_matrix(kern,lisf.get_dictionary(),dec_funct.basis_vectors)*dec_funct.alpha);
+            beta = lisf.get_inv_kernel_marix()*(kernel_matrix(kern,lisf,dec_funct.basis_vectors)*dec_funct.alpha);
             matrix<sample_type,0,1,mem_manager_type> out_vectors(lisf.get_dictionary());
 
 

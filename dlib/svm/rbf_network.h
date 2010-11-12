@@ -117,7 +117,7 @@ namespace dlib
             linearly_independent_subset_finder<kernel_type> lisf(kernel, num_centers);
             fill_lisf(lisf, x);
 
-            const long num_centers = lisf.dictionary_size();
+            const long num_centers = lisf.size();
 
             // fill the K matrix with the output of the kernel for all the center and sample point pairs
             matrix<scalar_type,0,0,mem_manager_type> K(x.nr(), num_centers+1);

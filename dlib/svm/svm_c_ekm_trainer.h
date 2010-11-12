@@ -425,7 +425,7 @@ namespace dlib
             dlib::rand::kernel_1a rnd;
 
             // first pick the initial basis set randomly
-            for (unsigned long i = 0; i < 10*initial_basis_size && lisf.dictionary_size() < initial_basis_size; ++i)
+            for (unsigned long i = 0; i < 10*initial_basis_size && lisf.size() < initial_basis_size; ++i)
             {
                 lisf.add(x(rnd.get_random_32bit_number()%x.size()));
             }
@@ -458,7 +458,7 @@ namespace dlib
             {
                 // if the basis is already as big as it's going to get then just do the most
                 // accurate training right now.  
-                if (lisf.dictionary_size() == max_basis_size)
+                if (lisf.size() == max_basis_size)
                     trainer.set_epsilon(min_epsilon);
 
                 while (true)
@@ -484,7 +484,7 @@ namespace dlib
                 if (verbose)
                 {
                     std::cout << "svm objective: " << svm_objective << std::endl;
-                    std::cout << "basis size: " << lisf.dictionary_size() << std::endl;
+                    std::cout << "basis size: " << lisf.size() << std::endl;
                 }
 
                 // if we failed to make progress on this iteration then we are done
@@ -496,7 +496,7 @@ namespace dlib
                 // now add more elements to the basis
                 unsigned long count = 0;
                 for (unsigned long j = 0; 
-                     (j < 100*basis_size_increment) && (count < basis_size_increment) && (lisf.dictionary_size() < max_basis_size); 
+                     (j < 100*basis_size_increment) && (count < basis_size_increment) && (lisf.size() < max_basis_size); 
                      ++j)
                 {
                     // pick a random sample

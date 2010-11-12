@@ -77,7 +77,7 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(lisf.dictionary_size() > 0,
+            DLIB_ASSERT(lisf.size() > 0,
                 "\tvoid empirical_kernel_map::load(linearly_independent_subset_finder)"
                 << "\n\t You have to give a non-empty set of basis_samples"
                 << "\n\t this: " << this
@@ -85,7 +85,7 @@ namespace dlib
 
             kernel = lisf.get_kernel();
             weights = trans(chol(lisf.get_inv_kernel_marix()));
-            basis.resize(lisf.dictionary_size());
+            basis.resize(lisf.size());
             for (unsigned long i = 0; i < basis.size(); ++i)
                 basis[i] = lisf[i];
 
