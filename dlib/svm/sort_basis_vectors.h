@@ -63,11 +63,13 @@ namespace dlib
         )
         {
             DLIB_ASSERT(is_binary_classification_problem(samples, labels) &&
-                        0 < eps && eps <= 1,
+                        0 < eps && eps <= 1 && 
+                        basis.size() > 0,
                         "\t void sort_basis_vectors()"
                         << "\n\t Invalid arguments were given to this function."
                         << "\n\t is_binary_classification_problem(samples, labels): " << is_binary_classification_problem(samples, labels)
-                        << "\n\t eps: " << eps 
+                        << "\n\t basis.size(): " << basis.size() 
+                        << "\n\t eps:          " << eps 
             );
 
             typedef typename kernel_type::sample_type sample_type;

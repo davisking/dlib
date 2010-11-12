@@ -30,6 +30,7 @@ namespace dlib
         requires
             - is_binary_classification_problem(samples, labels)
             - 0 < eps <= 1
+            - basis.size() > 0
             - kernel_type is a kernel function object as defined in dlib/svm/kernel_abstract.h 
               It must be capable of operating on the elements of samples and basis.
             - vect1_type == a matrix or something convertible to a matrix via vector_to_matrix()
