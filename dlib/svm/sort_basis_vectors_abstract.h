@@ -37,8 +37,8 @@ namespace dlib
             - vect3_type == a matrix or something convertible to a matrix via vector_to_matrix()
         ensures
             - A kernel based learning method ultimately needs to select a set of basis functions
-              represented by a particular choice of kernel function and a set of basis vectors.  
-              This function attempts to order the elements of basis so that elements which are
+              represented by a particular choice of kernel and a set of basis vectors.  
+              sort_basis_vectors() attempts to order the elements of basis so that elements which are
               most useful in solving the binary classification problem defined by samples and
               labels come first. 
             - In particular, this function returns a std::vector, SB, of sorted basis vectors such that:
