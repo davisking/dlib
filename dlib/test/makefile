@@ -52,6 +52,7 @@ SRC += hash_map.cpp
 SRC += hash_set.cpp
 SRC += hash_table.cpp
 SRC += image.cpp
+SRC += is_same_object.cpp
 SRC += kcentroid.cpp
 SRC += kernel_matrix.cpp
 SRC += linear_manifold_regularizer.cpp

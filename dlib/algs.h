@@ -446,6 +446,41 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A is_same_object 
+
+        This is a templated function which checks if both of its arguments are actually
+        references to the same object.  It returns true if they are and false otherwise.
+
+    !*/
+
+    // handle the case where T and U are unrelated types.
+    template < typename T, typename U >
+    typename disable_if_c<is_convertible<T*, U*>::value || is_convertible<U*,T*>::value, bool>::type
+    is_same_object (
+        const T& a, 
+        const U& b
+    ) 
+    { 
+        return ((void*)&a == (void*)&b); 
+    }
+
+    // handle the case where T and U are related types because their pointers can be
+    // implicitly converted into one or the other.  E.g. a derived class and its base class. 
+    // Or where both T and U are just the same type.  This way we make sure that if there is a
+    // valid way to convert between these two pointer types then we will take that route rather
+    // than the void* approach used otherwise.
+    template < typename T, typename U >
+    typename enable_if_c<is_convertible<T*, U*>::value || is_convertible<U*,T*>::value, bool>::type
+    is_same_object (
+        const T& a, 
+        const U& b
+    ) 
+    { 
+        return (&a == &b); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
     /*!A is_unsigned_type 
 
         This is a template where is_unsigned_type<T>::value == true when T is an unsigned

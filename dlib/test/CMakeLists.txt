@@ -42,6 +42,7 @@ set (tests
    hash_set.cpp
    hash_table.cpp
    image.cpp
+   is_same_object.cpp
    kcentroid.cpp
    kernel_matrix.cpp
    linear_manifold_regularizer.cpp
