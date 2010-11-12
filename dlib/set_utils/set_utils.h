@@ -11,23 +11,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace set_utils_helpers
-    {
-        template <typename T, typename U>
-        inline bool is_same_object (
-            const T& a,
-            const U& b
-        )
-        {
-            if (is_same_type<const T,const U>::value == false)
-                return false;
-            if ((void*)&a == (void*)&b)
-                return true;
-            else
-                return false;
-        }
-    }
-
     template <
         typename T,
         typename U
@@ -37,7 +20,6 @@ namespace dlib
         const U& b
     )
     {
-        using namespace set_utils_helpers;
         if (is_same_object(a,b))
             return a.size();
 
@@ -79,7 +61,6 @@ namespace dlib
     )
     {
         typedef typename T::type type;
-        using namespace set_utils_helpers;
         if (is_same_object(a,u) || is_same_object(b,u))
         {
             V local_u;
@@ -141,7 +122,6 @@ namespace dlib
     )
     {
         typedef typename T::type type;
-        using namespace set_utils_helpers;
         if (is_same_object(a,i) || is_same_object(b,i))
         {
             V local_i;
@@ -221,7 +201,6 @@ namespace dlib
     )
     {
         typedef typename T::type type;
-        using namespace set_utils_helpers;
         if (is_same_object(a,d) || is_same_object(b,d))
         {
             V local_d;
