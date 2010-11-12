@@ -138,6 +138,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>vector_normalizer_pca</item> 
          <item>discriminant_pca</item> 
          <item>fill_lisf</item> 
+         <item>sort_basis_vectors</item> 
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
          <item>test_binary_decision_function</item> 
@@ -624,6 +625,23 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>empirical_kernel_map_ex.cpp.html</example>
          </examples>
 
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>sort_basis_vectors</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/sort_basis_vectors_abstract.h</spec_file>
+         <description>
+              A kernel based learning method ultimately needs to select a set of basis functions
+              represented by a particular choice of kernel and a set of basis vectors.  
+              sort_basis_vectors() is a function which attempts to perform supervised
+              basis set selection.  In particular, you give it a candidate set of basis
+              vectors and it sorts them according to how useful they are for solving
+              a particular decision problem.
+         </description>
       </component>
       
       
