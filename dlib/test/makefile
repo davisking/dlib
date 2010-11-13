@@ -12,7 +12,7 @@ LFLAGS = -lpthread   -lnsl
 
 # The name of the compiler.  If you only have one version of
 # gcc installed then you probably want to change this to just g++ 
-CC = nice g++-4.1
+CC = nice g++
 
 ####################################################
 ####################################################
