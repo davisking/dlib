@@ -380,6 +380,14 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#trans</link>
                      </item>
                      <item>
+                        <name>flipud</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#flipud</link>
+                     </item>
+                     <item>
+                        <name>fliplr</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#fliplr</link>
+                     </item>
+                     <item>
                         <name>dot</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#dot</link>
                      </item>

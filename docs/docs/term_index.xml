@@ -250,6 +250,8 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diagm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="trans"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="fliplr"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="flipud"/>
 
          <term name="dot">
             <term link="dlib/matrix/matrix_utilities_abstract.h.html#dot" name="for matrix objects"/>
