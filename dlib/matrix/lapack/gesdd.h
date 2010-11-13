@@ -243,6 +243,18 @@ namespace dlib
             if (info != 0)
                 return info;
 
+            // There is a bug in an older version of LAPACK in Debian etch 
+            // that causes the gesdd to return the wrong value for work_size
+            // when jobz == 'N'.  So verify the value of work_size.
+            if (jobz == 'N')
+            {
+                using std::min; 
+                using std::max; 
+                const T min_work_size = 3*min(m,n) + max(max(m,n),7*min(m,n));
+                if (work_size < min_work_size)
+                    work_size = min_work_size;
+            }
+
             if (work.size() < work_size)
                 work.set_size(static_cast<long>(work_size), 1);
 
@@ -314,6 +326,19 @@ namespace dlib
 
             if (info != 0)
                 return info;
+
+            // There is a bug in an older version of LAPACK in Debian etch 
+            // that causes the gesdd to return the wrong value for work_size
+            // when jobz == 'N'.  So verify the value of work_size.
+            if (jobz == 'N')
+            {
+                using std::min; 
+                using std::max; 
+                const T min_work_size = 3*min(m,n) + max(max(m,n),7*min(m,n));
+                if (work_size < min_work_size)
+                    work_size = min_work_size;
+            }
+
 
             if (work.size() < work_size)
                 work.set_size(static_cast<long>(work_size), 1);
