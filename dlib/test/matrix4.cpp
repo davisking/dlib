@@ -23,7 +23,7 @@ namespace
     using namespace dlib;
     using namespace std;
 
-    logger dlog("test.scale_rows_columns");
+    logger dlog("test.matrix4");
 
     void matrix_test (
     )
@@ -160,7 +160,52 @@ namespace
             DLIB_TEST(equal( diagm(v2)*m , tmp(diagm(v2))*m )); 
             DLIB_TEST(equal( scale_rows(m,v2) , tmp(diagm(v2))*m )); 
         }
+
     }
+
+    void test_stuff()
+    {
+        print_spinner();
+
+        {
+            matrix<double> m(3,3), lr(3,3), ud(3,3);
+
+            m = 1,2,3,
+                4,5,6,
+                7,8,9;
+
+
+            lr = 3,2,1,
+                 6,5,4,
+                 9,8,7;
+
+            ud = 7,8,9,
+                 4,5,6,
+                 1,2,3;
+
+            DLIB_TEST(lr == fliplr(m));
+            DLIB_TEST(ud == flipud(m));
+        }
+        {
+            matrix<double> m(3,2), lr(3,2), ud(3,2);
+
+            m = 1,2,
+                3,4,
+                5,6;
+
+            lr = 2,1,
+                 4,3,
+                 6,5;
+
+            ud = 5,6,
+                 3,4,
+                 1,2;
+
+            DLIB_TEST(lr == fliplr(m));
+            DLIB_TEST(ud == flipud(m));
+        }
+    }
+
 
 
 
@@ -170,13 +215,14 @@ namespace
     public:
         matrix_tester (
         ) :
-            tester ("test_scale_rows_columns",
+            tester ("test_matrix4",
                     "Runs tests on the scale_rows and scale_columns functions.")
         {}
 
         void perform_test (
         )
         {
+            test_stuff();
             for (int i = 0; i < 10; ++i)
                 matrix_test();
         }

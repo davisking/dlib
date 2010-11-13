@@ -50,6 +50,7 @@ set (tests
    map.cpp
    matrix2.cpp
    matrix3.cpp
+   matrix4.cpp
    matrix_chol.cpp
    matrix.cpp
    matrix_eig.cpp
@@ -67,7 +68,6 @@ set (tests
    rand.cpp
    read_write_mutex.cpp
    reference_counter.cpp
-   scale_rows_columns.cpp
    sequence.cpp
    serialize.cpp
    set.cpp
