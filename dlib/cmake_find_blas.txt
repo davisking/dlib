@@ -79,12 +79,13 @@ if (UNIX)
    
    if (NOT blas_found)
       find_library(atlas_lib atlas)
-      if (atlas_lib)
-         set(blas_libraries ${atlas_lib})
+      find_library(cblas_lib cblas)
+      if (atlas_lib AND cblas_lib)
+         set(blas_libraries ${atlas_lib} ${cblas_lib})
          set(blas_found 1)
          message(STATUS "Found ATLAS BLAS library")
       endif()
-      mark_as_advanced( atlas_lib)
+      mark_as_advanced( atlas_lib cblas_lib)
    endif()
 
 
