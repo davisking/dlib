@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.32" date="Nov 13, 2010">
+New Stuff:
   - Added a class for reading JPEG image files.
   - Added scale_rows(), flipud() and fliplr() matrix functions.
   - Added console_progress_indicator.  It is a tool for measuring how long a 
@@ -38,7 +51,7 @@ Other:
   - Optimized matrix expressions such as mat*diagm(vect)
   - Made the code in chol() more robust to indefinite matrices.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
