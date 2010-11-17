@@ -204,6 +204,16 @@ namespace
             DLIB_TEST(lr == fliplr(m));
             DLIB_TEST(ud == flipud(m));
         }
+
+        {
+            matrix<int> a, b;
+
+            a = matrix_cast<int>(round(10*randm(3,3)));
+            b = a;
+
+            b *= b;
+            DLIB_TEST(b == a*a);
+        }
     }
 
 

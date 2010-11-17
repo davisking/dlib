@@ -1273,6 +1273,15 @@ namespace dlib
             return *this;
         }
 
+        template <typename EXP>
+        matrix& operator *= (
+            const matrix_exp<EXP>& m
+        )
+        {
+            *this = *this * m;
+            return *this;
+        }
+
         matrix& operator += (
             const matrix& m
         )
