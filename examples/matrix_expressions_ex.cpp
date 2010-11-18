@@ -381,10 +381,11 @@ void custom_matrix_expressions_example(
 
 
     /*
-        As an aside, note that dlib contains functions equivalent to example_trans() and
-        example_vector_to_matrix() already.  They are:
+        As an aside, note that dlib contains functions equivalent to the ones we 
+        defined above.  They are:
             - dlib::trans()
             - dlib::vector_to_matrix()
+            - operator+ (e.g. you can say my_mat + 1)
 
 
         Also, if you are going to be creating your own matrix expression you should also
