@@ -14,6 +14,7 @@
 #include "../is_kind.h"
 #include "matrix_data_layout.h"
 #include "matrix_assign_fwd.h"
+#include "matrix_op.h"
 
 #ifdef _MSC_VER
 // Disable the following warnings for Visual Studio
@@ -236,7 +237,7 @@ namespace dlib
     // 
     // Also, the reason we want to apply this transformation in the first place is because it (1) makes
     // the expressions going into matrix multiply expressions simpler and (2) it makes it a lot more
-    // straight forward to bind BLAS calls to matrix expressions involving scalar multiplies.
+    // straightforward to bind BLAS calls to matrix expressions involving scalar multiplies.
     template < typename EXP1, typename EXP2 >
     inline const typename disable_if_c< matrix_multiply_exp<matrix_mul_scal_exp<EXP1>, matrix_mul_scal_exp<EXP2> >::both_are_costly ,      
                                         matrix_mul_scal_exp<matrix_multiply_exp<EXP1, EXP2>,false> >::type operator* (
@@ -762,6 +763,123 @@ namespace dlib
     )
     {
         return matrix_mul_scal_exp<EXP>(m.m,-1*m.s);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M>
+    struct op_add_scalar : basic_op_m<M> 
+    {
+        typedef typename M::type type;
+
+        op_add_scalar( const M& m_, const type& s_) : basic_op_m<M>(m_), s(s_){}
+
+        const type s;
+
+        const static long cost = M::cost+1;
+        typedef const typename M::type const_ret_type;
+        const_ret_type apply (long r, long c) const
+        { 
+            return this->m(r,c) + s;
+        }
+    };
+
+    template <
+        typename EXP,
+        typename T
+        >
+    const typename disable_if<is_matrix<T>, matrix_op<op_add_scalar<EXP> > >::type operator+ (
+        const matrix_exp<EXP>& m,
+        const T& val
+    )
+    {
+        typedef typename EXP::type type;
+
+        typedef op_add_scalar<EXP> op;
+        return matrix_op<op>(op(m.ref(), static_cast<type>(val)));
+    }
+
+    template <
+        typename EXP,
+        typename T
+        >
+    const typename disable_if<is_matrix<T>, matrix_op<op_add_scalar<EXP> > >::type operator+ (
+        const T& val,
+        const matrix_exp<EXP>& m
+    )
+    {
+        typedef typename EXP::type type;
+
+        typedef op_add_scalar<EXP> op;
+        return matrix_op<op>(op(m.ref(), static_cast<type>(val)));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M>
+    struct op_subl_scalar : basic_op_m<M> 
+    {
+        typedef typename M::type type;
+
+        op_subl_scalar( const M& m_, const type& s_) : basic_op_m<M>(m_), s(s_){}
+
+        const type s;
+
+        const static long cost = M::cost+1;
+        typedef const typename M::type const_ret_type;
+        const_ret_type apply (long r, long c) const
+        { 
+            return s - this->m(r,c) ;
+        }
+    };
+
+    template <
+        typename EXP,
+        typename T
+        >
+    const typename disable_if<is_matrix<T>, matrix_op<op_subl_scalar<EXP> > >::type operator- (
+        const T& val,
+        const matrix_exp<EXP>& m
+    )
+    {
+        typedef typename EXP::type type;
+
+        typedef op_subl_scalar<EXP> op;
+        return matrix_op<op>(op(m.ref(), static_cast<type>(val)));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M>
+    struct op_subr_scalar : basic_op_m<M> 
+    {
+        typedef typename M::type type;
+
+        op_subr_scalar( const M& m_, const type& s_) : basic_op_m<M>(m_), s(s_){}
+
+        const type s;
+
+        const static long cost = M::cost+1;
+        typedef const typename M::type const_ret_type;
+        const_ret_type apply (long r, long c) const
+        { 
+            return this->m(r,c) - s;
+        }
+    };
+
+    template <
+        typename EXP,
+        typename T
+        >
+    const typename disable_if<is_matrix<T>, matrix_op<op_subr_scalar<EXP> > >::type operator- (
+        const matrix_exp<EXP>& m,
+        const T& val
+    )
+    {
+        typedef typename EXP::type type;
+
+        typedef op_subr_scalar<EXP> op;
+        return matrix_op<op>(op(m.ref(), static_cast<type>(val)));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1317,6 +1435,28 @@ namespace dlib
                 for (long i = 0; i < size; ++i)
                     data(i) = -m.data(i);
             }
+            return *this;
+        }
+
+        matrix& operator += (
+            const T& val
+        )
+        {
+            const long size = nr()*nc();
+            for (long i = 0; i < size; ++i)
+                data(i) += val;
+
+            return *this;
+        }
+
+        matrix& operator -= (
+            const T& val
+        )
+        {
+            const long size = nr()*nc();
+            for (long i = 0; i < size; ++i)
+                data(i) -= val;
+
             return *this;
         }
 

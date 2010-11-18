@@ -214,6 +214,161 @@ namespace
             b *= b;
             DLIB_TEST(b == a*a);
         }
+
+        {
+            matrix<double> m(2,3), m2(2,3);
+
+            m = 1,2,3,
+                4,5,6;
+
+
+            m2 = 3,4,5,
+                 6,7,8;
+
+            DLIB_TEST(m + 2 == m2);
+            DLIB_TEST(2 + m == m2);
+
+            m += 2;
+            DLIB_TEST(m == m2);
+            m -= 2;
+
+            m2 = 0,1,2,
+                 3,4,5;
+
+            DLIB_TEST(m - 1 == m2);
+
+            m -= 1;
+            DLIB_TEST(m == m2);
+            m += 1;
+
+
+            m2 = 5,4,3,
+                 2,1,0;
+
+            DLIB_TEST(6 - m == m2);
+        }
+
+        {
+            matrix<float> m(2,3), m2(2,3);
+
+            m = 1,2,3,
+                4,5,6;
+
+
+            m2 = 3,4,5,
+                 6,7,8;
+
+            DLIB_TEST(m + 2 == m2);
+            DLIB_TEST(2 + m == m2);
+
+            m += 2;
+            DLIB_TEST(m == m2);
+            m -= 2;
+
+            m2 = 0,1,2,
+                 3,4,5;
+
+            DLIB_TEST(m - 1 == m2);
+
+            m -= 1;
+            DLIB_TEST(m == m2);
+            m += 1;
+
+
+            m2 = 5,4,3,
+                 2,1,0;
+
+            DLIB_TEST(6 - m == m2);
+        }
+
+        {
+            matrix<int> m(2,3), m2(2,3);
+
+            m = 1,2,3,
+                4,5,6;
+
+
+            m2 = 3,4,5,
+                 6,7,8;
+
+            DLIB_TEST(m + 2 == m2);
+            DLIB_TEST(2 + m == m2);
+
+            m += 2;
+            DLIB_TEST(m == m2);
+            m -= 2;
+
+            m2 = 0,1,2,
+                 3,4,5;
+
+            DLIB_TEST(m - 1 == m2);
+
+            m -= 1;
+            DLIB_TEST(m == m2);
+            m += 1;
+
+
+            m2 = 5,4,3,
+                 2,1,0;
+
+            DLIB_TEST(6 - m == m2);
+        }
+
+        {
+            matrix<int,2,3> m, m2;
+
+            m = 1,2,3,
+                4,5,6;
+
+
+            m2 = 3,4,5,
+                 6,7,8;
+
+            DLIB_TEST(m + 2 == m2);
+            DLIB_TEST(2 + m == m2);
+
+            m += 2;
+            DLIB_TEST(m == m2);
+            m -= 2;
+
+            m2 = 0,1,2,
+                 3,4,5;
+
+            DLIB_TEST(m - 1 == m2);
+
+            m -= 1;
+            DLIB_TEST(m == m2);
+            m += 1;
+
+
+            m2 = 5,4,3,
+                 2,1,0;
+
+            DLIB_TEST(6 - m == m2);
+        }
+
+        {
+            matrix<double> m(2,3), m2(3,2);
+
+            m = 1,2,3,
+                4,5,6;
+
+            m2 = 2,5,
+                 3,6,
+                 4,7;
+
+            DLIB_TEST(trans(m+1) == m2);
+            DLIB_TEST(trans(m)+1 == m2);
+            DLIB_TEST(1+trans(m) == m2);
+            DLIB_TEST(1+m-1 == m);
+
+            m = trans(m+1);
+            DLIB_TEST(m == m2);
+            m = trans(m-1);
+            DLIB_TEST(trans(m+1) == m2);
+            m = trans(m)+1;
+            DLIB_TEST(m == m2);
+        }
     }
 
 

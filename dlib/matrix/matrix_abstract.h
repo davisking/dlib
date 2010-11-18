@@ -108,6 +108,53 @@ namespace dlib
               scalar value.  The resulting matrix will have the same dimensions as m.
     !*/
 
+    template <typename T>
+    const matrix_exp operator+ (
+        const matrix_exp& m,
+        const T& value
+    );
+    /*!
+        ensures
+            - returns the result of adding value to all the elements of matrix m.  
+              The resulting matrix will have the same dimensions as m.
+    !*/
+
+    template <typename T>
+    const matrix_exp operator+ (
+        const T& value,
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - returns the result of adding value to all the elements of matrix m.  
+              The resulting matrix will have the same dimensions as m.
+    !*/
+
+    template <typename T>
+    const matrix_exp operator- (
+        const matrix_exp& m,
+        const T& value
+    );
+    /*!
+        ensures
+            - returns the result of subtracting value from all the elements of matrix m.  
+              The resulting matrix will have the same dimensions as m.
+    !*/
+
+    template <typename T>
+    const matrix_exp operator- (
+        const T& value,
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - Returns a matrix M such that:
+                - M has the same dimensions as m
+                - M contains the same type of element as m
+                - for all valid r and c:
+                    - M(r,c) == value - m(r,c)
+    !*/
+
     bool operator== (
         const matrix_exp& m1,
         const matrix_exp& m2
@@ -457,6 +504,22 @@ namespace dlib
                 - returns *this
         !*/
 
+        template <typename EXP>
+        matrix& operator *= (
+            const matrix_exp<EXP>& m
+        );
+        /*!
+            requires
+                - matrix_exp<EXP>::type == T
+                  (i.e. m must contain the same type of element as *this)
+                - nc() == m.nr()
+                - size() > 0 && m.size() > 0
+                  (you can't multiply any sort of empty matrices together)
+            ensures
+                - #(*this) == *this * m
+                - returns *this
+        !*/
+
         matrix& operator *= (
             const T& a
         );
@@ -472,6 +535,24 @@ namespace dlib
         /*!
             ensures
                 - #(*this) == *this / a
+                - returns *this
+        !*/
+
+        matrix& operator += (
+            const T& a
+        );
+        /*!
+            ensures
+                - #(*this) == *this + a
+                - returns *this
+        !*/
+
+        matrix& operator -= (
+            const T& a
+        );
+        /*!
+            ensures
+                - #(*this) == *this - a
                 - returns *this
         !*/
 
