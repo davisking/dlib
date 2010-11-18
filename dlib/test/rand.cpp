@@ -218,6 +218,7 @@ namespace
         {
             dlog << LINFO << "testing kernel_1a";
             rand_test<dlib::rand::kernel_1a>();
+            rand_test<dlib::rand::float_1a>();
         }
     } a;
 

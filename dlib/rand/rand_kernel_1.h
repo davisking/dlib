@@ -114,20 +114,12 @@ namespace dlib
             friend void serialize(
                 const rand_kernel_1& item, 
                 std::ostream& out
-            )
-            {
-                serialize(item.mt, out);
-                serialize(item.seed, out);
-            }
+            );
 
             friend void deserialize(
                 rand_kernel_1& item, 
                 std::istream& in 
-            )
-            {
-                deserialize(item.mt, in);
-                deserialize(item.seed, in);
-            }
+            );
 
         private:
             mt19937 mt;
@@ -148,6 +140,23 @@ namespace dlib
         static const bool value = true; 
     };
 
+    inline void serialize(
+        const rand_kernel_1& item, 
+        std::ostream& out
+    )
+    {
+        serialize(item.mt, out);
+        serialize(item.seed, out);
+    }
+
+    inline void deserialize(
+        rand_kernel_1& item, 
+        std::istream& in 
+    )
+    {
+        deserialize(item.mt, in);
+        deserialize(item.seed, in);
+    }
 }
 
 #endif // DLIB_RAND_KERNEl_1_
