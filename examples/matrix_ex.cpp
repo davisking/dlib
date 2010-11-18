@@ -151,6 +151,9 @@ int main()
     // MATLAB: E = A + B
     E = A + C;
 
+    // MATLAB: E = A + 5
+    E = A + 5;
+
     // MATLAB: E = E'
     E = trans(E);  // Note that if you want a conjugate transpose then you need to say conj(trans(E))
 
