@@ -323,6 +323,7 @@
    subject to the following constraints:
       sum(alpha) == C 
       min(alpha) >= 0 
+   Where f is convex.  This means that Q should be positive-semidefinite.
 </pre>
 
          </description>
