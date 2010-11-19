@@ -40,6 +40,7 @@ namespace dlib
                 subject to the following constraints:
                     - sum(alpha) == C (i.e. the sum of alpha values doesn't change)
                     - min(alpha) >= 0 (i.e. all alpha values are nonnegative)
+                Where f is convex.  This means that Q should be positive-semidefinite.
             - The solution to the above QP will be stored in #alpha.
             - This function uses a simple implementation of the sequential minimal
               optimization algorithm.  It starts the algorithm with the given alpha

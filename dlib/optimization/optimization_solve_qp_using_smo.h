@@ -28,6 +28,7 @@ namespace dlib
             subject to the following constraints:
                 - trans(e)*alpha == C (i.e. the sum of alpha values doesn't change)
                 - min(alpha) >= 0 (i.e. all alpha values are nonnegative)
+            Where f is convex.  This means that Q should be positive-semidefinite.
 
 
         To get from this problem formulation to the algorithm below we have to 
