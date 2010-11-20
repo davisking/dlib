@@ -102,8 +102,8 @@ namespace dlib
                 std::ostream& out
             )
             {
-				dlib::serialize(item.x, out);
-				dlib::serialize(item.i, out);
+                dlib::serialize(item.x, out);
+                dlib::serialize(item.i, out);
             }
 
             friend void deserialize(
@@ -111,7 +111,7 @@ namespace dlib
                 std::istream& in 
             )
             {
-				dlib::deserialize(item.x, in);
+                dlib::deserialize(item.x, in);
                 dlib::deserialize(item.i, in);
             }
 
