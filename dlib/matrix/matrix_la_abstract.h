@@ -190,6 +190,10 @@ namespace dlib
             - else
                 - returns a matrix with the same dimensions as A but it 
                   will have a bogus value.  I.e. it won't be a decomposition.
+                  In this case the algorithm returns a partial decomposition.
+                - You can tell when chol fails by looking at the lower right
+                  element of the returned matrix.  If it is 0 then it means
+                  A does not have a cholesky decomposition.  
 
             - If DLIB_USE_LAPACK is defined then the LAPACK routine xPOTRF 
               is used to compute the cholesky decomposition.
