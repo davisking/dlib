@@ -973,6 +973,64 @@ convergence:
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename M>
+    struct op_diag_inv
+    {
+        template <typename EXP>
+        op_diag_inv( const matrix_exp<EXP>& m_) : m(m_){}
+
+
+        const static long cost = 1;
+        const static long NR = (M::NC&&M::NR)? (tmax<M::NR,M::NC>::value) : (0);
+        const static long NC = NR;
+        typedef typename M::type type;
+        typedef const type const_ret_type;
+        typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
+
+
+        // hold the matrix by value
+        const matrix<type,NR,1,mem_manager_type,layout_type> m;
+
+        const_ret_type apply ( long r, long c) const 
+        { 
+            if (r==c)
+                return m(r);
+            else
+                return 0;
+        }
+
+        long nr () const { return m.size(); }
+        long nc () const { return m.size(); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_diag_op<op_diag_inv<EXP> > inv (
+        const matrix_diag_exp<EXP>& m
+    ) 
+    { 
+        typedef op_diag_inv<EXP> op;
+        return matrix_diag_op<op>(op(reciprocal(diag(m))));
+    }
+
+    template <
+        typename EXP
+        >
+    const matrix_diag_op<op_diag_inv<EXP> > pinv (
+        const matrix_diag_exp<EXP>& m
+    ) 
+    { 
+        typedef op_diag_inv<EXP> op;
+        return matrix_diag_op<op>(op(reciprocal(diag(m))));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename EXP>
     const typename matrix_exp<EXP>::matrix_type  inv_lower_triangular (
         const matrix_exp<EXP>& A 

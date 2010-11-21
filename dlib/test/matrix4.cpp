@@ -369,6 +369,141 @@ namespace
             m = trans(m)+1;
             DLIB_TEST(m == m2);
         }
+
+        {
+            matrix<double> d(3,1), di(3,1);
+            matrix<double> m(3,3);
+             
+            m = 1,2,3,
+                4,5,6,
+                7,8,9;
+
+            d = 1,2,3;
+
+            di = 1, 1/2.0, 1/3.0;
+
+            DLIB_TEST(inv(diagm(d)) == diagm(di));
+            DLIB_TEST(pinv(diagm(d)) == diagm(di));
+            DLIB_TEST(inv(diagm(d))*m == tmp(diagm(di))*m);
+            DLIB_TEST(m*inv(diagm(d)) == m*tmp(diagm(di)));
+
+            DLIB_TEST(inv(diagm(d)) + m == tmp(diagm(di)) + m);
+            DLIB_TEST(m + inv(diagm(d)) == tmp(diagm(di)) + m);
+
+            DLIB_TEST((m + identity_matrix<double>(3) == m + tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + identity_matrix<double,3>() == m + tmp(identity_matrix<double,3>())));
+            DLIB_TEST((m + 2*identity_matrix<double>(3) == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + 2*identity_matrix<double,3>() == m + 2*tmp(identity_matrix<double,3>())));
+            DLIB_TEST((m + identity_matrix<double>(3)*2 == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + identity_matrix<double,3>()*2 == m + 2*tmp(identity_matrix<double,3>())));
+
+            DLIB_TEST((identity_matrix<double>(3) + m == m + tmp(identity_matrix<double>(3))));
+            DLIB_TEST((identity_matrix<double,3>() + m == m + tmp(identity_matrix<double,3>())));
+            DLIB_TEST((2*identity_matrix<double>(3) + m == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((2*identity_matrix<double,3>() + m == m + 2*tmp(identity_matrix<double,3>())));
+
+        }
+        {
+            matrix<double,3,1> d(3,1), di(3,1);
+            matrix<double,3,3> m(3,3);
+             
+            m = 1,2,3,
+                4,5,6,
+                7,8,9;
+
+            d = 1,2,3;
+
+            di = 1, 1/2.0, 1/3.0;
+
+            DLIB_TEST(inv(diagm(d)) == diagm(di));
+            DLIB_TEST(inv(diagm(d)) == diagm(di));
+            DLIB_TEST(inv(diagm(d))*m == tmp(diagm(di))*m);
+            DLIB_TEST(m*inv(diagm(d)) == m*tmp(diagm(di)));
+
+            DLIB_TEST(inv(diagm(d)) + m == tmp(diagm(di)) + m);
+            DLIB_TEST(m + inv(diagm(d)) == tmp(diagm(di)) + m);
+
+
+            DLIB_TEST((m + identity_matrix<double>(3) == m + tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + identity_matrix<double,3>() == m + tmp(identity_matrix<double,3>())));
+            DLIB_TEST((m + 2*identity_matrix<double>(3) == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + 2*identity_matrix<double,3>() == m + 2*tmp(identity_matrix<double,3>())));
+            DLIB_TEST((m + identity_matrix<double>(3)*2 == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + identity_matrix<double,3>()*2 == m + 2*tmp(identity_matrix<double,3>())));
+
+            DLIB_TEST((identity_matrix<double>(3) + m == m + tmp(identity_matrix<double>(3))));
+            DLIB_TEST((identity_matrix<double,3>() + m == m + tmp(identity_matrix<double,3>())));
+            DLIB_TEST((2*identity_matrix<double>(3) + m == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((2*identity_matrix<double,3>() + m == m + 2*tmp(identity_matrix<double,3>())));
+        }
+
+        {
+            matrix<double,1,3> d(1,3), di(1,3);
+            matrix<double,3,3> m(3,3);
+             
+            m = 1,2,3,
+                4,5,6,
+                7,8,9;
+
+            d = 1,2,3;
+
+            di = 1, 1/2.0, 1/3.0;
+
+            DLIB_TEST(inv(diagm(d)) == diagm(di));
+            DLIB_TEST(inv(diagm(d)) == diagm(di));
+            DLIB_TEST(inv(diagm(d))*m == tmp(diagm(di))*m);
+            DLIB_TEST(m*inv(diagm(d)) == m*tmp(diagm(di)));
+
+            DLIB_TEST(inv(diagm(d)) + m == tmp(diagm(di)) + m);
+            DLIB_TEST(m + inv(diagm(d)) == tmp(diagm(di)) + m);
+
+
+            DLIB_TEST((m + identity_matrix<double>(3) == m + tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + identity_matrix<double,3>() == m + tmp(identity_matrix<double,3>())));
+            DLIB_TEST((m + 2*identity_matrix<double>(3) == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + 2*identity_matrix<double,3>() == m + 2*tmp(identity_matrix<double,3>())));
+            DLIB_TEST((m + identity_matrix<double>(3)*2 == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + identity_matrix<double,3>()*2 == m + 2*tmp(identity_matrix<double,3>())));
+
+            DLIB_TEST((identity_matrix<double>(3) + m == m + tmp(identity_matrix<double>(3))));
+            DLIB_TEST((identity_matrix<double,3>() + m == m + tmp(identity_matrix<double,3>())));
+            DLIB_TEST((2*identity_matrix<double>(3) + m == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((2*identity_matrix<double,3>() + m == m + 2*tmp(identity_matrix<double,3>())));
+        }
+
+        {
+            matrix<double,1,0> d(1,3), di(1,3);
+            matrix<double,0,3> m(3,3);
+             
+            m = 1,2,3,
+                4,5,6,
+                7,8,9;
+
+            d = 1,2,3;
+
+            di = 1, 1/2.0, 1/3.0;
+
+            DLIB_TEST(inv(diagm(d)) == diagm(di));
+            DLIB_TEST(inv(diagm(d)) == diagm(di));
+            DLIB_TEST(inv(diagm(d))*m == tmp(diagm(di))*m);
+            DLIB_TEST(m*inv(diagm(d)) == m*tmp(diagm(di)));
+
+            DLIB_TEST(inv(diagm(d)) + m == tmp(diagm(di)) + m);
+            DLIB_TEST(m + inv(diagm(d)) == tmp(diagm(di)) + m);
+
+
+            DLIB_TEST((m + identity_matrix<double>(3) == m + tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + identity_matrix<double,3>() == m + tmp(identity_matrix<double,3>())));
+            DLIB_TEST((m + 2*identity_matrix<double>(3) == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + 2*identity_matrix<double,3>() == m + 2*tmp(identity_matrix<double,3>())));
+            DLIB_TEST((m + identity_matrix<double>(3)*2 == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((m + identity_matrix<double,3>()*2 == m + 2*tmp(identity_matrix<double,3>())));
+
+            DLIB_TEST((identity_matrix<double>(3) + m == m + tmp(identity_matrix<double>(3))));
+            DLIB_TEST((identity_matrix<double,3>() + m == m + tmp(identity_matrix<double,3>())));
+            DLIB_TEST((2*identity_matrix<double>(3) + m == m + 2*tmp(identity_matrix<double>(3))));
+            DLIB_TEST((2*identity_matrix<double,3>() + m == m + 2*tmp(identity_matrix<double,3>())));
+        }
     }
 
 

@@ -185,6 +185,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP
+        >
+    class matrix_diag_exp : public matrix_exp<EXP> 
+    {
+        /*!
+            This is a matrix expression type used to represent diagonal matrices.
+            That is, square matrices with all off diagonal elements equal to 0.
+        !*/
+
+    protected:
+        matrix_diag_exp() {}
+        matrix_diag_exp(const matrix_diag_exp& item ):matrix_exp<EXP>(item) {}
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_EXP_h_

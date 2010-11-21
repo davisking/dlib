@@ -89,6 +89,84 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename OP >
+    class matrix_diag_op;
+
+    template < typename OP >
+    struct matrix_traits<matrix_diag_op<OP> >
+    {
+        typedef typename OP::type type;
+        typedef typename OP::const_ret_type const_ret_type;
+        typedef typename OP::mem_manager_type mem_manager_type;
+        typedef typename OP::layout_type layout_type;
+        const static long NR = OP::NR;
+        const static long NC = OP::NC;
+        const static long cost = OP::cost;
+    };
+
+    template <
+        typename OP
+        >
+    class matrix_diag_op : public matrix_diag_exp<matrix_diag_op<OP> >
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                The matrix_diag_op is simply a tool for reducing the amount of boilerplate
+                you need to write when creating matrix expressions.  
+        !*/
+
+    public:
+        typedef typename matrix_traits<matrix_diag_op>::type type;
+        typedef typename matrix_traits<matrix_diag_op>::const_ret_type const_ret_type;
+        typedef typename matrix_traits<matrix_diag_op>::mem_manager_type mem_manager_type;
+        typedef typename matrix_traits<matrix_diag_op>::layout_type layout_type;
+        const static long NR = matrix_traits<matrix_diag_op>::NR;
+        const static long NC = matrix_traits<matrix_diag_op>::NC;
+        const static long cost = matrix_traits<matrix_diag_op>::cost;
+
+    private:
+        // This constructor exists simply for the purpose of causing a compile time error if
+        // someone tries to create an instance of this object with the wrong kind of object.
+        template <typename T1>
+        matrix_diag_op (T1); 
+    public:
+
+        matrix_diag_op (
+            const OP& op_
+        ) :
+            op(op_)
+        {}
+
+        const_ret_type operator() (
+            long r, 
+            long c
+        ) const { return op.apply(r,c); }
+
+        const_ret_type operator() ( long i ) const 
+        { return matrix_exp<matrix_diag_op>::operator()(i); }
+
+        template <typename U>
+        bool aliases (
+            const matrix_exp<U>& item
+        ) const { return op.aliases(item); }
+
+        template <typename U>
+        bool destructively_aliases (
+            const matrix_exp<U>& item
+        ) const { return op.destructively_aliases(item); }
+
+        long nr (
+        ) const { return op.nr(); }
+
+        long nc (
+        ) const { return op.nc(); }
+
+
+        const OP op;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct does_not_alias 
     {
         /*!

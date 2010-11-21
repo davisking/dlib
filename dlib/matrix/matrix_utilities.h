@@ -1004,7 +1004,7 @@ namespace dlib
     template <
         typename EXP
         >
-    const matrix_op<op_diagm<EXP> > diagm (
+    const matrix_diag_op<op_diagm<EXP> > diagm (
         const matrix_exp<EXP>& m
     )
     {
@@ -1017,7 +1017,7 @@ namespace dlib
             << "\n\tm.nc(): " << m.nc() 
             );
         typedef op_diagm<EXP> op;
-        return matrix_op<op>(op(m.ref()));
+        return matrix_diag_op<op>(op(m.ref()));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1895,6 +1895,37 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename M>
+    struct op_add_diag 
+    {
+        op_add_diag( const M& m_, const typename M::type& value_) : m(m_), value(value_){}
+        const M& m;
+        const typename M::type value;
+
+        const static long cost = M::cost+1;
+        const static long NR = M::NR;
+        const static long NC = M::NC;
+        typedef typename M::type type;
+        typedef const typename M::type const_ret_type;
+        typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
+        const_ret_type apply ( long r, long c) const
+        { 
+            if (r==c)
+                return m(r,c)+value; 
+            else
+                return m(r,c);
+        }
+
+        long nr () const { return m.nr(); }
+        long nc () const { return m.nc(); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.destructively_aliases(item); }
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T 
         >
@@ -1920,7 +1951,7 @@ namespace dlib
     template <
         typename T
         >
-    const matrix_op<op_identity_matrix_2<T> > identity_matrix (
+    const matrix_diag_op<op_identity_matrix_2<T> > identity_matrix (
         const long& size 
     )
     {
@@ -1930,7 +1961,193 @@ namespace dlib
             << "\n\tsize: " << size 
             );
         typedef op_identity_matrix_2<T> op;
-        return matrix_op<op>(op(size));
+        return matrix_diag_op<op>(op(size));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP,
+        typename T
+        >
+    const matrix_op<op_add_diag<EXP> > operator+ (
+        const matrix_exp<EXP>& lhs,
+        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >& rhs 
+    )
+    {
+        // both matrices must contain the same type of element
+        COMPILE_TIME_ASSERT((is_same_type<T,typename EXP::type>::value == true));
+
+        // You can only add matrices together if they both have the same number of rows and columns.
+        DLIB_ASSERT(lhs.nc() == rhs.nc() &&
+                    lhs.nr() == rhs.nr(), 
+            "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
+            << "\n\tYou are trying to add two incompatible matrices together"
+            << "\n\tlhs.nr(): " << lhs.nr()
+            << "\n\tlhs.nc(): " << lhs.nc()
+            << "\n\trhs.nr(): " << rhs.nr()
+            << "\n\trhs.nc(): " << rhs.nc()
+            << "\n\t&lhs: " << &lhs 
+            << "\n\t&rhs: " << &rhs 
+            );
+
+
+        typedef op_add_diag<EXP> op;
+        return matrix_op<op>(op(lhs.ref(),1));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP,
+        typename T
+        >
+    const matrix_op<op_add_diag<EXP> > operator+ (
+        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >& lhs, 
+        const matrix_exp<EXP>& rhs
+    )
+    {
+        // both matrices must contain the same type of element
+        COMPILE_TIME_ASSERT((is_same_type<T,typename EXP::type>::value == true));
+
+        // You can only add matrices together if they both have the same number of rows and columns.
+        DLIB_ASSERT(lhs.nc() == rhs.nc() &&
+                    lhs.nr() == rhs.nr(), 
+            "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
+            << "\n\tYou are trying to add two incompatible matrices together"
+            << "\n\tlhs.nr(): " << lhs.nr()
+            << "\n\tlhs.nc(): " << lhs.nc()
+            << "\n\trhs.nr(): " << rhs.nr()
+            << "\n\trhs.nc(): " << rhs.nc()
+            << "\n\t&lhs: " << &lhs 
+            << "\n\t&rhs: " << &rhs 
+            );
+
+
+        typedef op_add_diag<EXP> op;
+        return matrix_op<op>(op(rhs.ref(),1));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        long N
+        >
+    struct op_const_diag_matrix : does_not_alias 
+    {
+        op_const_diag_matrix(const long& size_, const T& value_) : size(size_),value(value_) {}
+
+        const long size;
+        const T value;
+
+        const static long cost = 1;
+        const static long NR = N;
+        const static long NC = N;
+        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef row_major_layout layout_type;
+        typedef T type;
+        typedef const T const_ret_type;
+        const_ret_type apply (long r, long c) const 
+        { 
+            if (r == c)
+                return value;
+            else
+                return 0;
+        }
+
+        long nr() const { return size; }
+        long nc() const { return size; }
+    };
+
+    template <
+        typename T,
+        typename U
+        >
+    const typename disable_if<is_matrix<U>, matrix_diag_op<op_const_diag_matrix<T,0> > >::type operator* (
+        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >& m,
+        const U& value
+    )
+    {
+        typedef op_const_diag_matrix<T,0> op;
+        return matrix_diag_op<op>(op(m.nr(), value));
+    }
+
+    template <
+        typename T,
+        typename U
+        >
+    const typename disable_if<is_matrix<U>, matrix_diag_op<op_const_diag_matrix<T,0> > >::type operator* (
+        const U& value,
+        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >& m
+    )
+    {
+        typedef op_const_diag_matrix<T,0> op;
+        return matrix_diag_op<op>(op(m.nr(), value));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP,
+        typename T,
+        long N
+        >
+    const matrix_op<op_add_diag<EXP> > operator+ (
+        const matrix_exp<EXP>& lhs,
+        const matrix_exp<matrix_diag_op<op_const_diag_matrix<T,N> > >& rhs 
+    )
+    {
+        // both matrices must contain the same type of element
+        COMPILE_TIME_ASSERT((is_same_type<T,typename EXP::type>::value == true));
+
+        // You can only add matrices together if they both have the same number of rows and columns.
+        DLIB_ASSERT(lhs.nc() == rhs.nc() &&
+                    lhs.nr() == rhs.nr(), 
+            "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
+            << "\n\tYou are trying to add two incompatible matrices together"
+            << "\n\tlhs.nr(): " << lhs.nr()
+            << "\n\tlhs.nc(): " << lhs.nc()
+            << "\n\trhs.nr(): " << rhs.nr()
+            << "\n\trhs.nc(): " << rhs.nc()
+            << "\n\t&lhs: " << &lhs 
+            << "\n\t&rhs: " << &rhs 
+            );
+
+
+        typedef op_add_diag<EXP> op;
+        return matrix_op<op>(op(lhs.ref(),rhs.ref().op.value));
+    }
+
+    template <
+        typename EXP,
+        typename T,
+        long N
+        >
+    const matrix_op<op_add_diag<EXP> > operator+ (
+        const matrix_exp<matrix_diag_op<op_const_diag_matrix<T,N> > >& lhs, 
+        const matrix_exp<EXP>& rhs
+    )
+    {
+        // both matrices must contain the same type of element
+        COMPILE_TIME_ASSERT((is_same_type<T,typename EXP::type>::value == true));
+
+        // You can only add matrices together if they both have the same number of rows and columns.
+        DLIB_ASSERT(lhs.nc() == rhs.nc() &&
+                    lhs.nr() == rhs.nr(), 
+            "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
+            << "\n\tYou are trying to add two incompatible matrices together"
+            << "\n\tlhs.nr(): " << lhs.nr()
+            << "\n\tlhs.nc(): " << lhs.nc()
+            << "\n\trhs.nr(): " << rhs.nr()
+            << "\n\trhs.nc(): " << rhs.nc()
+            << "\n\t&lhs: " << &lhs 
+            << "\n\t&rhs: " << &rhs 
+            );
+
+
+        typedef op_add_diag<EXP> op;
+        return matrix_op<op>(op(rhs.ref(),lhs.ref().op.value));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1958,13 +2175,105 @@ namespace dlib
         typename T, 
         long N
         >
-    const matrix_op<op_identity_matrix<T,N> > identity_matrix (
+    const matrix_diag_op<op_identity_matrix<T,N> > identity_matrix (
     )
     {
         COMPILE_TIME_ASSERT(N > 0);
 
         typedef op_identity_matrix<T,N> op;
-        return matrix_op<op>(op());
+        return matrix_diag_op<op>(op());
+    }
+
+    template <
+        typename T,
+        typename U,
+        long N
+        >
+    const typename disable_if<is_matrix<U>, matrix_diag_op<op_const_diag_matrix<T,N> > >::type operator* (
+        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& m,
+        const U& value
+    )
+    {
+        typedef op_const_diag_matrix<T,N> op;
+        return matrix_diag_op<op>(op(m.nr(), value));
+    }
+
+    template <
+        typename T,
+        typename U,
+        long N
+        >
+    const typename disable_if<is_matrix<U>, matrix_diag_op<op_const_diag_matrix<T,N> > >::type operator* (
+        const U& value,
+        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& m
+    )
+    {
+        typedef op_const_diag_matrix<T,N> op;
+        return matrix_diag_op<op>(op(m.nr(), value));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP,
+        typename T,
+        long N
+        >
+    const matrix_op<op_add_diag<EXP> > operator+ (
+        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& lhs, 
+        const matrix_exp<EXP>& rhs
+    )
+    {
+        // both matrices must contain the same type of element
+        COMPILE_TIME_ASSERT((is_same_type<T,typename EXP::type>::value == true));
+
+        // You can only add matrices together if they both have the same number of rows and columns.
+        DLIB_ASSERT(lhs.nc() == rhs.nc() &&
+                    lhs.nr() == rhs.nr(), 
+            "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
+            << "\n\tYou are trying to add two incompatible matrices together"
+            << "\n\tlhs.nr(): " << lhs.nr()
+            << "\n\tlhs.nc(): " << lhs.nc()
+            << "\n\trhs.nr(): " << rhs.nr()
+            << "\n\trhs.nc(): " << rhs.nc()
+            << "\n\t&lhs: " << &lhs 
+            << "\n\t&rhs: " << &rhs 
+            );
+
+
+        typedef op_add_diag<EXP> op;
+        return matrix_op<op>(op(rhs.ref(),1));
+    }
+
+    template <
+        typename EXP,
+        typename T,
+        long N
+        >
+    const matrix_op<op_add_diag<EXP> > operator+ (
+        const matrix_exp<EXP>& lhs,
+        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& rhs
+    )
+    {
+        // both matrices must contain the same type of element
+        COMPILE_TIME_ASSERT((is_same_type<T,typename EXP::type>::value == true));
+
+        // You can only add matrices together if they both have the same number of rows and columns.
+        DLIB_ASSERT(lhs.nc() == rhs.nc() &&
+                    lhs.nr() == rhs.nr(), 
+            "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
+            << "\n\tYou are trying to add two incompatible matrices together"
+            << "\n\tlhs.nr(): " << lhs.nr()
+            << "\n\tlhs.nc(): " << lhs.nc()
+            << "\n\trhs.nr(): " << rhs.nr()
+            << "\n\trhs.nc(): " << rhs.nc()
+            << "\n\t&lhs: " << &lhs 
+            << "\n\t&rhs: " << &rhs 
+            );
+
+
+        typedef op_add_diag<EXP> op;
+        return matrix_op<op>(op(lhs.ref(),1));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2597,10 +2906,69 @@ namespace dlib
         >
     const matrix_op<op_scale_columns<EXP1,EXP2> > operator* (
         const matrix_exp<EXP1>& m,
-        const matrix_exp<matrix_op<op_diagm<EXP2> > >& v 
+        const matrix_exp<matrix_diag_op<op_diagm<EXP2> > >& v 
     )
     {
         return scale_columns(m,v.ref().op.m);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M1, typename M2>
+    struct op_scale_columns_diag  
+    {
+        op_scale_columns_diag(const M1& m1_, const M2& m2_) : m1(m1_), m2(m2_) {}
+        const M1& m1;
+        const M2& m2;
+
+        const static long cost = M1::cost + M2::cost + 1;
+        typedef typename M1::type type;
+        typedef const typename M1::type const_ret_type;
+        typedef typename M1::mem_manager_type mem_manager_type;
+        typedef typename M1::layout_type layout_type;
+        const static long NR = M1::NR;
+        const static long NC = M1::NC;
+
+        const_ret_type apply ( long r, long c) const { return m1(r,c)*m2(c,c); }
+
+        long nr () const { return m1.nr(); }
+        long nc () const { return m1.nc(); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        { return m1.aliases(item) || m2.aliases(item) ; }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        { return m1.destructively_aliases(item) || m2.aliases(item); }
+    };
+
+// turn expressions of the form mat*diagonal_matrix into scale_columns(mat, d)
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    const matrix_op<op_scale_columns_diag<EXP1,EXP2> > operator* (
+        const matrix_exp<EXP1>& m,
+        const matrix_diag_exp<EXP2>& d 
+    )
+    {
+        // Both arguments to this function must contain the same type of element
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+
+        // figure out the compile time known length of d
+        const long v_len = ((EXP2::NR)*(EXP2::NC) == 0)? 0 : (tmax<EXP2::NR,EXP2::NC>::value);
+
+        // the length of d must match the number of columns in m
+        COMPILE_TIME_ASSERT(EXP1::NC == v_len || EXP1::NC == 0 || v_len == 0);
+
+        DLIB_ASSERT(m.nc() == d.nr(), 
+            "\tconst matrix_exp operator*(m, d)"
+            << "\n\tmatrix dimensions don't match"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\td.nr(): " << d.nr()
+            << "\n\td.nc(): " << d.nc() 
+            );
+        typedef op_scale_columns_diag<EXP1,EXP2> op;
+        return matrix_op<op>(op(m.ref(),d.ref()));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2671,11 +3039,70 @@ namespace dlib
         typename EXP2
         >
     const matrix_op<op_scale_rows<EXP1,EXP2> > operator* (
-        const matrix_exp<matrix_op<op_diagm<EXP2> > >& v, 
+        const matrix_exp<matrix_diag_op<op_diagm<EXP2> > >& v, 
         const matrix_exp<EXP1>& m
     )
     {
         return scale_rows(m,v.ref().op.m);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M1, typename M2>
+    struct op_scale_rows_diag  
+    {
+        op_scale_rows_diag(const M1& m1_, const M2& m2_) : m1(m1_), m2(m2_) {}
+        const M1& m1;
+        const M2& m2;
+
+        const static long cost = M1::cost + M2::cost + 1;
+        typedef typename M1::type type;
+        typedef const typename M1::type const_ret_type;
+        typedef typename M1::mem_manager_type mem_manager_type;
+        typedef typename M1::layout_type layout_type;
+        const static long NR = M1::NR;
+        const static long NC = M1::NC;
+
+        const_ret_type apply ( long r, long c) const { return m1(r,c)*m2(r,r); }
+
+        long nr () const { return m1.nr(); }
+        long nc () const { return m1.nc(); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        { return m1.aliases(item) || m2.aliases(item) ; }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        { return m1.destructively_aliases(item) || m2.aliases(item); }
+    };
+
+// turn expressions of the form diagonal_matrix*mat into scale_rows(mat, d)
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    const matrix_op<op_scale_rows_diag<EXP1,EXP2> > operator* (
+        const matrix_diag_exp<EXP2>& d, 
+        const matrix_exp<EXP1>& m
+    )
+    {
+        // Both arguments to this function must contain the same type of element
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+
+        // figure out the compile time known length of d
+        const long v_len = ((EXP2::NR)*(EXP2::NC) == 0)? 0 : (tmax<EXP2::NR,EXP2::NC>::value);
+
+        // the length of d must match the number of rows in m
+        COMPILE_TIME_ASSERT(EXP1::NR == v_len || EXP1::NR == 0 || v_len == 0);
+
+        DLIB_ASSERT(d.nc() == m.nr(), 
+            "\tconst matrix_exp operator*(d, m)"
+            << "\n\tThe dimensions of the d and m matrices don't match."
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\td.nr(): " << d.nr()
+            << "\n\td.nc(): " << d.nc() 
+            );
+        typedef op_scale_rows_diag<EXP1,EXP2> op;
+        return matrix_op<op>(op(m.ref(),d.ref()));
     }
 
 // ----------------------------------------------------------------------------------------
