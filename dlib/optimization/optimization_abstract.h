@@ -169,6 +169,12 @@ namespace dlib
               first calling f() and then calling der().  That is, these two functions
               are always called in pairs with f() being called first and then der()
               being called second.
+            - Note that this function solves the maximization problem by converting it 
+              into a minimization problem.  Therefore, the values of f and its derivative
+              reported to the stopping strategy will be negated.  That is, stop_strategy
+              will see -f() and -der().  All this really means is that the status messages
+              from a stopping strategy in verbose mode will display a negated objective
+              value.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -241,6 +247,12 @@ namespace dlib
             - returns f(#x). 
             - Uses the dlib::derivative(f,derivative_eps) function to compute gradient
               information.
+            - Note that this function solves the maximization problem by converting it 
+              into a minimization problem.  Therefore, the values of f and its derivative
+              reported to the stopping strategy will be negated.  That is, stop_strategy
+              will see -f() and -der().  All this really means is that the status messages
+              from a stopping strategy in verbose mode will display a negated objective
+              value.
     !*/
 
 // ----------------------------------------------------------------------------------------
