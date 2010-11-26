@@ -34,6 +34,8 @@
          <item>find_max_single_variable</item> 
          <item>find_max_using_approximate_derivatives</item> 
          <item>find_max_bobyqa</item> 
+         <item>find_max_trust_region</item> 
+         <item>find_min_trust_region</item> 
       </section>
 
       <section>
@@ -54,6 +56,7 @@
          <item>poly_min_extrap</item> 
          <item>lagrange_poly_min_extrap</item> 
          <item>line_search</item> 
+         <item>solve_trust_region_subproblem</item> 
       </section>
 
     </top>  
@@ -313,6 +316,24 @@
    <!-- ************************************************************************* -->
 
       <component>
+         <name>solve_trust_region_subproblem</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_trust_region_abstract.h</spec_file>
+         <description>
+             This function solves the following optimization problem:
+<pre>
+Minimize: f(p) == 0.5*trans(p)*B*p + trans(g)*p
+subject to the following constraint:
+   length(p) &lt;= radius
+</pre>
+
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>solve_qp_using_smo</name>
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_solve_qp_using_smo_abstract.h</spec_file>
@@ -443,6 +464,32 @@
          <examples>
             <example>optimization_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_min_trust_region</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_trust_region_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained minimization of a nonlinear function using 
+             a trust region method.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_max_trust_region</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_trust_region_abstract.h</spec_file>
+         <description>
+             Performs an unconstrained maximization of a nonlinear function using 
+             a trust region method.
+         </description>
                                  
       </component>
 
