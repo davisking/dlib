@@ -191,7 +191,7 @@
                 This method uses an amount of memory that is quadratic in the number
                 of variables to be optimized.  It is generally very effective but 
                 if your problem has a very large number of variables then it isn't 
-                appropriate.  Instead You should try the <a href="#lbfgs_search_strategy">lbfgs_search_strategy</a>.
+                appropriate.  Instead, you should try the <a href="#lbfgs_search_strategy">lbfgs_search_strategy</a>.
                   </p>
          </description>
          <examples>
