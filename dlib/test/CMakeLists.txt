@@ -83,12 +83,13 @@ set (tests
    statistics.cpp
    std_vector_c.cpp
    string.cpp
-   svm.cpp
    svm_c_linear.cpp
+   svm.cpp
    thread_pool.cpp
    threads.cpp
    timer.cpp
    tokenizer.cpp
+   trust_region.cpp
    tuple.cpp
    type_safe_union.cpp
    )

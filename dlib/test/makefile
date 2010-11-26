@@ -99,6 +99,7 @@ SRC += thread_pool.cpp
 SRC += threads.cpp
 SRC += timer.cpp
 SRC += tokenizer.cpp
+SRC += trust_region.cpp
 SRC += tuple.cpp
 SRC += type_safe_union.cpp
 
