@@ -35,10 +35,11 @@ namespace dlib
         DLIB_ASSERT(B.nr() == B.nc() && is_col_vector(g) && g.size() == B.nr() && equal(B,trans(B)),
             "\t unsigned long solve_trust_region_subproblem()"
             << "\n\t invalid arguments were given to this function"
-            << "\n\t B.nr():           " << B.nr()
-            << "\n\t B.nc():           " << B.nc()
-            << "\n\t is_col_vector(g): " << is_col_vector(g) 
-            << "\n\t g.size():         " << g.size() 
+            << "\n\t B.nr():            " << B.nr()
+            << "\n\t B.nc():            " << B.nc()
+            << "\n\t is_col_vector(g):  " << is_col_vector(g) 
+            << "\n\t g.size():          " << g.size() 
+            << "\n\t equal(B,trans(B)): " << equal(B,trans(B)) 
             );
         DLIB_ASSERT(radius > 0 && eps > 0 && max_iter > 0,
             "\t unsigned long solve_trust_region_subproblem()"
@@ -56,7 +57,7 @@ namespace dlib
         p = 0;
 
 
-        const T numeric_eps = max(abs(BB))*std::numeric_limits<T>::epsilon();
+        const T numeric_eps = max(diag(abs(BB)))*std::numeric_limits<T>::epsilon();
 
         matrix<T,EXP1::NR,EXP2::NR,MM,L> R;
 
@@ -70,7 +71,9 @@ namespace dlib
         const T g_norm = length(gg);
 
         T lambda_min = 0;
-        T lambda_max = g_norm/radius - BB_min_eigenvalue;
+        T lambda_max = put_in_range(0, 
+                                    std::numeric_limits<T>::max(), 
+                                    g_norm/radius - BB_min_eigenvalue);
 
 
         // If we can tell that the minimum is at 0 then don't do anything.  Just return the answer. 
@@ -88,11 +91,11 @@ namespace dlib
             R = chol(BB + lambda*identity_matrix<T>(BB.nr()));
 
             // if the cholesky decomposition doesn't exist. 
-            if (R(R.nr()-1, R.nc()-1) <= numeric_eps)
+            if (R(R.nr()-1, R.nc()-1) <= 0)
             {
                 // If B is indefinite and g is equal to 0 then we should
                 // quit this loop and go right to the eigenvalue decomposition method.
-                if (g_norm < numeric_eps)
+                if (g_norm <= numeric_eps)
                     break;
 
                 // narrow the bracket on lambda.  Obviously the current lambda is
@@ -138,10 +141,12 @@ namespace dlib
             else
                 lambda_min = lambda;
 
-            // This is only going to happen when g is basically 0 and B is indefinite.  
-            if (p_norm < numeric_eps)
+
+            if (p_norm <= radius*std::numeric_limits<T>::epsilon())
             {
-                break;
+                const T alpha = 0.01;
+                lambda = (1-alpha)*lambda_min + alpha*lambda_max;
+                continue;
             }
 
             const T old_lambda = lambda;
@@ -249,9 +254,9 @@ namespace dlib
         {
             // Try to scale the trust region to some reasonable elliptic shape
             // appropriate for the current problem.
-            //d = 1,1;
             //d = clamp(abs(g),1e-1, 1e1);
             d = clamp(diag(abs(h)),1e-1, 1e1);
+            //d = 1;
 
 
             const unsigned long iter = solve_trust_region_subproblem(inv(diagm(d))*h*inv(diagm(d)),
@@ -272,7 +277,10 @@ namespace dlib
             if (std::abs(predicted_improvement) <= std::abs(measured_improvement)*std::numeric_limits<type>::epsilon())
                 break;
 
-            const type rho = measured_improvement/predicted_improvement;
+            // predicted_improvement shouldn't be negative but it might be if something went
+            // wrong in the trust region solver.  So put abs() here to guard against that.  This
+            // way the sign of rho is determined only by the sign of measured_improvement.
+            const type rho = measured_improvement/std::abs(predicted_improvement);
 
 
             
