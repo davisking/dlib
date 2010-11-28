@@ -45,7 +45,11 @@ namespace dlib
     /*!
         requires
             - f == a function that returns a scalar
-            - f must take either double or a dlib::matrix that is a column vector
+            - f must have one of the following forms:
+                - double f(double)
+                - double f(dlib::matrix)  (where the matrix is a column vector)
+                - double f(T, dlib::matrix)  (where the matrix is a column vector.  In 
+                  this case the derivative of f is taken with respect to the second argument.)
             - eps > 0
         ensures
             - returns a function that represents the derivative of the function f.  It

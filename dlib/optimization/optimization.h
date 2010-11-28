@@ -58,6 +58,33 @@ namespace dlib
             return der;
         }
 
+        template <typename T, typename U>
+        typename U::matrix_type operator()(const T& item, const U& x) const
+        {
+            // U must be some sort of dlib matrix 
+            COMPILE_TIME_ASSERT(is_matrix<U>::value);
+
+            typename U::matrix_type der(x.size());
+            typename U::matrix_type e(x);
+            for (long i = 0; i < x.size(); ++i)
+            {
+                const double old_val = e(i);
+
+                e(i) += eps;
+                const double delta_plus = f(item,e);
+                e(i) = old_val - eps;
+                const double delta_minus = f(item,e);
+
+                der(i) = (delta_plus - delta_minus)/(2*eps);
+
+                // and finally restore the old value of this element
+                e(i) = old_val;
+            }
+
+            return der;
+        }
+        
+
         double operator()(const double& x) const
         {
             return (f(x+eps)-f(x-eps))/(2*eps);
