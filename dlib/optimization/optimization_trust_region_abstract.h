@@ -60,6 +60,8 @@ namespace dlib
 
         !*/
 
+    public:
+
         // Define the type used to represent column vectors
         typedef matrix<double,0,1> column_vector;
         // Define the type used to represent the hessian matrix
