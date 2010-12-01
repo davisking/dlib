@@ -8,6 +8,7 @@
 #include "optimization/optimization_solve_qp_using_smo.h"
 #include "optimization/optimization_oca.h"
 #include "optimization/optimization_trust_region.h"
+#include "optimization/optimization_least_squares.h"
 
 #endif // DLIB_OPTIMIZATIOn_HEADER
 
