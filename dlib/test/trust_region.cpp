@@ -3,6 +3,7 @@
 
 
 #include <dlib/optimization.h>
+#include "optimization_test_functions.h"
 #include <sstream>
 #include <string>
 #include <cstdlib>
@@ -19,78 +20,9 @@ namespace
     using namespace test;
     using namespace dlib;
     using namespace std;
+    using namespace dlib::test_functions;
 
     logger dlog("test.trust_region");
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T>
-    T rosen ( const matrix<T,2,1>& m)
-    {
-        const T x = m(0); 
-        const T y = m(1);
-
-        // compute Rosenbrock's function and return the result
-        return 100.0*pow(y - x*x,2) + pow(1 - x,2);
-    }
-
-    template <typename T>
-    const matrix<T,2,1> rosen_derivative ( const matrix<T,2,1>& m)
-    {
-        const T x = m(0);
-        const T y = m(1);
-
-        // make us a column vector of length 2
-        matrix<T,2,1> res(2);
-
-        // now compute the gradient vector
-        res(0) = -400*x*(y-x*x) - 2*(1-x); // derivative of rosen() with respect to x
-        res(1) = 200*(y-x*x);              // derivative of rosen() with respect to y
-        return res;
-    }
-
-    template <typename T>
-    const matrix<T,2,2> rosen_hessian ( const matrix<T,2,1>& m)
-    {
-        const T x = m(0);
-        const T y = m(1);
-
-        // make us a column vector of length 2
-        matrix<T,2,2> res;
-
-        // now compute the gradient vector
-        res(0,0) = -400*y + 3*400*x*x + 2; 
-        res(1,1) = 200;              
-
-        res(0,1) = -400*x;              
-        res(1,0) = -400*x;              
-        return res;
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T>
-    struct rosen_model
-    {
-        typedef matrix<T,2,1> column_vector;
-        typedef matrix<T,2,2> general_matrix;
-
-        T operator() ( column_vector x) const
-        {
-            return static_cast<T>(rosen(x));
-        }
-
-        void get_derivative_and_hessian (
-            const column_vector& x,
-            column_vector& d,
-            general_matrix& h
-        ) const 
-        {
-            d = rosen_derivative(x);
-            h = rosen_hessian(x);
-        }
-
-    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -131,7 +63,7 @@ namespace
 
         matrix<T,2,1> p = 100*matrix_cast<T>(randm(2,1,rnd)) - 50;
 
-        T obj = find_min_trust_region(objective_delta_stop_strategy(0, 100), rosen_model<T>(), p);
+        T obj = find_min_trust_region(objective_delta_stop_strategy(0, 100), rosen_function_model<T>(), p);
 
         DLIB_TEST_MSG(obj == 0, "obj: " << obj);
         DLIB_TEST_MSG(length(p-ans) == 0, "length(p): " << length(p-ans));
@@ -258,6 +190,113 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_problems()
+    {
+        print_spinner();
+        {
+            matrix<double,4,1> ch;
+
+            ch = brown_start();
+
+            find_min_trust_region(objective_delta_stop_strategy(1e-7, 80),
+                                  brown_function_model(),
+                                  ch);
+
+            dlog << LINFO << "brown obj: " << brown(ch);
+            dlog << LINFO << "brown der: " << length(brown_derivative(ch));
+            dlog << LINFO << "brown error: " << length(ch - brown_solution());
+
+            DLIB_TEST(length(ch - brown_solution()) < 1e-5);
+
+        }
+        print_spinner();
+        {
+            matrix<double,2,1> ch;
+
+            ch = rosen_start<double>();
+
+            find_min_trust_region(objective_delta_stop_strategy(1e-7, 80),
+                                  rosen_function_model<double>(),
+                                  ch);
+
+            dlog << LINFO << "rosen obj: " << rosen(ch);
+            dlog << LINFO << "rosen der: " << length(rosen_derivative(ch));
+            dlog << LINFO << "rosen error: " << length(ch - rosen_solution<double>());
+
+            DLIB_TEST(length(ch - rosen_solution<double>()) < 1e-5);
+        }
+
+        print_spinner();
+        {
+            matrix<double,0,1> ch;
+
+            ch = chebyquad_start(2);
+
+            find_min_trust_region(objective_delta_stop_strategy(1e-7, 80),
+                                  chebyquad_function_model(),
+                                  ch);
+
+            dlog << LINFO << "chebyquad 2 obj: " << chebyquad(ch);
+            dlog << LINFO << "chebyquad 2 der: " << length(chebyquad_derivative(ch));
+            dlog << LINFO << "chebyquad 2 error: " << length(ch - chebyquad_solution(2));
+
+            DLIB_TEST(length(ch - chebyquad_solution(2)) < 1e-5);
+
+        }
+        print_spinner();
+        {
+            matrix<double,0,1> ch;
+
+            ch = chebyquad_start(4);
+
+            find_min_trust_region(objective_delta_stop_strategy(1e-7, 80),
+                                  chebyquad_function_model(),
+                                  ch);
+
+            dlog << LINFO << "chebyquad 4 obj: " << chebyquad(ch);
+            dlog << LINFO << "chebyquad 4 der: " << length(chebyquad_derivative(ch));
+            dlog << LINFO << "chebyquad 4 error: " << length(ch - chebyquad_solution(4));
+
+            DLIB_TEST(length(ch - chebyquad_solution(4)) < 1e-5);
+        }
+        print_spinner();
+        {
+            matrix<double,0,1> ch;
+
+            ch = chebyquad_start(6);
+
+            find_min_trust_region(objective_delta_stop_strategy(1e-12, 80),
+                                  chebyquad_function_model(),
+                                  ch);
+
+            dlog << LINFO << "chebyquad 6 obj: " << chebyquad(ch);
+            dlog << LINFO << "chebyquad 6 der: " << length(chebyquad_derivative(ch));
+            dlog << LINFO << "chebyquad 6 error: " << length(ch - chebyquad_solution(6));
+
+            DLIB_TEST(length(ch - chebyquad_solution(6)) < 1e-5);
+
+        }
+        print_spinner();
+        {
+            matrix<double,0,1> ch;
+
+            ch = chebyquad_start(8);
+
+            find_min_trust_region(objective_delta_stop_strategy(1e-10, 80),
+                                  chebyquad_function_model(),
+                                  ch);
+
+            dlog << LINFO << "chebyquad 8 obj: " << chebyquad(ch);
+            dlog << LINFO << "chebyquad 8 der: " << length(chebyquad_derivative(ch));
+            dlog << LINFO << "chebyquad 8 error: " << length(ch - chebyquad_solution(8));
+
+            DLIB_TEST(length(ch - chebyquad_solution(8)) < 1e-5);
+        }
+
+    }
+
+
+
     class optimization_tester : public tester
     {
     public:
@@ -280,6 +319,8 @@ namespace
 
 
             test_trust_region_sub_problem();
+
+            test_problems();
         }
     } a;
 
