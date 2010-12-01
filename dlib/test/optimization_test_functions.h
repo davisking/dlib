@@ -212,7 +212,6 @@ namespace dlib
         matrix<T,2,1> rosen_residual_derivative (int i, const matrix<T,2,1>& m)
         {
             const T x = m(0); 
-            const T y = m(1);
 
             matrix<T,2,1> d;
 
