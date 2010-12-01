@@ -40,6 +40,7 @@ namespace dlib
             << "\n\t is_col_vector(g):  " << is_col_vector(g) 
             << "\n\t g.size():          " << g.size() 
             << "\n\t equal(B,trans(B)): " << equal(B,trans(B)) 
+            << "\n\t max(abs(B-trans(B))): " << max(abs(B-trans(B)))
             );
         DLIB_ASSERT(radius > 0 && eps > 0 && max_iter > 0,
             "\t unsigned long solve_trust_region_subproblem()"
@@ -252,21 +253,12 @@ namespace dlib
 
         while(stale_x || stop_strategy.should_continue_search(x, f_value, g))
         {
-            // Try to scale the trust region to some reasonable elliptic shape
-            // appropriate for the current problem.
-            //d = clamp(abs(g),1e-1, 1e1);
-            d = clamp(diag(abs(h)),1e-1, 1e1);
-            //d = 1;
-
-
-            const unsigned long iter = solve_trust_region_subproblem(inv(diagm(d))*h*inv(diagm(d)),
-                                                                     inv(diagm(d))*g,
+            const unsigned long iter = solve_trust_region_subproblem(h,
+                                                                     g,
                                                                      radius,
                                                                      p, 
                                                                      0.1, 
                                                                      20);
-            // convert back from the spherical trust region to our elliptical one.
-            p = inv(diagm(d))*p;
 
 
             const type new_f_value = model(x+p);
@@ -290,7 +282,7 @@ namespace dlib
 
                 // something has gone horribly wrong if the radius has shrunk to zero.  So just
                 // give up if that happens.
-                if (radius == 0)
+                if (static_cast<type>(radius) == 0)
                     break;
             }
             else
