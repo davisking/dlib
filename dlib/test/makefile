@@ -55,6 +55,7 @@ SRC += image.cpp
 SRC += is_same_object.cpp
 SRC += kcentroid.cpp
 SRC += kernel_matrix.cpp
+SRC += least_squares.cpp
 SRC += linear_manifold_regularizer.cpp
 SRC += lz77_buffer.cpp
 SRC += map.cpp

@@ -45,6 +45,7 @@ set (tests
    is_same_object.cpp
    kcentroid.cpp
    kernel_matrix.cpp
+   least_squares.cpp
    linear_manifold_regularizer.cpp
    lz77_buffer.cpp
    map.cpp

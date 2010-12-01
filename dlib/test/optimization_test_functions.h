@@ -155,7 +155,7 @@ namespace dlib
         T rosen_big ( const matrix<T,2,1>& m)
         {
             using std::pow;
-            return 0.5*(pow(rosen_big_residual(1,m),2) + pow(rosen_big_residual(2,m)));
+            return 0.5*(pow(rosen_big_residual(1,m),2) + pow(rosen_big_residual(2,m),2));
         }
 
         template <typename T>
@@ -206,6 +206,25 @@ namespace dlib
             {
                 return 1 - x;
             }
+        }
+
+        template <typename T>
+        matrix<T,2,1> rosen_residual_derivative (int i, const matrix<T,2,1>& m)
+        {
+            const T x = m(0); 
+            const T y = m(1);
+
+            matrix<T,2,1> d;
+
+            if (i == 1)
+            {
+                d = -20*x, 10;
+            }
+            else
+            {
+                d = -1, 0;
+            }
+            return d;
         }
 
         template <typename T>
