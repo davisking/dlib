@@ -87,7 +87,7 @@ namespace dlib
             running_covariance<gen_matrix> cov;
 
             // compute the covariance matrix and the means of the two classes.
-            for (unsigned long i = 0; i < samples.size(); ++i)
+            for (long i = 0; i < samples.size(); ++i)
             {
                 temp = kernel_matrix(kern, basis, samples(i));
                 cov.add(temp);
@@ -112,7 +112,7 @@ namespace dlib
 
             long best_size = delta.size();
             long misses = 0;
-            matrix<long,0,1,mm_type> best_total_perm;
+            matrix<long,0,1,mm_type> best_total_perm = perm;
 
             // Now we basically find fisher's linear discriminant over and over.  Each
             // time sorting the features so that the most important ones pile up together.
