@@ -44,7 +44,7 @@ namespace dlib
             - This function performs an unconstrained minimization of the least squares
               function g(x) defined by:
                 - g(x) = sum over all i: 0.5*pow( f(list(i),x), 2 )
-            - This method combines the Levenberg–Marquardt method with a quasi-newton method
+            - This method combines the Levenberg-Marquardt method with a quasi-newton method
               for approximating the second order terms of the hessian and is appropriate for
               large residual problems (i.e. problems where the f() function isn't driven to 0).  
               In particular, it uses the method of Dennis, Gay, and Welsch as described in 
@@ -92,7 +92,7 @@ namespace dlib
             - This function performs an unconstrained minimization of the least squares
               function g(x) defined by:
                 - g(x) = sum over all i: 0.5*pow( f(list(i),x), 2 )
-            - This method implements a plain Levenberg–Marquardt approach for approximating
+            - This method implements a plain Levenberg-Marquardt approach for approximating
               the hessian of g().  Therefore, it is most appropriate for small residual problems
               (i.e. problems where f() goes to 0 at the solution).
             - Since this is a trust region algorithm, the radius parameter defines the initial 
