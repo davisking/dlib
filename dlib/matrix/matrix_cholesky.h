@@ -129,7 +129,7 @@ namespace dlib
         // now compute the actual cholesky decomposition
         int info = lapack::potrf('L', L_);
 
-        // check if its really SPD
+        // check if it's really SPD
         if (info == 0 && is_symmetric && min(abs(diag(L_))) > eps*100)
             isspd = true;
         else
