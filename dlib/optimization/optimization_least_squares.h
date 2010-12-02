@@ -5,6 +5,7 @@
 
 #include "../matrix.h"
 #include "optimization_trust_region.h"
+#include "optimization_least_squares_abstract.h"
 
 namespace dlib
 {
@@ -15,7 +16,7 @@ namespace dlib
         typename column_vector_type,
         typename funct_type,
         typename funct_der_type,
-        typename list_type
+        typename vector_type
         >
     class least_squares_function_model 
     {
@@ -23,7 +24,7 @@ namespace dlib
         least_squares_function_model (
             const funct_type& f_,
             const funct_der_type& der_,
-            const list_type& list_
+            const vector_type& list_
         ) : f(f_), der(der_), list(list_) 
         {
             S = 0;
@@ -33,7 +34,7 @@ namespace dlib
 
         const funct_type& f;
         const funct_der_type& der;
-        const list_type& list;
+        const vector_type& list;
 
         typedef typename column_vector_type::type type;
         typedef typename column_vector_type::mem_manager_type mem_manager_type;
@@ -139,15 +140,15 @@ namespace dlib
         typename column_vector_type,
         typename funct_type,
         typename funct_der_type,
-        typename list_type
+        typename vector_type
         >
-    least_squares_function_model<column_vector_type,funct_type,funct_der_type,list_type> least_squares_model (
+    least_squares_function_model<column_vector_type,funct_type,funct_der_type,vector_type> least_squares_model (
         const funct_type& f,
         const funct_der_type& der,
-        const list_type& list
+        const vector_type& list
     )
     {
-        return least_squares_function_model<column_vector_type,funct_type,funct_der_type,list_type>(f,der,list);
+        return least_squares_function_model<column_vector_type,funct_type,funct_der_type,vector_type>(f,der,list);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -156,18 +157,29 @@ namespace dlib
         typename stop_strategy_type,
         typename funct_type,
         typename funct_der_type,
-        typename list_type,
+        typename vector_type,
         typename T
         >
     double solve_least_squares (
         stop_strategy_type stop_strategy,
         const funct_type& f,
         const funct_der_type& der,
-        const list_type& list,
+        const vector_type& list,
         T& x, 
         double radius = 1
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_vector(vector_to_matrix(list)) && list.size() > 0 && 
+                    is_col_vector(x) && radius > 0,
+            "\t double solve_least_squares()"
+            << "\n\t invalid arguments were given to this function"
+            << "\n\t is_vector(list):  " << is_vector(vector_to_matrix(list)) 
+            << "\n\t list.size():      " << list.size() 
+            << "\n\t is_col_vector(x): " << is_col_vector(x) 
+            << "\n\t radius:           " << radius
+            );
+
         return find_min_trust_region(stop_strategy,
                                      least_squares_model<T>(f, der, vector_to_matrix(list)), 
                                      x, 
@@ -182,7 +194,7 @@ namespace dlib
         typename column_vector_type,
         typename funct_type,
         typename funct_der_type,
-        typename list_type
+        typename vector_type
         >
     class least_squares_lm_function_model 
     {
@@ -190,12 +202,12 @@ namespace dlib
         least_squares_lm_function_model (
             const funct_type& f_,
             const funct_der_type& der_,
-            const list_type& list_
+            const vector_type& list_
         ) : f(f_), der(der_), list(list_) {}
 
         const funct_type& f;
         const funct_der_type& der;
-        const list_type& list;
+        const vector_type& list;
 
         typedef typename column_vector_type::type type;
         typedef typename column_vector_type::mem_manager_type mem_manager_type;
@@ -245,15 +257,15 @@ namespace dlib
         typename column_vector_type,
         typename funct_type,
         typename funct_der_type,
-        typename list_type
+        typename vector_type
         >
-    least_squares_lm_function_model<column_vector_type,funct_type,funct_der_type,list_type> least_squares_lm_model (
+    least_squares_lm_function_model<column_vector_type,funct_type,funct_der_type,vector_type> least_squares_lm_model (
         const funct_type& f,
         const funct_der_type& der,
-        const list_type& list
+        const vector_type& list
     )
     {
-        return least_squares_lm_function_model<column_vector_type,funct_type,funct_der_type,list_type>(f,der,list);
+        return least_squares_lm_function_model<column_vector_type,funct_type,funct_der_type,vector_type>(f,der,list);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -262,18 +274,29 @@ namespace dlib
         typename stop_strategy_type,
         typename funct_type,
         typename funct_der_type,
-        typename list_type,
+        typename vector_type,
         typename T
         >
     double solve_least_squares_lm (
         stop_strategy_type stop_strategy,
         const funct_type& f,
         const funct_der_type& der,
-        const list_type& list,
+        const vector_type& list,
         T& x, 
         double radius = 1
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_vector(vector_to_matrix(list)) && list.size() > 0 && 
+                    is_col_vector(x) && radius > 0,
+            "\t double solve_least_squares_lm()"
+            << "\n\t invalid arguments were given to this function"
+            << "\n\t is_vector(list):  " << is_vector(vector_to_matrix(list)) 
+            << "\n\t list.size():      " << list.size() 
+            << "\n\t is_col_vector(x): " << is_col_vector(x) 
+            << "\n\t radius:           " << radius
+            );
+
         return find_min_trust_region(stop_strategy,
                                      least_squares_lm_model<T>(f, der, vector_to_matrix(list)), 
                                      x, 
