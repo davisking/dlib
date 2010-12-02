@@ -36,6 +36,8 @@
          <item>find_max_bobyqa</item> 
          <item>find_max_trust_region</item> 
          <item>find_min_trust_region</item> 
+         <item>solve_least_squares</item> 
+         <item>solve_least_squares_lm</item> 
       </section>
 
       <section>
@@ -469,6 +471,37 @@ subject to the following constraint:
 
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>solve_least_squares</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_least_squares_abstract.h</spec_file>
+         <description>
+            This is a function for solving non-linear least squares problems.  It uses a method
+            which combines the traditional Levenberg-Marquardt technique with a quasi-newton
+            approach.  It is appropriate for large residual problems (i.e. problems where the
+            terms in the least squares function, the residuals, don't go to zero but remain
+            large at the solution)
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>solve_least_squares_lm</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_least_squares_abstract.h</spec_file>
+         <description>
+            This is a function for solving non-linear least squares problems.  It uses 
+            the traditional Levenberg-Marquardt technique. 
+            It is appropriate for small residual problems (i.e. problems where the
+            terms in the least squares function, the residuals, go to zero at the solution)
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
       <component>
          <name>find_min_trust_region</name>
          <file>dlib/optimization.h</file>
