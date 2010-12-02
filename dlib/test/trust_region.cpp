@@ -63,16 +63,16 @@ namespace
 
         matrix<T,2,1> p = 100*matrix_cast<T>(randm(2,1,rnd)) - 50;
 
-        T obj = find_min_trust_region(objective_delta_stop_strategy(0, 100), rosen_function_model<T>(), p);
+        T obj = find_min_trust_region(objective_delta_stop_strategy(1e-12, 100), rosen_function_model<T>(), p);
 
-        DLIB_TEST_MSG(obj == 0, "obj: " << obj);
-        DLIB_TEST_MSG(length(p-ans) == 0, "length(p): " << length(p-ans));
+        DLIB_TEST_MSG(std::abs(obj) < 1e-10, "obj: " << obj);
+        DLIB_TEST_MSG(length(p-ans) < 1e-10, "length(p): " << length(p-ans));
 
         matrix<T,0,1> p2 = 100*matrix_cast<T>(randm(2,1,rnd)) - 50;
-        obj = find_max_trust_region(objective_delta_stop_strategy(0, 100), neg_rosen_model<T>(), p2);
+        obj = find_max_trust_region(objective_delta_stop_strategy(1e-12, 100), neg_rosen_model<T>(), p2);
 
-        DLIB_TEST_MSG(obj == 0, "obj: " << obj);
-        DLIB_TEST_MSG(length(p2-ans) == 0, "length(p2): " << length(p2-ans));
+        DLIB_TEST_MSG(std::abs(obj) < 1e-10, "obj: " << obj);
+        DLIB_TEST_MSG(length(p-ans) < 1e-10, "length(p): " << length(p-ans));
     }
 
 // ----------------------------------------------------------------------------------------
