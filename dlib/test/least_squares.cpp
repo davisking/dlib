@@ -274,6 +274,23 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+// These functions are declared here because wrapping the real rosen functions in this
+// way avoids triggering a bug in visual studio 2005 which prevents this code from compiling.
+    double rosen_residual_double (int i, const matrix<double,2,1>& m)
+    { return rosen_residual(i,m); }
+    float rosen_residual_float (int i, const matrix<float,2,1>& m)
+    { return rosen_residual(i,m); }
+
+    matrix<double,2,1> rosen_residual_derivative_double (int i, const matrix<double,2,1>& m)
+    { return rosen_residual_derivative(i,m); }
+    matrix<float,2,1> rosen_residual_derivative_float (int i, const matrix<float,2,1>& m)
+    { return rosen_residual_derivative(i,m); }
+
+    double rosen_big_residual_double (int i, const matrix<double,2,1>& m)
+    { return rosen_big_residual(i,m); }
+
+// ----------------------------------------------------------------------------------------
+
     void test_with_rosen()
     {
 
@@ -284,8 +301,8 @@ namespace
             ch = rosen_start<double>();
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual<double>,
-                                &rosen_residual_derivative<double>,
+                                &rosen_residual_double,
+                                &rosen_residual_derivative_double,
                                 range(1,20),
                                 ch);
 
@@ -302,8 +319,8 @@ namespace
             ch = rosen_start<double>();
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual<double>,
-                                &rosen_residual_derivative<double>,
+                                &rosen_residual_double,
+                                &rosen_residual_derivative_double,
                                 range(1,20),
                                 ch);
 
@@ -323,8 +340,8 @@ namespace
             ch = rosen_start<double>();
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual<double>,
-                                derivative(&rosen_residual<double>),
+                                &rosen_residual_double,
+                                derivative(&rosen_residual_double),
                                 range(1,20),
                                 ch);
 
@@ -341,8 +358,8 @@ namespace
             ch = rosen_start<float>();
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual<float>,
-                                derivative(&rosen_residual<float>),
+                                &rosen_residual_float,
+                                derivative(&rosen_residual_float),
                                 range(1,20),
                                 ch);
 
@@ -359,8 +376,8 @@ namespace
             ch = rosen_start<float>();
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual<float>,
-                                derivative(&rosen_residual<float>),
+                                &rosen_residual_float,
+                                derivative(&rosen_residual_float),
                                 range(1,20),
                                 ch);
 
@@ -377,8 +394,8 @@ namespace
             ch = rosen_start<double>();
 
             solve_least_squares_lm(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_residual<double>,
-                                derivative(&rosen_residual<double>),
+                                &rosen_residual_double,
+                                derivative(&rosen_residual_double),
                                 range(1,20),
                                 ch);
 
@@ -395,8 +412,8 @@ namespace
             ch = rosen_big_start<double>();
 
             solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
-                                &rosen_big_residual<double>,
-                                derivative(&rosen_big_residual<double>),
+                                &rosen_big_residual_double,
+                                derivative(&rosen_big_residual_double),
                                 range(1,2),
                                 ch);
 
