@@ -172,7 +172,7 @@ namespace dlib
 
         // We are probably in the "hard case".   Use an eigenvalue decomposition to sort things out.
         // Either that or the eps was just set too tight and really we are already done.
-        eigenvalue_decomposition<EXP1> ed(BB);
+        eigenvalue_decomposition<EXP1> ed(make_symmetric(BB));
 
         matrix<T,NR,NC,MM,L> ev = ed.get_real_eigenvalues();
         const long min_eig_idx = index_of_min(ev);
