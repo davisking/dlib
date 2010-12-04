@@ -15,6 +15,7 @@ endif(COMMAND cmake_policy)
 set (tests
    example.cpp
    example_args.cpp
+   any.cpp
    array2d.cpp
    array.cpp
    base64.cpp

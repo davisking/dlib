@@ -25,6 +25,7 @@ SRC += ../all/source.cpp
 SRC += example.cpp
 SRC += example_args.cpp
 
+SRC += any.cpp
 SRC += array2d.cpp
 SRC += array.cpp
 SRC += base64.cpp
