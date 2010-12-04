@@ -30,6 +30,8 @@ namespace dlib
             S = 0;
             last_f = 0;
             last_f2 = 0;
+
+            r.set_size(list.size(),1);
         }
 
         const funct_type& f;
@@ -53,6 +55,8 @@ namespace dlib
             for (long i = 0; i < list.size(); ++i)
             {
                 const type temp = f(list(i), x);
+                // save the residual for later
+                r(i) = temp;
                 result += temp*temp;
             }
 
@@ -66,16 +70,15 @@ namespace dlib
             general_matrix& h
         ) const
         {
-            matrix<type,0,NR,mem_manager_type,layout_type> J(list.size(), x.size());
-            matrix<type,0,1,mem_manager_type,layout_type> r(list.size(),1);
+            J.set_size(list.size(), x.size());
 
+            // compute the Jacobian
             for (long i = 0; i < list.size(); ++i)
             {
-                r(i) = f(list(i), x);
                 set_rowm(J,i) = trans(der(list(i), x));
             }
 
-
+            // Compute the Levenberg-Marquardt gradient and hessian
             d = trans(J)*r;
             h = trans(J)*J;
 
@@ -85,21 +88,26 @@ namespace dlib
                 S = 0;
             }
 
+            // If this isn't the first iteration then check if using
+            // a quasi-newton update helps things.
             if (last_r.size() != 0)
             {
-                column_vector s, y, yy, temp;
 
                 s = x - last_x;
-                y = trans(J)*r - trans(last_J)*last_r;
-                yy = trans(J)*r - trans(last_J)*r;
+                y = d - last_d;
+                yy = d - trans(last_J)*r;
 
                 const type ys = trans(y)*s;
-                temp = yy - S*s;
-                type scale = std::min<type>(1, std::abs(dot(s,yy))/std::abs(trans(s)*S*s));
+                vtemp = yy - S*s;
+                const type temp2 = std::abs(trans(s)*S*s);
+                type scale = (temp2 != 0) ? std::min<type>(1, std::abs(dot(s,yy))/temp2)  :  1;
 
-                S = scale*S + (temp*trans(y) + y*trans(temp))/(ys) - dot(temp,s)/ys/ys*y*trans(y);
+                if (ys != 0)
+                    S = scale*S + (vtemp*trans(y) + y*trans(vtemp))/(ys) - dot(vtemp,s)/ys/ys*y*trans(y);
+                else
+                    S *= scale;
 
-                // check how well both the models fit the last change in f we saw
+                // check how well both the models fit the last change we saw in f()
                 const type measured_delta = last_f2 - last_f;
                 s = -s;
                 const type h_predicted_delta = 0.5*trans(s)*h*s + trans(d)*s;
@@ -116,22 +124,35 @@ namespace dlib
                 {
                     S = 0;
                 }
+
+                // put r into last_r
+                r.swap(last_r);
+            }
+            else
+            {
+                // put r into last_r
+                last_r = r;
             }
 
-            last_r = r;
-            last_J = J;
+            J.swap(last_J);
             last_x = x;
+            last_d = d;
 
             last_f2 = last_f;
         }
 
         mutable type last_f;   // value of function we saw in last operator()
         mutable type last_f2;  // value of last_f we saw in get_derivative_and_hessian()
+        mutable matrix<type,0,1,mem_manager_type,layout_type> r;
+        mutable column_vector vtemp;
+        mutable column_vector s, y, yy;
 
         mutable general_matrix S;
         mutable column_vector last_x;
+        mutable column_vector last_d;
         mutable matrix<type,0,1,mem_manager_type,layout_type> last_r;
         mutable matrix<type,0,NR,mem_manager_type,layout_type> last_J;
+        mutable matrix<type,0,NR,mem_manager_type,layout_type> J;
     };
 
 // ----------------------------------------------------------------------------------------
