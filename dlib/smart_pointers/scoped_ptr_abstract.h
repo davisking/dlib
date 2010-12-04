@@ -37,6 +37,7 @@ namespace dlib
             REQUIREMENTS ON deleter
                 Must be a function object that performs deallocation of a pointer
                 of type T.  For example, see the default_deleter type defined above.
+                It must also not throw when constructed or when performing a delete.
 
             INITIAL VALUE
                 defined by constructor
