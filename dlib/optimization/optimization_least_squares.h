@@ -203,7 +203,10 @@ namespace dlib
             const funct_type& f_,
             const funct_der_type& der_,
             const vector_type& list_
-        ) : f(f_), der(der_), list(list_) {}
+        ) : f(f_), der(der_), list(list_) 
+        {
+            r.set_size(list.size(),1);
+        }
 
         const funct_type& f;
         const funct_der_type& der;
@@ -217,6 +220,9 @@ namespace dlib
         typedef column_vector_type column_vector;
         typedef matrix<type,NR,NR,mem_manager_type,layout_type> general_matrix;
 
+        mutable matrix<type,0,1,mem_manager_type,layout_type> r;
+        mutable column_vector vtemp;
+
         type operator() ( 
             const column_vector& x
         ) const
@@ -225,6 +231,8 @@ namespace dlib
             for (long i = 0; i < list.size(); ++i)
             {
                 const type temp = f(list(i), x);
+                // save the residual for later
+                r(i) = temp;
                 result += temp*temp;
             }
 
@@ -237,18 +245,16 @@ namespace dlib
             general_matrix& h
         ) const
         {
-            matrix<type,0,NR,mem_manager_type,layout_type> J(list.size(), x.size());
-            matrix<type,0,1,mem_manager_type,layout_type> r(list.size(),1);
-
+            d = 0;
+            h = 0;
             for (long i = 0; i < list.size(); ++i)
             {
-                r(i) = f(list(i), x);
-                set_rowm(J,i) = trans(der(list(i), x));
+                vtemp = der(list(i), x); 
+                d += r(i)*vtemp;
+                h += vtemp*trans(vtemp);
             }
-
-            d = trans(J)*r;
-            h = trans(J)*J;
         }
+
     };
 
 // ----------------------------------------------------------------------------------------
