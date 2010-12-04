@@ -136,6 +136,10 @@
                   <link>optimization_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Non-Linear Least Squares</name>
+                  <link>least_squares_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Kernel_RLS_Filtering</name>
                   <link>krls_filter_ex.cpp.html</link>
                </item>

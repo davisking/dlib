@@ -13,7 +13,9 @@
             This page documents library components that attempt to find the 
             minimum or maximum of a user supplied function.   An introduction
             to the general purpose non-linear optimizers in this section can be
-            found <a href="optimization_ex.cpp.html">here</a>.
+            found <a href="optimization_ex.cpp.html">here</a>.  For an example
+            showing how to use the non-linear least squares routines look 
+            <a href="least_squares_ex.cpp.html">here</a>.
          </p>
 
    </body>
@@ -483,6 +485,9 @@ subject to the following constraint:
             large at the solution)
          </description>
                                  
+         <examples>
+            <example>least_squares_ex.cpp.html</example>
+         </examples>
       </component>
 
    <!-- ************************************************************************* -->
@@ -498,6 +503,9 @@ subject to the following constraint:
             terms in the least squares function, the residuals, go to zero at the solution)
          </description>
                                  
+         <examples>
+            <example>least_squares_ex.cpp.html</example>
+         </examples>
       </component>
 
    <!-- ************************************************************************* -->
