@@ -154,7 +154,6 @@ namespace dlib
                     - Any previous object stored in this type_safe_union is destructed and its
                       state is lost.
                     - returns a non-const reference to the newly created T object.
-
         !*/
 
         void swap (
