@@ -56,6 +56,7 @@
       <section>
          <name>Objects</name>
          <item>static_set</item> 
+         <item>any</item> 
          <item>array</item> 
          <item>array2d</item> 
          <item>binary_search_tree</item> 
@@ -1155,6 +1156,25 @@
             <example>pipe_ex_2.cpp.html</example>
          </examples>
          
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>any</name>
+         <file>dlib/any.h</file>
+         <spec_file link="true">dlib/any/any_abstract.h</spec_file>
+         <description>
+                This object is basically a type-safe version of a void*.  In particular,
+                it is a container which can contain only one object but the object may
+                be of any type.  
+
+               <p>
+                It is somewhat like the <a href="#type_safe_union">type_safe_union</a> except you don't have to declare 
+                the set of possible content types beforehand.  So in some sense this is 
+                like a less type-strict version of the type_safe_union.
+               </p>
+         </description>
       </component>
       
    <!-- ************************************************************************* -->

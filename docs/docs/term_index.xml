@@ -838,6 +838,7 @@
          <term file="containers.html" name="sliding_buffer"/>
          <term file="containers.html" name="static_map"/>
          <term file="containers.html" name="static_set"/>
+         <term file="containers.html" name="any"/>
 
 
 
