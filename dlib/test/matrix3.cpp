@@ -597,7 +597,7 @@ namespace
             c_check_equal( tmp(c_temp + trans(conj(c_cv4))*trans(c_rv4)), c_temp + trans(conj(c_cv4))*trans(c_rv4));
 
             DLIB_TEST(abs((static_cast<complex<type> >(c_rv4*c_cv4) + i) - ((c_rv4*c_cv4)(0) + i)) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul );
-            DLIB_TEST(abs((rv4*cv4 + 1.0) - ((rv4*cv4)(0) + 1.0)) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul);
+            DLIB_TEST(max(abs((rv4*cv4 + 1.0) - ((rv4*cv4)(0) + 1.0))) < std::sqrt(std::numeric_limits<type>::epsilon())*eps_mul);
 
         }
 
