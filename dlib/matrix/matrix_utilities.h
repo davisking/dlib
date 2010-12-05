@@ -2031,7 +2031,7 @@ namespace dlib
         >
     const matrix_op<op_add_diag<EXP> > operator+ (
         const matrix_exp<EXP>& lhs,
-        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >& rhs 
+        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >&  
     )
     {
         // both matrices must contain the same type of element
@@ -2062,7 +2062,7 @@ namespace dlib
         typename T
         >
     const matrix_op<op_add_diag<EXP> > operator+ (
-        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >& lhs, 
+        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >& , 
         const matrix_exp<EXP>& rhs
     )
     {
@@ -2279,7 +2279,7 @@ namespace dlib
         long N
         >
     const matrix_op<op_add_diag<EXP> > operator+ (
-        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& lhs, 
+        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& , 
         const matrix_exp<EXP>& rhs
     )
     {
@@ -2311,7 +2311,7 @@ namespace dlib
         >
     const matrix_op<op_add_diag<EXP> > operator+ (
         const matrix_exp<EXP>& lhs,
-        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& rhs
+        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& 
     )
     {
         // both matrices must contain the same type of element
