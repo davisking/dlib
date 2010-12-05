@@ -16,7 +16,7 @@ Documentation:
   There should be HTML documentation accompanying this library.  But
   if there isn't you can download it from http://dlib.net
 
-Installation :
+Installation:
   To use this library all you have to do is extract the library 
   somewhere, make sure the folder *containing* the dlib folder is in 
   your include path, and finally add dlib/all/source.cpp to your 
