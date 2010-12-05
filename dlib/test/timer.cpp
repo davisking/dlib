@@ -57,7 +57,7 @@ namespace
     )
     /*!
         requires
-            - timer_t is an implementation of timer/timer_kernel_aseqract.h is instantiated 
+            - timer_t is an implementation of timer/timer_kernel_abstract.h is instantiated 
               timer_test_helper
         ensures
             - runs tests on timer_t for compliance with the specs 
@@ -90,7 +90,7 @@ namespace
     )
     /*!
         requires
-            - timer_t is an implementation of timer/timer_kernel_aseqract.h is instantiated 
+            - timer_t is an implementation of timer/timer_kernel_abstract.h is instantiated 
               timer_test_helper
         ensures
             - runs tests on timer_t for compliance with the specs 
