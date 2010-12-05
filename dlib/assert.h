@@ -89,8 +89,10 @@ namespace dlib
 
 #ifdef ENABLE_ASSERTS 
     #define DLIB_ASSERT(_exp,_message) DLIB_CASSERT(_exp,_message)
+    #define DLIB_IF_ASSERT(exp) exp
 #else
     #define DLIB_ASSERT(_exp,_message)
+    #define DLIB_IF_ASSERT(exp) 
 #endif
 
 // ----------------------------------------------------------------------------------------
