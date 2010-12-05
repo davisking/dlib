@@ -46,6 +46,8 @@ namespace
         {
             m.lock();
             timestamp = ts.get_timestamp();
+            dlog << LTRACE << "in set_timestamp(), time is " << timestamp;
+            dlib::sleep(1);
             m.unlock();
         }
     };
@@ -70,12 +72,14 @@ namespace
 
             timer_t t1(h,&timer_test_helper::set_timestamp);
             t1.set_delay_time(0);
+            dlog << LTRACE << "t1.start()";
             t1.start();
 
-            dlib::sleep(3000);
-            t1.stop();
+            dlib::sleep(60);
+            t1.stop_and_wait();
 
             dlib::uint64 cur_time = h.ts.get_timestamp();
+            dlog << LTRACE << "get current time: " << cur_time;
 
             // make sure the action function has been called recently
             DLIB_TEST_MSG((cur_time-h.timestamp)/1000 < 30, (cur_time-h.timestamp)/1000);
@@ -311,11 +315,14 @@ namespace
         void perform_test (
         )
         {
-            dlog << LINFO << "testing kernel_1a";
+            dlog << LINFO << "testing kernel_1a with test_timer";
             timer_test<timer<timer_test_helper>::kernel_1a>  ();
+            dlog << LINFO << "testing kernel_1a with test_timer2";
             timer_test2<timer<timer_test_helper>::kernel_1a>  ();
-            dlog << LINFO << "testing kernel_2a";
+
+            dlog << LINFO << "testing kernel_2a with test_timer";
             timer_test<timer<timer_test_helper>::kernel_2a>  ();
+            dlog << LINFO << "testing kernel_2a with test_timer2";
             timer_test2<timer<timer_test_helper>::kernel_2a>  ();
         }
     } a;
