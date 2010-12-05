@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.33" date="Dec 05, 2010">
+New Stuff:
   - Added the ability to add/subtract scalar values to/from all the elements 
     of a matrix using the - and + operators.
   - Added a trust region optimizer. 
@@ -32,7 +45,7 @@ Other:
     turns into diagm(reciprocal(d)).  Multiplication by a diagonal matrix
     is now also handled efficiently.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
