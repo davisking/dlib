@@ -105,8 +105,10 @@
                      <a href="dlib/matrix/matrix_math_functions_abstract.h.html#sin">trig functions</a>, etc.</li>
                   <li>Unconstrained non-linear optimization algorithms using the  
                       <a href="optimization.html#cg_search_strategy">conjugate gradient</a>, 
-                      <a href="optimization.html#bfgs_search_strategy">BFGS</a>, and
-                      <a href="optimization.html#lbfgs_search_strategy">L-BFGS</a> techniques</li>
+                      <a href="optimization.html#bfgs_search_strategy">BFGS</a>, 
+                      <a href="optimization.html#lbfgs_search_strategy">L-BFGS</a>, and
+                      <a href="optimization.html#solve_least_squares_lm">Levenberg-Marquardt</a>
+                      techniques</li>
                   <li>Box-constrained derivative-free optimization via the 
                       <a href="optimization.html#find_min_bobyqa">BOBYQA</a> algorithm</li> 
                   <li>An implementation of the <a href="optimization.html#oca">Optimized Cutting Plane Algorithm</a></li> 

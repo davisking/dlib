@@ -12,12 +12,25 @@
 
 <current>
 New Stuff:
+  - Added the ability to add/subtract scalar values to/from all the elements 
+    of a matrix using the - and + operators.
+  - Added a trust region optimizer. 
+  - Added Levenberg-Marquardt and LM/quasi-newton hybrid methods for solving
+    non-linear least squares problems.
+  - Added an any container object.
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+  - Fixed a compiler warning and also a runtime bug in sort_basis_vectors().  
+    The bug triggered when all the basis vectors were included in the final
+    answer.
 
 Other:
+  - Added a bunch of overloads to catch operations on diagonal matrices
+    and use more efficient code paths for them.  For example, inv(diagm(d))
+    turns into diagm(reciprocal(d)).  Multiplication by a diagonal matrix
+    is now also handled efficiently.
 
 </current>
 
