@@ -387,8 +387,8 @@ namespace
             DLIB_TEST(inv(diagm(d))*m == tmp(diagm(di))*m);
             DLIB_TEST(m*inv(diagm(d)) == m*tmp(diagm(di)));
 
-            DLIB_TEST(inv(diagm(d)) + m == tmp(diagm(di)) + m);
-            DLIB_TEST(m + inv(diagm(d)) == tmp(diagm(di)) + m);
+            DLIB_TEST(equal(inv(diagm(d)) + m , tmp(diagm(di)) + m));
+            DLIB_TEST(equal(m + inv(diagm(d)) , tmp(diagm(di)) + m));
 
             DLIB_TEST((m + identity_matrix<double>(3) == m + tmp(identity_matrix<double>(3))));
             DLIB_TEST((m + identity_matrix<double,3>() == m + tmp(identity_matrix<double,3>())));
@@ -420,8 +420,9 @@ namespace
             DLIB_TEST(inv(diagm(d))*m == tmp(diagm(di))*m);
             DLIB_TEST(m*inv(diagm(d)) == m*tmp(diagm(di)));
 
-            DLIB_TEST(inv(diagm(d)) + m == tmp(diagm(di)) + m);
-            DLIB_TEST(m + inv(diagm(d)) == tmp(diagm(di)) + m);
+            DLIB_TEST_MSG(equal(inv(diagm(d)) + m , tmp(diagm(di)) + m), 
+                          (inv(diagm(d)) + m) - (tmp(diagm(di)) + m) );
+            DLIB_TEST(equal(m + inv(diagm(d)) , tmp(diagm(di)) + m));
 
 
             DLIB_TEST((m + identity_matrix<double>(3) == m + tmp(identity_matrix<double>(3))));
@@ -454,8 +455,8 @@ namespace
             DLIB_TEST(inv(diagm(d))*m == tmp(diagm(di))*m);
             DLIB_TEST(m*inv(diagm(d)) == m*tmp(diagm(di)));
 
-            DLIB_TEST(inv(diagm(d)) + m == tmp(diagm(di)) + m);
-            DLIB_TEST(m + inv(diagm(d)) == tmp(diagm(di)) + m);
+            DLIB_TEST(equal(inv(diagm(d)) + m , tmp(diagm(di)) + m));
+            DLIB_TEST(equal(m + inv(diagm(d)) , tmp(diagm(di)) + m));
 
 
             DLIB_TEST((m + identity_matrix<double>(3) == m + tmp(identity_matrix<double>(3))));
@@ -488,8 +489,8 @@ namespace
             DLIB_TEST(inv(diagm(d))*m == tmp(diagm(di))*m);
             DLIB_TEST(m*inv(diagm(d)) == m*tmp(diagm(di)));
 
-            DLIB_TEST(inv(diagm(d)) + m == tmp(diagm(di)) + m);
-            DLIB_TEST(m + inv(diagm(d)) == tmp(diagm(di)) + m);
+            DLIB_TEST(equal(inv(diagm(d)) + m , tmp(diagm(di)) + m));
+            DLIB_TEST(equal(m + inv(diagm(d)) , tmp(diagm(di)) + m));
 
 
             DLIB_TEST((m + identity_matrix<double>(3) == m + tmp(identity_matrix<double>(3))));
@@ -530,21 +531,23 @@ namespace
 
             matrix<double,4,5> m = randm(4,5,rnd);
 
-            DLIB_TEST(pointwise_multiply(d1*trans(d2), m) == diagm(d1)*m*diagm(d2));
-            DLIB_TEST(pointwise_multiply(d1*trans(d2), m) == diagm(d1)*(m*diagm(d2)));
-            DLIB_TEST(pointwise_multiply(d1*trans(d2), m) == (diagm(d1)*m)*diagm(d2));
+            DLIB_TEST_MSG(equal(pointwise_multiply(d1*trans(d2), m) , diagm(d1)*m*diagm(d2)),
+                          pointwise_multiply(d1*trans(d2), m) - diagm(d1)*m*diagm(d2)
+            );
+            DLIB_TEST(equal(pointwise_multiply(d1*trans(d2), m) , diagm(d1)*(m*diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply(d1*trans(d2), m) , (diagm(d1)*m)*diagm(d2)));
 
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) == inv(diagm(d1))*m*inv(diagm(d2)));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) == inv(diagm(d1))*(m*inv(diagm(d2))));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) == (inv(diagm(d1))*m)*inv(diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) , inv(diagm(d1))*m*inv(diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) , inv(diagm(d1))*(m*inv(diagm(d2)))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) , (inv(diagm(d1))*m)*inv(diagm(d2))));
 
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans((d2)), m) == inv(diagm(d1))*m*(diagm(d2)));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans((d2)), m) == inv(diagm(d1))*(m*(diagm(d2))));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans((d2)), m) == (inv(diagm(d1))*m)*(diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans((d2)), m) , inv(diagm(d1))*m*(diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans((d2)), m) , inv(diagm(d1))*(m*(diagm(d2)))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans((d2)), m) , (inv(diagm(d1))*m)*(diagm(d2))));
 
-            DLIB_TEST(pointwise_multiply((d1)*trans(reciprocal(d2)), m) == (diagm(d1))*m*inv(diagm(d2)));
-            DLIB_TEST(pointwise_multiply((d1)*trans(reciprocal(d2)), m) == (diagm(d1))*(m*inv(diagm(d2))));
-            DLIB_TEST(pointwise_multiply((d1)*trans(reciprocal(d2)), m) == ((diagm(d1))*m)*inv(diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , (diagm(d1))*m*inv(diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , (diagm(d1))*(m*inv(diagm(d2)))));
+            DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , ((diagm(d1))*m)*inv(diagm(d2))));
         }
         for (int i = 0; i < 1; ++i)
         {
@@ -553,21 +556,21 @@ namespace
 
             matrix<double,4,5> m = randm(4,5,rnd);
 
-            DLIB_TEST(pointwise_multiply(d1*trans(d2), m) == diagm(d1)*m*diagm(d2));
-            DLIB_TEST(pointwise_multiply(d1*trans(d2), m) == diagm(d1)*(m*diagm(d2)));
-            DLIB_TEST(pointwise_multiply(d1*trans(d2), m) == (diagm(d1)*m)*diagm(d2));
+            DLIB_TEST(equal(pointwise_multiply(d1*trans(d2), m) , diagm(d1)*m*diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply(d1*trans(d2), m) , diagm(d1)*(m*diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply(d1*trans(d2), m) , (diagm(d1)*m)*diagm(d2)));
 
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) == inv(diagm(d1))*m*inv(diagm(d2)));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) == inv(diagm(d1))*(m*inv(diagm(d2))));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) == (inv(diagm(d1))*m)*inv(diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) , inv(diagm(d1))*m*inv(diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) , inv(diagm(d1))*(m*inv(diagm(d2)))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) , (inv(diagm(d1))*m)*inv(diagm(d2))));
 
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans((d2)), m) == inv(diagm(d1))*m*(diagm(d2)));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans((d2)), m) == inv(diagm(d1))*(m*(diagm(d2))));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans((d2)), m) == (inv(diagm(d1))*m)*(diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans((d2)), m) , inv(diagm(d1))*m*(diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans((d2)), m) , inv(diagm(d1))*(m*(diagm(d2)))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans((d2)), m) , (inv(diagm(d1))*m)*(diagm(d2))));
 
-            DLIB_TEST(pointwise_multiply((d1)*trans(reciprocal(d2)), m) == (diagm(d1))*m*inv(diagm(d2)));
-            DLIB_TEST(pointwise_multiply((d1)*trans(reciprocal(d2)), m) == (diagm(d1))*(m*inv(diagm(d2))));
-            DLIB_TEST(pointwise_multiply((d1)*trans(reciprocal(d2)), m) == ((diagm(d1))*m)*inv(diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , (diagm(d1))*m*inv(diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , (diagm(d1))*(m*inv(diagm(d2)))));
+            DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , ((diagm(d1))*m)*inv(diagm(d2))));
         }
         for (int i = 0; i < 1; ++i)
         {
@@ -576,21 +579,21 @@ namespace
 
             matrix<double,0,0> m = randm(4,5,rnd);
 
-            DLIB_TEST(pointwise_multiply(d1*trans(d2), m) == diagm(d1)*m*diagm(d2));
-            DLIB_TEST(pointwise_multiply(d1*trans(d2), m) == diagm(d1)*(m*diagm(d2)));
-            DLIB_TEST(pointwise_multiply(d1*trans(d2), m) == (diagm(d1)*m)*diagm(d2));
+            DLIB_TEST(equal(pointwise_multiply(d1*trans(d2), m) , diagm(d1)*m*diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply(d1*trans(d2), m) , diagm(d1)*(m*diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply(d1*trans(d2), m) , (diagm(d1)*m)*diagm(d2)));
 
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) == inv(diagm(d1))*m*inv(diagm(d2)));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) == inv(diagm(d1))*(m*inv(diagm(d2))));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) == (inv(diagm(d1))*m)*inv(diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) , inv(diagm(d1))*m*inv(diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) , inv(diagm(d1))*(m*inv(diagm(d2)))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans(reciprocal(d2)), m) , (inv(diagm(d1))*m)*inv(diagm(d2))));
 
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans((d2)), m) == inv(diagm(d1))*m*(diagm(d2)));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans((d2)), m) == inv(diagm(d1))*(m*(diagm(d2))));
-            DLIB_TEST(pointwise_multiply(reciprocal(d1)*trans((d2)), m) == (inv(diagm(d1))*m)*(diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans((d2)), m) , inv(diagm(d1))*m*(diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans((d2)), m) , inv(diagm(d1))*(m*(diagm(d2)))));
+            DLIB_TEST(equal(pointwise_multiply(reciprocal(d1)*trans((d2)), m) , (inv(diagm(d1))*m)*(diagm(d2))));
 
-            DLIB_TEST(pointwise_multiply((d1)*trans(reciprocal(d2)), m) == (diagm(d1))*m*inv(diagm(d2)));
-            DLIB_TEST(pointwise_multiply((d1)*trans(reciprocal(d2)), m) == (diagm(d1))*(m*inv(diagm(d2))));
-            DLIB_TEST(pointwise_multiply((d1)*trans(reciprocal(d2)), m) == ((diagm(d1))*m)*inv(diagm(d2)));
+            DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , (diagm(d1))*m*inv(diagm(d2))));
+            DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , (diagm(d1))*(m*inv(diagm(d2)))));
+            DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , ((diagm(d1))*m)*inv(diagm(d2))));
         }
     }
 
