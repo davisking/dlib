@@ -803,6 +803,7 @@ void process_file (
                             break;
 
                         case ':':
+                            token_accum.push_back(make_pair(type,token));
                             if (recently_seen_slots)
                             {
                                 token_accum.clear();
