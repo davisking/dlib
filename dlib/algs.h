@@ -585,6 +585,7 @@ namespace dlib
     template <> struct is_built_in_scalar_type<unsigned int>    { const static bool value = true; };
     template <> struct is_built_in_scalar_type<unsigned long>   { const static bool value = true; };
     template <> struct is_built_in_scalar_type<uint64>          { const static bool value = true; };
+    template <> struct is_built_in_scalar_type<int64>           { const static bool value = true; };
     template <> struct is_built_in_scalar_type<char>            { const static bool value = true; };
     template <> struct is_built_in_scalar_type<signed char>     { const static bool value = true; };
     template <> struct is_built_in_scalar_type<unsigned char>   { const static bool value = true; };
