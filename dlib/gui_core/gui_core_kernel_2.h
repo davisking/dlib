@@ -145,7 +145,10 @@ namespace dlib
         const static bool grayscale = false;
         const static bool hsi = false;
         const static long num = 3;
-        static unsigned long max() { return 255;}
+        typedef unsigned char basic_pixel_type;
+        static basic_pixel_type min() { return 0;}
+        static basic_pixel_type max() { return 255;}
+        const static bool is_unsigned = true;
         const static bool has_alpha = false;
     };
 
