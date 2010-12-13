@@ -609,7 +609,7 @@ namespace dlib
     !*/
 
     template <typename T, size_t s = sizeof(T)> struct promote;
-    template <typename T> struct promote<T,1> { typedef int16 type; };
+    template <typename T> struct promote<T,1> { typedef int32 type; };
     template <typename T> struct promote<T,2> { typedef int32 type; };
     template <typename T> struct promote<T,4> { typedef int64 type; };
     template <typename T> struct promote<T,8> { typedef int64 type; };
