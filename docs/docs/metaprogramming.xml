@@ -48,6 +48,7 @@
          <item>is_std_vector</item>
          <item>is_directed_graph</item>
          <item>is_built_in_scalar_type</item>
+         <item>promote</item>
          <item>unsigned_type</item> 
          <item>tabs</item> 
          <item>tmin</item> 
@@ -297,6 +298,24 @@
          <description>
             This is a template where is_built_in_scalar_type&lt;T&gt;::value == true when T
             is a built in scalar type such as int, char, float, etc.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>promote</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+        This is a template that takes one of the built in scalar types and give you another
+        scalar type that should be big enough to hold sums of values from the original scalar 
+        type.  The new scalar type will also always be signed.
+
+         <p>
+        For example, promote&lt;uint16&gt;::type == int32
+         </p>
          </description>
          
       </component>

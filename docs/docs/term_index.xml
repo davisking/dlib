@@ -408,6 +408,7 @@
          <term file="metaprogramming.html" name="is_std_vector"/>
          <term file="metaprogramming.html" name="is_directed_graph"/>
          <term file="metaprogramming.html" name="is_built_in_scalar_type"/>
+         <term file="metaprogramming.html" name="promote"/>
          <term file="metaprogramming.html" name="assign_zero_if_built_in_scalar_type"/>
 
 
@@ -847,6 +848,7 @@
     
 
          <term file="imaging.html" name="assign_image"/>
+         <term file="imaging.html" name="assign_image_scaled"/>
          <term file="imaging.html" name="assign_all_pixels"/>
          <term file="imaging.html" name="assign_border_pixels"/>
          <term file="imaging.html" name="assign_pixel"/>
