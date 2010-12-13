@@ -492,11 +492,32 @@ namespace dlib
         !*/
 
         template <typename T, typename P>
-        typename enable_if_c<sizeof(P) == sizeof(T), bool>::type less_or_equal_to_max (
+        typename enable_if_c<sizeof(P) == sizeof(T) && pixel_traits<T>::is_unsigned == pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
             const P& p
         ) 
         { 
-            return p <= pixel_traits<T>::max();
+            return p <= pixel_traits<T>::max();         
+        }
+
+        template <typename T, typename P>
+        typename enable_if_c<sizeof(P) == sizeof(T) && pixel_traits<T>::is_unsigned && !pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
+            const P& p
+        ) 
+        { 
+            if (p <= 0)
+                return true;
+            else if (static_cast<T>(p) <= pixel_traits<T>::max())
+                return true;
+            else
+                return false;
+        }
+
+        template <typename T, typename P>
+        typename enable_if_c<sizeof(P) == sizeof(T) && !pixel_traits<T>::is_unsigned && pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
+            const P& p
+        ) 
+        { 
+            return p <= static_cast<P>(pixel_traits<T>::max());
         }
 
         template <typename T, typename P>
@@ -507,8 +528,10 @@ namespace dlib
             return p <= static_cast<P>(pixel_traits<T>::max());
         }
 
+    // -----------------------------
+
         template <typename T, typename P>
-        typename enable_if<is_unsigned_type<P>, bool >::type greater_or_equal_to_min (
+        typename enable_if_c<pixel_traits<P>::is_unsigned, bool >::type greater_or_equal_to_min (
             const P& 
         ) { return true; }
         /*!
@@ -517,12 +540,21 @@ namespace dlib
         !*/
 
         template <typename T, typename P>
-        typename disable_if<is_unsigned_type<P>, bool >::type greater_or_equal_to_min (
+        typename enable_if_c<!pixel_traits<P>::is_unsigned && pixel_traits<T>::is_unsigned, bool >::type greater_or_equal_to_min (
+            const P& p
+        ) 
+        { 
+            return p >= 0;
+        }
+
+        template <typename T, typename P>
+        typename enable_if_c<!pixel_traits<P>::is_unsigned && !pixel_traits<T>::is_unsigned, bool >::type greater_or_equal_to_min (
             const P& p
         ) 
         { 
             return p >= pixel_traits<T>::min();
         }
+    // -----------------------------
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::grayscale>::type
@@ -541,6 +573,10 @@ namespace dlib
            else
               dest = pixel_traits<P1>::max();
         }
+
+    // -----------------------------
+    // -----------------------------
+    // -----------------------------
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::rgb>::type
