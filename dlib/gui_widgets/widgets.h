@@ -3085,7 +3085,7 @@ namespace dlib
             else
                 parent.invalidate_rectangle(rect);
 
-            assign_image(img,new_img);
+            assign_image_scaled(img,new_img);
         }
 
         struct overlay_rect

@@ -406,7 +406,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            assign_image(img,new_img);
+            assign_image_scaled(img,new_img);
             rectangle old(rect);
             rect.set_right(rect.left()+img.nc()-1); 
             rect.set_bottom(rect.top()+img.nr()-1);

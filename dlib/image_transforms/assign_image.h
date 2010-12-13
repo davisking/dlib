@@ -5,6 +5,7 @@
 
 #include "../pixel.h"
 #include "assign_image_abstract.h"
+#include "../statistics.h"
 
 namespace dlib
 {
@@ -21,7 +22,7 @@ namespace dlib
     )
     {
         // check for the case where dest is the same object as src
-        if ((void*)&dest == (void*)&src)
+        if (is_same_object(dest,src))
             return;
 
         dest.set_size(src.nr(),src.nc());
@@ -31,6 +32,77 @@ namespace dlib
             for (long c = 0; c < src.nc(); ++c)
             {
                 assign_pixel(dest[r][c], src[r][c]);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename dest_image_type,
+        typename src_image_type
+        >
+    void assign_image_scaled (
+        dest_image_type& dest,
+        const src_image_type& src,
+        const double thresh = 4
+    )
+    {
+        DLIB_ASSERT( thresh > 0,
+            "\tvoid assign_image_scaled()"
+            << "\n\t You have given an threshold value"
+            << "\n\t thresh: " << thresh 
+            );
+
+        // If the source and destination have the same range of values in their pixels then we don't need to do any
+        // special scaling.  So just call the regular assign_image().
+        if (pixel_traits<typename dest_image_type::type>::max() == pixel_traits<typename src_image_type::type>::max() &&
+            pixel_traits<typename dest_image_type::type>::min() == pixel_traits<typename src_image_type::type>::min() )
+        {
+            assign_image(dest, src);
+            return;
+        }
+
+        dest.set_size(src.nr(),src.nc());
+
+        if (src.size() == 0)
+            return;
+
+        if (src.size() == 1)
+        {
+            assign_pixel(dest[0][0], src[0][0]);
+            return;
+        }
+
+        // gather image statistics 
+        running_stats<double> rs;
+        for (long r = 0; r < src.nr(); ++r)
+        {
+            for (long c = 0; c < src.nc(); ++c)
+            {
+                rs.add(get_pixel_intensity(src[r][c]));
+            }
+        }
+
+        // Figure out the range of pixel values based on image statistics.  There might be some huge
+        // outliers so don't just pick the min and max values.
+        const double upper = std::min(rs.mean() + thresh*rs.stddev(), rs.max());
+        const double lower = std::max(rs.mean() - thresh*rs.stddev(), rs.min());
+
+        typedef typename pixel_traits<typename dest_image_type::type>::basic_pixel_type dpix_type;
+
+        const dpix_type dest_min = pixel_traits<typename dest_image_type::type>::min();
+        const dpix_type dest_max = pixel_traits<typename dest_image_type::type>::max();
+
+        const double scale = (upper!=lower)? ((dest_max - dest_min) / (upper - lower)) : 0;
+
+        for (long r = 0; r < src.nr(); ++r)
+        {
+            for (long c = 0; c < src.nc(); ++c)
+            {
+                const double val = get_pixel_intensity(src[r][c]) - lower;
+
+                assign_pixel(dest[r][c], scale*val + dest_min);
             }
         }
     }
