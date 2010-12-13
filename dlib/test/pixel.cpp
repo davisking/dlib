@@ -122,7 +122,7 @@ namespace
         DLIB_TEST(p_schar == std::numeric_limits<signed char>::max());
 
         DLIB_TEST(p_int == (255+100+50)/3);
-        DLIB_TEST(p_float == (255+100+50)/3);
+        DLIB_TEST_MSG(p_float == (255+100+50)/3, p_float - (255+100+50)/3);
         DLIB_TEST(p_gray == (255+100+50)/3);
 
         DLIB_TEST(p_rgb.red == 255);

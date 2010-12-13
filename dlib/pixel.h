@@ -482,50 +482,47 @@ namespace dlib
 
     // -----------------------------
 
+        template <typename T>
+        typename unsigned_type<T>::type make_unsigned (
+            const T& val
+        ) { return static_cast<typename unsigned_type<T>::type>(val); }
+
+        inline float make_unsigned(const float& val) { return val; }
+        inline double make_unsigned(const double& val) { return val; }
+        inline long double make_unsigned(const long double& val) { return val; }
+
+
         template <typename T, typename P>
-        typename enable_if_c<(sizeof(P) < sizeof(T)), bool>::type less_or_equal_to_max (
-            const P& 
-        ) { return true; }
+        typename enable_if_c<pixel_traits<T>::is_unsigned == pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
+            const P& p
+        ) 
         /*!
             ensures
                 - returns true if p is <= max value of T
         !*/
-
-        template <typename T, typename P>
-        typename enable_if_c<sizeof(P) == sizeof(T) && pixel_traits<T>::is_unsigned == pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
-            const P& p
-        ) 
         { 
             return p <= pixel_traits<T>::max();         
         }
 
         template <typename T, typename P>
-        typename enable_if_c<sizeof(P) == sizeof(T) && pixel_traits<T>::is_unsigned && !pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
+        typename enable_if_c<pixel_traits<T>::is_unsigned && !pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
             const P& p
         ) 
         { 
             if (p <= 0)
                 return true;
-            else if (static_cast<T>(p) <= pixel_traits<T>::max())
+            else if (make_unsigned(p) <= pixel_traits<T>::max())
                 return true;
             else
                 return false;
         }
 
         template <typename T, typename P>
-        typename enable_if_c<sizeof(P) == sizeof(T) && !pixel_traits<T>::is_unsigned && pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
+        typename enable_if_c<!pixel_traits<T>::is_unsigned && pixel_traits<P>::is_unsigned, bool>::type less_or_equal_to_max (
             const P& p
         ) 
         { 
-            return p <= static_cast<P>(pixel_traits<T>::max());
-        }
-
-        template <typename T, typename P>
-        typename enable_if_c<(sizeof(P) > sizeof(T)), bool>::type less_or_equal_to_max (
-            const P& p
-        ) 
-        { 
-            return p <= static_cast<P>(pixel_traits<T>::max());
+            return p <= make_unsigned(pixel_traits<T>::max());
         }
 
     // -----------------------------
