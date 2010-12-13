@@ -97,6 +97,7 @@ namespace dlib
             - image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - x_border_size >= 0
             - y_border_size >= 0
+            - pixel_traits<typename image_type::type> is defined  
         ensures
             - #img.nc() == img.nc()
             - #img.nr() == img.nr()
