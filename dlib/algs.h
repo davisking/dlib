@@ -599,6 +599,27 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
+    /*!A promote 
+        
+        This is a template that takes one of the built in scalar types and give you another
+        scalar type that should be big enough to hold sums of values from the original scalar 
+        type.  The new scalar type will also always be signed.
+
+        For example, promote<uint16>::type == int32
+    !*/
+
+    template <typename T, size_t s = sizeof(T)> struct promote;
+    template <typename T> struct promote<T,1> { typedef int16 type; };
+    template <typename T> struct promote<T,2> { typedef int32 type; };
+    template <typename T> struct promote<T,4> { typedef int64 type; };
+    template <typename T> struct promote<T,8> { typedef int64 type; };
+
+    template <> struct promote<float,sizeof(float)>             { typedef double type; };
+    template <> struct promote<double,sizeof(double)>           { typedef double type; };
+    template <> struct promote<long double,sizeof(long double)> { typedef long double type; };
+
+// ----------------------------------------------------------------------------------------
+    
     /*!A assign_zero_if_built_in_scalar_type
 
         This function assigns its argument the value of 0 if it is a built in scalar

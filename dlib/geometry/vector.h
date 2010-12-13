@@ -32,7 +32,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename U, typename enabled = void> 
-    struct promote;
+    struct vect_promote;
 
     template <typename T, typename U, bool res = (sizeof(T) <= sizeof(U))>
     struct largest_type
@@ -46,15 +46,15 @@ namespace dlib
     };
 
     template <typename T, typename U> 
-    struct promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer == std::numeric_limits<U>::is_integer>::type> 
+    struct vect_promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer == std::numeric_limits<U>::is_integer>::type> 
     { 
-        // If both T and U are both either integeral or non-integral then just
+        // If both T and U are both either integral or non-integral then just
         // use the biggest one
         typedef typename largest_type<T,U>::type type;
     };
 
     template <typename T, typename U> 
-    struct promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer != std::numeric_limits<U>::is_integer>::type> 
+    struct vect_promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer != std::numeric_limits<U>::is_integer>::type> 
     { 
         typedef double type;
     };
@@ -73,7 +73,7 @@ namespace dlib
     template <typename T, typename U, long N>
     struct vc_rebind_promote
     {
-        typedef vector<typename promote<T,U>::type,N> type;
+        typedef vector<typename vect_promote<T,U>::type,N> type;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ namespace dlib
             template <typename V, typename U, long N>
         struct vc_rebind_promote
         {
-            typedef vector<typename promote<V,U>::type,N> type;
+            typedef vector<typename vect_promote<V,U>::type,N> type;
         };
 
     public:
@@ -415,7 +415,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U, long N>
-        typename promote<T,U>::type dot (
+        typename vect_promote<T,U>::type dot (
             const vector<U,N>& rhs
         ) const 
         { 
@@ -429,7 +429,7 @@ namespace dlib
             const vector<U,N>& rhs
         ) const
         {
-            typedef vector<typename promote<T,U>::type,3> ret_type;
+            typedef vector<typename vect_promote<T,U>::type,3> ret_type;
 
             return ret_type (
                 y()*rhs.z() - z()*rhs.y(),
@@ -501,7 +501,7 @@ namespace dlib
             const U& val
         ) const
         {
-            typedef vector<typename promote<T,U>::type,3> ret_type;
+            typedef vector<typename vect_promote<T,U>::type,3> ret_type;
             return ret_type(x()/val, y()/val, z()/val);
         }
 
@@ -565,7 +565,7 @@ namespace dlib
             template <typename V, typename U, long N>
         struct vc_rebind_promote
         {
-            typedef vector<typename promote<V,U>::type,N> type;
+            typedef vector<typename vect_promote<V,U>::type,N> type;
         };
 
 
@@ -759,7 +759,7 @@ namespace dlib
         // ---------------------------------------
 
         template <typename U, long N>
-        typename promote<T,U>::type dot (
+        typename vect_promote<T,U>::type dot (
             const vector<U,N>& rhs
         ) const 
         { 
@@ -825,7 +825,7 @@ namespace dlib
             const U& val
         ) const
         {
-            typedef vector<typename promote<T,U>::type,2> ret_type;
+            typedef vector<typename vect_promote<T,U>::type,2> ret_type;
             return ret_type(x()/val, y()/val);
         }
 
@@ -884,7 +884,7 @@ namespace dlib
             const vector<U,N>& rhs
         ) const
         {
-            typedef vector<typename promote<T,U>::type,3> ret_type;
+            typedef vector<typename vect_promote<T,U>::type,3> ret_type;
             return ret_type (
                 y()*rhs.z(),
                 - x()*rhs.z(),
