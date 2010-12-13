@@ -56,6 +56,8 @@ namespace dlib
             - pixel_traits<typename out_image_type::type>::grayscale == true  
             - pixel_traits<typename in_image_type::type>::has_alpha == false
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - pixel_traits<typename in_image_type::type>::is_unsigned == true 
+            - pixel_traits<typename out_image_type::type>::is_unsigned == true 
         ensures
             - #out_img == the thresholded version of in_img (in_img is converted to a grayscale
               intensity image if it is color).  Pixels in in_img with grayscale values >= thresh 

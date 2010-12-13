@@ -24,16 +24,21 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10, 
+            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
+                        is_same_object(original, down) == false, 
                         "\t void pyramid_down::operator()"
                         << "\n\t original.nr(): " << original.nr()
                         << "\n\t original.nc(): " << original.nc()
-                        << "\n\t this: " << this
+                        << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                        << "\n\t this:                           " << this
                         );
 
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
+            typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
+            typedef typename promote<bp_type>::type ptype;
+            typename array2d<ptype>::kernel_1a temp_img;
             temp_img.set_size(original.nr(), (original.nc()-3)/2);
             down.set_size((original.nr()-3)/2, (original.nc()-3)/2);
 
@@ -50,11 +55,11 @@ namespace dlib
                 long oc = 0;
                 for (long c = 0; c < temp_img.nc(); ++c)
                 {
-                    unsigned long pix1;
-                    unsigned long pix2;
-                    unsigned long pix3;
-                    unsigned long pix4;
-                    unsigned long pix5;
+                    ptype pix1;
+                    ptype pix2;
+                    ptype pix3;
+                    ptype pix4;
+                    ptype pix5;
 
                     assign_pixel(pix1, original[r][oc]);
                     assign_pixel(pix2, original[r][oc+1]);
@@ -78,11 +83,11 @@ namespace dlib
             {
                 for (long c = 0; c < temp_img.nc(); ++c)
                 {
-                    unsigned long temp = temp_img[r-2][c] + 
-                                         temp_img[r-1][c]*4 +  
-                                         temp_img[r  ][c]*6 +  
-                                         temp_img[r-1][c]*4 +  
-                                         temp_img[r-2][c];  
+                    ptype temp = temp_img[r-2][c] + 
+                                 temp_img[r-1][c]*4 +  
+                                 temp_img[r  ][c]*6 +  
+                                 temp_img[r-1][c]*4 +  
+                                 temp_img[r-2][c];  
 
                     assign_pixel(down[dr][c],temp/256);
                 }
@@ -93,7 +98,6 @@ namespace dlib
 
     private:
 
-        array2d<unsigned long>::kernel_1a temp_img;
 
     };
 

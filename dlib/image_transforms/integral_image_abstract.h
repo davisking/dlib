@@ -52,7 +52,7 @@ namespace dlib
         /*!
             requires
                 - image_type == a type that implements the array2d/array2d_kernel_abstract.h interface
-                - pixel_traits<image_type::type> must be defined
+                - pixel_traits<typename image_type::type>::is_unsigned == true 
             ensures
                 - #nr() == img.nr()
                 - #nc() == img.nc()

@@ -29,6 +29,7 @@ namespace dlib
             requires
                 - original.nr() > 10
                 - original.nc() > 10
+                - is_same_object(original, down) == false
                 - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
                 - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
                 - pixel_traits<typename in_image_type::type>::has_alpha == false

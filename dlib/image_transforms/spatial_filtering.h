@@ -67,15 +67,16 @@ namespace dlib
         {
             for (long c = first_col; c < last_col; ++c)
             {
-                unsigned long p;
-                long temp = 0;
+                typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
+                typename promote<bp_type>::type p;
+                typename promote<bp_type>::type temp = 0;
                 for (long m = 0; m < M; ++m)
                 {
                     for (long n = 0; n < N; ++n)
                     {
                         // pull out the current pixel and put it into p
                         p = get_pixel_intensity(in_img[r-M/2+m][c-N/2+n]);
-                        temp += static_cast<long>(p)*filter[m][n];
+                        temp += p*filter[m][n];
                     }
                 }
 
@@ -94,12 +95,9 @@ namespace dlib
                     }
                 }
 
-                // apply our new value for the intensity
-                p = static_cast<unsigned long>(temp);
-
                 // save this pixel to the output image
                 assign_pixel(out_img[r][c], in_img[r][c]);
-                assign_pixel_intensity(out_img[r][c],p);
+                assign_pixel_intensity(out_img[r][c], temp);
             }
         }
     }

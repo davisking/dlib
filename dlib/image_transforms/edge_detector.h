@@ -97,7 +97,7 @@ namespace dlib
         out_image_type& vert
     )
     {
-        COMPILE_TIME_ASSERT(is_signed_type<typename out_image_type::type>::value);
+        COMPILE_TIME_ASSERT(pixel_traits<typename out_image_type::type>::is_unsigned == false);
         DLIB_ASSERT( (((void*)&in_img != (void*)&horz) && ((void*)&in_img != (void*)&vert) && ((void*)&vert != (void*)&horz)),
             "\tvoid sobel_edge_detector(in_img, horz, vert)"
             << "\n\tYou can't give the same image as more than one argument"
@@ -107,10 +107,10 @@ namespace dlib
             );
 
 
-        const long vert_filter[3][3] = {{-1,-2,-1}, 
+        const int vert_filter[3][3] = {{-1,-2,-1}, 
         {0,0,0}, 
         {1,2,1}};
-        const long horz_filter[3][3] = { {-1,0,1}, 
+        const int horz_filter[3][3] = { {-1,0,1}, 
         {-2,0,2}, 
         {-1,0,1}};
 
@@ -135,9 +135,11 @@ namespace dlib
         {
             for (long c = first_col; c < last_col; ++c)
             {
-                unsigned long p;
-                long horz_temp = 0;
-                long vert_temp = 0;
+                typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
+
+                typename promote<bp_type>::type p, horz_temp, vert_temp;
+                horz_temp = 0;
+                vert_temp = 0;
                 for (long m = 0; m < M; ++m)
                 {
                     for (long n = 0; n < N; ++n)
@@ -145,13 +147,13 @@ namespace dlib
                         // pull out the current pixel and put it into p
                         p = get_pixel_intensity(in_img[r-M/2+m][c-N/2+n]);
 
-                        horz_temp += static_cast<long>(p)*horz_filter[m][n];
-                        vert_temp += static_cast<long>(p)*vert_filter[m][n];
+                        horz_temp += p*horz_filter[m][n];
+                        vert_temp += p*vert_filter[m][n];
                     }
                 }
 
-                horz[r][c] = horz_temp;
-                vert[r][c] = vert_temp;
+                assign_pixel(horz[r][c] , horz_temp);
+                assign_pixel(vert[r][c] , vert_temp);
 
             }
         }

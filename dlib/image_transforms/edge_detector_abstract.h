@@ -45,7 +45,7 @@ namespace dlib
             - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - pixel_traits<typename in_image_type::type> must be defined
-              out_image_type::type == a signed integral type
+            - pixel_traits<typename out_image_type::type>::is_unsigned == false
             - (&in_img != &horz) && (&in_img != &vert) && (&vert != &horz)
               (i.e. all three images are different image objects)
         ensures

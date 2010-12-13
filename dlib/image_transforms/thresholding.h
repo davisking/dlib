@@ -69,6 +69,8 @@ namespace dlib
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::is_unsigned == true );
+        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::is_unsigned == true );
 
         COMPILE_TIME_ASSERT(pixel_traits<typename out_image_type::type>::grayscale);
 
@@ -206,7 +208,7 @@ namespace dlib
         {
             for (long c = 0; c < in_img.nc(); ++c)
             {
-                unsigned long p;
+                typename pixel_traits<typename in_image_type::type>::basic_pixel_type p;
                 assign_pixel(p,in_img[r][c]);
                 if (p >= upper_thresh)
                 {

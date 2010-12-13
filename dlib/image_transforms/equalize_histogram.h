@@ -25,6 +25,8 @@ namespace dlib
         matrix<unsigned long,R,C,MM>& hist
     )
     {
+        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::is_unsigned == true );
+
         // make sure hist is the right size
         if (R == 1)
             hist.set_size(1,pixel_traits<typename in_image_type::type>::max()+1);
@@ -58,6 +60,9 @@ namespace dlib
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::is_unsigned == true );
+        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::is_unsigned == true );
 
         typedef typename in_image_type::type in_pixel_type;
         typedef typename out_image_type::type out_pixel_type;

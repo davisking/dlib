@@ -35,6 +35,8 @@ namespace dlib
             const image_type& img
         )
         {
+            COMPILE_TIME_ASSERT( pixel_traits<typename image_type::type>::is_unsigned == true );
+
             unsigned long pixel;
             int_img.set_size(img.nr(), img.nc());
 
