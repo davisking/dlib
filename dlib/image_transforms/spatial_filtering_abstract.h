@@ -28,7 +28,7 @@ namespace dlib
             - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - pixel_traits<typename in_image_type::type>::has_alpha == false
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
-            - &in_img != &out_img
+            - is_same_object(in_img, out_img) == false 
             - scale > 0
             - M % 2 == 1  (i.e. M must be odd)
             - N % 2 == 1  (i.e. N must be odd)
