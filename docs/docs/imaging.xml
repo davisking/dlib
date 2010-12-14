@@ -579,7 +579,7 @@
          <description>        
             This global function copies one image into another and performs any
             necessary color space conversions to make it work right.  Additionally,
-            if the dynamic range of the source and destination images is not the same
+            if the dynamic range of the source image is too big to fit into the destination image
             then it will attempt to perform the appropriate scaling.
          </description>
                                  
