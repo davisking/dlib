@@ -53,10 +53,12 @@ namespace dlib
         ensures
             - #dest_img.nc() == src_img.nc()
             - #dest_img.nr() == src_img.nr()
-            - if (dest_image_type and src_image_type both contain pixels with the same dynamic
-              range as determined by the min() and max() pixel_traits properties) then
+            - if (dest_img's pixels have a wide enough dynamic range to contain all the
+              pixels in src_img.  (Note that dynamic range is determined by the min() and 
+              max() pixel_traits properties)) then
                 - performs: assign_image(dest_img, src_img) 
-                  (i.e. in this case, no scaling is performed. )
+                  (i.e. in this case, no scaling is performed.  Just a normal color space 
+                  conversion and copy )
             - else
                 - #dest_img will be converted to a grayscale image
                 - scales the contents of src_img into the dynamic range of dest_img and then

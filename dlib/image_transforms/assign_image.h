@@ -54,10 +54,10 @@ namespace dlib
             << "\n\t thresh: " << thresh 
             );
 
-        // If the source and destination have the same range of values in their pixels then we don't need to do any
-        // special scaling.  So just call the regular assign_image().
-        if (pixel_traits<typename dest_image_type::type>::max() == pixel_traits<typename src_image_type::type>::max() &&
-            pixel_traits<typename dest_image_type::type>::min() == pixel_traits<typename src_image_type::type>::min() )
+        // If the destination has a dynamic range big enough to contain the source image data then just do a 
+        // regular assign_image()
+        if (pixel_traits<typename dest_image_type::type>::max() >= pixel_traits<typename src_image_type::type>::max() &&
+            pixel_traits<typename dest_image_type::type>::min() <= pixel_traits<typename src_image_type::type>::min() )
         {
             assign_image(dest, src);
             return;
@@ -83,16 +83,28 @@ namespace dlib
                 rs.add(get_pixel_intensity(src[r][c]));
             }
         }
+        typedef typename pixel_traits<typename src_image_type::type>::basic_pixel_type spix_type;
+
+        if (std::numeric_limits<spix_type>::is_integer)
+        {
+            // If the destination has a dynamic range big enough to contain the source image data then just do a 
+            // regular assign_image()
+            if (pixel_traits<typename dest_image_type::type>::max() >= rs.max() &&
+                pixel_traits<typename dest_image_type::type>::min() <= rs.min() )
+            {
+                assign_image(dest, src);
+                return;
+            }
+        }
 
         // Figure out the range of pixel values based on image statistics.  There might be some huge
         // outliers so don't just pick the min and max values.
         const double upper = std::min(rs.mean() + thresh*rs.stddev(), rs.max());
         const double lower = std::max(rs.mean() - thresh*rs.stddev(), rs.min());
 
-        typedef typename pixel_traits<typename dest_image_type::type>::basic_pixel_type dpix_type;
 
-        const dpix_type dest_min = pixel_traits<typename dest_image_type::type>::min();
-        const dpix_type dest_max = pixel_traits<typename dest_image_type::type>::max();
+        const double dest_min = pixel_traits<typename dest_image_type::type>::min();
+        const double dest_max = pixel_traits<typename dest_image_type::type>::max();
 
         const double scale = (upper!=lower)? ((dest_max - dest_min) / (upper - lower)) : 0;
 
