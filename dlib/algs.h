@@ -601,7 +601,7 @@ namespace dlib
     
     /*!A promote 
         
-        This is a template that takes one of the built in scalar types and give you another
+        This is a template that takes one of the built in scalar types and gives you another
         scalar type that should be big enough to hold sums of values from the original scalar 
         type.  The new scalar type will also always be signed.
 
