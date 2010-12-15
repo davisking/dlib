@@ -377,15 +377,15 @@ namespace
 
         DLIB_TEST_MSG(max(abs(dm7*inv(dm7) - identity_matrix<double>(7))) < 1e-12, max(abs(dm7*inv(dm7) - identity_matrix<double>(7))));
         DLIB_TEST(equal(inv(dm7),  inv(m7)));
-        DLIB_TEST(det(dm7) == det(m7));
-        DLIB_TEST(min(dm7) == min(m7));
-        DLIB_TEST(max(dm7) == max(m7));
+        DLIB_TEST(abs(det(dm7) - det(m7) < 1e-14));
+        DLIB_TEST(abs(min(dm7) - min(m7) < 1e-14));
+        DLIB_TEST(abs(max(dm7) - max(m7) < 1e-14));
         DLIB_TEST_MSG(abs(sum(dm7) - sum(m7)) < 1e-14,sum(dm7) - sum(m7));
-        DLIB_TEST(prod(dm7) == prod(m7));
-        DLIB_TEST(diag(dm7) == diag(m7));
-        DLIB_TEST(trans(dm7) == trans(m7));
-        DLIB_TEST(abs(dm7) == abs(m7));
-        DLIB_TEST(round(dm7) == round(m7));
+        DLIB_TEST(abs(prod(dm7) -prod(m7)) < 1e-14);
+        DLIB_TEST(equal(diag(dm7) , diag(m7)));
+        DLIB_TEST(equal(trans(dm7) , trans(m7)));
+        DLIB_TEST(equal(abs(dm7) , abs(m7)));
+        DLIB_TEST(equal(round(dm7) , round(m7)));
         DLIB_TEST(matrix_cast<int>(dm7) == matrix_cast<int>(m7));
         DLIB_TEST((rotate<2,3>(dm7) == rotate<2,3>(m7)));
         DLIB_TEST((sum(pointwise_multiply(dm7,dm7) - pointwise_multiply(m7,m7))) < 1e-10);
