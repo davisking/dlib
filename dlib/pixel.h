@@ -639,14 +639,18 @@ namespace dlib
               // dest += (src - dest)*(alpha/255);
 
               int temp = avg;
+              // copy dest into dest_copy using assign_pixel to avoid potential
+              // warnings about implicit float to int warnings.
+              int dest_copy;
+              assign_pixel(dest_copy, dest);
 
-              temp -= dest;
+              temp -= dest_copy;
 
               temp *= src.alpha;
 
               temp /= 255;
 
-              assign_pixel(dest, temp+dest);
+              assign_pixel(dest, temp+dest_copy);
            }
         }
 
