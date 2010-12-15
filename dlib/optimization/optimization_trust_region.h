@@ -282,7 +282,7 @@ namespace dlib
 
                 // something has gone horribly wrong if the radius has shrunk to zero.  So just
                 // give up if that happens.
-                if (static_cast<type>(radius) == 0)
+                if (static_cast<type>(radius) <= std::numeric_limits<type>::min())
                     break;
             }
             else
