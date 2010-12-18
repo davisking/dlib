@@ -1410,8 +1410,6 @@ namespace dlib
 
             scalar_type Mp = numeric_limits<scalar_type>::infinity();
             scalar_type Mn = numeric_limits<scalar_type>::infinity();
-            scalar_type bp = -numeric_limits<scalar_type>::infinity();
-            scalar_type bn = -numeric_limits<scalar_type>::infinity();
 
             // As a speed hack, pull out pointers to the columns of the
             // kernel matrix we will be using below rather than accessing
@@ -1438,7 +1436,6 @@ namespace dlib
 
                         if (b > 0)
                         {
-                            bp = b;
                             scalar_type a = Q_ip[ip] + Q_diag[j] - 2*Q_ip[j]; 
                             if (a <= 0)
                                 a = tau;
@@ -1461,7 +1458,6 @@ namespace dlib
 
                         if (b > 0)
                         {
-                            bn = b;
                             scalar_type a = Q_in[in] + Q_diag[j] - 2*Q_in[j]; 
                             if (a <= 0)
                                 a = tau;
