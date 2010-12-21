@@ -177,7 +177,7 @@ namespace dlib
             init();
             make_sure_next_is_unreferenced();
 
-            // if the lookup table is pointing to cache(next,*) then clear lookup[next]
+            // if the lookup table is pointing to cache[next] then clear lookup[next]
             if (rlookup[next] != -1)
                 lookup[rlookup[next]] = -1;
 

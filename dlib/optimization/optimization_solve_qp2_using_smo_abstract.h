@@ -71,8 +71,8 @@ namespace dlib
                   Where f is convex.  This means that Q should be symmetric and positive-semidefinite.
                 
                 
-                This object implements the strategy used by the LIBSVM tool and described 
-                by the following papers:
+                This object implements the strategy used by the LIBSVM tool.  The following papers
+                can be consulted for additional details:
                     - Chang and Lin, Training {nu}-Support Vector Classifiers: Theory and Algorithms
                     - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
                       machines, 2001. Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
