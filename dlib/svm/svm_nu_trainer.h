@@ -196,7 +196,7 @@ namespace dlib
             alpha = pointwise_multiply(alpha,y)/rho;
 
             // count the number of support vectors
-            const long sv_count = sum(alpha != 0);
+            const long sv_count = (long)sum(alpha != 0);
 
             scalar_vector_type sv_alpha;
             sample_vector_type support_vectors;
