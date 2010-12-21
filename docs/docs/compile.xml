@@ -32,7 +32,7 @@
             <a href="examples/CMakeLists.txt.html">examples/CMakeLists.txt</a>
         </p>
         <p>
-        I try to make sure everything compiles fine under Visual Studio .NET 2003 (and above) and gcc (3.3 and above).  The compilers that will give you trouble are listed at the bottom of the page.
+        I try to make sure everything compiles fine under Visual Studio .NET 2005 (and above) and gcc (3.4 and above).  
         </p>
         <p>
            Again, note that you should <b><i>not</i></b> add the dlib folder itself to your compiler's include path.  
@@ -108,45 +108,9 @@
 
 
 
-
-
-        <h2>Visual Studio .NET 2003</h2>
-        <p>You need to link to one of the multithreaded C run-time libraries if you are using the threading stuff.  You can do 
-        this by setting it in the project options.  If you don't you will get some error about _beginthreadex not linking.
-        </p>
-
-
-
-        <h2>Visual C++ toolkit 2003</h2>
-        <p>
-           This is a pretty good compiler and it is free.  But it can be a major pain to use.
-           To get it working you have to download the platform sdk along with the toolkit itself.
-           Both of these things are available from the Microsoft web page for free.
-        </p>
-        <p>
-           Once you have the toolkit and platform sdk installed you should be ready to go.
-           Go to start -> programs -> microsoft visual c++ toolkit 2003 -> Visual C++ Toolkit 2003 Command Prompt.  Then switch to the directory that contains your source and the dlib folder.
-        </p>
-        <p>
-           The following is the command I use and yours should look similar:
-           <tt>cl /O2 -DNO_MAKEFILE /EHsc /MT "%1"</tt> <br/>
-               The %1 should be replaced with the cpp file(s) you want to compile.    
-         </p>
-         
-         <p>
-            You may also have to tell the compiler where the include and lib folders are in the platform sdk.
-            If the above command doesn't work try this one (change paths appropriately for your system):
-           <tt>cl /O2 -DNO_MAKEFILE /EHsc /MT /I"C:\Program Files\Microsoft Platform SDK\Include" "%1"  /link /LIBPATH:"C:\Program Files\Microsoft Platform SDK\Lib\" </tt>
-        </p>
-
-
-
-
-
-
         <h2>gcc</h2>
         <p>
-        I generally use the newest version of gcc but most other versions of gcc work just fine also (except 2.95, see below).
+        I generally use the newest version of gcc but most other versions of gcc work just fine also.
         </p>
         <p>
         The command line I generally use is "g++ -D NO_MAKEFILE -lnsl -lpthread file.cpp" I think you need to
@@ -164,60 +128,6 @@
         <p>
             The commands for gcc on windows are the same as above but you may also have to link (via the -l option) to the following libraries: gdi32, comctl32, user32, ws2_32, or imm32.
         </p>
-
-
-
-
-         
-
-
-
-
-
-
-
-
-
-
-
-
-        <center><h1>Problem Compilers</h1></center>
-        <p>
-        Below is a list of the problems I can remember with various compilers.  All the problems here are
-        bugs in the compiler and are a pain to write workarounds for (or the workarounds are slow/unsatisfactory) so I have no plans to deal with them.  Just avoid these compilers in the
-        given situations.
-        </p>
-
-
-
-
-
-        <li/> <b> Visual Studio .NET and earlier versions </b>
-        <ul>
-        These compilers don't compile standard C++ very well.  Visual Studio 6 
-        doesn't even make any pretenses about being standards compliant.  Visual Studio .NET is a lot 
-        better but has some bugs with how it implements namespace lookups so most of my code will not
-        compile in Visual Studio .NET.   (Note that Visual Studio .NET <I>2003</I> works just fine)
-        </ul>
-
-
-
-
-
-        <li/> <b> gcc 2.95 </b>
-        <ul>
-           <p>
-        The dir_nav component will not be able to list directories that contain files bigger than 4GB because
-        I had to use stat() rather than stat64() when compiling under this compiler.  
-           </p>
-           <p>
-              There are also some other problems with gcc 2.95.  
-              I believe all the containers work and all the API wrappers 
-              but the GUI stuff works.  It is sort of touch and go though.   
-           </p>
-        </ul>
-
-
 
 
 
