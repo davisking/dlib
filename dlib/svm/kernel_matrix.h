@@ -164,17 +164,70 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
 
+    /*
+        It is possible to implement the kernel_matrix() operator with just one operator
+        class but treating the version that takes only a single vector separately
+        leads to more efficient output by gcc in certain instances.  
+    */
+    template <typename K, typename vect_type1>
+    struct op_kern_mat_single  
+    {
+        op_kern_mat_single( 
+            const K& kern_, 
+            const vect_type1& vect1_
+        ) : 
+            kern(kern_), 
+            vect1(vect1_)
+        {
+            // make sure the requires clauses get checked eventually
+            impl::assert_is_vector(vect1);
+        }
+
+        const K& kern;
+        const vect_type1& vect1;
+
+        typedef typename K::scalar_type type;
+
+        const static long cost = 100;
+        const static long NR = (is_same_type<vect_type1,typename K::sample_type>::value) ? 1 : 0;
+        const static long NC = (is_same_type<vect_type1,typename K::sample_type>::value) ? 1 : 0;
+
+        typedef const type const_ret_type;
+        typedef typename K::mem_manager_type mem_manager_type;
+        typedef row_major_layout layout_type;
+
+        const_ret_type apply (long r, long c ) const 
+        { 
+            return kern(impl::access<K>(vect1,r), impl::access<K>(vect1,c)); 
+        }
+
+        long nr () const { return impl::size<K>(vect1); }
+        long nc () const { return impl::size<K>(vect1); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item ) const { return alias_helper(item.ref()); }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item ) const { return alias_helper(item.ref()); }
+
+        template <typename U> bool alias_helper  ( const U& ) const { return false; }
+
+        typedef typename K::sample_type samp_type;
+
+        // Say we destructively alias if vect1 is actually item.
+        bool alias_helper                   (const samp_type& item ) const { return are_same(item, vect1); }
+        template <typename U> bool are_same (const samp_type& , const U& )         const { return false; }
+        bool are_same                       (const samp_type& a, const samp_type& b) const { return (&a == &b); }
+    }; 
+
     template <
         typename K,
         typename V
         >
-    const matrix_op<op_kern_mat<K,V,V> > kernel_matrix (
+    const matrix_op<op_kern_mat_single<K,V> > kernel_matrix (
         const K& kern,
         const V& v
         )
     {
-        typedef op_kern_mat<K,V,V> op;
-        return matrix_op<op>(op(kern,v,v));
+        typedef op_kern_mat_single<K,V> op;
+        return matrix_op<op>(op(kern,v));
     }
     
 // ----------------------------------------------------------------------------------------
@@ -186,33 +239,18 @@ namespace dlib
         >
     inline void matrix_assign (
         matrix_dest_type& dest,
-        const matrix_exp<matrix_op<op_kern_mat<K,V,V> > >& src
+        const matrix_exp<matrix_op<op_kern_mat_single<K,V> > >& src
     )
     /*!
         Overload matrix assignment so that when a kernel_matrix expression
         gets assigned it only evaluates half the kernel matrix (since it is symmetric)
     !*/
     {
-        // if this is a symmetric kernel matrix
-        if (&src.ref().op.vect1 == &src.ref().op.vect2)
+        for (long r = 0; r < src.nr(); ++r)
         {
-            for (long r = 0; r < src.nr(); ++r)
+            for (long c = r; c < src.nc(); ++c)
             {
-                for (long c = r; c < src.nc(); ++c)
-                {
-                    dest(r,c) = dest(c,r) = src(r,c);
-                }
-            }
-        }
-        else
-        {
-            // This isn't a symmetric kernel matrix so just do a normal assignment loop
-            for (long r = 0; r < src.nr(); ++r)
-            {
-                for (long c = 0; c < src.nc(); ++c)
-                {
-                    dest(r,c) = src(r,c);
-                }
+                dest(r,c) = dest(c,r) = src(r,c);
             }
         }
     }
