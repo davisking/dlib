@@ -1114,6 +1114,12 @@ namespace dlib
         return matrix_op<op>(op(m.ref()));
     }
 
+    template <typename EXP>
+    struct diag_exp
+    {
+        typedef matrix_op<op_diag<EXP> > type;
+    };
+
 // ----------------------------------------------------------------------------------------
 
     template <typename M, typename target_type>

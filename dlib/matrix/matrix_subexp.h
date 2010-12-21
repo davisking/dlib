@@ -255,6 +255,12 @@ namespace dlib
         return matrix_op<op>(op(m.ref(),row));
     }
 
+    template <typename EXP>
+    struct rowm_exp
+    {
+        typedef matrix_op<op_rowm<EXP> > type;
+    };
+
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
@@ -403,6 +409,12 @@ namespace dlib
         typedef op_colm<EXP> op;
         return matrix_op<op>(op(m.ref(),col));
     }
+
+    template <typename EXP>
+    struct colm_exp
+    {
+        typedef matrix_op<op_colm<EXP> > type;
+    };
 
 // ----------------------------------------------------------------------------------------
 

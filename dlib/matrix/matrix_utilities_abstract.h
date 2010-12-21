@@ -27,6 +27,36 @@ namespace dlib
               of m in the order R(0)==m(0,0), R(1)==m(1,1), R(2)==m(2,2) and so on.
     !*/
 
+    template <typename EXP>
+    struct diag_exp
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This struct allows you to determine the type of matrix expression 
+                object returned from the diag() function.  An example makes its
+                use clear:
+
+                template <typename EXP>
+                void do_something( const matrix_exp<EXP>& mat)
+                {
+                    // d is a matrix expression that aliases mat.
+                    typename diag_exp<EXP>::type d = diag(mat);
+
+                    // Print the diagonal of mat.  So we see that by using
+                    // diag_exp we can save the object returned by diag() in
+                    // a local variable.    
+                    cout << d << endl;
+
+                    // Note that you can only save the return value of diag() to
+                    // a local variable if the argument to diag() has a lifetime
+                    // beyond the diag() expression.  The example shown above is
+                    // OK but the following would result in undefined behavior:
+                    typename diag_exp<EXP>::type bad = diag(mat + mat);
+                }
+        !*/
+        typedef type_of_expression_returned_by_diag type;
+    };
+
 // ----------------------------------------------------------------------------------------
 
     const matrix_exp diagm (

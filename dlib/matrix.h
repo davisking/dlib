@@ -9,6 +9,7 @@
 #include "matrix/matrix_math_functions.h"
 #include "matrix/matrix_assign.h"
 #include "matrix/matrix_la.h"
+#include "matrix/symmetric_matrix_cache.h"
 
 #ifdef DLIB_USE_BLAS
 #include "matrix/matrix_blas_bindings.h"

@@ -438,26 +438,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
-    struct colm_exp
-    {
-        typedef matrix_op<op_colm<EXP> > type;
-    };
-
-    template <typename EXP>
-    struct rowm_exp
-    {
-        typedef matrix_op<op_rowm<EXP> > type;
-    };
-
-    template <typename EXP>
-    struct diag_exp
-    {
-        typedef matrix_op<op_diag<EXP> > type;
-    };
-
-// ----------------------------------------------------------------------------------------
-
     template <typename EXP, typename cache_element_type>
     struct colm_exp<matrix_op<op_symm_cache<EXP, cache_element_type> > >
     {
