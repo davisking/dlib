@@ -1,16 +1,13 @@
-// Copyright (C) 2007  Davis E. King (davis@dlib.net)
+// Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SYMMETRIC_MATRIX_CAcHE_H__
 #define DLIB_SYMMETRIC_MATRIX_CAcHE_H__
 
-//#include "svm_abstract.h"
-#include <cmath>
-#include <limits>
-#include <sstream>
+#include "symmetric_matrix_cache_abstract.h"
 #include <vector>
-#include "dlib/matrix.h"
-#include "dlib/algs.h"
-#include "dlib/array.h"
+#include "../matrix.h"
+#include "../algs.h"
+#include "../array.h"
 
 namespace dlib 
 {
@@ -198,24 +195,36 @@ namespace dlib
         INITIAL VALUE
             - for all valid x:
                 - lookup(x) == -1 
-                - rlookup(x) == -1 
+
+            - diag_cache == the diagonal of the original matrix
+            - is_initialized == false 
+            - max_size_megabytes == the max_size_megabytes from symmetric_matrix_cache()
 
         CONVENTION
-            - if (lookup(c) != -1) then
-                - cache(lookup(c),*) == the cached column c of the matrix
-                - rlookup(lookup(c)) == c
+            - diag_cache == the diagonal of the original matrix
+            - lookup.size() == diag_cache.size()
 
-            - if (rlookup(x) != -1) then
-                - lookup(rlookup(x)) == x
-                - cache(x,*) == the cached column rlookup(x) of the matrix
+            - if (is_initialized) then
+                - if (lookup[c] != -1) then
+                    - cache[lookup[c]] == the cached column c of the matrix
+                    - rlookup[lookup[c]] == c
 
-            - next == the next row in the cache table to use to cache something 
+                - if (rlookup[x] != -1) then
+                    - lookup[rlookup[x]] == x
+                    - cache[x] == the cached column rlookup[x] of the matrix
+
+                - next == the next element in the cache table to use to cache something 
+                - references[i] == the number of outstanding references to cache element cache[i]
+
+                - diag_reference_count == the number of outstanding references to diag_cache. 
+                  (this isn't really needed.  It's just here so that we can reuse the matrix
+                  expression from colm() to implement diag())
         !*/
 
 
         mutable typename array<matrix<type,0,1,typename M::mem_manager_type> >::expand_1a cache;
         mutable typename array<long>::expand_1a references;
-        mutable matrix<type,0,1,typename M::mem_manager_type> diag_cache;
+        matrix<type,0,1,typename M::mem_manager_type> diag_cache;
         mutable std::vector<long> lookup;
         mutable std::vector<long> rlookup;
         mutable long next;
@@ -235,7 +244,10 @@ namespace dlib
         long max_size_megabytes
     )
     {
-        DLIB_ASSERT(m.size() > 0 && m.nr() == m.nc() && max_size_megabytes > 0, 
+        // Don't check that m is symmetric since doing so would be extremely onerous for the
+        // kinds of matrices intended for use with the symmetric_matrix_cache.  Check everything
+        // else though.
+        DLIB_ASSERT(m.size() > 0 && m.nr() == m.nc() && max_size_megabytes >= 0, 
             "\tconst matrix_exp symmetric_matrix_cache(const matrix_exp& m, max_size_megabytes)"
             << "\n\t You have given invalid arguments to this function"
             << "\n\t m.nr():             " << m.nr()
@@ -346,10 +358,96 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename M, typename cache_element_type>
+    struct op_rowm_symm_cache 
+    {
+        typedef cache_element_type type;
+
+        op_rowm_symm_cache(
+            const M& m_,
+            const type* data_,
+            long* ref_count_ 
+        ) : 
+            m(m_), 
+            data(data_),
+            ref_count(ref_count_)
+        {
+            *ref_count += 1;
+        }
+
+        op_rowm_symm_cache (
+            const op_rowm_symm_cache& item
+        ) :
+            m(item.m), 
+            data(item.data),
+            ref_count(item.ref_count)
+        {
+            *ref_count += 1;
+        }
+
+        ~op_rowm_symm_cache(
+        )
+        {
+            *ref_count -= 1;
+        }
+
+        const M& m;
+
+        const type* const data;
+        long* const ref_count;
+
+        const static long cost = M::cost;
+        const static long NR = 1;
+        const static long NC = M::NC;
+        typedef const type& const_ret_type;
+        typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
+        inline const_ret_type apply ( long , long c) const { return data[c]; }
+
+        long nr () const { return 1; }
+        long nc () const { return m.nc(); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
+    };
+
+    template <
+        typename EXP,
+        typename cache_element_type
+        >
+    inline const matrix_op<op_rowm_symm_cache<EXP,cache_element_type> > rowm (
+        const matrix_exp<matrix_op<op_symm_cache<EXP,cache_element_type> > >& m,
+        long row 
+    )
+    {
+        DLIB_ASSERT(row >= 0 && row < m.nr(), 
+            "\tconst matrix_exp rowm(const matrix_exp& m, row)"
+            << "\n\tYou have specified invalid sub matrix dimensions"
+            << "\n\tm.nr(): " << m.nr()
+            << "\n\tm.nc(): " << m.nc() 
+            << "\n\trow:    " << row 
+            );
+
+        std::pair<const cache_element_type*,long*> p = m.ref().op.col(row);
+
+        typedef op_rowm_symm_cache<EXP,cache_element_type> op;
+        return matrix_op<op>(op(m.ref().op.m, 
+                                p.first,
+                                p.second));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename EXP>
     struct colm_exp
     {
         typedef matrix_op<op_colm<EXP> > type;
+    };
+
+    template <typename EXP>
+    struct rowm_exp
+    {
+        typedef matrix_op<op_rowm<EXP> > type;
     };
 
     template <typename EXP>
@@ -364,6 +462,12 @@ namespace dlib
     struct colm_exp<matrix_op<op_symm_cache<EXP, cache_element_type> > >
     {
         typedef matrix_op<op_colm_symm_cache<EXP, cache_element_type> > type;
+    };
+
+    template <typename EXP, typename cache_element_type>
+    struct rowm_exp<matrix_op<op_symm_cache<EXP, cache_element_type> > >
+    {
+        typedef matrix_op<op_rowm_symm_cache<EXP, cache_element_type> > type;
     };
 
     template <typename EXP, typename cache_element_type>
