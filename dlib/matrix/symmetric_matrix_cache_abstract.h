@@ -21,9 +21,10 @@ namespace dlib
         requires
             - m.size() > 0
             - m.nr() == m.nc()
-            - m must be a symmetric matrix (i.e. m == trans(m))
             - max_size_megabytes >= 0
         ensures
+            - This function assumes that m is symmetric.  If m is not symmetric then it won't
+              crash but you will get incorrect results.
             - This method creates a matrix expression which internally caches the elements
               of m so that they can be accessed quickly.  It is useful if m is some kind of
               complex matrix expression which is both very large and expensive to evaluate.
