@@ -377,6 +377,10 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#diagm</link>
                      </item>
                      <item>
+                        <name>symmetric_matrix_cache</name>
+                        <link>dlib/matrix/symmetric_matrix_cache_abstract.h.html</link>
+                     </item>
+                     <item>
                         <name>trans</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#trans</link>
                      </item>

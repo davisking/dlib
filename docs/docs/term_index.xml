@@ -253,10 +253,13 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="randm"/>
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag_exp"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diagm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="trans"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="fliplr"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="flipud"/>
+
+         <term file="dlib/matrix/symmetric_matrix_cache_abstract.h.html" name="symmetric_matrix_cache"/>
 
          <term name="dot">
             <term link="dlib/matrix/matrix_utilities_abstract.h.html#dot" name="for matrix objects"/>
@@ -310,7 +313,9 @@
 
 
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="rowm"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="rowm_exp"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="colm"/>
+         <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="colm_exp"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="subm"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="range"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_rowm"/>
