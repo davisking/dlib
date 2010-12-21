@@ -56,46 +56,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
-    struct colm_exp
-    {
-        typedef matrix_op<op_colm<EXP> > type;
-    };
-
-    template <typename EXP>
-    struct rowm_exp
-    {
-        typedef matrix_op<op_rowm<EXP> > type;
-    };
-
-    template <typename EXP>
-    struct diag_exp
-    {
-        typedef matrix_op<op_diag<EXP> > type;
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename EXP, typename cache_element_type>
-    struct colm_exp<matrix_op<op_symm_cache<EXP, cache_element_type> > >
-    {
-        typedef matrix_op<op_colm_symm_cache<EXP, cache_element_type> > type;
-    };
-
-    template <typename EXP, typename cache_element_type>
-    struct rowm_exp<matrix_op<op_symm_cache<EXP, cache_element_type> > >
-    {
-        typedef matrix_op<op_rowm_symm_cache<EXP, cache_element_type> > type;
-    };
-
-    template <typename EXP, typename cache_element_type>
-    struct diag_exp<matrix_op<op_symm_cache<EXP, cache_element_type> > >
-    {
-        typedef matrix_op<op_colm_symm_cache<EXP, cache_element_type> > type;
-    };
-
-// ----------------------------------------------------------------------------------------
-
 }
 
 #endif // DLIB_SYMMETRIC_MATRIX_CAcHE_ABSTRACT_H__
