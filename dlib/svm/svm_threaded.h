@@ -58,7 +58,7 @@ namespace dlib
                     // on very large datasets.  Every bit of freed memory helps out.
                     j = job<trainer_type>();
                 }
-                catch (invalid_svm_nu_error&)
+                catch (invalid_nu_error&)
                 {
                     // If this is a svm_nu_trainer then we might get this exception if the nu is
                     // invalid.  In this case just return a cross validation score of 0.
