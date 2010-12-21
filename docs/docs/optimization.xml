@@ -31,6 +31,7 @@
          <item>find_min_using_approximate_derivatives</item> 
          <item>find_min_bobyqa</item> 
          <item>solve_qp_using_smo</item> 
+         <item>solve_qp2_using_smo</item> 
          <item>oca</item> 
          <item>find_max</item> 
          <item>find_max_single_variable</item> 
@@ -348,8 +349,38 @@ subject to the following constraint:
    subject to the following constraints:
       sum(alpha) == C 
       min(alpha) >= 0 
-   Where f is convex.  This means that Q should be positive-semidefinite.
+   Where f is convex.  This means that Q should be symmetric and positive-semidefinite.
 </pre>
+
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>solve_qp2_using_smo</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_solve_qp2_using_smo_abstract.h</spec_file>
+         <description>
+             This function solves the following quadratic program:
+<pre>
+   Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha 
+   subject to the following constraints:
+      sum(alpha) == nu*y.size() 
+      0 &lt;= min(alpha) &amp;&amp; max(alpha) &lt;= 1 
+      trans(y)*alpha == 0
+   Where f is convex.  This means that Q should be symmetric and positive-semidefinite.
+</pre>
+<br/>
+                This object implements the strategy used by the LIBSVM tool.  The following papers
+                can be consulted for additional details:
+               <ul>
+                  <li>Chang and Lin, Training {nu}-Support Vector Classifiers: Theory and Algorithms</li>
+                  <li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                     machines, 2001. Software available at 
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
+               </ul>
 
          </description>
                                  

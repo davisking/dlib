@@ -33,6 +33,9 @@
          <term file="dlib/optimization/optimization_bobyqa_abstract.h.html" name="bobyqa_failure"/>
          <term file="dlib/optimization/optimization_oca_abstract.h.html" name="oca_problem"/>
 
+         <term file="dlib/optimization/optimization_solve_qp2_using_smo_abstract.h.html" name="invalid_nu_error"/>
+         <term file="dlib/optimization/optimization_solve_qp2_using_smo_abstract.h.html" name="maximum_nu"/>
+
          <term file="optimization.html" name="derivative"/>
          <term file="optimization.html" name="make_line_search_function"/>
          <term file="optimization.html" name="poly_min_extrap"/>
@@ -48,6 +51,7 @@
          <term file="optimization.html" name="find_min_using_approximate_derivatives"/>
          <term file="optimization.html" name="find_min_bobyqa"/>
          <term file="optimization.html" name="solve_qp_using_smo"/>
+         <term file="optimization.html" name="solve_qp2_using_smo"/>
          <term file="optimization.html" name="oca"/>
          <term link="optimization.html#find_min_bobyqa" name="BOBYQA"/>
          <term file="optimization.html" name="find_max"/>
@@ -195,7 +199,6 @@
          <term file="ml.html" name="find_gamma_with_big_centroid_gap"/>
          <term file="ml.html" name="compute_mean_squared_distance"/>
          <term file="dlib/svm/feature_ranking_abstract.h.html" name="verbose_find_gamma_with_big_centroid_gap"/>
-         <term file="dlib/svm/svm_abstract.h.html" name="maximum_nu"/>
 
          <term file="ml.html" name="null_trainer"/>
          <term file="ml.html" name="null_trainer_type"/>

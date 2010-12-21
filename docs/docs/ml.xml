@@ -922,7 +922,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       <component>
          <name>svm_nu_trainer</name>
          <file>dlib/svm.h</file>
-         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <spec_file link="true">dlib/svm/svm_nu_trainer_abstract.h</spec_file>
          <description>
             <p>
                Trains a nu support vector classifier and outputs a <a href="#decision_function">decision_function</a>. 
