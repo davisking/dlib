@@ -377,9 +377,9 @@ namespace
 
         DLIB_TEST_MSG(max(abs(dm7*inv(dm7) - identity_matrix<double>(7))) < 1e-12, max(abs(dm7*inv(dm7) - identity_matrix<double>(7))));
         DLIB_TEST(equal(inv(dm7),  inv(m7)));
-        DLIB_TEST(abs(det(dm7) - det(m7) < 1e-14));
-        DLIB_TEST(abs(min(dm7) - min(m7) < 1e-14));
-        DLIB_TEST(abs(max(dm7) - max(m7) < 1e-14));
+        DLIB_TEST(abs(det(dm7) - det(m7)) < 1e-14);
+        DLIB_TEST(abs(min(dm7) - min(m7)) < 1e-14);
+        DLIB_TEST(abs(max(dm7) - max(m7)) < 1e-14);
         DLIB_TEST_MSG(abs(sum(dm7) - sum(m7)) < 1e-14,sum(dm7) - sum(m7));
         DLIB_TEST(abs(prod(dm7) -prod(m7)) < 1e-14);
         DLIB_TEST(equal(diag(dm7) , diag(m7)));
