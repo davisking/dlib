@@ -7,6 +7,7 @@
 #include "optimization/optimization_bobyqa.h"
 #include "optimization/optimization_solve_qp_using_smo.h"
 #include "optimization/optimization_solve_qp2_using_smo.h"
+#include "optimization/optimization_solve_qp3_using_smo.h"
 #include "optimization/optimization_oca.h"
 #include "optimization/optimization_trust_region.h"
 #include "optimization/optimization_least_squares.h"
