@@ -165,11 +165,12 @@ namespace dlib
             long num = (long)std::floor(temp);
             long num_total = (long)std::ceil(temp);
 
-            bool has_slack = false;
+            const scalar_type B_sign = (B > 0)? 1 : -1;
+
             long count = 0;
             for (long i = 0; i < alpha.nr(); ++i)
             {
-                if (y(i) == 1)
+                if (y(i) == B_sign)
                 {
                     if (count < num)
                     {
@@ -178,8 +179,7 @@ namespace dlib
                     }
                     else 
                     {
-                        has_slack = true;
-                        if (num_total > num)
+                        if (count < num_total)
                         {
                             ++count;
                             alpha(i) = C*(temp - std::floor(temp));
@@ -189,7 +189,7 @@ namespace dlib
                 }
             }
 
-            if (count != num_total || has_slack == false)
+            if (count != num_total)
             {
                 std::ostringstream sout;
                 sout << "Invalid QP3 constraint parameters of B: " << B << ", Cp: " << Cp << ", Cn: "<< Cn;
