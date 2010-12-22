@@ -400,10 +400,7 @@ namespace dlib
                 j_out = jn;
             }
 
-            if (j_out >= 0 && i_out >= 0)
-                return true;
-            else
-                return false;
+            return true;
         }
 
     // ------------------------------------------------------------------------------------
