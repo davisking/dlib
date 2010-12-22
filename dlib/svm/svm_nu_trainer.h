@@ -6,7 +6,6 @@
 //#include "local/make_label_kernel_matrix.h"
 
 #include "svm_nu_trainer_abstract.h"
-#include "calculate_rho_and_b.h"
 #include <cmath>
 #include <limits>
 #include <sstream>
@@ -220,6 +219,87 @@ namespace dlib
 
             // now return the decision function
             return decision_function<K> (sv_alpha, b, kernel_function, support_vectors);
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename scalar_vector_type,
+            typename scalar_vector_type2,
+            typename scalar_type
+            >
+        void calculate_rho_and_b(
+            const scalar_vector_type2& y,
+            const scalar_vector_type& alpha,
+            const scalar_vector_type& df,
+            scalar_type& rho, 
+            scalar_type& b
+        ) const
+        {
+            using namespace std;
+            long num_p_free = 0;
+            long num_n_free = 0;
+            scalar_type sum_p_free = 0;
+            scalar_type sum_n_free = 0;
+
+            scalar_type upper_bound_p = -numeric_limits<scalar_type>::infinity();
+            scalar_type upper_bound_n = -numeric_limits<scalar_type>::infinity();
+            scalar_type lower_bound_p = numeric_limits<scalar_type>::infinity();
+            scalar_type lower_bound_n = numeric_limits<scalar_type>::infinity();
+
+            for(long i = 0; i < alpha.nr(); ++i)
+            {
+                if(y(i) == 1)
+                {
+                    if(alpha(i) == 1)
+                    {
+                        if (df(i) > upper_bound_p)
+                            upper_bound_p = df(i);
+                    }
+                    else if(alpha(i) == 0)
+                    {
+                        if (df(i) < lower_bound_p)
+                            lower_bound_p = df(i);
+                    }
+                    else
+                    {
+                        ++num_p_free;
+                        sum_p_free += df(i);
+                    }
+                }
+                else
+                {
+                    if(alpha(i) == 1)
+                    {
+                        if (df(i) > upper_bound_n)
+                            upper_bound_n = df(i);
+                    }
+                    else if(alpha(i) == 0)
+                    {
+                        if (df(i) < lower_bound_n)
+                            lower_bound_n = df(i);
+                    }
+                    else
+                    {
+                        ++num_n_free;
+                        sum_n_free += df(i);
+                    }
+                }
+            }
+
+            scalar_type r1,r2;
+            if(num_p_free > 0)
+                r1 = sum_p_free/num_p_free;
+            else
+                r1 = (upper_bound_p+lower_bound_p)/2;
+
+            if(num_n_free > 0)
+                r2 = sum_n_free/num_n_free;
+            else
+                r2 = (upper_bound_n+lower_bound_n)/2;
+
+            rho = (r1+r2)/2;
+            b = (r1-r2)/2/rho;
         }
 
     // ------------------------------------------------------------------------------------
