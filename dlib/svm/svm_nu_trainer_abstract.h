@@ -29,7 +29,8 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object implements a trainer for a nu support vector machine for 
-                solving binary classification problems.
+                solving binary classification problems.  It is implemented using the SMO
+                algorithm.
 
                 The implementation of the nu-svm training algorithm used by this object is based
                 on the following excellent papers:
