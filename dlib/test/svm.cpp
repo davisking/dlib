@@ -368,6 +368,10 @@ namespace
         trainer.set_kernel(kernel_type(gamma));
         trainer.set_nu(0.05);
 
+        svm_c_trainer<kernel_type> c_trainer;
+        c_trainer.set_kernel(kernel_type(gamma));
+        c_trainer.set_c(100);
+
         svm_c_linear_trainer<linear_kernel<matrix<double,0,1> > > lin_trainer;
         lin_trainer.set_c(100000);
         // use an ekm to linearize this dataset so we can use it with the lin_trainer
@@ -383,6 +387,8 @@ namespace
         matrix<scalar_type> krr_cv = cross_validate_trainer_threaded(krr_trainer, x,y, 4, 2);
         print_spinner();
         matrix<scalar_type> svm_cv = cross_validate_trainer(trainer, x,y, 4);
+        print_spinner();
+        matrix<scalar_type> svm_c_cv = cross_validate_trainer(c_trainer, x,y, 4);
         print_spinner();
         matrix<scalar_type> rbf_cv = cross_validate_trainer_threaded(rbf_trainer, x,y, 10, 2);
         print_spinner();
@@ -400,7 +406,8 @@ namespace
 
         dlog << LDEBUG << "rvm cv:        " << rvm_cv;
         dlog << LDEBUG << "krr cv:        " << krr_cv;
-        dlog << LDEBUG << "svm cv:        " << svm_cv;
+        dlog << LDEBUG << "nu-svm cv:     " << svm_cv;
+        dlog << LDEBUG << "C-svm cv:      " << svm_c_cv;
         dlog << LDEBUG << "rbf cv:        " << rbf_cv;
         dlog << LDEBUG << "lin cv:        " << lin_cv;
         dlog << LDEBUG << "ocas_ekm cv:   " << ocas_ekm_cv;
@@ -415,6 +422,7 @@ namespace
         DLIB_TEST_MSG(mean(rvm_cv) > 0.9, rvm_cv);
         DLIB_TEST_MSG(mean(krr_cv) > 0.9, krr_cv);
         DLIB_TEST_MSG(mean(svm_cv) > 0.9, svm_cv);
+        DLIB_TEST_MSG(mean(svm_c_cv) > 0.9, svm_c_cv);
         DLIB_TEST_MSG(mean(rbf_cv) > 0.9, rbf_cv);
         DLIB_TEST_MSG(mean(lin_cv) > 0.9, lin_cv);
         DLIB_TEST_MSG(mean(peg_cv) > 0.9, peg_cv);
