@@ -56,7 +56,8 @@ class serv : public server::kernel_1a_c
         stream.tie(&stream);
 
         char ch;
-        while (stream.good())
+        // Loop until we hit the end of the stream.  This happens when the connection terminates.
+        while (stream.peek() != EOF)
         {
             // get the next character from the client
             ch = stream.get();
