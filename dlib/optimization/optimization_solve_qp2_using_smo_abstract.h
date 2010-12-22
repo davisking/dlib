@@ -68,7 +68,9 @@ namespace dlib
                     - sum(alpha) == nu*y.size() 
                     - 0 <= min(alpha) && max(alpha) <= 1 
                     - trans(y)*alpha == 0
-                  Where f is convex.  This means that Q should be symmetric and positive-semidefinite.
+
+                  Where all elements of y must be equal to +1 or -1 and f is convex.  
+                  This means that Q should be symmetric and positive-semidefinite.
                 
                 
                 This object implements the strategy used by the LIBSVM tool.  The following papers
