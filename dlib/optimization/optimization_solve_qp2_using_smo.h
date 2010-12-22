@@ -107,7 +107,7 @@ namespace dlib
             typename EXP2,
             long NR
             >
-        void operator() ( 
+        unsigned long operator() ( 
             const matrix_exp<EXP1>& Q,
             const matrix_exp<EXP2>& y,
             const scalar_type nu,
@@ -150,10 +150,13 @@ namespace dlib
                 }
             }
 
+            unsigned long count = 0;
+
             // now perform the actual optimization of alpha
             long i=0, j=0;
             while (find_working_group(y,alpha,Q,df,tau,eps,i,j))
             {
+                ++count;
                 const scalar_type old_alpha_i = alpha(i);
                 const scalar_type old_alpha_j = alpha(j);
 
@@ -168,6 +171,8 @@ namespace dlib
                 for(long k = 0; k < df.nr(); ++k)
                     df(k) += Q_i(k)*delta_alpha_i + Q_j(k)*delta_alpha_j;
             }
+
+            return count;
         }
 
         const column_matrix& get_gradient (

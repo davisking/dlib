@@ -93,7 +93,7 @@ namespace dlib
             typename EXP2,
             long NR
             >
-        void operator() ( 
+        unsigned long operator() ( 
             const matrix_exp<EXP1>& Q,
             const matrix_exp<EXP2>& y,
             const scalar_type nu,
@@ -121,6 +121,7 @@ namespace dlib
                   (a reasonable eps is usually about 1e-3)
                 - #get_gradient() == Q*(#alpha)
                   (i.e. stores the gradient of f() at #alpha in get_gradient())
+                - returns the number of iterations performed.  
             throws
                 - invalid_nu_error
                   This exception is thrown if nu >= maximum_nu(y).  
