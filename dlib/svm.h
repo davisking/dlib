@@ -24,6 +24,7 @@
 #include "svm/simplify_linear_decision_function.h"
 #include "svm/krr_trainer.h"
 #include "svm/sort_basis_vectors.h"
+#include "svm/svm_c_trainer.h"
 
 #endif // DLIB_SVm_HEADER
 
