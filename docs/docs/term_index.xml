@@ -52,6 +52,7 @@
          <term file="optimization.html" name="find_min_bobyqa"/>
          <term file="optimization.html" name="solve_qp_using_smo"/>
          <term file="optimization.html" name="solve_qp2_using_smo"/>
+         <term file="optimization.html" name="solve_qp3_using_smo"/>
          <term file="optimization.html" name="oca"/>
          <term link="optimization.html#find_min_bobyqa" name="BOBYQA"/>
          <term file="optimization.html" name="find_max"/>
@@ -164,6 +165,7 @@
          <term file="ml.html" name="simplify_linear_decision_function"/>
          <term file="ml.html" name="is_binary_classification_problem"/>
          <term file="ml.html" name="svm_nu_trainer"/>
+         <term file="ml.html" name="svm_c_trainer"/>
          <term file="ml.html" name="svm_c_linear_trainer"/>
          <term file="ml.html" name="svm_c_ekm_trainer"/>
          <term file="ml.html" name="rvm_trainer"/>
