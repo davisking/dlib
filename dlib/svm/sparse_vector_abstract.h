@@ -146,7 +146,6 @@ namespace dlib
         /*!
             requires
                 - a is a sorted range of std::pair objects
-                - b is a sorted range of std::pair objects
             ensures
                 - returns dot(a,a) 
         !*/
@@ -160,7 +159,6 @@ namespace dlib
         /*!
             requires
                 - a is a sorted range of std::pair objects
-                - b is a sorted range of std::pair objects
             ensures
                 - returns std::sqrt(length_squared(a,a))
         !*/
