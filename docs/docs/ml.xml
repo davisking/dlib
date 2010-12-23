@@ -77,6 +77,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>svm_c_ekm_trainer</item> 
          <item>rvm_trainer</item> 
          <item>krr_trainer</item> 
+         <item>svr_trainer</item> 
          <item>rvm_regression_trainer</item> 
          <item>rbf_network_trainer</item> 
          <item>rank_features</item> 
@@ -916,6 +917,28 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>krr_regression_ex.cpp.html</example>
             <example>krr_classification_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>svr_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svr_trainer_abstract.h</spec_file>
+         <description>
+            <p>
+                This object implements a trainer for performing epsilon-insensitive support 
+                vector regression.  It is implemented using the <a href="optimization.html#solve_qp3_using_smo">SMO</a> algorithm.
+            </p>
+                The implementation of the eps-SVR training algorithm used by this object is based
+                on the following paper:
+               <ul>
+                  <li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                     machines, 2001. Software available at 
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
+               </ul>
+         </description>
                                  
       </component>
       

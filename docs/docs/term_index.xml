@@ -172,6 +172,7 @@
          <term file="ml.html" name="svm_c_ekm_trainer"/>
          <term file="ml.html" name="rvm_trainer"/>
          <term file="ml.html" name="krr_trainer"/>
+         <term file="ml.html" name="svr_trainer"/>
          <term file="ml.html" name="rvm_regression_trainer"/>
          <term file="ml.html" name="rbf_network_trainer"/>
          <term file="ml.html" name="reduced"/>
@@ -185,6 +186,7 @@
          <term link="ml.html#svm_nu_trainer" name="support vector machine"/>
          <term link="ml.html#rvm_trainer" name="relevance vector machine"/>
          <term link="ml.html#krr_trainer" name="kernel ridge regression"/>
+         <term link="ml.html#svr_trainer" name="support vector regression"/>
          <term link="ml.html#krr_trainer" name="regularized least squares"/>
          <term link="ml.html#krr_trainer" name="least squares SVM"/>
          <term file="ml.html" name="krls"/>
