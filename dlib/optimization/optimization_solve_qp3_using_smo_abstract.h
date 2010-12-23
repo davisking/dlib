@@ -56,7 +56,7 @@ namespace dlib
                   This means that Q should be symmetric and positive-semidefinite.
                 
                 
-                This object implements the strategy used by the LIBSVM tool.  The following paper
+                This object implements the strategy used by the LIBSVM tool.  The following papers
                 can be consulted for additional details:
                     - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
                       machines, 2001. Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
