@@ -233,9 +233,7 @@ namespace dlib
                   Also, x should contain sample_type objects.
                 - y == a matrix or something convertible to a matrix via vector_to_matrix().
                   Also, y should contain scalar_type objects.
-                - is_vector(x) == true
-                - is_vector(y) == true
-                - x.size() == y.size() > 0
+                - is_learning_problem(x,y) == true
                 - if (get_lambda() == 0 && will_use_regression_loss_for_loo_cv() == false) then
                     - is_binary_classification_problem(x,y) == true
                       (i.e. if you want this algorithm to estimate a lambda appropriate for

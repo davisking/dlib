@@ -93,9 +93,7 @@ namespace dlib
                   Also, x should contain sample_type objects.
                 - y == a matrix or something convertible to a matrix via vector_to_matrix().
                   Also, y should contain scalar_type objects.
-                - x.nr() > 1
-                - x.nr() == y.nr() && x.nc() == 1 && y.nc() == 1 
-                  (i.e. x and y are both column vectors of the same length)
+                - is_learning_problem(x,y) == true
             ensures
                 - trains a RBF network given the training samples in x and 
                   labels in y and returns the resulting decision_function

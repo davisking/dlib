@@ -239,7 +239,7 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_vector(x) && is_vector(y) && x.size() == y.size() && x.size() > 0,
+            DLIB_ASSERT(is_learning_problem(x,y),
                 "\t decision_function krr_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
                 << "\n\t is_vector(x): " << is_vector(x)

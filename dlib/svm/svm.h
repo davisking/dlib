@@ -27,6 +27,35 @@ namespace dlib
         typename T,
         typename U
         >
+    inline bool is_learning_problem_impl (
+        const T& x,
+        const U& x_labels
+    )
+    {
+        return is_col_vector(x) && 
+               is_col_vector(x_labels) && 
+               x.size() == x_labels.size() && 
+               x.size() > 0;
+    }
+
+    template <
+        typename T,
+        typename U
+        >
+    inline bool is_learning_problem (
+        const T& x,
+        const U& x_labels
+    )
+    {
+        return is_learning_problem_impl(vector_to_matrix(x), vector_to_matrix(x_labels));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U
+        >
     bool is_binary_classification_problem_impl (
         const T& x,
         const U& x_labels
@@ -34,9 +63,12 @@ namespace dlib
     {
         bool seen_neg_class = false;
         bool seen_pos_class = false;
-        if (x.nc() != 1 || x_labels.nc() != 1) return false; 
-        if (x.nr() != x_labels.nr()) return false;
-        if (x.nr() <= 1) return false;
+
+        if (is_learning_problem_impl(x,x_labels) == false)
+            return false;
+
+        if (x.size() <= 1) return false;
+
         for (long r = 0; r < x_labels.nr(); ++r)
         {
             if (x_labels(r) != -1 && x_labels(r) != 1)

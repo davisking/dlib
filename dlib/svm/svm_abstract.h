@@ -24,7 +24,7 @@ namespace dlib
         typename T,
         typename U
         >
-    bool is_binary_classification_problem (
+    bool is_learning_problem (
         const T& x,
         const U& x_labels
     );
@@ -37,6 +37,24 @@ namespace dlib
                 - is_col_vector(x) == true
                 - is_col_vector(x_labels) == true
                 - x.size() == x_labels.size() 
+                - x.size() > 0
+    !*/
+
+    template <
+        typename T,
+        typename U
+        >
+    bool is_binary_classification_problem (
+        const T& x,
+        const U& x_labels
+    );
+    /*!
+        requires
+            - T == a matrix or something convertible to a matrix via vector_to_matrix()
+            - U == a matrix or something convertible to a matrix via vector_to_matrix()
+        ensures
+            - returns true if all of the following are true and false otherwise:
+                - is_learning_problem(x, x_labels) == true
                 - x.size() > 1
                 - there exists at least one sample from both the +1 and -1 classes.
                   (i.e. all samples can't have the same label)
