@@ -26,6 +26,7 @@
 #include "svm/sort_basis_vectors.h"
 #include "svm/svm_c_trainer.h"
 #include "svm/svm_one_class_trainer.h"
+#include "svm/svr_trainer.h"
 
 #endif // DLIB_SVm_HEADER
 
