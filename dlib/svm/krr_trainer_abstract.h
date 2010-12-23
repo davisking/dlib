@@ -33,7 +33,7 @@ namespace dlib
                 least squares or least squares SVM). 
 
                 The exact definition of what this algorithm does is this:
-                    Find w and b that minimizes the following (x_i are input samples and y_i are labels):
+                    Find w and b that minimizes the following (x_i are input samples and y_i are target values):
                         lambda*dot(w,w) + sum_over_i( (f(x_i) - y_i)^2 )
                         where f(x) == dot(x,w) - b
 
@@ -240,7 +240,7 @@ namespace dlib
                       classification functions then you had better give a valid classification
                       problem)
             ensures
-                - performs kernel ridge regression given the training samples in x and labels in y.  
+                - performs kernel ridge regression given the training samples in x and target values in y.  
                 - returns a decision_function F with the following properties:
                     - F(new_x) == predicted y value
 
