@@ -58,8 +58,10 @@ namespace dlib
                 
                 This object implements the strategy used by the LIBSVM tool.  The following paper
                 can be consulted for additional details:
-                      Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                    - Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
                       machines, 2001. Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
+                    - Working Set Selection Using Second Order Information for Training Support Vector Machines by
+                      Fan, Chen, and Lin.  In the Journal of Machine Learning Research 2005.
         !*/
 
     public:
