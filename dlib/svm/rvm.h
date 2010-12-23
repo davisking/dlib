@@ -693,7 +693,7 @@ namespace dlib
         {
 
             // make sure requires clause is not broken
-            DLIB_ASSERT(x.nr() > 1 && x.nr() == t.nr() && x.nc() == 1 && t.nc() == 1,
+            DLIB_ASSERT(is_learning_problem(x,t) && x.size() > 0,
                 "\tdecision_function rvm_regression_trainer::train(x,t)"
                 << "\n\t invalid inputs were given to this function"
                 << "\n\t x.nr(): " << x.nr() 
