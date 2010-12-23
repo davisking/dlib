@@ -164,6 +164,7 @@
          <term file="ml.html" name="randomize_samples"/>
          <term file="ml.html" name="simplify_linear_decision_function"/>
          <term file="ml.html" name="is_binary_classification_problem"/>
+         <term file="ml.html" name="is_learning_problem"/>
          <term file="ml.html" name="svm_nu_trainer"/>
          <term file="ml.html" name="svm_c_trainer"/>
          <term file="ml.html" name="svm_one_class_trainer"/>

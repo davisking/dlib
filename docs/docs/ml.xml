@@ -143,6 +143,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>sort_basis_vectors</item> 
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
+         <item>is_learning_problem</item> 
          <item>test_binary_decision_function</item> 
          <item>cross_validate_trainer</item> 
          <item>cross_validate_trainer_threaded</item> 
@@ -1257,6 +1258,21 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
              This function simply takes two vectors, the first containing feature vectors and
              the second containing labels, and reports back if the two could possibly 
              contain data for a well formed classification problem.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_learning_problem</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+             This function simply takes two vectors, the first containing feature vectors and
+             the second containing labels, and reports back if the two could possibly 
+             contain data for a well formed learning problem.  In this case it just means
+             that the two vectors have the same length and aren't empty.
          </description>
                                  
       </component>
