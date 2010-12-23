@@ -30,9 +30,9 @@ namespace dlib
               complex matrix expression which is both very large and expensive to evaluate.
               An example would be a kernel_matrix() expression with an expensive kernel and
               a large number of samples.  Such an expression would result in a huge matrix,
-              probably too big to store in memory.  The symmetric_matrix_cache() then makes
-              it easy to store just the parts of a matrix expression in memory which are 
-              accessed most often.  The specific details are defined below.
+              potentially too big to store in memory.  The symmetric_matrix_cache() then makes
+              it easy to store just the parts of a matrix expression which are accessed most 
+              often in memory.  The specific details are defined below.
             - returns a matrix M such that
                 - M == m
                   (i.e. M represents the same matrix as m)
