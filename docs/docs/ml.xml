@@ -71,6 +71,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>empirical_kernel_map</item>
          <item>kkmeans</item>
          <item>svm_nu_trainer</item> 
+         <item>svm_one_class_trainer</item> 
          <item>svm_c_trainer</item> 
          <item>svm_c_linear_trainer</item> 
          <item>svm_c_ekm_trainer</item> 
@@ -941,6 +942,28 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>svm_ex.cpp.html</example>
             <example>model_selection_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>svm_one_class_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_one_class_trainer_abstract.h</spec_file>
+         <description>
+            <p>
+               Trains a one-class support vector classifier and outputs a <a href="#decision_function">decision_function</a>. 
+               It is implemented using the <a href="optimization.html#solve_qp3_using_smo">SMO</a> algorithm.
+            </p>
+               The implementation of the one-class training algorithm used by this library is based
+               on the following paper:
+               <ul>
+                  <li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
+                     machines, 2001. Software available at 
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
+               </ul>
+         </description>
                                  
       </component>
       

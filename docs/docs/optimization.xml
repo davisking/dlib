@@ -408,12 +408,14 @@ subject to the following constraint:
    This means that Q should be symmetric and positive-semidefinite.
 </pre>
 <br/>
-                This object implements the strategy used by the LIBSVM tool.  The following paper
+                This object implements the strategy used by the LIBSVM tool.  The following papers
                 can be consulted for additional details:
                <ul>
                   <li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
                      machines, 2001. Software available at 
                      <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
+                  <li>Working Set Selection Using Second Order Information for Training Support Vector Machines by
+                     Fan, Chen, and Lin.  In the Journal of Machine Learning Research 2005.</li>
                </ul>
 
          </description>

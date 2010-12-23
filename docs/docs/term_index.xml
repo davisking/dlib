@@ -166,6 +166,7 @@
          <term file="ml.html" name="is_binary_classification_problem"/>
          <term file="ml.html" name="svm_nu_trainer"/>
          <term file="ml.html" name="svm_c_trainer"/>
+         <term file="ml.html" name="svm_one_class_trainer"/>
          <term file="ml.html" name="svm_c_linear_trainer"/>
          <term file="ml.html" name="svm_c_ekm_trainer"/>
          <term file="ml.html" name="rvm_trainer"/>
