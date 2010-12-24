@@ -85,7 +85,7 @@ namespace dlib
         std::istream& in 
     )
     {
-        typedef typename T::type scalar_type;
+        typedef typename T::value_type::second_type scalar_type;
         try
         {
             deserialize(const_cast<scalar_type&>(item.gamma), in);
@@ -172,7 +172,7 @@ namespace dlib
         std::istream& in 
     )
     {
-        typedef typename T::type scalar_type;
+        typedef typename T::value_type::second_type scalar_type;
         try
         {
             deserialize(const_cast<scalar_type&>(item.gamma), in);
@@ -258,7 +258,7 @@ namespace dlib
         std::istream& in 
     )
     {
-        typedef typename T::type scalar_type;
+        typedef typename T::value_type::second_type scalar_type;
         try
         {
             deserialize(const_cast<scalar_type&>(item.gamma), in);
