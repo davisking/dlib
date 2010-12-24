@@ -121,6 +121,7 @@ namespace dlib
                 - if (is_empty() == false) then
                     - Let U denote the type of object currently contained in this type_safe_union
                     - calls obj(this->get<U>())
+                    - The object returned by this->get<U>() will be non-const
         !*/
 
         template <typename T>
@@ -136,6 +137,39 @@ namespace dlib
                 - if (is_empty() == false) then
                     - Let U denote the type of object currently contained in this type_safe_union
                     - calls obj(this->get<U>())
+                    - The object returned by this->get<U>() will be non-const
+        !*/
+
+        template <typename T>
+        void apply_to_contents (
+            T& obj
+        ) const;
+        /*!
+            requires
+                - obj is a function object capable of operating on all the types contained
+                  in this type_safe_union.  I.e.  obj(this->get<U>()) must be a valid
+                  expression for all the possible U types.
+            ensures
+                - if (is_empty() == false) then
+                    - Let U denote the type of object currently contained in this type_safe_union
+                    - calls obj(this->get<U>())
+                    - The object returned by this->get<U>() will be const
+        !*/
+
+        template <typename T>
+        void apply_to_contents (
+            const T& obj
+        ) const;
+        /*!
+            requires
+                - obj is a function object capable of operating on all the types contained
+                  in this type_safe_union.  I.e.  obj(this->get<U>()) must be a valid
+                  expression for all the possible U types.
+            ensures
+                - if (is_empty() == false) then
+                    - Let U denote the type of object currently contained in this type_safe_union
+                    - calls obj(this->get<U>())
+                    - The object returned by this->get<U>() will be const
         !*/
 
         template <typename T> 

@@ -115,6 +115,32 @@ namespace dlib
             }
         }
 
+        template <typename T> 
+        T& unchecked_get(
+        ) 
+        /*!
+            requires
+                - contains<T>() == true
+            ensures
+                - returns a non-const reference to the T object
+        !*/
+        { 
+            return *reinterpret_cast<T*>(mem.get()); 
+        }
+
+        template <typename T> 
+        const T& unchecked_get(
+        ) const
+        /*!
+            requires
+                - contains<T>() == true
+            ensures
+                - returns a const reference to the T object
+        !*/
+        { 
+            return *reinterpret_cast<const T*>(mem.get()); 
+        }
+
         template <typename T>
         void operator() (T& item) 
         /*
@@ -206,9 +232,7 @@ namespace dlib
             {
                 // save the type_identity
                 serialize(item.type_identity, out);
-                // Now save whatever it is item contains.  Note that the const cast is ok
-                // here since serialize_helper doesn't modify anything in item.  
-                const_cast<type_safe_union&>(item).apply_to_contents(serialize_helper(out));
+                item.apply_to_contents(serialize_helper(out));
             }
             catch (serialization_error& e)
             {
@@ -275,29 +299,29 @@ namespace dlib
                 // do nothing because we are empty
                 case 0: break;
 
-                case 1: obj(get<T1>());  break;
-                case 2: obj(get<T2>());  break;
-                case 3: obj(get<T3>());  break;
-                case 4: obj(get<T4>());  break;
-                case 5: obj(get<T5>());  break;
+                case 1: obj(unchecked_get<T1>());  break;
+                case 2: obj(unchecked_get<T2>());  break;
+                case 3: obj(unchecked_get<T3>());  break;
+                case 4: obj(unchecked_get<T4>());  break;
+                case 5: obj(unchecked_get<T5>());  break;
 
-                case 6: obj(get<T6>());  break;
-                case 7: obj(get<T7>());  break;
-                case 8: obj(get<T8>());  break;
-                case 9: obj(get<T9>());  break;
-                case 10: obj(get<T10>());  break;
+                case 6: obj(unchecked_get<T6>());  break;
+                case 7: obj(unchecked_get<T7>());  break;
+                case 8: obj(unchecked_get<T8>());  break;
+                case 9: obj(unchecked_get<T9>());  break;
+                case 10: obj(unchecked_get<T10>());  break;
 
-                case 11: obj(get<T11>());  break;
-                case 12: obj(get<T12>());  break;
-                case 13: obj(get<T13>());  break;
-                case 14: obj(get<T14>());  break;
-                case 15: obj(get<T15>());  break;
+                case 11: obj(unchecked_get<T11>());  break;
+                case 12: obj(unchecked_get<T12>());  break;
+                case 13: obj(unchecked_get<T13>());  break;
+                case 14: obj(unchecked_get<T14>());  break;
+                case 15: obj(unchecked_get<T15>());  break;
 
-                case 16: obj(get<T16>());  break;
-                case 17: obj(get<T17>());  break;
-                case 18: obj(get<T18>());  break;
-                case 19: obj(get<T19>());  break;
-                case 20: obj(get<T20>());  break;
+                case 16: obj(unchecked_get<T16>());  break;
+                case 17: obj(unchecked_get<T17>());  break;
+                case 18: obj(unchecked_get<T18>());  break;
+                case 19: obj(unchecked_get<T19>());  break;
+                case 20: obj(unchecked_get<T20>());  break;
             }
         }
 
@@ -313,29 +337,105 @@ namespace dlib
                 // do nothing because we are empty
                 case 0: break;
 
-                case 1: obj(get<T1>());  break;
-                case 2: obj(get<T2>());  break;
-                case 3: obj(get<T3>());  break;
-                case 4: obj(get<T4>());  break;
-                case 5: obj(get<T5>());  break;
+                case 1: obj(unchecked_get<T1>());  break;
+                case 2: obj(unchecked_get<T2>());  break;
+                case 3: obj(unchecked_get<T3>());  break;
+                case 4: obj(unchecked_get<T4>());  break;
+                case 5: obj(unchecked_get<T5>());  break;
 
-                case 6: obj(get<T6>());  break;
-                case 7: obj(get<T7>());  break;
-                case 8: obj(get<T8>());  break;
-                case 9: obj(get<T9>());  break;
-                case 10: obj(get<T10>());  break;
+                case 6: obj(unchecked_get<T6>());  break;
+                case 7: obj(unchecked_get<T7>());  break;
+                case 8: obj(unchecked_get<T8>());  break;
+                case 9: obj(unchecked_get<T9>());  break;
+                case 10: obj(unchecked_get<T10>());  break;
 
-                case 11: obj(get<T11>());  break;
-                case 12: obj(get<T12>());  break;
-                case 13: obj(get<T13>());  break;
-                case 14: obj(get<T14>());  break;
-                case 15: obj(get<T15>());  break;
+                case 11: obj(unchecked_get<T11>());  break;
+                case 12: obj(unchecked_get<T12>());  break;
+                case 13: obj(unchecked_get<T13>());  break;
+                case 14: obj(unchecked_get<T14>());  break;
+                case 15: obj(unchecked_get<T15>());  break;
 
-                case 16: obj(get<T16>());  break;
-                case 17: obj(get<T17>());  break;
-                case 18: obj(get<T18>());  break;
-                case 19: obj(get<T19>());  break;
-                case 20: obj(get<T20>());  break;
+                case 16: obj(unchecked_get<T16>());  break;
+                case 17: obj(unchecked_get<T17>());  break;
+                case 18: obj(unchecked_get<T18>());  break;
+                case 19: obj(unchecked_get<T19>());  break;
+                case 20: obj(unchecked_get<T20>());  break;
+            }
+        }
+
+        template <
+            typename T
+            >
+        void apply_to_contents (
+            T& obj
+        ) const
+        {
+            switch (type_identity)
+            {
+                // do nothing because we are empty
+                case 0: break;
+
+                case 1: obj(unchecked_get<T1>());  break;
+                case 2: obj(unchecked_get<T2>());  break;
+                case 3: obj(unchecked_get<T3>());  break;
+                case 4: obj(unchecked_get<T4>());  break;
+                case 5: obj(unchecked_get<T5>());  break;
+
+                case 6: obj(unchecked_get<T6>());  break;
+                case 7: obj(unchecked_get<T7>());  break;
+                case 8: obj(unchecked_get<T8>());  break;
+                case 9: obj(unchecked_get<T9>());  break;
+                case 10: obj(unchecked_get<T10>());  break;
+
+                case 11: obj(unchecked_get<T11>());  break;
+                case 12: obj(unchecked_get<T12>());  break;
+                case 13: obj(unchecked_get<T13>());  break;
+                case 14: obj(unchecked_get<T14>());  break;
+                case 15: obj(unchecked_get<T15>());  break;
+
+                case 16: obj(unchecked_get<T16>());  break;
+                case 17: obj(unchecked_get<T17>());  break;
+                case 18: obj(unchecked_get<T18>());  break;
+                case 19: obj(unchecked_get<T19>());  break;
+                case 20: obj(unchecked_get<T20>());  break;
+            }
+        }
+
+        template <
+            typename T
+            >
+        void apply_to_contents (
+            const T& obj
+        ) const
+        {
+            switch (type_identity)
+            {
+                // do nothing because we are empty
+                case 0: break;
+
+                case 1: obj(unchecked_get<T1>());  break;
+                case 2: obj(unchecked_get<T2>());  break;
+                case 3: obj(unchecked_get<T3>());  break;
+                case 4: obj(unchecked_get<T4>());  break;
+                case 5: obj(unchecked_get<T5>());  break;
+
+                case 6: obj(unchecked_get<T6>());  break;
+                case 7: obj(unchecked_get<T7>());  break;
+                case 8: obj(unchecked_get<T8>());  break;
+                case 9: obj(unchecked_get<T9>());  break;
+                case 10: obj(unchecked_get<T10>());  break;
+
+                case 11: obj(unchecked_get<T11>());  break;
+                case 12: obj(unchecked_get<T12>());  break;
+                case 13: obj(unchecked_get<T13>());  break;
+                case 14: obj(unchecked_get<T14>());  break;
+                case 15: obj(unchecked_get<T15>());  break;
+
+                case 16: obj(unchecked_get<T16>());  break;
+                case 17: obj(unchecked_get<T17>());  break;
+                case 18: obj(unchecked_get<T18>());  break;
+                case 19: obj(unchecked_get<T19>());  break;
+                case 20: obj(unchecked_get<T20>());  break;
             }
         }
 

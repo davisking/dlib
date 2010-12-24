@@ -52,6 +52,12 @@ namespace
             last_kind = STRING;
         }
 
+        void operator()(const std::string& val)
+        {
+            DLIB_TEST(val == s_val);
+            last_kind = STRING;
+        }
+
     // ------------------------------
 
         friend class type_safe_union<float, double, char, std::string>;
@@ -95,7 +101,7 @@ namespace
 
 
             last_kind = NONE;
-            a.apply_to_contents(*this);
+            const_cast<const tsu&>(a).apply_to_contents(*this);
             DLIB_TEST(last_kind == FLOAT);
 
         // -----------
@@ -111,7 +117,7 @@ namespace
             c_val = 'a';
             a.get<char>() = c_val;
             last_kind = NONE;
-            a.apply_to_contents(*this);
+            const_cast<const tsu&>(a).apply_to_contents(*this);
             DLIB_TEST(last_kind == CHAR);
 
         // -----------
