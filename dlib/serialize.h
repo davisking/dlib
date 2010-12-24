@@ -50,6 +50,7 @@
         - std::wstring
         - std::vector
         - std::map
+        - std::pair
         - std::complex
         - dlib::uint64
         - dlib::int64
@@ -63,6 +64,7 @@
         - std::wstring
         - std::vector
         - std::map
+        - std::pair
         - std::complex
         - dlib::uint64
         - dlib::int64
@@ -600,6 +602,38 @@ namespace dlib
         {
             throw serialization_error("Error deserializing object of type bool");    
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename first_type, typename second_type>
+    void serialize (
+        const std::pair<first_type, second_type>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            serialize(item.first,out); 
+            serialize(item.second,out); 
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::pair"); }
+    }
+
+    template <typename first_type, typename second_type>
+    void deserialize (
+        std::pair<first_type, second_type>& item,
+        std::istream& in 
+    )
+    {
+        try
+        { 
+            deserialize(item.first,in); 
+            deserialize(item.second,in); 
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::pair"); }
     }
 
 // ----------------------------------------------------------------------------------------
