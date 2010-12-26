@@ -390,13 +390,12 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS 
                 This object represents a container for another function
-                object and an instance of a normlizer function.  
+                object and an instance of a normalizer function.  
 
-                It automatically noramlizes all inputs before passing them
+                It automatically normalizes all inputs before passing them
                 off to the contained function object.
         !*/
 
-        typedef typename function_type::kernel_type kernel_type;
         typedef typename function_type::scalar_type scalar_type;
         typedef typename function_type::sample_type sample_type;
         typedef typename function_type::mem_manager_type mem_manager_type;

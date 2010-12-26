@@ -369,7 +369,6 @@ namespace dlib
         >
     struct normalized_function 
     {
-        typedef typename function_type::kernel_type kernel_type;
         typedef typename function_type::scalar_type scalar_type;
         typedef typename function_type::sample_type sample_type;
         typedef typename function_type::mem_manager_type mem_manager_type;
