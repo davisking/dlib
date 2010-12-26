@@ -61,6 +61,27 @@ namespace dlib
 
     public:
 
+        typedef T1 type1;
+        typedef T2 type2;
+        typedef T3 type3;
+        typedef T4 type4;
+        typedef T5 type5;
+        typedef T6 type6;
+        typedef T7 type7;
+        typedef T8 type8;
+        typedef T9 type9;
+        typedef T10 type10;
+        typedef T11 type11;
+        typedef T12 type12;
+        typedef T13 type13;
+        typedef T14 type14;
+        typedef T15 type15;
+        typedef T16 type16;
+        typedef T17 type17;
+        typedef T18 type18;
+        typedef T19 type19;
+        typedef T20 type20;
+
         type_safe_union(
         );
         /*!
