@@ -552,6 +552,7 @@
          <item>queue</item> 
          <item>reference_counter</item> 
          <item>type_safe_union</item> 
+         <item>unordered_pair</item> 
          <item>sequence</item> 
          <item>set</item> 
          <item>stack</item> 
@@ -1159,6 +1160,20 @@
          <examples>
             <example>pipe_ex_2.cpp.html</example>
          </examples>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>unordered_pair</name>
+         <file>dlib/unordered_pair.h</file>
+         <spec_file link="true">dlib/unordered_pair.h</spec_file>
+         <description>
+                This object is very similar to the std::pair struct except unordered_pair 
+                is only capable of representing an unordered set of two items rather than 
+                an ordered list of two items like std::pair.  
+         </description>
          
       </component>
       

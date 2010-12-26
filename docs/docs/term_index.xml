@@ -233,6 +233,7 @@
          <term link="dlib/svm/kernel_abstract.h.html#Kernel_Function_Objects" name="Kernel Function Objects"/>
          <term file="dlib/svm/kernel_abstract.h.html" name="kernel_derivative"/>
 
+         <term file="containers.html" name="unordered_pair"/>
          <term file="containers.html" name="std_vector_c"/>
          <term file="containers.html" name="graph"/>
          <term file="containers.html" name="directed_graph"/>
