@@ -47,7 +47,7 @@ namespace dlib
         const T first;
         const T second;
 
-        unordered_pair() : first(T()), second(T()) 
+        unordered_pair() : first(), second() 
         /*!
             ensures
                 - #first and #second are default initialized
@@ -75,6 +75,19 @@ namespace dlib
             ensures
                 - #*this is a copy of p
         !*/ {}
+
+        unordered_pair& operator= (
+            const unordered_pair& item
+        ) 
+        /*!
+            ensures
+                - #*this == item
+        !*/
+        {
+            const_cast<T&>(first) = item.first;
+            const_cast<T&>(second) = item.second;
+            return *this;
+        }
     };
 
 // ----------------------------------------------------------------------------------------
