@@ -360,7 +360,7 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
-    
+
     template <>
     struct pixel_traits<bgr_pixel>
     {
@@ -377,7 +377,7 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
-    
+
     template <>
     struct pixel_traits<rgb_alpha_pixel>
     {
@@ -477,7 +477,7 @@ namespace dlib
         typename enable_if_c<pixel_traits<P>::grayscale>::type
         assign(P& dest, const P& src) 
         { 
-           dest = src;
+            dest = src;
         }
 
     // -----------------------------
@@ -562,13 +562,13 @@ namespace dlib
                 warnings about comparing signed types to unsigned and stuff like that.  
             */
 
-           if (less_or_equal_to_max<P1>(src))
-               if (greater_or_equal_to_min<P1>(src))
-                   dest = static_cast<P1>(src);
-               else
-                   dest = pixel_traits<P1>::min();
-           else
-              dest = pixel_traits<P1>::max();
+            if (less_or_equal_to_max<P1>(src))
+                if (greater_or_equal_to_min<P1>(src))
+                    dest = static_cast<P1>(src);
+                else
+                    dest = pixel_traits<P1>::min();
+            else
+                dest = pixel_traits<P1>::max();
         }
 
     // -----------------------------
@@ -579,28 +579,28 @@ namespace dlib
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::rgb>::type
         assign(P1& dest, const P2& src) 
         { 
-           dest.red = src.red; 
-           dest.green = src.green; 
-           dest.blue = src.blue; 
+            dest.red = src.red; 
+            dest.green = src.green; 
+            dest.blue = src.blue; 
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::rgb_alpha>::type
         assign(P1& dest, const P2& src) 
         { 
-           dest.red = src.red; 
-           dest.green = src.green; 
-           dest.blue = src.blue; 
-           dest.alpha = src.alpha; 
+            dest.red = src.red; 
+            dest.green = src.green; 
+            dest.blue = src.blue; 
+            dest.alpha = src.alpha; 
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::hsi>::type
         assign(P1& dest, const P2& src) 
         { 
-           dest.h = src.h; 
-           dest.s = src.s; 
-           dest.i = src.i; 
+            dest.h = src.h; 
+            dest.s = src.s; 
+            dest.i = src.i; 
         }
 
     // -----------------------------
@@ -621,37 +621,37 @@ namespace dlib
         assign(P1& dest, const P2& src) 
         { 
 
-           const unsigned char avg = static_cast<unsigned char>((static_cast<unsigned int>(src.red) +
-                                                                 static_cast<unsigned int>(src.green) +  
-                                                                 static_cast<unsigned int>(src.blue))/3); 
+            const unsigned char avg = static_cast<unsigned char>((static_cast<unsigned int>(src.red) +
+                                                                  static_cast<unsigned int>(src.green) +  
+                                                                  static_cast<unsigned int>(src.blue))/3); 
 
-           if (src.alpha == 255)
-           {
-               assign_pixel(dest, avg);
-           }
-           else
-           {
-              // perform this assignment using fixed point arithmetic: 
-              // dest = src*(alpha/255) + dest*(1 - alpha/255);
-              // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
-              // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
-              // dest = dest*1 + (src - dest)*(alpha/255);
-              // dest += (src - dest)*(alpha/255);
+            if (src.alpha == 255)
+            {
+                assign_pixel(dest, avg);
+            }
+            else
+            {
+                // perform this assignment using fixed point arithmetic: 
+                // dest = src*(alpha/255) + dest*(1 - alpha/255);
+                // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
+                // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
+                // dest = dest*1 + (src - dest)*(alpha/255);
+                // dest += (src - dest)*(alpha/255);
 
-              int temp = avg;
-              // copy dest into dest_copy using assign_pixel to avoid potential
-              // warnings about implicit float to int warnings.
-              int dest_copy;
-              assign_pixel(dest_copy, dest);
+                int temp = avg;
+                // copy dest into dest_copy using assign_pixel to avoid potential
+                // warnings about implicit float to int warnings.
+                int dest_copy;
+                assign_pixel(dest_copy, dest);
 
-              temp -= dest_copy;
+                temp -= dest_copy;
 
-              temp *= src.alpha;
+                temp *= src.alpha;
 
-              temp /= 255;
+                temp /= 255;
 
-              assign_pixel(dest, temp+dest_copy);
-           }
+                assign_pixel(dest, temp+dest_copy);
+            }
         }
 
         template < typename P1, typename P2 >
@@ -767,91 +767,91 @@ namespace dlib
         typename enable_if_c<pixel_traits<P1>::rgb>::type
         assign(P1& dest, const unsigned char& src) 
         { 
-           dest.red = src; 
-           dest.green = src; 
-           dest.blue = src; 
+            dest.red = src; 
+            dest.green = src; 
+            dest.blue = src; 
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::grayscale>::type
         assign(P1& dest, const P2& src) 
         { 
-           unsigned char p;
-           assign_pixel(p, src);
-           dest.red = p; 
-           dest.green = p; 
-           dest.blue = p; 
+            unsigned char p;
+            assign_pixel(p, src);
+            dest.red = p; 
+            dest.green = p; 
+            dest.blue = p; 
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::rgb_alpha>::type
         assign(P1& dest, const P2& src) 
         { 
-           if (src.alpha == 255)
-           {
-              dest.red = src.red;
-              dest.green = src.green;
-              dest.blue = src.blue;
-           }
-           else
-           {
-              // perform this assignment using fixed point arithmetic: 
-              // dest = src*(alpha/255) + src*(1 - alpha/255);
-              // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
-              // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
-              // dest = dest*1 + (src - dest)*(alpha/255);
-              // dest += (src - dest)*(alpha/255);
+            if (src.alpha == 255)
+            {
+                dest.red = src.red;
+                dest.green = src.green;
+                dest.blue = src.blue;
+            }
+            else
+            {
+                // perform this assignment using fixed point arithmetic: 
+                // dest = src*(alpha/255) + src*(1 - alpha/255);
+                // dest = src*(alpha/255) + dest*1 - dest*(alpha/255);
+                // dest = dest*1 + src*(alpha/255) - dest*(alpha/255);
+                // dest = dest*1 + (src - dest)*(alpha/255);
+                // dest += (src - dest)*(alpha/255);
 
-              unsigned int temp_r = src.red;
-              unsigned int temp_g = src.green;
-              unsigned int temp_b = src.blue;
+                unsigned int temp_r = src.red;
+                unsigned int temp_g = src.green;
+                unsigned int temp_b = src.blue;
 
-              temp_r -= dest.red;
-              temp_g -= dest.green;
-              temp_b -= dest.blue;
+                temp_r -= dest.red;
+                temp_g -= dest.green;
+                temp_b -= dest.blue;
 
-              temp_r *= src.alpha;
-              temp_g *= src.alpha;
-              temp_b *= src.alpha;
+                temp_r *= src.alpha;
+                temp_g *= src.alpha;
+                temp_b *= src.alpha;
 
-              temp_r >>= 8;
-              temp_g >>= 8;
-              temp_b >>= 8;
+                temp_r >>= 8;
+                temp_g >>= 8;
+                temp_b >>= 8;
 
-              dest.red += static_cast<unsigned char>(temp_r&0xFF);
-              dest.green += static_cast<unsigned char>(temp_g&0xFF);
-              dest.blue += static_cast<unsigned char>(temp_b&0xFF);
-           }
+                dest.red += static_cast<unsigned char>(temp_r&0xFF);
+                dest.green += static_cast<unsigned char>(temp_g&0xFF);
+                dest.blue += static_cast<unsigned char>(temp_b&0xFF);
+            }
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::hsi>::type
         assign(P1& dest, const P2& src) 
         { 
-           COLOUR c;
-           HSL h;
-           h.h = src.h;
-           h.h = h.h/255.0*360;
-           h.s = src.s/255.0;
-           h.l = src.i/255.0;
-           c = HSL2RGB(h);
+            COLOUR c;
+            HSL h;
+            h.h = src.h;
+            h.h = h.h/255.0*360;
+            h.s = src.s/255.0;
+            h.l = src.i/255.0;
+            c = HSL2RGB(h);
 
-           dest.red = static_cast<unsigned char>(c.r*255.0);
-           dest.green = static_cast<unsigned char>(c.g*255.0);
-           dest.blue = static_cast<unsigned char>(c.b*255.0);
+            dest.red = static_cast<unsigned char>(c.r*255.0);
+            dest.green = static_cast<unsigned char>(c.g*255.0);
+            dest.blue = static_cast<unsigned char>(c.b*255.0);
         }
 
     // -----------------------------
-        // dest is a color rgb_alpha_pixel
+    // dest is a color rgb_alpha_pixel
 
         template < typename P1 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha>::type
         assign(P1& dest, const unsigned char& src) 
         { 
-           dest.red = src; 
-           dest.green = src; 
-           dest.blue = src; 
-           dest.alpha = 255;
+            dest.red = src; 
+            dest.green = src; 
+            dest.blue = src; 
+            dest.alpha = 255;
         }
 
 
@@ -859,41 +859,41 @@ namespace dlib
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::grayscale>::type
         assign(P1& dest, const P2& src) 
         { 
-           unsigned char p;
-           assign_pixel(p, src);
+            unsigned char p;
+            assign_pixel(p, src);
 
-           dest.red = p; 
-           dest.green = p; 
-           dest.blue = p; 
-           dest.alpha = 255;
+            dest.red = p; 
+            dest.green = p; 
+            dest.blue = p; 
+            dest.alpha = 255;
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::rgb>::type
         assign(P1& dest, const P2& src) 
         { 
-           dest.red = src.red;
-           dest.green = src.green;
-           dest.blue = src.blue;
-           dest.alpha = 255;
+            dest.red = src.red;
+            dest.green = src.green;
+            dest.blue = src.blue;
+            dest.alpha = 255;
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::hsi>::type
         assign(P1& dest, const P2& src) 
         { 
-           COLOUR c;
-           HSL h;
-           h.h = src.h;
-           h.h = h.h/255.0*360;
-           h.s = src.s/255.0;
-           h.l = src.i/255.0;
-           c = HSL2RGB(h);
+            COLOUR c;
+            HSL h;
+            h.h = src.h;
+            h.h = h.h/255.0*360;
+            h.s = src.s/255.0;
+            h.l = src.i/255.0;
+            c = HSL2RGB(h);
 
-           dest.red = static_cast<unsigned char>(c.r*255.0);
-           dest.green = static_cast<unsigned char>(c.g*255.0);
-           dest.blue = static_cast<unsigned char>(c.b*255.0);
-           dest.alpha = 255;
+            dest.red = static_cast<unsigned char>(c.r*255.0);
+            dest.green = static_cast<unsigned char>(c.g*255.0);
+            dest.blue = static_cast<unsigned char>(c.b*255.0);
+            dest.alpha = 255;
         }
 
     // -----------------------------
@@ -903,9 +903,9 @@ namespace dlib
         typename enable_if_c<pixel_traits<P1>::hsi>::type
         assign(P1& dest, const unsigned char& src) 
         { 
-           dest.h = 0;
-           dest.s = 0;
-           dest.i = src;
+            dest.h = 0;
+            dest.s = 0;
+            dest.i = src;
         }
 
 
@@ -913,41 +913,41 @@ namespace dlib
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::grayscale>::type
         assign(P1& dest, const P2& src) 
         { 
-           dest.h = 0;
-           dest.s = 0;
-           assign_pixel(dest.i, src);
+            dest.h = 0;
+            dest.s = 0;
+            assign_pixel(dest.i, src);
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::rgb>::type
         assign(P1& dest, const P2& src) 
         { 
-           COLOUR c1;
-           HSL c2;
-           c1.r = src.red/255.0;
-           c1.g = src.green/255.0;
-           c1.b = src.blue/255.0;
-           c2 = RGB2HSL(c1);
+            COLOUR c1;
+            HSL c2;
+            c1.r = src.red/255.0;
+            c1.g = src.green/255.0;
+            c1.b = src.blue/255.0;
+            c2 = RGB2HSL(c1);
 
-           dest.h = static_cast<unsigned char>(c2.h/360.0*255.0);
-           dest.s = static_cast<unsigned char>(c2.s*255.0);
-           dest.i = static_cast<unsigned char>(c2.l*255.0);
+            dest.h = static_cast<unsigned char>(c2.h/360.0*255.0);
+            dest.s = static_cast<unsigned char>(c2.s*255.0);
+            dest.i = static_cast<unsigned char>(c2.l*255.0);
         }
 
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::rgb_alpha>::type
         assign(P1& dest, const P2& src) 
         { 
-           rgb_pixel temp;
-           // convert target hsi pixel to rgb
-           assign(temp,dest);
+            rgb_pixel temp;
+            // convert target hsi pixel to rgb
+            assign(temp,dest);
 
-           // now assign the rgb_alpha value to our temp rgb pixel
-           assign(temp,src);
+            // now assign the rgb_alpha value to our temp rgb pixel
+            assign(temp,src);
 
-           // now we can just go assign the new rgb value to the
-           // hsi pixel
-           assign(dest,temp);
+            // now we can just go assign the new rgb value to the
+            // hsi pixel
+            assign(dest,temp);
         }
 
     }
