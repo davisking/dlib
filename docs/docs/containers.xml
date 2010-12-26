@@ -1234,7 +1234,7 @@
       const std::vector&lt;scalar_type&gt;&amp; labels
    ) const
 </pre>
-                    Where decision_function is a type capable of being stored in an
+                  Where <tt>decision_function</tt> is a type capable of being stored in an
                     <a href="#any_decision_function">any_decision_function</a> object.
 
                <p>
