@@ -49,6 +49,7 @@
          <item>is_directed_graph</item>
          <item>is_built_in_scalar_type</item>
          <item>promote</item>
+         <item>basic_type</item>
          <item>unsigned_type</item> 
          <item>tabs</item> 
          <item>tmin</item> 
@@ -315,6 +316,23 @@
 
          <p>
         For example, promote&lt;uint16&gt;::type == int32
+         </p>
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>basic_type</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+        This is a template that takes a type and trips off any const, volatile, or reference
+        qualifiers and gives you back the basic underlying type.  So for example:
+
+         <p>
+        For example, promote&lt;const int&amp;&gt;::type == int 
          </p>
          </description>
          
