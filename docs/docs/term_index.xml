@@ -384,6 +384,9 @@
          <term file="containers.html" name="shared_ptr"/>
          <term file="containers.html" name="stack"/>
          <term file="containers.html" name="weak_ptr"/>
+         <term file="containers.html" name="any"/>
+         <term file="containers.html" name="any_trainer"/>
+         <term file="containers.html" name="any_decision_function"/>
 
          <term file="metaprogramming.html" name="enable_if"/>
          <term file="metaprogramming.html" name="disable_if"/>
@@ -855,7 +858,6 @@
          <term file="containers.html" name="sliding_buffer"/>
          <term file="containers.html" name="static_map"/>
          <term file="containers.html" name="static_set"/>
-         <term file="containers.html" name="any"/>
 
 
 

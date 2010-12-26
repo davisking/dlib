@@ -57,6 +57,8 @@
          <name>Objects</name>
          <item>static_set</item> 
          <item>any</item> 
+         <item>any_trainer</item> 
+         <item>any_decision_function</item> 
          <item>array</item> 
          <item>array2d</item> 
          <item>binary_search_tree</item> 
@@ -1192,6 +1194,54 @@
                 It is somewhat like the <a href="#type_safe_union">type_safe_union</a> except you don't have to declare 
                 the set of possible content types beforehand.  So in some sense this is 
                 like a less type-strict version of the type_safe_union.
+               </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>any_decision_function</name>
+         <file>dlib/any.h</file>
+         <spec_file link="true">dlib/any/any_decision_function_abstract.h</spec_file>
+         <description>
+               This object is a version of dlib::<a href="#any">any</a> that is restricted to containing 
+                elements which are some kind of function object with an operator() with 
+                the following signature: 
+                <tt>scalar_type operator()(const sample_type&amp;) const</tt>
+
+               <p>
+                  It is intended to be used to contain dlib::<a href="ml.html#decision_function">decision_function</a> 
+                  objects and other types which represent learned decision functions.  It allows you
+                to write code which contains and processes these decision functions
+                without needing to know the specific types of decision functions used.
+               </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>any_trainer</name>
+         <file>dlib/any.h</file>
+         <spec_file link="true">dlib/any/any_trainer_abstract.h</spec_file>
+         <description>
+                This object is a version of dlib::<a href="#any">any</a> that is restricted to containing 
+                elements which are some kind of object with a .train() method compatible 
+                with the following signature: 
+<pre> decision_function train(
+      const std::vector&lt;sample_type&gt;&amp; samples,
+      const std::vector&lt;scalar_type&gt;&amp; labels
+   ) const
+</pre>
+                    Where decision_function is a type capable of being stored in an
+                    <a href="#any_decision_function">any_decision_function</a> object.
+
+               <p>
+                  any_trainer is intended to be used to contain objects such as the <a href="ml.html#svm_nu_trainer">svm_nu_trainer</a>
+                and other similar types which represent supervised machine learning algorithms.   
+                It allows you to write code which contains and processes these trainer objects 
+                without needing to know the specific types of trainer objects used.
                </p>
          </description>
       </component>
