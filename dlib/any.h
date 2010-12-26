@@ -4,6 +4,8 @@
 #define DLIB_AnY_
 
 #include "any/any.h"
+#include "any/any_trainer.h"
+#include "any/any_decision_function.h"
 
 #endif // DLIB_AnY_
 
