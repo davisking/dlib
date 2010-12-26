@@ -632,6 +632,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A basic_type
+
+        This is a template that takes a type and trips off any const, volatile, or reference
+        qualifiers and gives you back the basic underlying type.  So for example:
+
+        basic_type<const int&>::type == int
+    !*/
+
+    template <typename T> struct basic_type { typedef T type; };
+    template <typename T> struct basic_type<const T> { typedef T type; };
+    template <typename T> struct basic_type<const T&> { typedef T type; };
+    template <typename T> struct basic_type<volatile const T&> { typedef T type; };
+    template <typename T> struct basic_type<T&> { typedef T type; };
+    template <typename T> struct basic_type<volatile T&> { typedef T type; };
+    template <typename T> struct basic_type<volatile T> { typedef T type; };
+    template <typename T> struct basic_type<volatile const T> { typedef T type; };
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     T put_in_range (
         const T& a, 
