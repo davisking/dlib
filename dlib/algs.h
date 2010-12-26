@@ -634,7 +634,7 @@ namespace dlib
 
     /*!A basic_type
 
-        This is a template that takes a type and trips off any const, volatile, or reference
+        This is a template that takes a type and strips off any const, volatile, or reference
         qualifiers and gives you back the basic underlying type.  So for example:
 
         basic_type<const int&>::type == int
