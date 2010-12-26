@@ -328,8 +328,8 @@
          <file>dlib/algs.h</file>
          <spec_file link="true">dlib/algs.h</spec_file>
          <description>
-        This is a template that takes a type and trips off any const, volatile, or reference
-        qualifiers and gives you back the basic underlying type.  So for example:
+        This is a template that takes a type and strips off any const, volatile, or reference
+        qualifiers and gives you back the basic underlying type.  
 
          <p>
         For example, promote&lt;const int&amp;&gt;::type == int 
