@@ -228,7 +228,6 @@ namespace dlib
         const long num_neg_train_samples = num_neg - num_neg_test_samples; 
 
 
-        typename trainer_type::trained_function_type d;
         sample_vector_type x_test, x_train;
         scalar_vector_type y_test, y_train;
         x_test.set_size (num_pos_test_samples  + num_neg_test_samples);
