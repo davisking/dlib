@@ -86,19 +86,13 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
 
       <section>
          <name>Trainer Adapters</name>
-         <item>train_probabilistic_decision_function</item> 
-         <item>reduced_decision_function_trainer</item> 
          <item>reduced</item> 
-         <item>reduced_decision_function_trainer2</item> 
          <item>reduced2</item> 
          <item>batch</item> 
          <item>verbose_batch</item> 
          <item>batch_cached</item> 
          <item>verbose_batch_cached</item> 
-         <item>batch_trainer</item> 
-         <item>null_trainer_type</item> 
          <item>null_trainer</item> 
-         <item>roc_trainer_type</item> 
          <item>roc_c1_trainer</item> 
          <item>roc_c2_trainer</item> 
       </section>
@@ -137,6 +131,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       <section>
          <name>Miscellaneous</name>
          <item>simplify_linear_decision_function</item> 
+         <item>train_probabilistic_decision_function</item> 
          <item>vector_normalizer</item> 
          <item>vector_normalizer_pca</item> 
          <item>discriminant_pca</item> 
@@ -837,6 +832,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/rbf_network_abstract.h</spec_file>
          <description>
                Trains a radial basis function network and outputs a <a href="#decision_function">decision_function</a>. 
+               This object can be used for either regression or binary classification problems.
                It's worth pointing out that this object is essentially an unregularized version 
                of <a href="#krr_trainer">kernel ridge regression</a>.  This means 
                you should really prefer to use kernel ridge regression instead.
@@ -950,7 +946,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/svm_nu_trainer_abstract.h</spec_file>
          <description>
             <p>
-               Trains a nu support vector classifier and outputs a <a href="#decision_function">decision_function</a>. 
+               Trains a nu support vector machine for solving binary classification problems and 
+               outputs a <a href="#decision_function">decision_function</a>. 
                It is implemented using the <a href="optimization.html#solve_qp2_using_smo">SMO</a> algorithm.
             </p>
                The implementation of the nu-svm training algorithm used by this library is based
@@ -999,7 +996,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/svm_c_trainer_abstract.h</spec_file>
          <description>
             <p>
-               Trains a C support vector classifier and outputs a <a href="#decision_function">decision_function</a>. 
+               Trains a C support vector machine for solving binary classification problems 
+               and outputs a <a href="#decision_function">decision_function</a>. 
                It is implemented using the <a href="optimization.html#solve_qp3_using_smo">SMO</a> algorithm.
             </p>
                The implementation of the C-SVM training algorithm used by this library is based
@@ -1021,10 +1019,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/svm_c_linear_trainer_abstract.h</spec_file>
          <description>
                 This object represents a tool for training the C formulation of 
-                a support vector machine and is optimized for the case where
-                linear kernels are used.   
-
-                It is implemented using the <a href="optimization.html#oca">oca</a>  
+                a support vector machine to solve binary classification problems. 
+                It is optimized for the case where linear kernels are used and  
+                is implemented using the <a href="optimization.html#oca">oca</a>  
                 optimizer and uses the exact line search described in the 
                 following paper:
                 <blockquote>
@@ -1047,7 +1044,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/svm_c_ekm_trainer_abstract.h</spec_file>
          <description>
                 This object represents a tool for training the C formulation of 
-                a support vector machine.   It is implemented using the <a href="#empirical_kernel_map">empirical_kernel_map</a>
+                a support vector machine for solving binary classification problems.   
+                It is implemented using the <a href="#empirical_kernel_map">empirical_kernel_map</a>
                 to kernelize the <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a>.  This makes it a very fast algorithm
                 capable of learning from very large datasets.
 
@@ -1691,7 +1689,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/svm_threaded_abstract.h</spec_file>
          <description>
-               Performs k-fold cross validation on a user supplied trainer object such
+               Performs k-fold cross validation on a user supplied binary classification trainer object such
                as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.  
                This function does the same thing as <a href="#cross_validate_trainer">cross_validate_trainer</a>
                except this function also allows you to specify how many threads of execution to use.
@@ -1707,7 +1705,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
          <description>
-               Performs k-fold cross validation on a user supplied trainer object such
+               Performs k-fold cross validation on a user supplied binary classification trainer object such
                as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or <a href="#rbf_network_trainer">rbf_network_trainer</a>.
          </description>
          <examples>
