@@ -126,6 +126,12 @@
          <term file="algorithms.html" name="random_subset_selector"/>
          <term file="algorithms.html" name="randomly_subsample"/>
 
+         <term file="ml.html" name="select_all_distinct_labels"/>
+         <term file="dlib/svm/multiclass_tools_abstract.h.html#find_missing_pairs" name="find_missing_pairs"/>
+
+         <term file="ml.html" name="one_vs_one_trainer"/>
+         <term file="ml.html" name="one_vs_one_decision_function"/>
+
          <term file="dlib/svm/pegasos_abstract.h.html" name="replicate_settings"/>
          <term file="ml.html" name="mlp"/>
          <term file="ml.html" name="load_libsvm_formatted_data"/>
@@ -182,7 +188,9 @@
          <term file="ml.html" name="train_probabilistic_decision_function"/>
          <term file="ml.html" name="cross_validate_trainer"/>
          <term file="ml.html" name="cross_validate_trainer_threaded"/>
+         <term file="ml.html" name="cross_validate_multiclass_trainer"/>
          <term file="ml.html" name="test_binary_decision_function"/>
+         <term file="ml.html" name="test_multiclass_decision_function"/>
          <term link="ml.html#svm_nu_trainer" name="support vector machine"/>
          <term link="ml.html#rvm_trainer" name="relevance vector machine"/>
          <term link="ml.html#krr_trainer" name="kernel ridge regression"/>

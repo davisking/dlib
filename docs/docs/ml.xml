@@ -82,6 +82,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>rbf_network_trainer</item> 
          <item>rank_features</item> 
          <item>svm_pegasos</item> 
+         <item>one_vs_one_trainer</item> 
       </section>
 
       <section>
@@ -119,6 +120,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>distance_function</item>
          <item>probabilistic_decision_function</item>
          <item>normalized_function</item>
+         <item>one_vs_one_decision_function</item>
       </section>
 
       <section>
@@ -126,6 +128,15 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>load_libsvm_formatted_data</item> 
          <item>save_libsvm_formatted_data</item> 
          <item>sparse_to_dense</item>
+      </section>
+
+      <section>
+         <name>Validation</name>
+         <item>cross_validate_trainer</item> 
+         <item>cross_validate_trainer_threaded</item> 
+         <item>cross_validate_multiclass_trainer</item> 
+         <item>test_binary_decision_function</item> 
+         <item>test_multiclass_decision_function</item> 
       </section>
 
       <section>
@@ -140,9 +151,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
          <item>is_learning_problem</item> 
-         <item>test_binary_decision_function</item> 
-         <item>cross_validate_trainer</item> 
-         <item>cross_validate_trainer_threaded</item> 
+         <item>select_all_distinct_labels</item> 
          <item>pick_initial_centers</item> 
          <item>find_gamma_with_big_centroid_gap</item> 
          <item>compute_mean_squared_distance</item> 
@@ -1124,6 +1133,38 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>one_vs_one_decision_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/one_vs_one_decision_function_abstract.h</spec_file>
+         <description>
+                This object represents a multiclass classifier built out
+                of a set of binary classifiers.  Each binary classifier
+                is used to vote for the correct multiclass label using a 
+                one vs. one strategy.  Therefore, if you have N classes then
+                there will be N*(N-1)/2 binary classifiers inside this object.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>one_vs_one_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/one_vs_one_trainer_abstract.h</spec_file>
+         <description>
+                This object is a tool for turning a bunch of binary classifiers
+                into a multiclass classifier.  It does this by training the binary
+                classifiers in a one vs. one fashion.  That is, if you have N possible
+                classes then it trains N*(N-1)/2 binary classifiers which are then used
+                to vote on the identity of a test sample.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>projection_function</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
@@ -1294,6 +1335,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
              the second containing labels, and reports back if the two could possibly 
              contain data for a well formed learning problem.  In this case it just means
              that the two vectors have the same length and aren't empty.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>select_all_distinct_labels</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/multiclass_tools_abstract.h</spec_file>
+         <description>
+              This is a function which determines all distinct values present in a 
+              std::vector and returns the result.  
          </description>
                                  
       </component>
@@ -1683,6 +1737,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>test_multiclass_decision_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_multiclass_trainer_abstract.h</spec_file>
+         <description>
+            Tests a multiclass decision function (e.g. <a href="#one_vs_one_decision_function">one_vs_one_decision_function</a>)
+            and returns a confusion matrix describing the results.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
       
       <component>
          <name>cross_validate_trainer_threaded</name>
@@ -1712,6 +1779,20 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>svm_ex.cpp.html</example>
             <example>model_selection_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>cross_validate_multiclass_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_multiclass_trainer_abstract.h</spec_file>
+         <description>
+            Performs k-fold cross validation on a user supplied multiclass classification trainer object such
+            as the <a href="#one_vs_one_trainer">one_vs_one_trainer</a>.  The result is described by a 
+            confusion matrix.
+         </description>
                                  
       </component>
       
