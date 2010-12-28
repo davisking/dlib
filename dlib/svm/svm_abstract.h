@@ -116,7 +116,7 @@ namespace dlib
         requires
             - is_binary_classification_problem(x,y) == true
             - 1 < folds <= x.nr()
-            - trainer_type == some kind of trainer object (e.g. svm_nu_trainer)
+            - trainer_type == some kind of binary classification trainer object (e.g. svm_nu_trainer)
         ensures
             - performs k-fold cross validation by using the given trainer to solve the
               given binary classification problem for the given number of folds.
