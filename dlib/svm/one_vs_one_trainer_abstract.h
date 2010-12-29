@@ -84,14 +84,6 @@ namespace dlib
                   distinguish l1 labeled samples from l2 labeled samples.
         !*/
 
-        struct invalid_label : public dlib::error 
-        { 
-            /*!
-                This is the exception thrown by the train() function below.
-            !*/
-            label_type l1, l2;
-        };
-
         void be_verbose (
         );
         /*!
@@ -106,6 +98,14 @@ namespace dlib
             ensures
                 - this object will not print anything to standard out
         !*/
+
+        struct invalid_label : public dlib::error 
+        { 
+            /*!
+                This is the exception thrown by the train() function below.
+            !*/
+            label_type l1, l2;
+        };
 
         trained_function_type train (
             const std::vector<sample_type>& all_samples,
