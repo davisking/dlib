@@ -62,6 +62,7 @@ set (tests
    member_function_pointer.cpp
    metaprogramming.cpp
    multithreaded_object.cpp
+   one_vs_one_trainer.cpp
    optimization.cpp
    optimization_test_functions.cpp
    opt_qp_solver.cpp
