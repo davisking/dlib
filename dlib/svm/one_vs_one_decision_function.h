@@ -143,7 +143,7 @@ namespace dlib
             }
 
             // now figure out who had the most votes
-            label_type best_label;
+            label_type best_label = label_type();
             int best_votes = 0;
             for (typename std::map<label_type,int>::iterator i = votes.begin(); i != votes.end(); ++i)
             {
