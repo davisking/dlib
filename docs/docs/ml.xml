@@ -1143,6 +1143,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 one vs. one strategy.  Therefore, if you have N classes then
                 there will be N*(N-1)/2 binary classifiers inside this object.
          </description>
+         <examples>
+            <example>multiclass_classification_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -1159,6 +1162,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 classes then it trains N*(N-1)/2 binary classifiers which are then used
                 to vote on the identity of a test sample.
          </description>
+         <examples>
+            <example>multiclass_classification_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -1745,6 +1751,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             Tests a multiclass decision function (e.g. <a href="#one_vs_one_decision_function">one_vs_one_decision_function</a>)
             and returns a confusion matrix describing the results.
          </description>
+         <examples>
+            <example>multiclass_classification_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -1793,6 +1802,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             as the <a href="#one_vs_one_trainer">one_vs_one_trainer</a>.  The result is described by a 
             confusion matrix.
          </description>
+         <examples>
+            <example>multiclass_classification_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       

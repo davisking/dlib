@@ -192,6 +192,10 @@
                   <link>svm_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Multiclass_Classification</name>
+                  <link>multiclass_classification_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Model_Selection</name>
                   <link>model_selection_ex.cpp.html</link>
                </item>
