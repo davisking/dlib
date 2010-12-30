@@ -71,6 +71,11 @@ namespace dlib
                 - C.nr() == C.nc() == L.size()
                 - C(r,c) == the number of times a sample with label L(r) was predicted
                   to have a label of L(c)
+
+              Note that sum(C) might be slightly less than x.size().  This happens if the number of 
+              samples in a class is not an even multiple of folds.  This is because each fold has the 
+              same number of test samples in it and so if the number of samples in a class isn't a 
+              multiple of folds then a few are not tested.  
     !*/
 
 }
