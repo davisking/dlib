@@ -87,6 +87,9 @@ namespace dlib
             invalid_label(const std::string& msg, const label_type& l1_, const label_type& l2_
                 ) : dlib::error(msg), l1(l1_), l2(l2_) {};
 
+            virtual ~invalid_label(
+            ) throw() {}
+
             label_type l1, l2;
         };
 
