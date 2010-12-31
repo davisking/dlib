@@ -32,6 +32,7 @@
          <item>memory_manager</item> 
          <item>memory_manager_global</item> 
          <item>memory_manager_stateless</item> 
+         <item>default_memory_manager</item> 
          <item>sync_extension</item> 
          <item>timer</item> 
          <item>timeout</item> 
@@ -487,6 +488,19 @@
             </implementation>                                  
          </implementations>
                         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>default_memory_manager</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a memory manager object which simply calls new and delete directly (i.e.
+            it doesn't really do anything).  It is the default memory manager used by most 
+            of the objects in dlib.
+         </description>
       </component>
             
    <!-- ************************************************************************* -->

@@ -455,6 +455,7 @@
          <term file="other.html" name="error"/>
          <term file="other.html" name="console_progress_indicator"/>
          <term file="other.html" name="memory_manager"/>
+         <term file="other.html" name="default_memory_manager"/>
          <term file="other.html" name="memory_manager_global"/>
          <term file="other.html" name="serialize"/>
          <term file="other.html" name="uint8"/>
