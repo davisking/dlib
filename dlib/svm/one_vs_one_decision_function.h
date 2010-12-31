@@ -13,20 +13,10 @@
 #include <map>
 #include "../any.h"
 #include "../unordered_pair.h"
+#include "null_df.h"
 
 namespace dlib
 {
-
-// ----------------------------------------------------------------------------------------
-
-    struct null_df
-    {
-        template <typename T>
-        double operator() ( const T&) const { return 0; }
-    };
-
-    inline void serialize(const null_df&, std::ostream&) {}
-    inline void deserialize(null_df&, std::istream&) {}
 
 // ----------------------------------------------------------------------------------------
 

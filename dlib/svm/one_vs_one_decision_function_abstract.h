@@ -9,23 +9,10 @@
 #include "../any/any_decision_function_abstract.h"
 #include "../unordered_pair.h"
 #include "one_vs_one_trainer_abstract.h"
+#include "null_df.h"
 
 namespace dlib
 {
-
-// ----------------------------------------------------------------------------------------
-
-    struct null_df
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This is a type used to represent an unused field in the 
-                list of template arguments of the one_vs_one_decision_function
-                defined below.  As such, this object doesn't actually do anything.
-        !*/
-        template <typename T>
-        double operator() ( const T&) const { return 0; }
-    };
 
 // ----------------------------------------------------------------------------------------
 
