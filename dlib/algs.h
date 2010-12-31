@@ -112,6 +112,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A default_memory_manager
+
+        This memory manager just calls new and delete directly.  
+
+    !*/
     typedef memory_manager_stateless_kernel_1<char> default_memory_manager;
 
 // ----------------------------------------------------------------------------------------
