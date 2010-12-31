@@ -1145,6 +1145,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          </description>
          <examples>
             <example>multiclass_classification_ex.cpp.html</example>
+            <example>custom_trainer_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -1164,6 +1165,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          </description>
          <examples>
             <example>multiclass_classification_ex.cpp.html</example>
+            <example>custom_trainer_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -1753,6 +1755,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          </description>
          <examples>
             <example>multiclass_classification_ex.cpp.html</example>
+            <example>custom_trainer_ex.cpp.html</example>
          </examples>
                                  
       </component>
@@ -1804,6 +1807,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          </description>
          <examples>
             <example>multiclass_classification_ex.cpp.html</example>
+            <example>custom_trainer_ex.cpp.html</example>
          </examples>
                                  
       </component>

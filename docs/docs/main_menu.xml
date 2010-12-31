@@ -196,6 +196,10 @@
                   <link>multiclass_classification_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Custom_Trainers</name>
+                  <link>custom_trainer_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Model_Selection</name>
                   <link>model_selection_ex.cpp.html</link>
                </item>
