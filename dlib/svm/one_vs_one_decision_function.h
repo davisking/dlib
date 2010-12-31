@@ -134,7 +134,7 @@ namespace dlib
             // run all the classifiers over the sample
             for(typename binary_function_table::const_iterator i = dfs.begin(); i != dfs.end(); ++i)
             {
-                const double score = i->second(sample);
+                const scalar_type score = i->second(sample);
 
                 if (score > 0)
                     votes[i->first.first] += 1;
