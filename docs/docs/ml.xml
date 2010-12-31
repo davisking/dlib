@@ -135,8 +135,10 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>cross_validate_trainer</item> 
          <item>cross_validate_trainer_threaded</item> 
          <item>cross_validate_multiclass_trainer</item> 
+         <item>cross_validate_regression_trainer</item> 
          <item>test_binary_decision_function</item> 
          <item>test_multiclass_decision_function</item> 
+         <item>test_regression_function</item> 
       </section>
 
       <section>
@@ -1812,6 +1814,35 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>multiclass_classification_ex.cpp.html</example>
             <example>custom_trainer_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>cross_validate_regression_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_regression_trainer_abstract.h</spec_file>
+         <description>
+            Performs k-fold cross validation on a user supplied regression trainer object such
+            as the <a href="#svr_trainer">svr_trainer</a> and returns the mean squared error.
+         </description>
+         <examples>
+            <example>svr_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>test_regression_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_regression_trainer_abstract.h</spec_file>
+         <description>
+            Tests a regression function (e.g. <a href="#decision_function">decision_function</a>)
+            and returns the mean squared error.
+         </description>
                                  
       </component>
       
