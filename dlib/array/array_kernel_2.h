@@ -13,7 +13,7 @@ namespace dlib
 
     template <
         typename T,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager 
         >
     class array_kernel_2 : public enumerable<T>
     {

@@ -11,7 +11,6 @@
 #include "../interfaces/remover.h"
 #include "../assert.h"
 #include "../serialize.h"
-#include "../memory_manager.h"
 
 namespace dlib
 {
@@ -21,7 +20,7 @@ namespace dlib
         typename range,
         unsigned long expnum,
         typename hash_table,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager
         >
     class hash_map_kernel_1 : public enumerable<map_pair<domain,range> >,
                               public pair_remover<domain,range>

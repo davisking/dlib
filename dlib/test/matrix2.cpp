@@ -642,7 +642,7 @@ namespace
 
             typedef matrix<double,0,0> mat;
 
-            matrix<double,0,0,memory_manager<char>::kernel_1a, column_major_layout> a(M,N);  
+            matrix<double,0,0,default_memory_manager, column_major_layout> a(M,N);  
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -651,9 +651,9 @@ namespace
                 }
             }
 
-            matrix<double,M,M,memory_manager<char>::kernel_1a, column_major_layout> u, u2;  
-            matrix<double,0,0,memory_manager<char>::kernel_1a, column_major_layout> q, q2;
-            matrix<double,N,N,memory_manager<char>::kernel_1a, column_major_layout> v, v2;
+            matrix<double,M,M,default_memory_manager, column_major_layout> u, u2;  
+            matrix<double,0,0,default_memory_manager, column_major_layout> q, q2;
+            matrix<double,N,N,default_memory_manager, column_major_layout> v, v2;
 
             matrix<double,M,N,MM, column_major_layout> a2;  
             a2 = tmp(a/2);
@@ -875,7 +875,7 @@ namespace
             const long M = 9;
             const long N = 40;
 
-            typedef matrix<double,0,0,memory_manager<char>::kernel_1a, column_major_layout> mat;
+            typedef matrix<double,0,0,default_memory_manager, column_major_layout> mat;
             mat a(M,N);  
             for (long r = 0; r < a.nr(); ++r)
             {

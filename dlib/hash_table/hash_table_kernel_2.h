@@ -11,7 +11,6 @@
 #include "../interfaces/remover.h"
 #include "../assert.h"
 #include "../serialize.h"
-#include "../memory_manager.h"
 #include <functional>
 
 namespace dlib 
@@ -21,7 +20,7 @@ namespace dlib
         typename domain,
         typename range,
         typename bst_base,
-        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename mem_manager = default_memory_manager,
         typename compare = std::less<domain>
         >
     class hash_table_kernel_2 : public enumerable<map_pair<domain,range> >,

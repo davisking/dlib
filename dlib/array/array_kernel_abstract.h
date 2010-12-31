@@ -5,14 +5,14 @@
 
 #include "../interfaces/enumerable.h"
 #include "../serialize.h"
-#include "../memory_manager/memory_manager_kernel_abstract.h"
+#include "../algs.h"
 
 namespace dlib
 {
 
     template <
         typename T,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager 
         >
     class array : public enumerable<T>
     {

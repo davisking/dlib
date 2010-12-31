@@ -8,14 +8,13 @@
 #include "../interfaces/enumerable.h"
 #include "../interfaces/remover.h"
 #include "../serialize.h"
-#include "../memory_manager.h"
 
 namespace dlib
 {
 
     template <
         typename T,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager
         >
     class stack_kernel_1 : public enumerable<T>,
                            public remover<T>

@@ -33,7 +33,7 @@ namespace dlib
     {
         typedef T type;
         typedef const T const_ret_type;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 1;
         const static long NC = 0;
@@ -140,7 +140,7 @@ namespace dlib
     {
         typedef T type;
         typedef const T const_ret_type;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
         const static long NR = 1;
         const static long NC = 0;
@@ -220,7 +220,7 @@ namespace dlib
     {
         typedef long type;
         typedef const long const_ret_type;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         const static long NR = 1;
         const static long NC = tabs<(end - start)>::value/inc_ + 1;
         const static long cost = 1;

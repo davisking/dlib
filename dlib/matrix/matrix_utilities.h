@@ -367,7 +367,7 @@ namespace dlib
         const static long NC = 1;
         typedef typename T::value_type type;
         typedef const typename T::value_type& const_ret_type;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
         const_ret_type apply (long r, long ) const { return vect[r]; }
@@ -420,7 +420,7 @@ namespace dlib
         const static long NC = 1;
         typedef T type;
         typedef const T& const_ret_type;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
         const_ret_type apply (long r, long ) const { return ptr[r]; }
@@ -466,7 +466,7 @@ namespace dlib
         const static long NC = 0;
         typedef T type;
         typedef const T& const_ret_type;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
         const_ret_type apply (long r, long c) const { return ptr[r*cols + c]; }
@@ -1811,7 +1811,7 @@ namespace dlib
         const static long cost = 1;
         const static long NR = 0;
         const static long NC = 0;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
         typedef T type;
         typedef const T& const_ret_type;
@@ -1895,7 +1895,7 @@ namespace dlib
         const static long cost = 1;
         const static long NR = NR_;
         const static long NC = NC_;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
         typedef T type;
         typedef const T& const_ret_type;
@@ -1934,7 +1934,7 @@ namespace dlib
         const static long cost = 1;
         const static long NR = NR_;
         const static long NC = NC_;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
         typedef T type;
         typedef const T const_ret_type;
@@ -2003,7 +2003,7 @@ namespace dlib
         const static long cost = 1;
         const static long NR = 0;
         const static long NC = 0;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
         typedef T type;
         typedef const T const_ret_type;
@@ -2109,7 +2109,7 @@ namespace dlib
         const static long cost = 1;
         const static long NR = N;
         const static long NC = N;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
         typedef T type;
         typedef const T const_ret_type;
@@ -2226,7 +2226,7 @@ namespace dlib
         const static long cost = 1;
         const static long NR = N;
         const static long NC = N;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
         typedef T type;
         typedef const T const_ret_type;

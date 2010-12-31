@@ -8,7 +8,6 @@
 #include "../interfaces/enumerable.h"
 #include "../interfaces/remover.h"
 #include "../serialize.h"
-#include "../memory_manager.h"
 
 namespace dlib
 {
@@ -16,7 +15,7 @@ namespace dlib
     template <
         typename T,
         typename bst_base,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager
         >
     class set_kernel_1 : public enumerable<const T>,
                          public asc_remover<T,typename bst_base::compare_type>

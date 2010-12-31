@@ -9,7 +9,6 @@
 #include "../interfaces/map_pair.h"
 #include "../interfaces/remover.h"
 #include "../serialize.h"
-#include "../memory_manager.h"
 
 namespace dlib
 {
@@ -18,7 +17,7 @@ namespace dlib
         typename domain,
         typename range,
         typename bst_base,  
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager 
         >
     class map_kernel_1 : public enumerable<map_pair<domain,range> >,
                          public asc_pair_remover<domain,range,typename bst_base::compare_type>

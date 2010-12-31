@@ -10,7 +10,6 @@
 #include "../interfaces/remover.h"
 #include "../assert.h"
 #include "../serialize.h"
-#include "../memory_manager.h"
 
 namespace dlib
 {
@@ -19,7 +18,7 @@ namespace dlib
         typename T,
         unsigned long expnum,
         typename hash_table,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager 
         >
     class hash_set_kernel_1 : public enumerable<const T>,
                               public remover<T>

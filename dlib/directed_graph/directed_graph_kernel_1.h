@@ -9,7 +9,6 @@
 #include "../smart_pointers.h"
 #include "../algs.h"
 #include <vector>
-#include "../memory_manager.h"
 #include "directed_graph_kernel_abstract.h"
 #include "../is_kind.h"
 
@@ -207,7 +206,7 @@ namespace dlib
     template <
         typename T,
         typename E = char,
-        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename mem_manager = default_memory_manager,
         bool is_checked = true 
         >
     class directed_graph_kernel_1 : noncopyable

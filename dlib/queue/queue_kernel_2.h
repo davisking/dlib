@@ -9,7 +9,6 @@
 #include "../interfaces/enumerable.h"
 #include "../interfaces/remover.h"
 #include "../serialize.h"
-#include "../memory_manager.h"
 
 namespace dlib
 {
@@ -17,7 +16,7 @@ namespace dlib
     template <
         typename T,
         unsigned long block_size,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager
         >
     class queue_kernel_2 : public enumerable<T>,
                            public remover<T>

@@ -9,7 +9,7 @@
 #include "binary_search_tree/binary_search_tree_kernel_c.h"
 
 
-#include "memory_manager.h"
+#include "algs.h"
 #include <functional>
 
 
@@ -19,7 +19,7 @@ namespace dlib
     template <
         typename domain,
         typename range,
-        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename mem_manager = default_memory_manager,
         typename compare = std::less<domain>
         >
     class binary_search_tree

@@ -35,7 +35,7 @@ namespace
     {
         typedef typename T::value_type::second_type scalar_type;
         typedef T sample_type;
-        typedef dlib::memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
 
         scalar_type operator() (
             const sample_type& a,

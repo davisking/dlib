@@ -3,7 +3,7 @@
 #ifndef DLIB_MATRIx_FWD
 #define DLIB_MATRIx_FWD
 
-#include "../memory_manager.h"
+#include "../algs.h"
 
 namespace dlib
 {
@@ -18,7 +18,7 @@ namespace dlib
         typename T,
         long num_rows = 0,
         long num_cols = 0,
-        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename mem_manager = default_memory_manager,
         typename layout = row_major_layout 
         >
     class matrix; 

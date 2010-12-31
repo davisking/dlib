@@ -7,14 +7,13 @@
 #include "../algs.h"
 #include "../interfaces/enumerable.h"
 #include "../serialize.h"
-#include "../memory_manager.h"
 #include "../geometry/rectangle.h"
 
 namespace dlib
 {
     template <
         typename T,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager
         >
     class array2d_kernel_1 : public enumerable<T>
     {

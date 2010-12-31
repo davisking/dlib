@@ -5,7 +5,6 @@
 
 #include "any.h"
 #include "../smart_pointers.h"
-#include "../memory_manager.h"
 
 #include "any_decision_function_abstract.h"
 
@@ -25,7 +24,7 @@ namespace dlib
 
         typedef sample_type_ sample_type;
         typedef scalar_type_ scalar_type;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
 
         any_decision_function()
         {

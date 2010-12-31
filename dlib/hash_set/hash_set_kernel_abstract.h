@@ -7,7 +7,7 @@
 #include "../interfaces/enumerable.h"
 #include "../interfaces/remover.h"
 #include "../serialize.h"
-#include "../memory_manager/memory_manager_kernel_abstract.h"
+#include "../algs.h"
 #include <functional>
 
 namespace dlib
@@ -16,7 +16,7 @@ namespace dlib
     template <
         typename T,
         unsigned long expnum,
-        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename mem_manager = default_memory_manager,
         typename compare = std::less<T>
         >
     class hash_set : public enumerable<const T>,

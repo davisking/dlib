@@ -7,7 +7,6 @@
 #include "../smart_pointers.h"
 
 #include "any_decision_function.h"
-#include "../memory_manager.h"
 
 #include "any_trainer_abstract.h"
 #include <vector>
@@ -26,7 +25,7 @@ namespace dlib
     public:
         typedef sample_type_ sample_type;
         typedef scalar_type_ scalar_type;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef any_decision_function<sample_type, scalar_type> trained_function_type;
 
 

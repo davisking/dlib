@@ -6,7 +6,6 @@
 #include "timer/timer_kernel_1.h"
 #include "timer/timer_kernel_2.h"
 #include "uintn.h"
-#include "memory_manager.h"
 
 namespace dlib
 {

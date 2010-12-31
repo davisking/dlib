@@ -5,7 +5,7 @@
 
 #include "graph/graph_kernel_1.h"
 
-#include "memory_manager.h"
+#include "algs.h"
 
 namespace dlib
 {
@@ -13,7 +13,7 @@ namespace dlib
     template <
         typename T,
         typename E = char,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager 
         >
     class graph 
     {

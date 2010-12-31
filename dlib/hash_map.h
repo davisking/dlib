@@ -9,7 +9,7 @@
 #include "hash_table.h"
 #include "algs.h"
 
-#include "memory_manager.h"
+#include "algs.h"
 #include <functional>
 
 namespace dlib
@@ -19,7 +19,7 @@ namespace dlib
         typename domain,
         typename range,
         unsigned long expnum,
-        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename mem_manager = default_memory_manager,
         typename compare = std::less<domain>
         >
     class hash_map

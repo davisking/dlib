@@ -10,7 +10,7 @@
 #include "sequence/sequence_compare_1.h"
 #include "sequence/sequence_sort_1.h"
 #include "sequence/sequence_sort_2.h"
-#include "memory_manager.h"
+#include "algs.h"
 
 
 
@@ -20,7 +20,7 @@ namespace dlib
 
     template <
         typename T,
-        typename mem_manager = memory_manager<char>::kernel_1a
+        typename mem_manager = default_memory_manager
         >
     class sequence
     {

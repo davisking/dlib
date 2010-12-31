@@ -8,7 +8,7 @@
 #include "../interfaces/enumerable.h"
 #include "../interfaces/remover.h"
 #include "../serialize.h"
-#include "../memory_manager/memory_manager_kernel_abstract.h"
+#include "../algs.h"
 #include <functional>
 
 namespace dlib 
@@ -17,7 +17,7 @@ namespace dlib
     template <
         typename domain,
         typename range,
-        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename mem_manager = default_memory_manager,
         typename compare = std::less<domain>
         >
     class hash_table : public enumerable<map_pair<domain,range> >,

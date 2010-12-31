@@ -23,7 +23,7 @@ namespace dlib
     {
         typedef typename T::value_type::second_type scalar_type;
         typedef T sample_type;
-        typedef dlib::memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
 
         sparse_radial_basis_kernel(const scalar_type g) : gamma(g) {}
         sparse_radial_basis_kernel() : gamma(0.1) {}
@@ -105,7 +105,7 @@ namespace dlib
     {
         typedef typename T::value_type::second_type scalar_type;
         typedef T sample_type;
-        typedef dlib::memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
 
         sparse_polynomial_kernel(const scalar_type g, const scalar_type c, const scalar_type d) : gamma(g), coef(c), degree(d) {}
         sparse_polynomial_kernel() : gamma(1), coef(0), degree(1) {}
@@ -194,7 +194,7 @@ namespace dlib
     {
         typedef typename T::value_type::second_type scalar_type;
         typedef T sample_type;
-        typedef dlib::memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
 
         sparse_sigmoid_kernel(const scalar_type g, const scalar_type c) : gamma(g), coef(c) {}
         sparse_sigmoid_kernel() : gamma(0.1), coef(-1.0) {}
@@ -277,7 +277,7 @@ namespace dlib
     {
         typedef typename T::value_type::second_type scalar_type;
         typedef T sample_type;
-        typedef dlib::memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
 
         scalar_type operator() (
             const sample_type& a,

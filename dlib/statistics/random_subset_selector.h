@@ -7,7 +7,6 @@
 #include "../rand.h"
 #include <vector>
 #include "../algs.h"
-#include "../memory_manager.h"
 #include "../string.h"
 #include "../serialize.h"
 #include <iostream>
@@ -36,7 +35,7 @@ namespace dlib
         !*/
     public:
         typedef T type;
-        typedef memory_manager<char>::kernel_1a mem_manager_type;
+        typedef default_memory_manager mem_manager_type;
         typedef Rand_type rand_type;
 
         typedef typename std::vector<T>::iterator iterator;

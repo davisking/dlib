@@ -5,7 +5,7 @@
 
 #include "matrix_exp_abstract.h"
 #include "../serialize.h"
-#include "../memory_manager.h"
+#include "../algs.h"
 #include "matrix_data_layout_abstract.h"
 
 namespace dlib
@@ -183,7 +183,7 @@ namespace dlib
         typename T,
         long num_rows = 0,
         long num_cols = 0,
-        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename mem_manager = default_memory_manager,
         typename layout = row_major_layout 
         >
     class matrix : public matrix_exp<matrix<T,num_rows,num_cols,mem_manager,layout> > 

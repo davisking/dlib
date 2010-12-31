@@ -7,7 +7,7 @@
 #include "hash_table/hash_table_kernel_1.h"
 #include "hash_table/hash_table_kernel_2.h"
 #include "hash_table/hash_table_kernel_c.h"
-#include "memory_manager.h"
+#include "algs.h"
 
 #include "binary_search_tree.h"
 #include <functional>
@@ -19,7 +19,7 @@ namespace dlib
     template <
         typename domain,
         typename range,
-        typename mem_manager = memory_manager<char>::kernel_1a,
+        typename mem_manager = default_memory_manager,
         typename compare = std::less<domain>
         >
     class hash_table
