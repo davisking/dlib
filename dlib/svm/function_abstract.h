@@ -126,7 +126,7 @@ namespace dlib
     template <
         typename function_type 
         >
-    struct generic_probabilistic_decision_function 
+    struct probabilistic_function 
     {
         /*!
             REQUIREMENTS ON function_type 
@@ -148,7 +148,7 @@ namespace dlib
         scalar_type beta;
         function_type decision_funct;
 
-        generic_probabilistic_decision_function (
+        probabilistic_function (
         );
         /*!
             ensures
@@ -157,15 +157,15 @@ namespace dlib
                 - #decision_funct has its initial value
         !*/
 
-        generic_probabilistic_decision_function (
-            const generic_probabilistic_decision_function& f
+        probabilistic_function (
+            const probabilistic_function& f
         );
         /*!
             ensures
                 - #*this is a copy of f
         !*/
 
-        generic_probabilistic_decision_function (
+        probabilistic_function (
             const scalar_type a,
             const scalar_type b,
             const function_type& decision_funct_ 
@@ -176,8 +176,8 @@ namespace dlib
                   and decision function.
         !*/
 
-        generic_probabilistic_decision_function& operator= (
-            const generic_probabilistic_decision_function& d
+        probabilistic_function& operator= (
+            const probabilistic_function& d
         );
         /*!
             ensures
@@ -209,22 +209,22 @@ namespace dlib
         typename function_type
         >
     void serialize (
-        const generic_probabilistic_decision_function<function_type>& item,
+        const probabilistic_function<function_type>& item,
         std::ostream& out
     );
     /*!
-        provides serialization support for generic_probabilistic_decision_function
+        provides serialization support for probabilistic_function
     !*/
 
     template <
         typename function_type
         >
     void deserialize (
-        generic_probabilistic_decision_function<function_type>& item,
+        probabilistic_function<function_type>& item,
         std::istream& in 
     );
     /*!
-        provides serialization support for generic_probabilistic_decision_function
+        provides serialization support for probabilistic_function
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -244,9 +244,9 @@ namespace dlib
                 estimate of the probability that a given sample is in the +1 class.
 
                 Note that this object is essentially just a copy of 
-                generic_probabilistic_decision_function but with the template argument 
+                probabilistic_function but with the template argument 
                 changed from being a function type to a kernel type.  Therefore, this
-                type is just a convenient version of generic_probabilistic_decision_function
+                type is just a convenient version of probabilistic_function
                 for the case where the decision function is a dlib::decision_function<K>.
         !*/
 
@@ -277,7 +277,7 @@ namespace dlib
         !*/
 
         probabilistic_decision_function (
-            const generic_probabilistic_decision_function<decision_function<K> >& d
+            const probabilistic_function<decision_function<K> >& d
         );
         /*!
             ensures

@@ -479,7 +479,7 @@ namespace dlib
         typename alloc_type1,
         typename alloc_type2
         >
-    const generic_probabilistic_decision_function<typename trainer_type::trained_function_type> 
+    const probabilistic_function<typename trainer_type::trained_function_type> 
     train_probabilistic_decision_function (
         const trainer_type& trainer,
         const std::vector<sample_type,alloc_type1>& x,
@@ -643,7 +643,7 @@ namespace dlib
         const double A = val(0);
         const double B = val(1);
 
-        return generic_probabilistic_decision_function<typename trainer_type::trained_function_type>( A, B, trainer.train(x,y) );
+        return probabilistic_function<typename trainer_type::trained_function_type>( A, B, trainer.train(x,y) );
     }
 
 // ----------------------------------------------------------------------------------------
