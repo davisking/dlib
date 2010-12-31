@@ -229,6 +229,7 @@
          <term file="ml.html" name="normalized_function"/>
          <term file="ml.html" name="distance_function"/>
          <term file="ml.html" name="probabilistic_decision_function"/>
+         <term file="ml.html" name="probabilistic_function"/>
          <term file="ml.html" name="linear_kernel"/>
          <term file="ml.html" name="offset_kernel"/>
          <term file="ml.html" name="polynomial_kernel"/>

@@ -120,6 +120,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>projection_function</item>
          <item>distance_function</item>
          <item>probabilistic_decision_function</item>
+         <item>probabilistic_function</item>
          <item>normalized_function</item>
          <item>one_vs_one_decision_function</item>
          <item>one_vs_all_decision_function</item>
@@ -816,8 +817,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
          <description>
             <p>
-               Trains a <a href="#probabilistic_decision_function">probabilistic_decision_function</a> using 
-               some sort of batch trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or
+               Trains a <a href="#probabilistic_function">probabilistic_function</a> using 
+               some sort of binary classification trainer object such as the <a href="#svm_nu_trainer">svm_nu_trainer</a> or
                <a href="#krr_trainer">krr_trainer</a>.
             </p>
             The probability model is created by using the technique described in the following papers:
@@ -1104,6 +1105,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>svm_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>probabilistic_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
+         <description>
+                This object represents a binary decision function for use with
+                any kind of binary classifier.  It returns an 
+                estimate of the probability that a given sample is in the +1 class. 
+         </description>
       </component>
       
    <!-- ************************************************************************* -->
