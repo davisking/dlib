@@ -188,6 +188,7 @@
          <term file="ml.html" name="reduced2"/>
          <term file="ml.html" name="reduced_decision_function_trainer2"/>
          <term file="ml.html" name="train_probabilistic_decision_function"/>
+         <term file="ml.html" name="probabilistic"/>
          <term file="ml.html" name="cross_validate_trainer"/>
          <term file="ml.html" name="cross_validate_trainer_threaded"/>
          <term file="ml.html" name="cross_validate_multiclass_trainer"/>
