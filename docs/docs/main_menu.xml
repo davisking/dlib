@@ -192,6 +192,10 @@
                   <link>svm_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Support_Vector_Regression</name>
+                  <link>svr_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Multiclass_Classification</name>
                   <link>multiclass_classification_ex.cpp.html</link>
                </item>

@@ -944,6 +944,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                      <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
                </ul>
          </description>
+         <examples>
+            <example>svr_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
