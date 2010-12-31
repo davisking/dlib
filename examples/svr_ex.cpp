@@ -83,6 +83,14 @@ int main()
 
     // The first column is the true value of the sinc function and the second
     // column is the output from the SVR estimate.  
+
+    // We can also do 5-fold cross-validation and find the mean squared error.  Note that
+    // we need to randomly shuffle the samples first.  See the svm_ex.cpp for a discussion of
+    // why this is important. 
+    randomize_samples(samples, targets);
+    cout << "MSE: "<< cross_validate_regression_trainer(trainer, samples, targets, 5) << endl;
+    // The output is: 
+    // MSE: 1.65984e-05
 }
 
 
