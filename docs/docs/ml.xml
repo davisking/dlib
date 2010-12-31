@@ -83,6 +83,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>rank_features</item> 
          <item>svm_pegasos</item> 
          <item>one_vs_one_trainer</item> 
+         <item>one_vs_all_trainer</item> 
       </section>
 
       <section>
@@ -121,6 +122,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>probabilistic_decision_function</item>
          <item>normalized_function</item>
          <item>one_vs_one_decision_function</item>
+         <item>one_vs_all_decision_function</item>
       </section>
 
       <section>
@@ -1172,6 +1174,38 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>multiclass_classification_ex.cpp.html</example>
             <example>custom_trainer_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>one_vs_all_decision_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/one_vs_all_decision_function_abstract.h</spec_file>
+         <description>
+                This object represents a multiclass classifier built out
+                of a set of binary classifiers.  Each binary classifier
+                is used to vote for the correct multiclass label using a 
+                one vs. all strategy.  Therefore, if you have N classes then
+                there will be N binary classifiers inside this object.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>one_vs_all_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/one_vs_all_trainer_abstract.h</spec_file>
+         <description>
+                This object is a tool for turning a bunch of binary classifiers
+                into a multiclass classifier.  It does this by training the binary
+                classifiers in a one vs. all fashion.  That is, if you have N possible
+                classes then it trains N binary classifiers which are then used
+                to vote on the identity of a test sample.
+         </description>
                                  
       </component>
       

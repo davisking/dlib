@@ -131,6 +131,8 @@
 
          <term file="ml.html" name="one_vs_one_trainer"/>
          <term file="ml.html" name="one_vs_one_decision_function"/>
+         <term file="ml.html" name="one_vs_all_trainer"/>
+         <term file="ml.html" name="one_vs_all_decision_function"/>
 
          <term file="dlib/svm/pegasos_abstract.h.html" name="replicate_settings"/>
          <term file="ml.html" name="mlp"/>
