@@ -63,6 +63,7 @@ set (tests
    metaprogramming.cpp
    multithreaded_object.cpp
    one_vs_one_trainer.cpp
+   one_vs_all_trainer.cpp
    optimization.cpp
    optimization_test_functions.cpp
    opt_qp_solver.cpp

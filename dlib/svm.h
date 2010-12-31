@@ -34,6 +34,8 @@
 #include "svm/cross_validate_multiclass_trainer.h"
 #include "svm/cross_validate_regression_trainer.h"
 
+#include "svm/one_vs_all_decision_function.h"
+#include "svm/one_vs_all_trainer.h"
 
 #endif // DLIB_SVm_HEADER
 
