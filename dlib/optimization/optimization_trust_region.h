@@ -32,15 +32,13 @@ namespace dlib
         */
 
         // make sure requires clause is not broken
-        DLIB_ASSERT(B.nr() == B.nc() && is_col_vector(g) && g.size() == B.nr() && equal(B,trans(B)),
+        DLIB_ASSERT(B.nr() == B.nc() && is_col_vector(g) && g.size() == B.nr(),
             "\t unsigned long solve_trust_region_subproblem()"
             << "\n\t invalid arguments were given to this function"
             << "\n\t B.nr():            " << B.nr()
             << "\n\t B.nc():            " << B.nc()
             << "\n\t is_col_vector(g):  " << is_col_vector(g) 
             << "\n\t g.size():          " << g.size() 
-            << "\n\t equal(B,trans(B)): " << equal(B,trans(B)) 
-            << "\n\t max(abs(B-trans(B))): " << max(abs(B-trans(B)))
             );
         DLIB_ASSERT(radius > 0 && eps > 0 && max_iter > 0,
             "\t unsigned long solve_trust_region_subproblem()"
