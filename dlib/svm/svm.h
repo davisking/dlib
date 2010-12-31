@@ -17,6 +17,7 @@
 #include "../enable_if.h"
 #include "../optimization.h"
 #include "svm_nu_trainer.h"
+#include <vector>
 
 namespace dlib
 {
@@ -473,21 +474,19 @@ namespace dlib
 
     template <
         typename trainer_type,
-        typename in_sample_vector_type,
-        typename in_scalar_vector_type
+        typename sample_type,
+        typename scalar_type,
+        typename alloc_type1,
+        typename alloc_type2
         >
-    const probabilistic_decision_function<typename trainer_type::kernel_type> train_probabilistic_decision_function_impl (
+    const generic_probabilistic_decision_function<typename trainer_type::trained_function_type> 
+    train_probabilistic_decision_function (
         const trainer_type& trainer,
-        const in_sample_vector_type& x,
-        const in_scalar_vector_type& y,
+        const std::vector<sample_type,alloc_type1>& x,
+        const std::vector<scalar_type,alloc_type2>& y,
         const long folds
     )
     {
-        typedef typename trainer_type::sample_type sample_type;
-        typedef typename trainer_type::scalar_type scalar_type;
-        typedef typename trainer_type::mem_manager_type mem_manager_type;
-        typedef typename trainer_type::kernel_type K;
-
 
         /*
             This function fits a sigmoid function to the output of the 
@@ -504,20 +503,18 @@ namespace dlib
 
         // make sure requires clause is not broken
         DLIB_ASSERT(is_binary_classification_problem(x,y) == true &&
-                    1 < folds && folds <= x.nr(),
+                    1 < folds && folds <= (long)x.size(),
             "\tprobabilistic_decision_function train_probabilistic_decision_function()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t x.nr(): " << x.nr() 
-            << "\n\t y.nr(): " << y.nr() 
-            << "\n\t x.nc(): " << x.nc() 
-            << "\n\t y.nc(): " << y.nc() 
+            << "\n\t x.size(): " << x.size() 
+            << "\n\t y.size(): " << y.size() 
             << "\n\t folds:  " << folds 
-            << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
+            << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
             );
 
         // count the number of positive and negative examples
-        const long num_pos = (long)sum(y > 0);
-        const long num_neg = (long)sum(y < 0);
+        const long num_pos = (long)sum(vector_to_matrix(y) > 0);
+        const long num_neg = (long)sum(vector_to_matrix(y) < 0);
 
         // figure out how many positive and negative examples we will have in each fold
         const long num_pos_test_samples = num_pos/folds; 
@@ -525,16 +522,15 @@ namespace dlib
         const long num_neg_test_samples = num_neg/folds; 
         const long num_neg_train_samples = num_neg - num_neg_test_samples; 
 
-        decision_function<K> d;
-        typename decision_function<K>::sample_vector_type x_test, x_train;
-        typename decision_function<K>::scalar_vector_type y_test, y_train;
-        x_test.set_size (num_pos_test_samples  + num_neg_test_samples);
-        y_test.set_size (num_pos_test_samples  + num_neg_test_samples);
-        x_train.set_size(num_pos_train_samples + num_neg_train_samples);
-        y_train.set_size(num_pos_train_samples + num_neg_train_samples);
+        typename trainer_type::trained_function_type d;
+        std::vector<sample_type,alloc_type1> x_test, x_train;
+        std::vector<scalar_type,alloc_type2> y_test, y_train;
+        x_test.resize (num_pos_test_samples  + num_neg_test_samples);
+        y_test.resize (num_pos_test_samples  + num_neg_test_samples);
+        x_train.resize(num_pos_train_samples + num_neg_train_samples);
+        y_train.resize(num_pos_train_samples + num_neg_train_samples);
 
-        typedef std_allocator<scalar_type, mem_manager_type> alloc_scalar_type_vector;
-        typedef std::vector<scalar_type, alloc_scalar_type_vector > dvector;
+        typedef std::vector<scalar_type, alloc_type2 > dvector;
 
         dvector out;
         dvector target;
@@ -554,25 +550,25 @@ namespace dlib
             // load up our positive test samples
             while (cur < num_pos_test_samples)
             {
-                if (y(pos_idx) == +1.0)
+                if (y[pos_idx] == +1.0)
                 {
-                    x_test(cur) = x(pos_idx);
-                    y_test(cur) = +1.0;
+                    x_test[cur] = x[pos_idx];
+                    y_test[cur] = +1.0;
                     ++cur;
                 }
-                pos_idx = (pos_idx+1)%x.nr();
+                pos_idx = (pos_idx+1)%x.size();
             }
 
             // load up our negative test samples
-            while (cur < x_test.nr())
+            while (cur < (long)x_test.size())
             {
-                if (y(neg_idx) == -1.0)
+                if (y[neg_idx] == -1.0)
                 {
-                    x_test(cur) = x(neg_idx);
-                    y_test(cur) = -1.0;
+                    x_test[cur] = x[neg_idx];
+                    y_test[cur] = -1.0;
                     ++cur;
                 }
-                neg_idx = (neg_idx+1)%x.nr();
+                neg_idx = (neg_idx+1)%x.size();
             }
 
             // load the training data from the data following whatever we loaded
@@ -584,40 +580,40 @@ namespace dlib
             // load up our positive train samples
             while (cur < num_pos_train_samples)
             {
-                if (y(train_pos_idx) == +1.0)
+                if (y[train_pos_idx] == +1.0)
                 {
-                    x_train(cur) = x(train_pos_idx);
-                    y_train(cur) = +1.0;
+                    x_train[cur] = x[train_pos_idx];
+                    y_train[cur] = +1.0;
                     ++cur;
                 }
-                train_pos_idx = (train_pos_idx+1)%x.nr();
+                train_pos_idx = (train_pos_idx+1)%x.size();
             }
 
             // load up our negative train samples
-            while (cur < x_train.nr())
+            while (cur < (long)x_train.size())
             {
-                if (y(train_neg_idx) == -1.0)
+                if (y[train_neg_idx] == -1.0)
                 {
-                    x_train(cur) = x(train_neg_idx);
-                    y_train(cur) = -1.0;
+                    x_train[cur] = x[train_neg_idx];
+                    y_train[cur] = -1.0;
                     ++cur;
                 }
-                train_neg_idx = (train_neg_idx+1)%x.nr();
+                train_neg_idx = (train_neg_idx+1)%x.size();
             }
 
             // do the training
             d = trainer.train (x_train,y_train);
 
             // now test this fold 
-            for (long i = 0; i < x_test.nr(); ++i)
+            for (unsigned long i = 0; i < x_test.size(); ++i)
             {
-                out.push_back(d(x_test(i)));
+                out.push_back(d(x_test[i]));
                 // if this was a positive example
-                if (y_test(i) == +1.0)
+                if (y_test[i] == +1.0)
                 {
                     target.push_back(hi_target);
                 }
-                else if (y_test(i) == -1.0)
+                else if (y_test[i] == -1.0)
                 {
                     target.push_back(lo_target);
                 }
@@ -647,25 +643,7 @@ namespace dlib
         const double A = val(0);
         const double B = val(1);
 
-        return probabilistic_decision_function<K>( A, B, trainer.train(x,y) );
-    }
-
-    template <
-        typename trainer_type,
-        typename in_sample_vector_type,
-        typename in_scalar_vector_type
-        >
-    const probabilistic_decision_function<typename trainer_type::kernel_type> train_probabilistic_decision_function (
-        const trainer_type& trainer,
-        const in_sample_vector_type& x,
-        const in_scalar_vector_type& y,
-        const long folds
-    )
-    {
-        return train_probabilistic_decision_function_impl(trainer,
-                                                          vector_to_matrix(x),
-                                                          vector_to_matrix(y),
-                                                          folds);
+        return generic_probabilistic_decision_function<typename trainer_type::trained_function_type>( A, B, trainer.train(x,y) );
     }
 
 // ----------------------------------------------------------------------------------------

@@ -124,6 +124,112 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename function_type 
+        >
+    struct generic_probabilistic_decision_function 
+    {
+        /*!
+            REQUIREMENTS ON function_type 
+                - function_type must be a function object with an overloaded
+                  operator() similar to the other function objects defined in
+                  this file.  The operator() should return a scalar type such as
+                  double or float.
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a binary decision function that returns an 
+                estimate of the probability that a given sample is in the +1 class.
+        !*/
+
+        typedef typename function_type::scalar_type scalar_type;
+        typedef typename function_type::sample_type sample_type;
+        typedef typename function_type::mem_manager_type mem_manager_type;
+
+        scalar_type alpha;
+        scalar_type beta;
+        function_type decision_funct;
+
+        generic_probabilistic_decision_function (
+        );
+        /*!
+            ensures
+                - #alpha == 0
+                - #beta == 0
+                - #decision_funct has its initial value
+        !*/
+
+        generic_probabilistic_decision_function (
+            const generic_probabilistic_decision_function& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
+        generic_probabilistic_decision_function (
+            const scalar_type a,
+            const scalar_type b,
+            const function_type& decision_funct_ 
+        ) : alpha(a), beta(b), decision_funct(decision_funct_) {}
+        /*!
+            ensures
+                - populates the probabilistic decision function with the given alpha, beta, 
+                  and decision function.
+        !*/
+
+        generic_probabilistic_decision_function& operator= (
+            const generic_probabilistic_decision_function& d
+        );
+        /*!
+            ensures
+                - #*this is identical to d
+                - returns *this
+        !*/
+
+        scalar_type operator() (
+            const sample_type& x
+        ) const
+        /*!
+            ensures
+                - returns a number P such that:
+                    - 0 <= P <= 1
+                    - P represents the probability that sample x is from 
+                      the class +1
+        !*/
+        {
+            // Evaluate the normal decision function
+            scalar_type f = decision_funct(x);
+            // Now basically normalize the output so that it is a properly
+            // conditioned probability of x being in the +1 class given
+            // the output of the decision function.
+            return 1/(1 + std::exp(alpha*f + beta));
+        }
+    };
+
+    template <
+        typename function_type
+        >
+    void serialize (
+        const generic_probabilistic_decision_function<function_type>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for generic_probabilistic_decision_function
+    !*/
+
+    template <
+        typename function_type
+        >
+    void deserialize (
+        generic_probabilistic_decision_function<function_type>& item,
+        std::istream& in 
+    );
+    /*!
+        provides serialization support for generic_probabilistic_decision_function
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename K
         >
     struct probabilistic_decision_function 
@@ -136,6 +242,12 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS 
                 This object represents a binary decision function that returns an 
                 estimate of the probability that a given sample is in the +1 class.
+
+                Note that this object is essentially just a copy of 
+                generic_probabilistic_decision_function but with the template argument 
+                changed from being a function type to a kernel type.  Therefore, this
+                type is just a convenient version of generic_probabilistic_decision_function
+                for the case where the decision function is a dlib::decision_function<K>.
         !*/
 
         typedef K kernel_type;
@@ -153,11 +265,19 @@ namespace dlib
             ensures
                 - #alpha == 0
                 - #beta == 0
-                - #decision_function has its initial value
+                - #decision_funct has its initial value
         !*/
 
         probabilistic_decision_function (
             const probabilistic_decision_function& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
+        probabilistic_decision_function (
+            const generic_probabilistic_decision_function<decision_function<K> >& d
         );
         /*!
             ensures

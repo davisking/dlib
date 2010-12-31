@@ -132,6 +132,104 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename function_type
+        >
+    struct generic_probabilistic_decision_function
+    {
+        typedef typename function_type::scalar_type scalar_type;
+        typedef typename function_type::sample_type sample_type;
+        typedef typename function_type::mem_manager_type mem_manager_type;
+
+        scalar_type alpha;
+        scalar_type beta;
+        function_type decision_funct;
+
+        generic_probabilistic_decision_function (
+        ) : alpha(0), beta(0), decision_funct(function_type()) {}
+
+        generic_probabilistic_decision_function (
+            const generic_probabilistic_decision_function& d
+        ) : 
+            alpha(d.alpha),
+            beta(d.beta),
+            decision_funct(d.decision_funct)
+        {}
+
+        generic_probabilistic_decision_function (
+            const scalar_type a_,
+            const scalar_type b_,
+            const function_type& decision_funct_ 
+        ) :
+            alpha(a_),
+            beta(b_),
+            decision_funct(decision_funct_)
+        {}
+
+        generic_probabilistic_decision_function& operator= (
+            const generic_probabilistic_decision_function& d
+        )
+        {
+            if (this != &d)
+            {
+                alpha = d.alpha;
+                beta = d.beta;
+                decision_funct = d.decision_funct;
+            }
+            return *this;
+        }
+
+        scalar_type operator() (
+            const sample_type& x
+        ) const
+        {
+            scalar_type f = decision_funct(x);
+            return 1/(1 + std::exp(alpha*f + beta));
+        }
+    };
+
+    template <
+        typename function_type 
+        >
+    void serialize (
+        const generic_probabilistic_decision_function<function_type>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.alpha, out);
+            serialize(item.beta, out);
+            serialize(item.decision_funct, out);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type generic_probabilistic_decision_function"); 
+        }
+    }
+
+    template <
+        typename function_type
+        >
+    void deserialize (
+        generic_probabilistic_decision_function<function_type>& item,
+        std::istream& in 
+    )
+    {
+        try
+        {
+            deserialize(item.alpha, in);
+            deserialize(item.beta, in);
+            deserialize(item.decision_funct, in);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while deserializing object of type generic_probabilistic_decision_function"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename K 
         >
     struct probabilistic_decision_function
@@ -147,6 +245,14 @@ namespace dlib
 
         probabilistic_decision_function (
         ) : alpha(0), beta(0), decision_funct(decision_function<K>()) {}
+
+        probabilistic_decision_function (
+            const generic_probabilistic_decision_function<decision_function<K> >& d
+        ) : 
+            alpha(d.alpha),
+            beta(d.beta),
+            decision_funct(d.decision_funct)
+        {}
 
         probabilistic_decision_function (
             const probabilistic_decision_function& d
@@ -216,7 +322,6 @@ namespace dlib
         std::istream& in 
     )
     {
-        typedef typename K::scalar_type scalar_type;
         try
         {
             deserialize(item.alpha, in);
