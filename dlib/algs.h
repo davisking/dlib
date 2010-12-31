@@ -72,6 +72,7 @@ namespace std
 #include "noncopyable.h"
 #include "enable_if.h"
 #include "uintn.h"
+#include "memory_manager_stateless/memory_manager_stateless_kernel_1.h" // for the default memory manager
 
 
 
@@ -108,6 +109,10 @@ inline const wchar_t* _dTcast<wchar_t> ( const char* , const wchar_t* b) { retur
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    typedef memory_manager_stateless_kernel_1<char> default_memory_manager;
 
 // ----------------------------------------------------------------------------------------
 
