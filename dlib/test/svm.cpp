@@ -238,6 +238,14 @@ namespace
         m(0) = 0.1; dlog << LDEBUG << "svr: " << sinc(m(0)) << "   " << test5(m); DLIB_TEST(abs(sinc(m(0)) - test5(m)) < 0.01);
         m(0) = -4;  dlog << LDEBUG << "svr: " << sinc(m(0)) << "   " << test5(m); DLIB_TEST(abs(sinc(m(0)) - test5(m)) < 0.01);
         m(0) = 5.0; dlog << LDEBUG << "svr: " << sinc(m(0)) << "   " << test5(m); DLIB_TEST(abs(sinc(m(0)) - test5(m)) < 0.01);
+
+
+        randomize_samples(samples, labels);
+        dlog << LINFO << "KRR MSE: "<< cross_validate_regression_trainer(krr_test, samples, labels, 6);
+        dlog << LINFO << "SVR MSE: "<< cross_validate_regression_trainer(svr_test, samples, labels, 6);
+        DLIB_TEST(cross_validate_regression_trainer(krr_test, samples, labels, 6) < 1e-4);
+        DLIB_TEST(cross_validate_regression_trainer(svr_test, samples, labels, 6) < 1e-4);
+
         dlog << LINFO << "   end test_regression()";
     }
 
