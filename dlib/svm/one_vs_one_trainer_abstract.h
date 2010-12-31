@@ -80,7 +80,7 @@ namespace dlib
             requires
                 - l1 != l2
             ensures
-                - Sets the trainer object used to create binary classifiers to
+                - Sets the trainer object used to create a binary classifier to
                   distinguish l1 labeled samples from l2 labeled samples.
         !*/
 
