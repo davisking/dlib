@@ -647,6 +647,48 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <typename trainer_type>
+    struct trainer_adapter_probabilistic
+    {
+        typedef probabilistic_function<typename trainer_type::trained_function_type> trained_function_type;
+
+        const trainer_type& trainer;
+        const long folds;
+
+        trainer_adapter_probabilistic (
+            const trainer_type& trainer_,
+            const long folds_
+        ) : trainer(trainer_),folds(folds_) {}
+
+        template <
+            typename sample_type, 
+            typename scalar_type,
+            typename alloc_type1,
+            typename alloc_type2
+            >
+        const trained_function_type train (
+            const std::vector<sample_type,alloc_type1>& samples,
+            const std::vector<scalar_type,alloc_type2>& labels
+        ) const
+        {
+            return train_probabilistic_decision_function(trainer, samples, labels, folds);
+        }
+
+    };
+
+    template <
+        typename trainer_type
+        >
+    trainer_adapter_probabilistic<trainer_type> probabilistic (
+        const trainer_type& trainer,
+        const long folds
+    )
+    {
+        return trainer_adapter_probabilistic<trainer_type>(trainer,folds); 
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <

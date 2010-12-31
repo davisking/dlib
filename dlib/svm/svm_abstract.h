@@ -97,6 +97,24 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename trainer_type
+        >
+    trainer_adapter_probabilistic<trainer_type> probabilistic (
+        const trainer_type& trainer,
+        const long folds
+    );
+    /*!
+        requires
+            - 1 < folds <= x.size()
+            - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
+        ensures
+            - returns a trainer adapter TA such that calling TA.train(samples, labels)
+              returns the same object as calling train_probabilistic_decision_function(trainer,samples,labels,folds).
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 //                                  Miscellaneous functions
 // ----------------------------------------------------------------------------------------
