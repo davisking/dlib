@@ -12,6 +12,7 @@
 #include "map.h"
 #include "stack.h"
 #include "sequence.h"
+#include "memory_manager.h"
 
 
 namespace dlib
