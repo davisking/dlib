@@ -79,10 +79,7 @@ int main()
 {
     try
     {
-        ifstream fin("config.txt");
-        cr_type cr;
-
-        cr.load_from(fin);
+        cr_type cr("config.txt");
 
         // Use our recursive function to print everything in the config file.
         print_config_reader_contents(cr);
