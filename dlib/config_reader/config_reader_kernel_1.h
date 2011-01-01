@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include "../algs.h"
 #include "../stl_checked/std_vector_c.h"
 
@@ -65,6 +66,22 @@ namespace dlib
             const bool redefinition;
         };
 
+        class file_not_found : public dlib::error 
+        {
+            friend class config_reader_kernel_1;
+            file_not_found(
+                const std::string& file_name_
+            ) : 
+                dlib::error(ECONFIG_READER, "Error in config_reader, unable to open file " + file_name_),
+                file_name(file_name_)
+            {}
+
+            ~file_not_found() throw() {}
+
+        public:
+            const std::string file_name;
+        };
+
         class config_reader_access_error : public dlib::error
         {
         public:
@@ -92,6 +109,10 @@ namespace dlib
         };
 
         config_reader_kernel_1(
+            const std::string& config_file 
+        );
+
+        config_reader_kernel_1(
             std::istream& in
         );
 
@@ -103,6 +124,10 @@ namespace dlib
 
         void load_from (
             std::istream& in
+        );
+
+        void load_from (
+            const std::string& config_file
         );
 
         bool is_key_defined (
@@ -270,12 +295,47 @@ namespace dlib
         typename map_string_void,
         typename tokenizer
         >
+    void config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
+    load_from(
+        const std::string& config_file
+    )
+    {
+        clear();
+        std::ifstream fin(config_file.c_str());
+        if (!fin)
+            throw file_not_found(config_file);
+
+        load_from(fin);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename map_string_string,
+        typename map_string_void,
+        typename tokenizer
+        >
     config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
     config_reader_kernel_1(
         std::istream& in
     )
     {
         load_from(in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename map_string_string,
+        typename map_string_void,
+        typename tokenizer
+        >
+    config_reader_kernel_1<map_string_string,map_string_void,tokenizer>::
+    config_reader_kernel_1(
+        const std::string& config_file
+    )
+    {
+        load_from(config_file);
     }
 
 // ----------------------------------------------------------------------------------------

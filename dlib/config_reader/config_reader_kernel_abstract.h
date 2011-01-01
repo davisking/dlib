@@ -109,6 +109,22 @@ namespace dlib
             const bool redefinition;
         };
 
+        class file_not_found : public dlib::error 
+        {
+            /*!
+                GENERAL
+                    This exception is thrown if the config file can't be opened for
+                    some reason.  The type member of this exception will be set
+                    to ECONFIG_READER.
+
+                INTERPRETING THIS EXCEPTION
+                    - file_name == the name of the config file which we failed to open
+            !*/
+        public:
+            const std::string file_name;
+        };
+
+
         class config_reader_access_error : public dlib::error
         {
             /*!
@@ -154,10 +170,32 @@ namespace dlib
                 - reads the config file to parse from the given input stream,
                   parses it and loads this object up with all the sub blocks and
                   key/value pairs it finds.
+                - before the load is performed, the previous state of the config file
+                  reader is erased.  So after the load the config file reader will contain
+                  only information from the given config file.
                 - This object will represent the top most block of the config file.
             throws
                 - std::bad_alloc
                 - config_reader_error
+        !*/
+
+        config_reader(
+            const std::string& config_file 
+        );
+        /*!
+            ensures 
+                - #*this is properly initialized
+                - parses the config file named by the config_file string.  Specifically, 
+                  parses it and loads this object up with all the sub blocks and
+                  key/value pairs it finds in the file.
+                - before the load is performed, the previous state of the config file
+                  reader is erased.  So after the load the config file reader will contain
+                  only information from the given config file.
+                - This object will represent the top most block of the config file.
+            throws
+                - std::bad_alloc
+                - config_reader_error
+                - file_not_found
         !*/
 
         virtual ~config_reader(
@@ -186,6 +224,9 @@ namespace dlib
                 - reads the config file to parse from the given input stream,
                   parses it and loads this object up with all the sub blocks and
                   key/value pairs it finds.
+                - before the load is performed, the previous state of the config file
+                  reader is erased.  So after the load the config file reader will contain
+                  only information from the given config file.
                 - *this will represent the top most block of the config file contained
                   in the input stream in.
             throws
@@ -193,6 +234,30 @@ namespace dlib
                     If this exception is thrown then *this is unusable 
                     until clear() is called and succeeds
                 - config_reader_error
+                    If this exception is thrown then this object will
+                    revert to its initial value.
+        !*/
+
+        void load_from (
+            const std::string& config_file
+        );
+        /*!
+            ensures 
+                - parses the config file named by the config_file string.  Specifically, 
+                  parses it and loads this object up with all the sub blocks and
+                  key/value pairs it finds in the file.  
+                - before the load is performed, the previous state of the config file
+                  reader is erased.  So after the load the config file reader will contain
+                  only information from the given config file.
+                - This object will represent the top most block of the config file.
+            throws
+                - std::bad_alloc 
+                    If this exception is thrown then *this is unusable 
+                    until clear() is called and succeeds
+                - config_reader_error
+                    If this exception is thrown then this object will
+                    revert to its initial value.
+                - file_not_found
                     If this exception is thrown then this object will
                     revert to its initial value.
         !*/
