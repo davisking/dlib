@@ -21,7 +21,8 @@
             A good tutorial and introduction to the general concepts used by most of the
             objects in this part of the library can be found in the <a href="svm_ex.cpp.html">svm example</a> program.
             After reading this example another good one to consult would be the <a href="model_selection_ex.cpp.html">model selection</a>
-            example program.
+            example program.  Finally, if you came here looking for a binary classification or regression tool then I would
+            try the <a href="#krr_trainer">krr_trainer</a> first as it is generally the easiest method to use.
          </p>
 
          <p>   
@@ -61,29 +62,79 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <menu width="150">
     <top>
 
+      <center><h2><u>Primary Algorithms</u></h2></center>
       <section>
-         <name>Primary Algorithms</name>
-         <item>mlp</item> 
-         <item>krls</item>
-         <item>kcentroid</item>
-         <item>linearly_independent_subset_finder</item>
-         <item>linear_manifold_regularizer</item>
-         <item>empirical_kernel_map</item>
-         <item>kkmeans</item>
+         <name>Binary Classification</name>
          <item>svm_nu_trainer</item> 
-         <item>svm_one_class_trainer</item> 
          <item>svm_c_trainer</item> 
          <item>svm_c_linear_trainer</item> 
          <item>svm_c_ekm_trainer</item> 
          <item>rvm_trainer</item> 
+         <item>svm_pegasos</item> 
+         <item>train_probabilistic_decision_function</item> 
+      </section>
+      <section>
+         <name>Multiclass Classification</name>
+         <item>one_vs_one_trainer</item> 
+         <item>one_vs_all_trainer</item> 
+      </section>
+      <section>
+         <name>Regression</name>
+         <item>mlp</item> 
+         <item>krls</item>
          <item>krr_trainer</item> 
          <item>svr_trainer</item> 
          <item>rvm_regression_trainer</item> 
          <item>rbf_network_trainer</item> 
+      </section>
+      <section>
+         <name>Unsupervised</name>
+         <item>kcentroid</item>
+         <item>linearly_independent_subset_finder</item>
+         <item>empirical_kernel_map</item>
+         <item>kkmeans</item>
+         <item>svm_one_class_trainer</item> 
+         <item>find_clusters_using_kmeans</item> 
+         <item>vector_normalizer</item> 
+         <item>vector_normalizer_pca</item> 
+      </section>
+      <section>
+         <name>Semi-Unsupervised</name>
+         <item>linear_manifold_regularizer</item>
+         <item>discriminant_pca</item> 
+         <item nolink="true">
+            <name>manifold_regularization_tools</name>
+            <sub>
+               <item>sample_pair</item>
+               <item>find_percent_shortest_edges_randomly</item>
+               <item>find_k_nearest_neighbors</item>
+               <item>find_approximate_k_nearest_neighbors</item>
+               <item>remove_short_edges</item>
+               <item>remove_long_edges</item>
+               <item>remove_percent_longest_edges</item>
+               <item>remove_percent_shortest_edges</item>
+               <item>squared_euclidean_distance</item>
+               <item>use_weights_of_one</item>
+               <item>use_gaussian_weights</item>
+            </sub>
+         </item>
+      </section>
+      <section>
+         <name>Feature Selection</name>
          <item>rank_features</item> 
-         <item>svm_pegasos</item> 
-         <item>one_vs_one_trainer</item> 
-         <item>one_vs_all_trainer</item> 
+         <item>sort_basis_vectors</item> 
+      </section>
+
+      <center><h2><u>Other Tools</u></h2></center>
+      <section>
+         <name>Validation</name>
+         <item>cross_validate_trainer</item> 
+         <item>cross_validate_trainer_threaded</item> 
+         <item>cross_validate_multiclass_trainer</item> 
+         <item>cross_validate_regression_trainer</item> 
+         <item>test_binary_decision_function</item> 
+         <item>test_multiclass_decision_function</item> 
+         <item>test_regression_function</item> 
       </section>
 
       <section>
@@ -135,25 +186,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       </section>
 
       <section>
-         <name>Validation</name>
-         <item>cross_validate_trainer</item> 
-         <item>cross_validate_trainer_threaded</item> 
-         <item>cross_validate_multiclass_trainer</item> 
-         <item>cross_validate_regression_trainer</item> 
-         <item>test_binary_decision_function</item> 
-         <item>test_multiclass_decision_function</item> 
-         <item>test_regression_function</item> 
-      </section>
-
-      <section>
          <name>Miscellaneous</name>
          <item>simplify_linear_decision_function</item> 
-         <item>train_probabilistic_decision_function</item> 
-         <item>vector_normalizer</item> 
-         <item>vector_normalizer_pca</item> 
-         <item>discriminant_pca</item> 
          <item>fill_lisf</item> 
-         <item>sort_basis_vectors</item> 
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
          <item>is_learning_problem</item> 
@@ -162,29 +197,12 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>find_gamma_with_big_centroid_gap</item> 
          <item>compute_mean_squared_distance</item> 
          <item>kernel_matrix</item> 
-         <item>find_clusters_using_kmeans</item> 
          <item>
                <name>sparse vectors</name>
                <link>dlib/svm/sparse_vector_abstract.h.html#sparse_vectors</link>
          </item>
 
          
-         <item nolink="true">
-            <name>manifold_regularization_tools</name>
-            <sub>
-               <item>sample_pair</item>
-               <item>find_percent_shortest_edges_randomly</item>
-               <item>find_k_nearest_neighbors</item>
-               <item>find_approximate_k_nearest_neighbors</item>
-               <item>remove_short_edges</item>
-               <item>remove_long_edges</item>
-               <item>remove_percent_longest_edges</item>
-               <item>remove_percent_shortest_edges</item>
-               <item>squared_euclidean_distance</item>
-               <item>use_weights_of_one</item>
-               <item>use_gaussian_weights</item>
-            </sub>
-         </item>
 
       </section>
 
@@ -1158,7 +1176,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
          <description>
                 This object represents a classification or regression function that was 
-                learned by a kernel based learning algorithm.  
+                learned by a kernel based learning algorithm.  Therefore, it is a function 
+                object that takes a sample object and returns a scalar value.
          </description>
          <examples>
             <example>svm_ex.cpp.html</example>
