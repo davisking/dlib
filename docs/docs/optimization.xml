@@ -25,23 +25,28 @@
    <menu width="150">
     <top>
       <section>
-         <name>Main Routines</name>
+         <name>General Purpose Optimizers</name>
          <item>find_min</item> 
          <item>find_min_single_variable</item> 
          <item>find_min_using_approximate_derivatives</item> 
          <item>find_min_bobyqa</item> 
-         <item>solve_qp_using_smo</item> 
-         <item>solve_qp2_using_smo</item> 
-         <item>solve_qp3_using_smo</item> 
-         <item>oca</item> 
          <item>find_max</item> 
          <item>find_max_single_variable</item> 
          <item>find_max_using_approximate_derivatives</item> 
          <item>find_max_bobyqa</item> 
          <item>find_max_trust_region</item> 
          <item>find_min_trust_region</item> 
+      </section>
+
+      <section>
+         <name>Special Purpose Optimizers</name>
+         <item>solve_qp_using_smo</item> 
+         <item>solve_qp2_using_smo</item> 
+         <item>solve_qp3_using_smo</item> 
+         <item>oca</item> 
          <item>solve_least_squares</item> 
          <item>solve_least_squares_lm</item> 
+         <item>solve_trust_region_subproblem</item> 
       </section>
 
       <section>
@@ -62,7 +67,6 @@
          <item>poly_min_extrap</item> 
          <item>lagrange_poly_min_extrap</item> 
          <item>line_search</item> 
-         <item>solve_trust_region_subproblem</item> 
       </section>
 
     </top>  
