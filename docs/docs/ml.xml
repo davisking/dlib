@@ -99,7 +99,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>vector_normalizer_pca</item> 
       </section>
       <section>
-         <name>Semi-Unsupervised</name>
+         <name>Semi-Supervised</name>
          <item>linear_manifold_regularizer</item>
          <item>discriminant_pca</item> 
          <item nolink="true">
