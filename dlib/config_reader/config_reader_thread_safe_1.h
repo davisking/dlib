@@ -49,6 +49,10 @@ namespace dlib
             std::istream& in
         );
 
+        config_reader_thread_safe_1(
+            const std::string& config_file 
+        );
+
         virtual ~config_reader_thread_safe_1(
         ); 
 
@@ -57,6 +61,10 @@ namespace dlib
 
         void load_from (
             std::istream& in
+        );
+
+        void load_from (
+            const std::string& config_file 
         );
 
         bool is_key_defined (
@@ -199,6 +207,22 @@ namespace dlib
         typename config_reader_base,
         typename map_string_void
         >
+    void config_reader_thread_safe_1<config_reader_base,map_string_void>::
+    load_from(
+        const std::string& config_file
+    )
+    {
+        auto_mutex M(*m);
+        cr->load_from(config_file);
+        fill_block_table();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename config_reader_base,
+        typename map_string_void
+        >
     config_reader_thread_safe_1<config_reader_base,map_string_void>::
     config_reader_thread_safe_1(
         std::istream& in
@@ -211,6 +235,34 @@ namespace dlib
         {
             m = new rmutex;
             cr = new config_reader_base(in);
+            fill_block_table();
+        }
+        catch (...)
+        {
+            if (m) delete m;
+            if (cr) delete cr;
+            throw;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename config_reader_base,
+        typename map_string_void
+        >
+    config_reader_thread_safe_1<config_reader_base,map_string_void>::
+    config_reader_thread_safe_1(
+        const std::string& config_file
+    ) :
+        m(0),
+        cr(0),
+        own_pointers(true)
+    {
+        try
+        {
+            m = new rmutex;
+            cr = new config_reader_base(config_file);
             fill_block_table();
         }
         catch (...)
