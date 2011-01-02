@@ -28,7 +28,8 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS 
                 This object represents a classification or regression function that was 
-                learned by a kernel based learning algorithm.  
+                learned by a kernel based learning algorithm.   Therefore, it is a function 
+                object that takes a sample object and returns a scalar value.
         !*/
 
         typedef K kernel_type;
