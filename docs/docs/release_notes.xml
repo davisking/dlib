@@ -12,13 +12,61 @@
 
 <current>
 New Stuff:
+   - General Stuff 
+      - Added the promote template
+      - Added the basic_type template
+      - Added the assign_image_scaled() function
+      - Added the unordered_pair object.
+      - Added the symmetric_matrix_cache() function
+      - Added two new quadratic program solvers.  The solve_qp2_using_smo
+        and solve_qp3_using_smo objects.
 
+   - Machine Learning Stuff
+      - Added the svm_c_trainer object.  It implements C-SVM classification and
+        allows the user to set different C values for each class.
+      - Added the svm_one_class_trainer object. 
+      - Added the svr_trainer object.  It implements epsilon-insensitive
+        support vector regression.
+      - Added two new any objects.  The any_decision_function for containing 
+        decision function style objects and the any_trainer for trainers.
+      - Added cross_validate_regression_trainer()
+      - Added test_regression_function()
+      - Added the probabilistic() function.  It is a trainer adapter that
+        simply calls train_probabilistic_decision_function().
+      - Added tools for multiclass classification 
+         - Added one_vs_one_trainer
+         - Added one_vs_all_trainer
+         - Added cross_validate_multiclass_trainer()
+         - Added test_multiclass_decision_function()
+ 
 Non-Backwards Compatible Changes:
+  - invalid_svm_nu_error has been renamed to invalid_nu_error.
+  - Changed the pixel_traits so that signed grayscale pixel types are allowed.  
+    This involved adding a few new fields to pixel_traits.  I also changed the 
+    get_pixel_intensity() function so that its return value is of the same type 
+    as the basic pixel type rather than always being unsigned long.
+  - Removed the kernel_type typedef from the normalized function since this
+    meta-object should be capable of working with non-kernel decision functions.
+  - train_probabilistic_decision_function() no longer accepts column vectors of 
+    samples and labels.  Now it only accepts std::vectors of samples and labels.  
 
 Bug fixes:
+  - Fixed a bug in the deserialization code for the sparse kernels.  The bug
+    prevented code which used the deserialize() routine from compiling.
 
 Other:
-
+  - Changed the image display GUI widgets to use the assign_image_scaled() 
+    function internally.  Now they will accept just about any image and 
+    do the right thing.
+  - Modified the type_safe_union so that you can call apply_to_contents() on const
+    type_safe_unions.
+  - Added serialization support for std::pair objects.
+  - Made the train_probabilistic_decision_function() more general by making it work 
+    with any kind of trainer object rather than only ones which produce 
+    dlib::decision_function objects.  I also made it work with trainers that only 
+    take std::vectors.
+  - Added overloads to the config_reader's methods to allow it to load directly 
+    from a file name given as a string in addition to taking istream objects.
 </current>
 
 <!-- *******************************************************************************  -->
