@@ -12,6 +12,18 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.34" date="Jan 03, 2011">
+New Stuff:
    - General Stuff 
       - Added the promote template
       - Added the basic_type template
@@ -67,7 +79,7 @@ Other:
     take std::vectors.
   - Added overloads to the config_reader's methods to allow it to load directly 
     from a file name given as a string in addition to taking istream objects.
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
