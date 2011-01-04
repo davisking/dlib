@@ -450,10 +450,10 @@ namespace
 
             di = 1, 1/2.0, 1/3.0;
 
-            DLIB_TEST(inv(diagm(d)) == diagm(di));
-            DLIB_TEST(inv(diagm(d)) == diagm(di));
-            DLIB_TEST(inv(diagm(d))*m == tmp(diagm(di))*m);
-            DLIB_TEST(m*inv(diagm(d)) == m*tmp(diagm(di)));
+            DLIB_TEST(equal(inv(diagm(d)) , diagm(di)));
+            DLIB_TEST(equal(inv(diagm(d)) , diagm(di)));
+            DLIB_TEST(equal(inv(diagm(d))*m , tmp(diagm(di))*m));
+            DLIB_TEST(equal(m*inv(diagm(d)) , m*tmp(diagm(di))));
 
             DLIB_TEST(equal(inv(diagm(d)) + m , tmp(diagm(di)) + m));
             DLIB_TEST(equal(m + inv(diagm(d)) , tmp(diagm(di)) + m));
