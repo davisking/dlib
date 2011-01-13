@@ -35,9 +35,10 @@ There are four scripts in the docs folder.
  - testenv:  This script tests your environment for all the needed utilities.
 	     Run it and it should tell you what else you need to install. 
 	     Note that the htmlify utility is something I wrote and is in
-	     the htmlify subfolder.  You should build and install it. 
-	     (go into that folder, make a subfolder called build, then cd
-	     into build and say:  "cmake ..; make; sudo make install".  
+	     dlib's svn repository in the trunk/tools/htmlify folder.  You 
+	     should build and install it.  (go into that folder, make a 
+	     subfolder called build, then cd into build and say:  
+	     	"cmake ..; make; sudo make install".  
 	     You will need to install cmake if you don't have it already)
 
  - makedocs: This remakes all the HTML documentation by pulling files out
