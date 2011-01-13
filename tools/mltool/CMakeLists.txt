@@ -15,6 +15,11 @@ PROJECT(${target_name})
 # cmake that they are part of our target (which is the exectuable named mltool)
 ADD_EXECUTABLE(${target_name} 
    src/main.cpp
+   src/regression.cpp
+   src/regression.h
+   src/common.h
+   src/option_range.h
+   src/option_range.cpp
 )
 
 
