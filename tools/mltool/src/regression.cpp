@@ -14,6 +14,7 @@
 #include <cfloat>
 
 using namespace dlib;
+using namespace std;
 
 // ----------------------------------------------------------------------------------------
 
@@ -341,11 +342,12 @@ svr_test (
              gamma <= gamma_range.get_max_value();
              gamma = gamma_range.get_next_value (gamma))
         {
+            cout << "test with svr-C: " << svr_c << "   gamma: "<< gamma << flush;
             double cv_error;
             trainer.set_kernel (kernel_type (gamma));
             cv_error = cross_validate_regression_trainer (trainer, 
                                                           dense_samples, labels, 10);
-            printf ("%3.6f %3.6f %3.9f\n", svr_c, gamma, cv_error);
+            cout << "   10-fold-MSE: "<< cv_error << endl;
         }
     }
 }
