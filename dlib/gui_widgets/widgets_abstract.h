@@ -2030,7 +2030,8 @@ namespace dlib
                 This object represents an image inside a scrollable region.  
                 You give it an image to display by calling set_image().
                 This widget also allows you to add rectangle and line overlays that
-                will be drawn on top of the image.
+                will be drawn on top of the image.  Finally, if you hold the Ctrl key
+                you can zoom in and out using the mouse wheel.
 
                 The image is drawn such that:
                     - the pixel img[0][0] is the upper left corner of the image.

@@ -5659,7 +5659,10 @@ namespace dlib
     image_display::
     image_display(  
         drawable_window& w
-    ): scrollable_region(w)  
+    ): 
+        scrollable_region(w),
+        zoom_in_scale(1),
+        zoom_out_scale(1)
     { 
         enable_mouse_drag();
 
@@ -5772,18 +5775,33 @@ namespace dlib
             return;
 
         const point origin(total_rect().tl_corner());
-
-        draw_image(c, origin, img, area);
+        
+        // draw the image on the screen
+        const rectangle img_area = total_rect().intersect(area);
+        for (long row = img_area.top(); row <= img_area.bottom(); ++row)
+        {
+            for (long col = img_area.left(); col <= img_area.right(); ++col)
+            {
+                assign_pixel(c[row-c.top()][col-c.left()], 
+                             img[(row-origin.y())*zoom_out_scale/zoom_in_scale][(col-origin.x())*zoom_out_scale/zoom_in_scale]);
+            }
+        }
 
         // now draw all the overlay rectangles
         for (unsigned long i = 0; i < overlay_rects.size(); ++i)
         {
-            draw_rectangle(c, translate_rect(overlay_rects[i].rect, origin), overlay_rects[i].color, area);
+            rectangle orect = overlay_rects[i].rect;
+            orect.left()   = orect.left()*zoom_in_scale/zoom_out_scale;
+            orect.right()  = orect.right()*zoom_in_scale/zoom_out_scale;
+            orect.top()    = orect.top()*zoom_in_scale/zoom_out_scale;
+            orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
+
+            draw_rectangle(c, translate_rect(orect, origin), overlay_rects[i].color, area);
             if (overlay_rects[i].label.size() != 0)
             {
                 // make a rectangle that is at the spot we want to draw our string
-                rectangle r(overlay_rects[i].rect.br_corner(),  
-                            overlay_rects[i].rect.br_corner() + point(10000,10000));
+                rectangle r(orect.br_corner(),  
+                            orect.br_corner() + point(10000,10000));
                 r = translate_rect(r, origin);
                 mfont->draw_string(c, r, overlay_rects[i].label, overlay_rects[i].color, 0, 
                                    std::string::npos, area);
@@ -5793,7 +5811,110 @@ namespace dlib
         // now draw all the overlay lines 
         for (unsigned long i = 0; i < overlay_lines.size(); ++i)
         {
-            draw_line(c, overlay_lines[i].p1+origin, overlay_lines[i].p2+origin, overlay_lines[i].color, area);
+            draw_line(c, 
+                      zoom_in_scale*overlay_lines[i].p1/zoom_out_scale + origin, 
+                      zoom_in_scale*overlay_lines[i].p2/zoom_out_scale + origin, 
+                      overlay_lines[i].color, area);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    on_wheel_up (
+        unsigned long state
+    )
+    {
+        // if CONTROL is not being held down
+        if ((state & base_window::CONTROL) == 0)
+        {
+            scrollable_region::on_wheel_up(state);
+            return;
+        }
+
+        if (rect.contains(lastx,lasty) == false || hidden || !enabled)
+            return;
+
+
+        if (zoom_in_scale < 100 && zoom_out_scale == 1)
+        {
+            const point mouse_loc(lastx, lasty);
+            // the pixel in img that the mouse is over
+            const point pix_loc = (mouse_loc - total_rect().tl_corner())/zoom_in_scale;
+
+            zoom_in_scale = zoom_in_scale*10/9 + 1;
+
+            set_total_rect_size(img.nc()*zoom_in_scale, img.nr()*zoom_in_scale);
+
+            // make is to the pixel under the mouse doesn't move while we zoom
+            const point delta = total_rect().tl_corner() - (mouse_loc - pix_loc*zoom_in_scale);
+            scroll_to_rect(translate_rect(display_rect(), delta)); 
+        }
+        else if (zoom_out_scale != 1)
+        {
+            const point mouse_loc(lastx, lasty);
+            // the pixel in img that the mouse is over
+            const point pix_loc = (mouse_loc - total_rect().tl_corner())*zoom_out_scale;
+
+            zoom_out_scale = zoom_out_scale*9/10;
+            if (zoom_out_scale == 0)
+                zoom_out_scale = 1;
+
+            set_total_rect_size(img.nc()/zoom_out_scale, img.nr()/zoom_out_scale);
+
+            // make is to the pixel under the mouse doesn't move while we zoom
+            const point delta = total_rect().tl_corner() - (mouse_loc - pix_loc/zoom_out_scale);
+            scroll_to_rect(translate_rect(display_rect(), delta)); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    on_wheel_down (
+        unsigned long state
+    )
+    {
+        // if CONTROL is not being held down
+        if ((state & base_window::CONTROL) == 0)
+        {
+            scrollable_region::on_wheel_down(state);
+            return;
+        }
+
+        if (rect.contains(lastx,lasty) == false || hidden || !enabled)
+            return;
+
+
+        if (zoom_in_scale != 1)
+        {
+            const point mouse_loc(lastx, lasty);
+            // the pixel in img that the mouse is over
+            const point pix_loc = (mouse_loc - total_rect().tl_corner())/zoom_in_scale;
+
+            zoom_in_scale = zoom_in_scale*9/10;
+            if (zoom_in_scale == 0)
+                zoom_in_scale = 1;
+
+            set_total_rect_size(img.nc()*zoom_in_scale, img.nr()*zoom_in_scale);
+
+            // make is to the pixel under the mouse doesn't move while we zoom
+            const point delta = total_rect().tl_corner() - (mouse_loc - pix_loc*zoom_in_scale);
+            scroll_to_rect(translate_rect(display_rect(), delta)); 
+        }
+        else if (std::max(img.nr(), img.nc())/zoom_out_scale > 10)
+        {
+            const point mouse_loc(lastx, lasty);
+            // the pixel in img that the mouse is over
+            const point pix_loc = (mouse_loc - total_rect().tl_corner())*zoom_out_scale;
+
+            zoom_out_scale = zoom_out_scale*10/9 + 1;
+
+            set_total_rect_size(img.nc()/zoom_out_scale, img.nr()/zoom_out_scale);
+
+            // make is to the pixel under the mouse doesn't move while we zoom
+            const point delta = total_rect().tl_corner() - (mouse_loc - pix_loc/zoom_out_scale);
+            scroll_to_rect(translate_rect(display_rect(), delta)); 
         }
     }
 

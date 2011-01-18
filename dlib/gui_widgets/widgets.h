@@ -3143,11 +3143,22 @@ namespace dlib
             const canvas& c
         ) const;
 
+        void on_wheel_up (
+            unsigned long state
+        );
+
+        void on_wheel_down (
+            unsigned long state
+        );
+
         array2d<rgb_alpha_pixel>::kernel_1a img;
 
 
         std::vector<overlay_rect> overlay_rects;
         std::vector<overlay_line> overlay_lines;
+
+        long zoom_in_scale;
+        long zoom_out_scale;
 
         // restricted functions
         image_display(image_display&);        // copy constructor
