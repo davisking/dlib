@@ -595,6 +595,18 @@ namespace
             DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , (diagm(d1))*(m*inv(diagm(d2)))));
             DLIB_TEST(equal(pointwise_multiply((d1)*trans(reciprocal(d2)), m) , ((diagm(d1))*m)*inv(diagm(d2))));
         }
+
+
+
+        {
+            for (int i = 0; i < 5; ++i)
+            {
+                matrix<double> m = randm(3,4) + 1;
+
+                DLIB_TEST(equal(1.0/m , reciprocal(m)));
+                DLIB_TEST(equal(0.0/m , zeros_matrix<double>(3,4)));
+            }
+        }
     }
 
 

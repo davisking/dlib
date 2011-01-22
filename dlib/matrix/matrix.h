@@ -744,6 +744,42 @@ namespace dlib
         return matrix_mul_scal_exp<EXP>(m.m,m.s/static_cast<type>(s));
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template <typename M>
+    struct op_s_div_m : basic_op_m<M> 
+    {
+        typedef typename M::type type;
+
+        op_s_div_m( const M& m_, const type& s_) : basic_op_m<M>(m_), s(s_){}
+
+        const type s;
+
+        const static long cost = M::cost+1;
+        typedef const typename M::type const_ret_type;
+        const_ret_type apply (long r, long c) const
+        { 
+            return s/this->m(r,c);
+        }
+    };
+
+    template <
+        typename EXP,
+        typename S
+        >
+    const typename disable_if<is_matrix<S>, matrix_op<op_s_div_m<EXP> > >::type operator/ (
+        const S& val,
+        const matrix_exp<EXP>& m
+    )
+    {
+        typedef typename EXP::type type;
+
+        typedef op_s_div_m<EXP> op;
+        return matrix_op<op>(op(m.ref(), static_cast<type>(val)));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename EXP
         >

@@ -109,6 +109,17 @@ namespace dlib
     !*/
 
     template <typename T>
+    const matrix_exp operator/ (
+        const T& value,
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - returns the result of dividing the given scalar value by all the elements 
+              of matrix m.  The resulting matrix will have the same dimensions as m.
+    !*/
+
+    template <typename T>
     const matrix_exp operator+ (
         const matrix_exp& m,
         const T& value
