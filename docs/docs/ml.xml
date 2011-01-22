@@ -83,6 +83,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>mlp</item> 
          <item>krls</item>
          <item>krr_trainer</item> 
+         <item>rr_trainer</item> 
          <item>svr_trainer</item> 
          <item>rvm_regression_trainer</item> 
          <item>rbf_network_trainer</item> 
@@ -952,14 +953,36 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                represents the learned function. 
             </p>
             The implementation is done using the <a href="#empirical_kernel_map">empirical_kernel_map</a> and 
-            <a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a> 
-            and thus allows you to run the algorithm on large datasets and obtain sparse outputs.  It is also
-            capable of automatically estimating its regularization parameter using leave-one-out cross-validation.
+            <a href="#linearly_independent_subset_finder">linearly_independent_subset_finder</a> to kernelize
+            the <a href="#rr_trainer">rr_trainer</a> object.  Thus it allows you to run the algorithm on large 
+            datasets and obtain sparse outputs.  It is also capable of automatically estimating its 
+            regularization parameter using leave-one-out cross-validation.
          </description>
          <examples>
             <example>krr_regression_ex.cpp.html</example>
             <example>krr_classification_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>rr_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/rr_trainer_abstract.h</spec_file>
+         <description>
+            <p>
+               Performs linear ridge regression and outputs a <a href="#decision_function">decision_function</a> that 
+               represents the learned function.  In particular, this object can only be used with
+               the <a href="#linear_kernel">linear_kernel</a>.  It is optimized for the linear case where
+               the number of features in each sample vector is small (i.e. on the order of 1000 or less since the 
+               algorithm is cubic in the number of features.).  
+               If you want to use a nonlinear kernel then you should use the <a href="#krr_trainer">krr_trainer</a>.
+            </p>
+              This object is capable of automatically estimating its regularization parameter using 
+              leave-one-out cross-validation.  
+         </description>
                                  
       </component>
       
