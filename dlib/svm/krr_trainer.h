@@ -143,7 +143,7 @@ namespace dlib
             DLIB_ASSERT(lambda_ >= 0,
                 "\t void krr_trainer::set_lambda()"
                 << "\n\t lambda must be greater than or equal to 0"
-                << "\n\t lambda: " << lambda 
+                << "\n\t lambda_: " << lambda_
                 << "\n\t this:   " << this
                 );
 
