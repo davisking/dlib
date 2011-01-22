@@ -19,8 +19,6 @@ namespace dlib
 
             INITIAL VALUE
                 - get_lambda() == 0
-                - basis_loaded() == false
-                - get_max_basis_size() == 400
                 - will_use_regression_loss_for_loo_cv() == true
                 - get_search_lambdas() == logspace(-9, 2, 50) 
                 - this object will not be verbose unless be_verbose() is called
@@ -79,7 +77,9 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns a copy of the kernel function in use by this object
+                - returns a copy of the kernel function in use by this object.  Since
+                  the linear kernels don't have any parameters this function just
+                  returns kernel_type()
         !*/
 
         void set_lambda (
