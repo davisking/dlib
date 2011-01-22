@@ -1,7 +1,7 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_KRR_TRAInER_H__
-#define DLIB_KRR_TRAInER_H__
+#ifndef DLIB_RR_TRAInER_H__
+#define DLIB_RR_TRAInER_H__
 
 #include "../algs.h"
 #include "function.h"
@@ -9,7 +9,7 @@
 #include "empirical_kernel_map.h"
 #include "linearly_independent_subset_finder.h"
 #include "../statistics.h"
-#include "krr_trainer_abstract.h"
+#include "rr_trainer_abstract.h"
 #include <vector>
 #include <iostream>
 
@@ -18,7 +18,7 @@ namespace dlib
     template <
         typename K 
         >
-    class krr_trainer
+    class rr_trainer
     {
 
     public:
@@ -28,13 +28,15 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
         typedef decision_function<kernel_type> trained_function_type;
 
-        krr_trainer (
+        // You are getting a compiler error on this line because you supplied a non-linear or 
+        // sparse kernel to the rr_trainer object.  You have to use dlib::linear_kernel with this trainer.
+        COMPILE_TIME_ASSERT((is_same_type<K, linear_kernel<sample_type> >::value));
+
+        rr_trainer (
         ) :
             verbose(false),
             use_regression_loss(true),
-            lambda(0),
-            max_basis_size(400),
-            ekm_stale(true)
+            lambda(0)
         {
             // default lambda search list
             lams = matrix_cast<scalar_type>(logspace(-9, 2, 50)); 
@@ -73,67 +75,7 @@ namespace dlib
         const kernel_type get_kernel (
         ) const
         {
-            return kern;
-        }
-
-        void set_kernel (
-            const kernel_type& k
-        )
-        {
-            kern = k;
-        }
-
-        template <typename T>
-        void set_basis (
-            const T& basis_samples
-        )
-        {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(basis_samples.size() > 0 && is_vector(vector_to_matrix(basis_samples)),
-                "\tvoid krr_trainer::set_basis(basis_samples)"
-                << "\n\t You have to give a non-empty set of basis_samples and it must be a vector"
-                << "\n\t basis_samples.size():                       " << basis_samples.size() 
-                << "\n\t is_vector(vector_to_matrix(basis_samples)): " << is_vector(vector_to_matrix(basis_samples)) 
-                << "\n\t this: " << this
-                );
-
-            basis = vector_to_matrix(basis_samples);
-            ekm_stale = true;
-        }
-
-        bool basis_loaded (
-        ) const
-        {
-            return (basis.size() != 0);
-        }
-
-        void clear_basis (
-        )
-        {
-            basis.set_size(0);
-            ekm.clear();
-            ekm_stale = true;
-        }
-
-        unsigned long get_max_basis_size (
-        ) const
-        {
-            return max_basis_size;
-        }
-
-        void set_max_basis_size (
-            unsigned long max_basis_size_
-        )
-        {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(max_basis_size_ > 0,
-                "\t void krr_trainer::set_max_basis_size()"
-                << "\n\t max_basis_size_ must be greater than 0"
-                << "\n\t max_basis_size_: " << max_basis_size_ 
-                << "\n\t this:            " << this
-                );
-
-            max_basis_size = max_basis_size_;
+            return kernel_type();
         }
 
         void set_lambda (
@@ -142,7 +84,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(lambda_ >= 0,
-                "\t void krr_trainer::set_lambda()"
+                "\t void rr_trainer::set_lambda()"
                 << "\n\t lambda must be greater than or equal to 0"
                 << "\n\t lambda: " << lambda 
                 << "\n\t this:   " << this
@@ -164,7 +106,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_vector(lambdas) && lambdas.size() > 0 && min(lambdas) > 0,
-                "\t void krr_trainer::set_search_lambdas()"
+                "\t void rr_trainer::set_search_lambdas()"
                 << "\n\t lambdas must be a non-empty vector of values"
                 << "\n\t is_vector(lambdas): " << is_vector(lambdas) 
                 << "\n\t lambdas.size():     " << lambdas.size()
@@ -240,7 +182,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_learning_problem(x,y),
-                "\t decision_function krr_trainer::train(x,y)"
+                "\t decision_function rr_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
                 << "\n\t is_vector(x): " << is_vector(x)
                 << "\n\t is_vector(y): " << is_vector(y)
@@ -253,69 +195,21 @@ namespace dlib
             {
                 // make sure requires clause is not broken
                 DLIB_ASSERT(is_binary_classification_problem(x,y),
-                    "\t decision_function krr_trainer::train(x,y)"
+                    "\t decision_function rr_trainer::train(x,y)"
                     << "\n\t invalid inputs were given to this function"
                     );
             }
 #endif
 
-            // The first thing we do is make sure we have an appropriate ekm ready for use below.
-            if (basis_loaded())
-            {
-                if (ekm_stale)
-                {
-                    ekm.load(kern, basis);
-                    ekm_stale = false;
-                }
-            }
-            else
-            {
-                linearly_independent_subset_finder<kernel_type> lisf(kern, max_basis_size);
-                fill_lisf(lisf, x);
-                ekm.load(lisf);
-            }
-
-            if (verbose)
-            {
-                std::cout << "\nNumber of basis vectors used: " << ekm.out_vector_size() << std::endl;
-            }
-
             typedef matrix<scalar_type,0,1,mem_manager_type> column_matrix_type;
             typedef matrix<scalar_type,0,0,mem_manager_type> general_matrix_type;
 
-            running_stats<scalar_type> rs;
-
-            // Now we project all the x samples into kernel space using our EKM 
-            matrix<column_matrix_type,0,1,mem_manager_type > proj_x;
-            proj_x.set_size(x.size());
-            for (long i = 0; i < proj_x.size(); ++i)
-            {
-                scalar_type err;
-                // Note that we also append a 1 to the end of the vectors because this is
-                // a convenient way of dealing with the bias term later on.
-                if (verbose == false)
-                {
-                    proj_x(i) = ekm.project(x(i));
-                }
-                else
-                {
-                    proj_x(i) = ekm.project(x(i),err);
-                    rs.add(err);
-                }
-            }
-
-            const long dims = ekm.out_vector_size();
-
-            if (verbose)
-            {
-                std::cout << "Mean EKM projection error:                  " << rs.mean() << std::endl;
-                std::cout << "Standard deviation of EKM projection error: " << rs.stddev() << std::endl;
-            }
+            const long dims = x(0).size();
 
             /*
-                Notes on the solution of KRR
+                Notes on the solution of ridge regression 
 
-                Let A = an proj_x.size() by ekm.out_vector_size() matrix which contains
+                Let A = an x.size() by dims matrix which contains
                 all the projected data samples.
 
                 Let I = an identity matrix
@@ -333,7 +227,7 @@ namespace dlib
 
                     Notes on Regularized Least Squares by Ryan M. Rifkin and Ross A. Lippert.
 
-                    In the implementation of the krr_trainer I'm only using two simple equations
+                    In the implementation of the rr_trainer I'm only using two simple equations
                     from the above paper.
 
 
@@ -344,7 +238,7 @@ namespace dlib
                         where V*D*trans(V) == C 
 
                     Also, via some simple linear algebra the above paper works out that the leave one out 
-                    value for a sample x(i) is equal to the following (we refer to proj_x(i) as x(i) for brevity):
+                    value for a sample x(i) is equal to the following (we refer to x(i) as x(i) for brevity):
                         Let G = inv(C + lambda*I)
                         let val = trans(x(i))*G*x(i);
 
@@ -356,7 +250,7 @@ namespace dlib
 
 
                 Finally, note that we will pretend there was a 1 appended to the end of each
-                vector in proj_x.  We won't actually do that though because we don't want to
+                vector in x.  We won't actually do that though because we don't want to
                 have to make a copy of all the samples.  So throughout the following code 
                 I have explicitly dealt with this.
             */
@@ -365,24 +259,25 @@ namespace dlib
             column_matrix_type  L, tempv, w;
 
             // compute C and L
-            for (long i = 0; i < proj_x.size(); ++i)
+            for (long i = 0; i < x.size(); ++i)
             {
-                C += proj_x(i)*trans(proj_x(i));
-                L += y(i)*proj_x(i);
-                tempv += proj_x(i);
+                C += x(i)*trans(x(i));
+                L += y(i)*x(i);
+                tempv += x(i);
             }
 
+            // Account for the extra 1 that we pretend is appended to x
             // Make C = [C      tempv
-            //           tempv' proj_x.size()]
+            //           tempv' x.size()]
             C = join_cols(join_rows(C, tempv), 
-                          join_rows(trans(tempv), uniform_matrix<scalar_type>(1,1, proj_x.size())));
+                          join_rows(trans(tempv), uniform_matrix<scalar_type>(1,1, x.size())));
             L = join_cols(L, uniform_matrix<scalar_type>(1,1, sum(y)));
 
             eigenvalue_decomposition<general_matrix_type> eig(make_symmetric(C));
             const general_matrix_type V = eig.get_pseudo_v();
             const column_matrix_type  D = eig.get_real_eigenvalues();
 
-            // We can save some work by pre-multiplying the proj_x vectors by trans(V)
+            // We can save some work by pre-multiplying the x vectors by trans(V)
             // and saving the result so we don't have to recompute it over and over later.
             matrix<column_matrix_type,0,1,mem_manager_type > Vx;
             if (lambda == 0 || output_looe)
@@ -390,13 +285,13 @@ namespace dlib
                 // Save the transpose of V into a temporary because the subsequent matrix
                 // vector multiplies will be faster (because of better cache locality).
                 const general_matrix_type transV( colm(trans(V),range(0,dims-1))  );
-                // Remember the pretend 1 at the end of proj_x(*).  We want to multiply trans(V)*proj_x(*)
+                // Remember the pretend 1 at the end of x(*).  We want to multiply trans(V)*x(*)
                 // so to do this we pull the last column off trans(V) and store it separately.
                 const column_matrix_type lastV = colm(trans(V), dims);
-                Vx.set_size(proj_x.size());
-                for (long i = 0; i < proj_x.size(); ++i)
+                Vx.set_size(x.size());
+                for (long i = 0; i < x.size(); ++i)
                 {
-                    Vx(i) = transV*proj_x(i);
+                    Vx(i) = transV*x(i);
                     Vx(i) = squared(Vx(i) + lastV);
                 }
             }
@@ -425,14 +320,14 @@ namespace dlib
                     w = colm(w,0,dims);
 
                     scalar_type looe = 0;
-                    for (long i = 0; i < proj_x.size(); ++i)
+                    for (long i = 0; i < x.size(); ++i)
                     {
-                        // perform equivalent of: val = trans(proj_x(i))*G*proj_x(i);
+                        // perform equivalent of: val = trans(x(i))*G*x(i);
                         const scalar_type val = dot(tempv, Vx(i));
                         const scalar_type temp = (1 - val);
                         scalar_type loov;
                         if (temp != 0)
-                            loov = (trans(w)*proj_x(i) + b - y(i)*val) / temp;
+                            loov = (trans(w)*x(i) + b - y(i)*val) / temp;
                         else
                             loov = 0;
 
@@ -450,7 +345,7 @@ namespace dlib
 
                 // mark that we saved the looe to best_looe already
                 output_looe = false;
-                best_looe /= proj_x.size();
+                best_looe /= x.size();
 
                 if (verbose)
                 {
@@ -479,21 +374,21 @@ namespace dlib
             if (output_looe)
             {
                 best_looe = 0;
-                for (long i = 0; i < proj_x.size(); ++i)
+                for (long i = 0; i < x.size(); ++i)
                 {
-                    // perform equivalent of: val = trans(proj_x(i))*G*proj_x(i);
+                    // perform equivalent of: val = trans(x(i))*G*x(i);
                     const scalar_type val = dot(tempv, Vx(i));
                     const scalar_type temp = (1 - val);
                     scalar_type loov;
                     if (temp != 0)
-                        loov = (trans(w)*proj_x(i) + b - y(i)*val) / temp;
+                        loov = (trans(w)*x(i) + b - y(i)*val) / temp;
                     else
                         loov = 0;
 
                     best_looe += loss(loov, y(i));
                 }
 
-                best_looe /= proj_x.size();
+                best_looe /= x.size();
 
                 if (verbose)
                 {
@@ -506,15 +401,11 @@ namespace dlib
 
             // convert w into a proper decision function
             decision_function<kernel_type> df;
-            df = ekm.convert_to_decision_function(w);
+            df.alpha.set_size(1);
+            df.alpha = 1;
+            df.basis_vectors.set_size(1);
+            df.basis_vectors(0) = w;
             df.b = -b; // don't forget about the bias we stuck onto all the vectors
-
-            // If we used an automatically derived basis then there isn't any point in
-            // keeping the ekm around.  So free its memory.
-            if (basis_loaded() == false)
-            {
-                ekm.clear();
-            }
 
             return df;
         }
@@ -541,17 +432,10 @@ namespace dlib
 
         /*!
             CONVENTION
-                - if (ekm_stale) then
-                    - kern or basis have changed since the last time
-                      they were loaded into the ekm
-
                 - get_lambda() == lambda
-                - get_kernel() == kern
-                - get_max_basis_size() == max_basis_size
+                - get_kernel() == kernel_type() 
                 - will_use_regression_loss_for_loo_cv() == use_regression_loss
                 - get_search_lambdas() == lams
-
-                - basis_loaded() == (basis.size() != 0)
         !*/
 
         bool verbose;
@@ -559,18 +443,11 @@ namespace dlib
 
         scalar_type lambda;
 
-        kernel_type kern;
-        unsigned long max_basis_size;
-
-        matrix<sample_type,0,1,mem_manager_type> basis;
-        mutable empirical_kernel_map<kernel_type> ekm;
-        mutable bool ekm_stale; 
-
         matrix<scalar_type,0,0,mem_manager_type> lams; 
     }; 
 
 }
 
-#endif // DLIB_KRR_TRAInER_H__
+#endif // DLIB_RR_TRAInER_H__
 
 
