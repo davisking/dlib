@@ -209,8 +209,7 @@ namespace dlib
             /*
                 Notes on the solution of ridge regression 
 
-                Let A = an x.size() by dims matrix which contains
-                all the projected data samples.
+                Let A = an x.size() by dims matrix which contains all the data samples.
 
                 Let I = an identity matrix
 
@@ -238,7 +237,7 @@ namespace dlib
                         where V*D*trans(V) == C 
 
                     Also, via some simple linear algebra the above paper works out that the leave one out 
-                    value for a sample x(i) is equal to the following (we refer to x(i) as x(i) for brevity):
+                    value for a sample x(i) is equal to the following:
                         Let G = inv(C + lambda*I)
                         let val = trans(x(i))*G*x(i);
 
@@ -315,7 +314,7 @@ namespace dlib
                     // compute the solution w for the current lambda
                     w = G*L;
 
-                    // make w have the same length as the x_proj vectors.
+                    // make w have the same length as the x vectors.
                     const scalar_type b = w(dims);
                     w = colm(w,0,dims);
 
@@ -364,7 +363,7 @@ namespace dlib
             G = tempm*trans(V);
             w = G*L;
            
-            // make w have the same length as the x_proj vectors.
+            // make w have the same length as the x vectors.
             const scalar_type b = w(dims);
             w = colm(w,0,dims);
 
