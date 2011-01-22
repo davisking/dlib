@@ -76,12 +76,16 @@ namespace dlib
             const linearly_independent_subset_finder<kernel_type>& lisf
         )
         {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(lisf.size() > 0,
-                "\tvoid empirical_kernel_map::load(linearly_independent_subset_finder)"
-                << "\n\t You have to give a non-empty set of basis_samples"
-                << "\n\t this: " << this
-                );
+            if (lisf.size() == 0)
+            {
+                std::ostringstream sout;
+                sout << "An empty linearly_independent_subset_finder was supplied to the\n"
+                     << "empirical_kernel_map::load() function.  One reason this might occur\n"
+                     << "is if your dataset contains only zero vectors (or vectors \n"
+                     << "approximately zero).\n";
+                clear();
+                throw empirical_kernel_map_error(sout.str());
+            }
 
             kernel = lisf.get_kernel();
             weights = trans(chol(lisf.get_inv_kernel_marix()));
