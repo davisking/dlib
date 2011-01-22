@@ -141,6 +141,12 @@ namespace
             samp3 = trans(kernel_matrix(kern, samp3, vect2));
             DLIB_TEST(equal(samp3, trans(kernel_matrix(kern, samp, vect2))));
 
+
+            samp2 += kernel_matrix(kern, vect1, samp);
+            DLIB_TEST(equal(samp2, 2*kernel_matrix(kern, vect1, samp)));
+
+            samp3 += trans(kernel_matrix(kern, samp, vect2));
+            DLIB_TEST(equal(samp3, 2*trans(kernel_matrix(kern, samp, vect2))));
         }
     };
 

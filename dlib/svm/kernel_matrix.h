@@ -54,7 +54,8 @@ namespace dlib
         // --------------------------------------------
 
         template <typename kernel_type, typename T>
-        inline unsigned long size ( const T& m)
+        inline typename disable_if<is_same_type<T,typename kernel_type::sample_type>,unsigned long>::type 
+        size ( const T& m)
         {
             return m.size();
         }
