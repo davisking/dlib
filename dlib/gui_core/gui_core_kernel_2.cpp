@@ -183,7 +183,7 @@ namespace dlib
                 {
 
                     // You are supposed to call this if using XLib in a threaded program.  Note
-                    // however that at one point I nocied that calling this causes a dead-lock 
+                    // however that at one point I noticed that calling this causes a dead-lock 
                     // when using XIM.  But I can't reproduce that anymore and not calling it 
                     // sometimes causes XCloseDisplay() to hang.
                     if (XInitThreads() == 0)
@@ -225,9 +225,11 @@ namespace dlib
 
                     xim = NULL;
                     window_table.get_mutex().lock();
-                    if (setlocale( LC_CTYPE, "" ) && XSupportsLocale() && XSetLocaleModifiers("")){
+                    std::string saved_locale(setlocale (LC_CTYPE, NULL));
+                    if (setlocale( LC_CTYPE, "" ) && XSupportsLocale() && XSetLocaleModifiers(""))
                         xim = XOpenIM(disp, NULL, NULL, NULL);
-                    }
+                    else
+                        setlocale( LC_CTYPE, saved_locale.c_str() );
                     window_table.get_mutex().unlock();
 
                     if (xim)
