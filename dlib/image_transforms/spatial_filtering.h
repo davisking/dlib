@@ -38,7 +38,7 @@ namespace dlib
             "\tvoid spatially_filter_image()"
             << "\n\tYou can't give a scale of zero"
             );
-        DLIB_ASSERT(is_same_object(in_img, out_img),
+        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
             "\tvoid spatially_filter_image()"
             << "\n\tYou must give two different image objects"
             );
