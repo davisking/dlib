@@ -240,7 +240,7 @@ namespace dlib
     {
         try
         {
-            const typename clp_base::option_type& opt = option(option_name);
+            const typename clp_base::option_type& opt = this->option(option_name);
             const unsigned long number_of_arguments = opt.number_of_arguments();
             const unsigned long count = opt.count();
             for (unsigned long i = 0; i < number_of_arguments; ++i)
@@ -307,7 +307,7 @@ namespace dlib
     {
         try
         {
-            const typename clp_base::option_type& opt = option(option_name);
+            const typename clp_base::option_type& opt = this->option(option_name);
             const unsigned long number_of_arguments = opt.number_of_arguments();
             const unsigned long count = opt.count();
             for (unsigned long i = 0; i < number_of_arguments; ++i)
@@ -386,8 +386,8 @@ namespace dlib
         {
             for (size_t j = i+1; j < length; ++j)
             {
-                if (option(option_set[i]).count() > 0 &&
-                    option(option_set[j]).count() > 0 )
+                if (this->option(option_set[i]).count() > 0 &&
+                    this->option(option_set[j]).count() > 0 )
                 {
                     throw cmd_line_check_error(
                         EINCOMPATIBLE_OPTIONS,
@@ -410,8 +410,8 @@ namespace dlib
         const string_type& option_name2
     ) const
     {
-        if (option(option_name1).count() > 0 &&
-            option(option_name2).count() > 0 )
+        if (this->option(option_name1).count() > 0 &&
+            this->option(option_name2).count() > 0 )
         {
             throw cmd_line_check_error(
                 EINCOMPATIBLE_OPTIONS,
@@ -462,13 +462,13 @@ namespace dlib
     ) const
     {
         // first check if the sub_option is present
-        if (option(sub_option).count() > 0)
+        if (this->option(sub_option).count() > 0)
         {
             // now check if any of the parents are present
             bool parents_present = false;
             for (size_t i = 0; i < length; ++i)
             {
-                if (option(parent_option_set[i]).count() > 0)
+                if (this->option(parent_option_set[i]).count() > 0)
                 {
                     parents_present = true;
                     break;
@@ -497,7 +497,7 @@ namespace dlib
         bool parents_present = false;
         for (size_t i = 0; i < parent_length; ++i)
         {
-            if (option(parent_option_set[i]).count() > 0)
+            if (this->option(parent_option_set[i]).count() > 0)
             {
                 parents_present = true;
                 break;
@@ -510,7 +510,7 @@ namespace dlib
             size_t i = 0;
             for (; i < sub_length; ++i)
             {
-                if (option(sub_option_set[i]).count() > 0)
+                if (this->option(sub_option_set[i]).count() > 0)
                     break;
             }
             if (i != sub_length)
