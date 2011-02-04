@@ -63,14 +63,14 @@ namespace
         DLIB_TEST(a.contains<double>() == false);
         DLIB_TEST(any_cast<int>(a) == 4);
 
-        bool error = true;
+        bool error = false;
         try
         {
             any_cast<double>(a);
         }
         catch (bad_any_cast&)
         {
-            error = false;
+            error = true;
         }
         DLIB_TEST(error);
 
@@ -93,14 +93,14 @@ namespace
 
         a.clear();
         DLIB_TEST(a.is_empty());
-        error = true;
+        error = false;
         try
         {
             any_cast<string>(a);
         }
         catch (bad_any_cast&)
         {
-            error = false;
+            error = true;
         }
         DLIB_TEST(error);
 
@@ -120,7 +120,7 @@ namespace
         void perform_test (
         )
         {
-            void run_test();
+            run_test();
         }
     } a;
 
