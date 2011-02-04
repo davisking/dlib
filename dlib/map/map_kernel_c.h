@@ -81,12 +81,12 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( (!is_in_domain(d)) &&
+        DLIB_CASSERT( (!this->is_in_domain(d)) &&
                 (reinterpret_cast<void*>(&d) != reinterpret_cast<void*>(&r)),
             "\tvoid map::add"
             << "\n\tdomain element being added must not already be in the map"
             << "\n\tand d and r must not be the same variable"
-            << "\n\tis_in_domain(d): " << (is_in_domain(d) ? "true" : "false")
+            << "\n\tis_in_domain(d): " << (this->is_in_domain(d) ? "true" : "false")
             << "\n\tthis: " << this
             << "\n\t&d:   " << reinterpret_cast<void*>(&d)
             << "\n\t&r:   " << reinterpret_cast<void*>(&r)
@@ -136,14 +136,14 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( (is_in_domain(d)) &&
+        DLIB_CASSERT( (this->is_in_domain(d)) &&
                 (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&r)) &&
                 (reinterpret_cast<void*>(&r) != reinterpret_cast<void*>(&d_copy)) &&
                 (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&d_copy)),
             "\tvoid map::remove"
             << "\n\tcan't remove something that isn't in the map or if the paremeters actually"
             << "\n\tare the same variable.  Either way can't remove."
-            << "\n\tis_in_domain(d): " << (is_in_domain(d) ? "true" : "false")
+            << "\n\tis_in_domain(d): " << (this->is_in_domain(d) ? "true" : "false")
             << "\n\tthis:      " << this
             << "\n\t&d:        " << reinterpret_cast<const void*>(&d)
             << "\n\t&r:        " << reinterpret_cast<void*>(&r)
@@ -165,7 +165,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(is_in_domain(d),
+        DLIB_CASSERT(this->is_in_domain(d),
             "\tvoid map::destroy"
             << "\n\tcan't remove something that isn't in the map"
             << "\n\tthis:      " << this
@@ -187,7 +187,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( is_in_domain(d),
+        DLIB_CASSERT( this->is_in_domain(d),
             "\trange& map::operator[]"
             << "\n\td must be in the domain of the map"
             << "\n\tthis: " << this
@@ -208,7 +208,7 @@ namespace dlib
     ) const
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( is_in_domain(d),
+        DLIB_CASSERT( this->is_in_domain(d),
             "\tconst range& map::operator[]"
             << "\n\td must be in the domain of the map"
             << "\n\tthis: " << this

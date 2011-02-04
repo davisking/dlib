@@ -179,7 +179,7 @@ namespace dlib
         {
             copy_to_df_helper(any_decision_function<sample_type, scalar_type>& target_) : target(target_) {}
 
-            mutable any_decision_function<sample_type, scalar_type>& target;
+            any_decision_function<sample_type, scalar_type>& target;
 
             template <typename T>
             void operator() (

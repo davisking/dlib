@@ -81,12 +81,12 @@ namespace dlib
     {
 
         // make sure requires clause is not broken
-        DLIB_CASSERT( (!is_in_domain(d)) &&
+        DLIB_CASSERT( (!this->is_in_domain(d)) &&
                 (reinterpret_cast<void*>(&d) != reinterpret_cast<void*>(&r)),
             "\tvoid hash_map::add"
             << "\n\tdomain element being added must not already be in the hash_map"
             << "\n\tand d and r must not be the same variable"
-            << "\n\tis_in_domain(d): " << (is_in_domain(d) ? "true" : "false")
+            << "\n\tis_in_domain(d): " << (this->is_in_domain(d) ? "true" : "false")
             << "\n\tthis: " << this
             << "\n\t&d:   " << reinterpret_cast<void*>(&d)
             << "\n\t&r:   " << reinterpret_cast<void*>(&r)
@@ -142,14 +142,14 @@ namespace dlib
 
 
         // make sure requires clause is not broken
-        DLIB_CASSERT( (is_in_domain(d)) &&
+        DLIB_CASSERT( (this->is_in_domain(d)) &&
                 (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&r)) &&
                 (reinterpret_cast<void*>(&r) != reinterpret_cast<void*>(&d_copy)) &&
                 (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&d_copy)),
             "\tvoid hash_map::remove"
             << "\n\tcan't remove something that isn't in the hash_map or if the paremeters"
             << "\n\tare actually the same variable.  Either way can't remove."
-            << "\n\tis_in_domain(d): " << (is_in_domain(d) ? "true" : "false")
+            << "\n\tis_in_domain(d): " << (this->is_in_domain(d) ? "true" : "false")
             << "\n\tthis:      " << this
             << "\n\t&d:        " << reinterpret_cast<const void*>(&d)
             << "\n\t&r:        " << reinterpret_cast<void*>(&r)
@@ -174,7 +174,7 @@ namespace dlib
 
 
         // make sure requires clause is not broken
-        DLIB_CASSERT( is_in_domain(d), 
+        DLIB_CASSERT( this->is_in_domain(d), 
             "\tvoid hash_map::destroy"
             << "\n\tcan't remove something that isn't in the hash_map"
             << "\n\tthis:      " << this
@@ -197,7 +197,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( is_in_domain(d),
+        DLIB_CASSERT( this->is_in_domain(d),
             "\trange& hash_map::operator[]"
             << "\n\td must be in the domain of the hash_map"
             << "\n\tthis: " << this

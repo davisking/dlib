@@ -717,6 +717,25 @@ namespace dlib
     {
 
         template <typename T>
+        unsigned long node_num_values (
+            const T& bn,
+            unsigned long n
+        )  
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT( n < bn.number_of_nodes(),
+                         "\tvoid bayes_node_utils::node_num_values(bn, n)"
+                         << "\n\tInvalid arguments to this function"
+                         << "\n\tn:                     " << n 
+                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
+            );
+
+            return bn.node(n).data.table().num_values(); 
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        template <typename T>
         void set_node_value (
             T& bn,
             unsigned long n,
@@ -827,25 +846,6 @@ namespace dlib
             );
 
             bn.node(n).data.table().set_num_values(num); 
-        }
-
-    // ----------------------------------------------------------------------------------------
-
-        template <typename T>
-        unsigned long node_num_values (
-            const T& bn,
-            unsigned long n
-        )  
-        { 
-            // make sure requires clause is not broken
-            DLIB_ASSERT( n < bn.number_of_nodes(),
-                         "\tvoid bayes_node_utils::node_num_values(bn, n)"
-                         << "\n\tInvalid arguments to this function"
-                         << "\n\tn:                     " << n 
-                         << "\n\tbn.number_of_nodes():  " << bn.number_of_nodes() 
-            );
-
-            return bn.node(n).data.table().num_values(); 
         }
 
     // ----------------------------------------------------------------------------------------

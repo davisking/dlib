@@ -103,7 +103,7 @@ namespace
 
         matrix<type> a(rows,cols), temp, temp2, temp3;
 
-        for (int i = 0; i < 6; ++i)
+        for (int k = 0; k < 6; ++k)
         {
             for (long r= 0; r < a.nr(); ++r)
             {

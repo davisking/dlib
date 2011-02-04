@@ -981,7 +981,7 @@ convergence:
 
 
         const static long cost = 1;
-        const static long NR = (M::NC&&M::NR)? (tmax<M::NR,M::NC>::value) : (0);
+        const static long NR = ((M::NC!=0)&&(M::NR!=0))? (tmax<M::NR,M::NC>::value) : (0);
         const static long NC = NR;
         typedef typename M::type type;
         typedef const type const_ret_type;

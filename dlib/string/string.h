@@ -20,6 +20,42 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
+    inline const typename disable_if<is_same_type<charT,char>,std::string>::type narrow (
+        const std::basic_string<charT,traits,alloc>& str
+    )
+    {
+        std::string temp;
+        temp.reserve(str.size());
+        std::string::size_type i;
+        for (i = 0; i < str.size(); ++i)
+        {
+            if (zero_extend_cast<unsigned long>(str[i]) > 255)
+                temp += ' ';
+            else
+                temp += zero_extend_cast<char>(str[i]);
+        }
+        return temp;
+    }
+
+    template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
+    inline const typename enable_if<is_same_type<charT,char>,std::string>::type narrow (
+        const std::basic_string<charT,traits,alloc>& str
+    )
+    { 
+        return str;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename traits,
         typename alloc
         >
@@ -435,42 +471,6 @@ namespace dlib
     };
 
     const string_assign sa = string_assign();
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename charT,
-        typename traits,
-        typename alloc
-        >
-    inline const typename disable_if<is_same_type<charT,char>,std::string>::type narrow (
-        const std::basic_string<charT,traits,alloc>& str
-    )
-    {
-        std::string temp;
-        temp.reserve(str.size());
-        std::string::size_type i;
-        for (i = 0; i < str.size(); ++i)
-        {
-            if (zero_extend_cast<unsigned long>(str[i]) > 255)
-                temp += ' ';
-            else
-                temp += zero_extend_cast<char>(str[i]);
-        }
-        return temp;
-    }
-
-    template <
-        typename charT,
-        typename traits,
-        typename alloc
-        >
-    inline const typename enable_if<is_same_type<charT,char>,std::string>::type narrow (
-        const std::basic_string<charT,traits,alloc>& str
-    )
-    { 
-        return str;
-    }
 
 // ----------------------------------------------------------------------------------------
 

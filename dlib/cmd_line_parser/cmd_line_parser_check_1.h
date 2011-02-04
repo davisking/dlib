@@ -270,7 +270,7 @@ namespace dlib
     {
         try
         {
-            const typename clp_base::option_type& opt = option(option_name);
+            const typename clp_base::option_type& opt = this->option(option_name);
             const unsigned long number_of_arguments = opt.number_of_arguments();
             const unsigned long count = opt.count();
             for (unsigned long i = 0; i < number_of_arguments; ++i)
@@ -348,7 +348,7 @@ namespace dlib
         const char_type* (&arg_set)[length]
     ) const
     {
-        const typename clp_base::option_type& opt = option(option_name);
+        const typename clp_base::option_type& opt = this->option(option_name);
         const unsigned long number_of_arguments = opt.number_of_arguments();
         const unsigned long count = opt.count();
         for (unsigned long i = 0; i < number_of_arguments; ++i)
@@ -433,12 +433,12 @@ namespace dlib
         const char_type* (&sub_option_set)[length]
     ) const
     {
-        if (option(parent_option).count() == 0)
+        if (this->option(parent_option).count() == 0)
         {
             size_t i = 0;
             for (; i < length; ++i)
             {
-                if (option(sub_option_set[i]).count() > 0)
+                if (this->option(sub_option_set[i]).count() > 0)
                     break;
             }
             if (i != length)
@@ -533,7 +533,7 @@ namespace dlib
         size_t i = 0;
         for (; i < length; ++i)
         {
-            if (option(option_set[i]).count() > 1)
+            if (this->option(option_set[i]).count() > 1)
                 break;
         }
         if (i != length)

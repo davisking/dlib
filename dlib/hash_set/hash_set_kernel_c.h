@@ -68,7 +68,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( !is_member(item),
+        DLIB_CASSERT( !this->is_member(item),
             "\tvoid hash_set::add"
             << "\n\titem being added must not already be in the hash_set"
             << "\n\tthis: " << this
@@ -90,7 +90,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( is_member(item) &&
+        DLIB_CASSERT( this->is_member(item) &&
                 (reinterpret_cast<const void*>(&item) != reinterpret_cast<void*>(&item_copy)),
             "\tvoid hash_set::remove"
             << "\n\titem should be in the hash_set if it's going to be removed"
@@ -114,7 +114,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( is_member(item),
+        DLIB_CASSERT( this->is_member(item),
             "\tvoid hash_set::destroy"
             << "\n\titem should be in the hash_set if it's going to be removed"
             << "\n\tthis:       " << this

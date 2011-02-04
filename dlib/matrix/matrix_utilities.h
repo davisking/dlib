@@ -1088,7 +1088,7 @@ namespace dlib
         const M& m;
 
         const static long cost = M::cost;
-        const static long NR = (M::NC&&M::NR)? (tmin<M::NR,M::NC>::value) : (0);
+        const static long NR = tmin<M::NR,M::NC>::value;
         const static long NC = 1;
         typedef typename M::type type;
         typedef typename M::const_ret_type const_ret_type;

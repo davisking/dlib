@@ -87,7 +87,7 @@ namespace dlib
         range& r
     )
     {
-        DLIB_CASSERT(operator[](d) != 0 &&
+        DLIB_CASSERT(this->operator[](d) != 0 &&
                 (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&d_copy)) &&
                 (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&r)) &&
                 (reinterpret_cast<const void*>(&r) != reinterpret_cast<void*>(&d_copy)),

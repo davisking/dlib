@@ -16,7 +16,7 @@ namespace dlib
 // ------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename Kern 
         >
     class rbf_network_trainer 
     {
@@ -28,7 +28,7 @@ namespace dlib
         !*/
 
     public:
-        typedef K kernel_type;
+        typedef Kern kernel_type;
         typedef typename kernel_type::scalar_type scalar_type;
         typedef typename kernel_type::sample_type sample_type;
         typedef typename kernel_type::mem_manager_type mem_manager_type;
