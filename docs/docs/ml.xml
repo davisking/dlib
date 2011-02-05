@@ -192,6 +192,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>fill_lisf</item> 
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
+         <item>approximate_distance_function</item> 
          <item>is_learning_problem</item> 
          <item>select_all_distinct_labels</item> 
          <item>pick_initial_centers</item> 
@@ -1829,7 +1830,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                It begins by performing the same post processing as
                the <a href="#reduced_decision_function_trainer">reduced_decision_function_trainer</a>
                object but it also performs a global gradient based optimization 
-               to further improve the results.
+               to further improve the results.  The gradient based optimization is
+               implemented using the <a href="#approximate_distance_function">approximate_distance_function</a> routine.
                </p>
          </description>
          <examples>
@@ -1838,6 +1840,25 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                                  
       </component>
       
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>approximate_distance_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/reduced_abstract.h</spec_file>
+         <description>
+              This function attempts to find a <a href="#distance_function">distance_function</a> object which is close
+              to a target distance_function.  That is, it searches for an X such that target(X) is
+              minimized.  Critically, X may be set to use fewer basis vectors than the target.   
+
+              <p>The optimization begins with an initial guess supplied by the user 
+              and searches for an X which locally minimizes target(X).  Since
+              this problem can have many local minima the quality of the starting point
+              can significantly influence the results.   </p>
+         </description>
+                                 
+      </component>
       
    <!-- ************************************************************************* -->
       

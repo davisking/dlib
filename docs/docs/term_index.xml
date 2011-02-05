@@ -187,6 +187,7 @@
          <term file="ml.html" name="reduced"/>
          <term file="ml.html" name="reduced_decision_function_trainer"/>
          <term file="ml.html" name="reduced2"/>
+         <term file="ml.html" name="approximate_distance_function"/>
          <term file="ml.html" name="reduced_decision_function_trainer2"/>
          <term file="ml.html" name="train_probabilistic_decision_function"/>
          <term file="ml.html" name="probabilistic"/>
