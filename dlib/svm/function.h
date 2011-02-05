@@ -339,8 +339,9 @@ namespace dlib
     template <
         typename K
         >
-    struct distance_function
+    class distance_function
     {
+    public:
         typedef K kernel_type;
         typedef typename K::scalar_type scalar_type;
         typedef typename K::sample_type sample_type;
@@ -349,13 +350,42 @@ namespace dlib
         typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
 
-        scalar_vector_type alpha;
-        scalar_type b;
-        K kernel_function;
-        sample_vector_type basis_vectors;
 
         distance_function (
         ) : b(0), kernel_function(K()) {}
+
+        explicit distance_function (
+            const kernel_type& kern
+        ) : b(0), kernel_function(kern) {}
+
+        distance_function (
+            const kernel_type& kern,
+            const sample_type& samp
+        ) :
+            alpha(ones_matrix<scalar_type>(1,1)),
+            b(kern(samp,samp)),
+            kernel_function(kern)
+        {
+            basis_vectors.set_size(1,1);
+            basis_vectors(0) = samp;
+        }
+
+        distance_function (
+            const decision_function<K>& f
+        ) :
+            alpha(f.alpha),
+            b(trans(f.alpha)*kernel_matrix(f.kernel_function,f.basis_vectors)*f.alpha),
+            kernel_function(f.kernel_function),
+            basis_vectors(f.basis_vectors)
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(f.alpha.size() == f.basis_vectors.size(),
+                "\t distance_function(f)"
+                << "\n\t The supplied decision_function is invalid."
+                << "\n\t f.alpha.size(): " << f.alpha.size()
+                << "\n\t f.basis_vectors.size(): " << f.basis_vectors.size()
+                );
+        }
 
         distance_function (
             const distance_function& d
@@ -364,7 +394,8 @@ namespace dlib
             b(d.b),
             kernel_function(d.kernel_function),
             basis_vectors(d.basis_vectors) 
-        {}
+        {
+        }
 
         distance_function (
             const scalar_vector_type& alpha_,
@@ -376,7 +407,46 @@ namespace dlib
             b(b_),
             kernel_function(kernel_function_),
             basis_vectors(basis_vectors_)
-        {}
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(alpha_.size() == basis_vectors_.size(),
+                "\t distance_function()"
+                << "\n\t The supplied arguments are invalid."
+                << "\n\t alpha_.size(): " << alpha_.size()
+                << "\n\t basis_vectors_.size(): " << basis_vectors_.size()
+                );
+        }
+
+        distance_function (
+            const scalar_vector_type& alpha_,
+            const K& kernel_function_,
+            const sample_vector_type& basis_vectors_
+        ) :
+            alpha(alpha_),
+            b(trans(alpha)*kernel_matrix(kernel_function_,basis_vectors_)*alpha),
+            kernel_function(kernel_function_),
+            basis_vectors(basis_vectors_)
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(alpha_.size() == basis_vectors_.size(),
+                "\t distance_function()"
+                << "\n\t The supplied arguments are invalid."
+                << "\n\t alpha_.size(): " << alpha_.size()
+                << "\n\t basis_vectors_.size(): " << basis_vectors_.size()
+                );
+        }
+
+        const scalar_vector_type& get_alpha (
+        ) const { return alpha; }
+
+        const scalar_type& get_squared_norm (
+        ) const { return b; }
+
+        const K& get_kernel(
+        ) const { return kernel_function; }
+
+        const sample_vector_type& get_basis_vectors (
+        ) const { return basis_vectors; }
 
         distance_function& operator= (
             const distance_function& d
@@ -422,7 +492,75 @@ namespace dlib
             else
                 return 0;
         }
+
+        distance_function operator* (
+            const scalar_type& val
+        ) const
+        {
+            return distance_function(val*alpha,
+                                     val*val*b,
+                                     kernel_function,
+                                     basis_vectors);
+        }
+
+        distance_function operator/ (
+            const scalar_type& val
+        ) const
+        {
+            return distance_function(alpha/val,
+                                     b/val/val,
+                                     kernel_function,
+                                     basis_vectors);
+        }
+
+        distance_function operator+ (
+            const distance_function& rhs
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(get_kernel() == rhs.get_kernel(),
+                "\t distance_function distance_function::operator+()"
+                << "\n\t You can only add two distance_functions together if they use the same kernel."
+                );
+
+            return distance_function(join_cols(alpha, rhs.alpha),
+                                     b + rhs.b + 2*trans(alpha)*kernel_matrix(kernel_function,basis_vectors,rhs.basis_vectors)*rhs.alpha,
+                                     kernel_function,
+                                     join_cols(basis_vectors, rhs.basis_vectors));
+        }
+
+        distance_function operator- (
+            const distance_function& rhs
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(get_kernel() == rhs.get_kernel(),
+                "\t distance_function distance_function::operator-()"
+                << "\n\t You can only subtract two distance_functions if they use the same kernel."
+                );
+
+            return distance_function(join_cols(alpha, -rhs.alpha),
+                                     b + rhs.b - 2*trans(alpha)*kernel_matrix(kernel_function,basis_vectors,rhs.basis_vectors)*rhs.alpha,
+                                     kernel_function,
+                                     join_cols(basis_vectors, rhs.basis_vectors));
+        }
+
+    private:
+
+        scalar_vector_type alpha;
+        scalar_type b;
+        K kernel_function;
+        sample_vector_type basis_vectors;
+
     };
+
+    template <
+        typename K
+        >
+    distance_function<K> operator* (
+        const typename K::scalar_type& val,
+        const distance_function<K>& df
+    ) { return df*val; }
 
     template <
         typename K

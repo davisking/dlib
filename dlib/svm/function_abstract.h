@@ -352,7 +352,7 @@ namespace dlib
     template <
         typename K
         >
-    struct distance_function 
+    class distance_function 
     {
         /*!
             REQUIREMENTS ON K
@@ -365,15 +365,16 @@ namespace dlib
                 represents to points in input space as well as other points
                 represented by distance_functions.
 
-                Any routine that creates a distance_function should always
-                automatically populate the this->b field.  But for reference, 
-                this->b is supposed to contain the squared norm of the point
-                in kernel feature space.  So this means that if this function
-                is to compute a proper distance then this->b should always be equal 
-                to the following:
-                    trans(alpha)*kernel_matrix(kernel_function,basis_vectors)*alpha
+                Specifically, if O() is the feature mapping associated with
+                the kernel used by this object.  Then this object represents
+                the point:  
+                    sum alpha(i)*O(basis_vectors(i))
+
+                I.e.  It represents a linear combination of the basis vectors where 
+                the weights of the linear combination are stored in the alpha vector.
         !*/
 
+    public:
         typedef K kernel_type;
         typedef typename K::scalar_type scalar_type;
         typedef typename K::sample_type sample_type;
@@ -382,38 +383,135 @@ namespace dlib
         typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
 
-        scalar_vector_type alpha;
-        scalar_type        b;
-        K                  kernel_function;
-        sample_vector_type basis_vectors;
-
         distance_function (
         );
         /*!
             ensures
-                - #b == 0
-                - #alpha.nr() == 0
-                - #basis_vectors.nr() == 0
+                - #get_squared_norm() == 0
+                - #get_alpha().size() == 0
+                - #get_basis_vectors().size() == 0
+                - #get_kernel() == K() (i.e. the default value of the kernel)
+        !*/
+
+        explicit distance_function (
+            const kernel_type& kern
+        );
+        /*!
+            ensures
+                - #get_squared_norm() == 0
+                - #get_alpha().size() == 0
+                - #get_basis_vectors().size() == 0
+                - #get_kernel() == kern 
+        !*/
+
+        distance_function (
+            const kernel_type& kern,
+            const sample_type& samp
+        );
+        /*!
+            ensures
+                - This object represents the point in kernel feature space which
+                  corresponds directly to the given sample.  In particular this means
+                  that:
+                    - #get_kernel() == kern
+                    - #get_alpha() == a vector of length 1 which contains the value 1 
+                    - #get_basis_vectors() == a vector of length 1 which contains samp
+        !*/
+
+        distance_function (
+            const decision_function<K>& f
+        );
+        /*!
+            ensures
+                - Every decision_function represents a point in kernel feature space along
+                  with a bias value.  This constructor discards the bias value and creates 
+                  a distance_function which represents the point associated with the given 
+                  decision_function f.  In particular, this means:
+                    - #get_alpha() == f.alpha
+                    - #get_kernel() == f.kernel_function
+                    - #get_basis_vectors() == f.basis_vectors
         !*/
 
         distance_function (
             const distance_function& f
         );
         /*!
+            requires
+                - f is a valid distance_function.  In particular, this means that
+                  f.alpha.size() == f.basis_vectors.size()
             ensures
                 - #*this is a copy of f
         !*/
 
         distance_function (
-            const scalar_vector_type& alpha_,
-            const scalar_type& b_,
-            const K& kernel_function_,
-            const sample_vector_type& basis_vectors_
-        ) : alpha(alpha_), b(b_), kernel_function(kernel_function_), basis_vectors(basis_vectors_) {}
+            const scalar_vector_type& alpha,
+            const scalar_type& squared_norm,
+            const K& kernel_function,
+            const sample_vector_type& basis_vectors
+        ); 
         /*!
+            requires
+                - alpha.size() == basis_vectors.size()
+                - squared_norm == trans(alpha)*kernel_matrix(kernel_function,basis_vectors)*alpha
+                  (Basically, squared_norm needs to be set properly for this object to make sense.  
+                  You should prefer to use the following constructor which computes squared_norm for 
+                  you.  This version is provided just in case you already know squared_norm and 
+                  don't want to spend CPU cycles to recompute it.)
             ensures
                 - populates the distance function with the given basis vectors, weights(i.e. alphas),
-                  b term, and kernel function.
+                  squared_norm value, and kernel function. I.e.
+                    - #get_alpha() == alpha
+                    - #get_squared_norm() == squared_norm 
+                    - #get_kernel() == kernel_function
+                    - #get_basis_vectors() == basis_vectors
+        !*/
+
+        distance_function (
+            const scalar_vector_type& alpha,
+            const K& kernel_function,
+            const sample_vector_type& basis_vectors
+        );
+        /*!
+            requires
+                - alpha.size() == basis_vectors.size()
+            ensures
+                - populates the distance function with the given basis vectors, weights(i.e. alphas), 
+                  and kernel function.  The correct b value is computed automatically.  I.e.
+                    - #get_alpha() == alpha
+                    - #get_squared_norm() == trans(alpha)*kernel_matrix(kernel_function,basis_vectors)*alpha
+                      (i.e. get_squared_norm() will be automatically set to the correct value)
+                    - #get_kernel() == kernel_function
+                    - #get_basis_vectors() == basis_vectors
+        !*/
+
+        const scalar_vector_type& get_alpha (
+        ) const; 
+        /*!
+            ensures
+                - returns the set of weights on each basis vector in this object
+        !*/
+
+        const scalar_type& get_squared_norm (
+        ) const;
+        /*!
+            ensures
+                - returns the squared norm of the point represented by this object.  This value is
+                  equal to the following expression:
+                    trans(get_alpha()) * kernel_matrix(get_kernel(),get_basis_vectors()) * get_alpha()
+        !*/
+
+        const K& get_kernel(
+        ) const;
+        /*!
+            ensures
+                - returns the kernel used by this object.
+        !*/
+
+        const sample_vector_type& get_basis_vectors (
+        ) const;
+        /*!
+            ensures
+                - returns the set of basis vectors contained in this object
         !*/
 
         distance_function& operator= (
@@ -427,47 +525,93 @@ namespace dlib
 
         scalar_type operator() (
             const sample_type& x
-        ) const
+        ) const;
         /*!
             ensures
                 - Let O(x) represent the point x projected into kernel induced feature space.
-                - let c == sum alpha(i)*O(basis_vectors(i)) == the point in kernel space that
-                  this object represents.
+                - let c == sum_over_i get_alpha()(i)*O(get_basis_vectors()(i)) == the point in kernel space that
+                  this object represents.  That is, c is the weighted sum of basis vectors.
                 - Then this object returns the distance between the point O(x) and c in kernel
                   space. 
         !*/
-        {
-            scalar_type temp = 0;
-            for (long i = 0; i < alpha.nr(); ++i)
-                temp += alpha(i) * kernel_function(x,basis_vectors(i));
-
-            temp = b + kernel_function(x,x) - 2*temp; 
-            if (temp > 0)
-                return std::sqrt(temp);
-            else
-                return 0;
-        }
 
         scalar_type operator() (
             const distance_function& x
-        ) const
+        ) const;
         /*!
+            requires
+                - kernel_function == x.kernel_function
             ensures
                 - returns the distance between the points in kernel space represented by *this and x.
         !*/
-        {
-            scalar_type temp = 0;
-            for (long i = 0; i < alpha.nr(); ++i)
-                for (long j = 0; j < x.alpha.nr(); ++j)
-                    temp += alpha(i)*x.alpha(j) * kernel_function(basis_vectors(i), x.basis_vectors(j));
 
-            temp = b + x.b - 2*temp;
-            if (temp > 0)
-                return std::sqrt(temp);
-            else
-                return 0;
-        }
+        distance_function operator* (
+            const scalar_type& val
+        ) const;
+        /*!
+            ensures
+                - multiplies the point represented by *this by val and returns the result.  In
+                  particular, this function returns a decision_function DF such that:
+                    - DF.get_basis_vectors() == get_basis_vectors()
+                    - DF.get_kernel() == get_kernel() 
+                    - DF.get_alpha() == get_alpha() * val
+        !*/
+
+        distance_function operator/ (
+            const scalar_type& val
+        ) const;
+        /*!
+            ensures
+                - divides the point represented by *this by val and returns the result.  In
+                  particular, this function returns a decision_function DF such that:
+                    - DF.get_basis_vectors() == get_basis_vectors()
+                    - DF.get_kernel() == get_kernel() 
+                    - DF.get_alpha() == get_alpha() / val
+        !*/
+
+        distance_function operator+ (
+            const distance_function& rhs
+        ) const;
+        /*!
+            requires
+                - get_kernel() == rhs.get_kernel()
+            ensures
+                - returns a distance function DF such that:
+                    - DF represents the sum of the point represented by *this and rhs
+                    - DF.get_basis_vectors().size() == get_basis_vectors().size() + rhs.get_basis_vectors().size()
+                    - DF.get_basis_vectors() contains all the basis vectors in both *this and rhs.
+                    - DF.get_kernel() == get_kernel() 
+                    - DF.alpha == join_cols(get_alpha(), rhs.get_alpha())
+        !*/
+
+        distance_function operator- (
+            const distance_function& rhs
+        ) const;
+        /*!
+            requires
+                - get_kernel() == rhs.get_kernel()
+            ensures
+                - returns a distance function DF such that:
+                    - DF represents the difference of the point represented by *this and rhs (i.e. *this - rhs)
+                    - DF.get_basis_vectors().size() == get_basis_vectors().size() + rhs.get_basis_vectors().size()
+                    - DF.get_basis_vectors() contains all the basis vectors in both *this and rhs.
+                    - DF.get_kernel() == get_kernel() 
+                    - DF.alpha == join_cols(get_alpha(), -1 * rhs.get_alpha())
+        !*/
     };
+
+    template <
+        typename K
+        >
+    distance_function<K> operator* (
+        const typename K::scalar_type& val,
+        const distance_function<K>& df
+    ) { return df*val; }
+    /*!
+        ensures
+            - multiplies the point represented by *this by val and returns the result.   This
+              function just allows multiplication syntax of the form val*df.
+    !*/
 
     template <
         typename K

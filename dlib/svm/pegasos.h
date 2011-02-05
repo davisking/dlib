@@ -248,7 +248,7 @@ namespace dlib
         ) const
         {
             distance_function<offset_kernel<kernel_type> > df = w.get_distance_function();
-            return decision_function<kernel_type>(df.alpha, -tau*sum(df.alpha), kernel, df.basis_vectors);
+            return decision_function<kernel_type>(df.get_alpha(), -tau*sum(df.get_alpha()), kernel, df.get_basis_vectors());
         }
 
         void swap (

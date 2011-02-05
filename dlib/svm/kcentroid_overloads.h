@@ -247,19 +247,22 @@ namespace dlib
         distance_function<kernel_type> get_distance_function (
         ) const
         {
-            distance_function<kernel_type> temp;
-            temp.kernel_function = kernel;
-
             if (samples_seen > 0)
             {
-                temp.b = squared_norm();
-                temp.basis_vectors.set_size(1);
-                temp.basis_vectors(0) = w;
-                temp.alpha.set_size(1);
-                temp.alpha(0) = alpha;
-            }
+                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors; 
+                typename distance_function<kernel_type>::scalar_vector_type temp_alpha; 
 
-            return temp;
+                temp_basis_vectors.set_size(1);
+                temp_basis_vectors(0) = w;
+                temp_alpha.set_size(1);
+                temp_alpha(0) = alpha;
+
+                return distance_function<kernel_type>(temp_alpha, squared_norm(), kernel, temp_basis_vectors);
+            }
+            else
+            {
+                return distance_function<kernel_type>(kernel);
+            }
         }
 
     private:
@@ -576,12 +579,11 @@ namespace dlib
         distance_function<kernel_type> get_distance_function (
         ) const
         {
-            distance_function<kernel_type> temp;
-            temp.kernel_function = kernel;
 
             if (samples_seen > 0)
             {
-                temp.b = squared_norm();
+                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors; 
+                typename distance_function<kernel_type>::scalar_vector_type temp_alpha; 
 
                 // What we are doing here needs a bit of explanation.  The w vector
                 // has an implicit extra dimension tacked on to it with the value of w_extra.
@@ -595,27 +597,30 @@ namespace dlib
                 if (std::abs(w_extra) > std::numeric_limits<scalar_type>::epsilon())
                 {
                     scale = (x_extra/w_extra);
-                    temp.basis_vectors.set_size(1);
-                    temp.alpha.set_size(1);
-                    temp.basis_vectors(0) = w*scale;
-                    temp.alpha(0) = alpha/scale;
+                    temp_basis_vectors.set_size(1);
+                    temp_alpha.set_size(1);
+                    temp_basis_vectors(0) = w*scale;
+                    temp_alpha(0) = alpha/scale;
                 }
                 else
                 {
                     // In this case w_extra is zero. So the only way we can get the same
                     // thing in the output basis vector set is by using two vectors
-                    temp.basis_vectors.set_size(2);
-                    temp.alpha.set_size(2);
-                    temp.basis_vectors(0) = 2*w;
-                    temp.alpha(0) = alpha;
-                    temp.basis_vectors(1) = w;
-                    temp.alpha(1) = -alpha;
+                    temp_basis_vectors.set_size(2);
+                    temp_alpha.set_size(2);
+                    temp_basis_vectors(0) = 2*w;
+                    temp_alpha(0) = alpha;
+                    temp_basis_vectors(1) = w;
+                    temp_alpha(1) = -alpha;
                 }
 
 
+                return distance_function<kernel_type>(temp_alpha, squared_norm(), kernel, temp_basis_vectors);
             }
-
-            return temp;
+            else
+            {
+                return distance_function<kernel_type>(kernel);
+            }
         }
 
     private:
@@ -877,19 +882,22 @@ namespace dlib
         distance_function<kernel_type> get_distance_function (
         ) const
         {
-            distance_function<kernel_type> temp;
-            temp.kernel_function = kernel;
-
             if (samples_seen > 0)
             {
-                temp.b = squared_norm();
-                temp.basis_vectors.set_size(1);
-                temp.basis_vectors(0) = sample_type(w.begin(), w.end());
-                temp.alpha.set_size(1);
-                temp.alpha(0) = alpha;
-            }
+                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors; 
+                typename distance_function<kernel_type>::scalar_vector_type temp_alpha; 
 
-            return temp;
+                temp_basis_vectors.set_size(1);
+                temp_basis_vectors(0) = sample_type(w.begin(), w.end());
+                temp_alpha.set_size(1);
+                temp_alpha(0) = alpha;
+
+                return distance_function<kernel_type>(temp_alpha, squared_norm(), kernel, temp_basis_vectors);
+            }
+            else
+            {
+                return distance_function<kernel_type>(kernel);
+            }
         }
 
     private:
@@ -1201,12 +1209,10 @@ namespace dlib
         distance_function<kernel_type> get_distance_function (
         ) const
         {
-            distance_function<kernel_type> temp;
-            temp.kernel_function = kernel;
-
             if (samples_seen > 0)
             {
-                temp.b = squared_norm();
+                typename distance_function<kernel_type>::sample_vector_type temp_basis_vectors; 
+                typename distance_function<kernel_type>::scalar_vector_type temp_alpha; 
 
                 // What we are doing here needs a bit of explanation.  The w vector
                 // has an implicit extra dimension tacked on to it with the value of w_extra.
@@ -1220,29 +1226,33 @@ namespace dlib
                 if (std::abs(w_extra) > std::numeric_limits<scalar_type>::epsilon())
                 {
                     scale = (x_extra/w_extra);
-                    temp.basis_vectors.set_size(1);
-                    temp.alpha.set_size(1);
-                    temp.basis_vectors(0) = sample_type(w.begin(), w.end());
-                    sparse_vector::scale_by(temp.basis_vectors(0), scale);
-                    temp.alpha(0) = alpha/scale;
+                    temp_basis_vectors.set_size(1);
+                    temp_alpha.set_size(1);
+                    temp_basis_vectors(0) = sample_type(w.begin(), w.end());
+                    sparse_vector::scale_by(temp_basis_vectors(0), scale);
+                    temp_alpha(0) = alpha/scale;
                 }
                 else
                 {
                     // In this case w_extra is zero. So the only way we can get the same
                     // thing in the output basis vector set is by using two vectors
-                    temp.basis_vectors.set_size(2);
-                    temp.alpha.set_size(2);
-                    temp.basis_vectors(0) = sample_type(w.begin(), w.end());
-                    sparse_vector::scale_by(temp.basis_vectors(0), 2);
-                    temp.alpha(0) = alpha;
-                    temp.basis_vectors(1) = sample_type(w.begin(), w.end());
-                    temp.alpha(1) = -alpha;
+                    temp_basis_vectors.set_size(2);
+                    temp_alpha.set_size(2);
+                    temp_basis_vectors(0) = sample_type(w.begin(), w.end());
+                    sparse_vector::scale_by(temp_basis_vectors(0), 2);
+                    temp_alpha(0) = alpha;
+                    temp_basis_vectors(1) = sample_type(w.begin(), w.end());
+                    temp_alpha(1) = -alpha;
                 }
 
+                return distance_function<kernel_type>(temp_alpha, squared_norm(), kernel, temp_basis_vectors);
 
             }
+            else
+            {
+                return distance_function<kernel_type>(kernel);
+            }
 
-            return temp;
         }
 
     private:
