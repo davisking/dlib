@@ -403,28 +403,27 @@ namespace dlib
 
     template <
         typename K,
-        typename stop_strategy_type
+        typename stop_strategy_type,
+        typename T
         >
     distance_function<K> approximate_distance_function (
         stop_strategy_type stop_strategy,
         const distance_function<K>& target,
-        const distance_function<K>& starting_point
+        const T& starting_basis
     )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(target.get_basis_vectors().size() > 0 &&
-                    starting_point.get_basis_vectors().size() > 0 &&
-                    target.get_kernel() == starting_point.get_kernel(),
+                    starting_basis.size() > 0,
                     "\t  distance_function approximate_distance_function()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t target.get_basis_vectors().size():         " << target.get_basis_vectors().size() 
-                    << "\n\t starting_point.get_basis_vectors().size(): " << starting_point.get_basis_vectors().size() 
-                    << "\n\t target.kernel_function == starting_point.kernel_function: " << (target.get_kernel() == starting_point.get_kernel())
+                    << "\n\t target.get_basis_vectors().size(): " << target.get_basis_vectors().size() 
+                    << "\n\t starting_basis.size():             " << starting_basis.size() 
         );
 
         using namespace red_impl;
         // The next few statements just find the best weights with which to approximate 
-        // the target object with the set of vectors in the starting_point object.  This
+        // the target object with the set of basis vectors in starting_basis.  This
         // is really just a simple application of some linear algebra.  For the details 
         // see page 554 of Learning with kernels by Scholkopf and Smola where they talk 
         // about "Optimal Expansion Coefficients."
@@ -437,9 +436,9 @@ namespace dlib
         matrix<scalar_type,0,1,mem_manager_type> beta;
 
         // Now we compute the fist approximate distance function.  
-        beta = pinv(kernel_matrix(kern,starting_point.get_basis_vectors())) *
-            (kernel_matrix(kern,starting_point.get_basis_vectors(),target.get_basis_vectors())*target.get_alpha());
-        matrix<sample_type,0,1,mem_manager_type> out_vectors(starting_point.get_basis_vectors());
+        beta = pinv(kernel_matrix(kern,starting_basis)) *
+            (kernel_matrix(kern,starting_basis,target.get_basis_vectors())*target.get_alpha());
+        matrix<sample_type,0,1,mem_manager_type> out_vectors(vector_to_matrix(starting_basis));
 
 
         // Now setup to do a global optimization of all the parameters in the approximate 
@@ -552,10 +551,9 @@ namespace dlib
             linearly_independent_subset_finder<kernel_type> lisf(kern, num_bv);
             fill_lisf(lisf,x);
 
-            distance_function<kernel_type> approx(ones_matrix<scalar_type>(lisf.size(),1), kern, vector_to_matrix(lisf));
-            const distance_function<kernel_type> target = dec_funct;
-
-            approx = approximate_distance_function(objective_delta_stop_strategy(eps), target, approx);
+            distance_function<kernel_type> approx, target;
+            target = dec_funct;
+            approx = approximate_distance_function(objective_delta_stop_strategy(eps), target, lisf);
 
             decision_function<kernel_type> new_df(approx.get_alpha(), 
                                                   0,
