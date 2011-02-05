@@ -109,6 +109,42 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename K,
+        typename stop_strategy_type
+        >
+    distance_function<K> approximate_distance_function (
+        stop_strategy_type stop_strategy,
+        const distance_function<K>& target,
+        const distance_function<K>& starting_point
+    );
+    /*!
+        requires
+            - stop_strategy == an object that defines a stop strategy such as one of 
+              the objects from dlib/optimization/optimization_stop_strategies_abstract.h
+            - target.get_basis_vectors().size() > 0 && starting_point.get_basis_vectors().size() > 0
+              (i.e. target and starting_point have to have some basis vectors in them)
+            - target.get_kernel() == starting_point.get_kernel()
+              (i.e. both distance functions must use the same kernel)
+            - kernel_derivative<K> is defined
+              (i.e. The analytic derivative for the given kernel must be defined)
+            - K::sample_type must be a dlib::matrix object and the basis_vectors inside the
+              distance_functions must be column vectors.
+        ensures
+            - This function attempts to find a distance function object which is close
+              to the given target.  That is, it searches for an X such that target(X) is
+              minimized.  The optimization begins with the initial guess contained in 
+              starting_point and searches for an X which locally minimizes target(X).  Since
+              this problem can have many local minima the quality of the starting point
+              can significantly influence the results.   
+            - The returned distance_function will contain the same number of basis vectors
+              as the given starting_point object.  
+            - The optimization is carried out until the stop_strategy indicates it 
+              should stop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename trainer_type 
         >
     class reduced_decision_function_trainer2
@@ -179,6 +215,9 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const;
         /*!
+            requires
+                - x must be a list of objects which are each some kind of dlib::matrix 
+                  which represents column or row vectors.
             ensures
                 - trains a decision_function using the trainer that was supplied to
                   this object's constructor and then finds a reduced representation
