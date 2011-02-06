@@ -523,10 +523,15 @@ namespace dlib
                 << "\n\t You can only add two distance_functions together if they use the same kernel."
                 );
 
-            return distance_function(join_cols(alpha, rhs.alpha),
-                                     b + rhs.b + 2*trans(alpha)*kernel_matrix(kernel_function,basis_vectors,rhs.basis_vectors)*rhs.alpha,
-                                     kernel_function,
-                                     join_cols(basis_vectors, rhs.basis_vectors));
+            if (alpha.size() == 0)
+                return rhs;
+            else if (rhs.alpha.size() == 0)
+                return *this;
+            else
+                return distance_function(join_cols(alpha, rhs.alpha),
+                                        b + rhs.b + 2*trans(alpha)*kernel_matrix(kernel_function,basis_vectors,rhs.basis_vectors)*rhs.alpha,
+                                        kernel_function,
+                                        join_cols(basis_vectors, rhs.basis_vectors));
         }
 
         distance_function operator- (
@@ -539,10 +544,17 @@ namespace dlib
                 << "\n\t You can only subtract two distance_functions if they use the same kernel."
                 );
 
-            return distance_function(join_cols(alpha, -rhs.alpha),
-                                     b + rhs.b - 2*trans(alpha)*kernel_matrix(kernel_function,basis_vectors,rhs.basis_vectors)*rhs.alpha,
-                                     kernel_function,
-                                     join_cols(basis_vectors, rhs.basis_vectors));
+            if (alpha.size() == 0 && rhs.alpha.size() == 0)
+                return distance_function(kernel_function);
+            else if (alpha.size() != 0 && rhs.alpha.size() == 0)
+                return *this;
+            else if (alpha.size() == 0 && rhs.alpha.size() != 0)
+                return -1*rhs;
+            else
+                return distance_function(join_cols(alpha, -rhs.alpha),
+                                        b + rhs.b - 2*trans(alpha)*kernel_matrix(kernel_function,basis_vectors,rhs.basis_vectors)*rhs.alpha,
+                                        kernel_function,
+                                        join_cols(basis_vectors, rhs.basis_vectors));
         }
 
     private:
