@@ -6,6 +6,7 @@
 #include "any/any.h"
 #include "any/any_trainer.h"
 #include "any/any_decision_function.h"
+#include "any/any_function.h"
 
 #endif // DLIB_AnY_
 
