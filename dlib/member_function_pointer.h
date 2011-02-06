@@ -5,6 +5,7 @@
 
 #include "member_function_pointer/member_function_pointer_kernel_1.h"
 #include "member_function_pointer/member_function_pointer_kernel_c.h"
+#include "member_function_pointer/make_mfp.h"
 
 namespace dlib
 {
