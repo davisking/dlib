@@ -97,9 +97,9 @@ namespace dlib
         /*!
             ensures
                 - if (this object contains any kind of object) then
-                    - returns true
+                    - returns false 
                 - else
-                    - returns false
+                    - returns true 
         !*/
 
         template <typename T>

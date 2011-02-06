@@ -119,9 +119,16 @@ namespace dlib
         /*!
             ensures
                 - if (this object contains any kind of object) then
-                    - returns true
+                    - returns false 
                 - else
-                    - returns false
+                    - returns true 
+        !*/
+
+        bool is_set (
+        ) const;
+        /*!
+            ensures
+                - returns !is_empty()
         !*/
 
         result_type operator() (

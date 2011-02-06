@@ -103,9 +103,9 @@ namespace dlib
         /*!
             ensures
                 - if (this object contains any kind of object) then
-                    - returns true
+                    - returns false 
                 - else
-                    - returns false
+                    - returns true
         !*/
 
         trained_function_type train (

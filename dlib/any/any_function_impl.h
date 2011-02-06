@@ -69,6 +69,12 @@ bool is_empty(
     return data.get() == 0;
 }
 
+bool is_set(
+) const
+{
+    return !is_empty();
+}
+
 template <typename T>
 T& cast_to(
 ) 
