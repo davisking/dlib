@@ -818,6 +818,15 @@ namespace dlib
             event_handler_self.clear();
         }
 
+        void set_click_handler (
+            const any_function<void()>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            event_handler = event_handler_;
+            event_handler_self.clear();
+        }
+
         template <
             typename T
             >
@@ -828,6 +837,15 @@ namespace dlib
         {
             auto_mutex M(m);
             event_handler_self = make_mfp(object,event_handler_);
+            event_handler.clear();
+        }
+
+        void set_sourced_click_handler (
+            const any_function<void(button&)>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            event_handler_self = event_handler_;
             event_handler.clear();
         }
 
@@ -850,6 +868,14 @@ namespace dlib
             button_down_handler = make_mfp(object,event_handler);
         }
 
+        void set_button_down_handler (
+            const any_function<void()>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            button_down_handler = event_handler;
+        }
+
         template <
             typename T
             >
@@ -860,6 +886,14 @@ namespace dlib
         {
             auto_mutex M(m);
             button_up_handler = make_mfp(object,event_handler);
+        }
+
+        void set_button_up_handler (
+            const any_function<void(bool)>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            button_up_handler = event_handler;
         }
 
         template <
@@ -874,6 +908,14 @@ namespace dlib
             button_down_handler_self = make_mfp(object,event_handler);
         }
 
+        void set_sourced_button_down_handler (
+            const any_function<void(button&)>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            button_down_handler_self = event_handler;
+        }
+
         template <
             typename T
             >
@@ -884,6 +926,14 @@ namespace dlib
         {
             auto_mutex M(m);
             button_up_handler_self = make_mfp(object,event_handler);
+        }
+
+        void set_sourced_button_up_handler (
+            const any_function<void(bool,button&)>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            button_up_handler_self = event_handler;
         }
 
     private:
@@ -993,6 +1043,10 @@ namespace dlib
             T& object,
             void (T::*eh)()
         ) { auto_mutex M(m); scroll_handler = make_mfp(object,eh); }
+
+        void set_scroll_handler (
+            const any_function<void()>& eh
+        ) { auto_mutex M(m); scroll_handler = eh; }
 
         void set_pos (
             long x,
@@ -1580,15 +1634,13 @@ namespace dlib
 
     class menu_item_text : public menu_item
     {
-        template <typename T>
         void initialize (
-            T &object,
-            void (T::*event_handler_)(),
+            const any_function<void()>& event_handler_,
             unichar hk
         )
         {
             dlib::ustring &str = text;
-            action = make_mfp(object,event_handler_);
+            action = event_handler_;
 
             if (hk != 0)
             {
@@ -1619,7 +1671,19 @@ namespace dlib
             f(default_font::get_font()),
             hotkey(hk)
         {
-            initialize(object, event_handler_, hk);
+            initialize(make_mfp(object, event_handler_), hk);
+        }
+
+        menu_item_text (
+            const std::string& str,
+            const any_function<void()>& event_handler_,
+            unichar hk = 0
+        ) : 
+            text(convert_wstring_to_utf32(convert_mbstring_to_wstring(str))),
+            f(default_font::get_font()),
+            hotkey(hk)
+        {
+            initialize(event_handler_, hk);
         }
 
         template <typename T>
@@ -1633,7 +1697,19 @@ namespace dlib
             f(default_font::get_font()),
             hotkey(hk)
         {
-            initialize(object, event_handler_, hk);
+            initialize(make_mfp(object, event_handler_), hk);
+        }
+
+        menu_item_text (
+            const std::wstring& str,
+            const any_function<void()>& event_handler_,
+            unichar hk = 0
+        ) : 
+            text(convert_wstring_to_utf32(str)),
+            f(default_font::get_font()),
+            hotkey(hk)
+        {
+            initialize(event_handler_, hk);
         }
 
         template <typename T>
@@ -1647,7 +1723,19 @@ namespace dlib
             f(default_font::get_font()),
             hotkey(hk)
         {
-            initialize(object, event_handler_, hk);
+            initialize(make_mfp(object, event_handler_), hk);
+        }
+
+        menu_item_text (
+            const dlib::ustring& str,
+            const any_function<void()>& event_handler_,
+            unichar hk = 0
+        ) : 
+            text(str),
+            f(default_font::get_font()),
+            hotkey(hk)
+        {
+            initialize(event_handler_, hk);
         }
 
         virtual unichar get_hot_key (

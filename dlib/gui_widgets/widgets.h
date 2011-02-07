@@ -245,6 +245,15 @@ namespace dlib
             event_handler_self.clear();
         }
 
+        void set_click_handler (
+            const any_function<void()>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            event_handler = event_handler_;
+            event_handler_self.clear();
+        }
+
         template <
             typename T
             >
@@ -255,6 +264,15 @@ namespace dlib
         {
             auto_mutex M(m);
             event_handler_self = make_mfp(object,event_handler_);
+            event_handler.clear();
+        }
+
+        void set_sourced_click_handler (
+            const any_function<void(toggle_button&)>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            event_handler_self = event_handler_;
             event_handler.clear();
         }
 
@@ -500,6 +518,21 @@ namespace dlib
             enter_key_handler = make_mfp(object,event_handler);
         }
 
+        void set_text_modified_handler (
+            const any_function<void()>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            text_modified_handler = event_handler;
+        }
+
+        void set_enter_key_handler (
+            const any_function<void()>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            enter_key_handler = event_handler;
+        }
 
         template <
             typename T
@@ -511,6 +544,14 @@ namespace dlib
         {
             auto_mutex M(m);
             focus_lost_handler = make_mfp(object,event_handler);
+        }
+
+        void set_focus_lost_handler (
+            const any_function<void()>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            focus_lost_handler = event_handler;
         }
 
     private:
@@ -853,6 +894,14 @@ namespace dlib
             text_modified_handler = make_mfp(object,event_handler);
         }
 
+        void set_text_modified_handler (
+            const any_function<void()>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            text_modified_handler = event_handler;
+        }
+
         template <
             typename T
             >
@@ -865,6 +914,13 @@ namespace dlib
             enter_key_handler = make_mfp(object,event_handler);
         }
 
+        void set_enter_key_handler (
+            const any_function<void()>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            enter_key_handler = event_handler;
+        }
 
         template <
             typename T
@@ -876,6 +932,14 @@ namespace dlib
         {
             auto_mutex M(m);
             focus_lost_handler = make_mfp(object,event_handler);
+        }
+
+        void set_focus_lost_handler (
+            const any_function<void()>& event_handler
+        )
+        {
+            auto_mutex M(m);
+            focus_lost_handler = event_handler;
         }
 
     private:
@@ -1167,6 +1231,14 @@ namespace dlib
             event_handler = make_mfp(object,eh);
         }
 
+        void set_click_handler (
+            const any_function<void(unsigned long,unsigned long)>& eh
+        )
+        {
+            auto_mutex M(m);
+            event_handler = eh;
+        }
+
         void set_tab_group (
             unsigned long idx,
             widget_group& group
@@ -1436,16 +1508,12 @@ namespace dlib
             ~box_win (
             );
 
-            template <
-                typename T
-                >
             void set_click_handler (
-                T& object,
-                void (T::*event_handler_)()
+                const any_function<void()>& event_handler_
             )
             {
                 auto_mutex M(wm);
-                event_handler = make_mfp(object,event_handler_);
+                event_handler = event_handler_;
             }
 
         private:
@@ -1516,7 +1584,18 @@ namespace dlib
     {
         using namespace message_box_helper;
         box_win* win = new box_win(title,message);
-        win->set_click_handler(object,event_handler);
+        win->set_click_handler(make_mfp(object,event_handler));
+    }
+
+    inline void message_box (
+        const std::string& title,
+        const std::string& message,
+        const any_function<void()>& event_handler
+    )
+    {
+        using namespace message_box_helper;
+        box_win* win = new box_win(title,message);
+        win->set_click_handler(event_handler);
     }
 
     inline void message_box (
@@ -1670,6 +1749,10 @@ namespace dlib
             void (T::*eh)(unsigned long index)
         ) { auto_mutex M(m); event_handler = make_mfp(object,eh); }
 
+        void set_double_click_handler (
+            const any_function<void(unsigned long)>& eh
+        ) { auto_mutex M(m); event_handler = eh; }
+
         template <
             typename T
             >
@@ -1677,6 +1760,10 @@ namespace dlib
             T& object,
             void (T::*eh)(unsigned long index)
         ) { auto_mutex M(m); single_click_event_handler = make_mfp(object,eh); }
+
+        void set_click_handler (
+            const any_function<void(unsigned long)>& eh
+        ) { auto_mutex M(m); single_click_event_handler = eh; }
 
         bool at_start (
         ) const;
@@ -1765,16 +1852,12 @@ namespace dlib
             ~box_win (
             );
 
-            template <
-                typename T
-                >
             void set_click_handler (
-                T& object,
-                void (T::*event_handler_)(const std::string&)
+                const any_function<void(const std::string&)>& event_handler_
             )
             {
                 auto_mutex M(wm);
-                event_handler = make_mfp(object,event_handler_);
+                event_handler = event_handler_;
             }
 
         private:
@@ -1852,7 +1935,16 @@ namespace dlib
     {
         using namespace open_file_box_helper;
         box_win* win = new box_win("Open File",true);
-        win->set_click_handler(object,event_handler);
+        win->set_click_handler(make_mfp(object,event_handler));
+    }
+
+    inline void open_file_box (
+        const any_function<void(const std::string&)>& event_handler
+    )
+    {
+        using namespace open_file_box_helper;
+        box_win* win = new box_win("Open File",true);
+        win->set_click_handler(event_handler);
     }
 
     template <
@@ -1865,7 +1957,16 @@ namespace dlib
     {
         using namespace open_file_box_helper;
         box_win* win = new box_win("Open File");
-        win->set_click_handler(object,event_handler);
+        win->set_click_handler(make_mfp(object,event_handler));
+    }
+
+    inline void open_existing_file_box (
+        const any_function<void(const std::string&)>& event_handler
+    )
+    {
+        using namespace open_file_box_helper;
+        box_win* win = new box_win("Open File");
+        win->set_click_handler(event_handler);
     }
 
     template <
@@ -1878,7 +1979,16 @@ namespace dlib
     {
         using namespace open_file_box_helper;
         box_win* win = new box_win("Save File",true);
-        win->set_click_handler(object,event_handler);
+        win->set_click_handler(make_mfp(object,event_handler));
+    }
+
+    inline void save_file_box (
+        const any_function<void(const std::string&)>& event_handler
+    )
+    {
+        using namespace open_file_box_helper;
+        box_win* win = new box_win("Save File",true);
+        win->set_click_handler(event_handler);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2313,6 +2423,14 @@ namespace dlib
             node_selected_handler = make_mfp(object,event_handler_);
         }
 
+        void set_node_selected_handler (
+            const any_function<void(unsigned long)>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            node_selected_handler = event_handler_;
+        }
+
         template <
             typename T
             >
@@ -2323,6 +2441,14 @@ namespace dlib
         {
             auto_mutex M(m);
             node_deselected_handler = make_mfp(object,event_handler_);
+        }
+
+        void set_node_deselected_handler (
+            const any_function<void(unsigned long)>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            node_deselected_handler = event_handler_;
         }
 
         template <
@@ -2337,6 +2463,14 @@ namespace dlib
             node_deleted_handler = make_mfp(object,event_handler_);
         }
 
+        void set_node_deleted_handler (
+            const any_function<void()>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            node_deleted_handler = event_handler_;
+        }
+
         template <
             typename T
             >
@@ -2347,6 +2481,14 @@ namespace dlib
         {
             auto_mutex M(m);
             graph_modified_handler = make_mfp(object,event_handler_);
+        }
+
+        void set_graph_modified_handler (
+            const any_function<void()>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            graph_modified_handler = event_handler_;
         }
 
     protected:
@@ -2950,6 +3092,10 @@ namespace dlib
             T& object,
             void (T::*eh)(unsigned long, unsigned long)
         ) { text_modified_handler = make_mfp(object,eh); }
+
+        void set_text_modified_handler (
+            const any_function<void(unsigned long, unsigned long)>& eh
+        ) { text_modified_handler = eh; }
 
     private:
 

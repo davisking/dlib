@@ -64,6 +64,20 @@ namespace dlib
               then nothing occurs.
     !*/
 
+    void open_file_box (
+        const any_function<void(const std::string&)>& event_handler
+    );
+    /*!
+        ensures
+            - Displays a window titled "Open File" that will allow the user to select a 
+              file.  
+            - The displayed window will start out showing the directory get_current_dir()
+              (i.e. it starts in the current working directory)
+            - The event_handler function is called if the user selects
+              a file.  If the user closes the window without selecting a file
+              then nothing occurs.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -86,6 +100,20 @@ namespace dlib
               then nothing occurs.
     !*/
 
+    void open_existing_file_box (
+        const any_function<void(const std::string&)>& event_handler
+    );
+    /*!
+        ensures
+            - Displays a window titled "Open File" that will allow the user to select 
+              a file.  But only a file that already exists.
+            - The displayed window will start out showing the directory get_current_dir()
+              (i.e. it starts in the current working directory)
+            - The event_handler function is called if the user selects
+              a file.  If the user closes the window without selecting a file
+              then nothing occurs.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -104,6 +132,20 @@ namespace dlib
             - The displayed window will start out showing the directory get_current_dir()
               (i.e. it starts in the current working directory)
             - The event_handler function is called on object if the user selects
+              a file.  If the user closes the window without selecting a file
+              then nothing occurs.
+    !*/
+
+    void save_file_box (
+        const any_function<void(const std::string&)>& event_handler
+    );
+    /*!
+        ensures
+            - Displays a window titled "Save File" that will allow the user to select 
+              a file.  
+            - The displayed window will start out showing the directory get_current_dir()
+              (i.e. it starts in the current working directory)
+            - The event_handler function is called if the user selects
               a file.  If the user closes the window without selecting a file
               then nothing occurs.
     !*/
@@ -153,6 +195,20 @@ namespace dlib
             - Displays a message box with the given title and message.  It will have a 
               single button and when the user clicks it the message box will go away.
             - The event_handler function is called on object when the user clicks
+              ok or otherwise closes the message box window. 
+            - this function does not block but instead returns immediately.
+    !*/
+
+    void message_box (
+        const std::string& title,
+        const std::string& message,
+        const any_function<void()>& event_handler
+    );
+    /*!
+        ensures
+            - Displays a message box with the given title and message.  It will have a 
+              single button and when the user clicks it the message box will go away.
+            - The event_handler function is called when the user clicks
               ok or otherwise closes the message box window. 
             - this function does not block but instead returns immediately.
     !*/
@@ -405,6 +461,21 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_click_handler (
+            const any_function<void()>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when the toggle_button is 
+                  toggled by the user. 
+                - this event is NOT triggered by calling set_checked() or set_unchecked().
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
         template <
             typename T
             >
@@ -417,6 +488,22 @@ namespace dlib
                 - event_handler is a valid pointer to a member function in T.
             ensures
                 - the event_handler function is called on object when the toggle_button is 
+                  toggled by the user. self will be a reference to the toggle_button object
+                  that the user clicked.
+                - this event is NOT triggered by calling set_checked() or set_unchecked().
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_sourced_click_handler (
+            const any_function<void(toggle_button& self)>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when the toggle_button is 
                   toggled by the user. self will be a reference to the toggle_button object
                   that the user clicked.
                 - this event is NOT triggered by calling set_checked() or set_unchecked().
@@ -594,6 +681,20 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_text_modified_handler (
+            const any_function<void()>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when the text in this text_field 
+                  is modified by the user.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
         template <
             typename T
             >
@@ -614,6 +715,20 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_enter_key_handler (
+            const any_function<void()>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when this text field has input 
+                  focus and the user hits the enter key on their keyboard.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
         template <
             typename T
             >
@@ -627,6 +742,20 @@ namespace dlib
             ensures
                 - the event_handler function is called on object when this object
                   loses input focus due to the user clicking outside the text field
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_focus_lost_handler (
+            const any_function<void()>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when this object loses input 
+                  focus due to the user clicking outside the text field
                 - any previous calls to this function are overridden by this new call.  
                   (i.e. you can only have one event handler associated with this 
                   event at a time)
@@ -783,6 +912,20 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_text_modified_handler (
+            const any_function<void()>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when the text in this text_box 
+                  is modified by the user.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
         template <
             typename T
             >
@@ -803,6 +946,20 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_enter_key_handler (
+            const any_function<void()>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when this text box has input 
+                  focus and the user hits the enter key on their keyboard.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
         template <
             typename T
             >
@@ -816,6 +973,20 @@ namespace dlib
             ensures
                 - the event_handler function is called on object when this object
                   loses input focus due to the user clicking outside the text box
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_focus_lost_handler (
+            const any_function<void()>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when this object loses input 
+                  focus due to the user clicking outside the text box
                 - any previous calls to this function are overridden by this new call.  
                   (i.e. you can only have one event handler associated with this 
                   event at a time)
@@ -1016,6 +1187,22 @@ namespace dlib
                   on a tab that isn't already selected.  new_idx will give the index of 
                   the newly selected tab and old_idx will give the index of the tab 
                   that was previously selected. 
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_click_handler (
+            const any_function<void(unsigned long new_idx, unsigned long old_idx)>& eh
+        );
+        /*!
+            ensures
+                - The event_handler function is called when the user clicks on a tab 
+                  that isn't already selected.  new_idx will give the index of the 
+                  newly selected tab and old_idx will give the index of the tab that 
+                  was previously selected. 
                 - any previous calls to this function are overridden by this new call.  
                   (i.e. you can only have one event handler associated with this 
                   event at a time)
@@ -1369,6 +1556,21 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_double_click_handler (
+            const any_function<void(unsigned long index)>& event_handler
+        ); 
+        /*!
+            ensures
+                - The event_handler function is called when the user double clicks on 
+                  one of the rows in this list box.  index gives the row number for 
+                  the item the user clicked.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
         template <
             typename T
             >
@@ -1385,6 +1587,22 @@ namespace dlib
                   number for the item the user clicked.  (Note that the second click
                   in a double click triggers the double click handler above instead
                   of this event)
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_click_handler (
+            const any_function<void(unsigned long index)>& event_handler
+        );
+        /*!
+            ensures
+                - The event_handler function is called when the user clicks on one 
+                  of the rows in this list box.  index gives the row number for the 
+                  item the user clicked.  (Note that the second click in a double 
+                  click triggers the double click handler above instead of this event)
                 - any previous calls to this function are overridden by this new call.  
                   (i.e. you can only have one event handler associated with this 
                   event at a time)
@@ -1689,7 +1907,7 @@ namespace dlib
             >
         void set_node_selected_handler (
             T& object,
-            void (T::*event_handler_)(unsigned long node_index)
+            void (T::*event_handler)(unsigned long node_index)
         );
         /*!
             requires
@@ -1705,12 +1923,27 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_node_selected_handler (
+            const any_function<void(unsigned long node_index)>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when the user selects
+                  a node.  
+                - node_index == the index of the node that was selected
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
         template <
             typename T
             >
         void set_node_deselected_handler (
             T& object,
-            void (T::*event_handler_)(unsigned long node_index)
+            void (T::*event_handler)(unsigned long node_index)
         );
         /*!
             requires
@@ -1726,12 +1959,26 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
+        void set_node_deselected_handler (
+            const any_function<void(unsigned long node_index)>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when the user deselects a node.  
+                - node_index == the index of the node that was deselected
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
         template <
             typename T
             >
         void set_node_deleted_handler (
             T& object,
-            void (T::*event_handler_)()
+            void (T::*event_handler)()
         );
         /*!
             requires
@@ -1739,6 +1986,19 @@ namespace dlib
             ensures
                 - the event_handler function is called on object when the user 
                   deletes a node.  
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_node_deleted_handler (
+            const any_function<void()>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when the user deletes a node.  
                 - any previous calls to this function are overridden by this new call.  
                   (i.e. you can only have one event handler associated with this 
                   event at a time)
@@ -1759,6 +2019,24 @@ namespace dlib
             ensures
                 - the event_handler function is called on object when the user 
                   modifies the graph (i.e. adds or removes a node or edge)
+                - the event_handler function is not called when the user just
+                  moves nodes around on the screen.
+                - This event is always dispatched before any more specific event
+                  that results from the user modifying the graph.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_graph_modified_handler (
+            const any_function<void()>& event_handler
+        );
+        /*!
+            ensures
+                - the event_handler function is called when the user modifies 
+                  the graph (i.e. adds or removes a node or edge)
                 - the event_handler function is not called when the user just
                   moves nodes around on the screen.
                 - This event is always dispatched before any more specific event
@@ -2002,6 +2280,21 @@ namespace dlib
             ensures
                 - the event_handler function is called on object when the user selects
                   a node.  
+                - row == row will give the row of the grid item that was modified
+                - col == col will give the column of the grid item that was modified
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        !*/
+
+        void set_text_modified_handler (
+            const any_function<void(unsigned long row, unsigned long col)>& event_handler
+        ); 
+        /*!
+            ensures
+                - the event_handler function is called when the user selects a node.  
                 - row == row will give the row of the grid item that was modified
                 - col == col will give the column of the grid item that was modified
                 - any previous calls to this function are overridden by this new call.  
