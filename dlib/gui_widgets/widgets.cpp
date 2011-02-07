@@ -2690,12 +2690,12 @@ namespace dlib
             void* param
         )
         {
-            // The point of this extra member function pointer stuff is to allow the user
+            // The point of this extra event_handler stuff is to allow the user
             // to end the program from within the callback.  So we want to destroy the 
             // window *before* we call their callback.
             box_win& w = *reinterpret_cast<box_win*>(param);
             w.close_window();
-            member_function_pointer<>::kernel_1a event_handler(w.event_handler);
+            any_function<void()> event_handler(w.event_handler);
             delete &w;
             if (event_handler.is_set())
                 event_handler(); 
@@ -2717,10 +2717,10 @@ namespace dlib
         on_window_close (
         )
         {
-            // The point of this extra member function pointer stuff is to allow the user
+            // The point of this extra event_handler stuff is to allow the user
             // to end the program within the callback.  So we want to destroy the 
             // window *before* we call their callback. 
-            member_function_pointer<>::kernel_1a event_handler_copy(event_handler);
+            any_function<void()> event_handler_copy(event_handler);
             delete this;
             if (event_handler_copy.is_set())
                 event_handler_copy();

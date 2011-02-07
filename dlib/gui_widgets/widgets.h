@@ -25,6 +25,7 @@
 #include "../misc_api.h"
 #include <cctype>
 #include <vector>
+#include "../any.h"
 
 #ifdef _MSC_VER
 // This #pragma directive is also located in the algs.h file but for whatever
@@ -240,7 +241,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            event_handler.set(object,event_handler_);
+            event_handler = make_mfp(object,event_handler_);
             event_handler_self.clear();
         }
 
@@ -253,7 +254,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            event_handler_self.set(object,event_handler_);
+            event_handler_self = make_mfp(object,event_handler_);
             event_handler.clear();
         }
 
@@ -267,8 +268,8 @@ namespace dlib
         tooltip btn_tooltip;
         bool checked;
 
-        member_function_pointer<>::kernel_1a event_handler;
-        member_function_pointer<toggle_button&>::kernel_1a event_handler_self;
+        any_function<void()> event_handler;
+        any_function<void(toggle_button&)> event_handler_self;
 
         scoped_ptr<toggle_button_style> style;
 
@@ -484,7 +485,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            text_modified_handler.set(object,event_handler);
+            text_modified_handler = make_mfp(object,event_handler);
         }
 
         template <
@@ -496,7 +497,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            enter_key_handler.set(object,event_handler);
+            enter_key_handler = make_mfp(object,event_handler);
         }
 
 
@@ -509,7 +510,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            focus_lost_handler.set(object,event_handler);
+            focus_lost_handler = make_mfp(object,event_handler);
         }
 
     private:
@@ -603,9 +604,9 @@ namespace dlib
         long highlight_start;
         long highlight_end;
         long shift_pos;
-        member_function_pointer<>::kernel_1a_c text_modified_handler;
-        member_function_pointer<>::kernel_1a_c enter_key_handler;
-        member_function_pointer<>::kernel_1a_c focus_lost_handler;
+        any_function<void()> text_modified_handler;
+        any_function<void()> enter_key_handler;
+        any_function<void()> focus_lost_handler;
 
         scoped_ptr<text_field_style> style;
 
@@ -849,7 +850,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            text_modified_handler.set(object,event_handler);
+            text_modified_handler = make_mfp(object,event_handler);
         }
 
         template <
@@ -861,7 +862,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            enter_key_handler.set(object,event_handler);
+            enter_key_handler = make_mfp(object,event_handler);
         }
 
 
@@ -874,7 +875,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            focus_lost_handler.set(object,event_handler);
+            focus_lost_handler = make_mfp(object,event_handler);
         }
 
     private:
@@ -976,9 +977,9 @@ namespace dlib
         long highlight_start;
         long highlight_end;
         long shift_pos;
-        member_function_pointer<>::kernel_1a_c text_modified_handler;
-        member_function_pointer<>::kernel_1a_c enter_key_handler;
-        member_function_pointer<>::kernel_1a_c focus_lost_handler;
+        any_function<void()> text_modified_handler;
+        any_function<void()> enter_key_handler;
+        any_function<void()> focus_lost_handler;
 
         scoped_ptr<text_box_style> style;
 
@@ -1163,7 +1164,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            event_handler.set(object,eh);
+            event_handler = make_mfp(object,eh);
         }
 
         void set_tab_group (
@@ -1240,7 +1241,7 @@ namespace dlib
         const long top_pad;
         const long bottom_pad;
 
-        member_function_pointer<unsigned long,unsigned long>::kernel_1a event_handler;
+        any_function<void(unsigned long,unsigned long)> event_handler;
 
         // restricted functions
         tabbed_display(tabbed_display&);        // copy constructor
@@ -1444,7 +1445,7 @@ namespace dlib
             )
             {
                 auto_mutex M(wm);
-                event_handler.set(object,event_handler_);
+                event_handler = make_mfp(object,event_handler_);
             }
 
         private:
@@ -1464,7 +1465,7 @@ namespace dlib
             label msg;
             button btn_ok;
 
-            member_function_pointer<>::kernel_1a event_handler;
+            any_function<void()> event_handler;
         };
 
         class blocking_box_win : public drawable_window
@@ -1667,7 +1668,7 @@ namespace dlib
         void set_double_click_handler (
             T& object,
             void (T::*eh)(unsigned long index)
-        ) { auto_mutex M(m); event_handler.set(object,eh); }
+        ) { auto_mutex M(m); event_handler = make_mfp(object,eh); }
 
         template <
             typename T
@@ -1675,7 +1676,7 @@ namespace dlib
         void set_click_handler (
             T& object,
             void (T::*eh)(unsigned long index)
-        ) { auto_mutex M(m); single_click_event_handler.set(object,eh); }
+        ) { auto_mutex M(m); single_click_event_handler = make_mfp(object,eh); }
 
         bool at_start (
         ) const;
@@ -1730,8 +1731,8 @@ namespace dlib
 
         bool ms_enabled;
         typename array<data<S> >::kernel_2a_c items;
-        member_function_pointer<unsigned long>::kernel_1a event_handler;
-        member_function_pointer<unsigned long>::kernel_1a single_click_event_handler;
+        any_function<void(unsigned long)> event_handler;
+        any_function<void(unsigned long)> single_click_event_handler;
         unsigned long last_selected;
 
         scoped_ptr<list_box_style> style;
@@ -1773,7 +1774,7 @@ namespace dlib
             )
             {
                 auto_mutex M(wm);
-                event_handler.set(object,event_handler_);
+                event_handler = make_mfp(object,event_handler_);
             }
 
         private:
@@ -1836,7 +1837,7 @@ namespace dlib
             std::string prefix;
             int cur_dir;
 
-            member_function_pointer<const std::string&>::kernel_1a event_handler;
+            any_function<void(const std::string&)> event_handler;
             sequence<scoped_ptr<toggle_button> >::kernel_2a_c sob;
         };
     }
@@ -2309,7 +2310,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            node_selected_handler.set(object,event_handler_);
+            node_selected_handler = make_mfp(object,event_handler_);
         }
 
         template <
@@ -2321,7 +2322,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            node_deselected_handler.set(object,event_handler_);
+            node_deselected_handler = make_mfp(object,event_handler_);
         }
 
         template <
@@ -2333,7 +2334,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            node_deleted_handler.set(object,event_handler_);
+            node_deleted_handler = make_mfp(object,event_handler_);
         }
 
         template <
@@ -2345,7 +2346,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            graph_modified_handler.set(object,event_handler_);
+            graph_modified_handler = make_mfp(object,event_handler_);
         }
 
     protected:
@@ -2783,10 +2784,10 @@ namespace dlib
         unsigned long selected_edge_parent;
         unsigned long selected_edge_child;
 
-        member_function_pointer<unsigned long>::kernel_1a node_selected_handler;
-        member_function_pointer<unsigned long>::kernel_1a node_deselected_handler;
-        member_function_pointer<>::kernel_1a node_deleted_handler;
-        member_function_pointer<>::kernel_1a graph_modified_handler;
+        any_function<void(unsigned long)> node_selected_handler;
+        any_function<void(unsigned long)> node_deselected_handler;
+        any_function<void()> node_deleted_handler;
+        any_function<void()> graph_modified_handler;
 
         graph_type external_graph;
         // rebind the graph_ type to make us a graph_ of data structs
@@ -2948,7 +2949,7 @@ namespace dlib
         void set_text_modified_handler (
             T& object,
             void (T::*eh)(unsigned long, unsigned long)
-        ) { text_modified_handler.set(object,eh); }
+        ) { text_modified_handler = make_mfp(object,eh); }
 
     private:
 
@@ -3041,7 +3042,7 @@ namespace dlib
         bool recent_cursor_move;
         timer<text_grid>::kernel_2a cursor_timer;
         rgb_pixel border_color_;
-        member_function_pointer<unsigned long, unsigned long>::kernel_1a_c text_modified_handler;
+        any_function<void(unsigned long, unsigned long)> text_modified_handler;
     };
 
 // ----------------------------------------------------------------------------------------

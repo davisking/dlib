@@ -20,6 +20,7 @@
 #include "../smart_pointers.h"
 #include "../unicode.h"
 #include <cctype>
+#include "../any.h"
 
 
 namespace dlib
@@ -813,7 +814,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            event_handler.set(object,event_handler_);
+            event_handler = make_mfp(object,event_handler_);
             event_handler_self.clear();
         }
 
@@ -826,7 +827,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            event_handler_self.set(object,event_handler_);
+            event_handler_self = make_mfp(object,event_handler_);
             event_handler.clear();
         }
 
@@ -846,7 +847,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            button_down_handler.set(object,event_handler);
+            button_down_handler = make_mfp(object,event_handler);
         }
 
         template <
@@ -858,7 +859,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            button_up_handler.set(object,event_handler);
+            button_up_handler = make_mfp(object,event_handler);
         }
 
         template <
@@ -870,7 +871,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            button_down_handler_self.set(object,event_handler);
+            button_down_handler_self = make_mfp(object,event_handler);
         }
 
         template <
@@ -882,7 +883,7 @@ namespace dlib
         )
         {
             auto_mutex M(m);
-            button_up_handler_self.set(object,event_handler);
+            button_up_handler_self = make_mfp(object,event_handler);
         }
 
     private:
@@ -894,12 +895,12 @@ namespace dlib
         dlib::ustring name_;
         tooltip btn_tooltip;
 
-        member_function_pointer<>::kernel_1a event_handler;
-        member_function_pointer<button&>::kernel_1a event_handler_self;
-        member_function_pointer<>::kernel_1a button_down_handler;
-        member_function_pointer<bool>::kernel_1a button_up_handler;
-        member_function_pointer<button&>::kernel_1a button_down_handler_self;
-        member_function_pointer<bool,button&>::kernel_1a button_up_handler_self;
+        any_function<void()> event_handler;
+        any_function<void(button&)> event_handler_self;
+        any_function<void()> button_down_handler;
+        any_function<void(bool)> button_up_handler;
+        any_function<void(button&)> button_down_handler_self;
+        any_function<void(bool,button&)> button_up_handler_self;
 
         scoped_ptr<button_style> style;
 
@@ -991,7 +992,7 @@ namespace dlib
         void set_scroll_handler (
             T& object,
             void (T::*eh)()
-        ) { auto_mutex M(m); scroll_handler.set(object,eh); }
+        ) { auto_mutex M(m); scroll_handler = make_mfp(object,eh); }
 
         void set_pos (
             long x,
@@ -1183,8 +1184,8 @@ namespace dlib
                 button_action(w),
                 my_scroll_bar(object)
             {
-                bup.set(object,up);
-                bdown.set(object,down);
+                bup = make_mfp(object,up);
+                bdown = make_mfp(object,down);
 
                 enable_events();
             }
@@ -1226,8 +1227,8 @@ namespace dlib
             ) { bup(mouse_over); } 
 
             scroll_bar& my_scroll_bar;
-            member_function_pointer<>::kernel_1a bdown;
-            member_function_pointer<bool>::kernel_1a bup;
+            any_function<void()> bdown;
+            any_function<void(bool)> bup;
         };
 
         friend class slider_class;
@@ -1244,7 +1245,7 @@ namespace dlib
                 mouse_in_widget(false),
                 my_scroll_bar(object)
             {
-                mfp.set(object,handler);
+                callback = make_mfp(object,handler);
                 enable_events();
             }
 
@@ -1311,7 +1312,7 @@ namespace dlib
             void on_drag (
             )
             {
-                mfp();
+                callback();
             }
 
             void draw (
@@ -1323,7 +1324,7 @@ namespace dlib
 
             bool mouse_in_widget;
             scroll_bar& my_scroll_bar;
-            member_function_pointer<>::kernel_1a mfp;
+            any_function<void()> callback;
         };
 
 
@@ -1349,7 +1350,7 @@ namespace dlib
         slider_class slider;
         bar_orientation ori; 
         filler top_filler, bottom_filler;
-        member_function_pointer<>::kernel_1a scroll_handler;
+        any_function<void()> scroll_handler;
 
         long pos;
         long max_pos; 
@@ -1569,7 +1570,7 @@ namespace dlib
     private:
         dlib::ustring text;
         const shared_ptr_thread_safe<font> f;
-        member_function_pointer<>::kernel_1a action;
+        any_function<void()> action;
         unichar hotkey;
         point underline_p1;
         point underline_p2;
@@ -1587,7 +1588,7 @@ namespace dlib
         )
         {
             dlib::ustring &str = text;
-            action.set(object,event_handler_);
+            action = make_mfp(object,event_handler_);
 
             if (hk != 0)
             {
@@ -1713,7 +1714,7 @@ namespace dlib
     private:
         dlib::ustring text;
         const shared_ptr_thread_safe<font> f;
-        member_function_pointer<>::kernel_1a action;
+        any_function<void()> action;
         unichar hotkey;
         point underline_p1;
         point underline_p2;
