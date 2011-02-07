@@ -58,6 +58,7 @@
          <item>static_set</item> 
          <item>any</item> 
          <item>any_trainer</item> 
+         <item>any_function</item> 
          <item>any_decision_function</item> 
          <item>array</item> 
          <item>array2d</item> 
@@ -1216,6 +1217,18 @@
                 to write code which contains and processes these decision functions
                 without needing to know the specific types of decision functions used.
                </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>any_function</name>
+         <file>dlib/any.h</file>
+         <spec_file link="true">dlib/any/any_function_abstract.h</spec_file>
+         <description>
+                This object is a version of dlib::<a href="#any">any</a> that is restricted to containing 
+                elements which are some kind of function or function object.    
          </description>
       </component>
       

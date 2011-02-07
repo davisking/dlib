@@ -63,6 +63,7 @@
          <item>deserialize</item> 
          <item>serialize</item> 
          <item>zero_extend_cast</item> 
+         <item>make_mfp</item> 
       
       </section>
 
@@ -403,6 +404,19 @@
       </component>
       
       
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>make_mfp</name>
+         <file>dlib/member_function_pointer.h</file>
+         <spec_file>dlib/member_function_pointer/make_mfp_abstract.h</spec_file>
+         <description>
+            This function is a simple factory for creating <a href="#member_function_pointer">member_function_pointer</a>
+            objects without needing to know the necessary template arguments for the member_function_pointer.
+         </description>
+                                 
+      </component>
+            
    <!-- ************************************************************************* -->
       
       <component checked="true">

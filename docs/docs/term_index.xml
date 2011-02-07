@@ -402,6 +402,7 @@
          <term file="containers.html" name="stack"/>
          <term file="containers.html" name="weak_ptr"/>
          <term file="containers.html" name="any"/>
+         <term file="containers.html" name="any_function"/>
          <term file="containers.html" name="any_trainer"/>
          <term file="containers.html" name="any_decision_function"/>
 
@@ -972,6 +973,7 @@
          <term link="other.html#dlib_testing_suite" name="unit testing"/>
          <term file="other.html" name="logger"/>
          <term file="other.html" name="member_function_pointer"/>
+         <term file="other.html" name="make_mfp"/>
          <term file="other.html" name="bound_function_pointer"/>
          <term file="other.html" name="memory_manager_stateless"/>
          <term file="other.html" name="pipe"/>
