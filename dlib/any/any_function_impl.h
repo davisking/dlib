@@ -310,6 +310,7 @@ static typename disable_if<is_function<T>,const T&>::type deref (const U& item) 
 
 #define DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE               \
     typename funct_type<T>::type item;                      \
+    derived() {}                                            \
     derived(const T& val) : item(copy(val)) {}              \
     virtual void copy_to ( scoped_ptr<base>& dest) const    \
     { dest.reset(new derived(deref<T>(item))); }
