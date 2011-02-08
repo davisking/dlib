@@ -121,6 +121,21 @@ public:
         // set which function should get called when the button gets clicked.  In this case we want
         // the on_button_clicked member to be called on *this.
         b.set_click_handler(*this,&win::on_button_clicked);
+        // Alternatively, if you have a compiler which supports the lambda functions from the
+        // new C++ standard then you can use a lambda function instead of telling the click
+        // handler to call one of the member functions.  So for example, you could do this
+        // instead (uncomment the code if you have C++0x support):
+        /*
+        b.set_click_handler([&](){
+                ++counter;
+                ostringstream sout;
+                sout << "Counter: " << counter;
+                c.set_text(sout.str());
+                });
+        */
+        // In general, all the functions which register events can take either member 
+        // functions or lambda functions.
+
         
         // Lets also make a simple menu bar.  
         // First we say how many menus we want in our menu bar.  In this example we only want 1.
