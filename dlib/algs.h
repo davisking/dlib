@@ -771,6 +771,21 @@ namespace dlib
     struct is_function<T (A0, A1, A2, A3)> { static const bool value = true; };
     template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4> 
     struct is_function<T (A0, A1, A2, A3, A4)> { static const bool value = true; };
+    template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4,
+                          typename A5> 
+    struct is_function<T (A0,A1,A2,A3,A4,A5)> { static const bool value = true; };
+    template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4,
+                          typename A5, typename A6> 
+    struct is_function<T (A0,A1,A2,A3,A4,A5,A6)> { static const bool value = true; };
+    template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4,
+                          typename A5, typename A6, typename A7> 
+    struct is_function<T (A0,A1,A2,A3,A4,A5,A6,A7)> { static const bool value = true; };
+    template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4,
+                          typename A5, typename A6, typename A7, typename A8> 
+    struct is_function<T (A0,A1,A2,A3,A4,A5,A6,A7,A8)> { static const bool value = true; };
+    template <typename T, typename A0, typename A1, typename A2, typename A3, typename A4,
+                          typename A5, typename A6, typename A7, typename A8, typename A9> 
+    struct is_function<T (A0,A1,A2,A3,A4,A5,A6,A7,A8,A9)> { static const bool value = true; };
 
 
     template <typename T> class funct_wrap0
