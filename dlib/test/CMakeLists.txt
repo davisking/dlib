@@ -16,6 +16,7 @@ set (tests
    example.cpp
    example_args.cpp
    any.cpp
+   any_function.cpp
    array2d.cpp
    array.cpp
    base64.cpp
