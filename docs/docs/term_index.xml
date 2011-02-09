@@ -1018,6 +1018,7 @@
          <term file="parsing.html" name="rpad"/>
          <term file="parsing.html" name="left_substr"/>
          <term file="parsing.html" name="right_substr"/>
+         <term file="parsing.html" name="split"/>
          <term file="parsing.html" name="unichar"/>
          <term file="parsing.html" name="ustring"/>
          <term file="parsing.html" name="convert_utf8_to_utf32"/>

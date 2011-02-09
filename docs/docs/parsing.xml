@@ -54,6 +54,7 @@
          <item>rpad</item> 
          <item>left_substr</item> 
          <item>right_substr</item> 
+         <item>split</item> 
          <item>tolower</item> 
          <item>toupper</item> 
          <item>convert_utf8_to_utf32</item> 
@@ -98,6 +99,18 @@
             
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>split</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>
+             Breaks a string into a sequence of substrings delimited
+             by a user specified set of characters.   
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
       <component>
          <name>right_substr</name>
          <file>dlib/string.h</file>
