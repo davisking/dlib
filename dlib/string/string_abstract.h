@@ -5,6 +5,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 #include "../error.h"
 
 namespace dlib
@@ -247,6 +248,8 @@ namespace dlib
         const charT* trim_chars = _dT(charT," \t\r\n")
     );
     /*!
+        requires
+            - trim_chars == a valid null-terminated C string
         ensures
             - returns ltrim(str, std::basic_string<charT,traits,alloc>(trim_chars))
     !*/
@@ -278,6 +281,8 @@ namespace dlib
         const charT* trim_chars = _dT(charT," \t\r\n")
     );
     /*!
+        requires
+            - trim_chars == a valid null-terminated C string
         ensures
             - returns rtrim(str, std::basic_string<charT,traits,alloc>(trim_chars))
     !*/
@@ -309,6 +314,8 @@ namespace dlib
         const charT* trim_chars = _dT(charT," \t\r\n")
     );
     /*!
+        requires
+            - trim_chars == a valid null-terminated C string
         ensures
             - returns trim(str, std::basic_string<charT,traits,alloc>(trim_chars))
     !*/
@@ -349,6 +356,8 @@ namespace dlib
         const charT* pad_string = _dT(charT," ")
     );
     /*!
+        requires
+            - pad_string == a valid null-terminated C string
         ensures
             - returns rpad(str, pad_length, std::basic_string<charT,traits,alloc>(pad_string))
     !*/
@@ -389,6 +398,8 @@ namespace dlib
         const charT* pad_string = _dT(charT," ")
     );
     /*!
+        requires
+            - pad_string == a valid null-terminated C string
         ensures
             - returns lpad(str, pad_length, std::basic_string<charT,traits,alloc>(pad_string))
     !*/
@@ -424,6 +435,8 @@ namespace dlib
         const charT* pad_string = _dT(charT," ")
     );
     /*!
+        requires
+            - pad_string == a valid null-terminated C string
         ensures
             - returns pad(str, pad_length, std::basic_string<charT,traits,alloc>(pad_string))
     !*/
@@ -455,6 +468,8 @@ namespace dlib
         const charT* delim = _dT(charT," \n\r\t")
     );
     /*!
+        requires
+            - delim == a valid null-terminated C string
         ensures
             - returns left_substr(str, std::basic_string<charT,traits,alloc>(delim))
     !*/
@@ -489,8 +504,50 @@ namespace dlib
         const charT* delim = _dT(charT," \n\r\t")
     );
     /*!
+        requires
+            - delim == a valid null-terminated C string
         ensures
             - returns right_substr(str, std::basic_string<charT,traits,alloc>(delim))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
+    const std::vector<std::basic_string<charT,traits,alloc> > split (
+        const std::basic_string<charT,traits,alloc>& str,
+        const std::basic_string<charT,traits,alloc>& delim 
+    );
+    /*!
+        ensures
+            - Breaks the given string str into a sequence of substrings delimited
+              by characters in delim and returns the results.  
+            - returns a vector V such that:
+                - V.size() == the number of substrings found in str.
+                - for all i: V[i] == The ith substring.  Note that it will not contain
+                  any delimiter characters (i.e. characters in delim). 
+                - V contains the substrings in the order in which they appear in str.
+                  That is, V[0] contains the first substring, V[1] the second, and
+                  so on.
+    !*/
+
+    template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
+    const std::vector<std::basic_string<charT,traits,alloc> > split (
+        const std::basic_string<charT,traits,alloc>& str,
+        const charT* delim = _dT(charT," \n\r\t")
+    );
+    /*!
+        requires
+            - trim_chars == a valid null-terminated C string
+        ensures
+            - returns split(str, std::basic_string<charT,traits,alloc>(delim))
     !*/
 
 // ----------------------------------------------------------------------------------------

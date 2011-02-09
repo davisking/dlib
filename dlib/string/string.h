@@ -12,6 +12,7 @@
 #include "../uintn.h"
 #include <cctype>
 #include <algorithm>
+#include <vector>
 #include "../enable_if.h"
 
 namespace dlib
@@ -839,6 +840,70 @@ namespace dlib
             return str.substr(delim_pos+1);
         else
             return _dT(charT,"");
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
+    const std::vector<std::basic_string<charT,traits,alloc> > split (
+        const std::basic_string<charT,traits,alloc>& str,
+        const charT* delim = _dT(charT," \n\r\t")
+    )
+    {
+        std::basic_string<charT,traits,alloc> temp;
+
+        std::vector<std::basic_string<charT,traits,alloc> > res;
+
+        for (unsigned long i = 0; i < str.size(); ++i)
+        {
+            // check if delim contains the character str[i]
+            bool hit = false;
+            const charT* d = delim;
+            while (*d != '\0')
+            {
+                if (str[i] == *d)
+                {
+                    hit = true;
+                    break;
+                }
+                ++d;
+            }
+
+            if (hit)
+            {
+                if (temp.size() != 0)
+                {
+                    res.push_back(temp);
+                    temp.clear();
+                }
+            }
+            else
+            {
+                temp.push_back(str[i]);
+            }
+        }
+
+        if (temp.size() != 0)
+            res.push_back(temp);
+
+        return res;
+    }
+
+    template <
+        typename charT,
+        typename traits,
+        typename alloc
+        >
+    const std::vector<std::basic_string<charT,traits,alloc> > split (
+        const std::basic_string<charT,traits,alloc>& str,
+        const std::basic_string<charT,traits,alloc>& delim 
+    )
+    {
+        return split(str,delim.c_str());
     }
 
 // ----------------------------------------------------------------------------------------
