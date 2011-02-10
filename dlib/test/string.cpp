@@ -187,6 +187,63 @@ namespace
     }
 
 
+    void test_split()
+    {
+        std::vector<string> v;
+
+        string str;
+        string delim = " , ";
+
+        v = split(string("one, two,three four")," ,");
+        DLIB_TEST(v.size() == 4);
+        DLIB_TEST(v[0] == "one");
+        DLIB_TEST(v[1] == "two");
+        DLIB_TEST(v[2] == "three");
+        DLIB_TEST(v[3] == "four");
+
+        v = split(string("one, two,three four"),delim);
+        DLIB_TEST(v.size() == 4);
+        DLIB_TEST(v[0] == "one");
+        DLIB_TEST(v[1] == "two");
+        DLIB_TEST(v[2] == "three");
+        DLIB_TEST(v[3] == "four");
+
+        v = split(string(""));
+        DLIB_TEST(v.size() == 0);
+
+        v = split(string("   "));
+        DLIB_TEST(v.size() == 0);
+
+        v = split(string(" one two  "));
+        DLIB_TEST(v.size() == 2);
+        DLIB_TEST(v[0] == "one");
+        DLIB_TEST(v[1] == "two");
+
+        v = split(string(" one   "));
+        DLIB_TEST(v.size() == 1);
+        DLIB_TEST(v[0] == "one");
+
+        v = split(string("one"));
+        DLIB_TEST(v.size() == 1);
+        DLIB_TEST(v[0] == "one");
+
+        v = split(string("o"));
+        DLIB_TEST(v.size() == 1);
+        DLIB_TEST(v[0] == "o");
+
+
+        std::vector<wstring> wv;
+        wstring wstr = L"test string";
+        wv = split(wstr);
+        DLIB_TEST(wv.size() == 2);
+        DLIB_TEST(wv[0] == L"test");
+        DLIB_TEST(wv[1] == L"string");
+        wv = split(wstr,L" ");
+        DLIB_TEST(wv.size() == 2);
+        DLIB_TEST(wv[0] == L"test");
+        DLIB_TEST(wv[1] == L"string");
+    }
+
 
 
     class string_tester : public tester
@@ -202,6 +259,7 @@ namespace
         )
         {
             string_test();
+            test_split();
         }
     } a;
 
