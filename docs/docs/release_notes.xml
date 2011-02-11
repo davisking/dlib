@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.35" date="Feb 10, 2011">
+New Stuff:
    - Added the rr_trainer.  It is a version of krr_trainer which is optimized
      for use with the linear_kernel.
    - Added the approximate_distance_function() routine.  It is the core optimizer
@@ -44,7 +57,7 @@ Bug fixes:
 Other:
    - Updated the image_display widget so you can zoom in and out using the 
      mouse wheel.
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
