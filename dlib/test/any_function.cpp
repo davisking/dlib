@@ -74,7 +74,7 @@ namespace
         DLIB_TEST(a.is_empty() == false);
         DLIB_TEST(a.is_set() == true);
         DLIB_TEST(a.contains<test>() == true);
-        DLIB_TEST(a.contains<double>() == false);
+        DLIB_TEST(a.contains<int(*)()>() == false);
         DLIB_TEST(any_cast<test>(a)() == 4);
         DLIB_TEST(a() == 4);
     }
@@ -87,8 +87,8 @@ namespace
 
         DLIB_TEST(a.is_empty());
         DLIB_TEST(a.is_set()==false);
-        DLIB_TEST(a.contains<int>() == false);
-        DLIB_TEST(a.contains<string>() == false);
+        DLIB_TEST(a.contains<int(*)()>() == false);
+        DLIB_TEST(a.contains<test>() == false);
         DLIB_TEST(a.is_empty());
 
         a = b;
@@ -103,7 +103,7 @@ namespace
         bool error = false;
         try
         {
-            any_cast<double>(a);
+            any_cast<int(*)()>(a);
         }
         catch (bad_any_cast&)
         {
@@ -133,7 +133,7 @@ namespace
         error = false;
         try
         {
-            any_cast<test2>(a);
+            any_cast<test>(a);
         }
         catch (bad_any_cast&)
         {
@@ -147,11 +147,11 @@ namespace
 
     void run_test2()
     {
-        any_function<int(int,int)> f = add;
+        any_function<int(int,int)> f = &add;
 
         DLIB_TEST(f(1,3) == 4);
 
-        any_function<string(string,string)> g(cat);
+        any_function<string(string,string)> g(&cat);
         DLIB_TEST(g("one", "two") == "onetwo");
     }
 
