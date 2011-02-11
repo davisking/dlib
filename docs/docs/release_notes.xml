@@ -12,12 +12,38 @@
 
 <current>
 New Stuff:
+   - Added the rr_trainer.  It is a version of krr_trainer which is optimized
+     for use with the linear_kernel.
+   - Added the approximate_distance_function() routine.  It is the core optimizer
+     behind the reduced2() trainer adapter.  
+   - Added an any_function which supports the same functionality as std::function 
+     from the upcoming C++0x standard.  I added this so dlib can be modified to 
+     easily support lambda functions while still being compilable with compilers 
+     which don't support the new std::function.
+   - Added overloads of all the GUI event handlers so you can use general functions 
+     as callbacks (via any_function).  This way, if you have a C++0x compiler, you 
+     can use lambda functions with the event handlers.
+   - Added the split() function for splitting up strings.
  
 Non-Backwards Compatible Changes:
+   - Improved the distance_function object by turning it into a properly 
+     encapsulated class rather than just a simple struct.  I also added 
+     overloaded +, -, *, and / operators for this object so you can do the 
+     kind of arithmetic you would expect on an object which represents a 
+     point in a vector space.  This breaks backwards compatibility with 
+     the previous interface though as the member variables are now private.
 
 Bug fixes:
+   - Fixed a compile-time error in the kernel_matrix().
+   - Fixed a bug in an assert in the spatially_filter_image() function.
+   - Applied a patch from Nils Labugt which fixes a runtime bug in the gui_core 
+     component.  The bug caused a crash when using X11 and Ubuntu 10.10 in
+     certain cases.
+   - Updated code so that it compiles with the clang compiler.
 
 Other:
+   - Updated the image_display widget so you can zoom in and out using the 
+     mouse wheel.
 </current>
 
 <!-- *******************************************************************************  -->
