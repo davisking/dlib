@@ -137,7 +137,7 @@ namespace dlib
                     name_                == name()
                     description_         == description()
                     number_of_arguments_ == number_of_arguments()
-                    options[index]       == operator[](index)
+                    options[N][arg]      == argument(arg,N)
                     num_present          == count()                    
             !*/
 
