@@ -23,8 +23,6 @@ namespace dlib
             "\t type assignment_cost(cost,assignment)"
             << "\n\t cost.nr(): " << cost.nr()
             << "\n\t cost.nc(): " << cost.nc()
-            << "\n\t min(assignment): " << min(vector_to_matrix(assignment)) 
-            << "\n\t max(assignment): " << max(vector_to_matrix(assignment)) 
             );
 #ifdef ENABLE_ASSERTS
         // can't call max on an empty vector. So put an if here to guard against it.
