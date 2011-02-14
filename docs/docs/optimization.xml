@@ -435,15 +435,11 @@ subject to the following constraint:
          <spec_file link="true">dlib/optimization/max_cost_assignment_abstract.h</spec_file>
          <description>
             This function is an implementation of the Hungarian algorithm (also know as the Kuhn-Munkres algorithm).
-            It solves the following optimization problem:
-<pre>
-   Maximize: f(A) == assignment_cost(cost, A)
-   Subject to the following constraints:
-      - The elements of A are unique. That is, there aren't any 
-        elements of A which are equal.  
-      - A.size() == cost.nr()
-</pre>
-<br/>
+            It solves the optimal assignment problem. For example, suppose you have an equal number of workers
+            and jobs and you need to decide which workers to assign to which jobs. Some workers are better at 
+            certain jobs than others. So you would like to find out how to assign them all to jobs such that 
+            overall productivity is maximized. You can use this routine to solve this problem and others like it. 
+
          </description>
                                  
       </component>
