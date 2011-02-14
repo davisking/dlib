@@ -11,6 +11,7 @@
 #include "optimization/optimization_oca.h"
 #include "optimization/optimization_trust_region.h"
 #include "optimization/optimization_least_squares.h"
+#include "optimization/max_cost_assignment.h"
 
 #endif // DLIB_OPTIMIZATIOn_HEADER
 

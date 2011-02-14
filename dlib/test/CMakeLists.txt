@@ -59,12 +59,13 @@ set (tests
    matrix_eig.cpp
    matrix_lu.cpp
    matrix_qr.cpp
+   max_cost_assignment.cpp
    md5.cpp
    member_function_pointer.cpp
    metaprogramming.cpp
    multithreaded_object.cpp
-   one_vs_one_trainer.cpp
    one_vs_all_trainer.cpp
+   one_vs_one_trainer.cpp
    optimization.cpp
    optimization_test_functions.cpp
    opt_qp_solver.cpp
