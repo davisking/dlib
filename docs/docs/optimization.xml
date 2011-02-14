@@ -47,6 +47,7 @@
          <item>solve_least_squares</item> 
          <item>solve_least_squares_lm</item> 
          <item>solve_trust_region_subproblem</item> 
+         <item>max_cost_assignment</item> 
       </section>
 
       <section>
@@ -422,6 +423,27 @@ subject to the following constraint:
                      Fan, Chen, and Lin.  In the Journal of Machine Learning Research 2005.</li>
                </ul>
 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>max_cost_assignment</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/max_cost_assignment_abstract.h</spec_file>
+         <description>
+            This function is an implementation of the Hungarian algorithm (also know as the Kuhn-Munkres algorithm).
+            It solves the following optimization problem:
+<pre>
+   Maximize: f(A) == assignment_cost(cost, A)
+   Subject to the following constraints:
+      - The elements of A are unique. That is, there aren't any 
+        elements of A which are equal.  
+      - A.size() == cost.nr()
+</pre>
+<br/>
          </description>
                                  
       </component>
