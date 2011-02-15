@@ -33,13 +33,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename U, long NR, long NC, typename MM, typename L>
+    template <typename EXP>
     std::vector<long> max_cost_assignment (
-        const matrix<U,NR,NC,MM,L>& cost
+        const matrix_exp<EXP>& cost
     );
     /*!
         requires
-            - U == some integer type (e.g. int)
+            - EXP::type == some integer type (e.g. int)
+              (i.e. cost must contain integers rather than floats or doubles)
             - cost.nr() == cost.nc()
         ensures
             - Finds and returns the solution to the following optimization problem:

@@ -50,14 +50,14 @@ namespace dlib
 
     namespace impl
     {
-        template <typename U, long NR, long NC, typename MM, typename L>
+        template <typename EXP>
         inline void compute_slack(
             const long x,
-            std::vector<U>& slack,
+            std::vector<typename EXP::type>& slack,
             std::vector<long>& slackx,
-            const matrix<U,NR,NC,MM,L>& cost,
-            const std::vector<U>& lx,
-            const std::vector<U>& ly
+            const matrix_exp<EXP>& cost,
+            const std::vector<typename EXP::type>& lx,
+            const std::vector<typename EXP::type>& ly
         )
         {
             for (long y = 0; y < cost.nc(); ++y)
@@ -73,15 +73,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename U, long NR, long NC, typename MM, typename L>
+    template <typename EXP>
     std::vector<long> max_cost_assignment (
-        const matrix<U,NR,NC,MM,L>& cost
+        const matrix_exp<EXP>& cost_
     )                         
     {
+        const_temp_matrix<EXP> cost(cost_);
+        typedef typename EXP::type type;
         // This algorithm only works if the elements of the cost matrix can be reliably 
         // compared using operator==. However, comparing for equality with floating point
         // numbers is not a stable operation. So you need to use an integer cost matrix.
-        COMPILE_TIME_ASSERT(std::numeric_limits<U>::is_integer);
+        COMPILE_TIME_ASSERT(std::numeric_limits<type>::is_integer);
         DLIB_ASSERT(cost.nr() == cost.nc(),
             "\t std::vector<long> max_cost_assignment(cost)"
             << "\n\t cost.nr(): " << cost.nr()
@@ -101,11 +103,11 @@ namespace dlib
         if (cost.size() == 0)
             return std::vector<long>();
 
-        std::vector<U> lx, ly;
+        std::vector<type> lx, ly;
         std::vector<long> xy;
         std::vector<long> yx;
         std::vector<char> S, T;
-        std::vector<U> slack;
+        std::vector<type> slack;
         std::vector<long> slackx;
         std::vector<long> aug_path;
 
@@ -145,7 +147,7 @@ namespace dlib
             T.assign(cost.nc(), false);
 
             // clear out old slack values
-            slack.assign(cost.nc(), std::numeric_limits<U>::max());
+            slack.assign(cost.nc(), std::numeric_limits<type>::max());
             slackx.resize(cost.nc());
             /*
                 slack and slackx are maintained such that we always
@@ -212,7 +214,7 @@ namespace dlib
                 // Since we didn't find an augmenting path we need to improve the 
                 // feasible labeling stored in lx and ly.  We also need to keep the
                 // slack updated accordingly.
-                U delta = std::numeric_limits<U>::max();
+                type delta = std::numeric_limits<type>::max();
                 for (unsigned long i = 0; i < T.size(); ++i)
                 {
                     if (!T[i])
