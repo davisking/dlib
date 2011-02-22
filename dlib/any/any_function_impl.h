@@ -504,5 +504,7 @@ struct derived<T,result_type (A1,A2,A3,A4,A5,A6,A7,A8,A9,A10)> : public base
 
 scoped_ptr<base> data;
 
+#undef DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
+
 #endif // DLIB_ANY_FUNCTION_RETURN
 
