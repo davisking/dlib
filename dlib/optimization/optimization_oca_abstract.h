@@ -110,8 +110,8 @@ namespace dlib
         /*!
             INITIAL VALUE
                 - get_subproblem_epsilon() == 1e-2
-                - get_subproblem_max_iterations() == 200000
-                - get_inactive_plane_threshold() == 10
+                - get_subproblem_max_iterations() == 50000
+                - get_inactive_plane_threshold() == 20
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for solving the optimization problem defined above

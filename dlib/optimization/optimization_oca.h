@@ -55,9 +55,9 @@ namespace dlib
         oca () 
         {
             sub_eps = 1e-2;
-            sub_max_iter = 200000;
+            sub_max_iter = 50000;
 
-            inactive_thresh = 10;
+            inactive_thresh = 20;
         }
 
         void set_subproblem_epsilon (
@@ -154,6 +154,7 @@ namespace dlib
                 // what it is.
                 bs.push_back(R_lower_bound);
                 planes.push_back(zeros_matrix<scalar_type>(w.size(),1));
+                alpha = uniform_matrix<scalar_type>(1,1, C);
                 miss_count.push_back(0);
 
                 K.set_size(1,1);
@@ -172,6 +173,13 @@ namespace dlib
                 problem.get_risk(w_cur, cur_risk, planes.back());
                 bs.push_back(cur_risk - dot(w_cur,planes.back()));
                 miss_count.push_back(0);
+
+                // If alpha is empty then initialize it (we must always have sum(alpha) == C).  
+                // But otherwise, just append a zero.
+                if (alpha.size() == 0)
+                    alpha = uniform_matrix<scalar_type>(1,1, C);
+                else
+                    alpha = join_cols(alpha,zeros_matrix<scalar_type>(1,1));
 
                 // Check the objective value at w_cur and see if it is better than
                 // the best seen so far.
@@ -199,7 +207,6 @@ namespace dlib
                     ++rr;
                 }
 
-                alpha = uniform_matrix<scalar_type>(planes.size(),1, C/planes.size());
 
                 // solve the cutting plane subproblem for the next w_cur.   We solve it to an
                 // accuracy that is related to how big the error gap is
@@ -207,6 +214,8 @@ namespace dlib
                 // just a sanity check
                 if (eps < 1e-16)
                     eps = 1e-16;
+                // Note that we warm start this optimization by using the alpha from the last
+                // iteration as the starting point.
                 solve_qp_using_smo(K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
 
                 // construct the w_cur that minimized the subproblem.
@@ -245,6 +254,7 @@ namespace dlib
                     bs.erase(bs.begin()+idx);
                     miss_count.erase(miss_count.begin()+idx);
                     K = removerc(K, idx, idx);
+                    alpha = remove_row(alpha,idx);
                 }
 
             }
