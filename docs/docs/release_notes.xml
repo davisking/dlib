@@ -12,13 +12,19 @@
 
 <current>
 New Stuff:
+   - Added an implementation of the Hungarian algorithm for solving the optimal 
+     assignment problem (in the new max_cost_assignment() routine).
  
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a problem which prevented the any_function unit test from compiling 
+     in visual studio 2008.
 
 Other:
-
+   - Changed the oca optimizer so that it warm starts the QP subproblem
+     rather than resolving it from scratch during each iteration. This 
+     improves the speed and stability of the algorithm.
 </current>
 
 <!-- *******************************************************************************  -->
