@@ -12,6 +12,18 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.36" date="Mar 2, 2011">
+New Stuff:
    - Added an implementation of the Hungarian algorithm for solving the optimal 
      assignment problem (in the new max_cost_assignment() routine).
  
@@ -25,7 +37,7 @@ Other:
    - Changed the oca optimizer so that it warm starts the QP subproblem
      rather than resolving it from scratch during each iteration. This 
      improves the speed and stability of the algorithm.
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
