@@ -9,7 +9,7 @@
 namespace dlib
 {
 
-    class compression_stream 
+    class compress_stream 
     {
         /*!
             INITIAL VALUE
@@ -24,7 +24,7 @@ namespace dlib
 
         class decompression_error : public dlib::error {};
 
-        compression_stream (
+        compress_stream (
         );
         /*!
             ensures
@@ -33,7 +33,7 @@ namespace dlib
                 - std::bad_alloc
         !*/
 
-        virtual ~compression_stream (
+        virtual ~compress_stream (
         );
         /*!
             ensures
@@ -83,8 +83,8 @@ namespace dlib
     private:
 
         // restricted functions
-        compression_stream(compression_stream&);        // copy constructor
-        compression_stream& operator=(compression_stream&);    // assignment operator
+        compress_stream(compress_stream&);        // copy constructor
+        compress_stream& operator=(compress_stream&);    // assignment operator
 
     };   
    
