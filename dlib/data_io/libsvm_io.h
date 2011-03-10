@@ -45,6 +45,7 @@ namespace dlib
         COMPILE_TIME_ASSERT(is_unsigned_type<key_type>::value);
 
         samples.clear();
+        labels.clear();
 
         ifstream fin(file_name.c_str());
 
