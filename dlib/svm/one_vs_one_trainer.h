@@ -46,10 +46,6 @@ namespace dlib
         void set_trainer (
             const any_trainer& trainer
         )
-        /*!
-            ensures
-                - sets the trainer used for all pairs of training
-        !*/
         {
             default_trainer = trainer;
             trainers.clear();
@@ -60,12 +56,6 @@ namespace dlib
             const label_type& l1,
             const label_type& l2
         )
-        /*!
-            requires
-                - l1 != l2
-            ensures
-                - sets the trainer used for just the l1 l2 class pair
-        !*/
         {
             trainers[make_unordered_pair(l1,l2)] = trainer;
         }
