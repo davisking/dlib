@@ -75,6 +75,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
+    struct is_pair : public default_is_kind_value  
+    {
+        /*!
+            - if (T is a std::pair object) then
+                - is_std_vector<T>::value == true
+            - else
+                - is_std_vector<T>::value == false
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
     struct is_rand : public default_is_kind_value  
     {
         /*!
@@ -96,6 +109,11 @@ namespace dlib
     template <typename T> struct is_std_vector<T&>      { const static bool value = is_std_vector<T>::value; };
     template <typename T> struct is_std_vector<const T&>{ const static bool value = is_std_vector<T>::value; };
     template <typename T> struct is_std_vector<const T> { const static bool value = is_std_vector<T>::value; };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    struct is_pair<std::pair<T,U> > { const static bool value = true; };
 
 // ----------------------------------------------------------------------------------------
 
