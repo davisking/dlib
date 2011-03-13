@@ -46,6 +46,7 @@
          <item>is_rand</item>
          <item>is_matrix</item>
          <item>is_std_vector</item>
+         <item>is_pair</item>
          <item>is_directed_graph</item>
          <item>is_built_in_scalar_type</item>
          <item>promote</item>
@@ -348,6 +349,19 @@
          <description>
             This is a template where is_std_vector&lt;T&gt;::value == true when T
             is a <a href="containers.html#std_vector_c">std_vector_c</a> or std::vector object.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_pair</name>
+         <file>dlib/is_kind.h</file>
+         <spec_file link="true">dlib/is_kind.h</spec_file>
+         <description>
+            This is a template where is_pair&lt;T&gt;::value == true when T
+            is a std::pair object.
          </description>
          
       </component>

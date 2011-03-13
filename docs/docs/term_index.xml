@@ -444,6 +444,7 @@
          <term file="metaprogramming.html" name="is_rand"/>
          <term file="metaprogramming.html" name="is_matrix"/>
          <term file="metaprogramming.html" name="is_std_vector"/>
+         <term file="metaprogramming.html" name="is_pair"/>
          <term file="metaprogramming.html" name="is_directed_graph"/>
          <term file="metaprogramming.html" name="is_built_in_scalar_type"/>
          <term file="metaprogramming.html" name="promote"/>
