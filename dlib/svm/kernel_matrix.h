@@ -30,14 +30,18 @@ namespace dlib
             return m[i];
         }
 
+        // Only use this function if T isn't a std::pair because in that case the entire vector is
+        // probably itself a sparse sample.
         template <typename kernel_type, typename T, typename alloc>
-        inline const T& access ( const std::vector<T,alloc>& m, long i)
+        inline typename disable_if<is_pair<T>,const T&>::type access ( const std::vector<T,alloc>& m, long i)
         {
             return m[i];
         }
 
+        // Only use this function if T isn't a std::pair because in that case the entire vector is
+        // probably a sparse sample.
         template <typename kernel_type, typename T, typename alloc>
-        inline const T& access ( const std_vector_c<T,alloc>& m, long i)
+        inline typename disable_if<is_pair<T>,const T&>::type access ( const std_vector_c<T,alloc>& m, long i)
         {
             return m[i];
         }
