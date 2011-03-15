@@ -48,6 +48,7 @@ namespace dlib
 
     public:
         typedef typename EXP::type type;
+        typedef type value_type; // Redefined for compatibility with the STL
         typedef typename EXP::const_ret_type const_ret_type;
         typedef typename EXP::mem_manager_type mem_manager_type;
         typedef typename EXP::layout_type layout_type;

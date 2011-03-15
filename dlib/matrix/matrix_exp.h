@@ -67,6 +67,7 @@ namespace dlib
 
     public:
         typedef typename matrix_traits<EXP>::type type;
+        typedef type value_type;
         typedef typename matrix_traits<EXP>::const_ret_type const_ret_type;
         typedef typename matrix_traits<EXP>::mem_manager_type mem_manager_type;
         typedef typename matrix_traits<EXP>::layout_type layout_type;
