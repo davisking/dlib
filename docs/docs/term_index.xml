@@ -157,7 +157,13 @@
          <term file="ml.html" name="remove_percent_shortest_edges"/>
          <term file="ml.html" name="find_approximate_k_nearest_neighbors"/>
          <term file="dlib/manifold_regularization/graph_creation_abstract.h.html" name="contains_duplicate_pairs"/>
-         <term file="dlib/manifold_regularization/graph_creation_abstract.h.html" name="max_index_value_plus_one"/>
+         <term name="max_index_plus_one">
+            <term link="dlib/manifold_regularization/graph_creation_abstract.h.html#max_index_plus_one" name="for graphs"/>
+            <term link="dlib/svm/sparse_vector_abstract.h.html#max_index_plus_one" name="for sparse vectors"/>
+         </term>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="add_to"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="subtract_from"/>
+
          <term file="ml.html" name="linear_manifold_regularizer"/>
          <term file="ml.html" name="squared_euclidean_distance"/>
          <term file="ml.html" name="use_weights_of_one"/>
