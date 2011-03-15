@@ -85,7 +85,7 @@ namespace dlib
                   it must in turn contain objects with an interface compatible with dlib::sample_pair
                 - edges.size() > 0
                 - contains_duplicate_pairs(edges) == false
-                - max_index_value_plus_one(edges) <= samples.size()
+                - max_index_plus_one(edges) <= samples.size()
                 - weight_funct(edges[i]) must be a valid expression that evaluates to a
                   floating point number >= 0
             ensures

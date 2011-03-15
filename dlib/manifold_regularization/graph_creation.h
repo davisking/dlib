@@ -415,7 +415,7 @@ namespace dlib
     template <
         typename vector_type 
         >
-    unsigned long max_index_value_plus_one (
+    unsigned long max_index_plus_one (
         const vector_type& pairs
     )
     {

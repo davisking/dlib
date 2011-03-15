@@ -216,13 +216,13 @@ namespace dlib
             // make sure requires clause is not broken
             DLIB_ASSERT(edges.size() > 0 &&
                         contains_duplicate_pairs(edges) == false &&
-                        max_index_value_plus_one(edges) <= samples.size(),
+                        max_index_plus_one(edges) <= samples.size(),
                 "\t void linear_manifold_regularizer::build()"
                 << "\n\t Invalid inputs were given to this function."
                 << "\n\t edges.size():                    " << edges.size()
                 << "\n\t samples.size():                  " << samples.size()
                 << "\n\t contains_duplicate_pairs(edges): " << contains_duplicate_pairs(edges) 
-                << "\n\t max_index_value_plus_one(edges): " << max_index_value_plus_one(edges) 
+                << "\n\t max_index_plus_one(edges):       " << max_index_plus_one(edges) 
                 );
 
 
