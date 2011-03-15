@@ -122,6 +122,47 @@ namespace
         DLIB_TEST(abs(df(samples[1]) - (-1)) < 1e-6);
         DLIB_TEST(abs(df(samples[2]) - (1)) < 1e-6);
         DLIB_TEST(abs(df(samples[3]) - (1)) < 1e-6);
+
+
+        // While we are at it, make sure the krr_trainer works with sparse samples
+        krr_trainer<sparse_linear_kernel<sparse_sample_type> > krr;
+
+        df = krr.train(samples, labels);
+        DLIB_TEST(abs(df(samples[0]) - (-1)) < 1e-6);
+        DLIB_TEST(abs(df(samples[1]) - (-1)) < 1e-6);
+        DLIB_TEST(abs(df(samples[2]) - (1)) < 1e-6);
+        DLIB_TEST(abs(df(samples[3]) - (1)) < 1e-6);
+
+
+        // Now test some of the sparse helper functions
+        DLIB_TEST(sparse_vector::max_index_plus_one(samples) == 2);
+        DLIB_TEST(sparse_vector::max_index_plus_one(samples[0]) == 2);
+
+        matrix<double,3,1> m;
+        m = 1;
+        sparse_vector::add_to(m, samples[3]);
+        DLIB_TEST(m(0) == 1 + samples[3][0].second);
+        DLIB_TEST(m(1) == 1 + samples[3][1].second);
+        DLIB_TEST(m(2) == 1);
+
+        m = 1;
+        sparse_vector::subtract_from(m, samples[3]);
+        DLIB_TEST(m(0) == 1 - samples[3][0].second);
+        DLIB_TEST(m(1) == 1 - samples[3][1].second);
+        DLIB_TEST(m(2) == 1);
+
+        m = 1;
+        sparse_vector::add_to(m, samples[3], 2);
+        DLIB_TEST(m(0) == 1 + 2*samples[3][0].second);
+        DLIB_TEST(m(1) == 1 + 2*samples[3][1].second);
+        DLIB_TEST(m(2) == 1);
+
+        m = 1;
+        sparse_vector::subtract_from(m, samples[3], 2);
+        DLIB_TEST(m(0) == 1 - 2*samples[3][0].second);
+        DLIB_TEST(m(1) == 1 - 2*samples[3][1].second);
+        DLIB_TEST(m(2) == 1);
+
     }
 
 // ----------------------------------------------------------------------------------------

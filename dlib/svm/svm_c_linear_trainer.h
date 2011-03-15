@@ -18,45 +18,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T>
-    typename enable_if<is_matrix<typename T::type>,unsigned long>::type num_dimensions_in_samples (
-        const T& samples
-    ) 
-    {
-        if (samples.size() > 0)
-            return samples(0).size();
-        else
-            return 0;
-    }
-
-    template <typename T>
-    typename disable_if<is_matrix<typename T::type>,unsigned long>::type num_dimensions_in_samples (
-        const T& samples
-    ) 
-    /*!
-        T must be a sparse vector with an integral key type
-    !*/
-    {
-        typedef typename T::type sample_type;
-        // You are getting this error because you are attempting to use sparse sample vectors with
-        // the svm_c_linear_trainer object but you aren't using an unsigned integer as your key type
-        // in the sparse vectors.
-        COMPILE_TIME_ASSERT(sparse_vector::has_unsigned_keys<sample_type>::value);
-
-
-        // these should be sparse samples so look over all them to find the max dimension.
-        unsigned long max_dim = 0;
-        for (long i = 0; i < samples.size(); ++i)
-        {
-            if (samples(i).size() > 0)
-                max_dim = std::max<unsigned long>(max_dim, (--samples(i).end())->first + 1);
-        }
-
-        return max_dim;
-    }
-    
-// ----------------------------------------------------------------------------------------
-
     template <
         typename matrix_type, 
         typename in_sample_vector_type,
@@ -105,7 +66,7 @@ namespace dlib
         ) const 
         {
             // plus 1 for the bias term
-            return num_dimensions_in_samples(samples) + 1;
+            return sparse_vector::max_index_plus_one(samples) + 1;
         }
 
         virtual bool optimization_status (
@@ -170,13 +131,13 @@ namespace dlib
                 {
                     if (labels(i) > 0)
                     {
-                        subtract_from(subgradient, samples(i), Cpos);
+                        sparse_vector::subtract_from(subgradient, samples(i), Cpos);
 
                         subgradient(subgradient.size()-1) += Cpos;
                     }
                     else
                     {
-                        add_to(subgradient, samples(i), Cneg);
+                        sparse_vector::add_to(subgradient, samples(i), Cneg);
 
                         subgradient(subgradient.size()-1) -= Cneg;
                     }
@@ -193,51 +154,6 @@ namespace dlib
 
     // -----------------------------------------------------
     // -----------------------------------------------------
-
-        // The next few functions are overloads to handle both dense and sparse vectors
-        template <typename EXP>
-        inline void add_to (
-            matrix_type& subgradient,
-            const matrix_exp<EXP>& sample,
-            const scalar_type& C
-        ) const
-        {
-            for (long r = 0; r < sample.size(); ++r)
-                subgradient(r) += C*sample(r);
-        }
-
-        template <typename T>
-        inline typename disable_if<is_matrix<T> >::type add_to (
-            matrix_type& subgradient,
-            const T& sample,
-            const scalar_type& C
-        ) const
-        {
-            for (typename T::const_iterator i = sample.begin(); i != sample.end(); ++i)
-                subgradient(i->first) += C*i->second;
-        }
-
-        template <typename EXP>
-        inline void subtract_from (
-            matrix_type& subgradient,
-            const matrix_exp<EXP>& sample,
-            const scalar_type& C
-        ) const
-        {
-            for (long r = 0; r < sample.size(); ++r)
-                subgradient(r) -= C*sample(r);
-        }
-
-        template <typename T>
-        inline typename disable_if<is_matrix<T> >::type subtract_from (
-            matrix_type& subgradient,
-            const T& sample,
-            const scalar_type& C
-        ) const
-        {
-            for (typename T::const_iterator i = sample.begin(); i != sample.end(); ++i)
-                subgradient(i->first) -= C*i->second;
-        }
 
         template <typename EXP>
         scalar_type dot_helper (
@@ -637,9 +553,9 @@ namespace dlib
             df.basis_vectors.set_size(1);
             // Copy the plane normal into the output basis vector.  The output vector might be a
             // sparse vector container so we need to use this special kind of copy to handle that case.
-            // As an aside, the reason for using num_dimensions_in_samples() and not just w.size()-1 is because
+            // As an aside, the reason for using max_index_plus_one() and not just w.size()-1 is because
             // doing it this way avoids an inane warning from gcc that can occur in some cases.
-            const long out_size = num_dimensions_in_samples(x);
+            const long out_size = sparse_vector::max_index_plus_one(x);
             sparse_vector::assign_dense_to_sparse(df.basis_vectors(0), matrix_cast<scalar_type>(colm(w, 0, out_size)));
             df.alpha.set_size(1);
             df.alpha(0) = 1;

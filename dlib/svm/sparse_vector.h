@@ -276,6 +276,237 @@ namespace dlib
             }
         }
 
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+        namespace impl
+        {
+            template <typename T>
+            typename enable_if<is_matrix<typename T::type>,unsigned long>::type max_index_plus_one (
+                const T& samples
+            ) 
+            {
+                if (samples.size() > 0)
+                    return samples(0).size();
+                else
+                    return 0;
+            }
+
+            template <typename T>
+            typename enable_if<is_built_in_scalar_type<typename T::type>,unsigned long>::type max_index_plus_one (
+                const T& sample
+            ) 
+            {
+                return sample.size();
+            }
+
+            template <typename T>
+            typename enable_if<is_pair<typename T::type::value_type> ,unsigned long>::type max_index_plus_one (
+                const T& samples
+            ) 
+            {
+                typedef typename T::type sample_type;
+                // You are getting this error because you are attempting to use sparse sample vectors 
+                // but you aren't using an unsigned integer as your key type in the sparse vectors.
+                COMPILE_TIME_ASSERT(sparse_vector::has_unsigned_keys<sample_type>::value);
+
+
+                // these should be sparse samples so look over all them to find the max index.
+                unsigned long max_dim = 0;
+                for (long i = 0; i < samples.size(); ++i)
+                {
+                    if (samples(i).size() > 0)
+                        max_dim = std::max<unsigned long>(max_dim, (--samples(i).end())->first + 1);
+                }
+
+                return max_dim;
+            }
+        }
+
+        template <typename T>
+        typename enable_if<is_pair<typename T::value_type>,unsigned long>::type max_index_plus_one (
+            const T& sample
+        ) 
+        {
+            if (sample.size() > 0)
+                return (--sample.end())->first + 1;
+            return 0;
+        }
+
+        template <typename T>
+        typename disable_if<is_pair<typename T::value_type>,unsigned long>::type max_index_plus_one (
+            const T& samples
+        ) 
+        {
+            return impl::max_index_plus_one(vector_to_matrix(samples));
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename EXP>
+        inline void add_to (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_exp<EXP>& src 
+        ) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
+                "\t void add_to(dest,src)"
+                << "\n\t dest must be a vector large enough to hold the src vector."
+                << "\n\t is_vector(dest):         " << is_vector(dest)
+                << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
+                << "\n\t dest.size():             " << dest.size() 
+                );
+
+            for (long r = 0; r < src.size(); ++r)
+                dest(r) += src(r);
+        }
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename EXP>
+        inline typename disable_if<is_matrix<EXP> >::type add_to (
+            matrix<T,NR,NC,MM,L>& dest,
+            const EXP& src
+        ) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
+                "\t void add_to(dest,src)"
+                << "\n\t dest must be a vector large enough to hold the src vector."
+                << "\n\t is_vector(dest):         " << is_vector(dest)
+                << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
+                << "\n\t dest.size():             " << dest.size() 
+                );
+
+            for (typename EXP::const_iterator i = src.begin(); i != src.end(); ++i)
+                dest(i->first) += i->second;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename EXP, typename U>
+        inline void add_to (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_exp<EXP>& src,
+            const U& C
+        ) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
+                "\t void add_to(dest,src)"
+                << "\n\t dest must be a vector large enough to hold the src vector."
+                << "\n\t is_vector(dest):         " << is_vector(dest)
+                << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
+                << "\n\t dest.size():             " << dest.size() 
+                );
+
+            for (long r = 0; r < src.size(); ++r)
+                dest(r) += C*src(r);
+        }
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename EXP, typename U>
+        inline typename disable_if<is_matrix<EXP> >::type add_to (
+            matrix<T,NR,NC,MM,L>& dest,
+            const EXP& src,
+            const U& C
+        ) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
+                "\t void add_to(dest,src)"
+                << "\n\t dest must be a vector large enough to hold the src vector."
+                << "\n\t is_vector(dest):         " << is_vector(dest)
+                << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
+                << "\n\t dest.size():             " << dest.size() 
+                );
+
+            for (typename EXP::const_iterator i = src.begin(); i != src.end(); ++i)
+                dest(i->first) += C*i->second;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename EXP>
+        inline void subtract_from (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_exp<EXP>& src 
+        ) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
+                "\t void subtract_from(dest,src)"
+                << "\n\t dest must be a vector large enough to hold the src vector."
+                << "\n\t is_vector(dest):         " << is_vector(dest)
+                << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
+                << "\n\t dest.size():             " << dest.size() 
+                );
+
+            for (long r = 0; r < src.size(); ++r)
+                dest(r) -= src(r);
+        }
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename EXP>
+        inline typename disable_if<is_matrix<EXP> >::type subtract_from (
+            matrix<T,NR,NC,MM,L>& dest,
+            const EXP& src
+        ) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
+                "\t void subtract_from(dest,src)"
+                << "\n\t dest must be a vector large enough to hold the src vector."
+                << "\n\t is_vector(dest):         " << is_vector(dest)
+                << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
+                << "\n\t dest.size():             " << dest.size() 
+                );
+
+            for (typename EXP::const_iterator i = src.begin(); i != src.end(); ++i)
+                dest(i->first) -= i->second;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename EXP, typename U>
+        inline void subtract_from (
+            matrix<T,NR,NC,MM,L>& dest,
+            const matrix_exp<EXP>& src,
+            const U& C
+        ) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
+                "\t void subtract_from(dest,src)"
+                << "\n\t dest must be a vector large enough to hold the src vector."
+                << "\n\t is_vector(dest):         " << is_vector(dest)
+                << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
+                << "\n\t dest.size():             " << dest.size() 
+                );
+
+            for (long r = 0; r < src.size(); ++r)
+                dest(r) -= C*src(r);
+        }
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename EXP, typename U>
+        inline typename disable_if<is_matrix<EXP> >::type subtract_from (
+            matrix<T,NR,NC,MM,L>& dest,
+            const EXP& src,
+            const U& C
+        ) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(dest) && max_index_plus_one(src) <= static_cast<unsigned long>(dest.size()),
+                "\t void subtract_from(dest,src)"
+                << "\n\t dest must be a vector large enough to hold the src vector."
+                << "\n\t is_vector(dest):         " << is_vector(dest)
+                << "\n\t max_index_plus_one(src): " << max_index_plus_one(src)
+                << "\n\t dest.size():             " << dest.size() 
+                );
+
+            for (typename EXP::const_iterator i = src.begin(); i != src.end(); ++i)
+                dest(i->first) -= C*i->second;
+        }
+
+    // ------------------------------------------------------------------------------------
+
     }
 
 // ----------------------------------------------------------------------------------------

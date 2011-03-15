@@ -11,6 +11,7 @@
 #include "../algs.h"
 #include "../matrix.h"
 #include "../string.h"
+#include "../svm/sparse_vector.h"
 #include <vector>
 
 namespace dlib
@@ -221,12 +222,7 @@ namespace dlib
 
 
         // figure out how many elements we need in our dense vectors.  
-        unsigned long max_dim = 0;
-        for (unsigned long i = 0; i < samples.size(); ++i)
-        {
-            if (samples[i].size() > 0)
-                max_dim = std::max<unsigned long>(max_dim, (--samples[i].end())->first + 1);
-        }
+        const unsigned long max_dim = sparse_vector::max_index_plus_one(samples);
 
 
         // now turn all the samples into dense samples

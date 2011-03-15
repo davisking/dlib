@@ -31,6 +31,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A has_unsigned_keys
+
+        This is a template where has_unsigned_keys<T>::value == true when T is a
+        sparse vector that contains unsigned integral keys and false otherwise.
+    !*/
+
+    template <typename T>
+    struct has_unsigned_keys
+    {
+        static const bool value = is_unsigned_type<typename T::value_type::first_type>::value;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     namespace sparse_vector
     {
         template <typename T, typename U>
@@ -178,21 +192,74 @@ namespace dlib
                   (i.e. multiplies every element of the vector a by value)
         !*/
 
+    // ----------------------------------------------------------------------------------------
+
+        template <typename T>
+        unsigned long max_index_plus_one (
+            const T& samples
+        ); 
+        /*!
+            requires
+                - samples == a single vector (either sparse or dense), or a container
+                  of vectors which is either a dlib::matrix of vectors or something 
+                  convertible to a dlib::matrix via vector_to_matrix() (e.g. a std::vector)
+                    Value types of samples include (but are not limited to):
+                        - dlib::matrix<double,0,1>                      // A single dense vector 
+                        - std::map<unsigned int, double>                // A single sparse vector
+                        - std::vector<dlib::matrix<double,0,1> >        // An array of dense vectors
+                        - std::vector<std::map<unsigned int, double> >  // An array of sparse vectors
+            ensures
+                - This function tells you the dimensionality of a set of vectors.  The vectors
+                  can be either sparse or dense.  
+                - if (samples.size() == 0) then
+                    - returns 0
+                - else if (samples contains dense vectors or is a dense vector) then
+                    - returns the number of elements in the first sample vector.  This means
+                      we implicitly assume all dense vectors have the same length)
+                - else
+                    - In this case samples contains sparse vectors or is a sparse vector.  
+                    - returns the largest element index in any sample + 1.  Note that the element index values
+                      are the values stored in std::pair::first.  So this number tells you the dimensionality
+                      of a set of sparse vectors.
+        !*/
+
+    // ----------------------------------------------------------------------------------------
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename SRC, typename U>
+        inline void add_to (
+            matrix<T,NR,NC,MM,L>& dest,
+            const SRC& src,
+            const U& C = 1
+        );
+        /*!
+            requires
+                - SRC == a matrix expression or a sparse vector
+                - is_vector(dest) == true
+                - max_index_plus_one(src) <= dest.size()
+            ensures
+                - dest += C*src
+        !*/
+
+    // ----------------------------------------------------------------------------------------
+
+        template <typename T, long NR, long NC, typename MM, typename L, typename SRC, typename U>
+        inline void subtract_from (
+            matrix<T,NR,NC,MM,L>& dest,
+            const SRC& src,
+            const U& C = 1
+        );
+        /*!
+            requires
+                - SRC == a matrix expression or a sparse vector
+                - is_vector(dest) == true
+                - max_index_plus_one(src) <= dest.size()
+            ensures
+                - dest -= C*src
+        !*/
+
+    // ----------------------------------------------------------------------------------------
+
     }
-
-// ----------------------------------------------------------------------------------------
-
-    /*!A has_unsigned_keys
-
-        This is a template where has_unsigned_keys<T>::value == true when T is a
-        sparse vector that contains unsigned integral keys and false otherwise.
-    !*/
-
-    template <typename T>
-    struct has_unsigned_keys
-    {
-        static const bool value = is_unsigned_type<typename T::value_type::first_type>::value;
-    };
 
 // ----------------------------------------------------------------------------------------
 
