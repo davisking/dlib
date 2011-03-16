@@ -131,15 +131,14 @@ namespace dlib
             std::list<vect_type> planes;
             std::vector<scalar_type> bs, miss_count;
 
-            vect_type temp, alpha, w_cur;
+            vect_type temp, alpha;
 
             w.set_size(problem.get_num_dimensions(), 1);
             w = 0;
-            w_cur = w;
 
-            // The best objective value seen so far.   Note also
-            // that w always contains the best solution seen so far.
-            scalar_type best_obj = std::numeric_limits<scalar_type>::max();
+            // The current objective value.  Note also that w always contains 
+            // the current solution.
+            scalar_type cur_obj = std::numeric_limits<scalar_type>::max();
 
             // This will hold the cutting plane objective value.  This value is
             // a lower bound on the true optimal objective value.
@@ -170,8 +169,8 @@ namespace dlib
                 // add the next cutting plane
                 scalar_type cur_risk;
                 planes.resize(planes.size()+1);
-                problem.get_risk(w_cur, cur_risk, planes.back());
-                bs.push_back(cur_risk - dot(w_cur,planes.back()));
+                problem.get_risk(w, cur_risk, planes.back());
+                bs.push_back(cur_risk - dot(w,planes.back()));
                 miss_count.push_back(0);
 
                 // If alpha is empty then initialize it (we must always have sum(alpha) == C).  
@@ -181,15 +180,7 @@ namespace dlib
                 else
                     alpha = join_cols(alpha,zeros_matrix<scalar_type>(1,1));
 
-                // Check the objective value at w_cur and see if it is better than
-                // the best seen so far.
-                const scalar_type cur_obj = 0.5*trans(w_cur)*w_cur + C*cur_risk;
-                if (cur_obj < best_obj)
-                {
-                    best_obj = cur_obj;
-                    // move w_cur into w
-                    w.swap(w_cur);
-                }
+                cur_obj = 0.5*trans(w)*w + C*cur_risk;
 
 
                 // compute kernel matrix for all the planes
@@ -208,9 +199,9 @@ namespace dlib
                 }
 
 
-                // solve the cutting plane subproblem for the next w_cur.   We solve it to an
+                // solve the cutting plane subproblem for the next w.   We solve it to an
                 // accuracy that is related to how big the error gap is
-                scalar_type eps = std::min<scalar_type>(sub_eps, 0.1*(best_obj-cp_obj)) ;
+                scalar_type eps = std::min<scalar_type>(sub_eps, 0.1*(cur_obj-cp_obj)) ;
                 // just a sanity check
                 if (eps < 1e-16)
                     eps = 1e-16;
@@ -218,14 +209,14 @@ namespace dlib
                 // iteration as the starting point.
                 solve_qp_using_smo(K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
 
-                // construct the w_cur that minimized the subproblem.
-                w_cur = 0;
+                // construct the w that minimized the subproblem.
+                w = 0;
                 rr = 0;
                 for (typename std::list<vect_type>::iterator i = planes.begin(); i != planes.end(); ++i)
                 {
                     if (alpha(rr) != 0)
                     {
-                        w_cur -= alpha(rr)*(*i);
+                        w -= alpha(rr)*(*i);
                         miss_count[rr] = 0;
                     }
                     else
@@ -237,10 +228,10 @@ namespace dlib
 
                 // Compute the lower bound on the true objective given to us by the cutting 
                 // plane subproblem.
-                cp_obj = -0.5*trans(w_cur)*w_cur + trans(alpha)*vector_to_matrix(bs);
+                cp_obj = -0.5*trans(w)*w + trans(alpha)*vector_to_matrix(bs);
 
                 // report current status
-                if (problem.optimization_status(best_obj, best_obj - cp_obj, planes.size(), counter))
+                if (problem.optimization_status(cur_obj, cur_obj - cp_obj, planes.size(), counter))
                     break;
 
                 // If it has been a while since a cutting plane was an active constraint then
@@ -259,7 +250,7 @@ namespace dlib
 
             }
 
-            return best_obj;
+            return cur_obj;
         }
 
     private:
