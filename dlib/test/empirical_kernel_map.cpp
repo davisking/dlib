@@ -33,7 +33,8 @@ namespace
                 0                     // the number of command line arguments for this test
             )
         {
-            thetime = time(0);
+            // always use the same time so that tests are repeatable
+            thetime = 0;//time(0);
         }
 
         time_t thetime;
