@@ -32,6 +32,8 @@ set (tests
    conditioning_class_c.cpp
    conditioning_class.cpp
    config_reader.cpp
+   create_iris_datafile.cpp
+   data_io.cpp
    directed_graph.cpp
    discriminant_pca.cpp
    ekm_and_lisf.cpp
