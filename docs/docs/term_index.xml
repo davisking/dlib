@@ -141,6 +141,7 @@
          <term file="ml.html" name="load_libsvm_formatted_data"/>
          <term file="ml.html" name="save_libsvm_formatted_data"/>
          <term file="ml.html" name="sparse_to_dense"/>
+         <term file="ml.html" name="fix_nonzero_indexing"/>
          <term link="ml.html#mlp" name="multi-layer perceptron"/>
          <term link="ml.html#mlp" name="neural network"/>
          <term file="ml.html" name="svm_pegasos"/>

@@ -184,6 +184,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>load_libsvm_formatted_data</item> 
          <item>save_libsvm_formatted_data</item> 
          <item>sparse_to_dense</item>
+         <item>fix_nonzero_indexing</item>
       </section>
 
       <section>
@@ -1529,7 +1530,10 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
             If you want to load data into dense vectors (i.e.
             dlib::matrix objects) then you can use the <a href="#sparse_to_dense">sparse_to_dense</a>
-            function to perform the conversion.
+            function to perform the conversion.  Also, some LIBSVM formatted files number
+            their features beginning with 1 rather than 0.  If this bothers you, then you
+            can fix it by using the <a href="#fix_nonzero_indexing">fix_nonzero_indexing</a> function
+            on the data after it is loaded.
          </description>
                                  
       </component>
@@ -1557,6 +1561,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             This is a simple function that takes a std::vector of 
             <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a> 
             and returns to you the equivalent std::vector of dense vectors. 
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>fix_nonzero_indexing</name>
+         <file>dlib/data_io.h</file>
+         <spec_file link="true">dlib/data_io/libsvm_io_abstract.h</spec_file>
+         <description>
+            This is a simple function that takes a std::vector of 
+            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a> 
+            and makes sure they are zero-indexed (e.g. makes sure the first index value is zero).   
          </description>
       </component>
       
