@@ -1209,7 +1209,7 @@
                This object is a version of dlib::<a href="#any">any</a> that is restricted to containing 
                 elements which are some kind of function object with an operator() with 
                 the following signature: 
-                <tt>scalar_type operator()(const sample_type&amp;) const</tt>
+                <tt>result_type operator()(const sample_type&amp;) const</tt>
 
                <p>
                   It is intended to be used to contain dlib::<a href="ml.html#decision_function">decision_function</a> 
