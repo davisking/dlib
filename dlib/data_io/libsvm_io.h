@@ -107,6 +107,82 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <typename sample_type, typename alloc>
+    typename enable_if<is_const_type<typename sample_type::value_type::first_type> >::type 
+    fix_nonzero_indexing (
+        std::vector<sample_type,alloc>& samples
+    )
+    {
+        typedef typename sample_type::value_type pair_type;
+        typedef typename impl::strip_const<typename pair_type::first_type>::type key_type;
+
+        if (samples.size() == 0)
+            return;
+
+        // figure out the min index value
+        key_type min_idx = samples[0].begin()->first;
+        for (unsigned long i = 0; i < samples.size(); ++i)
+            min_idx = std::min(min_idx, samples[i].begin()->first);
+
+        // Now adjust all the samples so that their min index value is zero.
+        if (min_idx != 0)
+        {
+            sample_type temp;
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                // copy samples[i] into temp but make sure it has a min index of zero.
+                temp.clear();
+                typename sample_type::iterator j;
+                for (j = samples[i].begin(); j != samples[i].end(); ++j)
+                {
+                    temp.insert(temp.end(), std::make_pair(j->first-min_idx, j->second));
+                }
+
+                // replace the current sample with temp.
+                samples[i].swap(temp);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+// If the "first" values in the std::pair objects are not const then we can modify them 
+// directly and that is what this version of fix_nonzero_indexing() does.
+    template <typename sample_type, typename alloc>
+    typename disable_if<is_const_type<typename sample_type::value_type::first_type> >::type 
+    fix_nonzero_indexing (
+        std::vector<sample_type,alloc>& samples
+    )
+    {
+        typedef typename sample_type::value_type pair_type;
+        typedef typename impl::strip_const<typename pair_type::first_type>::type key_type;
+
+        if (samples.size() == 0)
+            return;
+
+        // figure out the min index value
+        key_type min_idx = samples[0].begin()->first;
+        for (unsigned long i = 0; i < samples.size(); ++i)
+            min_idx = std::min(min_idx, samples[i].begin()->first);
+
+        // Now adjust all the samples so that their min index value is zero.
+        if (min_idx != 0)
+        {
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                typename sample_type::iterator j;
+                for (j = samples[i].begin(); j != samples[i].end(); ++j)
+                {
+                    j->first -= min_idx;
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
 // This is an overload for sparse vectors
     template <typename sample_type, typename label_type, typename alloc1, typename alloc2>

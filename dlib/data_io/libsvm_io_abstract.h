@@ -131,6 +131,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename sample_type, typename alloc>
+    void fix_nonzero_indexing (
+        std::vector<sample_type,alloc>& samples
+    );
+    /*!
+        requires
+            - samples must only contain valid sparse vectors.  The definition of
+              a sparse vector can be found at the top of dlib/svm/sparse_vector_abstract.h
+        ensures
+            - Adjusts the sparse vectors in samples so that they are zero-indexed.  
+              Or in other words, assume the smallest used index value in any of the sparse 
+              vectors is N.  Then this function subtracts N from all the index values in 
+              samples.  This is useful, for example, if you load a libsvm formatted datafile 
+              with features indexed from 1 rather than 0 and you would like to fix this.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_LIBSVM_iO_ABSTRACT_H__
