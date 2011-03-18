@@ -31,12 +31,12 @@ namespace dlib
     {
     public:
 
-        typedef typename one_vs_one_trainer::label_type label_type;
+        typedef typename one_vs_one_trainer::label_type result_type;
         typedef typename one_vs_one_trainer::sample_type sample_type;
         typedef typename one_vs_one_trainer::scalar_type scalar_type;
         typedef typename one_vs_one_trainer::mem_manager_type mem_manager_type;
 
-        typedef std::map<unordered_pair<label_type>, any_decision_function<sample_type, scalar_type> > binary_function_table;
+        typedef std::map<unordered_pair<result_type>, any_decision_function<sample_type, scalar_type> > binary_function_table;
 
         one_vs_one_decision_function() :num_classes(0) {}
 
@@ -46,7 +46,7 @@ namespace dlib
         {
 #ifdef ENABLE_ASSERTS
             {
-                const std::vector<unordered_pair<label_type> > missing_pairs = find_missing_pairs(dfs_);
+                const std::vector<unordered_pair<result_type> > missing_pairs = find_missing_pairs(dfs_);
                 if (missing_pairs.size() != 0)
                 {
                     std::ostringstream sout;
@@ -65,7 +65,7 @@ namespace dlib
 #endif
 
             // figure out how many labels are covered by this set of binary decision functions
-            std::set<label_type> labels;
+            std::set<result_type> labels;
             for (typename binary_function_table::const_iterator i = dfs.begin(); i != dfs.end(); ++i)
             {
                 labels.insert(i->first.first);
@@ -80,16 +80,16 @@ namespace dlib
             return dfs;
         }
 
-        const std::vector<label_type> get_labels (
+        const std::vector<result_type> get_labels (
         ) const
         {
-            std::set<label_type> labels;
+            std::set<result_type> labels;
             for (typename binary_function_table::const_iterator i = dfs.begin(); i != dfs.end(); ++i)
             {
                 labels.insert(i->first.first);
                 labels.insert(i->first.second);
             }
-            return std::vector<label_type>(labels.begin(), labels.end());
+            return std::vector<result_type>(labels.begin(), labels.end());
         }
 
 
@@ -109,7 +109,7 @@ namespace dlib
             return num_classes;
         }
 
-        label_type operator() (
+        result_type operator() (
             const sample_type& sample
         ) const
         {
@@ -119,7 +119,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            std::map<label_type,int> votes;
+            std::map<result_type,int> votes;
 
             // run all the classifiers over the sample
             for(typename binary_function_table::const_iterator i = dfs.begin(); i != dfs.end(); ++i)
@@ -133,9 +133,9 @@ namespace dlib
             }
 
             // now figure out who had the most votes
-            label_type best_label = label_type();
+            result_type best_label = result_type();
             int best_votes = 0;
-            for (typename std::map<label_type,int>::iterator i = votes.begin(); i != votes.end(); ++i)
+            for (typename std::map<result_type,int>::iterator i = votes.begin(); i != votes.end(); ++i)
             {
                 if (i->second > best_votes)
                 {
@@ -172,10 +172,10 @@ namespace dlib
         try
         {
             type_safe_union<DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10> temp;
-            typedef typename T::label_type label_type;
+            typedef typename T::label_type result_type;
             typedef typename T::sample_type sample_type;
             typedef typename T::scalar_type scalar_type;
-            typedef std::map<unordered_pair<label_type>, any_decision_function<sample_type, scalar_type> > binary_function_table;
+            typedef std::map<unordered_pair<result_type>, any_decision_function<sample_type, scalar_type> > binary_function_table;
 
             const unsigned long version = 1;
             serialize(version, out);
@@ -246,7 +246,7 @@ namespace dlib
         try
         {
             type_safe_union<DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10> temp;
-            typedef typename T::label_type label_type;
+            typedef typename T::label_type result_type;
             typedef typename T::sample_type sample_type;
             typedef typename T::scalar_type scalar_type;
             typedef impl::copy_to_df_helper<sample_type, scalar_type> copy_to;
@@ -260,10 +260,10 @@ namespace dlib
             unsigned long size;
             deserialize(size, in);
 
-            typedef std::map<unordered_pair<label_type>, any_decision_function<sample_type, scalar_type> > binary_function_table;
+            typedef std::map<unordered_pair<result_type>, any_decision_function<sample_type, scalar_type> > binary_function_table;
             binary_function_table dfs;
 
-            unordered_pair<label_type> p;
+            unordered_pair<result_type> p;
             for (unsigned long i = 0; i < size; ++i)
             {
                 deserialize(p, in);

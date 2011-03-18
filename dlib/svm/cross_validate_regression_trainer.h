@@ -24,7 +24,6 @@ namespace dlib
         const std::vector<label_type>& y_test
     )
     {
-        typedef typename reg_funct_type::scalar_type scalar_type;
         typedef typename reg_funct_type::mem_manager_type mem_manager_type;
 
         // make sure requires clause is not broken
@@ -62,7 +61,6 @@ namespace dlib
         const long folds
     )
     {
-        typedef typename trainer_type::scalar_type scalar_type;
         typedef typename trainer_type::mem_manager_type mem_manager_type;
 
         // make sure requires clause is not broken

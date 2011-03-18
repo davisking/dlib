@@ -15,7 +15,7 @@ namespace dlib
 
     template <
         typename sample_type_,
-        typename scalar_type_ = double
+        typename result_type_ = double
         >
     class any_decision_function
     {
@@ -23,7 +23,7 @@ namespace dlib
     public:
 
         typedef sample_type_ sample_type;
-        typedef scalar_type_ scalar_type;
+        typedef result_type_ result_type;
         typedef default_memory_manager mem_manager_type;
 
         any_decision_function()
@@ -69,13 +69,13 @@ namespace dlib
             return data.get() == 0;
         }
 
-        scalar_type operator() (
+        result_type operator() (
             const sample_type& item
         ) const
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_empty() == false,
-                "\t scalar_type any_decision_function::operator()"
+                "\t result_type any_decision_function::operator()"
                 << "\n\t You can't call operator() on an empty any_decision_function"
                 << "\n\t this: " << this
                 );
@@ -151,7 +151,7 @@ namespace dlib
                 scoped_ptr<base>& dest
             ) const = 0;
 
-            virtual scalar_type evaluate (
+            virtual result_type evaluate (
                 const sample_type& samp
             ) const = 0;
         };
@@ -170,7 +170,7 @@ namespace dlib
                 dest.reset(new derived<T>(item));
             }
 
-            virtual scalar_type evaluate (
+            virtual result_type evaluate (
                 const sample_type& samp
             ) const 
             {
@@ -185,11 +185,11 @@ namespace dlib
 
     template <
         typename sample_type,
-        typename scalar_type
+        typename result_type
         >
     inline void swap (
-        any_decision_function<sample_type, scalar_type>& a,
-        any_decision_function<sample_type, scalar_type>& b
+        any_decision_function<sample_type, result_type>& a,
+        any_decision_function<sample_type, result_type>& b
     ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------

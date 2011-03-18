@@ -104,7 +104,7 @@ namespace
             print_spinner();
             typedef matrix<scalar_type,2,1> sample_type;
 
-            std::vector<sample_type> samples;
+            std::vector<sample_type> samples, norm_samples;
             std::vector<label_type> labels;
 
             // First, get our labeled set of training data
@@ -129,7 +129,7 @@ namespace
             trainer.set_trainer(poly_trainer, 1);
 
             randomize_samples(samples, labels);
-            matrix<scalar_type> res = cross_validate_multiclass_trainer(trainer, samples, labels, 2);
+            matrix<double> res = cross_validate_multiclass_trainer(trainer, samples, labels, 2);
 
             print_spinner();
 
@@ -139,6 +139,26 @@ namespace
                   0,  0, 80;
 
             DLIB_TEST_MSG(ans == res, "res: \n" << res);
+
+            // test using a normalized_function with a one_vs_all_decision_function 
+            {
+                poly_trainer.set_kernel(poly_kernel(1.1, 1, 2));
+                trainer.set_trainer(poly_trainer, 1);
+                vector_normalizer<sample_type> normalizer;
+                normalizer.train(samples);
+                for (unsigned long i = 0; i < samples.size(); ++i)
+                    norm_samples.push_back(normalizer(samples[i]));
+                normalized_function<one_vs_all_decision_function<ova_trainer> > ndf;
+                ndf.function = trainer.train(norm_samples, labels);
+                ndf.normalizer = normalizer;
+                DLIB_TEST(ndf(samples[0])  == labels[0]);
+                DLIB_TEST(ndf(samples[40])  == labels[40]);
+                DLIB_TEST(ndf(samples[90])  == labels[90]);
+                DLIB_TEST(ndf(samples[120])  == labels[120]);
+                poly_trainer.set_kernel(poly_kernel(0.1, 1, 2));
+                trainer.set_trainer(poly_trainer, 1);
+                print_spinner();
+            }
 
             one_vs_all_decision_function<ova_trainer> df = trainer.train(samples, labels);
 
@@ -205,7 +225,7 @@ namespace
             trainer.set_trainer(probabilistic(poly_trainer, 3), 1);
 
             randomize_samples(samples, labels);
-            matrix<scalar_type> res = cross_validate_multiclass_trainer(trainer, samples, labels, 2);
+            matrix<double> res = cross_validate_multiclass_trainer(trainer, samples, labels, 2);
 
             print_spinner();
 

@@ -103,18 +103,15 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<typename dec_funct_type::scalar_type, 1, 2, typename dec_funct_type::mem_manager_type> 
-    test_binary_decision_function_impl (
+    const matrix<double,1,2> test_binary_decision_function_impl (
         const dec_funct_type& dec_funct,
         const in_sample_vector_type& x_test,
         const in_scalar_vector_type& y_test
     )
     {
-        typedef typename dec_funct_type::scalar_type scalar_type;
         typedef typename dec_funct_type::sample_type sample_type;
         typedef typename dec_funct_type::mem_manager_type mem_manager_type;
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
-        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
 
         // make sure requires clause is not broken
         DLIB_ASSERT( is_binary_classification_problem(x_test,y_test) == true,
@@ -156,9 +153,9 @@ namespace dlib
         }
 
 
-        matrix<scalar_type, 1, 2, mem_manager_type> res;
-        res(0) = (scalar_type)num_pos_correct/(scalar_type)(num_pos); 
-        res(1) = (scalar_type)num_neg_correct/(scalar_type)(num_neg); 
+        matrix<double, 1, 2, mem_manager_type> res;
+        res(0) = (double)num_pos_correct/(double)(num_pos); 
+        res(1) = (double)num_neg_correct/(double)(num_neg); 
         return res;
     }
 
@@ -167,8 +164,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<typename dec_funct_type::scalar_type, 1, 2, typename dec_funct_type::mem_manager_type> 
-    test_binary_decision_function (
+    const matrix<double,1,2> test_binary_decision_function (
         const dec_funct_type& dec_funct,
         const in_sample_vector_type& x_test,
         const in_scalar_vector_type& y_test
@@ -186,7 +182,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    const matrix<double, 1, 2, typename trainer_type::mem_manager_type> 
     cross_validate_trainer_impl (
         const trainer_type& trainer,
         const in_sample_vector_type& x,
@@ -194,7 +190,7 @@ namespace dlib
         const long folds
     )
     {
-        typedef typename trainer_type::scalar_type scalar_type;
+        typedef typename in_scalar_vector_type::value_type scalar_type;
         typedef typename trainer_type::sample_type sample_type;
         typedef typename trainer_type::mem_manager_type mem_manager_type;
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
@@ -239,7 +235,7 @@ namespace dlib
         long pos_idx = 0;
         long neg_idx = 0;
 
-        matrix<scalar_type, 1, 2, mem_manager_type> res;
+        matrix<double, 1, 2, mem_manager_type> res;
         set_all_elements(res,0);
 
         for (long i = 0; i < folds; ++i)
@@ -314,7 +310,7 @@ namespace dlib
 
         } // for (long i = 0; i < folds; ++i)
 
-        return res/(scalar_type)folds;
+        return res/(double)folds;
     }
 
     template <
@@ -322,7 +318,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    const matrix<double, 1, 2, typename trainer_type::mem_manager_type> 
     cross_validate_trainer (
         const trainer_type& trainer,
         const in_sample_vector_type& x,

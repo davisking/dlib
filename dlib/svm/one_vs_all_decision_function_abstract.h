@@ -52,12 +52,12 @@ namespace dlib
         !*/
     public:
 
-        typedef typename one_vs_all_trainer::label_type label_type;
+        typedef typename one_vs_all_trainer::label_type result_type;
         typedef typename one_vs_all_trainer::sample_type sample_type;
         typedef typename one_vs_all_trainer::scalar_type scalar_type;
         typedef typename one_vs_all_trainer::mem_manager_type mem_manager_type;
 
-        typedef std::map<label_type, any_decision_function<sample_type, scalar_type> > binary_function_table;
+        typedef std::map<result_type, any_decision_function<sample_type, scalar_type> > binary_function_table;
 
         one_vs_all_decision_function(
         );
@@ -107,7 +107,7 @@ namespace dlib
                   with that decision function.
         !*/
 
-        const std::vector<label_type> get_labels (
+        const std::vector<result_type> get_labels (
         ) const;
         /*!
             ensures
@@ -124,7 +124,7 @@ namespace dlib
                   this object)
         !*/
 
-        label_type operator() (
+        result_type operator() (
             const sample_type& sample
         ) const
         /*!

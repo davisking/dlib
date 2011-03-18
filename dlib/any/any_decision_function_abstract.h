@@ -13,7 +13,7 @@ namespace dlib
 
     template <
         typename sample_type_,
-        typename scalar_type_ = double
+        typename result_type_ = double
         >
     class any_decision_function
     {
@@ -26,7 +26,7 @@ namespace dlib
                 This object is a version of dlib::any that is restricted to containing 
                 elements which are some kind of function object with an operator() with 
                 the following signature: 
-                    scalar_type operator()(const sample_type&) const
+                    result_type operator()(const sample_type&) const
 
                 It is intended to be used to contain dlib::decision_function objects and
                 other types which represent learned decision functions.  It allows you
@@ -37,7 +37,7 @@ namespace dlib
     public:
 
         typedef sample_type_ sample_type;
-        typedef scalar_type_ scalar_type;
+        typedef result_type_ result_type;
         typedef default_memory_manager mem_manager_type;
 
         any_decision_function(
@@ -98,7 +98,7 @@ namespace dlib
                     - returns true
         !*/
 
-        scalar_type operator() (
+        result_type operator() (
             const sample_type& item
         ) const;
         /*!
@@ -174,11 +174,11 @@ namespace dlib
 
     template <
         typename sample_type,
-        typename scalar_type
+        typename result_type
         >
     inline void swap (
-        any_decision_function<sample_type,scalar_type>& a,
-        any_decision_function<sample_type,scalar_type>& b
+        any_decision_function<sample_type,result_type>& a,
+        any_decision_function<sample_type,result_type>& b
     ) { a.swap(b); }
     /*!
         provides a global swap function
@@ -189,10 +189,10 @@ namespace dlib
     template <
         typename T,
         typename sample_type,
-        typename scalar_type
+        typename result_type
         > 
     T& any_cast(
-        any_decision_function<sample_type,scalar_type>& a
+        any_decision_function<sample_type,result_type>& a
     ) { return a.cast_to<T>(); }
     /*!
         ensures
@@ -204,10 +204,10 @@ namespace dlib
     template <
         typename T,
         typename sample_type,
-        typename scalar_type
+        typename result_type
         > 
     const T& any_cast(
-        const any_decision_function<sample_type,scalar_type>& a
+        const any_decision_function<sample_type,result_type>& a
     ) { return a.cast_to<T>(); }
     /*!
         ensures

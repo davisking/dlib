@@ -16,8 +16,7 @@ namespace dlib
         typename sample_type,
         typename label_type
         >
-    const matrix<typename dec_funct_type::scalar_type, 0, 0, typename dec_funct_type::mem_manager_type> 
-    test_multiclass_decision_function (
+    const matrix<double> test_multiclass_decision_function (
         const dec_funct_type& dec_funct,
         const std::vector<sample_type>& x_test,
         const std::vector<label_type>& y_test
@@ -46,8 +45,7 @@ namespace dlib
         typename sample_type,
         typename label_type 
         >
-    const matrix<typename trainer_type::scalar_type, 0, 0, typename trainer_type::mem_manager_type> 
-    cross_validate_multiclass_trainer (
+    const matrix<double> cross_validate_multiclass_trainer (
         const trainer_type& trainer,
         const std::vector<sample_type>& x,
         const std::vector<label_type>& y,

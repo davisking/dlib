@@ -69,7 +69,7 @@ namespace
             trainer.set_trainer(krr_trainer<kernel_type>());
 
             randomize_samples(samples, labels);
-            matrix<scalar_type> cv = cross_validate_multiclass_trainer(trainer, samples, labels, 4);
+            matrix<double> cv = cross_validate_multiclass_trainer(trainer, samples, labels, 4);
 
             dlog << LINFO << "confusion matrix: \n" << cv;
             const scalar_type cv_accuracy = sum(diag(cv))/sum(cv);

@@ -26,6 +26,7 @@ namespace dlib
     {
         typedef K kernel_type;
         typedef typename K::scalar_type scalar_type;
+        typedef typename K::scalar_type result_type;
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
 
@@ -75,11 +76,11 @@ namespace dlib
             return *this;
         }
 
-        scalar_type operator() (
+        result_type operator() (
             const sample_type& x
         ) const
         {
-            scalar_type temp = 0;
+            result_type temp = 0;
             for (long i = 0; i < alpha.nr(); ++i)
                 temp += alpha(i) * kernel_function(x,basis_vectors(i));
 
@@ -137,6 +138,7 @@ namespace dlib
     struct probabilistic_function
     {
         typedef typename function_type::scalar_type scalar_type;
+        typedef typename function_type::result_type result_type;
         typedef typename function_type::sample_type sample_type;
         typedef typename function_type::mem_manager_type mem_manager_type;
 
@@ -178,11 +180,11 @@ namespace dlib
             return *this;
         }
 
-        scalar_type operator() (
+        result_type operator() (
             const sample_type& x
         ) const
         {
-            scalar_type f = decision_funct(x);
+            result_type f = decision_funct(x);
             return 1/(1 + std::exp(alpha*f + beta));
         }
     };
@@ -236,6 +238,7 @@ namespace dlib
     {
         typedef K kernel_type;
         typedef typename K::scalar_type scalar_type;
+        typedef typename K::scalar_type result_type;
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
 
@@ -285,11 +288,11 @@ namespace dlib
             return *this;
         }
 
-        scalar_type operator() (
+        result_type operator() (
             const sample_type& x
         ) const
         {
-            scalar_type f = decision_funct(x);
+            result_type f = decision_funct(x);
             return 1/(1 + std::exp(alpha*f + beta));
         }
     };
@@ -344,6 +347,7 @@ namespace dlib
     public:
         typedef K kernel_type;
         typedef typename K::scalar_type scalar_type;
+        typedef typename K::scalar_type result_type;
         typedef typename K::sample_type sample_type;
         typedef typename K::mem_manager_type mem_manager_type;
 
@@ -462,11 +466,11 @@ namespace dlib
             return *this;
         }
 
-        scalar_type operator() (
+        result_type operator() (
             const sample_type& x
         ) const
         {
-            scalar_type temp = 0;
+            result_type temp = 0;
             for (long i = 0; i < alpha.nr(); ++i)
                 temp += alpha(i) * kernel_function(x,basis_vectors(i));
 
@@ -477,11 +481,11 @@ namespace dlib
                 return 0;
         }
 
-        scalar_type operator() (
+        result_type operator() (
             const distance_function& x
         ) const
         {
-            scalar_type temp = 0;
+            result_type temp = 0;
             for (long i = 0; i < alpha.nr(); ++i)
                 for (long j = 0; j < x.alpha.nr(); ++j)
                     temp += alpha(i)*x.alpha(j) * kernel_function(basis_vectors(i), x.basis_vectors(j));
@@ -624,7 +628,7 @@ namespace dlib
         >
     struct normalized_function 
     {
-        typedef typename function_type::scalar_type scalar_type;
+        typedef typename function_type::result_type result_type;
         typedef typename function_type::sample_type sample_type;
         typedef typename function_type::mem_manager_type mem_manager_type;
 
@@ -646,7 +650,7 @@ namespace dlib
             const function_type& funct 
         ) : normalizer(normalizer_), function(funct) {}
 
-        scalar_type operator() (
+        result_type operator() (
             const sample_type& x
         ) const { return function(normalizer(x)); }
     };
@@ -706,6 +710,7 @@ namespace dlib
         typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
         typedef matrix<scalar_type,0,0,mem_manager_type> scalar_matrix_type;
         typedef matrix<sample_type,0,1,mem_manager_type> sample_vector_type;
+        typedef scalar_vector_type result_type;
 
         scalar_matrix_type weights;
         K                  kernel_function;
@@ -727,7 +732,7 @@ namespace dlib
         long out_vector_size (
         ) const { return weights.nr(); }
 
-        const scalar_vector_type& operator() (
+        const result_type& operator() (
             const sample_type& x
         ) const
         {
@@ -741,7 +746,7 @@ namespace dlib
         }
 
     private:
-        mutable scalar_vector_type temp1, temp2;
+        mutable result_type temp1, temp2;
     };
 
     template <

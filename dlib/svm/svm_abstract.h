@@ -125,8 +125,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
-    cross_validate_trainer (
+    const matrix<double,1,2> cross_validate_trainer (
         const trainer_type& trainer,
         const in_sample_vector_type& x,
         const in_scalar_vector_type& y,
@@ -157,8 +156,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<typename dec_funct_type::scalar_type, 1, 2, typename dec_funct_type::mem_manager_type> 
-    test_binary_decision_function (
+    const matrix<double,1,2> test_binary_decision_function (
         const dec_funct_type& dec_funct,
         const in_sample_vector_type& x_test,
         const in_scalar_vector_type& y_test

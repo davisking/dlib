@@ -6,6 +6,7 @@
 #include <vector>
 #include "../matrix.h"
 #include "one_vs_one_trainer.h"
+#include "cross_validate_multiclass_trainer_abstract.h"
 
 namespace dlib
 {
@@ -17,14 +18,12 @@ namespace dlib
         typename sample_type,
         typename label_type
         >
-    const matrix<typename dec_funct_type::scalar_type, 0, 0, typename dec_funct_type::mem_manager_type> 
-    test_multiclass_decision_function (
+    const matrix<double> test_multiclass_decision_function (
         const dec_funct_type& dec_funct,
         const std::vector<sample_type>& x_test,
         const std::vector<label_type>& y_test
     )
     {
-        typedef typename dec_funct_type::scalar_type scalar_type;
         typedef typename dec_funct_type::mem_manager_type mem_manager_type;
 
         // make sure requires clause is not broken
@@ -42,7 +41,7 @@ namespace dlib
         for (unsigned long i = 0; i < all_labels.size(); ++i)
             label_to_int[all_labels[i]] = i;
 
-        matrix<typename dec_funct_type::scalar_type, 0, 0, typename dec_funct_type::mem_manager_type> res;
+        matrix<double, 0, 0, typename dec_funct_type::mem_manager_type> res;
         res.set_size(all_labels.size(), all_labels.size());
 
         res = 0;
@@ -73,15 +72,13 @@ namespace dlib
         typename sample_type,
         typename label_type 
         >
-    const matrix<typename trainer_type::scalar_type, 0, 0, typename trainer_type::mem_manager_type> 
-    cross_validate_multiclass_trainer (
+    const matrix<double> cross_validate_multiclass_trainer (
         const trainer_type& trainer,
         const std::vector<sample_type>& x,
         const std::vector<label_type>& y,
         const long folds
     )
     {
-        typedef typename trainer_type::scalar_type scalar_type;
         typedef typename trainer_type::mem_manager_type mem_manager_type;
 
         // make sure requires clause is not broken
@@ -116,7 +113,7 @@ namespace dlib
         std::vector<sample_type> x_test, x_train;
         std::vector<label_type> y_test, y_train;
 
-        matrix<scalar_type, 0, 0, mem_manager_type> res;
+        matrix<double, 0, 0, mem_manager_type> res;
 
         std::map<label_type,long> next_test_idx;
         for (unsigned long i = 0; i < all_labels.size(); ++i)

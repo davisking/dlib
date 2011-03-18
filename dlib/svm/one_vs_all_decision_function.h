@@ -28,12 +28,12 @@ namespace dlib
     {
     public:
 
-        typedef typename one_vs_all_trainer::label_type label_type;
+        typedef typename one_vs_all_trainer::label_type result_type;
         typedef typename one_vs_all_trainer::sample_type sample_type;
         typedef typename one_vs_all_trainer::scalar_type scalar_type;
         typedef typename one_vs_all_trainer::mem_manager_type mem_manager_type;
 
-        typedef std::map<label_type, any_decision_function<sample_type, scalar_type> > binary_function_table;
+        typedef std::map<result_type, any_decision_function<sample_type, scalar_type> > binary_function_table;
 
         one_vs_all_decision_function() :num_classes(0) {}
 
@@ -50,10 +50,10 @@ namespace dlib
             return dfs;
         }
 
-        const std::vector<label_type> get_labels (
+        const std::vector<result_type> get_labels (
         ) const
         {
-            std::vector<label_type> temp;
+            std::vector<result_type> temp;
             temp.reserve(dfs.size());
             for (typename binary_function_table::const_iterator i = dfs.begin(); i != dfs.end(); ++i)
             {
@@ -79,7 +79,7 @@ namespace dlib
             return num_classes;
         }
 
-        label_type operator() (
+        result_type operator() (
             const sample_type& sample
         ) const
         {
@@ -89,7 +89,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            label_type best_label = label_type();
+            result_type best_label = result_type();
             scalar_type best_score = -std::numeric_limits<scalar_type>::infinity();
 
             // run all the classifiers over the sample and find the best one
@@ -132,10 +132,10 @@ namespace dlib
         try
         {
             type_safe_union<DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10> temp;
-            typedef typename T::label_type label_type;
+            typedef typename T::label_type result_type;
             typedef typename T::sample_type sample_type;
             typedef typename T::scalar_type scalar_type;
-            typedef std::map<label_type, any_decision_function<sample_type, scalar_type> > binary_function_table;
+            typedef std::map<result_type, any_decision_function<sample_type, scalar_type> > binary_function_table;
 
             const unsigned long version = 1;
             serialize(version, out);
@@ -206,7 +206,7 @@ namespace dlib
         try
         {
             type_safe_union<DF1,DF2,DF3,DF4,DF5,DF6,DF7,DF8,DF9,DF10> temp;
-            typedef typename T::label_type label_type;
+            typedef typename T::label_type result_type;
             typedef typename T::sample_type sample_type;
             typedef typename T::scalar_type scalar_type;
             typedef impl_ova::copy_to_df_helper<sample_type, scalar_type> copy_to;
@@ -220,10 +220,10 @@ namespace dlib
             unsigned long size;
             deserialize(size, in);
 
-            typedef std::map<label_type, any_decision_function<sample_type, scalar_type> > binary_function_table;
+            typedef std::map<result_type, any_decision_function<sample_type, scalar_type> > binary_function_table;
             binary_function_table dfs;
 
-            label_type l;
+            result_type l;
             for (unsigned long i = 0; i < size; ++i)
             {
                 deserialize(l, in);

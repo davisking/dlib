@@ -437,6 +437,7 @@ namespace dlib
     public:
         typedef typename matrix_type::mem_manager_type mem_manager_type;
         typedef typename matrix_type::type scalar_type;
+        typedef matrix_type result_type;
 
         template <typename vector_type>
         void train (
@@ -495,7 +496,7 @@ namespace dlib
                       input feature shown to train() 
         !*/
  
-        const matrix_type& operator() (
+        const result_type& operator() (
             const matrix_type& x
         ) const;
         /*!
@@ -592,6 +593,7 @@ namespace dlib
     public:
         typedef typename matrix_type::mem_manager_type mem_manager_type;
         typedef typename matrix_type::type scalar_type;
+        typedef matrix<scalar_type,0,1,mem_manager_type> result_type;
 
         template <typename vector_type>
         void train (
@@ -670,7 +672,7 @@ namespace dlib
                       matrix 
         !*/
 
-        const matrix<scalar_type,0,1,mem_manager_type>& operator() (
+        const result_type& operator() (
             const matrix_type& x
         ) const;
         /*!
