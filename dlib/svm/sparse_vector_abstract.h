@@ -270,7 +270,7 @@ namespace dlib
                 - is_vector(dest) == true
                 - max_index_plus_one(src) <= dest.size()
             ensures
-                - dest += C*src
+                - #dest == dest + C*src
         !*/
 
     // ----------------------------------------------------------------------------------------
@@ -287,7 +287,7 @@ namespace dlib
                 - is_vector(dest) == true
                 - max_index_plus_one(src) <= dest.size()
             ensures
-                - dest -= C*src
+                - #dest == dest - C*src
         !*/
 
     // ----------------------------------------------------------------------------------------
