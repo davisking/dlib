@@ -115,26 +115,24 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        template <typename T, typename EXP>
-        void assign_dense_to_sparse (
+        template <typename T, typename U>
+        void assign (
             T& dest,
-            const matrix_exp<EXP>& src
+            const U& src
         );
         /*!
             requires
-                - is_vector(src) == true
-                - the key type in T is capable of holding integers or T is a dlib::matrix
-                  capable of storing src
+                - dest == a sparse vector or a dense vector
+                - src == a sparse vector or a dense vector
+                - dest is not dense when src is sparse
+                  (i.e. you can't assign a sparse vector to a dense vector.  This is
+                  because we don't know what the proper dimensionality should be for the
+                  dense vector)
             ensures
-                - if (T is a dlib::matrix) then
-                    - #dest == src
-                      (if dest is just a normal matrix then this function just does a normal copy)
-                - else
-                    - dest is a sparse vector and this function copies src into it. The
-                      assignment is performed such that the following is true:
-                        for all i: if (src(i) != 0) then make_pair(i, src(i)) is an element of #dest
-                    - #dest will be properly sorted
+                - #src represents the same vector as dest.  
+                  (conversion between sparse/dense formats is done automatically)
         !*/
+
 
     // ----------------------------------------------------------------------------------------
 

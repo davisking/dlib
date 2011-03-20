@@ -148,16 +148,17 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
 
         template <typename T, typename EXP>
-        typename enable_if<is_matrix<T> >::type assign_dense_to_sparse (
+        typename enable_if<is_matrix<T> >::type assign (
             T& dest,
             const matrix_exp<EXP>& src
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_vector(src),
-                "\t void assign_dense_to_sparse(dest,src)"
+                "\t void assign(dest,src)"
                 << "\n\t the src matrix must be a row or column vector"
                 );
 
@@ -165,14 +166,14 @@ namespace dlib
         }
 
         template <typename T, typename EXP>
-        typename disable_if<is_matrix<T> >::type assign_dense_to_sparse (
+        typename disable_if<is_matrix<T> >::type assign (
             T& dest,
             const matrix_exp<EXP>& src
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_vector(src),
-                "\t void assign_dense_to_sparse(dest,src)"
+                "\t void assign(dest,src)"
                 << "\n\t the src matrix must be a row or column vector"
                 );
 
@@ -185,6 +186,26 @@ namespace dlib
             }
         }
 
+        template <typename T, typename U>
+        typename disable_if_c<is_matrix<T>::value || is_matrix<U>::value>::type assign (
+            T& dest,        // sparse
+            const U& src    // sparse
+        )
+        {
+            dest.assign(src.begin(), src.end());
+        }
+
+        template <typename T, typename U, typename Comp, typename Alloc, typename S>
+        typename disable_if<is_matrix<S> >::type assign (
+            std::map<T,U,Comp,Alloc>& dest, // sparse
+            const S& src                    // sparse
+        )
+        {
+            dest.clear();
+            dest.insert(src.begin(), src.end());
+        }
+
+    // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
         template <typename T>

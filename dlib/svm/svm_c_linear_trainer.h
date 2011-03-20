@@ -531,7 +531,7 @@ namespace dlib
             // As an aside, the reason for using max_index_plus_one() and not just w.size()-1 is because
             // doing it this way avoids an inane warning from gcc that can occur in some cases.
             const long out_size = sparse_vector::max_index_plus_one(x);
-            sparse_vector::assign_dense_to_sparse(df.basis_vectors(0), matrix_cast<scalar_type>(colm(w, 0, out_size)));
+            sparse_vector::assign(df.basis_vectors(0), matrix_cast<scalar_type>(colm(w, 0, out_size)));
             df.alpha.set_size(1);
             df.alpha(0) = 1;
 
