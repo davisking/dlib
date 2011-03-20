@@ -164,6 +164,7 @@
          </term>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="add_to"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="subtract_from"/>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="assign"/>
 
          <term file="ml.html" name="linear_manifold_regularizer"/>
          <term file="ml.html" name="squared_euclidean_distance"/>
@@ -402,7 +403,6 @@
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="distance_squared"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="distance"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="has_unsigned_keys"/>
-         <term file="dlib/svm/sparse_vector_abstract.h.html" name="assign_dense_to_sparse"/>
 
          <term file="containers.html" name="remover"/>
          <term file="containers.html" name="scoped_ptr"/>
