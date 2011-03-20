@@ -155,31 +155,6 @@ namespace dlib
     // -----------------------------------------------------
     // -----------------------------------------------------
 
-        template <typename EXP>
-        scalar_type dot_helper (
-            const matrix_type& w,
-            const matrix_exp<EXP>& sample
-        ) const
-        {
-            return dot(colm(w,0,sample.size()), sample);
-        }
-
-        template <typename T>
-        typename disable_if<is_matrix<T>,scalar_type >::type dot_helper (
-            const matrix_type& w,
-            const T& sample
-        ) const
-        {
-            // compute a dot product between a dense column vector and a sparse vector
-            scalar_type temp = 0;
-            for (typename T::const_iterator i = sample.begin(); i != sample.end(); ++i)
-                temp += w(i->first) * i->second;
-            return temp;
-        }
-
-    // -----------------------------------------------------
-    // -----------------------------------------------------
-
         void line_search (
             matrix_type& w
         ) const
@@ -189,9 +164,9 @@ namespace dlib
                 - for all i: #dot_prods[i] == dot(colm(#w,0,w.size()-1), samples(i)) - #w(w.size()-1)
         !*/
         {
-
+            using sparse_vector::dot;
             for (long i = 0; i < samples.size(); ++i)
-                dot_prods[i] = dot_helper(w,samples(i)) - w(w.size()-1);
+                dot_prods[i] = dot(colm(w,0,w.size()-1), samples(i)) - w(w.size()-1);
 
             if (is_first_call)
             {

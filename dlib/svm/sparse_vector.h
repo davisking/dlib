@@ -195,19 +195,16 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        template <typename T, typename U>
+        template <typename T>
         typename T::value_type::second_type dot (
             const T& a,
-            const U& b
+            const T& b
         )
         {
             typedef typename T::value_type::second_type scalar_type;
-            typedef typename U::value_type::second_type scalar_typeU;
-            // Both T and U must contain the same kinds of elements
-            COMPILE_TIME_ASSERT((is_same_type<scalar_type, scalar_typeU>::value));
 
             typename T::const_iterator ai = a.begin();
-            typename U::const_iterator bi = b.begin();
+            typename T::const_iterator bi = b.begin();
 
             scalar_type sum = 0;
             while (ai != a.end() && bi != b.end())
@@ -229,6 +226,43 @@ namespace dlib
             }
 
             return sum;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, typename EXP>
+        typename T::value_type::second_type dot (
+            const T& a,
+            const matrix_exp<EXP>& b
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_vector(b) && max_index_plus_one(a) <= (unsigned long)b.size(),
+                "\t scalar_type dot(sparse_vector a, dense_vector b)"
+                << "\n\t 'b' must be a vector to be used in a dot product and the sparse vector 'a'"
+                << "\n\t can't be bigger that the dense vector 'b'."
+                );
+
+            typedef typename T::value_type::second_type scalar_type;
+
+            scalar_type sum = 0;
+            for (typename T::const_iterator ai = a.begin(); ai != a.end(); ++ai)
+            {
+                sum += ai->second * b(ai->first);
+            }
+
+            return sum;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, typename EXP>
+        typename T::value_type::second_type dot (
+            const matrix_exp<EXP>& b,
+            const T& a
+        )
+        {
+            return dot(a,b);
         }
 
     // ------------------------------------------------------------------------------------

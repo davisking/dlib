@@ -163,6 +163,23 @@ namespace
         DLIB_TEST(m(1) == 1 - 2*samples[3][1].second);
         DLIB_TEST(m(2) == 1);
 
+        // test mixed sparse and dense dot products
+        {
+            std::map<unsigned int, double> sv;
+            matrix<double,0,1> dv(4);
+
+            dv = 1,2,3,4;
+
+            sv[0] = 1;
+            sv[3] = 1;
+
+            using namespace sparse_vector;
+
+            DLIB_TEST(dot(sv,dv) == 5);
+            DLIB_TEST(dot(dv,sv) == 5);
+            DLIB_TEST(dot(dv,dv) == 30);
+            DLIB_TEST(dot(sv,sv) == 2);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -202,10 +219,10 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    class svm_c_linear_tester : public tester
+    class tester_svm_c_linear : public tester
     {
     public:
-        svm_c_linear_tester (
+        tester_svm_c_linear (
         ) :
             tester ("test_svm_c_linear",
                     "Runs tests on the svm_c_linear_trainer.")

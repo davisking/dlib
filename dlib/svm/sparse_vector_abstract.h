@@ -138,15 +138,48 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        template <typename T, typename U>
+        template <typename T>
         typename T::value_type::second_type dot (
             const T& a,
-            const U& b
+            const T& b
         );
         /*!
             requires
-                - a is a sorted range of std::pair objects
-                - b is a sorted range of std::pair objects
+                - a and b are valid sparse vectors (as defined at the top of this file).
+            ensures
+                - returns the dot product between the vectors a and b
+        !*/
+
+    // ----------------------------------------------------------------------------------------
+
+        template <typename T, typename EXP>
+        typename T::value_type::second_type dot (
+            const T& a,
+            const matrix_exp<EXP>& b
+        );
+        /*!
+            requires
+                - a is a valid sparse vector (as defined at the top of this file).
+                - is_vector(b) == true
+                - max_index_plus_one(a) <= b.size()
+                  (i.e. a can't be bigger than b)
+            ensures
+                - returns the dot product between the vectors a and b
+        !*/
+
+    // ----------------------------------------------------------------------------------------
+
+        template <typename T, typename EXP>
+        typename T::value_type::second_type dot (
+            const matrix_exp<EXP>& a,
+            const T& b
+        );
+        /*!
+            requires
+                - b is a valid sparse vector (as defined at the top of this file).
+                - is_vector(a) == true
+                - max_index_plus_one(b) <= a.size()
+                  (i.e. b can't be bigger than a)
             ensures
                 - returns the dot product between the vectors a and b
         !*/
