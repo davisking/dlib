@@ -133,6 +133,7 @@
 
          <term file="ml.html" name="one_vs_one_trainer"/>
          <term file="ml.html" name="one_vs_one_decision_function"/>
+         <term file="ml.html" name="multiclass_linear_decision_function"/>
          <term file="ml.html" name="one_vs_all_trainer"/>
          <term file="ml.html" name="one_vs_all_decision_function"/>
 
