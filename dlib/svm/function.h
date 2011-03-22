@@ -13,6 +13,8 @@
 #include "../rand.h"
 #include "../statistics.h"
 #include "kernel_matrix.h"
+#include "kernel.h"
+#include "sparse_kernel.h"
 
 namespace dlib
 {
@@ -791,6 +793,107 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename K,
+        typename result_type_ = typename K::scalar_type 
+        >
+    struct multiclass_linear_decision_function
+    {
+        typedef result_type_ result_type;
+
+        typedef K kernel_type;
+        typedef typename K::scalar_type scalar_type;
+        typedef typename K::sample_type sample_type;
+        typedef typename K::mem_manager_type mem_manager_type;
+
+        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
+        typedef matrix<scalar_type,0,0,mem_manager_type> scalar_matrix_type;
+
+        // You are getting a compiler error on this line because you supplied a non-linear kernel
+        // to the multiclass_linear_decision_function object.  You have to use one of the linear 
+        // kernels with this object.
+        COMPILE_TIME_ASSERT((is_same_type<K, linear_kernel<sample_type> >::value ||
+                             is_same_type<K, sparse_linear_kernel<sample_type> >::value ));
+
+
+        scalar_matrix_type       weights;
+        scalar_vector_type       b;
+        std::vector<result_type> labels; 
+
+        const std::vector<result_type>& get_labels(
+        ) const { return labels; }
+
+        unsigned long number_of_classes (
+        ) const { return labels.size(); }
+
+        result_type operator() (
+            const sample_type& x
+        ) const
+        {
+            // Rather than doing something like, best_idx = index_of_max(weights*x-b)
+            // we do the following somewhat more complex thing because this supports
+            // both sparse and dense samples.
+            using sparse_vector::dot;
+            scalar_type best_val = dot(rowm(weights,0),x) - b(0);
+            unsigned long best_idx = 0;
+
+            for (unsigned long i = 0; i < labels.size(); ++i)
+            {
+                scalar_type temp = dot(rowm(weights,i),x) - b(i);
+                if (temp > best_val)
+                {
+                    best_val = temp;
+                    best_idx = i;
+                }
+            }
+
+            return labels[best_idx];
+        }
+    };
+
+    template <
+        typename K,
+        typename result_type_
+        >
+    void serialize (
+        const multiclass_linear_decision_function<K,result_type_>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.weights,         out);
+            serialize(item.b,               out);
+            serialize(item.labels,          out);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while serializing object of type multiclass_linear_decision_function"); 
+        }
+    }
+
+    template <
+        typename K,
+        typename result_type_
+        >
+    void deserialize (
+        multiclass_linear_decision_function<K,result_type_>& item,
+        std::istream& in 
+    )
+    {
+        try
+        {
+            deserialize(item.weights,         in);
+            deserialize(item.b,               in);
+            deserialize(item.labels,          in);
+        }
+        catch (serialization_error& e)
+        { 
+            throw serialization_error(e.info + "\n   while deserializing object of type multiclass_linear_decision_function"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 

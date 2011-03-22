@@ -864,6 +864,100 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename K,
+        typename result_type_ = typename K::scalar_type 
+        >
+    struct multiclass_linear_decision_function
+    {
+        /*!
+            REQUIREMENTS ON K
+                K must be either linear_kernel or sparse_linear_kernel.  
+
+            WHAT THIS OBJECT REPRESENTS 
+                This object represents a multiclass classifier built out of a set of 
+                binary classifiers.  Each binary classifier is used to vote for the 
+                correct multiclass label using a one vs. all strategy.  Therefore, 
+                if you have N classes then there will be N binary classifiers inside 
+                this object.  Additionally, this object is linear in the sense that
+                each of these binary classifiers is a simple linear plane.
+        !*/
+
+        typedef result_type_ result_type;
+
+        typedef K kernel_type;
+        typedef typename K::scalar_type scalar_type;
+        typedef typename K::sample_type sample_type;
+        typedef typename K::mem_manager_type mem_manager_type;
+
+        typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
+        typedef matrix<scalar_type,0,0,mem_manager_type> scalar_matrix_type;
+
+        scalar_matrix_type       weights;
+        scalar_vector_type       b;
+        std::vector<result_type> labels; 
+
+        const std::vector<result_type>& get_labels(
+        ) const { return labels; }
+        /*!
+            ensures
+                - returns a vector containing all the labels which can be
+                  predicted by this object.
+        !*/
+
+        unsigned long number_of_classes (
+        ) const;
+        /*!
+            ensures
+                - returns get_labels().size()
+                  (i.e. returns the number of different labels/classes predicted by
+                  this object)
+        !*/
+
+        result_type operator() (
+            const sample_type& x
+        ) const;
+        /*!
+            requires
+                - weights.size() > 0
+                - weights.nr() == number_of_classes() == b.size()
+                - if (x is a dense vector, i.e. a dlib::matrix) then
+                    - is_vector(x) == true
+                    - x.size() == weights.nc()
+                      (i.e. it must be legal to multiply weights with x)
+            ensures
+                - Returns the predicted label for the x sample.  In particular, it returns
+                  the following:
+                    labels[index_of_max(weights*x-b)]
+        !*/
+    };
+
+    template <
+        typename K,
+        typename result_type_
+        >
+    void serialize (
+        const multiclass_linear_decision_function<K,result_type_>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for multiclass_linear_decision_function
+    !*/
+
+    template <
+        typename K,
+        typename result_type_
+        >
+    void deserialize (
+        multiclass_linear_decision_function<K,result_type_>& item,
+        std::istream& in 
+    );
+    /*!
+        provides serialization support for multiclass_linear_decision_function
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_FUNCTION_ABSTRACT_
