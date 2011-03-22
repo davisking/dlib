@@ -159,8 +159,6 @@ namespace dlib
             requires
                 - a is a valid sparse vector (as defined at the top of this file).
                 - is_vector(b) == true
-                - max_index_plus_one(a) <= b.size()
-                  (i.e. a can't be bigger than b)
             ensures
                 - returns the dot product between the vectors a and b
         !*/
@@ -176,8 +174,6 @@ namespace dlib
             requires
                 - b is a valid sparse vector (as defined at the top of this file).
                 - is_vector(a) == true
-                - max_index_plus_one(b) <= a.size()
-                  (i.e. b can't be bigger than a)
             ensures
                 - returns the dot product between the vectors a and b
         !*/

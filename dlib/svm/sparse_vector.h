@@ -258,16 +258,18 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_vector(b) && max_index_plus_one(a) <= (unsigned long)b.size(),
+            DLIB_ASSERT(is_vector(b),
                 "\t scalar_type dot(sparse_vector a, dense_vector b)"
-                << "\n\t 'b' must be a vector to be used in a dot product and the sparse vector 'a'"
-                << "\n\t can't be bigger that the dense vector 'b'."
+                << "\n\t 'b' must be a vector to be used in a dot product." 
                 );
 
             typedef typename T::value_type::second_type scalar_type;
+            typedef typename T::value_type::first_type first_type;
 
             scalar_type sum = 0;
-            for (typename T::const_iterator ai = a.begin(); ai != a.end(); ++ai)
+            for (typename T::const_iterator ai = a.begin(); 
+                 (ai != a.end()) && (ai->first < static_cast<first_type>(b.size())); 
+                 ++ai)
             {
                 sum += ai->second * b(ai->first);
             }

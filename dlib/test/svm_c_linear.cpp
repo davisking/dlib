@@ -233,6 +233,9 @@ namespace
                 DLIB_TEST(dot(dv,sv) == 5);
                 DLIB_TEST(dot(dv,dv) == 30);
                 DLIB_TEST(dot(sv,sv) == 2);
+
+                sv[10] = 9;
+                DLIB_TEST(dot(sv,dv) == 5);
             }
 
             // test mixed sparse dense assignments
