@@ -117,9 +117,21 @@ namespace
 
 
             std::vector<long> assign = brute_force_max_cost_assignment(cost);
-            const T true_eval = assignment_cost(cost, assign);
+            T true_eval = assignment_cost(cost, assign);
             assign = max_cost_assignment(cost);
+            DLIB_TEST(assignment_cost(cost,assign) == true_eval);
+            assign = max_cost_assignment(matrix_cast<char>(cost));
+            DLIB_TEST(assignment_cost(cost,assign) == true_eval);
 
+
+            cost = matrix_cast<T>(randm(size,size,rnd)*range);
+            assign = brute_force_max_cost_assignment(cost);
+            true_eval = assignment_cost(cost, assign);
+            assign = max_cost_assignment(cost);
+            DLIB_TEST(assignment_cost(cost,assign) == true_eval);
+            assign = max_cost_assignment(matrix_cast<unsigned char>(cost));
+            DLIB_TEST(assignment_cost(cost,assign) == true_eval);
+            assign = max_cost_assignment(matrix_cast<typename unsigned_type<T>::type>(cost));
             DLIB_TEST(assignment_cost(cost,assign) == true_eval);
         }
 
@@ -131,6 +143,7 @@ namespace
                 if ((i%100) == 0)
                     print_spinner();
 
+                test_hungarian<short>();
                 test_hungarian<int>();
                 test_hungarian<long>();
             }
