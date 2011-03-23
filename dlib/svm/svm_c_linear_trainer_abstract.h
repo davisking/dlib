@@ -145,9 +145,9 @@ namespace dlib
                 - returns the SVM regularization parameter for the +1 class.  
                   It is the parameter that determines the trade off between
                   trying to fit the +1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization ability of the 
-                  resulting classifier.  Larger values encourage exact fitting 
-                  while smaller values of C may encourage better generalization. 
+                  but hopefully improving the generalization of the resulting 
+                  classifier.  Larger values encourage exact fitting while 
+                  smaller values of C may encourage better generalization. 
         !*/
 
         const scalar_type get_c_class2 (
@@ -157,9 +157,9 @@ namespace dlib
                 - returns the SVM regularization parameter for the -1 class.  
                   It is the parameter that determines the trade off between
                   trying to fit the -1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization ability of the 
-                  resulting classifier.  Larger values encourage exact fitting 
-                  while smaller values of C may encourage better generalization. 
+                  but hopefully improving the generalization of the resulting 
+                  classifier.  Larger values encourage exact fitting while 
+                  smaller values of C may encourage better generalization. 
         !*/
 
         void set_c_class1 (
