@@ -32,6 +32,7 @@
          <term file="dlib/optimization/optimization_line_search_abstract.h.html" name="optimize_single_variable_failure"/>
          <term file="dlib/optimization/optimization_bobyqa_abstract.h.html" name="bobyqa_failure"/>
          <term file="dlib/optimization/optimization_oca_abstract.h.html" name="oca_problem"/>
+         <term file="optimization.html" name="structural_svm_problem"/>
 
          <term file="dlib/optimization/optimization_solve_qp2_using_smo_abstract.h.html" name="invalid_nu_error"/>
          <term file="dlib/optimization/optimization_solve_qp2_using_smo_abstract.h.html" name="maximum_nu"/>

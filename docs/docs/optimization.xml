@@ -44,6 +44,7 @@
          <item>solve_qp2_using_smo</item> 
          <item>solve_qp3_using_smo</item> 
          <item>oca</item> 
+         <item>structural_svm_problem</item> 
          <item>solve_least_squares</item> 
          <item>solve_least_squares_lm</item> 
          <item>solve_trust_region_subproblem</item> 
@@ -665,6 +666,39 @@ subject to the following constraint:
       </component>
 
    <!-- ************************************************************************* -->
+
+      <component>
+         <name>structural_svm_problem</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_problem_abstract.h</spec_file>
+         <description>
+                This object is a tool for solving the optimization problem associated 
+                with a structural support vector machine.  A structural SVM is a supervised 
+                machine learning method for learning to predict complex outputs.  This is
+                contrasted with a binary classifier which makes only simple yes/no predictions.  
+                A structural SVM, on the other hand, can learn to predict outputs as complex
+                as entire parse trees.  To do this, it learns a function F(x,y) which measures 
+                how well a particular data sample x matches a label y.  When used for prediction,
+                the best label for an x is then given by the y which maximizes F(x,y).   
+
+                <br/>
+                <br/>
+
+                For further information you should consult the following paper: 
+                <blockquote>
+                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural SVMs, 
+                    Machine Learning, 77(1):27-59, 2009.
+                </blockquote>
+
+                    Note that this object is essentially a tool for solving the 1-Slack structural
+                    SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced 
+                    paper.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
 
    </components>
 
