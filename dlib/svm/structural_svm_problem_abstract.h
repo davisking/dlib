@@ -41,7 +41,7 @@ namespace dlib
                 A structural SVM, on the other hand, can learn to predict outputs as complex
                 as entire parse trees.  To do this, it learns a function F(x,y) which measures 
                 how well a particular data sample x matches a label y.  When used for prediction,
-                the best label for an x is then given by the y which maximizes F(x,y).   
+                the best label for a new x is then given by the y which maximizes F(x,y).   
 
                 To use this object you inherit from it, provide implementations of its four 
                 pure virtual functions, and then pass your object to the oca optimizer.
@@ -50,10 +50,10 @@ namespace dlib
                 To define the optimization problem precisely, we first introduce some notation:
                     - let PSI(x,y)    == the joint feature vector for input x and a label y.
                     - let F(x,y|w)    == dot(w,PSI(x,y)).  
-                    - let LOSS(idx,y) == the loss incurred for predicting that the ith-th sample
-                      has a label of y.  
-                    - let x_i == the i-th input sample.
-                    - let y_i == the correct label for the i-th input sample.
+                    - let LOSS(idx,y) == the loss incurred for predicting that the ith-th training 
+                      sample has a label of y.  
+                    - let x_i == the i-th training sample.
+                    - let y_i == the correct label for the i-th training sample.
                     - The number of data samples is N.
 
                 Then the optimization problem solved using this object is the following:
@@ -85,13 +85,13 @@ namespace dlib
         !*/
 
         void set_epsilon (
-            scalar_type eps_
+            scalar_type eps
         );
         /*!
             requires
-                - eps_ > 0
+                - eps > 0
             ensures
-                - #get_epsilon() == eps_
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
@@ -117,9 +117,9 @@ namespace dlib
             ensures
                 - Returns the number of joint feature vectors per training sample kept in 
                   the separation oracle cache.  This cache is used to avoid unnecessary 
-                  calls to the separation oracle.  Note that a value of 0 means that 
-                  caching is not used at all.  This is appropriate if the separation
-                  oracle is cheap to evaluate. 
+                  calls to the user supplied separation_oracle() function.  Note that a 
+                  value of 0 means that caching is not used at all.  This is appropriate 
+                  if the separation oracle is cheap to evaluate. 
         !*/
 
         void be_verbose (
@@ -186,7 +186,7 @@ namespace dlib
                 - 0 <= idx < get_num_samples()
             ensures
                 - #psi == PSI(x_idx, y_idx)
-                  (i.e. the joint feature vector for sample idx and its true label.)
+                  (i.e. the joint feature vector for the idx-th training sample its true label.)
         !*/
 
         virtual void separation_oracle (
@@ -201,7 +201,7 @@ namespace dlib
                 - current_solution.size() == get_num_dimensions()
             ensures
                 - runs the separation oracle on the idx-th sample.  We define this as follows: 
-                    - let X           == the idx-th input sample.
+                    - let X           == the idx-th training sample.
                     - let PSI(X,y)    == the joint feature vector for input X and an arbitrary label y.
                     - let F(X,y)      == dot(current_solution,PSI(X,y)).  
                     - let LOSS(idx,y) == the loss incurred for predicting that the ith-th sample
