@@ -75,15 +75,6 @@ namespace dlib
                   b term, and kernel function.
         !*/
 
-        decision_function& operator= (
-            const decision_function& d
-        );
-        /*!
-            ensures
-                - #*this is identical to d
-                - returns *this
-        !*/
-
         result_type operator() (
             const sample_type& x
         ) const
@@ -177,15 +168,6 @@ namespace dlib
             ensures
                 - populates the probabilistic decision function with the given alpha, beta, 
                   and decision function.
-        !*/
-
-        probabilistic_function& operator= (
-            const probabilistic_function& d
-        );
-        /*!
-            ensures
-                - #*this is identical to d
-                - returns *this
         !*/
 
         result_type operator() (
@@ -297,15 +279,6 @@ namespace dlib
             ensures
                 - populates the probabilistic decision function with the given alpha, beta, 
                   and decision_function.
-        !*/
-
-        probabilistic_decision_function& operator= (
-            const probabilistic_decision_function& d
-        );
-        /*!
-            ensures
-                - #*this is identical to d
-                - returns *this
         !*/
 
         result_type operator() (
@@ -518,15 +491,6 @@ namespace dlib
                 - returns the set of basis vectors contained in this object
         !*/
 
-        distance_function& operator= (
-            const distance_function& d
-        );
-        /*!
-            ensures
-                - #*this is identical to d
-                - returns *this
-        !*/
-
         result_type operator() (
             const sample_type& x
         ) const;
@@ -696,15 +660,6 @@ namespace dlib
                 - populates this object with the vector_normalizer and function object 
         !*/
 
-        normalized_function& operator= (
-            const normalized_function& d
-        );
-        /*!
-            ensures
-                - #*this is identical to d
-                - returns *this
-        !*/
-
         result_type operator() (
             const sample_type& x
         ) const
@@ -795,15 +750,6 @@ namespace dlib
             ensures
                 - populates the projection function with the given basis vectors, weights,
                   and kernel function.
-        !*/
-
-        projection_function& operator= (
-            const projection_function& d
-        );
-        /*!
-            ensures
-                - #*this is identical to d
-                - returns *this
         !*/
 
         long out_vector_size (

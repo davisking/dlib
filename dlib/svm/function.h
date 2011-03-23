@@ -64,20 +64,6 @@ namespace dlib
             basis_vectors(basis_vectors_)
         {}
 
-        decision_function& operator= (
-            const decision_function& d
-        )
-        {
-            if (this != &d)
-            {
-                alpha = d.alpha;
-                b = d.b;
-                kernel_function = d.kernel_function;
-                basis_vectors = d.basis_vectors;
-            }
-            return *this;
-        }
-
         result_type operator() (
             const sample_type& x
         ) const
@@ -168,19 +154,6 @@ namespace dlib
             beta(b_),
             decision_funct(decision_funct_)
         {}
-
-        probabilistic_function& operator= (
-            const probabilistic_function& d
-        )
-        {
-            if (this != &d)
-            {
-                alpha = d.alpha;
-                beta = d.beta;
-                decision_funct = d.decision_funct;
-            }
-            return *this;
-        }
 
         result_type operator() (
             const sample_type& x
@@ -276,19 +249,6 @@ namespace dlib
             beta(b_),
             decision_funct(decision_funct_)
         {}
-
-        probabilistic_decision_function& operator= (
-            const probabilistic_decision_function& d
-        )
-        {
-            if (this != &d)
-            {
-                alpha = d.alpha;
-                beta = d.beta;
-                decision_funct = d.decision_funct;
-            }
-            return *this;
-        }
 
         result_type operator() (
             const sample_type& x
@@ -453,20 +413,6 @@ namespace dlib
 
         const sample_vector_type& get_basis_vectors (
         ) const { return basis_vectors; }
-
-        distance_function& operator= (
-            const distance_function& d
-        )
-        {
-            if (this != &d)
-            {
-                alpha = d.alpha;
-                b = d.b;
-                kernel_function = d.kernel_function;
-                basis_vectors = d.basis_vectors;
-            }
-            return *this;
-        }
 
         result_type operator() (
             const sample_type& x
