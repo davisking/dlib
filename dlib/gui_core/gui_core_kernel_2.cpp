@@ -1093,9 +1093,9 @@ namespace dlib
                             if (depth != 24)
                             {
                                 // convert this image into an 8 bit image
-                                unsigned int red_bits;
-                                unsigned int green_bits;
-                                unsigned int blue_bits;
+                                unsigned int red_bits = 0;
+                                unsigned int green_bits = 0;
+                                unsigned int blue_bits = 0;
                                 if (depth != 16)
                                 {
                                     unsigned int bits = depth/3;
