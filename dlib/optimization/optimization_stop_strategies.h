@@ -44,8 +44,8 @@ namespace dlib
             );
         }
 
-        const objective_delta_stop_strategy& be_verbose( 
-        ) const
+        objective_delta_stop_strategy& be_verbose( 
+        ) 
         {
             _verbose = true;
             return *this;
@@ -83,7 +83,7 @@ namespace dlib
         }
 
     private:
-        mutable bool _verbose;
+        bool _verbose;
 
         bool _been_used;
         double _min_delta;
@@ -123,8 +123,8 @@ namespace dlib
             );
         }
 
-        const gradient_norm_stop_strategy& be_verbose( 
-        ) const
+        gradient_norm_stop_strategy& be_verbose( 
+        ) 
         {
             _verbose = true;
             return *this;
@@ -158,7 +158,7 @@ namespace dlib
         }
 
     private:
-        mutable bool _verbose;
+        bool _verbose;
 
         double _min_norm;
         unsigned long _max_iter;

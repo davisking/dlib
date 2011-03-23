@@ -53,8 +53,8 @@ namespace dlib
                   executed.
         !*/
 
-        const objective_delta_stop_strategy& be_verbose( 
-        ) const;
+        objective_delta_stop_strategy& be_verbose( 
+        );
         /*!
             ensures
                 - causes this object to print status messages to standard out 
@@ -120,8 +120,8 @@ namespace dlib
                   max_iter iterations has been executed.
         !*/
 
-        const gradient_norm_stop_strategy& be_verbose( 
-        ) const;
+        gradient_norm_stop_strategy& be_verbose( 
+        );
         /*!
             ensures
                 - causes this object to print status messages to standard out 
