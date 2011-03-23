@@ -20,6 +20,13 @@ namespace dlib
     {
     public:
         /*!
+            REQUIREMENTS ON matrix_type
+                - matrix_type == a dlib::matrix capable of storing column vectors
+
+            REQUIREMENTS ON feature_vector_type_ 
+                - feature_vector_type_ == a dlib::matrix capable of storing column vectors
+                  or a sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
+
             INITIAL VALUE
                 - get_epsilon() == 0.001
                 - get_max_cache_size() == 10
@@ -27,6 +34,43 @@ namespace dlib
                 - This object will not be verbose
 
             WHAT THIS OBJECT REPRESENTS
+                This object is a tool for solving the optimization problem associated 
+                with a structural support vector machine.  A structural SVM is a supervised 
+                machine learning method for learning to predict complex outputs.  This is
+                contrasted with a binary classifier which makes only simple yes/no predictions.  
+                A structural SVM, on the other hand, can learn to predict outputs as complex
+                as entire parse trees.  To do this, it learns a function F(x,y) which measures 
+                how well a particular data sample x matches a label y.  When used for prediction,
+                the best label for an x is then given by the y which maximizes F(x,y).   
+
+                To use this object you inherit from it, provide implementations of its four 
+                pure virtual functions, and then pass your object to the oca optimizer.
+
+
+                To define the optimization problem precisely, we first introduce some notation:
+                    - let PSI(x,y)    == the joint feature vector for input x and a label y.
+                    - let F(x,y|w)    == dot(w,PSI(x,y)).  
+                    - let LOSS(idx,y) == the loss incurred for predicting that the ith-th sample
+                      has a label of y.  
+                    - let x_i == the i-th input sample.
+                    - let y_i == the correct label for the i-th input sample.
+                    - The number of data samples is N.
+
+                Then the optimization problem solved using this object is the following:
+                    Minimize: h(w) == 0.5*dot(w,w) + C*R(w)
+
+                    Where R(w) == sum from i=1 to N: 1/N * sample_risk(i,w)
+                    and sample_risk(i,w) == max over all Y: LOSS(i,Y) + F(x_i,Y|w) - F(x_i,y_i|w)
+                    and C > 0
+
+
+                For further information you should consult the following paper: 
+                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural SVMs, 
+                    Machine Learning, 77(1):27-59, 2009.
+
+                    Note that this object is essentially a tool for solving the 1-Slack structural
+                    SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced 
+                    paper.
 
         !*/
 
@@ -53,6 +97,10 @@ namespace dlib
         const scalar_type get_epsilon (
         ) const;
         /*!
+            ensures
+                - returns the error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer 
+                  to execute.
         !*/
 
         void set_max_cache_size (
@@ -77,26 +125,38 @@ namespace dlib
         void be_verbose (
         );
         /*!
+            ensures
+                - This object will print status messages to standard out so that a 
+                  user can observe the progress of the algorithm.
         !*/
 
         void be_quiet(
         );
         /*!
+            ensures
+                - this object will not print anything to standard out
         !*/
 
         scalar_type get_c (
         ) const; 
         /*!
+            ensures
+                - returns the SVM regularization parameter.  It is the parameter that 
+                  determines the trade off between trying to fit the training data 
+                  exactly or allowing more errors but hopefully improving the 
+                  generalization of the resulting classifier.  Larger values encourage 
+                  exact fitting while smaller values of C may encourage better 
+                  generalization. 
         !*/
 
         void set_c (
-            scalar_type C_
+            scalar_type C
         );
         /*!
             requires
-                - C_ > 0
+                - C > 0
             ensures
-                - #get_c() == C_
+                - #get_c() == C
         !*/
 
     // --------------------------------
