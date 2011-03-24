@@ -77,6 +77,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <name>Multiclass Classification</name>
          <item>one_vs_one_trainer</item> 
          <item>one_vs_all_trainer</item> 
+         <item>svm_multiclass_linear_trainer</item> 
       </section>
       <section>
          <name>Regression</name>
@@ -1296,6 +1297,21 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 classifiers in a one vs. all fashion.  That is, if you have N possible
                 classes then it trains N binary classifiers which are then used
                 to vote on the identity of a test sample.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>svm_multiclass_linear_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_multiclass_linear_trainer_abstract.h</spec_file>
+         <description>
+                This object represents a tool for training a multiclass support 
+                vector machine.  It is optimized for the case where linear kernels 
+                are used and implemented using the <a href="optimization.html#structural_svm_problem">structural_svm_problem</a>
+                object.
          </description>
                                  
       </component>

@@ -132,6 +132,7 @@
          <term file="ml.html" name="select_all_distinct_labels"/>
          <term file="dlib/svm/multiclass_tools_abstract.h.html#find_missing_pairs" name="find_missing_pairs"/>
 
+         <term file="ml.html" name="svm_multiclass_linear_trainer"/>
          <term file="ml.html" name="one_vs_one_trainer"/>
          <term file="ml.html" name="one_vs_one_decision_function"/>
          <term file="ml.html" name="multiclass_linear_decision_function"/>

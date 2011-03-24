@@ -672,7 +672,8 @@ subject to the following constraint:
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/structural_svm_problem_abstract.h</spec_file>
          <description>
-                This object is a tool for solving the optimization problem associated 
+                This object, when used with the <a href="#oca">oca</a> optimizer, is a tool 
+                for solving the optimization problem associated 
                 with a structural support vector machine.  A structural SVM is a supervised 
                 machine learning method for learning to predict complex outputs.  This is
                 contrasted with a binary classifier which makes only simple yes/no predictions.  
