@@ -41,7 +41,7 @@ namespace dlib
                 A structural SVM, on the other hand, can learn to predict outputs as complex
                 as entire parse trees.  To do this, it learns a function F(x,y) which measures 
                 how well a particular data sample x matches a label y.  When used for prediction,
-                the best label for a new x is then given by the y which maximizes F(x,y).   
+                the best label for a new x is given by the y which maximizes F(x,y).   
 
                 To use this object you inherit from it, provide implementations of its four 
                 pure virtual functions, and then pass your object to the oca optimizer.
