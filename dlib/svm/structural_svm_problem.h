@@ -197,7 +197,7 @@ namespace dlib
                 for (unsigned long i = 0; i < num; ++i)
                 {
                     get_truth_joint_feature_vector(i, ftemp);
-                    subtract_from(psi_true, ftemp);
+                    sparse_vector::subtract_from(psi_true, ftemp);
                 }
             }
 
@@ -208,7 +208,7 @@ namespace dlib
                 scalar_type loss;
                 separation_oracle_cached(i, w, loss, ftemp);
                 total_loss += loss;
-                add_to(subgradient, ftemp);
+                sparse_vector::add_to(subgradient, ftemp);
             }
 
             subgradient /= num;
