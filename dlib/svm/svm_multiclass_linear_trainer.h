@@ -62,7 +62,7 @@ namespace dlib
         {
             sparse_vector::assign(psi, samples[idx]);
             // Add a constant -1 to account for the bias term.
-            psi.push_back(std::make_pair(dims-1,-1));
+            psi.push_back(std::make_pair(dims-1,static_cast<scalar_type>(-1)));
 
             // Find which distinct label goes with this psi.
             const long label_idx = index_of_max(vector_to_matrix(distinct_labels) == labels[idx]);
@@ -99,7 +99,7 @@ namespace dlib
 
             sparse_vector::assign(psi, samples[idx]);
             // add a constant -1 to account for the bias term
-            psi.push_back(std::make_pair(dims-1,-1));
+            psi.push_back(std::make_pair(dims-1,static_cast<scalar_type>(-1)));
 
             offset_feature_vector(psi, dims*best_idx);
 
