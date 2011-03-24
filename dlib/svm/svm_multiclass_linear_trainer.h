@@ -83,7 +83,8 @@ namespace dlib
             // figure out which label is the best
             for (unsigned long i = 0; i < distinct_labels.size(); ++i)
             {
-                using sparse_vector::dot;
+                using dlib::sparse_vector::dot;
+                using dlib::dot;
                 // perform: temp == dot(relevant part of current solution, samples[idx]) - current_bias
                 scalar_type temp = dot(rowm(current_solution, range(i*dims, (i+1)*dims-2)), samples[idx]) - current_solution((i+1)*dims-1);
 

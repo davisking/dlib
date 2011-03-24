@@ -164,7 +164,8 @@ namespace dlib
                 - for all i: #dot_prods[i] == dot(colm(#w,0,w.size()-1), samples(i)) - #w(w.size()-1)
         !*/
         {
-            using sparse_vector::dot;
+            using dlib::sparse_vector::dot;
+            using dlib::dot;
             for (long i = 0; i < samples.size(); ++i)
                 dot_prods[i] = dot(colm(w,0,w.size()-1), samples(i)) - w(w.size()-1);
 
