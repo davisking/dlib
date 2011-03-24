@@ -94,6 +94,7 @@ set (tests
    string.cpp
    svm_c_linear.cpp
    svm.cpp
+   svm_multiclass_linear.cpp
    symmetric_matrix_cache.cpp
    thread_pool.cpp
    threads.cpp

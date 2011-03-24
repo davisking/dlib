@@ -104,6 +104,7 @@ SRC += std_vector_c.cpp
 SRC += string.cpp
 SRC += svm_c_linear.cpp
 SRC += svm.cpp
+SRC += svm_multiclass_linear.cpp
 SRC += symmetric_matrix_cache.cpp
 SRC += thread_pool.cpp
 SRC += threads.cpp
