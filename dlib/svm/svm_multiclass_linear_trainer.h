@@ -8,6 +8,7 @@
 #include "../optimization/optimization_oca.h"
 #include "../matrix.h"
 #include "sparse_vector.h"
+#include "function.h"
 
 namespace dlib
 {
@@ -22,6 +23,12 @@ namespace dlib
     class multiclass_svm_problem : public structural_svm_problem<matrix_type,
                                                                  std::vector<std::pair<unsigned long,typename matrix_type::type> > > 
     {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines the optimization problem for the multiclass SVM trainer
+                object at the bottom of this file.  
+        !*/
+
     public:
         typedef typename matrix_type::type scalar_type;
         typedef std::vector<std::pair<unsigned long,scalar_type> > feature_vector_type;
@@ -144,20 +151,124 @@ namespace dlib
         typedef multiclass_linear_decision_function<kernel_type, label_type> trained_function_type;
 
 
+        // You are getting a compiler error on this line because you supplied a non-linear kernel
+        // to the svm_c_linear_trainer object.  You have to use one of the linear kernels with this
+        // trainer.
+        COMPILE_TIME_ASSERT((is_same_type<K, linear_kernel<sample_type> >::value ||
+                             is_same_type<K, sparse_linear_kernel<sample_type> >::value ));
+
+        svm_multiclass_linear_trainer (
+        ) :
+            C(1),
+            eps(0.001),
+            verbose(false)
+        {
+        }
+
+        void set_epsilon (
+            scalar_type eps_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(eps_ > 0,
+                "\t void svm_multiclass_linear_trainer::set_epsilon()"
+                << "\n\t eps_ must be greater than 0"
+                << "\n\t eps_: " << eps_ 
+                << "\n\t this: " << this
+                );
+
+            eps = eps_;
+        }
+
+        const scalar_type get_epsilon (
+        ) const { return eps; }
+
+        void be_verbose (
+        )
+        {
+            verbose = true;
+        }
+
+        void be_quiet (
+        )
+        {
+            verbose = false;
+        }
+
+        void set_oca (
+            const oca& item
+        )
+        {
+            solver = item;
+        }
+
+        const oca get_oca (
+        ) const
+        {
+            return solver;
+        }
+
+        const kernel_type get_kernel (
+        ) const
+        {
+            return kernel_type();
+        }
+
+        void set_c (
+            scalar_type C_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(C_ > 0,
+                "\t void svm_multiclass_linear_trainer::set_c()"
+                << "\n\t C must be greater than 0"
+                << "\n\t C_:   " << C_ 
+                << "\n\t this: " << this
+                );
+
+            C = C_;
+        }
+
+        const scalar_type get_c (
+        ) const
+        {
+            return C;
+        }
+
         trained_function_type train (
             const std::vector<sample_type>& all_samples,
             const std::vector<label_type>& all_labels
         ) const
         {
-            oca solver;
+            scalar_type svm_objective = 0;
+            return train(all_samples, all_labels, svm_objective);
+        }
+
+        trained_function_type train (
+            const std::vector<sample_type>& all_samples,
+            const std::vector<label_type>& all_labels,
+            scalar_type& svm_objective
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_learning_problem(all_samples,all_labels),
+                "\t trained_function_type svm_multiclass_linear_trainer::train(all_samples,all_labels)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t all_samples.size():     " << all_samples.size() 
+                << "\n\t all_labels.size():      " << all_labels.size() 
+                );
+
             typedef matrix<scalar_type,0,1> w_type;
             w_type weights;
             multiclass_svm_problem<w_type, sample_type, label_type> problem(all_samples, all_labels);
-            problem.be_verbose();
-            problem.set_max_cache_size(0);
-            problem.set_c(100);
+            if (verbose)
+                problem.be_verbose();
 
-            solver(problem, weights);
+            problem.set_max_cache_size(0);
+            problem.set_c(C);
+            problem.set_epsilon(eps);
+
+            svm_objective = solver(problem, weights);
 
             trained_function_type df;
 
@@ -167,6 +278,12 @@ namespace dlib
             df.b       = colm(reshape(weights, df.labels.size(), dims+1), dims);
             return df;
         }
+
+    private:
+        scalar_type C;
+        scalar_type eps;
+        bool verbose;
+        oca solver;
     };
 
 // ----------------------------------------------------------------------------------------
