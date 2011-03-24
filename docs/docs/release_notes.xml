@@ -12,6 +12,18 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.37" date="Mar 24, 2011">
+New Stuff:
    - Added a multiclass support vector machine.
    - Added a tool for solving the optimization problem associated with
      structural support vector machines.
@@ -42,7 +54,7 @@ Bug fixes:
 Other:
    - Added a value_type typedef to matrix_exp so it's easier to write templates
      which operate on STL containers and matrix objects.
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
