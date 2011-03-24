@@ -38,6 +38,7 @@
 #include "svm/one_vs_all_trainer.h"
 
 #include "svm/structural_svm_problem.h"
+#include "svm/svm_multiclass_linear_trainer.h"
 
 #endif // DLIB_SVm_HEADER
 
