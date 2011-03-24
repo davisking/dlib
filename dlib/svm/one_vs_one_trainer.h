@@ -88,6 +88,14 @@ namespace dlib
             const std::vector<label_type>& all_labels
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_learning_problem(all_samples,all_labels),
+                "\t trained_function_type one_vs_one_trainer::train(all_samples,all_labels)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t all_samples.size():     " << all_samples.size() 
+                << "\n\t all_labels.size():      " << all_labels.size() 
+                );
+
             const std::vector<label_type> distinct_labels = select_all_distinct_labels(all_labels);
 
             std::vector<sample_type> samples;
