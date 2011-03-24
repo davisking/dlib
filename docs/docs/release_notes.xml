@@ -12,12 +12,36 @@
 
 <current>
 New Stuff:
+   - Added a multiclass support vector machine.
+   - Added a tool for solving the optimization problem associated with
+     structural support vector machines.
+   - Added new functions for dealing with sparse vectors: add_to(), 
+     subtract_from(), max_index_plus_one(), fix_nonzero_indexing(), a
+     more flexible dot(), and I renamed assign_dense_to_sparse() to assign() 
+     and made it more flexible.
  
 Non-Backwards Compatible Changes:
+   - Renamed max_index_value_plus_one() (a function for working with graphs) to 
+     max_index_plus_one() so that it uses the same name as the essentially 
+     identical function for working with sparse vectors.
+   - I simplified the cross_validate_multiclass_trainer(), cross_validate_trainer(), 
+     test_binary_decision_function(), and test_multiclass_decision_function()
+     routines.  They now always return double matrices regardless of any other 
+     consideration.  This only breaks previous code if you had been assigning
+     the result into a float or long double matrix.
+   - Renamed assign_dense_to_sparse() to assign()
 
 Bug fixes:
+   - Fixed a bug in load_libsvm_formatted_data().  I had forgotten to clear the 
+     contents of the labels output vector before adding the loaded label data.  
+   - Fixed a bug in the kernel_matrix() function.  It didn't compile when used 
+     with sparse samples which were of type std::vector&lt;std::pair&lt;&gt; &gt;.  
+     Moreover, some of the trainers have a dependency on kernel_matrix() so this 
+     fix makes those trainers also work with this kind of sparse sample.
 
 Other:
+   - Added a value_type typedef to matrix_exp so it's easier to write templates
+     which operate on STL containers and matrix objects.
 </current>
 
 <!-- *******************************************************************************  -->
