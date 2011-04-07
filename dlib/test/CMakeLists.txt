@@ -73,6 +73,7 @@ set (tests
    opt_qp_solver.cpp
    pipe.cpp
    pixel.cpp
+   probabilistic.cpp
    queue.cpp
    rand.cpp
    read_write_mutex.cpp

@@ -68,22 +68,21 @@ namespace dlib
 
     template <
         typename trainer_type,
-        typename sample_type,
-        typename scalar_type,
-        typename alloc_type1,
-        typename alloc_type2
+        typename sample_vector_type,
+        typename label_vector_type
         >
     const probabilistic_function<typename trainer_type::trained_function_type> 
     train_probabilistic_decision_function (
         const trainer_type& trainer,
-        const std::vector<sample_type,alloc_type1>& x,
-        const std::vector<scalar_type,alloc_type2>& y,
+        const sample_vector_type& x,
+        const label_vector_type& y,
         const long folds
     );
     /*!
         requires
             - 1 < folds <= x.size()
             - is_binary_classification_problem(x,y) == true
+            - x and y must be std::vector objects or types with a compatible interface.
             - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
         ensures
             - trains a classifier given the training samples in x and labels in y.  

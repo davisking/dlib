@@ -470,19 +470,19 @@ namespace dlib
 
     template <
         typename trainer_type,
-        typename sample_type,
-        typename scalar_type,
-        typename alloc_type1,
-        typename alloc_type2
+        typename sample_vector_type,
+        typename label_vector_type
         >
     const probabilistic_function<typename trainer_type::trained_function_type> 
     train_probabilistic_decision_function (
         const trainer_type& trainer,
-        const std::vector<sample_type,alloc_type1>& x,
-        const std::vector<scalar_type,alloc_type2>& y,
+        const sample_vector_type& x,
+        const label_vector_type& y,
         const long folds
     )
     {
+        typedef typename sample_vector_type::value_type sample_type;
+        typedef typename label_vector_type::value_type scalar_type;
 
         /*
             This function fits a sigmoid function to the output of the 
@@ -519,14 +519,14 @@ namespace dlib
         const long num_neg_train_samples = num_neg - num_neg_test_samples; 
 
         typename trainer_type::trained_function_type d;
-        std::vector<sample_type,alloc_type1> x_test, x_train;
-        std::vector<scalar_type,alloc_type2> y_test, y_train;
+        std::vector<sample_type> x_test, x_train;
+        std::vector<scalar_type> y_test, y_train;
         x_test.resize (num_pos_test_samples  + num_neg_test_samples);
         y_test.resize (num_pos_test_samples  + num_neg_test_samples);
         x_train.resize(num_pos_train_samples + num_neg_train_samples);
         y_train.resize(num_pos_train_samples + num_neg_train_samples);
 
-        typedef std::vector<scalar_type, alloc_type2 > dvector;
+        typedef std::vector<scalar_type > dvector;
 
         dvector out;
         dvector target;
@@ -658,14 +658,12 @@ namespace dlib
         ) : trainer(trainer_),folds(folds_) {}
 
         template <
-            typename sample_type, 
-            typename scalar_type,
-            typename alloc_type1,
-            typename alloc_type2
+            typename T, 
+            typename U
             >
         const trained_function_type train (
-            const std::vector<sample_type,alloc_type1>& samples,
-            const std::vector<scalar_type,alloc_type2>& labels
+            const T& samples,
+            const U& labels
         ) const
         {
             return train_probabilistic_decision_function(trainer, samples, labels, folds);
