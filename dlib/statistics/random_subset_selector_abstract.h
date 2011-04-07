@@ -71,6 +71,7 @@ namespace dlib
         !*/
     public:
         typedef T type;
+        typedef T value_type;
         typedef default_memory_manager mem_manager_type;
         typedef Rand_type rand_type;
 
