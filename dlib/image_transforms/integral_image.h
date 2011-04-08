@@ -35,13 +35,11 @@ namespace dlib
             const image_type& img
         )
         {
-            COMPILE_TIME_ASSERT( pixel_traits<typename image_type::type>::is_unsigned == true );
-
-            unsigned long pixel;
+            long pixel;
             int_img.set_size(img.nr(), img.nc());
 
             // compute the first row of the integral image
-            unsigned long temp = 0;
+            long temp = 0;
             for (long c = 0; c < img.nc(); ++c)
             {
                 assign_pixel(pixel, img[0][c]);
@@ -67,15 +65,16 @@ namespace dlib
             const rectangle& rect
         ) const
         {
-            DLIB_ASSERT(get_rect(*this).contains(rect) == true,
+            DLIB_ASSERT(get_rect(*this).contains(rect) == true && rect.is_empty() == false,
                 "\tlong get_sum_of_area(rect)"
                 << "\n\tYou have given a rectangle that goes outside the image"
                 << "\n\tthis:            " << this
+                << "\n\trect.is_empty(): " << rect.is_empty()
                 << "\n\trect:            " << rect 
                 << "\n\tget_rect(*this): " << get_rect(*this) 
             );
 
-            unsigned long top_left = 0, top_right = 0, bottom_left = 0, bottom_right = 0;
+            long top_left = 0, top_right = 0, bottom_left = 0, bottom_right = 0;
 
             bottom_right = int_img[rect.bottom()][rect.right()];
             if (rect.left()-1 >= 0 && rect.top()-1 >= 0)
@@ -98,7 +97,7 @@ namespace dlib
 
     private:
 
-        array2d<unsigned long>::kernel_1a int_img;
+        array2d<long>::kernel_1a_c int_img;
 
 
     };

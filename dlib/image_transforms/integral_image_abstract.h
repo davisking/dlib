@@ -65,6 +65,7 @@ namespace dlib
         ) const;
         /*!
             requires
+                - rect.is_empty() == false
                 - get_rect(*this).contains(rect) == true
                   (i.e. rect must not be outside the integral image)
             ensures
