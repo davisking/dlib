@@ -97,7 +97,7 @@ namespace dlib
 
     private:
 
-        array2d<long>::kernel_1a_c int_img;
+        array2d<long>::kernel_1a int_img;
 
 
     };
