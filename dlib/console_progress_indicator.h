@@ -43,6 +43,18 @@ namespace dlib
                 - #target() == target_value
         !*/
 
+        inline void reset (
+            double target_value
+        );
+        /*!
+            ensures
+                - #target() == target_value
+                - performs the equivalent of:
+                    *this = console_progress_indicator(target_value)
+                    (i.e. resets this object with a new target value)
+
+        !*/
+
         inline double target (
         ) const;
         /*!
@@ -68,7 +80,7 @@ namespace dlib
 
     private:
 
-        const double target_val;
+        double target_val;
 
         time_t start_time;
         double first_val;
@@ -165,6 +177,17 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    void console_progress_indicator::
+    reset (
+        double target_value
+    ) 
+    {
+        *this = console_progress_indicator(target_value);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_CONSOLE_PROGRESS_INDiCATOR_H__
