@@ -164,28 +164,9 @@
          <file>dlib/crc32.h</file>
          <spec_file>dlib/crc32/crc32_kernel_abstract.h</spec_file>
          <description>
-            This object represents the CRC-32 algorithm for calculating
-                        checksums.   
+            This object represents the CRC-32 algorithm for calculating checksums.   
          </description>
          
-         <implementations>
-            <implementation>
-               <name>crc32_kernel_1</name>
-               <file>dlib/crc32/crc32_kernel_1.h</file>
-               <description> 
-                  This implementation uses the polynomial 0xedb88320. 
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for crc32_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation>                                  
-         </implementations>
-                        
       </component>
             
    <!-- ************************************************************************* -->
