@@ -13,7 +13,7 @@ namespace dlib
     template <
         typename T
         >
-    class pipe_kernel_1 
+    class pipe 
     {
         /*!
             INITIAL VALUE
@@ -60,14 +60,16 @@ namespace dlib
         !*/
 
     public:
+        // this is here for backwards compatibility with older versions of dlib.
+        typedef pipe kernel_1a;
 
         typedef T type;
 
-        explicit pipe_kernel_1 (  
+        explicit pipe (  
             unsigned long maximum_size
         );
 
-        virtual ~pipe_kernel_1 (
+        virtual ~pipe (
         );
 
         void empty (
@@ -144,8 +146,8 @@ namespace dlib
         bool enqueue_enabled;
 
         // restricted functions
-        pipe_kernel_1(const pipe_kernel_1&);        // copy constructor
-        pipe_kernel_1& operator=(const pipe_kernel_1&);    // assignment operator
+        pipe(const pipe&);        // copy constructor
+        pipe& operator=(const pipe&);    // assignment operator
 
     };    
 
@@ -158,8 +160,8 @@ namespace dlib
     template <
         typename T
         >
-    pipe_kernel_1<T>::
-    pipe_kernel_1 (  
+    pipe<T>::
+    pipe (  
         unsigned long maximum_size
     ) : 
         pipe_size(0),
@@ -183,8 +185,8 @@ namespace dlib
     template <
         typename T
         >
-    pipe_kernel_1<T>::
-    ~pipe_kernel_1 (
+    pipe<T>::
+    ~pipe (
     )
     {
         auto_mutex M(m);
@@ -209,7 +211,7 @@ namespace dlib
     template <
         typename T
         >
-    void pipe_kernel_1<T>::
+    void pipe<T>::
     empty (
     )
     {
@@ -226,7 +228,7 @@ namespace dlib
     template <
         typename T
         >
-    void pipe_kernel_1<T>::
+    void pipe<T>::
     wait_until_empty (
     ) const
     {
@@ -249,7 +251,7 @@ namespace dlib
     template <
         typename T
         >
-    void pipe_kernel_1<T>::
+    void pipe<T>::
     enable (
     )
     {
@@ -262,7 +264,7 @@ namespace dlib
     template <
         typename T
         >
-    void pipe_kernel_1<T>::
+    void pipe<T>::
     disable (
     )
     {
@@ -278,7 +280,7 @@ namespace dlib
     template <
         typename T
         >
-    bool pipe_kernel_1<T>::
+    bool pipe<T>::
     is_enabled (
     ) const
     {
@@ -291,7 +293,7 @@ namespace dlib
     template <
         typename T
         >
-    unsigned long pipe_kernel_1<T>::
+    unsigned long pipe<T>::
     max_size (
     ) const
     {
@@ -304,7 +306,7 @@ namespace dlib
     template <
         typename T
         >
-    unsigned long pipe_kernel_1<T>::
+    unsigned long pipe<T>::
     size (
     ) const
     {
@@ -317,7 +319,7 @@ namespace dlib
     template <
         typename T
         >
-    bool pipe_kernel_1<T>::
+    bool pipe<T>::
     enqueue (
         T& item
     )
@@ -402,7 +404,7 @@ namespace dlib
     template <
         typename T
         >
-    bool pipe_kernel_1<T>::
+    bool pipe<T>::
     dequeue (
         T& item
     )
@@ -463,7 +465,7 @@ namespace dlib
     template <
         typename T
         >
-    bool pipe_kernel_1<T>::
+    bool pipe<T>::
     enqueue_or_timeout (
         T& item,
         unsigned long timeout
@@ -557,7 +559,7 @@ namespace dlib
     template <
         typename T
         >
-    bool pipe_kernel_1<T>::
+    bool pipe<T>::
     dequeue_or_timeout (
         T& item,
         unsigned long timeout
@@ -626,7 +628,7 @@ namespace dlib
     template <
         typename T
         >
-    void pipe_kernel_1<T>::
+    void pipe<T>::
     wait_for_num_blocked_dequeues (
         unsigned long num
     )const
@@ -649,7 +651,7 @@ namespace dlib
     template <
         typename T
         >
-    bool pipe_kernel_1<T>::
+    bool pipe<T>::
     is_enqueue_enabled (
     ) const
     {
@@ -662,7 +664,7 @@ namespace dlib
     template <
         typename T
         >
-    void pipe_kernel_1<T>::
+    void pipe<T>::
     disable_enqueue (
     )
     {
@@ -677,7 +679,7 @@ namespace dlib
     template <
         typename T
         >
-    void pipe_kernel_1<T>::
+    void pipe<T>::
     enable_enqueue (
     )
     {

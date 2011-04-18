@@ -532,7 +532,7 @@ namespace
         void perform_test (
         )
         {
-            pipe_kernel_test<dlib::pipe<int>::kernel_1a>();
+            pipe_kernel_test<dlib::pipe<int> >();
         }
     } a;
 

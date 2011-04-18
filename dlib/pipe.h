@@ -6,27 +6,5 @@
 #include "pipe/pipe_kernel_1.h"
 
 
-namespace dlib
-{
-
-    template <
-        typename T
-        >
-    class pipe
-    {
-        pipe() {}
-    public:
-                
-
-        //----------- kernels ---------------
-
-        // kernel_1a        
-        typedef     pipe_kernel_1<T>    
-                    kernel_1a;
-
-
-    };
-}
-
 #endif // DLIB_PIPe_
 
