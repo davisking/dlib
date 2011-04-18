@@ -410,13 +410,13 @@ namespace
         void perform_test (
         )
         {
-            dlog << LINFO << "testing kernel_1a";
+            dlog << LINFO << "testing config_reader";
             print_spinner();
-            config_reader_test<config_reader::kernel_1a>();
+            config_reader_test<config_reader>();
 
-            dlog << LINFO << "testing thread_safe_1a";
+            dlog << LINFO << "testing config_reader_thread_safe";
             print_spinner();
-            config_reader_test<config_reader::thread_safe_1a>();
+            config_reader_test<config_reader_thread_safe>();
         }
     } a;
 

@@ -11,16 +11,10 @@
 namespace dlib
 {
 
-    template <
-        typename config_reader_base
-        >
     class config_reader_thread_safe 
     {
 
         /*!                
-            REQUIREMENTS ON config_reader_base 
-                is an implementation of config_reader/config_reader_kernel_abstract.h
-
             WHAT THIS EXTENSION DOES FOR config_reader 
                 This object extends a normal config_reader by simply wrapping all 
                 its member functions inside mutex locks to make it safe to use

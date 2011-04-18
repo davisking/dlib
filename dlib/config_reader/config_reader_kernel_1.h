@@ -11,6 +11,10 @@
 #include "../algs.h"
 #include "../stl_checked/std_vector_c.h"
 
+#ifndef DLIB_ISO_CPP_ONLY
+#include "config_reader_thread_safe_1.h"
+#endif
+
 namespace dlib
 {
 
@@ -41,6 +45,16 @@ namespace dlib
         !*/
         
     public:
+
+        // These two typedefs are defined for backwards compatibility with older versions of dlib.
+        typedef config_reader_kernel_1 kernel_1a;
+#ifndef DLIB_ISO_CPP_ONLY
+        typedef config_reader_thread_safe_1<
+            config_reader_kernel_1,
+            map_string_void 
+            > thread_safe_1a;
+#endif // DLIB_ISO_CPP_ONLY
+
 
         config_reader_kernel_1();
 

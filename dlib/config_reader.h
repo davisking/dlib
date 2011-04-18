@@ -9,40 +9,23 @@
 
 #include "algs.h"
 
-#ifndef DLIB_ISO_CPP_ONLY
-#include "config_reader/config_reader_thread_safe_1.h"
-#endif
 
 namespace dlib
 {
 
+    typedef config_reader_kernel_1<
+        map<std::string,std::string>::kernel_1b,
+        map<std::string,void*>::kernel_1b,
+        tokenizer::kernel_1a
+        > config_reader;
 
-    class config_reader
-    {
-        config_reader() {}
-
-    public:
-        
-        //----------- kernels ---------------
-
-        // kernel_1a        
-        typedef     config_reader_kernel_1<
-                        map<std::string,std::string>::kernel_1b,
-                        map<std::string,void*>::kernel_1b,
-                        tokenizer::kernel_1a
-                        > kernel_1a;
- 
- 
 #ifndef DLIB_ISO_CPP_ONLY
-        // thread_safe_1a
-        typedef     config_reader_thread_safe_1<
-                        kernel_1a,
-                        map<std::string,void*>::kernel_1b
-                        > thread_safe_1a;
-
+    typedef config_reader_thread_safe_1<
+        config_reader,
+        map<std::string,void*>::kernel_1b
+        > config_reader_thread_safe;
 #endif // DLIB_ISO_CPP_ONLY
 
-    };
 
 }
 
