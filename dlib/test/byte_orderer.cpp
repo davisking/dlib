@@ -33,7 +33,7 @@ namespace
         void perform_test (
         )
         {
-            byte_orderer::kernel_1a bo;
+            byte_orderer bo;
 
             union data
             {

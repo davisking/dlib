@@ -10,7 +10,7 @@
 namespace dlib
 {
 
-    class byte_orderer_kernel_1 
+    class byte_orderer 
     {
         /*!
             INITIAL VALUE
@@ -34,7 +34,10 @@ namespace dlib
 
     public:
 
-        byte_orderer_kernel_1 (        
+        // this is here for backwards compatibility with older versions of dlib.
+        typedef byte_orderer kernel_1a;
+
+        byte_orderer (        
         )
         {
             // This will probably never be false but if it is then it means chars are not 8bits
@@ -49,7 +52,7 @@ namespace dlib
                 little_endian = false;
         }
 
-        virtual ~byte_orderer_kernel_1 (
+        virtual ~byte_orderer (
         ){}
 
         bool host_is_big_endian (
@@ -168,15 +171,15 @@ namespace dlib
         bool little_endian;
 
         // restricted functions
-        byte_orderer_kernel_1(const byte_orderer_kernel_1&);        // copy constructor
-        byte_orderer_kernel_1& operator=(const byte_orderer_kernel_1&);    // assignment operator
+        byte_orderer(const byte_orderer&);        // copy constructor
+        byte_orderer& operator=(const byte_orderer&);    // assignment operator
 
     };    
 
     // make flip not do anything at all for chars
-    template <> inline void byte_orderer_kernel_1::flip<char> ( char& ) const {} 
-    template <> inline void byte_orderer_kernel_1::flip<unsigned char> ( unsigned char& ) const {} 
-    template <> inline void byte_orderer_kernel_1::flip<signed char> ( signed char& ) const {} 
+    template <> inline void byte_orderer::flip<char> ( char& ) const {} 
+    template <> inline void byte_orderer::flip<unsigned char> ( unsigned char& ) const {} 
+    template <> inline void byte_orderer::flip<signed char> ( signed char& ) const {} 
 }
 
 #endif // DLIB_BYTE_ORDEREr_KERNEL_1_ 
