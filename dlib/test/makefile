@@ -42,6 +42,7 @@ SRC += compress_stream.cpp
 SRC += conditioning_class_c.cpp
 SRC += conditioning_class.cpp
 SRC += config_reader.cpp
+SRC += crc32.cpp
 SRC += create_iris_datafile.cpp
 SRC += data_io.cpp
 SRC += directed_graph.cpp

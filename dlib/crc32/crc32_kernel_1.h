@@ -10,7 +10,7 @@
 namespace dlib
 {
 
-    class crc32_kernel_1 
+    class crc32 
     {
         /*!
             INITIAL VALUE
@@ -24,10 +24,17 @@ namespace dlib
 
     public:
 
-        inline crc32_kernel_1 (        
+        // this is here for backwards compatibility with older versions of dlib.
+        typedef crc32 kernel_1a;
+
+        inline crc32 (        
         );
 
-        inline virtual ~crc32_kernel_1 (
+        inline crc32 (        
+            const std::string& item
+        );
+
+        inline virtual ~crc32 (
         );
 
         inline void clear(
@@ -45,23 +52,27 @@ namespace dlib
         ) const;
 
         inline void swap (
-            crc32_kernel_1& item
+            crc32& item
         );
 
+        inline crc32& operator=(
+            const crc32&
+        );  
+
     private:
+
+        inline void fill_crc_table(
+        );
 
         unsigned long checksum;
         unsigned long table[256];
 
-        // restricted functions
-        crc32_kernel_1(const crc32_kernel_1&);        // copy constructor
-        crc32_kernel_1& operator=(const crc32_kernel_1&);    // assignment operator
 
     };    
 
     inline void swap (
-        crc32_kernel_1& a, 
-        crc32_kernel_1& b 
+        crc32& a, 
+        crc32& b 
     ) { a.swap(b); }   
 
 // ----------------------------------------------------------------------------------------
@@ -70,11 +81,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    crc32_kernel_1::
-    crc32_kernel_1 (        
+    void crc32::
+    fill_crc_table (
     )
     {
-        checksum = 0xFFFFFFFF;
         unsigned long temp;
 
         // fill out the crc table
@@ -90,20 +100,41 @@ namespace dlib
             }
             table[i] = temp;
         }
-
     }
 
 // ----------------------------------------------------------------------------------------
 
-    crc32_kernel_1::
-    ~crc32_kernel_1 (
+    crc32::
+    crc32 (        
+    )
+    {
+        checksum = 0xFFFFFFFF;
+        fill_crc_table();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    crc32::
+    crc32 (        
+        const std::string& item
+    )
+    {
+        checksum = 0xFFFFFFFF;
+        fill_crc_table();
+        add(item);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    crc32::
+    ~crc32 (
     )
     {
     }
 
 // ----------------------------------------------------------------------------------------
 
-    void crc32_kernel_1::
+    void crc32::
     clear(
     )
     {
@@ -112,7 +143,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void crc32_kernel_1::
+    void crc32::
     add (
         unsigned char item
     )
@@ -122,7 +153,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void crc32_kernel_1::
+    void crc32::
     add (
         const std::string& item
     )
@@ -133,7 +164,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long crc32_kernel_1::
+    unsigned long crc32::
     get_checksum (
     ) const
     {
@@ -142,12 +173,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void crc32_kernel_1::
+    void crc32::
     swap (
-        crc32_kernel_1& item
+        crc32& item
     )
     {
         exchange(checksum,item.checksum);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    crc32& crc32::
+    operator=(
+        const crc32& item
+    )
+    {
+        checksum = item.checksum;
+        return *this;
     }
 
 // ----------------------------------------------------------------------------------------

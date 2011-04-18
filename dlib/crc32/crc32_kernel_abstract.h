@@ -28,8 +28,17 @@ namespace dlib
         /*!
             ensures                
                 - #*this is properly initialized
-            throws
-                - std::bad_alloc
+        !*/
+
+        crc32 (        
+            const std::string& item
+        );
+        /*!
+            ensures                
+                - #*this is properly initialized
+                - calls this->add(item).
+                  (i.e. Using this constructor is the same as using the default 
+                  constructor and then calling add() on item)
         !*/
 
         virtual ~crc32 (
@@ -44,10 +53,6 @@ namespace dlib
         /*!
             ensures
                 - #*this has its initial value
-            throws
-                - std::bad_alloc
-                    if this exception is thrown then #*this is unusable 
-                    until clear() is called and succeeds
         !*/
 
         void add (
@@ -82,12 +87,6 @@ namespace dlib
             ensures
                 - swaps *this and item
         !*/ 
-
-    private:
-
-        // restricted functions
-        crc32(const crc32&);        // copy constructor
-        crc32& operator=(const crc32&);    // assignment operator
 
     };    
 

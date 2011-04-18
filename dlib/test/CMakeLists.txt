@@ -32,6 +32,7 @@ set (tests
    conditioning_class_c.cpp
    conditioning_class.cpp
    config_reader.cpp
+   crc32.cpp
    create_iris_datafile.cpp
    data_io.cpp
    directed_graph.cpp
