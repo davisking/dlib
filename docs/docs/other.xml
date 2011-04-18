@@ -12,10 +12,7 @@
          <p>
 
          This page documents library components that don't really fit in anywhere else.  
-         They all basically follow the same conventions as 
-         the rest of the library.   So to get a pipe for example you would need to write something 
-         like <tt>typedef dlib::pipe::kernel_1a pipe_type;</tt> and from then on make your pipes like 
-         <tt>pipe_type my_pipe(pipe_size);</tt>.  
+         They all follow the same conventions as the rest of the library. 
          </p>
 
    </body>
@@ -305,26 +302,6 @@
             <example>pipe_ex_2.cpp.html</example>
          </examples>
 
-         <implementations>
-            <implementation>
-               <name>pipe_kernel_1</name>
-               <file>dlib/pipe/pipe_kernel_1.h</file>
-               <description> 
-                  This implementation is done using a circular buffer in the obvious way. See the source for details.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for pipe_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-                           
-                        
       </component>
       
       
