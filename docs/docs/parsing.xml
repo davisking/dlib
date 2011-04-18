@@ -494,25 +494,6 @@
             <example>config_reader_ex.cpp.html</example>
          </examples>
          
-         <implementations>
-            <implementation>
-               <name>config_reader_kernel_1</name>
-               <file>dlib/config_reader/config_reader_kernel_1.h</file>
-               <description> 
-                  This implementation is done using the <a href="containers.html#map">map</a> object in the obvious way.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for config_reader_kernel_1 that uses map_kernel_1b</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-               
          <extensions>
             <extension>
                <name>config_reader_thread_safe</name>
@@ -522,19 +503,6 @@
                 its member functions inside mutex locks to make it safe to use
                 in a threaded program.  
                </description>
-               <implementations>
-                  <implementation>
-                     <name>config_reader_thread_safe_1</name>
-                     <file>dlib/config_reader/config_reader_thread_safe_1.h</file>
-                     <description>This implementation is done in the obvious way.  See the source for details</description>
-                     <typedefs>
-                        <typedef>
-                           <name>thread_safe_1a</name>
-                           <description>is a typedef for config_reader_kernel_1 extended by config_reader_thread_safe_1</description>
-                        </typedef>
-                     </typedefs>
-                  </implementation>
-               </implementations>
             </extension>
          </extensions>
          

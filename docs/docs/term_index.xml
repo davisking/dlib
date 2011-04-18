@@ -1011,6 +1011,7 @@
          <term file="dlib/interfaces/cmd_line_parser_option.h.html" name="cmd_line_parser_option"/>
          <term link="parsing.html#cmd_line_parser" name="command line parsing"/>
          <term file="parsing.html" name="config_reader"/>
+         <term file="parsing.html" name="config_reader_thread_safe"/>
          <term link="parsing.html#config_reader" name="config file parser"/>
          <term file="parsing.html" name="cpp_pretty_printer"/>
          <term file="parsing.html" name="cpp_tokenizer"/>
