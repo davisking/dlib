@@ -393,26 +393,6 @@
          <examples>
             <example>file_to_code_ex.cpp.html</example>
          </examples>
-         
-         <implementations>
-            <implementation>
-               <name>base64_kernel_1</name>
-               <file>dlib/base64/base64_kernel_1.h</file>
-               <description> 
-                  This implementation is done using a lookup table in the obvious way.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for base64_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-                     
       </component>
       
    <!-- ************************************************************************* -->
