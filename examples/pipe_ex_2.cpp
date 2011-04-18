@@ -48,9 +48,6 @@ typedef type_safe_union<int, float, std::string> tsu_type;
   
 */
 
-// And here we have a typedef for the pipe we will be using
-typedef dlib::pipe<tsu_type>::kernel_1a pipe_type;
-
 // ----------------------------------------------------------------------------------------
 
 class pipe_example : private threaded_object 
@@ -81,7 +78,7 @@ public:
     }
 
     // Here we declare our pipe object.  It will contain our messages.
-    pipe_type message_pipe;
+    dlib::pipe<tsu_type> message_pipe;
 
 private:
 

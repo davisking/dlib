@@ -115,7 +115,7 @@ public:
     // There are only two requirements on the type of objects you can use in a
     // pipe, first they must have a default constructor and second they must
     // be swappable by a global swap().
-    dlib::pipe<job>::kernel_1a job_pipe;
+    dlib::pipe<job> job_pipe;
 
 private:
     void thread ()
