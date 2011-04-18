@@ -13,7 +13,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    base64_kernel_1::line_ending_type base64_kernel_1::
+    base64::line_ending_type base64::
     line_ending (
     ) const
     {
@@ -22,7 +22,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void base64_kernel_1::
+    void base64::
     set_line_ending (
         line_ending_type eol_style_
     )
@@ -32,8 +32,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    base64_kernel_1::
-    base64_kernel_1 (
+    base64::
+    base64 (
     ) : 
         encode_table(0),
         decode_table(0),
@@ -149,8 +149,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    base64_kernel_1::
-    ~base64_kernel_1 (
+    base64::
+    ~base64 (
     )
     {
         delete [] encode_table;
@@ -159,7 +159,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void base64_kernel_1::
+    void base64::
     encode (
         std::istream& in_,
         std::ostream& out_
@@ -306,7 +306,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void base64_kernel_1::
+    void base64::
     decode (
         std::istream& in_,
         std::ostream& out_

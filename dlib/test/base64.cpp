@@ -196,7 +196,7 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
         )
         {
             print_spinner();
-            base64_kernel_test<base64::kernel_1a>();
+            base64_kernel_test<base64>();
         }
     } a;
 

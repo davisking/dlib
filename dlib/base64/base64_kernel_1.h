@@ -10,7 +10,7 @@
 namespace dlib
 {
 
-    class base64_kernel_1 
+    class base64 
     {
         /*!
             INITIAL VALUE
@@ -33,14 +33,16 @@ namespace dlib
         !*/
 
     public:
+        // this is here for backwards compatibility with older versions of dlib.
+        typedef base64 kernel_1a;
 
         class decode_error : public dlib::error { public:
         decode_error( const std::string& e) : error(e) {}};
 
-        base64_kernel_1 (
+        base64 (
         );
 
-        virtual ~base64_kernel_1 (
+        virtual ~base64 (
         );
 
         enum line_ending_type
@@ -75,8 +77,8 @@ namespace dlib
         line_ending_type eol_style;
 
         // restricted functions
-        base64_kernel_1(base64_kernel_1&);        // copy constructor
-        base64_kernel_1& operator=(base64_kernel_1&);    // assignment operator
+        base64(base64&);        // copy constructor
+        base64& operator=(base64&);    // assignment operator
 
     };   
    
