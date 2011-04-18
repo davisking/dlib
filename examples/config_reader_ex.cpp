@@ -21,7 +21,7 @@
 // types we could use here.  The other one is a thread-safe version for use in an
 // application that needs to access a global config reader from multiple threads.  
 // But we aren't doing that here so I'm using the normal kind.
-typedef dlib::config_reader::kernel_1a cr_type;
+typedef dlib::config_reader cr_type;
 
 
 using namespace std;
