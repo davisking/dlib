@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     istringstream sin;
 
     // this is the object we will use to do the base64 encoding
-    base64::kernel_1a base64_coder;
+    base64 base64_coder;
     // this is the object we will use to do the data compression
     compress_stream::kernel_1ea compressor;
 
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
     sout << "// This function returns the contents of the file '" << argv[1] << "'\n";
     sout << "const std::string get_decoded_string()\n";
     sout << "{\n";
-    sout << "    dlib::base64::kernel_1a base64_coder;\n";
+    sout << "    dlib::base64 base64_coder;\n";
     sout << "    dlib::compress_stream::kernel_1ea compressor;\n";
     sout << "    std::ostringstream sout;\n";
     sout << "    std::istringstream sin;\n\n";
