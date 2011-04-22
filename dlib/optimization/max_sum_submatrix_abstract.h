@@ -12,7 +12,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
+    template <
+        typename EXP
+        >
     std::vector<rectangle> max_sum_submatrix(
         const matrix_exp<EXP>& mat,
         unsigned long max_rects,
@@ -25,11 +27,11 @@ namespace dlib
         ensures
             - This function finds the submatrix within mat which has the largest sum.  It then
               zeros out that submatrix and repeats the process until no more maximal submatrices can 
-              be found.  The std::vector returned will be ordered so that the largest sum rectangles 
-              come first. 
+              be found.  The std::vector returned will be ordered so that the rectangles with the
+              largest sum come first. 
             - Each submatrix must have a sum greater than thresh.  If no such submatrix exists then
               the algorithm terminates and returns an empty std::vector.  
-            - At most max_rects rectangles are returned.
+            - At most max_rects rectangles are returned. 
 
             - This function is basically an implementation of the efficient subwindow search (I-ESS)
               algorithm presented in the following paper: 
