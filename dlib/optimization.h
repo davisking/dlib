@@ -12,6 +12,7 @@
 #include "optimization/optimization_trust_region.h"
 #include "optimization/optimization_least_squares.h"
 #include "optimization/max_cost_assignment.h"
+#include "optimization/max_sum_submatrix.h"
 
 #endif // DLIB_OPTIMIZATIOn_HEADER
 

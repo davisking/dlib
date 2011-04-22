@@ -74,6 +74,7 @@ SRC += matrix_eig.cpp
 SRC += matrix_lu.cpp
 SRC += matrix_qr.cpp
 SRC += max_cost_assignment.cpp
+SRC += max_sum_submatrix.cpp
 SRC += md5.cpp
 SRC += member_function_pointer.cpp
 SRC += metaprogramming.cpp

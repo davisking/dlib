@@ -64,6 +64,7 @@ set (tests
    matrix_lu.cpp
    matrix_qr.cpp
    max_cost_assignment.cpp
+   max_sum_submatrix.cpp
    md5.cpp
    member_function_pointer.cpp
    metaprogramming.cpp
