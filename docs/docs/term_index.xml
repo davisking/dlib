@@ -44,6 +44,7 @@
          <term file="optimization.html" name="line_search"/>
          <term file="optimization.html" name="find_min"/>
          <term file="optimization.html" name="max_cost_assignment"/>
+         <term file="optimization.html" name="max_sum_submatrix"/>
          <term file="dlib/optimization/max_cost_assignment_abstract.h.html" name="assignment_cost"/>
          <term file="optimization.html" name="solve_least_squares"/>
          <term file="optimization.html" name="solve_least_squares_lm"/>

@@ -49,6 +49,7 @@
          <item>solve_least_squares_lm</item> 
          <item>solve_trust_region_subproblem</item> 
          <item>max_cost_assignment</item> 
+         <item>max_sum_submatrix</item> 
       </section>
 
       <section>
@@ -441,6 +442,20 @@ subject to the following constraint:
             certain jobs than others. So you would like to find out how to assign them all to jobs such that 
             overall productivity is maximized. You can use this routine to solve this problem and others like it. 
 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>max_sum_submatrix</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/max_sum_submatrix_abstract.h</spec_file>
+         <description>
+              This function finds the submatrix within a user supplied matrix which has the largest sum.  It then
+              zeros out that submatrix and repeats the process until no more maximal submatrices can 
+              be found.   
          </description>
                                  
       </component>
