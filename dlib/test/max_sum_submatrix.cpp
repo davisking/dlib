@@ -79,14 +79,21 @@ namespace
         std::vector<rectangle> res;
         res = max_sum_submatrix(mat, true_rects.size()+10, 0);
 
-        DLIB_CASSERT(res.size() == true_rects.size(),"");
+        DLIB_TEST(res.size() == true_rects.size());
+
+        // make sure big rectangles come first
+        for (unsigned long i = 0; i+1 < res.size(); ++i)
+        {
+            DLIB_TEST(sum(subm(mat,res[i])) >= sum(subm(mat,res[i+1])));
+        }
 
         // make sure rectangles match
         sort(true_rects.begin(), true_rects.end(), order_rects);
         sort(res.begin(), res.end(), order_rects);
         for (unsigned long i = 0; i < res.size(); ++i)
         {
-            DLIB_CASSERT(res[i] == true_rects[i],"i: " << i << "  res[i]: " << res[i] << "  true_rects[i]: " <<  true_rects[i]);
+            DLIB_TEST_MSG(res[i] == true_rects[i],
+                          "i: " << i << "  res[i]: " << res[i] << "  true_rects[i]: " <<  true_rects[i]);
         }
 
     }
@@ -100,32 +107,37 @@ namespace
         mat = 1;
         std::vector<rectangle> res = max_sum_submatrix(mat, 0, 0);
 
-        DLIB_CASSERT(res.size() == 0,"");
+        DLIB_TEST(res.size() == 0);
         res = max_sum_submatrix(mat, 1, 0);
-        DLIB_CASSERT(res.size() == 1,"");
-        DLIB_CASSERT(res[0] == get_rect(mat),"");
+        DLIB_TEST(res.size() == 1);
+        DLIB_TEST(res[0] == get_rect(mat));
         res = max_sum_submatrix(mat, 3, 0);
-        DLIB_CASSERT(res.size() == 1,"");
-        DLIB_CASSERT(res[0] == get_rect(mat),"");
+        DLIB_TEST(res.size() == 1);
+        DLIB_TEST(res[0] == get_rect(mat));
         res = max_sum_submatrix(mat, 3, 10);
-        DLIB_CASSERT(res.size() == 1,"");
-        DLIB_CASSERT(res[0] == get_rect(mat),"");
+        DLIB_TEST(res.size() == 1);
+        DLIB_TEST(res[0] == get_rect(mat));
 
         res = max_sum_submatrix(mat, 3, mat.size());
-        DLIB_CASSERT(res.size() == 0,"");
+        DLIB_TEST(res.size() == 0);
 
         mat = -1;
         res = max_sum_submatrix(mat, 1, 0);
-        DLIB_CASSERT(res.size() == 0,"");
+        DLIB_TEST(res.size() == 0);
 
+        const rectangle rect1 = rectangle(10,10,40,40);
+        const rectangle rect2 = rectangle(35,35,80,80);
 
-        set_subm(mat, rectangle(10,10,40,40)) = 2;
-        set_subm(mat, rectangle(35,35,80,80)) = 1;
+        set_subm(mat, rect1) = 2;
+        set_subm(mat, rect2) = 1;
         res = max_sum_submatrix(mat, 3, 0);
-        DLIB_CASSERT(res.size() == 2,res.size() << "   " << res[0]);
-        sort(res.begin(), res.end(), order_rects);
-        DLIB_CASSERT(res[0] == rectangle(10,10,40,40),"");
-        DLIB_CASSERT(res[1] == rectangle(35,35,80,80),"");
+        DLIB_TEST(res.size() == 2);
+        DLIB_TEST(res[0] == rect2);
+        DLIB_TEST(res[1] == rect1);
+
+        res = max_sum_submatrix(mat, 3, 2*rect1.area() - 2*(rect1.intersect(rect2)).area());
+        DLIB_TEST(res.size() == 1);
+        DLIB_TEST(res[0] == rect2);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -152,6 +164,7 @@ namespace
 
             run_test2<int>();
             run_test2<short>();
+            run_test2<signed char>();
             run_test2<float>();
             run_test2<double>();
         }
