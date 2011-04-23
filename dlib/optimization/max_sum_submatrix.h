@@ -212,8 +212,10 @@ namespace dlib
                 rectangle rect(left, q.top().top_min, 
                                right, q.top().bottom_min);
 
-                if (weight > thresh)
-                    results.push_back(rect);
+                if (weight <= thresh)
+                    break;
+
+                results.push_back(rect);
 
                 if (results.size() >= max_rects)
                     break;
