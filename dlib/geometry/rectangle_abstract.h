@@ -90,9 +90,10 @@ namespace dlib
                 - #bottom() == p.y()
         !*/
 
+        template <typename T>
         rectangle (
-            const point& p1,
-            const point& p2
+            const vector<T,2>& p1,
+            const vector<T,2>& p2
         );
         /*!
             ensures
