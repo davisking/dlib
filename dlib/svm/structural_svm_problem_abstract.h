@@ -51,7 +51,8 @@ namespace dlib
                     - let PSI(x,y)    == the joint feature vector for input x and a label y.
                     - let F(x,y|w)    == dot(w,PSI(x,y)).  
                     - let LOSS(idx,y) == the loss incurred for predicting that the ith-th training 
-                      sample has a label of y.  
+                      sample has a label of y.  Note that LOSS() should always be >= 0 and should
+                      become exactly 0 when y is the correct label for the idx-th sample.
                     - let x_i == the i-th training sample.
                     - let y_i == the correct label for the i-th training sample.
                     - The number of data samples is N.
@@ -205,7 +206,8 @@ namespace dlib
                     - let PSI(X,y)    == the joint feature vector for input X and an arbitrary label y.
                     - let F(X,y)      == dot(current_solution,PSI(X,y)).  
                     - let LOSS(idx,y) == the loss incurred for predicting that the ith-th sample
-                      has a label of y.  
+                      has a label of y.  Note that LOSS() should always be >= 0 and should
+                      become exactly 0 when y is the correct label for the idx-th sample.
 
                         Then the separation oracle finds a Y such that: 
                             Y = argmax over all y: LOSS(idx,y) + F(X,y) 
