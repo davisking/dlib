@@ -5,6 +5,7 @@
 
 #include "../pixel.h"
 #include "../array2d.h"
+#include "../geometry.h"
 
 namespace dlib
 {
