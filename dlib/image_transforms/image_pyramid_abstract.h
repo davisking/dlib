@@ -24,7 +24,7 @@ namespace dlib
         void operator() (
             const in_image_type& original,
             out_image_type& down
-        );
+        ) const;
         /*!
             requires
                 - original.nr() > 10

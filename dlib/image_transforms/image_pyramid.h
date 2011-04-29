@@ -21,7 +21,7 @@ namespace dlib
         void operator() (
             const in_image_type& original,
             out_image_type& down
-        )
+        ) const
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
