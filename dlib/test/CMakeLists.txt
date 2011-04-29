@@ -77,6 +77,7 @@ set (tests
    pipe.cpp
    pixel.cpp
    probabilistic.cpp
+   pyramid_down.cpp
    queue.cpp
    rand.cpp
    read_write_mutex.cpp

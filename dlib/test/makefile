@@ -87,6 +87,7 @@ SRC += opt_qp_solver.cpp
 SRC += pipe.cpp
 SRC += pixel.cpp
 SRC += probabilistic.cpp
+SRC += pyramid_down.cpp
 SRC += queue.cpp
 SRC += rand.cpp
 SRC += read_write_mutex.cpp
