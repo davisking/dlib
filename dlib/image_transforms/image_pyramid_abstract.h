@@ -49,6 +49,8 @@ namespace dlib
                     - 1. Applies a 5x5 Gaussian filter to the original image to smooth it a little.
                     - 2. Every other row and column is discarded to create an image half the size
                          of the original.  This smaller image is stored in #down.
+                - if both input and output images contain RGB pixels then the downsampled image will
+                  be in color.  Otherwise, the downsampling will be performed in a grayscale mode.
                 - The location of a point P in original image will show up at point point_down(P)
                   in the #down image.  
                 - Note that some points on the border of the original image will correspond to 
