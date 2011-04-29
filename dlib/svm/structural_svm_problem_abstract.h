@@ -14,7 +14,7 @@ namespace dlib
 
     template <
         typename matrix_type,
-        typename feature_vector_type_ 
+        typename feature_vector_type_ = matrix_type
         >
     class structural_svm_problem : public oca_problem<matrix_type> 
     {
