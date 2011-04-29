@@ -14,6 +14,85 @@ namespace dlib
     {
     public:
 
+        template <typename T>
+        vector<double,2> point_down (
+            const vector<T,2>& p
+        ) const
+        {
+            //do return (p - vector<T,2>(2,2))/2.0;
+            return p/2.0 - vector<double,2>(1,1);
+        }
+
+        template <typename T>
+        vector<double,2> point_up (
+            const vector<T,2>& p
+        ) const
+        {
+            return p*2 + vector<T,2>(2,2);
+        }
+
+    // -----------------------------
+
+        template <typename T>
+        vector<double,2> point_down (
+            const vector<T,2>& p,
+            unsigned int levels
+        ) const
+        {
+            vector<double,2> temp = p;
+            for (unsigned int i = 0; i < levels; ++i)
+                temp = point_down(temp);
+            return temp;
+        }
+
+        template <typename T>
+        vector<double,2> point_up (
+            const vector<T,2>& p,
+            unsigned int levels
+        ) const
+        {
+            vector<double,2> temp = p;
+            for (unsigned int i = 0; i < levels; ++i)
+                temp = point_up(temp);
+            return temp;
+        }
+
+    // -----------------------------
+
+        rectangle rect_up (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+        }
+
+        rectangle rect_up (
+            const rectangle& rect,
+            unsigned int levels
+        ) const
+        {
+            return rectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+        }
+
+    // -----------------------------
+
+        rectangle rect_down (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+        }
+
+        rectangle rect_down (
+            const rectangle& rect,
+            unsigned int levels
+        ) const
+        {
+            return rectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+        }
+
+    // -----------------------------
+
         template <
             typename in_image_type,
             typename out_image_type
