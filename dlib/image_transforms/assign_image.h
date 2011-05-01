@@ -16,6 +16,26 @@ namespace dlib
         typename dest_image_type,
         typename src_image_type
         >
+    void impl_assign_image (
+        dest_image_type& dest,
+        const src_image_type& src
+    )
+    {
+        dest.set_size(src.nr(),src.nc());
+
+        for (long r = 0; r < src.nr(); ++r)
+        {
+            for (long c = 0; c < src.nc(); ++c)
+            {
+                assign_pixel(dest[r][c], src(r,c));
+            }
+        }
+    }
+
+    template <
+        typename dest_image_type,
+        typename src_image_type
+        >
     void assign_image (
         dest_image_type& dest,
         const src_image_type& src
@@ -25,15 +45,7 @@ namespace dlib
         if (is_same_object(dest,src))
             return;
 
-        dest.set_size(src.nr(),src.nc());
-
-        for (long r = 0; r < src.nr(); ++r)
-        {
-            for (long c = 0; c < src.nc(); ++c)
-            {
-                assign_pixel(dest[r][c], src[r][c]);
-            }
-        }
+        impl_assign_image(dest, array_to_matrix(src));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -42,7 +54,7 @@ namespace dlib
         typename dest_image_type,
         typename src_image_type
         >
-    void assign_image_scaled (
+    void impl_assign_image_scaled (
         dest_image_type& dest,
         const src_image_type& src,
         const double thresh = 4
@@ -70,7 +82,7 @@ namespace dlib
 
         if (src.size() == 1)
         {
-            assign_pixel(dest[0][0], src[0][0]);
+            assign_pixel(dest[0][0], src(0,0));
             return;
         }
 
@@ -80,7 +92,7 @@ namespace dlib
         {
             for (long c = 0; c < src.nc(); ++c)
             {
-                rs.add(get_pixel_intensity(src[r][c]));
+                rs.add(get_pixel_intensity(src(r,c)));
             }
         }
         typedef typename pixel_traits<typename src_image_type::type>::basic_pixel_type spix_type;
@@ -92,7 +104,7 @@ namespace dlib
             if (pixel_traits<typename dest_image_type::type>::max() >= rs.max() &&
                 pixel_traits<typename dest_image_type::type>::min() <= rs.min() )
             {
-                assign_image(dest, src);
+                impl_assign_image(dest, src);
                 return;
             }
         }
@@ -112,11 +124,28 @@ namespace dlib
         {
             for (long c = 0; c < src.nc(); ++c)
             {
-                const double val = get_pixel_intensity(src[r][c]) - lower;
+                const double val = get_pixel_intensity(src(r,c)) - lower;
 
                 assign_pixel(dest[r][c], scale*val + dest_min);
             }
         }
+    }
+
+    template <
+        typename dest_image_type,
+        typename src_image_type
+        >
+    void assign_image_scaled (
+        dest_image_type& dest,
+        const src_image_type& src,
+        const double thresh = 4
+    )
+    {
+        // check for the case where dest is the same object as src
+        if (is_same_object(dest,src))
+            return;
+
+        impl_assign_image_scaled(dest, array_to_matrix(src),thresh);
     }
 
 // ----------------------------------------------------------------------------------------
