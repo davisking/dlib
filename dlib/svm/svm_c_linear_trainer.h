@@ -72,6 +72,8 @@ namespace dlib
         virtual bool optimization_status (
             scalar_type current_objective_value,
             scalar_type current_error_gap,
+            scalar_type ,
+            scalar_type ,
             unsigned long num_cutting_planes,
             unsigned long num_iterations
         ) const 

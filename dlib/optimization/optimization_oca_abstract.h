@@ -49,6 +49,8 @@ namespace dlib
         virtual bool optimization_status (
             scalar_type current_objective_value,
             scalar_type current_error_gap,
+            scalar_type current_risk_value,
+            scalar_type current_risk_gap,
             unsigned long num_cutting_planes,
             unsigned long num_iterations
         ) const = 0;
@@ -59,8 +61,10 @@ namespace dlib
                 - current_error_gap == The bound on how much lower the objective function
                   can drop before we reach the optimal point.  At the optimal solution the
                   error gap is equal to 0.
-                - num_cutting_planes == the number of cutting planes the algorithm is currently
-                  using
+                - current_risk_value == the current value of the R(w) term of the objective function.
+                - current_risk_gap == the bound on how much lower the risk term can go.  At the optimal
+                  solution the risk gap is zero.
+                - num_cutting_planes == the number of cutting planes the algorithm is currently using.
                 - num_iterations == A count of the total number of iterations that have executed
                   since we started running the optimization.
             ensures

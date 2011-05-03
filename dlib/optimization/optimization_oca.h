@@ -28,6 +28,8 @@ namespace dlib
         virtual bool optimization_status (
             scalar_type ,
             scalar_type ,
+            scalar_type ,
+            scalar_type ,
             unsigned long,
             unsigned long
         ) const = 0;
@@ -164,7 +166,6 @@ namespace dlib
             unsigned long counter = 0;
             while (true)
             {
-                ++counter;
 
                 // add the next cutting plane
                 scalar_type cur_risk;
@@ -180,8 +181,16 @@ namespace dlib
                 else
                     alpha = join_cols(alpha,zeros_matrix<scalar_type>(1,1));
 
-                cur_obj = 0.5*trans(w)*w + C*cur_risk;
+                const scalar_type wnorm = 0.5*trans(w)*w;
+                cur_obj = wnorm + C*cur_risk;
 
+                // report current status
+                const scalar_type risk_gap = cur_risk - (cp_obj-wnorm)/C;
+                if (counter > 0 && problem.optimization_status(cur_obj, cur_obj - cp_obj, 
+                                                               cur_risk, risk_gap, planes.size(), counter))
+                {
+                    break;
+                }
 
                 // compute kernel matrix for all the planes
                 K.swap(Ktmp);
@@ -230,9 +239,6 @@ namespace dlib
                 // plane subproblem.
                 cp_obj = -0.5*trans(w)*w + trans(alpha)*vector_to_matrix(bs);
 
-                // report current status
-                if (problem.optimization_status(cur_obj, cur_obj - cp_obj, planes.size(), counter))
-                    break;
 
                 // If it has been a while since a cutting plane was an active constraint then
                 // we should throw it away.
@@ -248,6 +254,7 @@ namespace dlib
                     alpha = remove_row(alpha,idx);
                 }
 
+                ++counter;
             }
 
             return cur_obj;
