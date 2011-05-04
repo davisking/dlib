@@ -208,21 +208,23 @@ namespace dlib
     };
 
     template <
-        typename T
+        typename T,
+        typename mem_manager
         >
     inline void swap (
-        array2d<T>& a, 
-        array2d<T>& b 
+        array2d<T,mem_manager>& a, 
+        array2d<T,mem_manager>& b 
     ) { a.swap(b); }   
     /*!
         provides a global swap function
     !*/
 
     template <
-        typename T
+        typename T,
+        typename mem_manager
         >
     void serialize (
-        const array2d<T>& item, 
+        const array2d<T,mem_manager>& item, 
         std::ostream& out 
     );   
     /*!
@@ -230,10 +232,11 @@ namespace dlib
     !*/
 
     template <
-        typename T 
+        typename T,
+        typename mem_manager
         >
     void deserialize (
-        array2d<T>& item, 
+        array2d<T,mem_manager>& item, 
         std::istream& in
     );   
     /*!
