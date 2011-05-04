@@ -329,7 +329,7 @@ namespace
             std::vector< dlib::vector<double> > a;
 
             dlib::vector<double> v;
-            dlib::rand::float_1a rnd;
+            dlib::rand rnd;
 
             for (int i = 0; i < 10; ++i)
             {

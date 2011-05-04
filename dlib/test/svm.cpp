@@ -58,7 +58,7 @@ namespace
 
         sample_type m;
 
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
 
         print_spinner();
         // we will make 50 points from each class
@@ -549,7 +549,7 @@ namespace
         offset_kernel<sigmoid_kernel<sample_type> > k5;
         offset_kernel<radial_basis_kernel<sample_type> > k6;
 
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
 
         sample_type x, y;
         for (int i = 0; i < 10; ++i)

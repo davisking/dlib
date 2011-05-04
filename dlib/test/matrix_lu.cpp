@@ -24,7 +24,7 @@ namespace
 
     logger dlog("test.matrix_lu");
 
-    dlib::rand::float_1a rnd;
+    dlib::rand rnd;
 
 // ----------------------------------------------------------------------------------------
 

@@ -82,7 +82,7 @@ namespace dlib
         std::vector<sample_pair, alloc> edges;
         edges.reserve(num);
 
-        dlib::rand::kernel_1a rnd;
+        dlib::rand rnd;
         rnd.set_seed(cast_to_string(random_seed));
 
         // randomly sample a bunch of edges
@@ -211,7 +211,7 @@ namespace dlib
         std::vector<sample_pair, alloc> temp;
         temp.reserve(num);
 
-        dlib::rand::kernel_1a rnd;
+        dlib::rand rnd;
         rnd.set_seed(cast_to_string(random_seed));
 
         // randomly sample a bunch of edges

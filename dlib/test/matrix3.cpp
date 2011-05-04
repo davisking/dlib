@@ -87,7 +87,7 @@ namespace
     }
 
     template <typename type>
-    type rnd_num (dlib::rand::float_1a& rnd)
+    type rnd_num (dlib::rand& rnd)
     {
         return static_cast<type>(10*rnd.get_random_double());
     }
@@ -99,7 +99,7 @@ namespace
         // It does this by performing an assignment that is subject to BLAS bindings and comparing the
         // results directly to an unevaluated matrix_exp that should be equal.
 
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
 
         matrix<type> a(rows,cols), temp, temp2, temp3;
 

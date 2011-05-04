@@ -33,7 +33,7 @@ namespace
             - runs tests on array for compliance with the specs
     !*/
     {        
-        dlib::rand::kernel_1a rnd;
+        dlib::rand rnd;
 
 
         array a1, a2;

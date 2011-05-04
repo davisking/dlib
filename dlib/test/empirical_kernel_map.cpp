@@ -38,7 +38,7 @@ namespace
         }
 
         time_t thetime;
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
 
         void test_projection_error()
         {

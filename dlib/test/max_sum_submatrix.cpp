@@ -43,7 +43,7 @@ namespace
         const int num
     )
     {
-        static dlib::rand::kernel_1a rnd;
+        static dlib::rand rnd;
 
         matrix<int> mat, mask;
 

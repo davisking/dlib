@@ -857,7 +857,7 @@ namespace
 
         // test apq with a big vector
         p.set_size(500);
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
         for (long i = 0; i < p.size(); ++i)
         {
             p(i) = rnd.get_random_double()*20 - 10; 

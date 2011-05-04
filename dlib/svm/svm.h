@@ -772,7 +772,7 @@ namespace dlib
         U& u
     )
     {
-        rand::kernel_1a r;
+        rand r;
         randomize_samples(t,u,r);
     }
 
@@ -846,7 +846,7 @@ namespace dlib
         T& t
     )
     {
-        rand::kernel_1a r;
+        rand r;
         randomize_samples(t,r);
     }
 

@@ -484,7 +484,7 @@ namespace dlib
         const vector_type& samples
     )
     {   
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
         impl::fill_lisf(lisf, vector_to_matrix(samples),rnd, 2000);
     }
 
@@ -515,7 +515,7 @@ namespace dlib
         const int sampling_size = 2000
     )
     {   
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
         rnd.set_seed(cast_to_string(random_seed));
         impl::fill_lisf(lisf, vector_to_matrix(samples), rnd, sampling_size);
     }

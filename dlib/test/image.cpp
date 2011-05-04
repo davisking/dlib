@@ -449,7 +449,7 @@ namespace
     void test_integral_image (
     )
     {
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
 
         array2d<unsigned char>::kernel_1a_c img;
         integral_image int_img;

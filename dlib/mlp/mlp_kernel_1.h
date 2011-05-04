@@ -362,7 +362,7 @@ namespace dlib
         matrix<double> w3m;
 
 
-        rand::float_1a rand_nums;
+        rand rand_nums;
 
         // temporary storage
         mutable matrix<double> e1, e2, e3;

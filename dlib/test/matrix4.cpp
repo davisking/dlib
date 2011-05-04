@@ -523,7 +523,7 @@ namespace
         }
 
 
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
         for (int i = 0; i < 1; ++i)
         {
             matrix<double> d1 = randm(4,1,rnd);

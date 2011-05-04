@@ -133,7 +133,7 @@ namespace
         void test_running_covariance (
         )
         {
-            dlib::rand::float_1a rnd;
+            dlib::rand rnd;
             std::vector<matrix<double,0,1> > vects;
 
             running_covariance<matrix<double,0,1> > cov, cov2;

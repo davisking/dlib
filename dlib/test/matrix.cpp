@@ -734,7 +734,7 @@ namespace
             a.set_size(1000,10);
             b.set_size(1000,10);
             i.set_size(1000,10);
-            dlib::rand::float_1a rnd;
+            dlib::rand rnd;
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)

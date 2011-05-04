@@ -422,7 +422,7 @@ namespace dlib
             // we will use a linearly_independent_subset_finder to store our basis set. 
             linearly_independent_subset_finder<kernel_type> lisf(get_kernel(), max_basis_size);
 
-            dlib::rand::kernel_1a rnd;
+            dlib::rand rnd;
 
             // first pick the initial basis set randomly
             for (unsigned long i = 0; i < 10*initial_basis_size && lisf.size() < initial_basis_size; ++i)

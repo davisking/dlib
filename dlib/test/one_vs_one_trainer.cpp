@@ -45,7 +45,7 @@ namespace
 
             sample_type m;
 
-            dlib::rand::float_1a rnd;
+            dlib::rand rnd;
 
 
             // make some samples near the origin

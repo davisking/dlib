@@ -25,7 +25,7 @@ namespace
 
     logger dlog("test.matrix2");
 
-    dlib::rand::float_1a rnd;
+    dlib::rand rnd;
 
     void matrix_test (
     )

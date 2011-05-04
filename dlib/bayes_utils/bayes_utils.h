@@ -1188,7 +1188,7 @@ namespace dlib
 
         assignment v;
 
-        dlib::rand::float_1a rnd;
+        dlib::rand rnd;
         matrix<double,1> samples; 
     };
 

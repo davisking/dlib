@@ -27,7 +27,7 @@ namespace dlib
               board_dimension squares on each side. 
     !*/
     {
-        static dlib::rand::float_1a rnd;
+        static dlib::rand rnd;
 
         x.clear();
         y.clear();
