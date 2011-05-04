@@ -700,7 +700,15 @@ subject to the following constraint:
                 <br/>
                 <br/>
 
-                For further information you should consult the following paper: 
+                For an introduction to structured support vector machines you should consult 
+                the following paper: 
+                <blockquote>
+                    Predicting Structured Objects with Support Vector Machines by 
+                    By Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
+                </blockquote>
+
+                For a more detailed discussion of the particular algorithm implemented by this
+                object see the following paper:  
                 <blockquote>
                     T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural SVMs, 
                     Machine Learning, 77(1):27-59, 2009.
