@@ -19,10 +19,7 @@ namespace dlib
 
 
             WHAT THIS OBJECT REPRESENTS
-                this object represents a pseudorandom number generator.
-
-                note that different implementations do not necessairly return the 
-                same sequence of random numbers given the same seed.
+                This object represents a pseudorandom number generator.
         !*/
         
         public:
@@ -93,6 +90,24 @@ namespace dlib
             /*!
                 ensures
                     - returns a pseudorandom number in the range 0 to 2^32-1 
+                throws
+                    - std::bad_alloc
+            !*/
+
+            float get_random_float (
+            );
+            /*!
+                ensures
+                    - returns a random float number N where:  0.0 <= N < 1.0.
+                throws
+                    - std::bad_alloc
+            !*/
+
+            double get_random_double (
+            );
+            /*!
+                ensures
+                    - returns a random double number N where:  0.0 <= N < 1.0.
                 throws
                     - std::bad_alloc
             !*/

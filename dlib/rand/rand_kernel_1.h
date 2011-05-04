@@ -15,7 +15,7 @@ namespace dlib
 {
 
 
-    class rand_kernel_1
+    class rand
     {
 
         /*!       
@@ -29,15 +29,24 @@ namespace dlib
         
         public:
 
-            rand_kernel_1(
+            // These typedefs are here for backwards compatibility with older versions of dlib.
+            typedef rand kernel_1a;
+            typedef rand float_1a;
+
+            rand(
             ) 
             {
                 // prime the generator a bit
                 for (int i = 0; i < 10000; ++i)
                     mt();
+
+                max_val =  0xFFFFFF;
+                max_val *= 0x1000000;
+                max_val += 0xFFFFFF;
+                max_val += 0.01;
             }
 
-            virtual ~rand_kernel_1(
+            virtual ~rand(
             )
             {}
 
@@ -103,8 +112,61 @@ namespace dlib
                 return mt();
             }
 
+            double get_random_double (
+            )
+            {
+                uint32 temp;
+
+                temp = rand::get_random_32bit_number();
+                temp &= 0xFFFFFF;
+
+                double val = static_cast<double>(temp);
+
+                val *= 0x1000000;
+
+                temp = rand::get_random_32bit_number();
+                temp &= 0xFFFFFF;
+
+                val += temp;
+
+                val /= max_val;
+
+                if (val < 1.0)
+                {
+                    return val;
+                }
+                else
+                {
+                    // return a value slightly less than 1.0
+                    return 1.0 - std::numeric_limits<double>::epsilon();
+                }
+            }
+
+            float get_random_float (
+            )
+            {
+                uint32 temp;
+
+                temp = rand::get_random_32bit_number();
+                temp &= 0xFFFFFF;
+
+                const float scale = 1.0/0x1000000;
+
+                const float val = static_cast<float>(temp)*scale;
+                if (val < 1.0f)
+                {
+                    return val;
+                }
+                else
+                {
+                    // return a value slightly less than 1.0
+                    return 1.0f - std::numeric_limits<float>::epsilon();
+                }
+            }
+
+
             void swap (
-                rand_kernel_1& item
+                rand& item
             )
             {
                 exchange(mt,item.mt);
@@ -112,12 +174,12 @@ namespace dlib
             }
     
             friend void serialize(
-                const rand_kernel_1& item, 
+                const rand& item, 
                 std::ostream& out
             );
 
             friend void deserialize(
-                rand_kernel_1& item, 
+                rand& item, 
                 std::istream& in 
             );
 
@@ -125,23 +187,26 @@ namespace dlib
             mt19937 mt;
 
             std::string seed;
+
+
+            double max_val;
     };
 
 
     inline void swap (
-        rand_kernel_1& a, 
-        rand_kernel_1& b 
+        rand& a, 
+        rand& b 
     ) { a.swap(b); }   
 
 
     template <>
-    struct is_rand<rand_kernel_1>
+    struct is_rand<rand>
     {
         static const bool value = true; 
     };
 
     inline void serialize(
-        const rand_kernel_1& item, 
+        const rand& item, 
         std::ostream& out
     )
     {
@@ -150,7 +215,7 @@ namespace dlib
     }
 
     inline void deserialize(
-        rand_kernel_1& item, 
+        rand& item, 
         std::istream& in 
     )
     {
