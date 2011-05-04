@@ -61,7 +61,7 @@ int main()
 
     sample_type m;
 
-    dlib::rand::float_1a rnd;
+    dlib::rand rnd;
 
     // we will make 50 points from each class
     const long num = 50;

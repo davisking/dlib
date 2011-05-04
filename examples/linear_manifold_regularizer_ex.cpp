@@ -258,7 +258,7 @@ void test_manifold_regularization (
 
 // ----------------------------------------------------------------------------------------
 
-dlib::rand::float_1a rnd;
+dlib::rand rnd;
 
 void generate_circle (
     std::vector<sample_type>& samples,

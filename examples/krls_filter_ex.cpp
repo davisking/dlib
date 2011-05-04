@@ -61,7 +61,7 @@ int main()
     // faster filtering and won't introduce much error.
     krls<kernel_type> test(kernel_type(0.05),0.001,7);
 
-    dlib::rand::float_1a rnd;
+    dlib::rand rnd;
 
     // Now lets loop over a big range of values from the sinc() function.  Each time
     // adding some random noise to the data we send to the krls object for training.

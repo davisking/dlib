@@ -40,7 +40,7 @@ int main()
     std::vector<sample_type> samples;
     std::vector<double> labels;
 
-    dlib::rand::float_1a rnd;
+    dlib::rand rnd;
 
     for (int x = -30; x <= 30; ++x)
     {

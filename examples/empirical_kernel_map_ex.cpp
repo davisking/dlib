@@ -320,7 +320,7 @@ void generate_concentric_circles (
     samples.clear();
     labels.clear();
 
-    dlib::rand::float_1a rnd;
+    dlib::rand rnd;
 
     // make some samples near the origin
     double radius = 1.0;

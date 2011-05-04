@@ -32,7 +32,7 @@ using namespace dlib;
 // ----------------------------------------------------------------------------------------
 
 // This declares a random number generator that we will be using below  
-dlib::rand::float_1a rnd;
+dlib::rand rnd;
 
 // ----------------------------------------------------------------------------------------
 
