@@ -64,15 +64,21 @@ namespace dlib
                     and sample_risk(i,w) == max over all Y: LOSS(i,Y) + F(x_i,Y|w) - F(x_i,y_i|w)
                     and C > 0
 
+                
 
-                For further information you should consult the following paper: 
+                For an introduction to structured support vector machines you should consult 
+                the following paper: 
+                    Predicting Structured Objects with Support Vector Machines by 
+                    By Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
+
+                For a more detailed discussion of the particular algorithm implemented by this
+                object see the following paper:  
                     T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural SVMs, 
                     Machine Learning, 77(1):27-59, 2009.
 
                     Note that this object is essentially a tool for solving the 1-Slack structural
                     SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced 
                     paper.
-
         !*/
 
         typedef typename matrix_type::type scalar_type;
@@ -101,7 +107,8 @@ namespace dlib
             ensures
                 - returns the error epsilon that determines when training should stop.
                   Smaller values may result in a more accurate solution but take longer 
-                  to execute.
+                  to execute.  Specifically, the algorithm stops when the average sample
+                  risk (i.e. R(w) as defined above) is within epsilon of its optimal value.
         !*/
 
         void set_max_cache_size (

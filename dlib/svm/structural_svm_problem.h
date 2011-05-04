@@ -164,9 +164,7 @@ namespace dlib
 
             bool should_stop = false;
 
-            if (current_objective_value == 0)
-                should_stop = true;
-            else if (current_error_gap/current_objective_value < eps)
+            if (current_risk_gap < eps)
                 should_stop = true;
 
             if (should_stop && !skip_cache)
