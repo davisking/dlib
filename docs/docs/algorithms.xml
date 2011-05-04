@@ -179,58 +179,6 @@
             This object represents a pseudorandom number generator.
          </description>
          
-         <implementations>
-            <implementation>
-               <name>rand_kernel_1</name>
-               <file>dlib/rand/rand_kernel_1.h</file>
-               <description> 
-                  This implementation is done using the Mersenne Twister algorithm.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for rand_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-         
-         <extensions>
-      
-            <extension>
-               <name>rand_float</name>
-               <spec_file>dlib/rand/rand_float_abstract.h</spec_file>
-               <description> 
-                  This extension gives rand the ability to generate random floating point numbers.
-               </description> 
-
-               <implementations>
-                  <implementation>
-                     <name>rand_float_1</name>
-                     <file>dlib/rand/rand_float_1.h</file>
-                     <description> 
-                        The implementation is obvious.  Click on the link if you want to see.                        
-                     </description> 
-
-                     <typedefs>
-                        <typedef>
-                           <name>float_1a</name>
-                           <description>is a typedef for rand_kernel_1a extended by rand_float_1</description>
-                        </typedef>
-                     </typedefs>                
-                     
-                  </implementation> 
-                           
-               </implementations>
-   
-               
-            </extension>
-         </extensions>
-               
-                        
       </component>
             
    <!-- ************************************************************************* -->
