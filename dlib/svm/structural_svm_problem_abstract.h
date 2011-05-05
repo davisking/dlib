@@ -109,6 +109,11 @@ namespace dlib
                   Smaller values may result in a more accurate solution but take longer 
                   to execute.  Specifically, the algorithm stops when the average sample
                   risk (i.e. R(w) as defined above) is within epsilon of its optimal value.
+
+                  Also note that sample risk is an upper bound on a sample's loss.  So
+                  you can think of this epsilon value as saying "solve the optimization
+                  problem until the average loss per sample is within epsilon of it's 
+                  optimal value".
         !*/
 
         void set_max_cache_size (
