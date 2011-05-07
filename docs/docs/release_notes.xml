@@ -12,12 +12,38 @@
 
 <current>
 New Stuff:
+   - Added the max_sum_submatrix() function to the optimization tools.
+   - Upgraded the pyramid_down function object so it can create color pyramids.  
+     Also, added some functions which define the coordinate transforms between 
+     different layers in an image pyramid.  
  
 Non-Backwards Compatible Changes:
+   - Changed the oca_problem interface to the oca optimizer.  Now the 
+     optimization_status() function reports back the current risk and risk gap 
+     in addition to the overall objective value and objective gap. 
+   - Changed the stopping condition for the structured svm to the one suggested
+     by the Joachims paper.  Now it stops when the risk gap is below a user
+     supplied epsilon. 
 
 Bug fixes:
 
 Other:
+   - Various usability improvements.
+   - Improved the feature vector caching in the structural_svm_problem object.
+   - Some objects were setup as multi-implementation objects but only had one 
+     implementation.  I went through dlib and switched these to single implementation 
+     objects.  So for example, to use the dlib crc32 module you used to declare an 
+     object of type "crc32::kernel_1a" but now you can just say "crc32".  Note that 
+     I did this change in a way that maintains backwards compatibility with previous 
+     versions.  So crc32::kernel_1a is still allowed but that form is officially 
+     deprecated.  The modified objects are as follows:
+      - base64
+      - byte_orderer
+      - config_reader
+      - crc32
+      - pipe
+      - rand
+
 </current>
 
 <!-- *******************************************************************************  -->
