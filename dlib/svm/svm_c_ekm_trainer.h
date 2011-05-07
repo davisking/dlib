@@ -34,8 +34,8 @@ namespace dlib
             verbose = false;
             ekm_stale = true;
 
-            initial_basis_size = 5;
-            basis_size_increment = 10;
+            initial_basis_size = 10;
+            basis_size_increment = 50;
             max_basis_size = 300;
         }
 
@@ -56,8 +56,8 @@ namespace dlib
             verbose = false;
             ekm_stale = true;
 
-            initial_basis_size = 5;
-            basis_size_increment = 10;
+            initial_basis_size = 10;
+            basis_size_increment = 50;
             max_basis_size = 300;
         }
 
