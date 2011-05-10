@@ -193,9 +193,13 @@ namespace dlib
             feature_vector_type ftemp;
             const unsigned long num = get_num_samples();
 
-            // initialize psi_true if we haven't done so already.  
+            // initialize psi_true and a few other things if we haven't done so already.  
             if (psi_true.size() == 0)
             {
+                // initialize the cache if necessary.
+                if (cache.size() == 0 && max_cache_size != 0)
+                    cache.resize(get_num_samples());
+
                 psi_true.set_size(w.size(),1);
                 psi_true = 0;
 
@@ -255,9 +259,6 @@ namespace dlib
             feature_vector_type& psi
         ) const 
         {
-
-            if (cache.size() == 0 && max_cache_size != 0)
-                cache.resize(get_num_samples());
 
             if (!skip_cache && max_cache_size != 0)
             {
