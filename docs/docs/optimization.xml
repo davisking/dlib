@@ -731,7 +731,7 @@ subject to the following constraint:
          <description>
             This is just a version of the <a href="#structural_svm_problem">structural_svm_problem</a> 
             which is capable of using multiple cores/threads at a time.  You should use it if
-            you have a multi-core CPU.
+            you have a multi-core CPU and the separation oracle takes a long time to compute.
          </description>
                                  
       </component>
