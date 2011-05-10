@@ -4,6 +4,7 @@
 #define DLIB_SVm_MULTICLASS_LINEAR_TRAINER_H__
 
 #include "svm_multiclass_linear_trainer_abstract.h"
+#include "structural_svm_problem.h"
 #include <vector>
 #include "../optimization/optimization_oca.h"
 #include "../matrix.h"
