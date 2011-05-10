@@ -222,13 +222,7 @@ namespace dlib
 
             subgradient = psi_true;
             scalar_type total_loss = 0;
-            for (unsigned long i = 0; i < num; ++i)
-            {
-                scalar_type loss;
-                separation_oracle_cached(i, w, loss, ftemp);
-                total_loss += loss;
-                sparse_vector::add_to(subgradient, ftemp);
-            }
+            call_separation_oracle_on_all_samples(w,subgradient,total_loss);
 
             subgradient /= num;
             total_loss /= num;
@@ -236,6 +230,24 @@ namespace dlib
             risk = std::max<scalar_type>(total_loss + dot(subgradient,w), 0);
         }
 
+        virtual void call_separation_oracle_on_all_samples (
+            matrix_type& w,
+            matrix_type& subgradient,
+            scalar_type& total_loss
+        ) const
+        {
+            feature_vector_type ftemp;
+            const unsigned long num = get_num_samples();
+            for (unsigned long i = 0; i < num; ++i)
+            {
+                scalar_type loss;
+                separation_oracle_cached(i, w, loss, ftemp);
+                total_loss += loss;
+                sparse_vector::add_to(subgradient, ftemp);
+            }
+        }
+
+    protected:
         void separation_oracle_cached (
             const long idx,
             const matrix_type& current_solution,
@@ -312,6 +324,7 @@ namespace dlib
                 }
             }
         }
+    private:
 
         struct cache_record
         {
