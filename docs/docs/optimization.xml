@@ -45,6 +45,7 @@
          <item>solve_qp3_using_smo</item> 
          <item>oca</item> 
          <item>structural_svm_problem</item> 
+         <item>structural_svm_problem_threaded</item> 
          <item>solve_least_squares</item> 
          <item>solve_least_squares_lm</item> 
          <item>solve_trust_region_subproblem</item> 
@@ -717,6 +718,20 @@ subject to the following constraint:
                     Note that this object is essentially a tool for solving the 1-Slack structural
                     SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced 
                     paper.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>structural_svm_problem_threaded</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_problem_threaded_abstract.h</spec_file>
+         <description>
+            This is just a version of the <a href="#structural_svm_problem">structural_svm_problem</a> 
+            which is capable of using multiple cores/threads at a time.  You should use it if
+            you have a multi-core CPU.
          </description>
                                  
       </component>
