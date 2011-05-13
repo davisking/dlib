@@ -15,6 +15,17 @@ namespace test
 // -----------------------------------------------------------------------------
 
     static dlib::mutex spinner_mutex;
+    static dlib::mutex test_count_mutex;
+    dlib::uint64 test_count = 0;
+
+// -----------------------------------------------------------------------------
+
+    dlib::uint64 number_of_testing_statements_executed (
+    )
+    {
+        dlib::auto_mutex lock(test_count_mutex);
+        return test_count;
+    }
 
 // -----------------------------------------------------------------------------
 
@@ -25,13 +36,40 @@ namespace test
         const char* _exp_str
     )
     {
+        test_count_mutex.lock();
+        ++test_count;
+        test_count_mutex.unlock();
         if ( !(_exp) )                                                         
         {                                                                       
             std::ostringstream dlib__out;                                       
-                dlib__out << "\n\nError occurred at line " << line << ".\n";    
-                dlib__out << "Error occurred in file " << file << ".\n";      
-                dlib__out << "Failing expression was " << _exp_str << ".\n";           
-                throw dlib::error(dlib__out.str());      
+            dlib__out << "\n\nError occurred at line " << line << ".\n";    
+            dlib__out << "Error occurred in file " << file << ".\n";      
+            dlib__out << "Failing expression was " << _exp_str << ".\n";           
+            throw dlib::error(dlib__out.str());      
+        }
+    }                                                                      
+
+// -----------------------------------------------------------------------------
+
+    void check_test_msg (
+        bool _exp,
+        long line,
+        const char* file,
+        const char* _exp_str,
+        const char* _msg
+    )
+    {
+        test_count_mutex.lock();
+        ++test_count;
+        test_count_mutex.unlock();
+        if ( !(_exp) )                                                         
+        {                                                                       
+            std::ostringstream dlib__out;                                       
+            dlib__out << "\n\nError occurred at line " << line << ".\n";    
+            dlib__out << "Error occurred in file " << file << ".\n";      
+            dlib__out << "Failing expression was " << _exp_str << ".\n";           
+            dlib__out << _msg << "\n";                                      
+            throw dlib::error(dlib__out.str());      
         }
     }                                                                      
 

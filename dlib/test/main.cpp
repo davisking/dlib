@@ -185,8 +185,10 @@ int main (int argc, char** argv)
             if (be_verbose)
             {
                 cout << "\n\nTesting Finished\n";
+                cout << "Total number of individual testing statements executed: "<< number_of_testing_statements_executed() << endl;
                 cout << "All tests completed successfully\n\n";
             }
+            dlog << LINFO << "Total number of individual testing statements executed: "<< number_of_testing_statements_executed();
             dlog << LINFO << "All tests completed successfully";
         }
         else
@@ -194,9 +196,11 @@ int main (int argc, char** argv)
             if (be_verbose)
             {
                 cout << "\n\nTesting Finished\n";
+                cout << "Total number of individual testing statements executed: "<< number_of_testing_statements_executed() << endl;
                 cout << "Number of failed tests: " << num_of_failed_tests << "\n";
                 cout << "Number of passed tests: " << num_of_passed_tests << "\n\n";
             }
+            dlog << LINFO << "Total number of individual testing statements executed: "<< number_of_testing_statements_executed();
             dlog << LWARN << "Number of failed tests: " << num_of_failed_tests;
             dlog << LWARN << "Number of passed tests: " << num_of_passed_tests;
         }

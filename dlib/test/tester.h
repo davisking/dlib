@@ -18,17 +18,7 @@
 
 
 #define DLIB_TEST(_exp) check_test(_exp, __LINE__, __FILE__, #_exp);
-
-#define DLIB_TEST_MSG(_exp,_message)                                        \
-    {if ( !(_exp) )                                                         \
-    {                                                                       \
-        std::ostringstream dlib__out;                                       \
-        dlib__out << "\n\nError occurred at line " << __LINE__ << ".\n";    \
-        dlib__out << "Error occurred in file " << __FILE__ << ".\n";      \
-        dlib__out << "Failing expression was " << #_exp << ".\n";           \
-        dlib__out << _message << "\n";                                      \
-        throw dlib::error(dlib__out.str());      \
-    }}                                                                      
+#define DLIB_TEST_MSG(_exp,_message) check_test_msg(_exp, __LINE__, __FILE__, #_exp, #_message);
 
 namespace test
 {
@@ -47,11 +37,29 @@ namespace test
         const char* _exp_str
     );
     
+    void check_test_msg (
+        bool _exp,
+        long line,
+        const char* file,
+        const char* _exp_str,
+        const char* _msg
+    );
+    
 // -----------------------------------------------------------------------------
 
 // This bool controls any cout statements in this program.  Only print to 
 // standard out if we should be verbose.  The default is true
     extern bool be_verbose;
+
+// -----------------------------------------------------------------------------
+
+    dlib::uint64 number_of_testing_statements_executed (
+    );
+    /*!
+        ensures
+            - returns the total number of DLIB_TEST and DLIB_TEST_MSG
+              statements executed since program startup.
+    !*/
 
 // -----------------------------------------------------------------------------
 
