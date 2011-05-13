@@ -97,6 +97,15 @@ namespace dlib
         void enable_enqueue (
         );
 
+        bool is_dequeue_enabled (
+        ) const;
+
+        void disable_dequeue (
+        );
+
+        void enable_dequeue (
+        );
+
         bool is_enabled (
         ) const;
 
@@ -144,6 +153,7 @@ namespace dlib
         mutable unsigned long enqueue_waiters;
         mutable unsigned long unblock_sig_waiters;
         bool enqueue_enabled;
+        bool dequeue_enabled;
 
         // restricted functions
         pipe(const pipe&);        // copy constructor
@@ -176,7 +186,8 @@ namespace dlib
         dequeue_waiters(0),
         enqueue_waiters(0),
         unblock_sig_waiters(0),
-        enqueue_enabled(true)
+        enqueue_enabled(true),
+        dequeue_enabled(true)
     {
     }
 
@@ -236,7 +247,7 @@ namespace dlib
         // this function is sort of like a call to enqueue so treat it like that
         ++enqueue_waiters;
 
-        while (pipe_size > 0 && enabled )
+        while (pipe_size > 0 && enabled && dequeue_enabled )
             enqueue_sig.wait();
 
         // let the destructor know we are ending if it is blocked waiting
@@ -424,11 +435,11 @@ namespace dlib
         }
 
         // wait until there is something in the pipe or we are disabled 
-        while (pipe_size == 0 && enabled &&
+        while (pipe_size == 0 && enabled && dequeue_enabled &&
                !(pipe_max_size == 0 && first == 0 && last == 0) )
             dequeue_sig.wait();
 
-        if (enabled == false)
+        if (enabled == false || dequeue_enabled == false)
         {
             --dequeue_waiters;
             // let the destructor know we are unblocking
@@ -581,7 +592,7 @@ namespace dlib
 
         bool timed_out = false;
         // wait until there is something in the pipe or we are disabled or we timeout.
-        while (pipe_size == 0 && enabled && 
+        while (pipe_size == 0 && enabled && dequeue_enabled &&
                !(pipe_max_size == 0 && first == 0 && last == 0) )
         {
             if (timeout == 0 || dequeue_sig.wait_or_timeout(timeout) == false)
@@ -591,7 +602,7 @@ namespace dlib
             }
         }
 
-        if (enabled == false || timed_out)
+        if (enabled == false || timed_out || dequeue_enabled == false)
         {
             --dequeue_waiters;
             // let the destructor know we are unblocking
@@ -636,7 +647,7 @@ namespace dlib
         auto_mutex M(m);
         ++unblock_sig_waiters;
 
-        while ( (dequeue_waiters < num || pipe_size != 0) && enabled)
+        while ( (dequeue_waiters < num || pipe_size != 0) && enabled && dequeue_enabled)
             unblock_sig.wait();
 
         // let the destructor know we are ending if it is blocked waiting
@@ -685,6 +696,47 @@ namespace dlib
     {
         auto_mutex M(m);
         enqueue_enabled = true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    bool pipe<T>::
+    is_dequeue_enabled (
+    ) const
+    {
+        auto_mutex M(m);
+        return dequeue_enabled;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    void pipe<T>::
+    disable_dequeue (
+    )
+    {
+        auto_mutex M(m);
+        dequeue_enabled = false;
+        dequeue_sig.broadcast();
+    }
+
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    void pipe<T>::
+    enable_dequeue (
+    )
+    {
+        auto_mutex M(m);
+        dequeue_enabled = true;
     }
 
 // ----------------------------------------------------------------------------------------

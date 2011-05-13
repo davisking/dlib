@@ -22,6 +22,7 @@ namespace dlib
                 size() == 0
                 is_enabled() == true
                 is_enqueue_enabled() == true
+                is_dequeue_enabled() == true
 
             WHAT THIS OBJECT REPRESENTS
                 This is a first in first out queue with a fixed maximum size containing 
@@ -64,6 +65,26 @@ namespace dlib
                 - #is_enabled() == true
         !*/
 
+        void disable (
+        );
+        /*!
+            ensures
+                - #is_enabled() == false
+                - causes all current and future calls to enqueue(), dequeue(),
+                  enqueue_or_timeout() and dequeue_or_timeout() to not block but 
+                  to return false immediately until enable() is called.
+                - causes all current and future calls to wait_until_empty() and
+                  wait_for_num_blocked_dequeues() to not block but return
+                  immediately until enable() is called.
+        !*/
+
+        bool is_enabled (
+        ) const;
+        /*!
+            ensures
+                - returns true if this pipe is currently enabled, false otherwise.
+        !*/
+
         void empty (
         );
         /*!
@@ -78,6 +99,7 @@ namespace dlib
                 - blocks until one of the following is the case:
                     - size() == 0  
                     - is_enabled() == false
+                    - is_dequeue_enabled() == false
         !*/
 
         void wait_for_num_blocked_dequeues (
@@ -90,6 +112,7 @@ namespace dlib
                       to dequeue() and dequeue_or_timeout() is greater than 
                       or equal to num.
                     - is_enabled() == false
+                    - is_dequeue_enabled() == false
         !*/
 
         bool is_enqueue_enabled (
@@ -122,24 +145,34 @@ namespace dlib
                 - #is_enqueue_enabled() == true
         !*/
 
-        void disable (
-        );
-        /*!
-            ensures
-                - #is_enabled() == false
-                - causes all current and future calls to enqueue(), dequeue(),
-                  enqueue_or_timeout() and dequeue_or_timeout() to not block but 
-                  to return false immediately until enable() is called.
-                - causes all current and future calls to wait_until_empty() and
-                  wait_for_num_blocked_dequeues() to not block but return
-                  immediately until enable() is called.
-        !*/
-
-        bool is_enabled (
+        bool is_dequeue_enabled (
         ) const;
         /*!
             ensures
-                - returns true if this pipe is currently enabled, false otherwise.
+                - returns true if the dequeue() and dequeue_or_timeout() functions are 
+                  currently enabled, returns false otherwise.  (note that the higher 
+                  level is_enabled() function can overrule this one.  So if 
+                  is_enabled() == false then dequeue functions are still disabled even
+                  if is_dequeue_enabled() returns true.  But if is_dequeue_enabled() == false 
+                  then dequeue functions are always disabled no matter the state of 
+                  is_enabled())
+        !*/
+
+        void disable_dequeue (
+        );
+        /*!
+            ensures
+                - #is_dequeue_enabled() == false 
+                - causes all current and future calls to dequeue() and
+                  dequeue_or_timeout() to not block but to return false 
+                  immediately until enable_dequeue() is called.
+        !*/
+
+        void enable_dequeue (
+        );
+        /*!
+            ensures
+                - #is_dequeue_enabled() == true
         !*/
 
         unsigned long max_size (
@@ -227,6 +260,7 @@ namespace dlib
                         - max_size() == 0 and another thread is trying to enqueue an item 
                           onto this pipe and we can receive our item directly from that thread.  
                         - someone calls disable()
+                        - someone calls disable_dequeue()
                 - else
                     - this call does not block.
                 - if (this call to dequeue() returns true) then
@@ -250,6 +284,7 @@ namespace dlib
                         - max_size() == 0 and another thread is trying to enqueue an item onto this 
                           pipe and we can receive our item directly from that thread.  
                         - someone calls disable() 
+                        - someone calls disable_dequeue()
                         - timeout milliseconds passes
                 - else
                     - this call does not block.
