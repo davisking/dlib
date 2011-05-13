@@ -89,6 +89,19 @@ namespace dlib
                 - this object is properly initialized
         !*/
 
+        template <typename T>
+        type_safe_union (
+            const T& item
+        );
+        /*!
+            requires
+                - T must be one of the types given to this object's template arguments
+            ensures
+                - this object is properly initialized
+                - #get<T>() == item
+                  (i.e. this object will contain a copy of item)
+        !*/
+
         ~type_safe_union(
         );
         /*!
@@ -209,6 +222,19 @@ namespace dlib
                     - Any previous object stored in this type_safe_union is destructed and its
                       state is lost.
                     - returns a non-const reference to the newly created T object.
+        !*/
+
+        template <typename T>
+        type_safe_union& operator= (
+            const T& item
+        );
+        /*!
+            requires
+                - T must be one of the types given to this object's template arguments
+            ensures
+                - #get<T>() == item
+                  (i.e. this object will contain a copy of item)
+                - returns *this
         !*/
 
         void swap (
