@@ -26,6 +26,7 @@ set (tests
    binary_search_tree_kernel_2a.cpp
    binary_search_tree_mm1.cpp
    binary_search_tree_mm2.cpp
+   bridge.cpp
    byte_orderer.cpp
    cmd_line_parser.cpp
    cmd_line_parser_wchar_t.cpp
