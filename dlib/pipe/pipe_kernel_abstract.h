@@ -265,6 +265,7 @@ namespace dlib
                     - this call does not block.
                 - if (this call to dequeue() returns true) then
                     - #is_enabled() == true 
+                    - #is_dequeue_enabled() == true 
                     - the oldest item that was enqueued into this pipe has been
                       swapped into #item.
                 - else
@@ -290,6 +291,7 @@ namespace dlib
                     - this call does not block.
                 - if (this call to dequeue_or_timeout() returns true) then
                     - #is_enabled() == true 
+                    - #is_dequeue_enabled() == true 
                     - the oldest item that was enqueued into this pipe has been
                       swapped into #item.
                 - else
