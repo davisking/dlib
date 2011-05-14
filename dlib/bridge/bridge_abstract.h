@@ -160,6 +160,15 @@ namespace dlib
                 - blocks until all resources associated with this object have been destroyed.
         !*/
 
+        void clear (
+        );
+        /*!
+            ensures
+                - returns this object to its default constructed state.  That is, it will
+                  be inactive, neither maintaining a connection nor attempting to acquire one.
+                - Any active connections or listening sockets will be closed.
+        !*/
+
         bridge_status get_bridge_status (
         ) const;
         /*!
@@ -171,6 +180,13 @@ namespace dlib
                     - if (BS.is_connected) then
                         - BS.foreign_ip == the IP address of the remote host we are connected to.
                         - BS.foreign_port == the port number on the remote host we are connected to.
+                    - else if (the bridge has previously been connected to a remote host but hasn't been 
+                               reconfigured or cleared since) then
+                        - BS.foreign_ip == the IP address of the remote host we were connected to.
+                        - BS.foreign_port == the port number on the remote host we were connected to.
+                    - else
+                        - BS.foreign_ip == ""
+                        - BS.foreign_port == 0
         !*/
 
 
@@ -196,7 +212,8 @@ namespace dlib
                 - if (the receive pipe can contain bridge_status objects) then
                     - Whenever the bridge's status changes the updated bridge_status will be
                       enqueued onto the receive pipe unless the change was a TCP disconnect 
-                      resulting from a user calling reconfigure() or destructing this bridge.  
+                      resulting from a user calling reconfigure(), clear(), or destructing this 
+                      bridge.  The status contents are defined by get_bridge_status().
             throws
                 - socket_error
                   This exception is thrown if we are unable to open the listening socket.
@@ -256,7 +273,8 @@ namespace dlib
                 - if (the receive pipe can contain bridge_status objects) then
                     - Whenever the bridge's status changes the updated bridge_status will be
                       enqueued onto the receive pipe unless the change was a TCP disconnect 
-                      resulting from a user calling reconfigure() or destructing this bridge.  
+                      resulting from a user calling reconfigure(), clear(), or destructing this 
+                      bridge.  The status contents are defined by get_bridge_status().
         !*/
         template <typename T, typename R>
         void reconfigure (

@@ -110,6 +110,11 @@ namespace
             DLIB_TEST(msg.get<bridge_status>().is_connected == true);
             DLIB_TEST(msg.get<bridge_status>().foreign_ip == "127.0.0.1");
             DLIB_TEST(msg.get<bridge_status>().foreign_port == testing_port);
+            msg = b1.get_bridge_status();
+            DLIB_TEST(msg.contains<bridge_status>() == true);
+            DLIB_TEST(msg.get<bridge_status>().is_connected == true);
+            DLIB_TEST(msg.get<bridge_status>().foreign_ip == "127.0.0.1");
+            DLIB_TEST(msg.get<bridge_status>().foreign_port == testing_port);
 
             bridge_status temp;
             out_status.dequeue(temp);
@@ -129,6 +134,61 @@ namespace
             }
 
         }
+
+        in.dequeue(msg);
+        DLIB_TEST(msg.contains<bridge_status>() == true);
+        DLIB_TEST(msg.get<bridge_status>().is_connected == false);
+        DLIB_TEST(msg.get<bridge_status>().foreign_ip == "127.0.0.1");
+        DLIB_TEST(msg.get<bridge_status>().foreign_port == testing_port);
+        msg = b1.get_bridge_status();
+        DLIB_TEST(msg.contains<bridge_status>() == true);
+        DLIB_TEST(msg.get<bridge_status>().is_connected == false);
+        DLIB_TEST(msg.get<bridge_status>().foreign_ip == "127.0.0.1");
+        DLIB_TEST(msg.get<bridge_status>().foreign_port == testing_port);
+    }
+
+    void do_test5_5(int pipe_size)
+    {
+        typedef type_safe_union<int, bridge_status> tsu_type;
+
+        dlib::pipe<tsu_type> out(pipe_size);
+        dlib::pipe<tsu_type> in(pipe_size);
+        dlib::pipe<bridge_status> out_status(pipe_size);
+
+        bridge b1(connect_to_ip_and_port("127.0.0.1",testing_port), receive(in));
+        tsu_type msg;
+
+        bridge b2(listen_on_port(testing_port), transmit(out), receive(out_status));
+
+        in.dequeue(msg);
+        DLIB_TEST(msg.contains<bridge_status>() == true);
+        DLIB_TEST(msg.get<bridge_status>().is_connected == true);
+        DLIB_TEST(msg.get<bridge_status>().foreign_ip == "127.0.0.1");
+        DLIB_TEST(msg.get<bridge_status>().foreign_port == testing_port);
+
+        bridge_status temp;
+        out_status.dequeue(temp);
+        DLIB_TEST(temp.is_connected == true);
+        DLIB_TEST(temp.foreign_ip == "127.0.0.1");
+
+        for (int i = 0; i < 100; ++i)
+        {
+            msg = i;
+            out.enqueue(msg);
+
+            msg.get<int>() = 0;
+
+            in.dequeue(msg);
+            DLIB_TEST(msg.contains<int>() == true);
+            DLIB_TEST(msg.get<int>() == i);
+        }
+
+        b2.clear();
+        msg = b2.get_bridge_status();
+        DLIB_TEST(msg.contains<bridge_status>() == true);
+        DLIB_TEST(msg.get<bridge_status>().is_connected == false);
+        DLIB_TEST(msg.get<bridge_status>().foreign_ip == "");
+        DLIB_TEST(msg.get<bridge_status>().foreign_port == 0);
 
         in.dequeue(msg);
         DLIB_TEST(msg.contains<bridge_status>() == true);
@@ -184,6 +244,7 @@ namespace
             print_spinner();
             for (int i = 0; i < 5; ++i)
                 do_test5(i);
+            do_test5_5(1);
             print_spinner();
             do_test6();
         }

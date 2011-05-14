@@ -511,6 +511,11 @@ namespace dlib
         ) { reconfigure(network_parameters,pipe); }
 
 
+        void clear (
+        )
+        {
+            pimpl.reset();
+        }
 
         template < typename T, typename R >
         void reconfigure (
