@@ -86,6 +86,9 @@
             This object is a tool for bridging a <a href="other.html#pipe">pipe</a> object between
             two network connected applications.  
          </description>
+         <examples>
+            <example>bridge_ex.cpp.html</example>
+         </examples>
       </component>
       
    <!-- ************************************************************************* -->

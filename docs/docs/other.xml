@@ -300,6 +300,7 @@
          <examples>
             <example>pipe_ex.cpp.html</example>
             <example>pipe_ex_2.cpp.html</example>
+            <example>bridge_ex.cpp.html</example>
          </examples>
 
       </component>

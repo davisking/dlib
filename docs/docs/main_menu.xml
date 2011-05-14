@@ -288,6 +288,10 @@
                   <link>quantum_computing_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Bridge</name>
+                  <link>bridge_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Pipe</name>
                   <link>pipe_ex.cpp.html</link>
                </item>
