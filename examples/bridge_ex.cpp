@@ -12,6 +12,39 @@
 */
 
 
+// =========== Example program output ===========
+/*
+     ---- Running example 1 ---- 
+    dequeued value: 1
+    dequeued value: 2
+    dequeued value: 3
+
+     ---- Running example 2 ---- 
+    dequeued value: 1
+    dequeued value: 2
+    dequeued value: 3
+
+     ---- Running example 3 ---- 
+    dequeued int:    1
+    dequeued int:    2
+    dequeued struct: 3   some string
+
+     ---- Running example 4 ---- 
+    bridge 1 status: is_connected: true
+    bridge 1 status: foreign_ip:   127.0.0.1
+    bridge 1 status: foreign_port: 43156
+    bridge 2 status: is_connected: true
+    bridge 2 status: foreign_ip:   127.0.0.1
+    bridge 2 status: foreign_port: 12345
+    dequeued int:    1
+    dequeued int:    2
+    dequeued struct: 3   some string
+    bridge 1 status: is_connected: false
+    bridge 1 status: foreign_ip:   127.0.0.1
+    bridge 1 status: foreign_port: 12345
+*/
+
+
 #include "dlib/bridge.h"
 #include "dlib/type_safe_union.h"
 #include <iostream>
