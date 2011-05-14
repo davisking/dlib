@@ -192,11 +192,22 @@ namespace dlib
                 // tell the threads to terminate
                 stop();
 
+                // save current pipe enabled status so we can restore it to however
+                // it was before this destructor ran.
+                bool transmit_enabled = true;
+                bool receive_enabled = true;
+
                 // make any calls blocked on a pipe return immediately.
                 if (transmit_pipe)
+                {
+                    transmit_enabled = transmit_pipe->is_dequeue_enabled();
                     transmit_pipe->disable_dequeue();
+                }
                 if (receive_pipe)
+                {
+                    receive_enabled = receive_pipe->is_enqueue_enabled();
                     receive_pipe->disable_enqueue();
+                }
 
                 {
                     auto_mutex lock(m);
@@ -210,9 +221,9 @@ namespace dlib
                 // wait for all the threads to terminate.
                 wait();
 
-                if (transmit_pipe)
+                if (transmit_pipe && transmit_enabled)
                     transmit_pipe->enable_dequeue();
-                if (receive_pipe)
+                if (receive_pipe && receive_enabled)
                     receive_pipe->enable_enqueue();
             }
 
