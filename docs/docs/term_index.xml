@@ -1002,6 +1002,7 @@
          <term file="network.html" name="server"/>
          <term link="network.html#http" name="HTTP server"/>
          <term file="network.html" name="sockstreambuf"/>
+         <term file="network.html" name="bridge"/>
 
 
 

@@ -26,6 +26,7 @@
             <name>Objects</name>
             <item>linker</item> 
             <item>server</item> 
+            <item>bridge</item> 
             <item>sockstreambuf</item> 
 
          </section>
@@ -73,6 +74,18 @@
                      
          </implementations>
                         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bridge</name>
+         <file>dlib/bridge.h</file>
+         <spec_file link="true">dlib/bridge/bridge_abstract.h</spec_file>
+         <description>
+            This object is a tool for bridging a <a href="other.html#pipe">pipe</a> object between
+            two network connected applications.  
+         </description>
       </component>
       
    <!-- ************************************************************************* -->
