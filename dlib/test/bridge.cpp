@@ -102,6 +102,12 @@ namespace
         bridge b1(connect_to_ip_and_port("127.0.0.1",testing_port), receive(in));
         tsu_type msg;
 
+        msg = b1.get_bridge_status();
+        DLIB_TEST(msg.contains<bridge_status>() == true);
+        DLIB_TEST(msg.get<bridge_status>().is_connected == false);
+        DLIB_TEST(msg.get<bridge_status>().foreign_ip == "");
+        DLIB_TEST(msg.get<bridge_status>().foreign_port == 0);
+
         {
             bridge b2(listen_on_port(testing_port), transmit(out), receive(out_status));
 
@@ -136,11 +142,6 @@ namespace
         }
 
         in.dequeue(msg);
-        DLIB_TEST(msg.contains<bridge_status>() == true);
-        DLIB_TEST(msg.get<bridge_status>().is_connected == false);
-        DLIB_TEST(msg.get<bridge_status>().foreign_ip == "127.0.0.1");
-        DLIB_TEST(msg.get<bridge_status>().foreign_port == testing_port);
-        msg = b1.get_bridge_status();
         DLIB_TEST(msg.contains<bridge_status>() == true);
         DLIB_TEST(msg.get<bridge_status>().is_connected == false);
         DLIB_TEST(msg.get<bridge_status>().foreign_ip == "127.0.0.1");
