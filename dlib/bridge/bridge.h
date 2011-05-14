@@ -116,6 +116,17 @@ namespace dlib
             >
         class impl_bridge : public impl_bridge_base, private noncopyable, private multithreaded_object
         {
+            /*!
+                CONVENTION
+                    - if (list) then
+                        - this object is supposed to be listening on the list object for incoming
+                          connections when not connected.
+                    - else
+                        - this object is supposed to be attempting to connect to ip:port when
+                          not connected.
+
+                    - get_bridge_status() == current_bs
+            !*/
         public:
 
             impl_bridge (
@@ -213,17 +224,6 @@ namespace dlib
             }
 
         private:
-            /*!
-                CONVENTION
-                    - if (list) then
-                        - this object is supposed to be listening on the list object for incoming
-                          connections when not connected.
-                    - else
-                        - this object is supposed to be attempting to connect to ip:port when
-                          not connected.
-
-                    - get_bridge_status() == current_bs
-            !*/
 
 
             template <typename pipe_type>
@@ -499,59 +499,73 @@ namespace dlib
 
         template < typename T, typename U, typename V >
         bridge (
-            T network_params,
+            T network_parameters,
             U pipe1,
             V pipe2 
-        ) { reconfigure(network_params,pipe1,pipe2); }
+        ) { reconfigure(network_parameters,pipe1,pipe2); }
 
         template < typename T, typename U>
         bridge (
-            T network_params,
+            T network_parameters,
             U pipe 
-        ) { reconfigure(network_params,pipe); }
+        ) { reconfigure(network_parameters,pipe); }
 
 
 
         template < typename T, typename R >
         void reconfigure (
-            listen_on_port network_params,
+            listen_on_port network_parameters,
             bridge_transmit_decoration<T> transmit_pipe,
             bridge_receive_decoration<R> receive_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_params.port, &transmit_pipe.p, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
+
+        template < typename T, typename R >
+        void reconfigure (
+            listen_on_port network_parameters,
+            bridge_receive_decoration<R> receive_pipe,
+            bridge_transmit_decoration<T> transmit_pipe
+        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
 
         template < typename T >
         void reconfigure (
-            listen_on_port network_params,
+            listen_on_port network_parameters,
             bridge_transmit_decoration<T> transmit_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,T>(network_params.port, &transmit_pipe.p, 0)); }
+        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,T>(network_parameters.port, &transmit_pipe.p, 0)); }
 
         template < typename R >
         void reconfigure (
-            listen_on_port network_params,
+            listen_on_port network_parameters,
             bridge_receive_decoration<R> receive_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<R,R>(network_params.port, 0, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<R,R>(network_parameters.port, 0, &receive_pipe.p)); }
 
 
 
 
         template < typename T, typename R >
         void reconfigure (
-            connect_to_ip_and_port network_params,
+            connect_to_ip_and_port network_parameters,
             bridge_transmit_decoration<T> transmit_pipe,
             bridge_receive_decoration<R> receive_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_params.ip, network_params.port, &transmit_pipe.p, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_parameters.ip, network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
+
+        template < typename T, typename R >
+        void reconfigure (
+            connect_to_ip_and_port network_parameters,
+            bridge_receive_decoration<R> receive_pipe,
+            bridge_transmit_decoration<T> transmit_pipe
+        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_parameters.ip, network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
 
         template < typename R >
         void reconfigure (
-            connect_to_ip_and_port network_params,
+            connect_to_ip_and_port network_parameters,
             bridge_receive_decoration<R> receive_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<R,R>(network_params.ip, network_params.port, 0, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<R,R>(network_parameters.ip, network_parameters.port, 0, &receive_pipe.p)); }
 
         template < typename T >
         void reconfigure (
-            connect_to_ip_and_port network_params,
+            connect_to_ip_and_port network_parameters,
             bridge_transmit_decoration<T> transmit_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,T>(network_params.ip, network_params.port, &transmit_pipe.p, 0)); }
+        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,T>(network_parameters.ip, network_parameters.port, &transmit_pipe.p, 0)); }
 
 
         bridge_status get_bridge_status (
