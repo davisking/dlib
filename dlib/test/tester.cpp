@@ -27,6 +27,14 @@ namespace test
         return test_count;
     }
 
+    void increment_test_count (
+    )
+    {
+        test_count_mutex.lock();
+        ++test_count;
+        test_count_mutex.unlock();
+    }
+
 // -----------------------------------------------------------------------------
 
     void check_test (
@@ -45,30 +53,6 @@ namespace test
             dlib__out << "\n\nError occurred at line " << line << ".\n";    
             dlib__out << "Error occurred in file " << file << ".\n";      
             dlib__out << "Failing expression was " << _exp_str << ".\n";           
-            throw dlib::error(dlib__out.str());      
-        }
-    }                                                                      
-
-// -----------------------------------------------------------------------------
-
-    void check_test_msg (
-        bool _exp,
-        long line,
-        const char* file,
-        const char* _exp_str,
-        const char* _msg
-    )
-    {
-        test_count_mutex.lock();
-        ++test_count;
-        test_count_mutex.unlock();
-        if ( !(_exp) )                                                         
-        {                                                                       
-            std::ostringstream dlib__out;                                       
-            dlib__out << "\n\nError occurred at line " << line << ".\n";    
-            dlib__out << "Error occurred in file " << file << ".\n";      
-            dlib__out << "Failing expression was " << _exp_str << ".\n";           
-            dlib__out << _msg << "\n";                                      
             throw dlib::error(dlib__out.str());      
         }
     }                                                                      
