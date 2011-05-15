@@ -895,7 +895,7 @@
 
 
 
-   <!--  This function turns a string of the form 2006-03-21T02:35:20.510956Z into a nice 
+   <!--  This function turns a string of the form 2006-03-21T02:35:20+00:00 into a nice 
    normal looking date -->
    <xsl:template name="format-date">
       <xsl:param name="xsd-date"/>
@@ -905,9 +905,13 @@
       <xsl:variable name="year" select="substring($date,1,4)"/>
       <xsl:variable name="month" select="substring($date,6,2)"/>
       <xsl:variable name="day" select="substring($date,9,2)"/>
-      <xsl:variable name="hour" select="substring($time,1,2)"/>
-      <xsl:variable name="minute" select="substring($time,4,2)"/>
+      <xsl:variable name="lhour" select="substring($time,1,2)"/>
+      <xsl:variable name="lminute" select="substring($time,4,2)"/>
       <xsl:variable name="second" select="substring($time,7,2)"/>
+
+      <xsl:variable name="ohour" select="substring($time,10,2)"/>
+      <xsl:variable name="ominute" select="substring($time,13,2)"/>
+
 
     <xsl:choose>
       <xsl:when test="$month = 1">Jan </xsl:when>
@@ -924,8 +928,19 @@
       <xsl:when test="$month = 12">Dec </xsl:when>
     </xsl:choose>
 
-      <xsl:value-of select="$day"/>, <xsl:value-of select="$year"/>
-      (<xsl:value-of select="$hour"/>:<xsl:value-of select="$minute"/>:<xsl:value-of select="$second"/> UTC)
+      <xsl:variable name="op" select="substring($time,9,1)"/>
+      <xsl:if test="$op = '-'">
+         <xsl:variable name="hour"   select="format-number(number($lhour)-number($ohour),'00')"/>
+         <xsl:variable name="minute" select="format-number(number($lminute)-number($ominute),'00')"/>
+         <xsl:value-of select="$day"/>, <xsl:value-of select="$year"/>
+         (<xsl:value-of select="$hour"/>:<xsl:value-of select="$minute"/>:<xsl:value-of select="$second"/> UTC)
+      </xsl:if>
+      <xsl:if test="$op = '+'">
+         <xsl:variable name="hour"   select="format-number(number($lhour)+number($ohour),'00')"/>
+         <xsl:variable name="minute" select="format-number(number($lminute)+number($ominute),'00')"/>
+         <xsl:value-of select="$day"/>, <xsl:value-of select="$year"/>
+         (<xsl:value-of select="$hour"/>:<xsl:value-of select="$minute"/>:<xsl:value-of select="$second"/> UTC)
+      </xsl:if>
 
    </xsl:template>
 
