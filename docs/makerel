@@ -35,19 +35,15 @@ else
     ./makedocs || exit 1
 fi;
 
-rm -rf release/* || report_failure
+rm -rf release || report_failure
+mkdir release || report_failure
 
 RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
 
 
-DLIB_REPOS=`svn info | grep URL | awk '{print $2}' | sed -e 's/\/docs$//'  `
 
-
-REVISION=`svn info | grep Revision | awk '{ print $2}'`
-
-svn log -v -r $REVISION:`cat $REVNUM_FILE` $DLIB_REPOS/dlib > release/change_log.txt || report_failure
-
-echo $REVISION | awk '{ print $1 + 1}' > $REVNUM_FILE
+CHANGESET_ID=`hg id -i | sed -e 's/\+//'`
+echo $CHANGESET_ID > $REVNUM_FILE
 
 cd release || report_failure
 RELDIR=`echo dlib-$RELEASE`
@@ -58,14 +54,14 @@ cp -r ../../docs/cache/examples . || report_failure
 
 echo Version: $RELEASE >> dlib/README.txt
 echo "Date:    `date`" >> dlib/README.txt
-echo Subversion Revision Number: $REVISION >> dlib/README.txt
+echo Mercurial Revision ID: $CHANGESET_ID >> dlib/README.txt
 
 
 
 WEBPAGE=`echo dlib_webpage-$RELEASE.tar`
 SOURCE_ZIP=`echo $RELDIR.zip`
 SOURCE_TAR=`echo $RELDIR.tar`
-tar -C ../../docs/chm -cf - docs/ documentation.html --exclude=".svn" | tar -xf - || report_failure
+tar -C ../../docs/chm -cf - docs/ documentation.html | tar -xf - || report_failure
 cd .. || report_failure
 
 tar -cf $SOURCE_TAR $RELDIR  || report_failure
@@ -73,7 +69,7 @@ tar -cf $SOURCE_TAR $RELDIR  || report_failure
 find $RELDIR -name "*.cpp" -or -name "*.h" -or -name "*.txt" -or -name "*.html" | xargs flip -m
 
 zip -r9 $SOURCE_ZIP $RELDIR > /dev/null || report_failure
-tar -C ../docs -cf $WEBPAGE --exclude=".svn" web || report_failure
+tar -C ../docs -cf $WEBPAGE web || report_failure
 bzip2 $SOURCE_TAR || report_failure
 bzip2 $WEBPAGE || report_failure
 
