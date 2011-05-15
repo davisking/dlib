@@ -68,8 +68,9 @@ makedocs ()
 
 # get XML versions of the change logs
     BASE_LOGGER_REVNUM=`echo $LOGGER_REVNUM - 1000 | bc`
-    echo Getting the mercurial change logs for revisions $LOGGER_REVNUM:$REVISION
-    hg log ../dlib --style=xml  -r$LOGGER_REVNUM:$REVISION > docs/log.txt || report_failure
+    NEXT_LOGGER_REVNUM=`echo $LOGGER_REVNUM + 1 | bc`
+    echo Getting the mercurial change logs for revisions $NEXT_LOGGER_REVNUM:$REVISION
+    hg log ../dlib --style=xml  -r$NEXT_LOGGER_REVNUM:$REVISION > docs/log.txt || report_failure
     echo Getting the mercurial change logs for revisions $BASE_LOGGER_REVNUM:$LOGGER_REVNUM
     hg log ../dlib --style=xml  -r$BASE_LOGGER_REVNUM:$LOGGER_REVNUM > docs/old_log.txt || report_failure 
 
@@ -119,7 +120,6 @@ makedocs ()
     cp docs/cache/examples/CMakeLists.txt docs/web/examples
     mkdir docs/chm/docs/examples || report_failure 
     cp docs/cache/examples/CMakeLists.txt docs/chm/docs/examples
-    rm -rf docs/cache
     cp docs/*.gif docs/web
     cp docs/*.gif docs/chm/docs
     cp docs/*.html docs/web
