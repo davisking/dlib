@@ -85,3 +85,9 @@ mv $SOURCE_TAR.bz2 v$RELEASE
 mv $SOURCE_ZIP v$RELEASE
 
 
+echo Create Mercurial tags and commit release
+cd ..
+hg tag v$RELEASE
+hg commit -m "Created release v$RELEASE"
+
+
