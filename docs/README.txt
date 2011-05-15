@@ -53,10 +53,10 @@ There are four scripts in the docs folder.
 	     <chm></chm> and <web></web> tags inside the XML though in 
 	     cases where the two differ.
 	
- - makesnapshot and makerel: These run makedocs as well as create tar and
- 	     zip files of the project.  They also run htmlhelp in wine to
-	     generate the chm help files.  Note that you will need to run
-	     docs/chm/htmlhelp/setup_htmlhelp.sh before it will work in wine.
+ - makerel:  Runs makedocs as well as creates tar and zip files of the project.  
+	     It also runs htmlhelp in wine to generate the chm help files.  
+	     Note that you will need to run docs/chm/htmlhelp/setup_htmlhelp.sh 
+	     before it will work in wine.
 
 
 ======================== License for documentation files ========================
