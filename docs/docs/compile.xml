@@ -44,9 +44,8 @@
         </p>
 
          <p>
-            Finally, note that <a href="dlib/revision.h.html">dlib/revision.h</a> defines DLIB_REVISION
-            which is a #define you can use to see what version of dlib you have.  The number in this file
-            is the subversion revision number associated with the particular copy of dlib you have.
+            Finally, note that <a href="dlib/revision.h.html">dlib/revision.h</a> defines DLIB_MAJOR_VERSION
+            and DLIB_MINOR_VERSION which are #defines you can use to see what version of dlib you have.  
          </p>
 
         <center><h1>Preprocessor Directives</h1></center>

@@ -2,8 +2,8 @@ This "package" is just a copy of the stuff I use to generate the documentation
 for the dlib library.  It contains a copy of the XSLT and XML I use to 
 generate the HTML documentation.
 
-The current version of these files can be obtained from the dlib subversion 
-repository at: https://dclib.svn.sourceforge.net/svnroot/dclib/trunk/docs
+The current version of these files can be obtained from the dlib Mercurial 
+repository at: http://dclib.hg.sourceforge.net:8000/hgroot/dclib/dclib 
 
 ======================== Overview  ========================
 

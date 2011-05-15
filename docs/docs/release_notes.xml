@@ -14,10 +14,13 @@
 New Stuff:
  
 Non-Backwards Compatible Changes:
+   - Removed the DLIB_REVISION macro and replaced it with DLIB_MAJOR_VERSION and
+     DLIB_MINOR_VERSION.
 
 Bug fixes:
 
 Other:
+   - dlib's version control system has switched from Subversion to Mercurial.
 
 </current>
 

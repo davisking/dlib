@@ -900,7 +900,7 @@
    <xsl:template name="format-date">
       <xsl:param name="xsd-date"/>
       <xsl:variable name="date" select="substring-before($xsd-date,'T')"/>
-      <xsl:variable name="time" select="substring-before(substring-after($xsd-date,'T'),'.')"/>
+      <xsl:variable name="time" select="substring-after($xsd-date,'T')"/>
 
       <xsl:variable name="year" select="substring($date,1,4)"/>
       <xsl:variable name="month" select="substring($date,6,2)"/>
@@ -945,7 +945,7 @@
    <xsl:template match="log">
       <xsl:for-each select="logentry">
       <xsl:sort order="descending" data-type="number" select="./@revision"/>
-      <u>Revision</u>: <xsl:value-of select="@revision"/> <br/>
+      <u>Revision</u>: <xsl:value-of select="substring(@node,1,12)"/> <br/>
       <u>Date</u>: <xsl:call-template name="format-date"><xsl:with-param name="xsd-date" select="date"/></xsl:call-template> <br/>
             <xsl:apply-templates select="msg"/>
             <xsl:apply-templates select="paths"/>
