@@ -87,7 +87,7 @@ mv $SOURCE_ZIP v$RELEASE
 
 echo Create Mercurial tags and commit release
 cd ..
-hg tag v$RELEASE
+hg tag v$RELEASE || report_failure
 hg commit -m "Created release v$RELEASE"
 
 
