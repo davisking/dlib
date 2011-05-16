@@ -1003,6 +1003,11 @@
          <term link="network.html#http" name="HTTP server"/>
          <term file="network.html" name="sockstreambuf"/>
          <term file="network.html" name="bridge"/>
+         <term file="dlib/bridge/bridge_abstract.h.html" name="connect_to_ip_and_port"/>
+         <term file="dlib/bridge/bridge_abstract.h.html" name="listen_on_port"/>
+         <term file="dlib/bridge/bridge_abstract.h.html" name="transmit"/>
+         <term file="dlib/bridge/bridge_abstract.h.html" name="receive"/>
+         <term file="dlib/bridge/bridge_abstract.h.html" name="bridge_status"/>
 
 
 
