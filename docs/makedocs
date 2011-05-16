@@ -77,7 +77,7 @@ makedocs ()
 # grab a clean copy of the repository 
     rm -rf docs/cache
     rm -rf cache.$$
-    hg clone .. cache.$$ > /dev/null || report_failure
+    hg archive cache.$$ || report_failure
 # put the stuff we need into the docs/cache folder
     mkdir docs/cache
     mv cache.$$/dlib docs/cache/
