@@ -348,6 +348,9 @@ namespace dlib
                             sockstreambuf::kernel_2a buf(con);
                             std::istream in(&buf);
                             typename receive_pipe_type::type item;
+                            // This isn't necessary but doing it avoids a warning about
+                            // item being uninitialized sometimes.
+                            assign_zero_if_built_in_scalar_type(item);
 
                             while (in.peek() != EOF)
                             {
@@ -417,6 +420,9 @@ namespace dlib
                         sockstreambuf::kernel_2a buf(con);
                         std::ostream out(&buf);
                         typename transmit_pipe_type::type item;
+                        // This isn't necessary but doing it avoids a warning about
+                        // item being uninitialized sometimes.
+                        assign_zero_if_built_in_scalar_type(item);
 
 
                         while (out)
