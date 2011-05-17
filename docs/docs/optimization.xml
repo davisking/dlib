@@ -698,7 +698,13 @@ subject to the following constraint:
                 how well a particular data sample x matches a label y.  When used for prediction,
                 the best label for a new x is given by the y which maximizes F(x,y).   
 
-                <br/>
+               <p>
+                  If you want to see example code that uses this object then take a look at
+                  the implementation of the 
+                  <a href="dlib/svm/svm_multiclass_linear_trainer.h.html">svm_multiclass_linear_trainer</a>
+                  object.
+               </p>
+
                 <br/>
 
                 For an introduction to structured support vector machines you should consult 
