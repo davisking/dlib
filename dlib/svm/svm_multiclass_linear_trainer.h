@@ -28,6 +28,15 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object defines the optimization problem for the multiclass SVM trainer
                 object at the bottom of this file.  
+
+                The joint feature vectors used by this object, the PSI(x,y) vectors, are
+                defined as follows:
+                    PSI(x,0) = [x,0,0,0,0, ...,0]
+                    PSI(x,1) = [0,x,0,0,0, ...,0]
+                    PSI(x,2) = [0,0,x,0,0, ...,0]
+                That is, if there are N labels then the joint feature vector has a
+                dimension that is N times the dimension of a single x sample.  Also,
+                note that we append a -1 value onto each x to account for the bias term.
         !*/
 
     public:
@@ -81,17 +90,21 @@ namespace dlib
             scalar_type best_val = -std::numeric_limits<scalar_type>::infinity();
             unsigned long best_idx = 0;
 
-            // figure out which label is the best
+            // Figure out which label is the best.  That is, what label maximizes
+            // LOSS(idx,y) + F(x,y).  Note that y in this case is given by distinct_labels[i].
             for (unsigned long i = 0; i < distinct_labels.size(); ++i)
             {
                 using dlib::sparse_vector::dot;
                 using dlib::dot;
+                // Compute the F(x,y) part:
                 // perform: temp == dot(relevant part of current solution, samples[idx]) - current_bias
                 scalar_type temp = dot(rowm(current_solution, range(i*dims, (i+1)*dims-2)), samples[idx]) - current_solution((i+1)*dims-1);
 
+                // Add the LOSS(idx,y) part:
                 if (labels[idx] != distinct_labels[i])
                     temp += 1;
 
+                // Now temp == LOSS(idx,y) + F(x,y).  Check if it is the biggest we have seen.
                 if (temp > best_val)
                 {
                     best_val = temp;
