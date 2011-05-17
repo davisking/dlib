@@ -13,15 +13,15 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename matrix_type,
-        typename feature_vector_type_ = matrix_type
+        typename matrix_type_,
+        typename feature_vector_type_ = matrix_type_
         >
-    class structural_svm_problem : public oca_problem<matrix_type> 
+    class structural_svm_problem : public oca_problem<matrix_type_> 
     {
     public:
         /*!
-            REQUIREMENTS ON matrix_type
-                - matrix_type == a dlib::matrix capable of storing column vectors
+            REQUIREMENTS ON matrix_type_
+                - matrix_type_ == a dlib::matrix capable of storing column vectors
 
             REQUIREMENTS ON feature_vector_type_ 
                 - feature_vector_type_ == a dlib::matrix capable of storing column vectors
@@ -81,6 +81,7 @@ namespace dlib
                     paper.
         !*/
 
+        typedef matrix_type_ matrix_type;
         typedef typename matrix_type::type scalar_type;
         typedef feature_vector_type_ feature_vector_type;
 
