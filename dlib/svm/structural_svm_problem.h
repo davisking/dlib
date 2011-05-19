@@ -65,7 +65,7 @@ namespace dlib
             feature_vector_type& out_psi
         ) const
         {
-            if (!skip_cache)
+            if (!skip_cache && prob->get_max_cache_size() != 0)
             {
                 scalar_type best_risk = -std::numeric_limits<scalar_type>::infinity();
                 unsigned long best_idx = 0;
@@ -101,6 +101,9 @@ namespace dlib
 
 
             prob->separation_oracle(sample_idx, current_solution, out_loss, out_psi);
+
+            if (prob->get_max_cache_size() == 0)
+                return;
 
             // if the cache is full
             if (loss.size() >= prob->get_max_cache_size())
