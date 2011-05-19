@@ -1,6 +1,7 @@
 /build/
 \.swp$
 \.o$
+\.orig$
 \.obj$
 ^docs/release/
 ^docs/docs/web/
