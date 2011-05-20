@@ -110,6 +110,17 @@ namespace dlib
             unsigned short num_threads
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(port != 0 && problem.get_num_samples() != 0 &&
+                        problem.get_num_dimensions() != 0,
+                "\t svm_struct_processing_node()"
+                << "\n\t Invalid arguments were given to this function"
+                << "\n\t port: " << port 
+                << "\n\t problem.get_num_samples():    " << problem.get_num_samples() 
+                << "\n\t problem.get_num_dimensions(): " << problem.get_num_dimensions() 
+                << "\n\t this: " << this
+                );
+
             the_problem.reset(new node_type<T,U>(problem, port, num_threads));
         }
 
@@ -191,7 +202,6 @@ namespace dlib
 
                         oracle_response<matrix_type>& data = temp.template get<oracle_response<matrix_type> >();
 
-                        data.subgradient.set_size(req.current_solution.size(),1);
                         data.subgradient = psi_true;
                         data.loss = 0;
 
@@ -376,6 +386,14 @@ namespace dlib
             return solver(problem, w);
         }
 
+        class invalid_problem : public error
+        {
+        public:
+            invalid_problem(
+                const std::string& a
+            ): error(a) {}
+        };
+
 
     private:
 
@@ -433,7 +451,7 @@ namespace dlib
                         // if this new dimension doesn't match what we have seen previously
                         if (seen_dim && num_dims != temp.template get<long>())
                         {
-                            throw dlib::error("remote hosts disagree on the number of dimensions!");
+                            throw invalid_problem("remote hosts disagree on the number of dimensions!");
                         }
                         seen_dim = true;
                         num_dims = temp.template get<long>();
