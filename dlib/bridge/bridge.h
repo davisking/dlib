@@ -26,7 +26,16 @@ namespace dlib
             const std::string& ip_,
             unsigned short port_
         ): ip(ip_), port(port_)
-        {}
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_ip_address(ip) && port != 0,
+                "\t connect_to_ip_and_port()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t ip:   " << ip 
+                << "\n\t port: " << port
+                << "\n\t this: " << this
+                );
+        }
 
     private:
         friend class bridge;
@@ -38,7 +47,16 @@ namespace dlib
     {
         listen_on_port(
             unsigned short port_
-        ) : port(port_) {}
+        ) : port(port_) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT( port != 0,
+                "\t listen_on_port()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t port: " << port
+                << "\n\t this: " << this
+                );
+        }
 
     private:
         friend class bridge;

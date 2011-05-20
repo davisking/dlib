@@ -18,6 +18,9 @@ namespace dlib
             unsigned short port
         );
         /*!
+            requires
+                - is_ip_address(ip) == true
+                - port != 0
             ensures
                 - this object will represent a request to make a TCP connection
                   to the given IP address and port number.
@@ -30,6 +33,8 @@ namespace dlib
             unsigned short port
         );
         /*!
+            requires
+                - port != 0
             ensures
                 - this object will represent a request to listen on the given
                   port number for incoming TCP connections.
