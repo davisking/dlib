@@ -114,7 +114,7 @@ namespace dlib
     /*!
         ensures
             - creates a new thread for the function pointed to by funct 
-            - passes it param as its parameter 
+            - passes it param as its parameter. (i.e. calls funct(param) from the new thread)
             - returns true upon success and false upon failure to create the new thread
     !*/
 
