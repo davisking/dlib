@@ -60,6 +60,7 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
+                - get_num_processing_nodes() == 0
                 - get_epsilon() == 0.001
                 - get_c() == 1
                 - This object will not be verbose
@@ -100,8 +101,8 @@ namespace dlib
                 of the training data):
                     int main()
                     {
-                        your_structural_svm_problem problem;
                         // Put one third of your data into this problem object.  How you do this depends on your problem.
+                        your_structural_svm_problem problem;
                         svm_struct_processing_node node(problem, 12345, number_of_cores_on_this_computer);
                         cout << "hit enter to terminate this program" << endl;
                         cin.get();
