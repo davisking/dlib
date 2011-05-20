@@ -90,6 +90,13 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>rbf_network_trainer</item> 
       </section>
       <section>
+         <name>Structured Prediction</name>
+         <item>structural_svm_problem</item> 
+         <item>structural_svm_problem_threaded</item> 
+         <item>svm_struct_controller_node</item> 
+         <item>svm_struct_processing_node</item> 
+      </section>
+      <section>
          <name>Unsupervised</name>
          <item>kcentroid</item>
          <item>linearly_independent_subset_finder</item>
@@ -2019,6 +2026,93 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <description>
             Tests a regression function (e.g. <a href="#decision_function">decision_function</a>)
             and returns the mean squared error.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>structural_svm_problem</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_problem_abstract.h</spec_file>
+         <description>
+                This object, when used with the <a href="optimization.html#oca">oca</a> optimizer, is a tool 
+                for solving the optimization problem associated 
+                with a structural support vector machine.  A structural SVM is a supervised 
+                machine learning method for learning to predict complex outputs.  This is
+                contrasted with a binary classifier which makes only simple yes/no predictions.  
+                A structural SVM, on the other hand, can learn to predict outputs as complex
+                as entire parse trees.  To do this, it learns a function F(x,y) which measures 
+                how well a particular data sample x matches a label y.  When used for prediction,
+                the best label for a new x is given by the y which maximizes F(x,y).   
+
+               <p>
+                  If you want to see example code that uses this object then take a look at
+                  the implementation of the 
+                  <a href="dlib/svm/svm_multiclass_linear_trainer.h.html">svm_multiclass_linear_trainer</a>
+                  object.
+               </p>
+
+                <br/>
+
+                For an introduction to structured support vector machines you should consult 
+                the following paper: 
+                <blockquote>
+                    Predicting Structured Objects with Support Vector Machines by 
+                    By Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
+                </blockquote>
+
+                For a more detailed discussion of the particular algorithm implemented by this
+                object see the following paper:  
+                <blockquote>
+                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural SVMs, 
+                    Machine Learning, 77(1):27-59, 2009.
+                </blockquote>
+
+                    Note that this object is essentially a tool for solving the 1-Slack structural
+                    SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced 
+                    paper.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>structural_svm_problem_threaded</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_problem_threaded_abstract.h</spec_file>
+         <description>
+            This is just a version of the <a href="#structural_svm_problem">structural_svm_problem</a> 
+            which is capable of using multiple cores/threads at a time.  You should use it if
+            you have a multi-core CPU and the separation oracle takes a long time to compute.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>svm_struct_controller_node</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_distributed_abstract.h</spec_file>
+         <description>
+            This object is a tool for distributing the work involved in solving a 
+            <a href="#structural_svm_problem">structural_svm_problem</a> across many computers.  
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>svm_struct_processing_node</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_distributed_abstract.h</spec_file>
+         <description>
+            This object is a tool for distributing the work involved in solving a 
+            <a href="#structural_svm_problem">structural_svm_problem</a> across many computers.  
          </description>
                                  
       </component>

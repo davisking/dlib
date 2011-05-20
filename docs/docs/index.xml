@@ -133,7 +133,7 @@
                   <li>General purpose <a href="ml.html#one_vs_one_trainer">multiclass classification</a> tools</li>
                   <li>A <a href="ml.html#svm_multiclass_linear_trainer">Multiclass SVM</a></li>
                   <li>A tool for solving the optimization problem associated with 
-                     <a href="optimization.html#structural_svm_problem">structural support vector machines</a>. </li> 
+                     <a href="ml.html#structural_svm_problem">structural support vector machines</a>. </li> 
                   <li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li>
                   <li>An online <a href="ml.html#svm_pegasos">SVM classification</a> algorithm</li>
                   <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector</li> and
