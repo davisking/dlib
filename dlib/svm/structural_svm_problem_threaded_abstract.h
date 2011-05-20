@@ -40,8 +40,15 @@ namespace dlib
         /*!
             ensures
                 - this object is properly initialized
-                - This object will use num_threads threads at a time to call the 
-                  separation_oracle() function.  
+                - #get_num_threads() == num_threads
+        !*/
+
+        unsigned long get_num_threads (
+        ) const; 
+        /*!
+            ensures
+                - Returns the number of threads which will be used to make concurrent
+                  calls to the separation_oracle() function.
         !*/
 
     };

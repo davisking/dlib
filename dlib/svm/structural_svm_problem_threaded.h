@@ -34,6 +34,9 @@ namespace dlib
             tp(num_threads)
         {}
 
+        unsigned long get_num_threads (
+        ) const { return tp.num_threads_in_pool(); }
+
     private:
 
         struct binder
