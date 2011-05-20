@@ -47,14 +47,18 @@ namespace dlib
             psi.clear();
             lru_count.clear();
 
-            prob->get_truth_joint_feature_vector(idx, true_psi);
+            if (prob->get_max_cache_size() != 0)
+                prob->get_truth_joint_feature_vector(idx, true_psi);
         }
 
         void get_truth_joint_feature_vector_cached (
             feature_vector_type& psi 
         ) const
         {
-            psi = true_psi;
+            if (prob->get_max_cache_size() != 0)
+                psi = true_psi;
+            else
+                prob->get_truth_joint_feature_vector(sample_idx, psi);
         }
 
         void separation_oracle_cached (
@@ -320,26 +324,19 @@ namespace dlib
             feature_vector_type ftemp;
             const unsigned long num = get_num_samples();
 
-            // initialize the cache if necessary.
-            if (cache.size() == 0 && max_cache_size != 0)
+            // initialize the cache and compute psi_true.
+            if (cache.size() == 0)
             {
                 cache.resize(get_num_samples());
                 for (unsigned long i = 0; i < cache.size(); ++i)
                     cache[i].init(this,i);
-            }
 
-            // initialize psi_true if necessary.  
-            if (psi_true.size() == 0)
-            {
                 psi_true.set_size(w.size(),1);
                 psi_true = 0;
 
                 for (unsigned long i = 0; i < num; ++i)
                 {
-                    if (cache.size() == 0)
-                        get_truth_joint_feature_vector(i, ftemp);
-                    else
-                        cache[i].get_truth_joint_feature_vector_cached(ftemp);
+                    cache[i].get_truth_joint_feature_vector_cached(ftemp);
 
                     sparse_vector::subtract_from(psi_true, ftemp);
                 }
@@ -380,18 +377,11 @@ namespace dlib
             feature_vector_type& psi
         ) const 
         {
-            if (cache.size() == 0)
-            {
-                separation_oracle(idx, current_solution, loss, psi);
-            }
-            else
-            {
-                cache[idx].separation_oracle_cached(skip_cache, 
-                                                    cur_risk_lower_bound,
-                                                    current_solution,
-                                                    loss,
-                                                    psi);
-            }
+            cache[idx].separation_oracle_cached(skip_cache, 
+                                                cur_risk_lower_bound,
+                                                current_solution,
+                                                loss,
+                                                psi);
         }
     private:
 
