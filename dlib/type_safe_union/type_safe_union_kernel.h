@@ -67,7 +67,7 @@ namespace dlib
 
         template <typename T>
         void invoke_on (
-            T& obj,
+            T& ,
             _void 
         ) const
         {
