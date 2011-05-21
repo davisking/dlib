@@ -43,15 +43,15 @@ namespace dlib
             friend void serialize (const oracle_response& item, std::ostream& out)
             {
                 serialize(item.subgradient, out);
-                serialize(item.loss, out);
-                serialize(item.num, out);
+                dlib::serialize(item.loss, out);
+                dlib::serialize(item.num, out);
             }
 
             friend void deserialize (oracle_response& item, std::istream& in)
             {
                 deserialize(item.subgradient, in);
-                deserialize(item.loss, in);
-                deserialize(item.num, in);
+                dlib::deserialize(item.loss, in);
+                dlib::deserialize(item.num, in);
             }
         };
 
@@ -78,17 +78,17 @@ namespace dlib
             friend void serialize (const oracle_request& item, std::ostream& out)
             {
                 serialize(item.current_solution, out);
-                serialize(item.cur_risk_lower_bound, out);
-                serialize(item.eps, out);
-                serialize(item.skip_cache, out);
+                dlib::serialize(item.cur_risk_lower_bound, out);
+                dlib::serialize(item.eps, out);
+                dlib::serialize(item.skip_cache, out);
             }
 
             friend void deserialize (oracle_request& item, std::istream& in)
             {
                 deserialize(item.current_solution, in);
-                deserialize(item.cur_risk_lower_bound, in);
-                deserialize(item.eps, in);
-                deserialize(item.skip_cache, in);
+				dlib::deserialize(item.cur_risk_lower_bound, in);
+                dlib::deserialize(item.eps, in);
+                dlib::deserialize(item.skip_cache, in);
             }
         };
 
