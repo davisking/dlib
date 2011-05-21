@@ -101,6 +101,7 @@ set (tests
    svm_c_linear.cpp
    svm.cpp
    svm_multiclass_linear.cpp
+   svm_struct.cpp
    symmetric_matrix_cache.cpp
    thread_pool.cpp
    threads.cpp
