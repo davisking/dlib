@@ -12,6 +12,10 @@
 
 <current>
 New Stuff:
+   - Added tools for distributing the work involved in solving a structured
+     SVM problem over many computers and CPUs. 
+   - Added the bridge.  It allows a dlib::pipe to be used for networked
+     communication.
  
 Non-Backwards Compatible Changes:
    - Removed the DLIB_REVISION macro and replaced it with DLIB_MAJOR_VERSION and
