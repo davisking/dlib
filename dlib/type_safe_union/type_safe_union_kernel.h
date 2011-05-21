@@ -8,34 +8,41 @@
 #include "../noncopyable.h"
 #include "../serialize.h"
 #include <new>
+#include <iostream>
 
 namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
+    struct _void{};
+    inline void serialize( const _void&, std::ostream&){}
+    inline void deserialize(  _void&, std::istream&){}
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T1,
-        typename T2 = T1,
-        typename T3 = T1,
-        typename T4 = T1,
-        typename T5 = T1, 
-        typename T6 = T1,
-        typename T7 = T1,
-        typename T8 = T1,
-        typename T9 = T1,
-        typename T10 = T1,
+        typename T2 = _void,
+        typename T3 = _void,
+        typename T4 = _void,
+        typename T5 = _void, 
+        typename T6 = _void,
+        typename T7 = _void,
+        typename T8 = _void,
+        typename T9 = _void,
+        typename T10 = _void,
 
-        typename T11 = T1,
-        typename T12 = T1,
-        typename T13 = T1,
-        typename T14 = T1,
-        typename T15 = T1,
-        typename T16 = T1,
-        typename T17 = T1,
-        typename T18 = T1,
-        typename T19 = T1,
-        typename T20 = T1
+        typename T11 = _void,
+        typename T12 = _void,
+        typename T13 = _void,
+        typename T14 = _void,
+        typename T15 = _void,
+        typename T16 = _void,
+        typename T17 = _void,
+        typename T18 = _void,
+        typename T19 = _void,
+        typename T20 = _void
         >
     class type_safe_union : noncopyable
     {
@@ -48,6 +55,24 @@ namespace dlib
         !*/
 
     private:
+
+        template <typename T, typename U>
+        void invoke_on (
+            T& obj,
+            U& item
+        ) const
+        {
+            obj(item);
+        }
+
+        template <typename T>
+        void invoke_on (
+            T& obj,
+            _void 
+        ) const
+        {
+        }
+
 
         const static size_t max_size = tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<
                                        tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<sizeof(T1),
@@ -375,29 +400,29 @@ namespace dlib
                 // do nothing because we are empty
                 case 0: break;
 
-                case 1: obj(unchecked_get<T1>());  break;
-                case 2: obj(unchecked_get<T2>());  break;
-                case 3: obj(unchecked_get<T3>());  break;
-                case 4: obj(unchecked_get<T4>());  break;
-                case 5: obj(unchecked_get<T5>());  break;
+                case 1: invoke_on(obj,unchecked_get<T1>());  break;
+                case 2: invoke_on(obj,unchecked_get<T2>());  break;
+                case 3: invoke_on(obj,unchecked_get<T3>());  break;
+                case 4: invoke_on(obj,unchecked_get<T4>());  break;
+                case 5: invoke_on(obj,unchecked_get<T5>());  break;
 
-                case 6: obj(unchecked_get<T6>());  break;
-                case 7: obj(unchecked_get<T7>());  break;
-                case 8: obj(unchecked_get<T8>());  break;
-                case 9: obj(unchecked_get<T9>());  break;
-                case 10: obj(unchecked_get<T10>());  break;
+                case 6: invoke_on(obj,unchecked_get<T6>());  break;
+                case 7: invoke_on(obj,unchecked_get<T7>());  break;
+                case 8: invoke_on(obj,unchecked_get<T8>());  break;
+                case 9: invoke_on(obj,unchecked_get<T9>());  break;
+                case 10: invoke_on(obj,unchecked_get<T10>());  break;
 
-                case 11: obj(unchecked_get<T11>());  break;
-                case 12: obj(unchecked_get<T12>());  break;
-                case 13: obj(unchecked_get<T13>());  break;
-                case 14: obj(unchecked_get<T14>());  break;
-                case 15: obj(unchecked_get<T15>());  break;
+                case 11: invoke_on(obj,unchecked_get<T11>());  break;
+                case 12: invoke_on(obj,unchecked_get<T12>());  break;
+                case 13: invoke_on(obj,unchecked_get<T13>());  break;
+                case 14: invoke_on(obj,unchecked_get<T14>());  break;
+                case 15: invoke_on(obj,unchecked_get<T15>());  break;
 
-                case 16: obj(unchecked_get<T16>());  break;
-                case 17: obj(unchecked_get<T17>());  break;
-                case 18: obj(unchecked_get<T18>());  break;
-                case 19: obj(unchecked_get<T19>());  break;
-                case 20: obj(unchecked_get<T20>());  break;
+                case 16: invoke_on(obj,unchecked_get<T16>());  break;
+                case 17: invoke_on(obj,unchecked_get<T17>());  break;
+                case 18: invoke_on(obj,unchecked_get<T18>());  break;
+                case 19: invoke_on(obj,unchecked_get<T19>());  break;
+                case 20: invoke_on(obj,unchecked_get<T20>());  break;
             }
         }
 
@@ -413,29 +438,29 @@ namespace dlib
                 // do nothing because we are empty
                 case 0: break;
 
-                case 1: obj(unchecked_get<T1>());  break;
-                case 2: obj(unchecked_get<T2>());  break;
-                case 3: obj(unchecked_get<T3>());  break;
-                case 4: obj(unchecked_get<T4>());  break;
-                case 5: obj(unchecked_get<T5>());  break;
+                case 1: invoke_on(obj,unchecked_get<T1>());  break;
+                case 2: invoke_on(obj,unchecked_get<T2>());  break;
+                case 3: invoke_on(obj,unchecked_get<T3>());  break;
+                case 4: invoke_on(obj,unchecked_get<T4>());  break;
+                case 5: invoke_on(obj,unchecked_get<T5>());  break;
 
-                case 6: obj(unchecked_get<T6>());  break;
-                case 7: obj(unchecked_get<T7>());  break;
-                case 8: obj(unchecked_get<T8>());  break;
-                case 9: obj(unchecked_get<T9>());  break;
-                case 10: obj(unchecked_get<T10>());  break;
+                case 6: invoke_on(obj,unchecked_get<T6>());  break;
+                case 7: invoke_on(obj,unchecked_get<T7>());  break;
+                case 8: invoke_on(obj,unchecked_get<T8>());  break;
+                case 9: invoke_on(obj,unchecked_get<T9>());  break;
+                case 10: invoke_on(obj,unchecked_get<T10>());  break;
 
-                case 11: obj(unchecked_get<T11>());  break;
-                case 12: obj(unchecked_get<T12>());  break;
-                case 13: obj(unchecked_get<T13>());  break;
-                case 14: obj(unchecked_get<T14>());  break;
-                case 15: obj(unchecked_get<T15>());  break;
+                case 11: invoke_on(obj,unchecked_get<T11>());  break;
+                case 12: invoke_on(obj,unchecked_get<T12>());  break;
+                case 13: invoke_on(obj,unchecked_get<T13>());  break;
+                case 14: invoke_on(obj,unchecked_get<T14>());  break;
+                case 15: invoke_on(obj,unchecked_get<T15>());  break;
 
-                case 16: obj(unchecked_get<T16>());  break;
-                case 17: obj(unchecked_get<T17>());  break;
-                case 18: obj(unchecked_get<T18>());  break;
-                case 19: obj(unchecked_get<T19>());  break;
-                case 20: obj(unchecked_get<T20>());  break;
+                case 16: invoke_on(obj,unchecked_get<T16>());  break;
+                case 17: invoke_on(obj,unchecked_get<T17>());  break;
+                case 18: invoke_on(obj,unchecked_get<T18>());  break;
+                case 19: invoke_on(obj,unchecked_get<T19>());  break;
+                case 20: invoke_on(obj,unchecked_get<T20>());  break;
             }
         }
 
@@ -451,29 +476,29 @@ namespace dlib
                 // do nothing because we are empty
                 case 0: break;
 
-                case 1: obj(unchecked_get<T1>());  break;
-                case 2: obj(unchecked_get<T2>());  break;
-                case 3: obj(unchecked_get<T3>());  break;
-                case 4: obj(unchecked_get<T4>());  break;
-                case 5: obj(unchecked_get<T5>());  break;
+                case 1: invoke_on(obj,unchecked_get<T1>());  break;
+                case 2: invoke_on(obj,unchecked_get<T2>());  break;
+                case 3: invoke_on(obj,unchecked_get<T3>());  break;
+                case 4: invoke_on(obj,unchecked_get<T4>());  break;
+                case 5: invoke_on(obj,unchecked_get<T5>());  break;
 
-                case 6: obj(unchecked_get<T6>());  break;
-                case 7: obj(unchecked_get<T7>());  break;
-                case 8: obj(unchecked_get<T8>());  break;
-                case 9: obj(unchecked_get<T9>());  break;
-                case 10: obj(unchecked_get<T10>());  break;
+                case 6: invoke_on(obj,unchecked_get<T6>());  break;
+                case 7: invoke_on(obj,unchecked_get<T7>());  break;
+                case 8: invoke_on(obj,unchecked_get<T8>());  break;
+                case 9: invoke_on(obj,unchecked_get<T9>());  break;
+                case 10: invoke_on(obj,unchecked_get<T10>());  break;
 
-                case 11: obj(unchecked_get<T11>());  break;
-                case 12: obj(unchecked_get<T12>());  break;
-                case 13: obj(unchecked_get<T13>());  break;
-                case 14: obj(unchecked_get<T14>());  break;
-                case 15: obj(unchecked_get<T15>());  break;
+                case 11: invoke_on(obj,unchecked_get<T11>());  break;
+                case 12: invoke_on(obj,unchecked_get<T12>());  break;
+                case 13: invoke_on(obj,unchecked_get<T13>());  break;
+                case 14: invoke_on(obj,unchecked_get<T14>());  break;
+                case 15: invoke_on(obj,unchecked_get<T15>());  break;
 
-                case 16: obj(unchecked_get<T16>());  break;
-                case 17: obj(unchecked_get<T17>());  break;
-                case 18: obj(unchecked_get<T18>());  break;
-                case 19: obj(unchecked_get<T19>());  break;
-                case 20: obj(unchecked_get<T20>());  break;
+                case 16: invoke_on(obj,unchecked_get<T16>());  break;
+                case 17: invoke_on(obj,unchecked_get<T17>());  break;
+                case 18: invoke_on(obj,unchecked_get<T18>());  break;
+                case 19: invoke_on(obj,unchecked_get<T19>());  break;
+                case 20: invoke_on(obj,unchecked_get<T20>());  break;
             }
         }
 
@@ -489,29 +514,29 @@ namespace dlib
                 // do nothing because we are empty
                 case 0: break;
 
-                case 1: obj(unchecked_get<T1>());  break;
-                case 2: obj(unchecked_get<T2>());  break;
-                case 3: obj(unchecked_get<T3>());  break;
-                case 4: obj(unchecked_get<T4>());  break;
-                case 5: obj(unchecked_get<T5>());  break;
+                case 1: invoke_on(obj,unchecked_get<T1>());  break;
+                case 2: invoke_on(obj,unchecked_get<T2>());  break;
+                case 3: invoke_on(obj,unchecked_get<T3>());  break;
+                case 4: invoke_on(obj,unchecked_get<T4>());  break;
+                case 5: invoke_on(obj,unchecked_get<T5>());  break;
 
-                case 6: obj(unchecked_get<T6>());  break;
-                case 7: obj(unchecked_get<T7>());  break;
-                case 8: obj(unchecked_get<T8>());  break;
-                case 9: obj(unchecked_get<T9>());  break;
-                case 10: obj(unchecked_get<T10>());  break;
+                case 6: invoke_on(obj,unchecked_get<T6>());  break;
+                case 7: invoke_on(obj,unchecked_get<T7>());  break;
+                case 8: invoke_on(obj,unchecked_get<T8>());  break;
+                case 9: invoke_on(obj,unchecked_get<T9>());  break;
+                case 10: invoke_on(obj,unchecked_get<T10>());  break;
 
-                case 11: obj(unchecked_get<T11>());  break;
-                case 12: obj(unchecked_get<T12>());  break;
-                case 13: obj(unchecked_get<T13>());  break;
-                case 14: obj(unchecked_get<T14>());  break;
-                case 15: obj(unchecked_get<T15>());  break;
+                case 11: invoke_on(obj,unchecked_get<T11>());  break;
+                case 12: invoke_on(obj,unchecked_get<T12>());  break;
+                case 13: invoke_on(obj,unchecked_get<T13>());  break;
+                case 14: invoke_on(obj,unchecked_get<T14>());  break;
+                case 15: invoke_on(obj,unchecked_get<T15>());  break;
 
-                case 16: obj(unchecked_get<T16>());  break;
-                case 17: obj(unchecked_get<T17>());  break;
-                case 18: obj(unchecked_get<T18>());  break;
-                case 19: obj(unchecked_get<T19>());  break;
-                case 20: obj(unchecked_get<T20>());  break;
+                case 16: invoke_on(obj,unchecked_get<T16>());  break;
+                case 17: invoke_on(obj,unchecked_get<T17>());  break;
+                case 18: invoke_on(obj,unchecked_get<T18>());  break;
+                case 19: invoke_on(obj,unchecked_get<T19>());  break;
+                case 20: invoke_on(obj,unchecked_get<T20>());  break;
             }
         }
 

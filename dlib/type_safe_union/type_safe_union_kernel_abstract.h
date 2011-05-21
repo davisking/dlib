@@ -13,25 +13,25 @@ namespace dlib
 
     template <
         typename T1,
-        typename T2 = T1,
-        typename T3 = T1,
-        typename T4 = T1,
-        typename T5 = T1, 
-        typename T6 = T1,
-        typename T7 = T1,
-        typename T8 = T1,
-        typename T9 = T1,
-        typename T10 = T1,
-        typename T11 = T1,
-        typename T12 = T1,
-        typename T13 = T1,
-        typename T14 = T1,
-        typename T15 = T1,
-        typename T16 = T1,
-        typename T17 = T1,
-        typename T18 = T1,
-        typename T19 = T1,
-        typename T20 = T1
+        typename T2 = _void,  // _void indicates parameter not used.
+        typename T3 = _void,
+        typename T4 = _void,
+        typename T5 = _void, 
+        typename T6 = _void,
+        typename T7 = _void,
+        typename T8 = _void,
+        typename T9 = _void,
+        typename T10 = _void,
+        typename T11 = _void,
+        typename T12 = _void,
+        typename T13 = _void,
+        typename T14 = _void,
+        typename T15 = _void,
+        typename T16 = _void,
+        typename T17 = _void,
+        typename T18 = _void,
+        typename T19 = _void,
+        typename T20 = _void
         >
     class type_safe_union : noncopyable
     {
