@@ -149,7 +149,7 @@ makedocs ()
     do
 
         # The last modified date for these files should always be the release date (regardless of when the actual xml files were modified). 
-        if [ "${i}" = "docs/release_notes.xml" -o "docs/old_release_notes.xml" \
+        if [ "${i}" = "docs/release_notes.xml" -o ${i} = "docs/old_release_notes.xml" \
              -o ${i} = "docs/change_log.xml" -o ${i} = "docs/old_change_log.xml" \
              -o ${i} = "docs/index.xml" ] 
         then
