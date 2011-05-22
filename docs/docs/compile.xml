@@ -32,7 +32,7 @@
             <a href="examples/CMakeLists.txt.html">examples/CMakeLists.txt</a>
         </p>
         <p>
-        I try to make sure everything compiles fine under Visual Studio .NET 2005 (and above) and gcc (3.4 and above).  
+        I try to make sure everything compiles fine under Visual Studio .NET 2005 (and above) and gcc (4.1 and above).  
         </p>
         <p>
            Again, note that you should <b><i>not</i></b> add the dlib folder itself to your compiler's include path.  
