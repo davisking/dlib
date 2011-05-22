@@ -1015,6 +1015,11 @@
          <xsl:with-param name="name">Deleted</xsl:with-param>
          <xsl:with-param name="color">red</xsl:with-param>
       </xsl:call-template>
+      <xsl:call-template name="paths">
+         <xsl:with-param name="type">R</xsl:with-param>
+         <xsl:with-param name="name">Deleted</xsl:with-param>
+         <xsl:with-param name="color">red</xsl:with-param>
+      </xsl:call-template>
    </xsl:template>
 
    <xsl:template match="msg">
