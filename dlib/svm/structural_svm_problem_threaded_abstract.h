@@ -12,10 +12,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename matrix_type,
-        typename feature_vector_type_ = matrix_type
+        typename matrix_type_,
+        typename feature_vector_type_ = matrix_type_
         >
-    class structural_svm_problem_threaded : public structural_svm_problem<matrix_type,feature_vector_type_> 
+    class structural_svm_problem_threaded : public structural_svm_problem<matrix_type_,feature_vector_type_> 
     {
     public:
         /*!
@@ -31,6 +31,7 @@ namespace dlib
                 if you are to use this version of the structural_svm_problem.
         !*/
 
+        typedef matrix_type_ matrix_type;
         typedef typename matrix_type::type scalar_type;
         typedef feature_vector_type_ feature_vector_type;
 
