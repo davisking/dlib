@@ -32,6 +32,11 @@ get_short_revision_number()
     RESULT=`hg log -r $1 | grep changeset | awk '{print $2}' | sed -e 's/:.*//'`  
 }
 
+get_last_modified_date()
+{
+    RESULT=`hg log $1 -l1 --template '{date|date}\n' | awk '{ print $2" "$3", " $5}'`
+}
+
 makedocs ()
 {
 
@@ -46,7 +51,7 @@ makedocs ()
     LOGGER_REVNUM=$RESULT
 
     XSLT_OPTIONS="--nodtdattr   --nonet   --novalid"
-    DATE=`date --date= "+%b %d, %Y"`;
+    DATE_TODAY=`date --date= "+%b %d, %Y"`;
 
 
 
@@ -57,14 +62,9 @@ makedocs ()
     REVISION=$RESULT
 
 
-    if [ "$1" = "snapshot" ] 
-        then
-        RELEASE="developmental snapshot $REVISION"
-    else
-        MAJOR_NUM=`cat $COUNTER_FILE` 
-        MINOR_NUM=`cat $MINOR_COUTNER_FILE` 
-        RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
-    fi;
+    MAJOR_NUM=`cat $COUNTER_FILE` 
+    MINOR_NUM=`cat $MINOR_COUTNER_FILE` 
+    RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
 
 # get XML versions of the change logs
     BASE_LOGGER_REVNUM=`echo $LOGGER_REVNUM - 1000 | bc`
@@ -142,25 +142,35 @@ makedocs ()
 
 
 
-    # make the web page version
-    echo Generate web page from XML and XSLT style sheet
-    cat docs/stylesheet.xsl | sed -e 's/"is_chm">[^<]*/"is_chm">false/' -e "s/_CURRENT_RELEASE_/$RELEASE/" -e "s/_LAST_MODIFIED_DATE_/$DATE/" \
-        > docs/stylesheet.$$.xsl
-    \ls docs/*.xml | xargs -i echo -o {} docs/stylesheet.$$.xsl {} | \
-        sed -e "s/\.xml /\.html /" | sed -e "s/-o docs/-o docs\/web/" | \
-        grep -v main_menu. |\
-        xargs -l xsltproc $XSLT_OPTIONS
-    rm docs/stylesheet.$$.xsl
+    # generate the HTML docs
+    echo Generate HTML docs from XML and XSLT style sheet
+    FILES=`\ls docs/*.xml | grep -v main_menu.xml`
+    for i in $FILES
+    do
 
-    # make the chm version
-    echo Generate non-web page version from XML and XSLT style sheet
-    cat docs/stylesheet.xsl | sed -e 's/"is_chm">[^<]*/"is_chm">true/' -e "s/_CURRENT_RELEASE_/$RELEASE/" -e "s/_LAST_MODIFIED_DATE_/$DATE/" \
-        > docs/stylesheet.$$.xsl
-    \ls docs/*.xml | xargs -i echo -o {} docs/stylesheet.$$.xsl {} | \
-        sed -e "s/\.xml /\.html /" | sed -e "s/-o docs/-o docs\/chm\/docs/" | \
-        grep -v main_menu. |\
-        xargs -l xsltproc $XSLT_OPTIONS
-    rm docs/stylesheet.$$.xsl
+        # The last modified date for these files should always be the release date (regardless of when the actual xml files were modified). 
+        if [ "${i}" = "docs/release_notes.xml" -o ${i} = "docs/change_log.xml" -o ${i} = "docs/old_change_log.xml" -o ${i} = "docs/index.html" ] 
+        then
+            DATE=$DATE_TODAY
+        else
+            get_last_modified_date ${i}
+            DATE=$RESULT
+        fi;
+
+        #make web version
+        cat docs/stylesheet.xsl | sed -e 's/"is_chm">[^<]*/"is_chm">false/' -e "s/_CURRENT_RELEASE_/$RELEASE/" -e "s/_LAST_MODIFIED_DATE_/$DATE/" \
+            > docs/stylesheet.$$.xsl
+        OUT_FILE=$(echo ${i} | sed -e "s/\.xml/\.html/" | sed -e "s/docs\//docs\/web\//")
+        xsltproc $XSLT_OPTIONS -o $OUT_FILE docs/stylesheet.$$.xsl ${i}
+
+        #make chm version
+        cat docs/stylesheet.xsl | sed -e 's/"is_chm">[^<]*/"is_chm">true/' -e "s/_CURRENT_RELEASE_/$RELEASE/" -e "s/_LAST_MODIFIED_DATE_/$DATE/" \
+            > docs/stylesheet.$$.xsl
+        OUT_FILE=$(echo ${i} | sed -e "s/\.xml/\.html/" | sed -e "s/docs\//docs\/chm\/docs\//")
+        xsltproc $XSLT_OPTIONS -o $OUT_FILE docs/stylesheet.$$.xsl ${i}
+
+        rm docs/stylesheet.$$.xsl
+    done
 
 
     FILES=`find docs/chm docs/web -iname "*.html" -type f`
@@ -190,7 +200,7 @@ makedocs ()
 
 
 # build all the html documentation
-makedocs $1;
+makedocs
 
 # now make the table of contents for the chm file
 echo Generating the table of contents for the chm file

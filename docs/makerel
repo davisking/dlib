@@ -27,13 +27,13 @@ if [ "$1" = "major" ]
     MINOR_NUM=0 
     echo $MAJOR_NUM > $COUNTER_FILE
     echo $MINOR_NUM > $MINOR_COUTNER_FILE
-    ./makedocs major || exit 1
 else 
     MAJOR_NUM=`cat $COUNTER_FILE` 
     MINOR_NUM=`cat $MINOR_COUTNER_FILE | awk '{print $1 + 1}'` 
     echo $MINOR_NUM > $MINOR_COUTNER_FILE
-    ./makedocs || exit 1
 fi;
+
+./makedocs || exit 1
 
 rm -rf release || report_failure
 mkdir release || report_failure
