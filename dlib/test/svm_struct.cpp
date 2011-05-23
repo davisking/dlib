@@ -561,6 +561,11 @@ namespace
             DLIB_TEST(std::abs(obj1 - obj3) < 1e-2);
             DLIB_TEST(std::abs(obj1 - obj4) < 1e-2);
             DLIB_TEST(std::abs(obj1 - obj5) < 1e-2);
+            DLIB_TEST(std::abs(obj1 - 1.155) < 1e-2);
+            DLIB_TEST(std::abs(obj2 - 1.155) < 1e-2);
+            DLIB_TEST(std::abs(obj3 - 1.155) < 1e-2);
+            DLIB_TEST(std::abs(obj4 - 1.155) < 1e-2);
+            DLIB_TEST(std::abs(obj5 - 1.155) < 1e-2);
 
             dlog << LINFO << "weight error: "<< max(abs(df1.weights - df2.weights));
             dlog << LINFO << "weight error: "<< max(abs(df1.weights - df3.weights));
