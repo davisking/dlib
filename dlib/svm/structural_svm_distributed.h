@@ -86,7 +86,7 @@ namespace dlib
             friend void deserialize (oracle_request& item, std::istream& in)
             {
                 deserialize(item.current_solution, in);
-				dlib::deserialize(item.cur_risk_lower_bound, in);
+                dlib::deserialize(item.cur_risk_lower_bound, in);
                 dlib::deserialize(item.eps, in);
                 dlib::deserialize(item.skip_cache, in);
             }
