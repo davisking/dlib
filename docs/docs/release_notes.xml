@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.39" date="May 22, 2011">
+New Stuff:
    - Added tools for distributing the work involved in solving a structured
      SVM problem over many computers and CPUs. 
    - Added the bridge.  It allows a dlib::pipe to be used for networked
@@ -26,9 +39,10 @@ Bug fixes:
 Other:
    - dlib's version control system has switched from Subversion to Mercurial.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
+
 <old name="17.38" date="May 7, 2011">
 New Stuff:
    - Added the max_sum_submatrix() function to the optimization tools.
