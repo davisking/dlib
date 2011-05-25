@@ -137,7 +137,7 @@ namespace dlib
         !*/
         {
             // this is just here to provide a compile time check that T is a POD.
-            // this checks *most* of the requrements for being a POD type.
+            // this checks *most* of the requirements for being a POD type.
             // You should not be calling this function on non POD types!
             union
             { 
