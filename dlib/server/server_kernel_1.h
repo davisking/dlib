@@ -358,7 +358,7 @@ namespace dlib
         else if (status == OTHER_ERROR)
         {
             throw dlib::socket_error(
-                "error occurred in server_kernel_1::start()\nunable to crate listener"
+                "error occurred in server_kernel_1::start()\nunable to create listener"
                 );            
         }
 
