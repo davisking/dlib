@@ -72,6 +72,22 @@ namespace dlib
         unsigned long output_components_;
         std::vector<unsigned char> data;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void load_jpeg (
+        image_type& image,
+        const std::string& file_name
+    )
+    {
+        jpeg_loader(file_name).get_image(image);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #ifdef NO_MAKEFILE

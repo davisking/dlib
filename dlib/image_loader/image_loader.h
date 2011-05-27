@@ -761,6 +761,34 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename image_type>
+    void load_bmp (
+        image_type& image,
+        const std::string& file_name
+    )
+    {
+        std::ifstream fin(file_name.c_str(), std::ios::binary);
+        if (!fin)
+            throw image_save_error("Unable to open " + file_name + " for reading.");
+        load_bmp(image, fin);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type>
+    void load_dng (
+        image_type& image,
+        const std::string& file_name
+    )
+    {
+        std::ifstream fin(file_name.c_str(), std::ios::binary);
+        if (!fin)
+            throw image_save_error("Unable to open " + file_name + " for reading.");
+        load_dng(image, fin);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_IMAGE_LOADEr_

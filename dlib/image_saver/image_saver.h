@@ -5,6 +5,7 @@
 
 #include "image_saver_abstract.h"
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include "../algs.h"
 #include "../pixel.h"
@@ -13,6 +14,7 @@
 #include "../entropy_encoder_model.h"
 #include "dng_shared.h"
 #include "../uintn.h"
+#include "../dir_nav.h"
 
 namespace dlib
 {
@@ -524,6 +526,33 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename image_type>
+    void save_dng (
+        const image_type& image,
+        const std::string& file_name
+    )
+    {
+        std::ofstream fout(file_name.c_str(), std::ios::binary);
+        if (!fout)
+            throw image_save_error("Unable to open " + file_name + " for writing.");
+        save_dng(image, fout);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type>
+    void save_bmp (
+        const image_type& image,
+        const std::string& file_name
+    )
+    {
+        std::ofstream fout(file_name.c_str(), std::ios::binary);
+        if (!fout)
+            throw image_save_error("Unable to open " + file_name + " for writing.");
+        save_bmp(image, fout);
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 

@@ -106,6 +106,26 @@ namespace dlib
         !*/
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void load_jpeg (
+        image_type& image,
+        const std::string& file_name
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined  
+        ensures
+            - performs: jpeg_loader(file_name).get_image(image);
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_JPEG_IMPORT_ABSTRACT

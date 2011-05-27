@@ -140,6 +140,22 @@ namespace dlib
         int color_type_;
         scoped_ptr<LibpngData> ld_;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void load_png (
+        image_type& image,
+        const std::string& file_name
+    )
+    {
+        png_loader(file_name).get_image(image);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #ifdef NO_MAKEFILE

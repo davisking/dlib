@@ -45,6 +45,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type 
+        >
+    void save_bmp (
+        const image_type& image,
+        const std::string& file_name
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined  
+        ensures
+            - opens the file indicated by file_name with an output file stream named fout
+              and performs:
+              save_bmp(image,fout);
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     /*!
         dlib dng file format:
             This is a file format I created for this library.  It is a lossless 
@@ -73,6 +92,23 @@ namespace dlib
                 This exception is thrown if there is an error that prevents us
                 from saving the image.  
             - std::bad_alloc 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type>
+    void save_dng (
+        const image_type& image,
+        const std::string& file_name
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined  
+        ensures
+            - opens the file indicated by file_name with an output file stream named fout 
+              and performs:
+              save_dng(image,fout);
     !*/
 
 // ----------------------------------------------------------------------------------------
