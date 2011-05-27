@@ -77,7 +77,7 @@ namespace dlib
         >
     void hysteresis_threshold (
         const in_image_type& in_img,
-        const out_image_type& out_img,
+        out_image_type& out_img,
         unsigned long lower_thresh,
         unsigned long upper_thresh
     );
