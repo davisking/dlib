@@ -182,11 +182,12 @@ namespace dlib
 
         COMPILE_TIME_ASSERT(pixel_traits<typename out_image_type::type>::grayscale);
 
-        DLIB_ASSERT( lower_thresh <= upper_thresh,
+        DLIB_ASSERT( lower_thresh <= upper_thresh && is_same_object(in_img, out_img) == false,
             "\tvoid hysteresis_threshold(in_img, out_img, lower_thresh, upper_thresh)"
             << "\n\tYou can't use an upper_thresh that is less than your lower_thresh"
             << "\n\tlower_thresh: " << lower_thresh 
             << "\n\tupper_thresh: " << upper_thresh 
+            << "\n\tis_same_object(in_img,out_img): " << is_same_object(in_img,out_img) 
             );
 
         // if there isn't any input image then don't do anything

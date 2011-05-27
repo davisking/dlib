@@ -89,6 +89,7 @@ namespace dlib
             - pixel_traits<typename in_image_type::type>::has_alpha == false
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
             - lower_thresh <= upper_thresh
+            - is_same_object(in_img, out_img) == false
         ensures
             - #out_img == the hysteresis thresholded version of in_img (in_img is converted to a 
               grayscale intensity image if it is color). Pixels in in_img with grayscale 
