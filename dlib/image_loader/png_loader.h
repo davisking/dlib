@@ -26,6 +26,8 @@ namespace dlib
         bool is_rgb() const;
         bool is_rgba() const;
 
+        unsigned int bit_depth () const { return bit_depth_; }
+
         template<typename T>
         void get_image( T& t) const
         {
@@ -42,7 +44,7 @@ namespace dlib
             t.set_size( height_, width_ );
 
 
-            if (is_gray())
+            if (is_gray() && bit_depth_ == 8)
             {
                 for ( unsigned n = 0; n < height_;n++ )
                 {
@@ -54,7 +56,19 @@ namespace dlib
                     }
                 }
             }
-            else if (is_rgb())
+            else if (is_gray() && bit_depth_ == 16)
+            {
+                for ( unsigned n = 0; n < height_;n++ )
+                {
+                    const uint16* v = (uint16*)get_row( n );
+                    for ( unsigned m = 0; m < width_;m++ )
+                    {
+                        dlib::uint16 p = v[m];
+                        assign_pixel( t[n][m], p );
+                    }
+                }
+            }
+            else if (is_rgb() && bit_depth_ == 8)
             {
                 for ( unsigned n = 0; n < height_;n++ )
                 {
@@ -69,7 +83,22 @@ namespace dlib
                     }
                 }
             }
-            else if (is_rgba())
+            else if (is_rgb() && bit_depth_ == 16)
+            {
+                for ( unsigned n = 0; n < height_;n++ )
+                {
+                    const uint16* v = (uint16*)get_row( n );
+                    for ( unsigned m = 0; m < width_;m++ )
+                    {
+                        rgb_pixel p;
+                        p.red   = static_cast<uint8>(v[m*3]);
+                        p.green = static_cast<uint8>(v[m*3+1]);
+                        p.blue  = static_cast<uint8>(v[m*3+2]);
+                        assign_pixel( t[n][m], p );
+                    }
+                }
+            }
+            else if (is_rgba() && bit_depth_ == 8)
             {
                 for ( unsigned n = 0; n < height_;n++ )
                 {
@@ -81,6 +110,22 @@ namespace dlib
                         p.green = v[m*4+1];
                         p.blue = v[m*4+2];
                         p.alpha = v[m*4+3];
+                        assign_pixel( t[n][m], p );
+                    }
+                }
+            }
+            else if (is_rgba() && bit_depth_ == 16)
+            {
+                for ( unsigned n = 0; n < height_;n++ )
+                {
+                    const uint16* v = (uint16*)get_row( n );
+                    for ( unsigned m = 0; m < width_;m++ )
+                    {
+                        rgb_alpha_pixel p;
+                        p.red   = static_cast<uint8>(v[m*4]);
+                        p.green = static_cast<uint8>(v[m*4+1]);
+                        p.blue  = static_cast<uint8>(v[m*4+2]);
+                        p.alpha = static_cast<uint8>(v[m*4+3]);
                         assign_pixel( t[n][m], p );
                     }
                 }

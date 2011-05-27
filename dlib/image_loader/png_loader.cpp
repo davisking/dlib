@@ -11,6 +11,7 @@
 #include "../dir_nav.h"
 #include "png_loader.h"
 #include <png.h>
+#include "../string.h"
 
 namespace dlib
 {
@@ -154,11 +155,13 @@ namespace dlib
         png_init_io( ld_->png_ptr_, fp );
         png_set_sig_bytes( ld_->png_ptr_, 8 );
         // flags force one byte per channel output
-        png_read_png( ld_->png_ptr_, ld_->info_ptr_, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING, NULL );
+        png_read_png( ld_->png_ptr_, ld_->info_ptr_, PNG_TRANSFORM_PACKING, NULL );
         height_ = png_get_image_height( ld_->png_ptr_, ld_->info_ptr_ );
         width_ = png_get_image_width( ld_->png_ptr_, ld_->info_ptr_ );
         bit_depth_ = png_get_bit_depth( ld_->png_ptr_, ld_->info_ptr_ );
         color_type_ = png_get_color_type( ld_->png_ptr_, ld_-> info_ptr_ );
+
+        std::cout << "bit_depth_: "<< bit_depth_ << std::endl;
 
         if (color_type_ != PNG_COLOR_TYPE_GRAY && 
             color_type_ != PNG_COLOR_TYPE_RGB && 
@@ -167,6 +170,13 @@ namespace dlib
             fclose( fp );
             png_destroy_read_struct( &( ld_->png_ptr_ ), &( ld_->info_ptr_ ), &( ld_->end_info_ ) );
             throw image_load_error(std::string("png_loader: unsupported color type in file ") + filename);
+        }
+
+        if (bit_depth_ != 8 && bit_depth_ != 16)
+        {
+            fclose( fp );
+            png_destroy_read_struct( &( ld_->png_ptr_ ), &( ld_->info_ptr_ ), &( ld_->end_info_ ) );
+            throw image_load_error("png_loader: unsupported bit depth of " + cast_to_string(bit_depth_) + " in file " + std::string(filename));
         }
 
         ld_->row_pointers_ = png_get_rows( ld_->png_ptr_, ld_->info_ptr_ );

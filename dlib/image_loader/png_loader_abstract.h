@@ -101,6 +101,14 @@ namespace dlib
                     - returns false
         !*/
 
+        unsigned int bit_depth (
+        ) const;
+        /*!
+            ensures
+                - returns the number of bits per channel in the image contained by this
+                  object.  The possible values are 8 or 16.
+        !*/
+
         template<
             typename image_type 
             >
