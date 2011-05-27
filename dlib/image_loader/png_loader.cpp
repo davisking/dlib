@@ -149,6 +149,7 @@ namespace dlib
             throw image_load_error(std::string("png_loader: parse error in file ") + filename);
         }
 
+        png_set_palette_to_rgb(ld_->png_ptr_);
 
         png_init_io( ld_->png_ptr_, fp );
         png_set_sig_bytes( ld_->png_ptr_, 8 );
