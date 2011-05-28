@@ -27,6 +27,8 @@
          <item>bigint</item> 
          <item>crc32</item> 
          <item>rand</item> 
+         <item>hash</item> 
+         <item>murmur_hash3</item> 
          <item>running_stats</item> 
          <item>running_scalar_covariance</item> 
          <item>running_covariance</item> 
@@ -165,6 +167,37 @@
          <spec_file>dlib/crc32/crc32_kernel_abstract.h</spec_file>
          <description>
             This object represents the CRC-32 algorithm for calculating checksums.   
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>murmur_hash3</name>
+         <file>dlib/hash.h</file>
+         <spec_file>dlib/general_hash/murmur_hash3_abstract.h</spec_file>
+         <description>
+            This function takes a block of memory and returns a 32bit hash.  The 
+            hashing algorithm used is Austin Appleby's excellent 
+            <a href="http://code.google.com/p/smhasher/">MurmurHash3</a>. 
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>hash</name>
+         <file>dlib/hash.h</file>
+         <spec_file>dlib/general_hash/hash_abstract.h</spec_file>
+         <description>
+            This is a set of convenience functions for invoking <a href="#murmur_hash3">murmur_hash3</a>
+            on std::strings, std::vectors, std::maps, or <a href="containers.html#matrix">dlib::matrix</a> objects.
+            <p>
+               As an aside, the hash() for matrix objects is defined <a href="dlib/matrix/matrix_utilities_abstract.h.html#hash">here</a>.
+               It has the same interface as all the others.
+            </p>
          </description>
          
       </component>

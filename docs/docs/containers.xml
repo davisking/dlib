@@ -476,6 +476,10 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#set_all_elements</link>
                      </item>
                      <item>
+                        <name>hash</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#hash</link>
+                     </item>
+                     <item>
                         <name>tmp</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#tmp</link>
                      </item>
