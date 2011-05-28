@@ -3177,7 +3177,7 @@ namespace dlib
             long new_cursor_pos
         );
 
-        array2d<data_type>::kernel_1a_c grid;
+        array2d<data_type> grid;
         array<unsigned long>::kernel_2a_c col_width;
         array<unsigned long>::kernel_2a_c row_height;
         bool has_focus;
@@ -3298,7 +3298,7 @@ namespace dlib
             unsigned long state
         );
 
-        array2d<rgb_alpha_pixel>::kernel_1a img;
+        array2d<rgb_alpha_pixel> img;
 
 
         std::vector<overlay_rect> overlay_rects;

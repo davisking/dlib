@@ -371,7 +371,7 @@ namespace dlib
             double values[num_orientation_bins];
         };
 
-        typename array2d<histogram>::kernel_1a hist_cells;
+        array2d<histogram> hist_cells;
 
         mutable descriptor_type des;
 

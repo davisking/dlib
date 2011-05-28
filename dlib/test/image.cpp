@@ -32,7 +32,7 @@ namespace
 
         print_spinner();
 
-        array2d<unsigned char>::kernel_1a_c img1, img2;
+        array2d<unsigned char> img1, img2;
 
         img1.set_size(100,100);
 
@@ -66,7 +66,7 @@ namespace
         }
 
         {
-            array2d<hsi_pixel>::kernel_1a img;
+            array2d<hsi_pixel> img;
             img.set_size(14,15);
             for (long r = 0; r < 14; ++r)
             {
@@ -106,7 +106,7 @@ namespace
 
 
         {
-            array2d<rgb_alpha_pixel>::kernel_1a img;
+            array2d<rgb_alpha_pixel> img;
             img.set_size(14,15);
             for (long r = 0; r < 14; ++r)
             {
@@ -147,7 +147,7 @@ namespace
 
 
         {
-            array2d<rgb_pixel>::kernel_1a img;
+            array2d<rgb_pixel> img;
             img.set_size(14,15);
             for (long r = 0; r < 14; ++r)
             {
@@ -212,7 +212,7 @@ namespace
 
 
         {
-            array2d<unsigned short>::kernel_1a img;
+            array2d<unsigned short> img;
             img.set_size(14,15);
             for (long r = 0; r < 14; ++r)
             {
@@ -247,7 +247,7 @@ namespace
 
 
         {
-            array2d<unsigned char>::kernel_1a img;
+            array2d<unsigned char> img;
             img.set_size(14,15);
             for (long r = 0; r < 14; ++r)
             {
@@ -308,7 +308,7 @@ namespace
         {
             // in this test we will only assign pixel values that can be
             // represented with 8 bits even though we are using a wider pixel type.
-            array2d<unsigned short>::kernel_1a img;
+            array2d<unsigned short> img;
             img.set_size(14,15);
             for (long r = 0; r < 14; ++r)
             {
@@ -365,8 +365,8 @@ namespace
         }
 
         {
-            array2d<unsigned short>::kernel_1a_c img1;
-            array2d<unsigned char>::kernel_1a_c img2;
+            array2d<unsigned short> img1;
+            array2d<unsigned char> img2;
             img1.set_size(10,10);
             assign_all_pixels(img1, 0);
 
@@ -394,7 +394,7 @@ namespace
         }
 
         {
-            array2d<unsigned char>::kernel_1a_c img;
+            array2d<unsigned char> img;
             img.set_size(10,10);
             assign_all_pixels(img, 0);
 
@@ -419,7 +419,7 @@ namespace
         }
 
         {
-            array2d<unsigned char>::kernel_1a_c img;
+            array2d<unsigned char> img;
             img.set_size(11,11);
             assign_all_pixels(img, 0);
 
@@ -451,7 +451,7 @@ namespace
     {
         dlib::rand rnd;
 
-        array2d<unsigned char>::kernel_1a_c img;
+        array2d<unsigned char> img;
         integral_image int_img;
 
         int_img.load(img);

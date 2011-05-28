@@ -309,7 +309,7 @@ namespace dlib
         long num_intervals;
         long initial_step_size;
 
-        typedef array2d<double>::kernel_1a image_type;
+        typedef array2d<double> image_type;
         typedef array<image_type>::expand_1d pyramid_type;
 
         pyramid_type pyramid;

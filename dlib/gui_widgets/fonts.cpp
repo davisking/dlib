@@ -244,7 +244,7 @@ namespace dlib
             {
                 int dwx0, dwy0;
                 int BBw, BBh, BBxoff0x, BByoff0y;
-                array2d<char>::kernel_1a bitmap;
+                array2d<char> bitmap;
                 bool has_dw;
             };
             bool parse_header( header_info& info )
@@ -587,7 +587,7 @@ namespace dlib
 
     bool bdf_font::
     bitmap_to_letter( 
-        array2d<char>::kernel_1a& bitmap, 
+        array2d<char>& bitmap, 
         unichar enc, 
         unsigned long width, 
         int x_offset,

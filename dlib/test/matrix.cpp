@@ -406,7 +406,7 @@ namespace
         }
 
         {
-            array2d<double>::kernel_1a_c a;
+            array2d<double> a;
             a.set_size(6,7);
 
 
@@ -447,7 +447,7 @@ namespace
         }
 
         {
-            array2d<double>::kernel_1a_c m;
+            array2d<double> m;
             m.set_size(5,5);
 
             for (long r = 0; r < m.nr(); ++r)

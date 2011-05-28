@@ -427,7 +427,7 @@ namespace dlib
             draw_image(c, point(rect.left(),rect.top()), img);
         }
 
-        array2d<rgb_alpha_pixel>::kernel_1a img;
+        array2d<rgb_alpha_pixel> img;
 
         // restricted functions
         image_widget(image_widget&);        // copy constructor

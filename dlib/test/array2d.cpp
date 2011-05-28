@@ -409,10 +409,7 @@ namespace
         )
         {
             dlog << LINFO << "testing kernel_1a";
-            array2d_kernel_test<array2d<unsigned long>::kernel_1a>  ();
-            print_spinner();
-            dlog << LINFO << "testing kernel_1a_c";
-            array2d_kernel_test<array2d<unsigned long>::kernel_1a_c> ();
+            array2d_kernel_test<array2d<unsigned long> >  ();
             print_spinner();
         }
     } a;

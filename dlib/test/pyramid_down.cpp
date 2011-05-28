@@ -22,7 +22,7 @@ namespace
 
 void test_pyramid_down_graysclae()
 {
-    array2d<unsigned char>::kernel_1a img, down;
+    array2d<unsigned char> img, down;
     pyramid_down pyr;
 
     img.set_size(300,264);
@@ -50,8 +50,8 @@ void test_pyramid_down_graysclae()
 
 void test_pyramid_down_rgb()
 {
-    array2d<rgb_pixel>::kernel_1a img;
-    array2d<bgr_pixel>::kernel_1a down;
+    array2d<rgb_pixel> img;
+    array2d<bgr_pixel> down;
     pyramid_down pyr;
 
     img.set_size(231, 351);
@@ -138,8 +138,8 @@ rgb_pixel mean_pixel (
 
 void test_pyramid_down_rgb2()
 {
-    array2d<rgb_pixel>::kernel_1a img, img3;
-    array2d<unsigned char>::kernel_1a img2, img4;
+    array2d<rgb_pixel> img, img3;
+    array2d<unsigned char> img2, img4;
 
 
     img.set_size(300,400);

@@ -217,9 +217,9 @@ namespace dlib
             }
         }
 
-        array2d<rgb_alpha_pixel>::kernel_1a img_mouseover;
-        array2d<rgb_alpha_pixel>::kernel_1a img_normal;
-        array2d<rgb_alpha_pixel>::kernel_1a img_disabled;
+        array2d<rgb_alpha_pixel> img_mouseover;
+        array2d<rgb_alpha_pixel> img_normal;
+        array2d<rgb_alpha_pixel> img_disabled;
 
         // this is the minimum amount of padding that can separate the name from the
         // edge of the button

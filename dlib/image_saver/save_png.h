@@ -133,7 +133,7 @@ namespace dlib
             try
             {
                 // convert from HSI to RGB (Or potentially RGB pixels that aren't laid out as R G B)
-                array2d<rgb_pixel>::kernel_1a temp_img;
+                array2d<rgb_pixel> temp_img;
                 assign_image(temp_img, img);
 
                 const int bit_depth = 8;
@@ -156,7 +156,7 @@ namespace dlib
             try
             {
                 // convert from RGBA pixels that aren't laid out as R G B A
-                array2d<rgb_alpha_pixel>::kernel_1a temp_img;
+                array2d<rgb_alpha_pixel> temp_img;
                 assign_image(temp_img, img);
 
                 const int bit_depth = 8;
@@ -203,7 +203,7 @@ namespace dlib
                 try
                 {
                     // convert from whatever this is to 16bit grayscale 
-                    array2d<dlib::uint16>::kernel_1a temp_img;
+                    array2d<dlib::uint16> temp_img;
                     assign_image(temp_img, img);
 
                     const int bit_depth = 16;

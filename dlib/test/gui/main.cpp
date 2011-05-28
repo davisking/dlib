@@ -18,7 +18,7 @@ using namespace dlib;
 using namespace std;
 
 
-typedef dlib::array2d<hsi_pixel>::kernel_1a_c image;
+typedef dlib::array2d<hsi_pixel> image;
 
 
 

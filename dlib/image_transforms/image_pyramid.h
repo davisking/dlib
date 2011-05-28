@@ -127,7 +127,7 @@ namespace dlib
 
             typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
             typedef typename promote<bp_type>::type ptype;
-            typename array2d<ptype>::kernel_1a temp_img;
+            array2d<ptype> temp_img;
             temp_img.set_size(original.nr(), (original.nc()-3)/2);
             down.set_size((original.nr()-3)/2, (original.nc()-3)/2);
 
@@ -218,7 +218,7 @@ namespace dlib
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-            array2d<rgbptype>::kernel_1a temp_img;
+            array2d<rgbptype> temp_img;
             temp_img.set_size(original.nr(), (original.nc()-3)/2);
             down.set_size((original.nr()-3)/2, (original.nc()-3)/2);
 
