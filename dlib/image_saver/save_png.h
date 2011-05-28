@@ -52,7 +52,7 @@ namespace dlib
                 this function.   You must also make sure you set your build environment
                 to link against the libpng library.
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-            COMPILE_TIME_ASSERT(sizeof(T) == 0);
+            COMPILE_TIME_ASSERT(sizeof(image_type) == 0);
 #else
         std::vector<png_byte*> row_pointers(img.nr());
         FILE *fp;
