@@ -136,14 +136,9 @@ namespace dlib
                 - reverses the byte ordering in item
         !*/
         {
-            // this is just here to provide a compile time check that T is a POD.
-            // this checks *most* of the requirements for being a POD type.
-            // You should not be calling this function on non POD types!
-            union
-            { 
-                int a;
-                T value;
-            } temp;
+            DLIB_ASSERT_HAS_STANDARD_LAYOUT(T);
+
+            T value;
 
             // If you are getting this as an error then you are probably using
             // this object wrong.  If you think you aren't then send me (Davis) an
@@ -161,11 +156,11 @@ namespace dlib
 
             const size_t size = sizeof(T);
             unsigned char* const ptr = reinterpret_cast<unsigned char*>(&item);
-            unsigned char* const ptr_temp = reinterpret_cast<unsigned char*>(&temp.value);
+            unsigned char* const ptr_temp = reinterpret_cast<unsigned char*>(&value);
             for (size_t i = 0; i < size; ++i)
                 ptr_temp[size-i-1] = ptr[i];
 
-            item = temp.value;
+            item = value;
         }
 
         bool little_endian;
