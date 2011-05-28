@@ -97,7 +97,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /*A DLIB_ASSERT_HAS_STANDARD_LAYOUT 
+    /*!A DLIB_ASSERT_HAS_STANDARD_LAYOUT 
     
         This macro is meant to cause a compiler error if a type doesn't have a simple
         memory layout (like a C struct). In particular, types with simple layouts are
@@ -108,7 +108,7 @@ namespace dlib
         it is a "standard layout type".  Once we can use C++0x we can change this macro 
         to something that uses the std::is_standard_layout type_traits class.  
         See: http://www2.research.att.com/~bs/C++0xFAQ.html#PODs
-    */
+    !*/
     // Use the fact that in C++03 you can't put non-PODs into a union.
 #define DLIB_ASSERT_HAS_STANDARD_LAYOUT(type)   \
     union  BOOST_JOIN(DAHSL_,__LINE__) { type TYPE_NOT_STANDARD_LAYOUT; };  \
