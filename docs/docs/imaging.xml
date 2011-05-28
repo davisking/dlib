@@ -27,7 +27,6 @@
          <name>Pixels</name>
          <item>rgb_pixel</item>
          <item>bgr_pixel</item>
-         <item>cv_image</item>
          <item>rgb_alpha_pixel</item>
          <item>hsi_pixel</item>
          <item>pixel_traits</item>
@@ -38,12 +37,16 @@
 
       <section>
          <name>Image I/O</name>
-         <item>png_loader</item>
          <item>jpeg_loader</item>
          <item>load_bmp</item> 
-         <item>save_bmp</item> 
          <item>load_dng</item> 
+         <item>load_image</item> 
+         <item>load_jpeg</item> 
+         <item>load_png</item> 
+         <item>png_loader</item>
+         <item>save_bmp</item> 
          <item>save_dng</item> 
+         <item>save_png</item> 
       </section>
 
       <section>
@@ -74,6 +77,8 @@
  
       <section>
          <name>Miscellaneous</name>
+
+         <item>cv_image</item>
 
          <item>draw_line</item> 
          <item>assign_image</item> 
@@ -467,6 +472,25 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>load_jpeg</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_loader/jpeg_loader_abstract.h</spec_file>
+         <description>        
+            This function loads a JPEG image file into 
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_JPEG_SUPPORT if you want to use this object.  You
+               must also set your build environment to link to the libjpeg library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>load_dng</name>
          <file>dlib/image_io.h</file>
          <spec_file link="true">dlib/image_loader/image_loader_abstract.h</spec_file>
@@ -493,6 +517,44 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>save_png</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_saver/save_png_abstract.h</spec_file>
+         <description>        
+      This global function writes an image to disk as a PNG (Portable Network Graphics) file. 
+            <p>
+               Note that you must define DLIB_PNG_SUPPORT if you want to use this function.  You
+               must also set your build environment to link to the libpng library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>load_image</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_loader/load_image_abstract.h</spec_file>
+         <description>        
+            This global function takes a file name, looks at its extension, and 
+            then loads it into an <a href="containers.html#array2d">array2d</a> of 
+            <a href="dlib/pixel.h.html">pixels</a> using the appropriate image 
+            loading routine.  The supported types are BMP, PNG, JPEG, and the dlib DNG file format. 
+
+            <p>
+               Note that you can only load PNG and JPEG files if you link against
+               libpng and libjpeg respectively.
+            </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>load_bmp</name>
          <file>dlib/image_io.h</file>
          <spec_file link="true">dlib/image_loader/image_loader_abstract.h</spec_file>
@@ -505,6 +567,25 @@
             <example>image_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>load_png</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_loader/png_loader_abstract.h</spec_file>
+         <description>        
+            This function loads a Portable Network Graphics (PNG) image file into 
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_PNG_SUPPORT if you want to use this object.  You
+               must also set your build environment to link to the libpng library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p>
+         </description>
+
       </component>
             
    <!-- ************************************************************************* -->

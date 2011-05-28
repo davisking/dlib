@@ -927,6 +927,8 @@
          <term file="imaging.html" name="get_histogram"/>
          <term file="imaging.html" name="hsi_pixel"/>
          <term file="imaging.html" name="load_bmp"/>
+         <term file="imaging.html" name="load_png"/>
+         <term file="imaging.html" name="load_jpeg"/>
          <term file="imaging.html" name="load_dng"/>
          <term file="imaging.html" name="pixel_traits"/>
          <term file="imaging.html" name="rgb_pixel"/>
@@ -936,6 +938,8 @@
          <term file="imaging.html" name="rgb_alpha_pixel"/>
          <term link="imaging.html#rgb_alpha_pixel" name="alpha"/>
          <term file="imaging.html" name="save_bmp"/>
+         <term file="imaging.html" name="save_png"/>
+         <term file="imaging.html" name="load_image"/>
          <term file="imaging.html" name="save_dng"/>
          <term file="imaging.html" name="spatially_filter_image"/>
          <term file="imaging.html" name="pyramid_down"/>
