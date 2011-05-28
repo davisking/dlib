@@ -161,7 +161,6 @@ namespace dlib
         bit_depth_ = png_get_bit_depth( ld_->png_ptr_, ld_->info_ptr_ );
         color_type_ = png_get_color_type( ld_->png_ptr_, ld_-> info_ptr_ );
 
-        std::cout << "bit_depth_: "<< bit_depth_ << std::endl;
 
         if (color_type_ != PNG_COLOR_TYPE_GRAY && 
             color_type_ != PNG_COLOR_TYPE_RGB && 
