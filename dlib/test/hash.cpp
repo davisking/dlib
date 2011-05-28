@@ -46,6 +46,39 @@ namespace
         }
     }
 
+    // Run the official test for MurmurHash3
+    void murmur_hash_test()
+    {
+        uint8 key[256];
+        uint32 hashes[256];
+        uint32 final = 0;
+
+        memset(key,0,sizeof(key));
+        memset(hashes,0,sizeof(hashes));
+
+        // Hash keys of the form {0}, {0,1}, {0,1,2}... up to N=255,using 256-N as
+        // the seed
+
+        for(int i = 0; i < 256; i++)
+        {
+            key[i] = (uint8)i;
+
+            hashes[i] = murmur_hash3(key,i,256-i);
+        }
+
+        byte_orderer bo;
+        bo.host_to_little(hashes);
+        // Then hash the result array
+        final = murmur_hash3(hashes,sizeof(hashes),0);
+
+        // The first four bytes of that hash, interpreted as a little-endian integer, is our
+        // verification value
+
+        dlog << LINFO << hex << "final: "<< final;
+        DLIB_TEST(final == 0xB0F57EE3);
+
+    }
+
     class test_hash : public tester
     {
     public:
@@ -59,6 +92,9 @@ namespace
         )
         {
             print_spinner();
+
+            murmur_hash_test();
+
             std::string str1 = "some random string";
             matrix<unsigned char> mat(2,2);
 
@@ -89,34 +125,34 @@ namespace
             m['t'] = 'T';
 
             dlog << LINFO << "hash(str1): "<< hash(str1);
-            dlog << LINFO << "hash(v): "<< hash(v);
-            dlog << LINFO << "hash(v2): "<< hash(v2);
-            dlog << LINFO << "hash(m): "<< hash(m);
-            dlog << LINFO << "hash(mat): "<< hash(mat);
+            dlog << LINFO << "hash(v):    "<< hash(v);
+            dlog << LINFO << "hash(v2):   "<< hash(v2);
+            dlog << LINFO << "hash(m):    "<< hash(m);
+            dlog << LINFO << "hash(mat):  "<< hash(mat);
             dlog << LINFO << "hash(mat2): "<< hash(mat2);
 
-            DLIB_TEST(hash(str1) == 1073638390);
-            DLIB_TEST(hash(v) == 4054789286);
-            DLIB_TEST(hash(v2) == 1669671676);
-            DLIB_TEST(hash(m) == 2865512303);
-            DLIB_TEST(hash(mat) == 1043635621);
-            DLIB_TEST(hash(mat2) == 982899794);
-            DLIB_TEST(murmur_hash3(&str1[0], str1.size(), 0) == 1073638390);
+            DLIB_TEST(hash(str1) == 0x3ffe6bf6);
+            DLIB_TEST(hash(v)    == 0xf1af2ca6);
+            DLIB_TEST(hash(v2)   == 0x63852afc);
+            DLIB_TEST(hash(m)    == 0xaacc3f6f);
+            DLIB_TEST(hash(mat)  == 0x3e349da5);
+            DLIB_TEST(hash(mat2) == 0x3a95dc52);
+            DLIB_TEST(murmur_hash3(&str1[0], str1.size(), 0) == 0x3ffe6bf6);
 
             dlog << LINFO << "hash(str1,1): "<< hash(str1,1);
-            dlog << LINFO << "hash(v,3): "<< hash(v,3);
-            dlog << LINFO << "hash(v2,3): "<< hash(v2,3);
-            dlog << LINFO << "hash(m,4): "<< hash(m,4);
-            dlog << LINFO << "hash(mat,5): "<< hash(mat,5);
+            dlog << LINFO << "hash(v,3):    "<< hash(v,3);
+            dlog << LINFO << "hash(v2,3):   "<< hash(v2,3);
+            dlog << LINFO << "hash(m,4):    "<< hash(m,4);
+            dlog << LINFO << "hash(mat,5):  "<< hash(mat,5);
             dlog << LINFO << "hash(mat2,6): "<< hash(mat2,6);
 
-            DLIB_TEST(hash(str1,1) == 2977753747);
-            DLIB_TEST(hash(v,3) == 2127112268);
-            DLIB_TEST(hash(v2,3) == 2999850111);
-            DLIB_TEST(hash(m,4) == 4200495810);
-            DLIB_TEST(hash(mat,5) == 2380427865);
-            DLIB_TEST(hash(mat2,6) == 3098179348 );
-            DLIB_TEST(murmur_hash3(&str1[0], str1.size(), 1) == 2977753747);
+            DLIB_TEST(hash(str1,1) == 0xb17cea93);
+            DLIB_TEST(hash(v,3)    == 0x7ec9284c);
+            DLIB_TEST(hash(v2,3)   == 0xb2ce147f);
+            DLIB_TEST(hash(m,4)    == 0xfa5e7ac2);
+            DLIB_TEST(hash(mat,5)  == 0x8de27259);
+            DLIB_TEST(hash(mat2,6) == 0xb8aa7714);
+            DLIB_TEST(murmur_hash3(&str1[0], str1.size(), 1) == 0xb17cea93);
 
         }
     } a;
