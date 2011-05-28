@@ -815,25 +815,6 @@
             <example>image_ex.cpp.html</example>
          </examples>
          
-         <implementations>
-            <implementation>
-               <name>array2d_kernel_1</name>
-               <file>dlib/array2d/array2d_kernel_1.h</file>
-               <description> 
-                  This is implemented in the obvious way.  See the source for details.
-                  It uses the <a href="other.html#memory_manager">memory_manager</a> for all memory allocations.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for array2d_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation>                                  
-         </implementations>
-                        
       </component>
             
    <!-- ************************************************************************* -->

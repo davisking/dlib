@@ -43,7 +43,7 @@ int main(int argc, char** argv)
         // Here we declare an image object that can store rgb_pixels.  Note that in 
         // dlib there is no explicit image object, just a 2D array and
         // various pixel types.  
-        array2d<rgb_pixel>::kernel_1a img;
+        array2d<rgb_pixel> img;
 
         // Now load the image file into our image.  If something is wrong then
         // load_image() will throw an exception.  Also, if you compiled with libpng

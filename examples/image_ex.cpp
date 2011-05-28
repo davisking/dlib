@@ -37,7 +37,7 @@ int main(int argc, char** argv)
         // Here we declare an image object that can store rgb_pixels.  Note that in 
         // dlib there is no explicit image object, just a 2D array and
         // various pixel types.  
-        array2d<rgb_pixel>::kernel_1a img;
+        array2d<rgb_pixel> img;
 
         // Now load the image file into our image.  If something is wrong then
         // load_image() will throw an exception.  Also, if you compiled with libpng
@@ -48,8 +48,8 @@ int main(int argc, char** argv)
         // Now lets use some image functions.  This example is going to perform
         // simple edge detection on the image.  First lets find the horizontal and
         // vertical gradient images.
-        array2d<short>::kernel_1a horz_gradient, vert_gradient;
-        array2d<unsigned char>::kernel_1a edge_image;
+        array2d<short> horz_gradient, vert_gradient;
+        array2d<unsigned char> edge_image;
         sobel_edge_detector(img,horz_gradient, vert_gradient);
 
         // now we do the non-maximum edge suppression step so that our edges are nice and thin

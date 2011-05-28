@@ -15,7 +15,7 @@ namespace dlib
         typename T,
         typename mem_manager = default_memory_manager
         >
-    class array2d_kernel_1 : public enumerable<T>
+    class array2d : public enumerable<T>
     {
 
         /*!
@@ -59,6 +59,10 @@ namespace dlib
 
         class row_helper;
     public:
+
+        // These typedefs are here for backwards compatibility with older versions of dlib.
+        typedef array2d kernel_1a;
+        typedef array2d kernel_1a_c;
          
         typedef T type;
         typedef mem_manager mem_manager_type;
@@ -74,7 +78,7 @@ namespace dlib
                         - (*this)[x] == data[x]
             !*/
 
-            friend class array2d_kernel_1;
+            friend class array2d;
             friend class row_helper;
 
         public:
@@ -83,11 +87,35 @@ namespace dlib
 
             const T& operator[] (
                 long column
-            ) const { return data[column]; }
+            ) const 
+            { 
+                // make sure requires clause is not broken
+                DLIB_ASSERT(column < nc() && column >= 0,
+                    "\tconst T& array2d::operator[](long column) const"
+                    << "\n\tThe column index given must be less than the number of columns."
+                    << "\n\tthis:    " << this
+                    << "\n\tcolumn:  " << column 
+                    << "\n\tnc(): " << nc()
+                );
+
+                return data[column]; 
+            }
 
             T& operator[] (
                 long column
-            ) { return data[column]; }
+            ) 
+            { 
+                // make sure requires clause is not broken
+                DLIB_ASSERT(column < nc() && column >= 0,
+                    "\tT& array2d::operator[](long column)"
+                    << "\n\tThe column index given must be less than the number of columns."
+                    << "\n\tthis:    " << this
+                    << "\n\tcolumn:  " << column 
+                    << "\n\tnc(): " << nc()
+                );
+
+                return data[column]; 
+            }
 
         private:
 
@@ -103,7 +131,7 @@ namespace dlib
 
         // -----------------------------------
 
-        array2d_kernel_1 (
+        array2d (
         ) : 
             nc_(0),
             nr_(0),
@@ -115,7 +143,7 @@ namespace dlib
         {
         }
 
-        virtual ~array2d_kernel_1 (
+        virtual ~array2d (
         ) { clear(); }
 
         long nc (
@@ -126,14 +154,38 @@ namespace dlib
 
         row& operator[] (
             long row
-        ) { return rows[row]; }
+        ) 
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(row < nr() && row >= 0,
+                "\trow& array2d::operator[](long row)"
+                << "\n\tThe row index given must be less than the number of rows."
+                << "\n\tthis:     " << this
+                << "\n\trow:      " << row 
+                << "\n\tnr(): " << nr()
+                );
+
+            return rows[row]; 
+        }
 
         const row& operator[] (
             long row
-        ) const { return rows[row]; }
+        ) const 
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(row < nr() && row >= 0,
+                "\tconst row& array2d::operator[](long row) const"
+                << "\n\tThe row index given must be less than the number of rows."
+                << "\n\tthis:     " << this
+                << "\n\trow:      " << row 
+                << "\n\tnr(): " << nr()
+            );
+
+            return rows[row]; 
+        }
 
         void swap (
-            array2d_kernel_1& item
+            array2d& item
         )
         {
             exchange(data,item.data);
@@ -179,10 +231,30 @@ namespace dlib
         ) const { return (cur != 0); }
 
         const T& element (
-        ) const { return *cur; }
+        ) const 
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_element_valid() == true,
+                "\tconst T& array2d::element()()"
+                << "\n\tYou can only call element() when you are at a valid one."
+                << "\n\tthis:    " << this
+            );
+
+            return *cur; 
+        }
 
         T& element (
-        ) { return *cur; }
+        ) 
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_element_valid() == true,
+                         "\tT& array2d::element()()"
+                         << "\n\tYou can only call element() when you are at a valid one."
+                         << "\n\tthis:    " << this
+            );
+
+            return *cur; 
+        }
 
         bool move_next (
         ) const
@@ -233,8 +305,8 @@ namespace dlib
         mutable bool at_start_;
 
         // restricted functions
-        array2d_kernel_1(array2d_kernel_1&);        // copy constructor
-        array2d_kernel_1& operator=(array2d_kernel_1&);    // assignment operator
+        array2d(array2d&);        // copy constructor
+        array2d& operator=(array2d&);    // assignment operator
 
     };
 
@@ -245,8 +317,8 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        array2d_kernel_1<T,mem_manager>& a, 
-        array2d_kernel_1<T,mem_manager>& b 
+        array2d<T,mem_manager>& a, 
+        array2d<T,mem_manager>& b 
     ) { a.swap(b); }   
 
 
@@ -255,7 +327,7 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array2d_kernel_1<T,mem_manager>& item, 
+        const array2d<T,mem_manager>& item, 
         std::ostream& out 
     )   
     {
@@ -271,7 +343,7 @@ namespace dlib
         }
         catch (serialization_error e)
         { 
-            throw serialization_error(e.info + "\n   while serializing object of type array2d_kernel_1"); 
+            throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
         }
     }
 
@@ -279,7 +351,7 @@ namespace dlib
         typename T 
         >
     void deserialize (
-        array2d_kernel_1<T>& item, 
+        array2d<T>& item, 
         std::istream& in
     )   
     {
@@ -298,7 +370,7 @@ namespace dlib
         catch (serialization_error e)
         { 
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type array2d_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
         }
     }
 
@@ -312,12 +384,22 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    void array2d_kernel_1<T,mem_manager>::
+    void array2d<T,mem_manager>::
     set_size (
         long nr__,
         long nc__
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT((nc__ > 0 && nr__ > 0) ||
+                (nc__ == 0 && nr__ == 0),
+               "\tvoid array2d::set_size(long nr__, long nc__)"
+               << "\n\tYou have to give a non zero nc and nr or just make both zero."
+               << "\n\tthis: " << this
+               << "\n\tnc__: " << nc__ 
+               << "\n\tnr__: " << nr__ 
+        );
+
         // set the enumerator back at the start
         at_start_ = true;
         cur = 0;

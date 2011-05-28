@@ -5,39 +5,7 @@
 
 
 #include "array2d/array2d_kernel_1.h"
-#include "array2d/array2d_kernel_c.h"
 #include "algs.h"
-
-
-
-namespace dlib
-{
-
-
-    template <
-        typename T,
-        typename mem_manager = default_memory_manager 
-        >
-    class array2d
-    {
-
-        array2d() {}
- 
-
-    public:
-        
-        //----------- kernels ---------------
-
-        // kernel_1a        
-        typedef     array2d_kernel_1<T,mem_manager>   
-                    kernel_1a;
-        typedef     array2d_kernel_c<kernel_1a>   
-                    kernel_1a_c;
-
-  
-
-    };
-}
 
 #endif // DLIB_ARRAY2d_
 
