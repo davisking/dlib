@@ -34,23 +34,16 @@ int main(int argc, char** argv)
             return 1;
         }
 
-        // Here we open the image file.  Note that when you open a binary file with 
-        // the C++ ifstream you must supply the ios::binary flag.
-        ifstream fin(argv[1],ios::binary);
-        if (!fin)
-        {
-            cout << "error, can't find " << argv[1] << endl;
-            return 1;
-        }
-
         // Here we declare an image object that can store rgb_pixels.  Note that in 
         // dlib there is no explicit image object, just a 2D array and
         // various pixel types.  
         array2d<rgb_pixel>::kernel_1a img;
 
-        // now load the bmp file into our image.  If the file isn't really a BMP
-        // or is corrupted then load_bmp() will throw an exception.
-        load_bmp(img, fin);
+        // Now load the image file into our image.  If something is wrong then
+        // load_image() will throw an exception.  Also, if you compiled with libpng
+        // and libjpeg then load_image() can also load PNG and JPEG files in addition
+        // to BMP files.
+        load_image(img, argv[1]);
 
         // Now lets use some image functions.  This example is going to perform
         // simple edge detection on the image.  First lets find the horizontal and
@@ -66,7 +59,8 @@ int main(int argc, char** argv)
         // window to display them on the screen.
 
 
-        // create a window to display the edge image 
+        // create a window to display the edge image.  (Note that you can zoom into 
+        // the window by holding CTRL and scrolling the mouse wheel)
         image_window my_window(edge_image);
 
         // also make a window to display the original image
