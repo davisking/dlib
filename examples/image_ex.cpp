@@ -50,16 +50,13 @@ int main(int argc, char** argv)
         // vertical gradient images.
         array2d<short> horz_gradient, vert_gradient;
         array2d<unsigned char> edge_image;
-        sobel_edge_detector(img,horz_gradient, vert_gradient);
+        sobel_edge_detector(img, horz_gradient, vert_gradient);
 
         // now we do the non-maximum edge suppression step so that our edges are nice and thin
         suppress_non_maximum_edges(horz_gradient, vert_gradient, edge_image); 
 
-        // Now we would like to see what our images look like.  So lets use our 
-        // window to display them on the screen.
-
-
-        // create a window to display the edge image.  (Note that you can zoom into 
+        // Now we would like to see what our images look like.  So lets use a 
+        // window to display them on the screen.  (Note that you can zoom into 
         // the window by holding CTRL and scrolling the mouse wheel)
         image_window my_window(edge_image);
 
