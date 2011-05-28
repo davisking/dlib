@@ -45,6 +45,7 @@ set (tests
    entropy_encoder_model.cpp
    geometry.cpp
    graph.cpp
+   hash.cpp
    hash_map.cpp
    hash_set.cpp
    hash_table.cpp

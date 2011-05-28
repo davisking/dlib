@@ -55,6 +55,7 @@ SRC += entropy_coder.cpp
 SRC += entropy_encoder_model.cpp
 SRC += geometry.cpp
 SRC += graph.cpp
+SRC += hash.cpp
 SRC += hash_map.cpp
 SRC += hash_set.cpp
 SRC += hash_table.cpp
