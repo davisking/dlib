@@ -34,7 +34,7 @@ namespace dlib
 
 #else	// defined(_MSC_VER)
 
-#define	DLIB_FORCE_INLINE __attribute__((always_inline))
+#define	DLIB_FORCE_INLINE __attribute__((always_inline)) inline 
 
     inline uint32 murmur_rotl32 ( uint32 x, int8 r )
     {
