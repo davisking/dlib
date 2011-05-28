@@ -667,10 +667,11 @@ namespace dlib
         long NR,
         long NC,
         typename MM,
-        typename U
+        typename U,
+        typename L
         >
     void set_all_elements (
-        matrix<T,NR,NC,MM>& m,
+        matrix<T,NR,NC,MM,L>& m,
         U value
     );
     /*!
@@ -688,6 +689,27 @@ namespace dlib
         ensures
             - returns a temporary matrix object that is a copy of m. 
               (This allows you to easily force a matrix_exp to fully evaluate)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        long NR, 
+        long NC, 
+        typename MM, 
+        typename L
+        >
+    uint32 hash (
+        const matrix<T,NR,NC,MM,L>& item,
+        uint32 seed = 0
+    );
+    /*!
+        ensures
+            - returns a 32bit hash of the data stored in item.  
+            - Each value of seed results in a different hash function being used.  
+              (e.g. hash(item,0) should generally not be equal to hash(item,1))
+            - uses the murmur_hash3() routine to compute the actual hash.
     !*/
 
 // ----------------------------------------------------------------------------------------

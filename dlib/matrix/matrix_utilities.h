@@ -16,6 +16,7 @@
 #include "matrix_expressions.h"
 #include "matrix_math_functions.h"
 #include "matrix_op.h"
+#include "../general_hash/murmur_hash3.h"
 
 
 namespace dlib
@@ -3964,6 +3965,22 @@ namespace dlib
     {
         typedef op_flipud<M> op;
         return matrix_op<op>(op(m.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, long NR, long NC, typename MM, typename L>
+    uint32 hash (
+        const matrix<T,NR,NC,MM,L>& item,
+        uint32 seed = 0
+    )
+    {
+        DLIB_ASSERT_HAS_STANDARD_LAYOUT(T);
+
+        if (item.size() == 0)
+            return 0;
+        else
+            return murmur_hash3(&item(0,0), sizeof(T)*item.size(), seed);
     }
 
 // ----------------------------------------------------------------------------------------
