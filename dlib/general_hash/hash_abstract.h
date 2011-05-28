@@ -23,6 +23,8 @@ namespace dlib
             - Each value of seed results in a different hash function being used.  
               (e.g. hash(item,0) should generally not be equal to hash(item,1))
             - uses the murmur_hash3() routine to compute the actual hash.
+            - This routine will always give the same hash value when presented
+              with the same input string.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -37,11 +39,12 @@ namespace dlib
             - Each value of seed results in a different hash function being used.  
               (e.g. hash(item,0) should generally not be equal to hash(item,1))
             - uses the murmur_hash3() routine to compute the actual hash.
-            - Note that the returned hash value will be different on big-endian and 
-              little-endian systems since hash() doesn't attempt to perform any byte 
-              swapping of the data contained in item.  If you want to always obtain 
-              the same hash then you need to byte swap the elements of item before 
-              passing it to hash().
+            - Note that if the memory layout of the elements in item change between
+              hardware platforms then hash() will give different outputs.  If you want
+              hash() to always give the same output for the same input then you must 
+              ensure that elements of item always have the same layout in memory.
+              Typically this means using fixed width types and performing byte swapping
+              to account for endianness before passing item to hash().
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -60,11 +63,12 @@ namespace dlib
             - Each value of seed results in a different hash function being used.  
               (e.g. hash(item,0) should generally not be equal to hash(item,1))
             - uses the murmur_hash3() routine to compute the actual hash.
-            - Note that the returned hash value will be different on big-endian and 
-              little-endian systems since hash() doesn't attempt to perform any byte 
-              swapping of the data contained in item.  If you want to always obtain 
-              the same hash then you need to byte swap the elements of item before 
-              passing it to hash().
+            - Note that if the memory layout of the elements in item change between
+              hardware platforms then hash() will give different outputs.  If you want
+              hash() to always give the same output for the same input then you must 
+              ensure that elements of item always have the same layout in memory.
+              Typically this means using fixed width types and performing byte swapping
+              to account for endianness before passing item to hash().
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -83,11 +87,12 @@ namespace dlib
             - Each value of seed results in a different hash function being used.  
               (e.g. hash(item,0) should generally not be equal to hash(item,1))
             - uses the murmur_hash3() routine to compute the actual hash.
-            - Note that the returned hash value will be different on big-endian and 
-              little-endian systems since hash() doesn't attempt to perform any byte 
-              swapping of the data contained in item.  If you want to always obtain 
-              the same hash then you need to byte swap the elements of item before 
-              passing it to hash().
+            - Note that if the memory layout of the elements in item change between
+              hardware platforms then hash() will give different outputs.  If you want
+              hash() to always give the same output for the same input then you must 
+              ensure that elements of item always have the same layout in memory.
+              Typically this means using fixed width types and performing byte swapping
+              to account for endianness before passing item to hash().
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -106,11 +111,14 @@ namespace dlib
             - Each value of seed results in a different hash function being used.  
               (e.g. hash(item,0) should generally not be equal to hash(item,1))
             - uses the murmur_hash3() routine to compute the actual hash.
-            - Note that the returned hash value will be different on big-endian and 
-              little-endian systems since hash() doesn't attempt to perform any byte 
-              swapping of the data contained in item.  If you want to always obtain 
-              the same hash then you need to byte swap the elements of item before 
-              passing it to hash().
+            - Note that if the memory layout of the elements in item change between
+              hardware platforms then hash() will give different outputs.  If you want
+              hash() to always give the same output for the same input then you must 
+              ensure that elements of item always have the same layout in memory.
+              Typically this means using fixed width types and performing byte swapping
+              to account for endianness before passing item to hash().  However, since
+              you can't modify the keys in a map you may have to copy it into a 
+              std::vector and then work from there.
     !*/
 
 // ----------------------------------------------------------------------------------------
