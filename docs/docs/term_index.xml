@@ -1098,6 +1098,7 @@
          <term link="dlib/algs.h.html#general_return_codes" name="SHUTDOWN"/>
          <term link="dlib/algs.h.html#general_return_codes" name="PORTINUSE"/>
 
+         <term link="dlib/general_hash/general_hash.h.html" name="general_hash"/>
       </term_list>
    
    </body>
