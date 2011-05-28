@@ -37,6 +37,11 @@ namespace dlib
             - Each value of seed results in a different hash function being used.  
               (e.g. hash(item,0) should generally not be equal to hash(item,1))
             - uses the murmur_hash3() routine to compute the actual hash.
+            - Note that the returned hash value will be different on big-endian and 
+              little-endian systems since hash() doesn't attempt to perform any byte 
+              swapping of the data contained in item.  If you want to always obtain 
+              the same hash then you need to byte swap the elements of item before 
+              passing it to hash().
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -47,11 +52,19 @@ namespace dlib
         uint32 seed = 0
     );
     /*!
+        requires
+            - T is a standard layout type (e.g. a POD type like int, float, 
+              or a simple struct).
         ensures
             - returns a 32bit hash of the data stored in item.  
             - Each value of seed results in a different hash function being used.  
               (e.g. hash(item,0) should generally not be equal to hash(item,1))
             - uses the murmur_hash3() routine to compute the actual hash.
+            - Note that the returned hash value will be different on big-endian and 
+              little-endian systems since hash() doesn't attempt to perform any byte 
+              swapping of the data contained in item.  If you want to always obtain 
+              the same hash then you need to byte swap the elements of item before 
+              passing it to hash().
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -62,11 +75,19 @@ namespace dlib
         uint32 seed = 0
     );
     /*!
+        requires
+            - T and U are standard layout types (e.g. POD types like int, float, 
+              or simple structs).
         ensures
             - returns a 32bit hash of the data stored in item.  
             - Each value of seed results in a different hash function being used.  
               (e.g. hash(item,0) should generally not be equal to hash(item,1))
             - uses the murmur_hash3() routine to compute the actual hash.
+            - Note that the returned hash value will be different on big-endian and 
+              little-endian systems since hash() doesn't attempt to perform any byte 
+              swapping of the data contained in item.  If you want to always obtain 
+              the same hash then you need to byte swap the elements of item before 
+              passing it to hash().
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -77,11 +98,19 @@ namespace dlib
         uint32 seed = 0
     );
     /*!
+        requires
+            - T and U are standard layout types (e.g. POD types like int, float, 
+              or simple structs).
         ensures
             - returns a 32bit hash of the data stored in item.  
             - Each value of seed results in a different hash function being used.  
               (e.g. hash(item,0) should generally not be equal to hash(item,1))
             - uses the murmur_hash3() routine to compute the actual hash.
+            - Note that the returned hash value will be different on big-endian and 
+              little-endian systems since hash() doesn't attempt to perform any byte 
+              swapping of the data contained in item.  If you want to always obtain 
+              the same hash then you need to byte swap the elements of item before 
+              passing it to hash().
     !*/
 
 // ----------------------------------------------------------------------------------------
