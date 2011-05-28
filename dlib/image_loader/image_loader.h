@@ -769,7 +769,7 @@ namespace dlib
     {
         std::ifstream fin(file_name.c_str(), std::ios::binary);
         if (!fin)
-            throw image_save_error("Unable to open " + file_name + " for reading.");
+            throw image_load_error("Unable to open " + file_name + " for reading.");
         load_bmp(image, fin);
     }
 
@@ -783,7 +783,7 @@ namespace dlib
     {
         std::ifstream fin(file_name.c_str(), std::ios::binary);
         if (!fin)
-            throw image_save_error("Unable to open " + file_name + " for reading.");
+            throw image_load_error("Unable to open " + file_name + " for reading.");
         load_dng(image, fin);
     }
 
