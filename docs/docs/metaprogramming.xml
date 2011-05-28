@@ -66,6 +66,7 @@
          <item>DLIB_CASSERT</item> 
          <item>COMPILE_TIME_ASSERT</item> 
          <item>ASSERT_ARE_SAME_TYPE</item> 
+         <item>DLIB_ASSERT_HAS_STANDARD_LAYOUT</item> 
          <item>ASSERT_ARE_NOT_SAME_TYPE</item> 
          <item>_dT</item> 
          <item>TIME_THIS</item> 
@@ -476,6 +477,27 @@
             If type1 and type2 are not the same type then the compile will fail.  This is sometimes useful 
             in validating template arguments.
       </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>DLIB_ASSERT_HAS_STANDARD_LAYOUT</name>
+         <file>dlib/assert.h</file>
+         <spec_file link="true">dlib/assert.h</spec_file>
+         <description>
+      <p>
+        This macro is meant to cause a compiler error if a type doesn't have a simple
+        memory layout (like a C struct). In particular, types with simple layouts are
+        ones which can be copied via memcpy().
+      </p>
+        
+        This was called a POD type in C++03 and in C++0x we are looking to check if 
+        it is a "standard layout type".  Once we can use C++0x we can change this macro 
+        to something that uses the std::is_standard_layout type_traits class.  
+        See: http://www2.research.att.com/~bs/C++0xFAQ.html#PODs
          </description>
                                  
       </component>
