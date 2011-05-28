@@ -57,8 +57,7 @@ namespace
         memset(hashes,0,sizeof(hashes));
 
         // Hash keys of the form {0}, {0,1}, {0,1,2}... up to N=255,using 256-N as
-        // the seed
-
+        // the seed.
         for(int i = 0; i < 256; i++)
         {
             key[i] = (uint8)i;
@@ -68,15 +67,10 @@ namespace
 
         byte_orderer bo;
         bo.host_to_little(hashes);
-        // Then hash the result array
         final = murmur_hash3(hashes,sizeof(hashes),0);
-
-        // The first four bytes of that hash, interpreted as a little-endian integer, is our
-        // verification value
 
         dlog << LINFO << hex << "final: "<< final;
         DLIB_TEST(final == 0xB0F57EE3);
-
     }
 
     class test_hash : public tester
