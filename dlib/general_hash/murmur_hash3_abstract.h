@@ -19,6 +19,8 @@ namespace dlib
             - returns a 32bit hash of the len bytes pointed to by key.  
             - Each value of seed results in a different hash function being used.  
               (e.g. murmur_hash3(key,len,0) should generally not be equal to murmur_hash3(key,len,1))
+            - This function is machine architecture agnostic and should always give the same
+              hash value when presented with the same inputs.
             - This hashing algorithm is Austin Appleby's excellent MurmurHash3.  
               See: http://code.google.com/p/smhasher/
     !*/
