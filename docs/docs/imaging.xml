@@ -16,6 +16,34 @@
             array2d</a> objects that contain various kinds of pixels.  
          </p>
 
+         <p>
+            <h2>Pixel Types</h2>
+            Most image handling routines in dlib will accept images containing any pixel type. 
+            This is made possible by defining a traits class, <a href="#pixel_traits">pixel_traits</a>, for 
+            each possible pixel type.  This traits class enables image processing routines to determine
+            how to handle each kind of pixel and therefore only pixels which have a pixel_traits definition
+            may be used.  The following list defines all the pixel types which come with pixel_traits definitions.  
+            <ul>
+               <li><b>RGB</b>
+                  <ul> There are two RGB pixel types in dlib, <a href="#rgb_pixel">rgb_pixel</a> and <a href="#bgr_pixel">bgr_pixel</a>.  
+                  Each defines a 24bit RGB pixel type.  The bgr_pixel is identical to rgb_pixel except that it lays
+                  the color channels down in memory in BGR order rather than RGB order and is therefore useful
+                  for interfacing with other image processing tools which expect this format (e.g. <a href="#cv_image">OpenCV</a>). </ul>
+               </li>
+               <li><b>RGB Alpha</b>
+                  <ul>The <a href="#rgb_alpha_pixel">rgb_alpha_pixel</a> is a 8bit per channel RGB pixel with an 8bit alpha channel.</ul>
+               </li>
+               <li><b>HSI</b>
+                  <ul>The <a href="#hsi_pixel">hsi_pixel</a> is a 24bit pixel which represents a point in the Hue Saturation Intensity 
+                  (HSI) color space. </ul>
+               </li>
+               <li><b>Grayscale</b>
+                  <ul>Any built in scalar type may be used as a grayscale pixel type.  For example, unsigned char, int, double, etc.</ul>
+               </li>
+            </ul>
+
+
+         </p>
    </body>
 
    <!-- ************************************************************************* -->
@@ -425,8 +453,7 @@
          <description>
             get_pixel_intensity() is a templated function that 
             returns the grayscale intensity of a pixel.  If the pixel isn't a grayscale
-            pixel then it converts the pixel to the HSI color space and returns the
-            obtained intensity value.
+            pixel then it converts the pixel to grayscale and returns that value.
          </description>
                                  
       </component>
@@ -510,6 +537,14 @@
          <description>        
       This global function writes an image out to an ostream as a dlib DNG file (a lossless 
       compressed image format). 
+            <p>
+               This routine can save images containing any type of pixel.  However, the DNG format
+               can natively store only the following pixel types: <b>rgb_pixel</b>, <b>hsi_pixel</b>,
+               <b>rgb_alpha_pixel</b>, <b>uint8</b>, and <b>uint16</b>.  All other pixel
+               types will be converted into one of these types as appropriate before being
+               saved to disk.
+            </p>
+
          </description>
                                  
       </component>
@@ -527,6 +562,13 @@
                must also set your build environment to link to the libpng library.  However,
                if you use CMake and dlib's default CMakeLists.txt file then it will get setup
                automatically.
+            </p>
+            <p>
+               This routine can save images containing any type of pixel.  However, save_png() can
+               only natively store the following pixel types: <b>rgb_pixel</b>, 
+               <b>rgb_alpha_pixel</b>, <b>uint8</b>, and <b>uint16</b>.  All other pixel
+               types will be converted into one of these types as appropriate before being
+               saved to disk.
             </p>
          </description>
                                  
@@ -595,7 +637,14 @@
          <file>dlib/image_io.h</file>
          <spec_file link="true">dlib/image_saver/image_saver_abstract.h</spec_file>
          <description>        
-      This global function writes an image out to an ostream as a MS Windows BMP file. 
+            This global function writes an image out to an ostream as a MS Windows BMP file. 
+
+            <p>
+               This routine can save images containing any type of pixel.  However, it will
+               convert all color pixels into <b>rgb_pixel</b> and grayscale pixels into 
+               <b>uint8</b> type before saving to disk.  
+            </p>
+
          </description>
                                  
       </component>
