@@ -14,6 +14,8 @@
 New Stuff:
  
 Non-Backwards Compatible Changes:
+   - Made get_pixel_intensity() more efficient.  However, the value returned
+     is slightly different than it used to be for RGB pixel types.
 
 Bug fixes:
 
