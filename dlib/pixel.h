@@ -237,7 +237,7 @@ namespace dlib
             - if (pixel_traits<P>::grayscale == true) then
                 - returns src
             - else
-                - converts src to the HSI color space and returns the intensity 
+                - converts src to grayscale and returns the resulting value.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1043,9 +1043,9 @@ namespace dlib
     {
         P temp = src;
         temp.alpha = 255;
-        hsi_pixel p;
+        typename pixel_traits<P>::basic_pixel_type p;
         assign_pixel(p,temp);
-        return static_cast<typename pixel_traits<P>::basic_pixel_type>(p.i);
+        return p;
     }
 
     template <
@@ -1057,9 +1057,9 @@ namespace dlib
         const P& src
     )
     {
-        hsi_pixel p;
+        typename pixel_traits<P>::basic_pixel_type p;
         assign_pixel(p,src);
-        return static_cast<typename pixel_traits<P>::basic_pixel_type>(p.i);
+        return p;
     }
 
     template <
