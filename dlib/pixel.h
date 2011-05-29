@@ -255,9 +255,14 @@ namespace dlib
             - pixel_traits<P> must be defined
             - pixel_traits<T> must be defined
         ensures
-            - #get_pixel_intensity(dest) == get_pixel_intensity(new_intensity) 
-              (or if get_pixel_intensity(new_intensity) can't be represented by 
-              dest then the closest value representable by dest is used)
+            - This function changes the intensity of the dest pixel. So if the pixel in 
+              question is a grayscale pixel then it simply assigns that pixel with the 
+              value of get_pixel_intensity(new_intensity).  However, if the pixel is not 
+              a grayscale pixel then it converts the pixel to the HSI color space and sets 
+              the I channel to the given intensity and then converts this HSI value back to 
+              the original pixel's color space.
+            - Note that we don't necessarily have #get_pixel_intensity(dest) == get_pixel_intensity(new_intensity) 
+              due to vagaries of how converting to and from HSI works out.
             - if (the dest pixel has an alpha channel) then
                 - #dest.alpha == dest.alpha
     !*/
@@ -984,12 +989,15 @@ namespace dlib
         const T& new_intensity
     )
     {
-        unsigned long alpha = dest.alpha;
         hsi_pixel p;
-        assign_pixel(p,dest);
+        const unsigned long old_alpha = dest.alpha;
+        dest.alpha = 255;
+        rgb_pixel temp;
+        assign_pixel(temp, dest); // put dest into an rgb_pixel to avoid the somewhat complicated assign_pixel(hsi,rgb_alpha).
+        assign_pixel(p,temp);
         assign_pixel(p.i, new_intensity);
         assign_pixel(dest,p);
-        dest.alpha = alpha;
+        dest.alpha = old_alpha;
     }
 
     template <

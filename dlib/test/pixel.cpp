@@ -467,6 +467,18 @@ namespace
             assign_pixel_intensity(p_int, -10000);
             assign_pixel_intensity(p_gray, -100);
 
+            p_rgba.red = 10;
+            p_rgba.green = 10;
+            p_rgba.blue = 10;
+            p_rgba.alpha = 0;
+            DLIB_TEST_MSG(get_pixel_intensity(p_rgba) == 10, (int)get_pixel_intensity(p_rgba));
+            assign_pixel_intensity(p_rgba, 2);
+            DLIB_TEST_MSG(p_rgba.red == 2, (int)p_rgba.red);
+            DLIB_TEST_MSG(p_rgba.green == 2, (int)p_rgba.green);
+            DLIB_TEST_MSG(p_rgba.blue == 2, (int)p_rgba.blue);
+            DLIB_TEST_MSG(p_rgba.alpha == 0, (int)p_rgba.alpha);
+            DLIB_TEST_MSG(get_pixel_intensity(p_rgba) == 2, (int)get_pixel_intensity(p_rgba));
+
             DLIB_TEST(p_float == -1000);
             DLIB_TEST(get_pixel_intensity(p_float) == -1000);
             DLIB_TEST(p_schar == -100);
