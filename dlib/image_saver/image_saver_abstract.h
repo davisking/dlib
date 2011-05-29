@@ -36,6 +36,9 @@ namespace dlib
             - image[0][0] will be in the upper left corner of the image.
             - image[image.nr()-1][image.nc()-1] will be in the lower right
               corner of the image.
+            - This routine can save images containing any type of pixel. However, it 
+              will convert all color pixels into rgb_pixel and grayscale pixels into 
+              uint8 type before saving to disk.
         throws
             - image_save_error
                 This exception is thrown if there is an error that prevents us
@@ -87,6 +90,11 @@ namespace dlib
             - image[0][0] will be in the upper left corner of the image.
             - image[image.nr()-1][image.nc()-1] will be in the lower right
               corner of the image.
+            - This routine can save images containing any type of pixel.  However, the 
+              DNG format can natively store only the following pixel types: rgb_pixel, 
+              hsi_pixel, rgb_alpha_pixel, uint8, and uint16.  All other pixel types 
+              will be converted into one of these types as appropriate before being
+              saved to disk.
         throws
             - image_save_error
                 This exception is thrown if there is an error that prevents us
