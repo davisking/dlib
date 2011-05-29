@@ -861,7 +861,7 @@
 
    <xsl:template match="term_list">
       <center>
-         <div style="font-size:1.3em">
+         <div style="font-size:1.2em">
       <a href="#A">[A]</a> 
       <a href="#B">[B]</a> 
       <a href="#C">[C]</a> 
