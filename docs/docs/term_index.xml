@@ -280,6 +280,9 @@
          <term file="containers.html" name="map"/>
 
 
+         <term file="dlib/matrix/matrix_data_layout_abstract.h.html" name="row_major_layout"/>
+         <term file="dlib/matrix/matrix_data_layout_abstract.h.html" name="column_major_layout"/>
+
          <term file="dlib/matrix/matrix_exp_abstract.h.html" name="matrix_exp"/>
          <term file="dlib/matrix/matrix_abstract.h.html" name="const_temp_matrix"/>
 
