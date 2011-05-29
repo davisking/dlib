@@ -861,6 +861,7 @@
 
    <xsl:template match="term_list">
       <center>
+         <div style="font-size:1.3em">
       <a href="#A">[A]</a> 
       <a href="#B">[B]</a> 
       <a href="#C">[C]</a> 
@@ -887,6 +888,7 @@
       <a href="#X">[X]</a> 
       <a href="#Y">[Y]</a> 
       <a href="#Z">[Z]</a> 
+         </div>
       </center>
       <xsl:call-template name="term_list_go" >
          <xsl:with-param name="num" select="1"/>
