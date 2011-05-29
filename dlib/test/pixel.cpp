@@ -433,6 +433,29 @@ namespace
             DLIB_TEST(get_pixel_intensity(p_rgb) == 0);
             DLIB_TEST(get_pixel_intensity(p_gray16) == 0);
 
+            p_rgb.red = 100;
+            p_rgb.green = 100;
+            p_rgb.blue = 100;
+            DLIB_TEST(get_pixel_intensity(p_rgb) == 100);
+            p_rgb.red = 1;
+            p_rgb.green = 2;
+            p_rgb.blue = 3;
+            DLIB_TEST(get_pixel_intensity(p_rgb) == 2);
+            p_rgba.alpha = 100;
+            p_rgba.red = 100;
+            p_rgba.green = 100;
+            p_rgba.blue = 100;
+            DLIB_TEST(get_pixel_intensity(p_rgba) == 100);
+            p_rgba.red = 1;
+            p_rgba.green = 2;
+            p_rgba.blue = 3;
+            p_rgba.alpha = 0;
+            DLIB_TEST(get_pixel_intensity(p_rgba) == 2);
+            p_hsi.h = 123;
+            p_hsi.s = 100;
+            p_hsi.i = 84;
+            DLIB_TEST(get_pixel_intensity(p_hsi) == 84);
+
             p_float = 54.25;
             DLIB_TEST(get_pixel_intensity(p_float) == 54.25);
 
