@@ -46,8 +46,8 @@ int main(int argc, char** argv)
         array2d<rgb_pixel> img;
 
         // Now load the image file into our image.  If something is wrong then
-        // load_image() will throw an exception.  Also, if you compiled with libpng
-        // and libjpeg then load_image() can also load PNG and JPEG files in addition
+        // load_image() will throw an exception.  Also, if you linked with libpng
+        // and libjpeg then load_image() can load PNG and JPEG files in addition
         // to BMP files. 
         load_image(img, argv[1]);
 

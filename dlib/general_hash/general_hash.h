@@ -5,6 +5,7 @@
 
 
 #include <string>
+#include "hash.h"
 
 namespace dlib 
 {
@@ -68,11 +69,7 @@ namespace dlib
         const std::string& item
     ) const
     {
-        unsigned long hash = 0;
-        std::string::size_type size = item.size();
-        for (std::string::size_type i = 0; i < size; ++i)
-            hash = hash*37 + static_cast<unsigned long>(item[i]);
-        return hash;
+        return hash(item);
     }
 
 // ----------------------------------------------------------------------------------------
