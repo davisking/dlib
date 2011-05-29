@@ -31,7 +31,7 @@
                   for interfacing with other image processing tools which expect this format (e.g. <a href="#cv_image">OpenCV</a>). </ul>
                </li>
                <li><b>RGB Alpha</b>
-                  <ul>The <a href="#rgb_alpha_pixel">rgb_alpha_pixel</a> is a 8bit per channel RGB pixel with an 8bit alpha channel.</ul>
+                  <ul>The <a href="#rgb_alpha_pixel">rgb_alpha_pixel</a> is an 8bit per channel RGB pixel with an 8bit alpha channel.</ul>
                </li>
                <li><b>HSI</b>
                   <ul>The <a href="#hsi_pixel">hsi_pixel</a> is a 24bit pixel which represents a point in the Hue Saturation Intensity 
