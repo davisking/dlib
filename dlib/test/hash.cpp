@@ -118,34 +118,34 @@ namespace
             m['a'] = 'A';
             m['t'] = 'T';
 
-            dlog << LINFO << "hash(str1): "<< hash(str1);
-            dlog << LINFO << "hash(v):    "<< hash(v);
-            dlog << LINFO << "hash(v2):   "<< hash(v2);
-            dlog << LINFO << "hash(m):    "<< hash(m);
-            dlog << LINFO << "hash(mat):  "<< hash(mat);
-            dlog << LINFO << "hash(mat2): "<< hash(mat2);
+            dlog << LINFO << "hash(str1): "<< dlib::hash(str1);
+            dlog << LINFO << "hash(v):    "<< dlib::hash(v);
+            dlog << LINFO << "hash(v2):   "<< dlib::hash(v2);
+            dlog << LINFO << "hash(m):    "<< dlib::hash(m);
+            dlog << LINFO << "hash(mat):  "<< dlib::hash(mat);
+            dlog << LINFO << "hash(mat2): "<< dlib::hash(mat2);
 
-            DLIB_TEST(hash(str1) == 0x3ffe6bf6);
-            DLIB_TEST(hash(v)    == 0xf1af2ca6);
-            DLIB_TEST(hash(v2)   == 0x63852afc);
-            DLIB_TEST(hash(m)    == 0xaacc3f6f);
-            DLIB_TEST(hash(mat)  == 0x3e349da5);
-            DLIB_TEST(hash(mat2) == 0x3a95dc52);
+            DLIB_TEST(dlib::hash(str1) == 0x3ffe6bf6);
+            DLIB_TEST(dlib::hash(v)    == 0xf1af2ca6);
+            DLIB_TEST(dlib::hash(v2)   == 0x63852afc);
+            DLIB_TEST(dlib::hash(m)    == 0xaacc3f6f);
+            DLIB_TEST(dlib::hash(mat)  == 0x3e349da5);
+            DLIB_TEST(dlib::hash(mat2) == 0x3a95dc52);
             DLIB_TEST(murmur_hash3(&str1[0], str1.size(), 0) == 0x3ffe6bf6);
 
-            dlog << LINFO << "hash(str1,1): "<< hash(str1,1);
-            dlog << LINFO << "hash(v,3):    "<< hash(v,3);
-            dlog << LINFO << "hash(v2,3):   "<< hash(v2,3);
-            dlog << LINFO << "hash(m,4):    "<< hash(m,4);
-            dlog << LINFO << "hash(mat,5):  "<< hash(mat,5);
-            dlog << LINFO << "hash(mat2,6): "<< hash(mat2,6);
+            dlog << LINFO << "hash(str1,1): "<< dlib::hash(str1,1);
+            dlog << LINFO << "hash(v,3):    "<< dlib::hash(v,3);
+            dlog << LINFO << "hash(v2,3):   "<< dlib::hash(v2,3);
+            dlog << LINFO << "hash(m,4):    "<< dlib::hash(m,4);
+            dlog << LINFO << "hash(mat,5):  "<< dlib::hash(mat,5);
+            dlog << LINFO << "hash(mat2,6): "<< dlib::hash(mat2,6);
 
-            DLIB_TEST(hash(str1,1) == 0xb17cea93);
-            DLIB_TEST(hash(v,3)    == 0x7ec9284c);
-            DLIB_TEST(hash(v2,3)   == 0xb2ce147f);
-            DLIB_TEST(hash(m,4)    == 0xfa5e7ac2);
-            DLIB_TEST(hash(mat,5)  == 0x8de27259);
-            DLIB_TEST(hash(mat2,6) == 0xb8aa7714);
+            DLIB_TEST(dlib::hash(str1,1) == 0xb17cea93);
+            DLIB_TEST(dlib::hash(v,3)    == 0x7ec9284c);
+            DLIB_TEST(dlib::hash(v2,3)   == 0xb2ce147f);
+            DLIB_TEST(dlib::hash(m,4)    == 0xfa5e7ac2);
+            DLIB_TEST(dlib::hash(mat,5)  == 0x8de27259);
+            DLIB_TEST(dlib::hash(mat2,6) == 0xb8aa7714);
             DLIB_TEST(murmur_hash3(&str1[0], str1.size(), 1) == 0xb17cea93);
 
         }
