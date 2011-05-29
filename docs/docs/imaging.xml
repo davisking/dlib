@@ -535,7 +535,7 @@
          <file>dlib/image_io.h</file>
          <spec_file link="true">dlib/image_saver/image_saver_abstract.h</spec_file>
          <description>        
-      This global function writes an image out to an ostream as a dlib DNG file (a lossless 
+      This global function saves an image as a dlib DNG file (a lossless 
       compressed image format). 
             <p>
                This routine can save images containing any type of pixel.  However, the DNG format
@@ -637,7 +637,7 @@
          <file>dlib/image_io.h</file>
          <spec_file link="true">dlib/image_saver/image_saver_abstract.h</spec_file>
          <description>        
-            This global function writes an image out to an ostream as a MS Windows BMP file. 
+            This global function saves an image as a MS Windows BMP file. 
 
             <p>
                This routine can save images containing any type of pixel.  However, it will
