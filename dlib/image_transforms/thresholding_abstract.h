@@ -78,8 +78,8 @@ namespace dlib
     void hysteresis_threshold (
         const in_image_type& in_img,
         out_image_type& out_img,
-        unsigned long lower_thresh,
-        unsigned long upper_thresh
+        typename pixel_traits<typename in_image_type::type>::basic_pixel_type lower_thresh,
+        typename pixel_traits<typename in_image_type::type>::basic_pixel_type upper_thresh
     );
     /*!
         requires

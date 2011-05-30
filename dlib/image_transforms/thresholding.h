@@ -173,8 +173,8 @@ namespace dlib
     void hysteresis_threshold (
         const in_image_type& in_img,
         out_image_type& out_img,
-        unsigned long lower_thresh,
-        unsigned long upper_thresh
+        typename pixel_traits<typename in_image_type::type>::basic_pixel_type lower_thresh,
+        typename pixel_traits<typename in_image_type::type>::basic_pixel_type upper_thresh
     )
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
@@ -198,7 +198,6 @@ namespace dlib
         }
 
         out_img.set_size(in_img.nr(),in_img.nc());
-        assign_all_pixels(out_img,0);
 
         const long size = 50;
         long rstack[size];
