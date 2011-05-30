@@ -22,7 +22,7 @@ namespace dlib
     void threshold_image (
         const in_image_type& in_img,
         out_image_type& out_img,
-        unsigned long thresh
+        typename pixel_traits<typename in_image_type::type>::basic_pixel_type thresh
     );
     /*!
         requires

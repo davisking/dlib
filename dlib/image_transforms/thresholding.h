@@ -24,7 +24,7 @@ namespace dlib
     void threshold_image (
         const in_image_type& in_img,
         out_image_type& out_img,
-        unsigned long thresh
+        typename pixel_traits<typename in_image_type::type>::basic_pixel_type thresh
     )
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
@@ -45,13 +45,10 @@ namespace dlib
         {
             for (long c = 0; c < in_img.nc(); ++c)
             {
-                typename out_image_type::type p;
-                assign_pixel(p,in_img[r][c]);
-                if (p >= thresh)
-                    p = on_pixel;
+                if (get_pixel_intensity(in_img[r][c]) >= thresh)
+                    assign_pixel(out_img[r][c], on_pixel);
                 else
-                    p = off_pixel;
-                out_img[r][c] = p;
+                    assign_pixel(out_img[r][c], off_pixel);
             }
         }
     }
