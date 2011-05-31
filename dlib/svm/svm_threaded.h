@@ -17,6 +17,7 @@
 #include <vector>
 #include "../smart_pointers.h"
 #include "../pipe.h"
+#include <iostream>
 
 namespace dlib
 {
@@ -63,6 +64,11 @@ namespace dlib
                     // If this is a svm_nu_trainer then we might get this exception if the nu is
                     // invalid.  In this case just return a cross validation score of 0.
                     result = 0;
+                }
+                catch (std::bad_alloc&)
+                {
+                    std::cerr << "\nstd::bad_alloc thrown while running cross_validate_trainer_threaded().  Not enough memory.\n" << std::endl;
+                    throw;
                 }
             }
         };
