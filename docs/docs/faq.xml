@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>Frequently Asked Questions</title>
+
+   <!-- ************************************************************************* -->
+
+
+   <questions>
+      <question text="Which machine learning method should I use?">
+         answer goes here
+      </question>
+
+      <question text="another question?">
+         <questions>
+            <question text="yet another question?">
+               <questions>
+                  <question text="what is 1 + 1?">
+                     2!
+                  </question>
+                  <question text="what is 1 + 6?">
+                     7!
+                  </question>
+               </questions>
+            </question>
+            <question text="yet yet YET another question?">
+               yet another answer goes here
+            </question>
+         </questions>
+      </question>
+   </questions>
+
+
+   <!-- ************************************************************************* -->
+
+</doc>

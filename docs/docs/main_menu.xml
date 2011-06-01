@@ -105,6 +105,10 @@
             <link>howto_contribute.html</link>
          </item>
          <item>
+            <name>FAQ</name>
+            <link>faq.html</link>
+         </item>
+         <item>
             <name>Index</name>
             <link>term_index.html</link>
          </item>
