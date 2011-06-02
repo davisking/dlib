@@ -11,7 +11,29 @@
       </question>
 
       <question text="How do I set the size of a matrix at runtime?">
+         Long answer, read the <a href="matrix_ex.cpp.html">matrix example program</a>.
+         <br/><br/>
+         Short answer, here are some examples:
+<code_box>
+   matrix&lt;double&gt; mat;
+   mat.set_size(4,5);
 
+   matrix&lt;double,0,1&gt; column_vect;
+   col_vect.set_size(6);
+
+   matrix&lt;double,0,1&gt; column_vect2(6);
+
+   matrix&lt;double,1&gt; row_vect;
+   row_vect.set_size(5);
+</code_box>
+
+      </question>
+
+      <question text="Where is the documentation for &lt;object/function&gt;?">
+         If you can't find something then check the <a href="term_index.html">index</a>.
+         <br/><br/>
+         Also, the bulk of the documentation can be found by following the 
+         <b><font style='font-size:1.3em' color='#007700'>Specification</font></b> links.   
       </question>
 
    </questions>

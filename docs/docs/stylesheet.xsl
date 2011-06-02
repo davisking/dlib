@@ -863,9 +863,16 @@
        </b>
    </xsl:template>   
    <xsl:template match="font">
-      <font color="{@color}">
-         <xsl:apply-templates/>
-       </font>
+      <xsl:if test="@style">
+         <font color="{@color}" style="{@style}">
+            <xsl:apply-templates/>
+         </font>
+      </xsl:if>
+      <xsl:if test="not(@style)">
+         <font color="{@color}">
+            <xsl:apply-templates/>
+         </font>
+      </xsl:if>
    </xsl:template>   
    <xsl:template match="img">
       <img src="{@src}" border="0" height="{@height}" width="{@width}" alt="{@alt}">
