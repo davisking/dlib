@@ -153,7 +153,7 @@
                 An example will make it clear.
 
 
-                <pre><font color='#3333FF'>int</font> <b>funct</b><font face="Lucida Console">(</font>
+                <code_box><font color='#3333FF'>int</font> <b>funct</b><font face="Lucida Console">(</font>
 <font color='#3333FF'>    int</font>&amp; something
 <font face="Lucida Console">);</font>
 <font color='#009900'>/*!
@@ -164,7 +164,7 @@
         - #funct() == something 
         - #something == something + 1
 !*/</font>
-                </pre>
+</code_box>
 
                 This says that funct() requires that "something" be greater than 4, that funct() will increment "something" 
                 by 1, and funct() returns the original value of something.  It also says that

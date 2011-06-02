@@ -221,6 +221,21 @@
                   margin: 0.5em;
                }
 
+
+               .code_box
+               {
+                  color: black;
+                  margin: 1em 0.25in;
+                  padding: 0.5em;
+                  background: rgb(240,240,240);
+                  border-top: black dotted 1px;
+                  border-left: black dotted 1px;
+                  border-right: black solid 2px;
+                  border-bottom: black solid 2px;
+               }
+
+
+
                .bdotted {border-bottom: 1px dotted}
                .bdashed {border-bottom: 1px dashed}
                .bsolid {border-bottom: 1px solid}
@@ -1251,6 +1266,11 @@
          </div>
    </xsl:template>
 
+   <!-- ************************************************************************* -->
+
+   <xsl:template match="code_box">
+      <pre class="code_box"><xsl:apply-templates/></pre>
+   </xsl:template>  
 
    <!-- ************************************************************************* -->
    <!-- ************************************************************************* -->

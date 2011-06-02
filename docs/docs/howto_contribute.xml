@@ -255,8 +255,9 @@
                <p>
                   Most importantly, it is impossible to validate the state of a pointer.  Consider two
                   functions:  
-                  <blockquote><tt>double compute_sum_of_array_elements(const double* array, int array_size);  <br/>
-                     double compute_sum_of_array_elements(const std::vector&lt;double&gt;&amp; array); </tt></blockquote>
+                  <code_box>
+double compute_sum_of_array_elements(const double* array, int array_size); 
+double compute_sum_of_array_elements(const std::vector&lt;double&gt;&amp; array); </code_box>
 
                   The first function is inherently unsafe.  If the user accidentally passes in an invalid pointer
                   or sets the size argument incorrectly then their program may crash and this will turn into a 
@@ -294,7 +295,7 @@
             <li> <h3>Don't use stack based arrays.   </h3>
                <ul><p>
                   A stack based array, or C style array, is an array declared like this:
-                  <blockquote><tt>int array[200];</tt></blockquote>
+                  <code_box>int array[200];</code_box>
                   Most of my criticisms of pointers also apply to stack based arrays.  In particular, 
                   if you are passing a stack based array to a function then that means you are probably
                   using functions similar to the unsafe compute_sum_of_array_elements() example above.
@@ -310,14 +311,13 @@
                   checking such as the  <a href="containers.html#std_vector_c">std_vector_c</a>.   </p>
                   <p>
                      Consider the following two bits of code:
-<pre>
-   for (int i = 0; i &lt; array_size; ++i) 
-      my_c_array[i] = 4;
+<code_box>
+for (int i = 0; i &lt; array_size; ++i) 
+   my_c_array[i] = 4;
 
-   for (int i = 0; i &lt; my_std_vector.size(); ++i)
-      my_std_vector[i] = 4;
-
-</pre>
+for (int i = 0; i &lt; my_std_vector.size(); ++i)
+   my_std_vector[i] = 4;
+</code_box>
                   The second loop clearly doesn't overflow the bounds of the my_std_vector.   On the other 
                   hand, just by looking at the code in the first loop, we can not tell if it overflows
                   my_c_array.  We have to assume that array_size is the appropriate constant but we could be wrong.
@@ -513,13 +513,12 @@ Dynamic Libraries in C++</a>, and
                            into either big or little endian byte order and then write them to an output stream.  
                            You could do this using code similar to the following:
 
-                           <pre>
-   dlib::<a href="other.html#byte_orderer">byte_orderer</a>::kernel_1a bo;
-   ...
-   bo.host_to_big(my_uint);
-   my_out_stream.write((char*)&amp;my_uint, sizeof(my_uint));
-   ...
-                           </pre>
+                           <code_box>
+dlib::<a href="other.html#byte_orderer">byte_orderer</a>::kernel_1a bo;
+...
+bo.host_to_big(my_uint);
+my_out_stream.write((char*)&amp;my_uint, sizeof(my_uint));
+... </code_box>
 
                            <p>
                            There are three important things to understand about this process.  First, you need
