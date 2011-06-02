@@ -5,33 +5,72 @@
    <title>Frequently Asked Questions</title>
 
    <!-- ************************************************************************* -->
-
-
-   <questions>
-      <question text="Which machine learning method should I use?">
+   <questions group="General">
+      <question text="Why isn't serialization working?">
          answer goes here
       </question>
 
-      <question text="another question?">
-         <questions>
-            <question text="yet another question?">
-               <questions>
-                  <question text="what is 1 + 1?">
-                     2!
-                  </question>
-                  <question text="what is 1 + 6?">
-                     7!
-                  </question>
-               </questions>
-            </question>
-            <question text="yet yet YET another question?">
-               yet another answer goes here
-            </question>
-         </questions>
+      <question text="How do I set the size of a matrix at runtime?">
+
+      </question>
+
+   </questions>
+
+   <!-- ************************************************************************* -->
+
+   <questions group="Machine Learning">
+
+      <question text="Why is RVM training is really slow?">
+         answer
+      </question>
+
+      <question text="Why is cross_validate_trainer_threaded() crashing?">
+      </question>
+
+      <question text="How can I define a custom kernel?">
+      </question>
+
+      <question text="Can you give advice on feature generation/kernel selection?">
+         <p>
+            Picking the right kernel all comes down to understanding your data, and obviously this is 
+            highly dependent on your problem. :)  
+         </p>
+
+         <p>
+            One thing that's sometimes useful is to plot each feature against the target value.  You can get an idea of 
+            what your overall feature space looks like and maybe tell if a linear kernel is the right solution.  But 
+            this still hides important information from you.  For example, imagine you have two diagonal lines which 
+            are very close together and are both the same length.  One line is of the +1 class and the other is the -1 
+            class.  Each feature (the x or y coordinate values) by itself tells you almost nothing about which class 
+            a point belongs to but together they tell you everything you need to know.  
+         </p>
+
+         <p>
+            On the other hand, if you know something about the data you are working with then you can also try and 
+            generate your own features.  So for example, if your data is a bunch of images and you know that one 
+            of your classes contains a lot of lines then you can make a feature that attempts to measure the number 
+            of lines in an image using a hough transform or sobel edge filter or whatever.  Generally, try and 
+            think up features which should be highly correlated with your target value.  A good way to do this is 
+            to try and actually hand code N solutions to the problem using whatever you know about your data or 
+            domain.  If you do a good job then you will have N really great features and a linear or rbf kernel 
+            will probably do very well when using them.
+         </p>
+
+         <p>
+            Or you can just try a whole bunch of kernels, kernel parameters, and training algorithm options while 
+            using cross validation.  I.e. when in doubt, use brute force :)   There is an example of that kind of 
+            thing in the <a href="model_selection_ex.cpp.html">model selection</a> example program. 
+         </p>
+      </question>
+
+      <question text="Why does my decision_function always give the same output?">
+      </question>
+
+      <question text="Which machine learning method should I use?">
       </question>
    </questions>
 
-
    <!-- ************************************************************************* -->
+
 
 </doc>

@@ -295,12 +295,16 @@
                      </xsl:if>
                      <xsl:apply-templates select="body"/>
 
-                     <ul>
-                     <xsl:for-each select="questions/question">      
-                        <xsl:sort select="translate(name,$lcletters, $ucletters)"/> 
-                        <li><a href="#{@text}"><xsl:value-of select="@text"/></a></li>
+                     <xsl:for-each select="questions">
+                        <xsl:sort select="translate(@group,$lcletters, $ucletters)"/> 
+                        <xsl:if test="@group"><h2><xsl:value-of select="@group"/></h2></xsl:if>
+                        <ul>
+                        <xsl:for-each select="question">      
+                           <xsl:sort select="translate(@text,$lcletters, $ucletters)"/> 
+                           <li><a href="#{@text}"><xsl:value-of select="@text"/></a></li>
+                        </xsl:for-each>
+                        </ul>
                      </xsl:for-each>
-                     </ul>
 
                   </td>
                   <!-- ************************************************************************* -->
@@ -323,11 +327,6 @@
                   
                <xsl:apply-templates select="components"/>
                <xsl:apply-templates select="questions"/>
-               <xsl:apply-templates select="questions/question/questions"/>
-               <xsl:apply-templates select="questions/question/questions/question/questions"/>
-               <xsl:apply-templates select="questions/question/questions/question/questions/question/questions"/>
-               <xsl:apply-templates select="questions/question/questions/question/questions/question/questions/question/questions"/>
-               <xsl:apply-templates select="questions/question/questions/question/questions/question/questions/question/questions/question/questions"/>
                   
             </div>
          </body>
@@ -474,28 +473,13 @@
    <xsl:template match="questions">
 
       <xsl:for-each select="question">      
-      <xsl:sort select="translate(name,$lcletters, $ucletters)"/> 
-         <xsl:variable name="checked" select="@checked"/>
+         <xsl:sort select="translate(@text,$lcletters, $ucletters)"/> 
 
          <a name = "{@text}">
             <div id="question">
                <a href="#top"><font size='2'><center>[top]</center></font></a>
                <h2><xsl:value-of select="@text"/></h2>
-
-               <xsl:for-each select=".">      
-                  <xsl:if test="questions">
-                     <ul>
-                     <xsl:for-each select="questions/question">      
-                        <xsl:sort select="translate(name,$lcletters, $ucletters)"/> 
-                        <li><a href="#{@text}"><xsl:value-of select="@text"/></a></li>
-                     </xsl:for-each>
-                     </ul>
-                  </xsl:if>
-                  <xsl:if test="not(questions)">
-                     <xsl:apply-templates select="."/>
-                  </xsl:if>
-               </xsl:for-each>
-
+               <xsl:apply-templates select="."/>
             </div>
          </a>
       </xsl:for-each>
