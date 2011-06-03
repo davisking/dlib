@@ -47,6 +47,8 @@ namespace
         std::vector<sample_type> centers;
         pick_initial_centers(seed_centers.size(), centers, samples, linear_kernel<sample_type>());
 
+        find_clusters_using_kmeans(samples, centers);
+
         DLIB_TEST(centers.size() == seed_centers.size());
 
         std::vector<int> hits(centers.size(),0);
@@ -87,6 +89,17 @@ namespace
             {
                 dlog << LINFO << "test dlib::vector<double,2>";
                 typedef dlib::vector<double,2> sample_type;
+                std::vector<sample_type> seed_centers;
+                seed_centers.push_back(sample_type(10,10));
+                seed_centers.push_back(sample_type(10,-10));
+                seed_centers.push_back(sample_type(-10,10));
+                seed_centers.push_back(sample_type(-10,-10));
+
+                run_test(seed_centers);
+            }
+            {
+                dlog << LINFO << "test dlib::vector<double,2>";
+                typedef dlib::vector<float,2> sample_type;
                 std::vector<sample_type> seed_centers;
                 seed_centers.push_back(sample_type(10,10));
                 seed_centers.push_back(sample_type(10,-10));

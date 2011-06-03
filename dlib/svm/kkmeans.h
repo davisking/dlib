@@ -405,7 +405,7 @@ namespace dlib
         typedef typename sample_type::type scalar_type;
 
         sample_type zero(centers[0]);
-        zero = 0;
+        set_all_elements(zero, 0);
 
         std::vector<unsigned long, alloc> center_element_count;
 
