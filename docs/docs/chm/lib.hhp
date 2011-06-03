@@ -47,6 +47,10 @@ docs/queue_ex.cpp.html
 docs/release_notes.html
 docs/old_release_notes.html
 docs/sockets_ex.cpp.html
+docs/faq.html
+docs/rbf_normal.gif
+docs/rbf_big_gamma.gif
+docs/rbf_small_gamma.gif
 
 [INFOTYPES]
 

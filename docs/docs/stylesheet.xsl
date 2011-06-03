@@ -874,6 +874,9 @@
          </font>
       </xsl:if>
    </xsl:template>   
+   <xsl:template match="image">
+      <img src="{@src}" border="0"/>
+   </xsl:template>   
    <xsl:template match="img">
       <img src="{@src}" border="0" height="{@height}" width="{@width}" alt="{@alt}">
          <xsl:apply-templates/>

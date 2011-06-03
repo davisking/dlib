@@ -138,17 +138,17 @@ cross_validate_trainer_threaded(trainer,
          data has just one feature and its value ranges from 0 to 7.  Then what you want is a 
          gamma value that gives nice Gaussian bumps like the one in this graph: <br/>
 
-         <center><img src="rbf_normal.gif"/></center>
+         <center><image src="rbf_normal.gif"/></center>
 
          <br/>
          However, if you make gamma really huge you will get this (it's zero everywhere except for one place):
          <br/>
-         <center><img src="rbf_big_gamma.gif"/></center>
+         <center><image src="rbf_big_gamma.gif"/></center>
 
          <br/>
          Or if you make gamma really small then it will be 1.0 everywhere:
          <br/>
-         <center><img src="rbf_small_gamma.gif"/></center>
+         <center><image src="rbf_small_gamma.gif"/></center>
 
          <p>
             So you need to pick the gamma value so that it is scaled reasonably to your data.  A <i><font color="red">good rule of
