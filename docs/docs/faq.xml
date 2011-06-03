@@ -7,7 +7,30 @@
    <!-- ************************************************************************* -->
    <questions group="General">
       <question text="Why isn't serialization working?">
-         answer goes here
+         Here are the potabilities:
+         <ul>
+            <li>You are using a file stream and forgot to put it into binary mode.  
+               You need to do something like this:
+<code_box>
+std::ifstream fin("myfile", std::ios::binary);
+</code_box>
+or
+<code_box>
+std::ofstream fout("myfile", std::ios::binary);
+</code_box>
+
+If you don't give <tt>std::ios::binary</tt> then the iostream will mess with the binary data and cause serialization
+to not work right.  
+            </li>
+
+            <br/>
+            <li>The iostream is in a bad state.  You can check the state by calling <tt>mystream.good()</tt>.
+            If it returns false then the stream is in an error state such as end-of-file or maybe it failed
+            to do the I/O.  Also note that if you close a file stream and reopen it you might have to call
+            <tt>mystream.clear()</tt> to clear out the error flags.
+            </li>
+         </ul>
+
       </question>
 
       <question text="How do I set the size of a matrix at runtime?">
@@ -15,16 +38,16 @@
          <br/><br/>
          Short answer, here are some examples:
 <code_box>
-   matrix&lt;double&gt; mat;
-   mat.set_size(4,5);
+matrix&lt;double&gt; mat;
+mat.set_size(4,5);
 
-   matrix&lt;double,0,1&gt; column_vect;
-   col_vect.set_size(6);
+matrix&lt;double,0,1&gt; column_vect;
+column_vect.set_size(6);
 
-   matrix&lt;double,0,1&gt; column_vect2(6);
+matrix&lt;double,0,1&gt; column_vect2(6);  // give size to constructor
 
-   matrix&lt;double,1&gt; row_vect;
-   row_vect.set_size(5);
+matrix&lt;double,1&gt; row_vect;
+row_vect.set_size(5);
 </code_box>
 
       </question>
@@ -43,10 +66,34 @@
    <questions group="Machine Learning">
 
       <question text="Why is RVM training is really slow?">
-         answer
+         The optimization algorithm is somewhat unpredictable.  Sometimes it is fast and 
+         sometimes it is slow.  What usually makes it really slow is if you use a radial basis
+         kernel and you set the gamma parameter to something too large.  This causes the
+         algorithm to start using a whole lot of relevance vectors (i.e. basis vectors) which
+         then makes it slow.  The algorithm is only fast as long as the number of relevance vectors
+         remains small but it is hard to know beforehand if that will be the case.  
+         <p>
+            You should try <a href="ml.html#krr_trainer">kernel ridge regression</a> instead since it
+            also doesn't take any parameters but is always very fast.
+         </p>
+
       </question>
 
       <question text="Why is cross_validate_trainer_threaded() crashing?">
+         This function makes a copy of your training data for each thread.  So you are probably running out
+         of memory.  To avoid this, use the <a href="algorithms.html#randomly_subsample">randomly_subsample</a> function
+         to reduce the amount of data you are using or use fewer threads. 
+         <p>
+            For example, you could reduce the amount of data by saying this:
+<code_box>
+// reduce to only 1000 samples
+cross_validate_trainer_threaded(trainer, 
+                                randomly_subsample(samples, 1000), 
+                                randomly_subsample(labels,  1000), 
+                                4,   // num folds
+                                4);  // num threads
+</code_box>
+         </p>
       </question>
 
       <question text="How can I define a custom kernel?">
@@ -55,14 +102,14 @@
       <question text="Can you give advice on feature generation/kernel selection?">
          <p>
             Picking the right kernel all comes down to understanding your data, and obviously this is 
-            highly dependent on your problem. :)  
+            highly dependent on your problem.  
          </p>
 
          <p>
             One thing that's sometimes useful is to plot each feature against the target value.  You can get an idea of 
             what your overall feature space looks like and maybe tell if a linear kernel is the right solution.  But 
             this still hides important information from you.  For example, imagine you have two diagonal lines which 
-            are very close together and are both the same length.  One line is of the +1 class and the other is the -1 
+            are very close together and are both the same length.  Suppose one line is of the +1 class and the other is the -1 
             class.  Each feature (the x or y coordinate values) by itself tells you almost nothing about which class 
             a point belongs to but together they tell you everything you need to know.  
          </p>
@@ -86,6 +133,29 @@
       </question>
 
       <question text="Why does my decision_function always give the same output?">
+         This happens when you use the radial_basis_kernel and you set the gamma value to
+         something highly inappropriate.  To understand what's happening lets imagine your
+         data has just one feature and its value ranges from 0 to 7.  Then what you want is a 
+         gamma value that gives nice Gaussian bumps like the one in this graph: <br/>
+
+         <center><img src="rbf_normal.gif"/></center>
+
+         <br/>
+         However, if you make gamma really huge you will get this (it's zero everywhere except for one place):
+         <br/>
+         <center><img src="rbf_big_gamma.gif"/></center>
+
+         <br/>
+         Or if you make gamma really small then it will be 1.0 everywhere:
+         <br/>
+         <center><img src="rbf_small_gamma.gif"/></center>
+
+         <p>
+            So you need to pick the gamma value so that it is scaled reasonably to your data.  A <i><font color="red">good rule of
+            thumb (i.e. not the optimal gamma, just a heuristic guess)</font></i> is the following:
+         </p>
+         <code_box>const double gamma = 1.0/compute_mean_squared_distance(randomly_subsample(samples, 2000));</code_box>
+           
       </question>
 
       <question text="Which machine learning method should I use?">
