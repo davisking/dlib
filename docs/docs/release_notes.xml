@@ -12,14 +12,26 @@
 
 <current>
 New Stuff:
+   - Added a function for saving to the PNG image format.
+   - Added Austin Appleby's excellent MurmurHash3 hashing code and setup some
+     additional convenience functions.  These functions are murmur_hash3() and
+     various overloads of hash().
  
 Non-Backwards Compatible Changes:
    - Made get_pixel_intensity() more efficient.  However, the value returned
      is slightly different than it used to be for RGB pixel types.
 
 Bug fixes:
+   - Setup proper error handling for libpng in the png_loader.  Now if the PNG
+     file is corrupted in the middle it won't just print a message and abort
+     the program.
+   - Fixed a bug in assign_pixel_intensity() that happened when the target pixel 
+     was an RGB pixel with an alpha channel.
 
 Other:
+   - Added a Frequently Asked Questions page
+   - Changed the array2d object so you don't have to say array2d&lt;type&gt;::kernel_1a
+     anymore to declare it.  Now you just say array2d&lt;type&gt;.
 
 </current>
 
