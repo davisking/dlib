@@ -69,7 +69,10 @@ namespace
         bo.host_to_little(hashes);
         final = murmur_hash3(hashes,sizeof(hashes),0);
 
-        dlog << LINFO << hex << "final: "<< final;
+		// using ostringstream to avoid compiler error in visual studio 2005
+		ostringstream sout;
+		sout << hex << final;
+		dlog << LINFO << "final: "<< sout.str();
         DLIB_TEST(final == 0xB0F57EE3);
     }
 
