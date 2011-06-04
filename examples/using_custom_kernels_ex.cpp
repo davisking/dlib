@@ -100,7 +100,7 @@ void deserialize ( ukf_kernel<T>& item, std::istream& in )
 // ----------------------------------------------------------------------------------------
 
 /*
-    This next thing, the kernel_derivative specialization is OPTIONAL.  You only need
+    This next thing, the kernel_derivative specialization is optional.  You only need
     to define it if you want to use the dlib::reduced2() or dlib::approximate_distance_function() 
     routines.  If so, then you need to supply code for computing the derivative of your kernel as 
     shown below.  Note also that you can only do this if your kernel operates on dlib::matrix
@@ -166,7 +166,7 @@ int main()
 
     // A valid kernel must always give rise to kernel matrices which are symmetric 
     // and positive semidefinite (i.e. have nonnegative eigenvalues).  This next
-    // bit of code makes a kernel matrix and checks if this is true.
+    // bit of code makes a kernel matrix and checks if it has these properties.
     const matrix<double> K = kernel_matrix(kernel_type(0.1), randomly_subsample(samples, 500));
     cout << "\nIs it symmetric? (this value should be 0): "<< min(abs(K - trans(K))) << endl;
     cout << "Smallest eigenvalue (should be >= 0):      "  << min(real_eigenvalues(K)) << endl;
