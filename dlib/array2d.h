@@ -5,7 +5,6 @@
 
 
 #include "array2d/array2d_kernel_1.h"
-#include "algs.h"
 
 #endif // DLIB_ARRAY2d_
 
