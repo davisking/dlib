@@ -32,6 +32,7 @@ to not work right.
          </ul>
 
       </question>
+      <!-- ****************************************** -->
 
       <question text="How do I set the size of a matrix at runtime?">
          Long answer, read the <a href="matrix_ex.cpp.html">matrix example program</a>.
@@ -51,6 +52,7 @@ row_vect.set_size(5);
 </code_box>
 
       </question>
+      <!-- ****************************************** -->
 
       <question text="Where is the documentation for &lt;object/function&gt;?">
          If you can't find something then check the <a href="term_index.html">index</a>.
@@ -79,6 +81,8 @@ row_vect.set_size(5);
 
       </question>
 
+      <!-- ****************************************** -->
+
       <question text="Why is cross_validate_trainer_threaded() crashing?">
          This function makes a copy of your training data for each thread.  So you are probably running out
          of memory.  To avoid this, use the <a href="algorithms.html#randomly_subsample">randomly_subsample</a> function
@@ -96,8 +100,13 @@ cross_validate_trainer_threaded(trainer,
          </p>
       </question>
 
+      <!-- ****************************************** -->
+
       <question text="How can I define a custom kernel?">
+         See the <a href="using_custom_kernels_ex.cpp.html">Using Custom Kernels</a> example program.
       </question>
+
+      <!-- ****************************************** -->
 
       <question text="Can you give advice on feature generation/kernel selection?">
          <p>
@@ -132,6 +141,8 @@ cross_validate_trainer_threaded(trainer,
          </p>
       </question>
 
+      <!-- ****************************************** -->
+
       <question text="Why does my decision_function always give the same output?">
          This happens when you use the radial_basis_kernel and you set the gamma value to
          something highly inappropriate.  To understand what's happening lets imagine your
@@ -158,8 +169,8 @@ cross_validate_trainer_threaded(trainer,
            
       </question>
 
-      <question text="Which machine learning method should I use?">
-      </question>
+      <!-- ****************************************** -->
+
    </questions>
 
    <!-- ************************************************************************* -->

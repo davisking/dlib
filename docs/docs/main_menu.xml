@@ -196,6 +196,10 @@
                   <link>svm_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Using_Custom_Kernels</name>
+                  <link>using_custom_kernels_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Support_Vector_Regression</name>
                   <link>svr_ex.cpp.html</link>
                </item>
