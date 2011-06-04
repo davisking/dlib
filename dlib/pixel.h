@@ -841,9 +841,9 @@ namespace dlib
             h.l = src.i/255.0;
             c = HSL2RGB(h);
 
-            dest.red = static_cast<unsigned char>(c.r*255.0);
-            dest.green = static_cast<unsigned char>(c.g*255.0);
-            dest.blue = static_cast<unsigned char>(c.b*255.0);
+            dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
+            dest.green = static_cast<unsigned char>(c.g*255.0 + 0.5);
+            dest.blue = static_cast<unsigned char>(c.b*255.0 + 0.5);
         }
 
     // -----------------------------
@@ -895,9 +895,9 @@ namespace dlib
             h.l = src.i/255.0;
             c = HSL2RGB(h);
 
-            dest.red = static_cast<unsigned char>(c.r*255.0);
-            dest.green = static_cast<unsigned char>(c.g*255.0);
-            dest.blue = static_cast<unsigned char>(c.b*255.0);
+            dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
+            dest.green = static_cast<unsigned char>(c.g*255.0 + 0.5);
+            dest.blue = static_cast<unsigned char>(c.b*255.0 + 0.5);
             dest.alpha = 255;
         }
 
@@ -934,9 +934,9 @@ namespace dlib
             c1.b = src.blue/255.0;
             c2 = RGB2HSL(c1);
 
-            dest.h = static_cast<unsigned char>(c2.h/360.0*255.0);
-            dest.s = static_cast<unsigned char>(c2.s*255.0);
-            dest.i = static_cast<unsigned char>(c2.l*255.0);
+            dest.h = static_cast<unsigned char>(c2.h/360.0*255.0 + 0.5);
+            dest.s = static_cast<unsigned char>(c2.s*255.0 + 0.5);
+            dest.i = static_cast<unsigned char>(c2.l*255.0 + 0.5);
         }
 
         template < typename P1, typename P2 >
