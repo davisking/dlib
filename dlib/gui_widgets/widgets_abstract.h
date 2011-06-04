@@ -2360,7 +2360,8 @@ namespace dlib
         );
         /*!
             requires
-                - image_type == an implementation of array2d/array2d_kernel_abstract.h
+                - image_type == an implementation of array2d/array2d_kernel_abstract.h or
+                  a dlib::matrix or something convertible to a matrix via array_to_matrix()
                 - pixel_traits<typename image_type::type> must be defined 
             ensures
                 - #*this widget is now displaying the given image new_img.
@@ -2534,7 +2535,8 @@ namespace dlib
         ); 
         /*!
             requires
-                - image_type == an implementation of array2d/array2d_kernel_abstract.h
+                - image_type == an implementation of array2d/array2d_kernel_abstract.h or
+                  a dlib::matrix or something convertible to a matrix via array_to_matrix()
                 - pixel_traits<typename image_type::type> must be defined 
             ensures
                 - this object is properly initialized 
