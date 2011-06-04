@@ -53,6 +53,25 @@ namespace
             }
         }
 
+        img2.clear();
+        DLIB_TEST(img2.size() == 0);
+        DLIB_TEST(img2.nr() == 0);
+        DLIB_TEST(img2.nc() == 0);
+        assign_image(img2, array_to_matrix(img1));
+
+        DLIB_TEST_MSG(img1.nr() == 100 && img1.nc() == 100 &&
+                     img2.nr() == 100 && img2.nc() == 100,"");
+
+
+        for (long r = 0; r < img1.nr(); ++r)
+        {
+            for (long c = 0; c < img1.nc(); ++c)
+            {
+                DLIB_TEST(img1[r][c] == 7);
+                DLIB_TEST(img2[r][c] == 7);
+            }
+        }
+
 
         threshold_image(img1, img2, 4);
 
