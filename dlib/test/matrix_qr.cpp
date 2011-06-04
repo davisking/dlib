@@ -187,7 +187,7 @@ namespace
             tester ("test_matrix_qr",
                     "Runs tests on the matrix QR component.")
         {
-            rnd.set_seed(cast_to_string(time(0)));
+            //rnd.set_seed(cast_to_string(time(0)));
         }
 
         void perform_test (
