@@ -2087,7 +2087,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <description>
             This is just a version of the <a href="#structural_svm_problem">structural_svm_problem</a> 
             which is capable of using multiple cores/threads at a time.  You should use it if
-            you have a multi-core CPU and the separation oracle takes a long time to compute.
+            you have a multi-core CPU and the separation oracle takes a long time to compute.  Or even better, if you
+            have multiple computers then you can use the <a href="#svm_struct_controller_node">svm_struct_controller_node</a>
+            to distribute the work across many computers.
          </description>
                                  
       </component>

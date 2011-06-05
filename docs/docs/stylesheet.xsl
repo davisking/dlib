@@ -9,7 +9,7 @@
    <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    <xsl:output method='html' version='1.0' encoding='UTF-8' indent='no' />
    <xsl:strip-space elements="*" />
-   <xsl:preserve-space elements="pre code_box" />
+   <xsl:preserve-space elements="pre code_box preserve_space" />
    
    
    <!-- ************************************************************************* -->
@@ -770,6 +770,10 @@ function BigToggle(node)
       <h1>
          <xsl:apply-templates/>
        </h1>
+   </xsl:template>
+
+   <xsl:template match="preserve_space">
+         <xsl:apply-templates/>
    </xsl:template>
    
    <xsl:template match="p">

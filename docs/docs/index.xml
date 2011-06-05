@@ -114,9 +114,9 @@
                   <li>Box-constrained derivative-free optimization via the 
                       <a href="optimization.html#find_min_bobyqa">BOBYQA</a> algorithm</li> 
                   <li>An implementation of the <a href="optimization.html#oca">Optimized Cutting Plane Algorithm</a></li> 
-                  <li>Several <a href="optimization.html#solve_qp2_using_smo">quadratic</a> 
-                              <a href="optimization.html#solve_qp3_using_smo">program</a> 
-                              <a href="optimization.html#solve_qp_using_smo">solvers</a> </li> 
+                  <li>Several <preserve_space><a href="optimization.html#solve_qp2_using_smo">quadratic</a> 
+                              <a href="optimization.html#solve_qp3_using_smo">program</a>
+                              <a href="optimization.html#solve_qp_using_smo">solvers</a></preserve_space> </li> 
                   <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
                   <li>A <a href="algorithms.html#rand">random number</a> object</li>
                </ul>
