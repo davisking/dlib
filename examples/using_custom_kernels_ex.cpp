@@ -1,7 +1,7 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example showing how to defined custom kernel functions for use with 
+    This is an example showing how to define custom kernel functions for use with 
     the machine learning tools in the dlib C++ Library.
 
     This example assumes you are somewhat familiar with the machine learning
@@ -80,7 +80,7 @@ struct ukf_kernel
 
 /*
     Here we define serialize() and deserialize() functions for our new kernel.  Defining
-    these function is optional.  However, if you don't define them you won't be able
+    these functions is optional.  However, if you don't define them you won't be able
     to save your learned decision_function objects to disk. 
 */
 
@@ -200,7 +200,7 @@ int main()
     // the results are similar.  If they are very different then you probably made a 
     // mistake.  So here we compare the results at a test point. 
     cout << "\nThese vectors should match, if they don't then we coded the kernel_derivative wrong!" << endl;
-    cout << "approximate derivative: \n" << derivative(kern)(samples[0],samples[100]) << endl;
+    cout << "approximate derivative: \n" <<               derivative(kern)(samples[0],samples[100]) << endl;
     cout << "exact derivative: \n" << kernel_derivative<kernel_type>(kern)(samples[0],samples[100]) << endl;
 
 }
