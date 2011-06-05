@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.40" date="Jun 05, 2011">
+New Stuff:
    - Added a function for saving to the PNG image format.
    - Added Austin Appleby's excellent MurmurHash3 hashing code and setup some
      additional convenience functions.  These functions are murmur_hash3() and
@@ -33,7 +46,7 @@ Other:
    - Changed the array2d object so you don't have to say array2d&lt;type&gt;::kernel_1a
      anymore to declare it.  Now you just say array2d&lt;type&gt;.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
