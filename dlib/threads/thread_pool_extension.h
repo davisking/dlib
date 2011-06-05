@@ -419,9 +419,9 @@ namespace dlib
             long arg1;
             long arg2;
 
-            member_function_pointer<>::kernel_1a_c mfp0;
-            member_function_pointer<long>::kernel_1a_c mfp1;
-            member_function_pointer<long,long>::kernel_1a_c mfp2;
+            member_function_pointer<>::kernel_1a mfp0;
+            member_function_pointer<long>::kernel_1a mfp1;
+            member_function_pointer<long,long>::kernel_1a mfp2;
             bfp_type bfp;
 
         };
