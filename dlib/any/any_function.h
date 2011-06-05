@@ -263,7 +263,7 @@ namespace dlib
     template <
         typename function_type, 
         // These arguments are used to control the overloading.  A user should
-        // not set with them.  
+        // not mess with them.  
         typename Enabled = void,
         unsigned long Num_args = sig_traits<function_type>::num_args
         >
