@@ -260,7 +260,8 @@ namespace dlib
 
     uint64 thread_pool_implementation::
     add_task_internal (
-        const bfp_type& bfp
+        const bfp_type& bfp,
+        shared_ptr<function_object_copy>& item
     )
     {
         auto_mutex M(m);
@@ -293,6 +294,7 @@ namespace dlib
         tasks[idx].thread_id = my_thread_id;
         tasks[idx].task_id = make_next_task_id(idx);
         tasks[idx].bfp = bfp;
+        tasks[idx].function_copy.swap(item);
 
         task_ready_signaler.signal();
 

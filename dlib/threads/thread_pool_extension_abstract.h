@@ -77,9 +77,9 @@ namespace dlib
         );
         /*!
             ensures
-                - if (item.is_ready() == false) then
+                - if (is_ready() == false) then
                     - the call to this function blocks until the thread processing the task related
-                      to the item future has finished.
+                      to this future has finished.
         !*/
 
         bool is_ready (
@@ -218,17 +218,16 @@ namespace dlib
                 mode any thread that calls add_task() is considered to be
                 a thread_pool thread capable of executing tasks.
 
-                Also note that all function objects are passed to the tasks
-                by reference.  This means you should ensure that your function
-                objects are not destroyed while tasks are still using them.
-                (e.g. Don't let them go out of scope right after a call to 
-                add_task())
+                This object is also implemented such that no memory allocations occur 
+                after the thread pool has been constructed (the future object also 
+                doesn't perform any memory allocations or contain any system 
+                resources such as mutex objects) so long as the user doesn't call
+                any of the add_task_by_value() routines.
 
             EXCEPTIONS
                 Note that if an exception is thrown inside a task thread and 
                 is not caught then the normal rule for uncaught exceptions in
-                threads applies. That is, the application will be terminated
-                and the text of the exception will be printed to standard error.
+                threads applies. That is, the application will be terminated.
         !*/
 
     public:
@@ -271,6 +270,25 @@ namespace dlib
                   the maximum number of tasks that this object will process concurrently.
         !*/
 
+        template <typename F>
+        uint64 add_task_by_value (
+            const F& function_object
+        );
+        /*!
+            requires
+                - function_object() is a valid expression 
+            ensures
+                - makes a copy of function_object, call it FCOPY.
+                - if (is_task_thread() == true and there aren't any free threads available) then
+                    - calls FCOPY() within the calling thread and returns when it finishes
+                - else
+                    - the call to this function blocks until there is a free thread in the pool
+                      to process this new task.  Once a free thread is available the task
+                      is handed off to that thread which then calls FCOPY().
+                - returns a task id that can be used by this->wait_for_task() to wait
+                  for the submitted task to finish.
+        !*/
+
         template <typename T>
         uint64 add_task (
             T& obj,
@@ -279,6 +297,9 @@ namespace dlib
         /*!
             requires
                 - funct == a valid member function pointer for class T
+                - obj will not go out of scope until after the task has completed (i.e. 
+                  this function passes obj to the task by reference.  If you want to avoid
+                  this restriction then use add_task_by_value())
             ensures
                 - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)() within the calling thread and returns
@@ -300,6 +321,9 @@ namespace dlib
         /*!
             requires
                 - funct == a valid member function pointer for class T
+                - obj will not go out of scope until after the task has completed (i.e. 
+                  this function passes obj to the task by reference.  If you want to avoid
+                  this restriction then use add_task_by_value())
             ensures
                 - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)(arg1) within the calling thread and returns
@@ -322,6 +346,9 @@ namespace dlib
         /*!
             requires
                 - funct == a valid member function pointer for class T
+                - obj will not go out of scope until after the task has completed (i.e. 
+                  this function passes obj to the task by reference.  If you want to avoid
+                  this restriction then use add_task_by_value())
             ensures
                 - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)(arg1,arg2) within the calling thread and returns
@@ -365,6 +392,9 @@ namespace dlib
             requires
                 - function_object(arg1.get()) is a valid expression 
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function object)
+                - function_object will not go out of scope until after the task has completed (i.e. 
+                  this function passes function_object to the task by reference.  If you want to avoid
+                  this restriction then use add_task_by_value())
             ensures
                 - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls function_object(arg1.get()) within the calling thread and returns
@@ -373,6 +403,28 @@ namespace dlib
                     - the call to this function blocks until there is a free thread in the pool
                       to process this new task.  Once a free thread is available the task
                       is handed off to that thread which then calls function_object(arg1.get()).
+                - #arg1.is_ready() == false 
+                - returns a task id that can be used by this->wait_for_task() to wait
+                  for the submitted task to finish.
+        !*/
+
+        template <typename F, typename A1>
+        uint64 add_task_by_value (
+            const F& function_object,
+            future<A1>& arg1
+        );
+        /*!
+            requires
+                - function_object(arg1.get()) is a valid expression 
+                  (i.e. The A1 type stored in the future must be a type that can be passed into the given function object)
+            ensures
+                - makes a copy of function_object, call it FCOPY.
+                - if (is_task_thread() == true and there aren't any free threads available) then
+                    - calls FCOPY(arg1.get()) within the calling thread and returns when it finishes
+                - else
+                    - the call to this function blocks until there is a free thread in the pool
+                      to process this new task.  Once a free thread is available the task
+                      is handed off to that thread which then calls FCOPY(arg1.get()).
                 - #arg1.is_ready() == false 
                 - returns a task id that can be used by this->wait_for_task() to wait
                   for the submitted task to finish.
@@ -389,6 +441,9 @@ namespace dlib
                 - funct == a valid member function pointer for class T
                 - (obj.*funct)(arg1.get()) must be a valid expression.
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
+                - obj will not go out of scope until after the task has completed (i.e. 
+                  this function passes obj to the task by reference.  If you want to avoid
+                  this restriction then use add_task_by_value())
             ensures
                 - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)(arg1.get()) within the calling thread and returns
@@ -413,6 +468,9 @@ namespace dlib
                 - funct == a valid member function pointer for class T
                 - (obj.*funct)(arg1.get()) must be a valid expression.
                   (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
+                - obj will not go out of scope until after the task has completed (i.e. 
+                  this function passes obj to the task by reference.  If you want to avoid
+                  this restriction then use add_task_by_value())
             ensures
                 - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)(arg1.get()) within the calling thread and returns
@@ -450,14 +508,21 @@ namespace dlib
         !*/
 
         // --------------------------------------------------------------------------------
-        // The remainder of this class just contains overloads for add_task() that take up 
-        // to 4 futures (as well as 0 futures).  Their behavior is identical to the above 
-        // add_task() functions.
+        // The remainder of this class just contains overloads for add_task() and add_task_by_value() 
+        // that take up to 4 futures (as well as 0 futures).  Their behavior is identical to the above 
+        // add_task() and add_task_by_value() functions.
         // --------------------------------------------------------------------------------
 
         template <typename F, typename A1, typename A2>
         uint64 add_task (
             F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2
+        );
+
+        template <typename F, typename A1, typename A2>
+        uint64 add_task_by_value (
+            const F& function_object,
             future<A1>& arg1,
             future<A2>& arg2
         );
@@ -493,6 +558,14 @@ namespace dlib
         template <typename F, typename A1, typename A2, typename A3>
         uint64 add_task (
             F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        );
+
+        template <typename F, typename A1, typename A2, typename A3>
+        uint64 add_task (
+            const F& function_object,
             future<A1>& arg1,
             future<A2>& arg2,
             future<A3>& arg3
@@ -535,6 +608,15 @@ namespace dlib
         template <typename F, typename A1, typename A2, typename A3, typename A4>
         uint64 add_task (
             F& function_object,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        );
+
+        template <typename F, typename A1, typename A2, typename A3, typename A4>
+        uint64 add_task (
+            const F& function_object,
             future<A1>& arg1,
             future<A2>& arg2,
             future<A3>& arg3,
