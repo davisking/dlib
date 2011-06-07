@@ -159,7 +159,8 @@ namespace dlib
             ensures
                 - swaps *this and item
                 - does not invalidate pointers or references to the object contained 
-                  inside *this or item.
+                  inside *this or item.  Moreover, a pointer or reference to the object in 
+                  *this will now refer to the contents of #item and vice versa.
         !*/
 
     };
