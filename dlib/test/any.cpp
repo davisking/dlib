@@ -104,6 +104,16 @@ namespace
         }
         DLIB_TEST(error);
 
+
+        a = 1;
+        b = 2;
+
+        int* a_ptr = &a.get<int>();
+        int* b_ptr = &b.get<int>();
+
+        swap(a,b);
+        DLIB_TEST(a_ptr == &b.get<int>());
+        DLIB_TEST(b_ptr == &a.get<int>());
     }
 
 // ----------------------------------------------------------------------------------------
