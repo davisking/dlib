@@ -8,6 +8,7 @@
 #include <ctime>
 #include <dlib/misc_api.h>
 #include <dlib/threads.h>
+#include <dlib/any.h>
 
 #include "tester.h"
 
@@ -29,6 +30,9 @@ namespace
 
     struct add_functor
     {
+        add_functor() { var = 1;}
+        add_functor(int v):var(v) {}
+
         template <typename T, typename U, typename V>
         void operator()(T a, U b, V& res)
         {
@@ -43,6 +47,14 @@ namespace
         {
             global_var = 9;
         }
+
+        // use an any just so that if this object goes out of scope
+        // then var will get all messed up.
+        any var;
+        void operator()(int& a) { dlib::sleep(100); a = var.get<int>(); }
+        void operator()(int& a, int& b) { dlib::sleep(100); a = var.get<int>(); b = 2; }
+        void operator()(int& a, int& b, int& c) { dlib::sleep(100); a = var.get<int>(); b = 2; c = 3; }
+        void operator()(int& a, int& b, int& c, int& d) { dlib::sleep(100); a = var.get<int>(); b = 2; c = 3; d = 4; }
     };
 
 
@@ -70,7 +82,7 @@ namespace
             add_functor f;
             for (int num_threads= 0; num_threads < 4; ++num_threads)
             {
-                future<int> a, b, c, res;
+                future<int> a, b, c, res, d;
                 thread_pool tp(num_threads);
                 print_spinner();
 
@@ -243,6 +255,35 @@ namespace
 
                 // add this task just to to perterb the thread pool before it goes out of scope
                 tp.add_task(f, a, b, res);
+
+                for (int k = 0; k < 3; ++k)
+                {
+                    print_spinner();
+                    global_var = 0;
+                    tp.add_task_by_value(add_functor());
+                    tp.wait_for_all_tasks();
+                    DLIB_TEST(global_var == 9);
+
+                    a = 0; b = 0; c = 0; d = 0;
+                    tp.add_task_by_value(add_functor(), a);
+                    DLIB_TEST(a == 1);
+                    a = 0; b = 0; c = 0; d = 0;
+                    tp.add_task_by_value(add_functor(8), a, b);
+                    DLIB_TEST(a == 8);
+                    DLIB_TEST(b == 2);
+                    a = 0; b = 0; c = 0; d = 0;
+                    tp.add_task_by_value(add_functor(), a, b, c);
+                    DLIB_TEST(a == 1);
+                    DLIB_TEST(b == 2);
+                    DLIB_TEST(c == 3);
+                    a = 0; b = 0; c = 0; d = 0;
+                    tp.add_task_by_value(add_functor(5), a, b, c, d);
+                    DLIB_TEST(a == 5);
+                    DLIB_TEST(b == 2);
+                    DLIB_TEST(c == 3);
+                    DLIB_TEST(d == 4);
+                }
+
             }
         }
 
