@@ -158,6 +158,8 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
+                - does not invalidate pointers or references to the object contained 
+                  inside *this or item.
         !*/
 
     };
