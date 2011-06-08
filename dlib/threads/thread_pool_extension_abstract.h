@@ -219,10 +219,10 @@ namespace dlib
                 a thread_pool thread capable of executing tasks.
 
                 This object is also implemented such that no memory allocations occur 
-                after the thread pool has been constructed (the future object also 
-                doesn't perform any memory allocations or contain any system 
-                resources such as mutex objects) so long as the user doesn't call
-                any of the add_task_by_value() routines.
+                after the thread_pool has been constructed so long as the user doesn't 
+                call any of the add_task_by_value() routines.  The future object also 
+                doesn't perform any memory allocations or contain any system resources 
+                such as mutex objects. 
 
             EXCEPTIONS
                 Note that if an exception is thrown inside a task thread and 
