@@ -568,8 +568,7 @@ namespace dlib
 
                 subgradient /= num;
                 total_loss /= num;
-                // Include a sanity check that the risk is always non-negative.
-                risk = std::max<scalar_type>(total_loss + dot(subgradient,w), 0);
+                risk = total_loss + dot(subgradient,w);
             }
 
             std::vector<std::pair<std::string,unsigned short> > nodes;
