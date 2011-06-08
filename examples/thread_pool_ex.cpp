@@ -62,9 +62,9 @@ public:
         tp.add_task(*this,&test::subtask2);    // schedule call to this->subtask2() 
 
         // Since var is a future, this line will wait for the test::subtask task to 
-        // finish and before allowing us to access the contents of var.  var will 
+        // finish before allowing us to access the contents of var.  Then var will 
         // return the integer it contains.  In this case result will be assigned 
-        // the value of 2 since var was incremented by subtask().
+        // the value 2 since var was incremented by subtask().
         int result = var;
         // print out the result
         dlog << LINFO << "var = " << result;
