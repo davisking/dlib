@@ -309,84 +309,20 @@ namespace dlib
             return type_identity == 0;
         }
 
-    private:
-        struct serialize_helper
-        {
-            /*
-                This is a function object to help us serialize type_safe_unions
-            */
-
-            std::ostream& out;
-            serialize_helper(std::ostream& out_): out(out_) {}
-            template <typename T>
-            void operator() (const T& item) const { serialize(item, out); } 
-        };
 
     public:
 
+        template <
+            typename t1, typename t2, typename t3, typename t4, typename t5,
+            typename t6, typename t7, typename t8, typename t9, typename t10,
+            typename t11, typename t12, typename t13, typename t14, typename t15,
+            typename t16, typename t17, typename t18, typename t19, typename t20
+            >
         friend void serialize (
-            const type_safe_union& item,
+            const type_safe_union<t1,t2,t3,t4,t5,t6,t7,t8,t9,t10, t11,t12,t13,t14,t15,t16,t17,t18,t19,t20>& item,
             std::ostream& out
-        )
-        {
-            try
-            {
-                // save the type_identity
-                serialize(item.type_identity, out);
-                item.apply_to_contents(serialize_helper(out));
-            }
-            catch (serialization_error& e)
-            {
-                throw serialization_error(e.info + "\n   while serializing an object of type type_safe_union");
-            }
-        }
+        );
 
-        friend void deserialize (
-            type_safe_union& item,
-            std::istream& in
-        )
-        {
-            try
-            {
-                int type_identity;
-                deserialize(type_identity, in);
-                switch (type_identity)
-                {
-                    // swap an empty type_safe_union into item since it should be in the empty state
-                    case 0: type_safe_union().swap(item); break;
-
-                    case 1: deserialize(item.get<T1>(), in);  break;
-                    case 2: deserialize(item.get<T2>(), in);  break;
-                    case 3: deserialize(item.get<T3>(), in);  break;
-                    case 4: deserialize(item.get<T4>(), in);  break;
-                    case 5: deserialize(item.get<T5>(), in);  break;
-
-                    case 6: deserialize(item.get<T6>(), in);  break;
-                    case 7: deserialize(item.get<T7>(), in);  break;
-                    case 8: deserialize(item.get<T8>(), in);  break;
-                    case 9: deserialize(item.get<T9>(), in);  break;
-                    case 10: deserialize(item.get<T10>(), in);  break;
-
-                    case 11: deserialize(item.get<T11>(), in);  break;
-                    case 12: deserialize(item.get<T12>(), in);  break;
-                    case 13: deserialize(item.get<T13>(), in);  break;
-                    case 14: deserialize(item.get<T14>(), in);  break;
-                    case 15: deserialize(item.get<T15>(), in);  break;
-
-                    case 16: deserialize(item.get<T16>(), in);  break;
-                    case 17: deserialize(item.get<T17>(), in);  break;
-                    case 18: deserialize(item.get<T18>(), in);  break;
-                    case 19: deserialize(item.get<T19>(), in);  break;
-                    case 20: deserialize(item.get<T20>(), in);  break;
-
-                    default: throw serialization_error("Corrupt data detected while deserializing type_safe_union");
-                }
-            }
-            catch (serialization_error& e)
-            {
-                throw serialization_error(e.info + "\n   while deserializing an object of type type_safe_union");
-            }
-        }
 
         template <
             typename T
@@ -636,6 +572,103 @@ namespace dlib
                                   is_convertible<from,T19>::value ||
                                   is_convertible<from,T20>::value;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        struct serialize_helper
+        {
+            /*
+                This is a function object to help us serialize type_safe_unions
+            */
+
+            std::ostream& out;
+            serialize_helper(std::ostream& out_): out(out_) {}
+            template <typename T>
+            void operator() (const T& item) const { serialize(item, out); } 
+        };
+    }
+
+    template <
+        typename T1, typename T2, typename T3, typename T4, typename T5,
+        typename T6, typename T7, typename T8, typename T9, typename T10,
+        typename T11, typename T12, typename T13, typename T14, typename T15,
+        typename T16, typename T17, typename T18, typename T19, typename T20
+        >
+    void serialize (
+        const type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            // save the type_identity
+            serialize(item.type_identity, out);
+            item.apply_to_contents(dlib::impl::serialize_helper(out));
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while serializing an object of type type_safe_union");
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T1, typename T2, typename T3, typename T4, typename T5,
+        typename T6, typename T7, typename T8, typename T9, typename T10,
+        typename T11, typename T12, typename T13, typename T14, typename T15,
+        typename T16, typename T17, typename T18, typename T19, typename T20
+        >
+    void deserialize (
+        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>&  item,
+        std::istream& in
+    )
+    {
+        try
+        {
+            typedef type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20> tsu_type;
+
+            int type_identity;
+            deserialize(type_identity, in);
+            switch (type_identity)
+            {
+                // swap an empty type_safe_union into item since it should be in the empty state
+                case 0: tsu_type().swap(item); break;
+
+                case 1: deserialize(item.template get<T1>(), in);  break;
+                case 2: deserialize(item.template get<T2>(), in);  break;
+                case 3: deserialize(item.template get<T3>(), in);  break;
+                case 4: deserialize(item.template get<T4>(), in);  break;
+                case 5: deserialize(item.template get<T5>(), in);  break;
+
+                case 6: deserialize(item.template get<T6>(), in);  break;
+                case 7: deserialize(item.template get<T7>(), in);  break;
+                case 8: deserialize(item.template get<T8>(), in);  break;
+                case 9: deserialize(item.template get<T9>(), in);  break;
+                case 10: deserialize(item.template get<T10>(), in);  break;
+
+                case 11: deserialize(item.template get<T11>(), in);  break;
+                case 12: deserialize(item.template get<T12>(), in);  break;
+                case 13: deserialize(item.template get<T13>(), in);  break;
+                case 14: deserialize(item.template get<T14>(), in);  break;
+                case 15: deserialize(item.template get<T15>(), in);  break;
+
+                case 16: deserialize(item.template get<T16>(), in);  break;
+                case 17: deserialize(item.template get<T17>(), in);  break;
+                case 18: deserialize(item.template get<T18>(), in);  break;
+                case 19: deserialize(item.template get<T19>(), in);  break;
+                case 20: deserialize(item.template get<T20>(), in);  break;
+
+                default: throw serialization_error("Corrupt data detected while deserializing type_safe_union");
+            }
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while deserializing an object of type type_safe_union");
+        }
+    }
 
 // ----------------------------------------------------------------------------------------
 
