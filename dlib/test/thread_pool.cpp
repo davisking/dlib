@@ -43,6 +43,11 @@ namespace
         void set_global_var() { global_var = 9; }
         void set_global_var_const() const { global_var = 9; }
 
+        void set_global_var_arg1(int val) { global_var = val; }
+        void set_global_var_const_arg1(int val) const { global_var = val; }
+        void set_global_var_arg2(int val, int val2) { global_var = val+val2; }
+        void set_global_var_const_arg2(int val, int val2) const { global_var = val+val2; }
+
         void operator()()
         {
             global_var = 9;
@@ -242,10 +247,90 @@ namespace
                     tp.wait_for_task(id);
                     DLIB_TEST(global_var == 9);
 
+                    global_var = 0;
+                    a = 4;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task(f, &add_functor::set_global_var_arg1, a);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 4);
+
+                    global_var = 0;
+                    a = 4;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task_by_value(f, &add_functor::set_global_var_arg1, a);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 4);
+
+
+
+                    global_var = 0;
+                    a = 4;
+                    b = 3;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task(f, &add_functor::set_global_var_arg2, a, b);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 7);
+
+                    global_var = 0;
+                    a = 4;
+                    b = 3;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task_by_value(f, &add_functor::set_global_var_arg2, a, b);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 7);
+
+                    global_var = 0;
+                    a = 4;
+                    b = 3;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task(f, &add_functor::set_global_var_const_arg2, a, b);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 7);
+
+                    global_var = 0;
+                    a = 4;
+                    b = 3;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task_by_value(f, &add_functor::set_global_var_const_arg2, a, b);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 7);
+
+
+
+
+
+
+                    global_var = 0;
+                    a = 4;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task(f, &add_functor::set_global_var_const_arg1, a);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 4);
+
+                    global_var = 0;
+                    a = 4;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task_by_value(f, &add_functor::set_global_var_const_arg1, a);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 4);
+
+                    global_var = 0;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task_by_value(f, &add_functor::set_global_var);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 9);
+
 
                     global_var = 0;
                     DLIB_TEST(global_var == 0);
                     id = tp.add_task(f, &add_functor::set_global_var_const);
+                    tp.wait_for_task(id);
+                    DLIB_TEST(global_var == 9);
+
+
+                    global_var = 0;
+                    DLIB_TEST(global_var == 0);
+                    id = tp.add_task_by_value(f, &add_functor::set_global_var_const);
                     tp.wait_for_task(id);
                     DLIB_TEST(global_var == 9);
 

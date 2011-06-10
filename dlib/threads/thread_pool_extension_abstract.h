@@ -303,11 +303,32 @@ namespace dlib
             ensures
                 - if (is_task_thread() == true and there aren't any free threads available) then
                     - calls (obj.*funct)() within the calling thread and returns
-                      when it finishes
+                      when it finishes.
                 - else
                     - the call to this function blocks until there is a free thread in the pool
                       to process this new task.  Once a free thread is available the task
                       is handed off to that thread which then calls (obj.*funct)()
+                - returns a task id that can be used by this->wait_for_task() to wait
+                  for the submitted task to finish.
+        !*/
+
+        template <typename T>
+        uint64 add_task_by_value (
+            const T& obj,
+            void (T::*funct)() 
+        ); 
+        /*!
+            requires
+                - funct == a valid member function pointer for class T
+            ensures
+                - makes a copy of obj, call it OBJ_COPY.
+                - if (is_task_thread() == true and there aren't any free threads available) then
+                    - calls (OBJ_COPY.*funct)() within the calling thread and returns 
+                      when it finishes.
+                - else
+                    - the call to this function blocks until there is a free thread in the pool
+                      to process this new task.  Once a free thread is available the task
+                      is handed off to that thread which then calls (OBJ_COPY.*funct)().
                 - returns a task id that can be used by this->wait_for_task() to wait
                   for the submitted task to finish.
         !*/
@@ -458,6 +479,30 @@ namespace dlib
         !*/
         
         template <typename T, typename T1, typename A1>
+        uint64 add_task_by_value (
+            const T& obj,
+            void (T::*funct)(T1),
+            future<A1>& arg1
+        ); 
+        /*!
+            requires
+                - funct == a valid member function pointer for class T
+                - (obj.*funct)(arg1.get()) must be a valid expression.
+                  (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
+            ensures
+                - makes a copy of obj, call it OBJ_COPY.
+                - if (is_task_thread() == true and there aren't any free threads available) then
+                    - calls (OBJ_COPY.*funct)(arg1.get()) within the calling thread and returns 
+                      when it finishes.
+                - else
+                    - the call to this function blocks until there is a free thread in the pool
+                      to process this new task.  Once a free thread is available the task
+                      is handed off to that thread which then calls (OBJ_COPY.*funct)(arg1.get()).
+                - returns a task id that can be used by this->wait_for_task() to wait
+                  for the submitted task to finish.
+        !*/
+
+        template <typename T, typename T1, typename A1>
         uint64 add_task (
             const T& obj,
             void (T::*funct)(T1) const,
@@ -484,6 +529,30 @@ namespace dlib
                   for the submitted task to finish.
         !*/
         
+        template <typename T, typename T1, typename A1>
+        uint64 add_task_by_value (
+            const T& obj,
+            void (T::*funct)(T1) const,
+            future<A1>& arg1
+        ); 
+        /*!
+            requires
+                - funct == a valid member function pointer for class T
+                - (obj.*funct)(arg1.get()) must be a valid expression.
+                  (i.e. The A1 type stored in the future must be a type that can be passed into the given function)
+            ensures
+                - makes a copy of obj, call it OBJ_COPY.
+                - if (is_task_thread() == true and there aren't any free threads available) then
+                    - calls (OBJ_COPY.*funct)(arg1.get()) within the calling thread and returns 
+                      when it finishes.
+                - else
+                    - the call to this function blocks until there is a free thread in the pool
+                      to process this new task.  Once a free thread is available the task
+                      is handed off to that thread which then calls (OBJ_COPY.*funct)(arg1.get()).
+                - returns a task id that can be used by this->wait_for_task() to wait
+                  for the submitted task to finish.
+        !*/
+
         template <typename T1, typename A1>
         uint64 add_task (
             void (*funct)(T1),
@@ -536,6 +605,13 @@ namespace dlib
             future<A2>& arg2
         ); 
         
+        uint64 add_task_by_value (
+            const T& obj,
+            void (T::*funct)(T1,T2),
+            future<A1>& arg1,
+            future<A2>& arg2
+        ); 
+
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2>
         uint64 add_task (
@@ -545,6 +621,15 @@ namespace dlib
             future<A2>& arg2
         ); 
         
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2>
+        uint64 add_task_by_value (
+            const T& obj,
+            void (T::*funct)(T1,T2) const,
+            future<A1>& arg1,
+            future<A2>& arg2
+        ); 
+
         template <typename T1, typename A1,
                   typename T2, typename A2>
         uint64 add_task (
@@ -564,7 +649,7 @@ namespace dlib
         );
 
         template <typename F, typename A1, typename A2, typename A3>
-        uint64 add_task (
+        uint64 add_task_by_value (
             const F& function_object,
             future<A1>& arg1,
             future<A2>& arg2,
@@ -581,11 +666,33 @@ namespace dlib
             future<A2>& arg2,
             future<A3>& arg3
         ); 
+
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3>
+        uint64 add_task_by_value (
+            const T& obj,
+            void (T::*funct)(T1,T2,T3),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ); 
         
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
                               typename T3, typename A3>
         uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1,T2,T3) const,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3
+        ); 
+
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3>
+        uint64 add_task_by_value (
             const T& obj,
             void (T::*funct)(T1,T2,T3) const,
             future<A1>& arg1,
@@ -615,7 +722,7 @@ namespace dlib
         );
 
         template <typename F, typename A1, typename A2, typename A3, typename A4>
-        uint64 add_task (
+        uint64 add_task_by_value (
             const F& function_object,
             future<A1>& arg1,
             future<A2>& arg2,
@@ -635,12 +742,38 @@ namespace dlib
             future<A3>& arg3,
             future<A4>& arg4
         ); 
+
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3,
+                              typename T4, typename A4>
+        uint64 add_task_by_value (
+            const T& obj,
+            void (T::*funct)(T1,T2,T3,T4),
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ); 
         
         template <typename T, typename T1, typename A1,
                               typename T2, typename A2,
                               typename T3, typename A3,
                               typename T4, typename A4>
         uint64 add_task (
+            const T& obj,
+            void (T::*funct)(T1,T2,T3,T4) const,
+            future<A1>& arg1,
+            future<A2>& arg2,
+            future<A3>& arg3,
+            future<A4>& arg4
+        ); 
+
+        template <typename T, typename T1, typename A1,
+                              typename T2, typename A2,
+                              typename T3, typename A3,
+                              typename T4, typename A4>
+        uint64 add_task_by_value (
             const T& obj,
             void (T::*funct)(T1,T2,T3,T4) const,
             future<A1>& arg1,
@@ -674,6 +807,12 @@ namespace dlib
             void (T::*funct)() const,
         ); 
         
+        template <typename T>
+        uint64 add_task_by_value (
+            const T& obj,
+            void (T::*funct)() const
+        ); 
+
         uint64 add_task (
             void (*funct)()
         ); 
