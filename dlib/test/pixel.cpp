@@ -8,6 +8,7 @@
 #include <ctime>
 #include <dlib/pixel.h>
 #include <dlib/matrix.h>
+#include <dlib/image_io.h>
 
 #include "tester.h"
 
