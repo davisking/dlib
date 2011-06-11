@@ -575,7 +575,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl
+    namespace impl_tsu
     {
         struct serialize_helper
         {
@@ -605,7 +605,7 @@ namespace dlib
         {
             // save the type_identity
             serialize(item.type_identity, out);
-            item.apply_to_contents(dlib::impl::serialize_helper(out));
+            item.apply_to_contents(dlib::impl_tsu::serialize_helper(out));
         }
         catch (serialization_error& e)
         {
