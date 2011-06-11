@@ -486,15 +486,16 @@ namespace
 
     void make_dataset (
         std::vector<sample_type>& samples,
-        std::vector<scalar_type>& labels
+        std::vector<scalar_type>& labels,
+        int num
     )
     {
         samples.clear();
         labels.clear();
-        dlib::rand rnd;
+        static dlib::rand rnd;
         for (int i = 0; i < 10; ++i)
         {
-            for (int j = 0; j < 100; ++j)
+            for (int j = 0; j < num; ++j)
             {
                 sample_type samp;
                 samp = 0;
@@ -517,7 +518,10 @@ namespace
                     "Runs tests on the structural svm components.")
         {}
 
-        void perform_test (
+        void run_test (
+            const std::vector<sample_type>& samples,
+            const std::vector<scalar_type>& labels,
+            const double true_obj
         )
         {
             typedef linear_kernel<sample_type> kernel_type;
@@ -529,10 +533,6 @@ namespace
 
             trainer1.set_epsilon(1e-4);
             trainer1.set_c(10);
-
-            std::vector<sample_type> samples;
-            std::vector<scalar_type> labels;
-            make_dataset(samples, labels);
 
 
             multiclass_linear_decision_function<kernel_type,double> df1, df2, df3, df4, df5;
@@ -561,11 +561,11 @@ namespace
             DLIB_TEST(std::abs(obj1 - obj3) < 1e-2);
             DLIB_TEST(std::abs(obj1 - obj4) < 1e-2);
             DLIB_TEST(std::abs(obj1 - obj5) < 1e-2);
-            DLIB_TEST(std::abs(obj1 - 1.155) < 1e-2);
-            DLIB_TEST(std::abs(obj2 - 1.155) < 1e-2);
-            DLIB_TEST(std::abs(obj3 - 1.155) < 1e-2);
-            DLIB_TEST(std::abs(obj4 - 1.155) < 1e-2);
-            DLIB_TEST(std::abs(obj5 - 1.155) < 1e-2);
+            DLIB_TEST(std::abs(obj1 - true_obj) < 1e-2);
+            DLIB_TEST(std::abs(obj2 - true_obj) < 1e-2);
+            DLIB_TEST(std::abs(obj3 - true_obj) < 1e-2);
+            DLIB_TEST(std::abs(obj4 - true_obj) < 1e-2);
+            DLIB_TEST(std::abs(obj5 - true_obj) < 1e-2);
 
             dlog << LINFO << "weight error: "<< max(abs(df1.weights - df2.weights));
             dlog << LINFO << "weight error: "<< max(abs(df1.weights - df3.weights));
@@ -589,27 +589,46 @@ namespace
             matrix<double> res = test_multiclass_decision_function(df1, samples, labels);
             dlog << LINFO << res;
             dlog << LINFO << "accuracy: " << sum(diag(res))/sum(res);
-            DLIB_TEST(sum(diag(res)) == 1000);
+            DLIB_TEST(sum(diag(res)) == samples.size());
 
             res = test_multiclass_decision_function(df2, samples, labels);
             dlog << LINFO << res;
             dlog << LINFO << "accuracy: " << sum(diag(res))/sum(res);
-            DLIB_TEST(sum(diag(res)) == 1000);
+            DLIB_TEST(sum(diag(res)) == samples.size());
 
             res = test_multiclass_decision_function(df3, samples, labels);
             dlog << LINFO << res;
             dlog << LINFO << "accuracy: " << sum(diag(res))/sum(res);
-            DLIB_TEST(sum(diag(res)) == 1000);
+            DLIB_TEST(sum(diag(res)) == samples.size());
 
             res = test_multiclass_decision_function(df4, samples, labels);
             dlog << LINFO << res;
             dlog << LINFO << "accuracy: " << sum(diag(res))/sum(res);
-            DLIB_TEST(sum(diag(res)) == 1000);
+            DLIB_TEST(sum(diag(res)) == samples.size());
 
             res = test_multiclass_decision_function(df5, samples, labels);
             dlog << LINFO << res;
             dlog << LINFO << "accuracy: " << sum(diag(res))/sum(res);
-            DLIB_TEST(sum(diag(res)) == 1000);
+            DLIB_TEST(sum(diag(res)) == samples.size());
+        }
+
+        void perform_test (
+        )
+        {
+            std::vector<sample_type> samples;
+            std::vector<scalar_type> labels;
+
+            dlog << LINFO << "test with 100 samples per class";
+            make_dataset(samples, labels, 100);
+            run_test(samples, labels, 1.155);
+
+            dlog << LINFO << "test with 1 sample per class";
+            make_dataset(samples, labels, 1);
+            run_test(samples, labels, 0.251);
+
+            dlog << LINFO << "test with 2 sample per class";
+            make_dataset(samples, labels, 2);
+            run_test(samples, labels, 0.444);
         }
     } a;
 

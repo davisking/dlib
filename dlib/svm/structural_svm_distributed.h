@@ -206,10 +206,14 @@ namespace dlib
                         data.loss = 0;
 
                         data.num = problem.get_num_samples();
+
+                        // how many samples to process in a single task (aim for 100 jobs per thread)
+                        const long block_size = std::max<long>(1, data.num / (1+tp.num_threads_in_pool()*100));
+
                         binder b(*this, req, data);
-                        for (long i = 0; i < data.num; ++i)
+                        for (long i = 0; i < data.num; i+=block_size)
                         {
-                            tp.add_task(b, &binder::call_oracle, i);
+                            tp.add_task(b, &binder::call_oracle, i, std::min(i + block_size, data.num));
                         }
                         tp.wait_for_all_tasks();
 
@@ -227,20 +231,50 @@ namespace dlib
                 ) : self(self_), req(req_), data(data_) {}
 
                 void call_oracle (
-                    long i
+                    long begin,
+                    long end
                 ) 
                 {
-                    scalar_type loss;
-                    feature_vector_type ftemp;
-                    self.cache[i].separation_oracle_cached(req.skip_cache, 
-                                                           req.cur_risk_lower_bound,
-                                                           req.current_solution,
-                                                           loss,
-                                                           ftemp);
+                    // If we are only going to call the separation oracle once then
+                    // don't run the slightly more complex for loop version of this code.
+                    if (end-begin <= 1)
+                    {
+                        scalar_type loss;
+                        feature_vector_type ftemp;
+                        self.cache[begin].separation_oracle_cached(req.skip_cache, 
+                                                                   req.cur_risk_lower_bound,
+                                                                   req.current_solution,
+                                                                   loss,
+                                                                   ftemp);
 
-                    auto_mutex lock(self.accum_mutex);
-                    data.loss += loss;
-                    sparse_vector::add_to(data.subgradient, ftemp);
+                        auto_mutex lock(self.accum_mutex);
+                        data.loss += loss;
+                        sparse_vector::add_to(data.subgradient, ftemp);
+                    }
+                    else
+                    {
+                        scalar_type loss = 0;
+                        matrix_type faccum(data.subgradient.size(),1);
+                        faccum = 0;
+
+                        feature_vector_type ftemp;
+
+                        for (long i = begin; i < end; ++i)
+                        {
+                            scalar_type loss_temp;
+                            self.cache[i].separation_oracle_cached(req.skip_cache, 
+                                                                   req.cur_risk_lower_bound,
+                                                                   req.current_solution,
+                                                                   loss_temp,
+                                                                   ftemp);
+                            loss += loss_temp;
+                            sparse_vector::add_to(faccum, ftemp);
+                        }
+
+                        auto_mutex lock(self.accum_mutex);
+                        data.loss += loss;
+                        sparse_vector::add_to(data.subgradient, faccum);
+                    }
                 }
 
                 const node_type& self;

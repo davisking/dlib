@@ -50,16 +50,42 @@ namespace dlib
             ) : self(self_), w(w_), subgradient(subgradient_), total_loss(total_loss_) {}
 
             void call_oracle (
-                long i
+                long begin,
+                long end
             ) 
             {
-                scalar_type loss;
-                feature_vector_type ftemp;
-                self.separation_oracle_cached(i, w, loss, ftemp);
+                // If we are only going to call the separation oracle once then
+                // don't run the slightly more complex for loop version of this code.
+                if (end-begin <= 1)
+                {
+                    scalar_type loss;
+                    feature_vector_type ftemp;
+                    self.separation_oracle_cached(begin, w, loss, ftemp);
 
-                auto_mutex lock(self.accum_mutex);
-                total_loss += loss;
-                sparse_vector::add_to(subgradient, ftemp);
+                    auto_mutex lock(self.accum_mutex);
+                    total_loss += loss;
+                    sparse_vector::add_to(subgradient, ftemp);
+                }
+                else
+                {
+                    scalar_type loss = 0;
+                    matrix_type faccum(subgradient.size(),1);
+                    faccum = 0;
+
+                    feature_vector_type ftemp;
+
+                    for (long i = begin; i < end; ++i)
+                    {
+                        scalar_type loss_temp;
+                        self.separation_oracle_cached(i, w, loss_temp, ftemp);
+                        loss += loss_temp;
+                        sparse_vector::add_to(faccum, ftemp);
+                    }
+
+                    auto_mutex lock(self.accum_mutex);
+                    total_loss += loss;
+                    sparse_vector::add_to(subgradient, faccum);
+                }
             }
 
             const structural_svm_problem_threaded& self;
@@ -76,10 +102,14 @@ namespace dlib
         ) const
         {
             const long num = this->get_num_samples();
+
+            // how many samples to process in a single task (aim for 100 jobs per thread)
+            const long block_size = std::max<long>(1, num / (1+tp.num_threads_in_pool()*100));
+
             binder b(*this, w, subgradient, total_loss);
-            for (long i = 0; i < num; ++i)
+            for (long i = 0; i < num; i+=block_size)
             {
-                tp.add_task(b, &binder::call_oracle, i);
+                tp.add_task(b, &binder::call_oracle, i, std::min(i+block_size, num));
             }
             tp.wait_for_all_tasks();
         }
