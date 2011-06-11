@@ -12,12 +12,19 @@
 
 <current>
 New Stuff:
+   - You can now add tasks to a thread_pool by value using the new 
+     add_task_by_value() method.
  
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a bug which caused multiply defined symbol errors during linking
+     if the PNG saving routine was #included.
 
 Other:
+   - Optimized the threaded and distributed structural svm solvers for the 
+     case where there are many data samples and the separation oracle is 
+     quick to evaluate.
 
 </current>
 
