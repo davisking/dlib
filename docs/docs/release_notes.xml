@@ -12,7 +12,7 @@
 
 <current>
 New Stuff:
-   - You can now add tasks to a thread_pool by value using the new 
+   - You can now add tasks to a thread_pool by value, using the new 
      add_task_by_value() method.
  
 Non-Backwards Compatible Changes:
