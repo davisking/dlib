@@ -570,6 +570,7 @@
          <term link="dlib/dir_nav/dir_nav_extensions_abstract.h.html#get_parent_directory" 
             name="get_parent_directory"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_ending"/>
+         <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_endings"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_all"/>
 
 
