@@ -70,6 +70,43 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class match_endings
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple function object that can be used with the
+                above get_files_in_directory_tree() function.  This object
+                allows you to look for files with a number of different 
+                endings.
+        !*/
+
+    public:
+        match_endings ( 
+            const std::string& ending_list
+        );
+        /*!
+            ensures
+                - ending_list is interpreted as a whitespace separated list
+                  of file endings. 
+                - this object will be a function that checks if a file has a 
+                  name that ends with one of the strings in ending_list.
+        !*/
+
+        bool operator() (
+            const file& f
+        ) const;
+        /*!
+            ensures
+                - if (the file f has a name that ends with one of the ending strings 
+                  given to this object's constructor) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     class match_all
     {
         /*!
