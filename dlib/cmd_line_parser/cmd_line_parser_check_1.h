@@ -3,7 +3,7 @@
 #ifndef DLIB_CMD_LINE_PARSER_CHECk_1_
 #define DLIB_CMD_LINE_PARSER_CHECk_1_ 
 
-#include "cmd_line_parser_kernel_abstract.h"
+#include "cmd_line_parser_check_abstract.h"
 #include <sstream>
 #include <string>
 #include "../string.h"
@@ -189,6 +189,11 @@ namespace dlib
         void check_incompatible_options (
             const string_type& option_name1,
             const string_type& option_name2
+        ) const;
+
+        void check_sub_option (
+            const string_type& parent_option,
+            const string_type& sub_option
         ) const;
 
         template <
@@ -420,6 +425,27 @@ namespace dlib
                 0 // this argument has no meaning and is only here to make this
                 // call different from the other constructor
             );
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename clp_base>
+    void cmd_line_parser_check_1<clp_base>::
+    check_sub_option (
+        const string_type& parent_option,
+        const string_type& sub_option
+    ) const
+    {
+        if (this->option(parent_option).count() == 0)
+        {
+            if (this->option(sub_option).count() != 0)
+            {
+                std::vector<string_type> vect;
+                vect.resize(1);
+                vect[0] = parent_option;
+                throw cmd_line_check_error( EMISSING_REQUIRED_OPTION, sub_option, vect);
+            }
         }
     }
 

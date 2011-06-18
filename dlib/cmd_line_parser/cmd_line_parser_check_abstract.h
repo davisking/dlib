@@ -217,6 +217,28 @@ namespace dlib
                         - opt2 == The next incompatible option found.
         !*/
 
+        void check_sub_option (
+            const string_type& parent_option,
+            const string_type& sub_option
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - option_is_defined(parent_option) == true
+                - option_is_defined(sub_option) == true
+            ensures
+                - if (option(parent_option).count() == 0) then
+                    - option(sub_option).count() == 0
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EMISSING_REQUIRED_OPTION 
+                        - opt == sub_option. 
+                        - required_opts == a vector that contains only parent_option. 
+        !*/
+
         template <
             size_t length
             >

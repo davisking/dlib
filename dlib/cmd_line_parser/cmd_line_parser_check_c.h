@@ -75,6 +75,11 @@ namespace dlib
             const string_type& option_name2
         ) const;
 
+        void check_sub_option (
+            const string_type& parent_option,
+            const string_type& sub_option
+        ) const;
+
         template <
             size_t length
             >
@@ -264,6 +269,30 @@ namespace dlib
             );
 
         clp_check::check_incompatible_options(option_name1,option_name2);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename clp_check>
+    void cmd_line_parser_check_c<clp_check>::
+    check_sub_option (
+        const string_type& parent_option,
+        const string_type& sub_option
+    ) const
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(parent_option) &&
+                      this->option_is_defined(sub_option), 
+                 "\tvoid cmd_line_parser_check::check_sub_option()"
+                 << "\n\tSee the requires clause for this function."
+                 << "\n\tthis:                             " << this
+                 << "\n\tparsed_line():                    " << this->parsed_line()
+                 << "\n\toption_is_defined(parent_option): " << this->option_is_defined(parent_option)
+                 << "\n\toption_is_defined(sub_option):    " << this->option_is_defined(sub_option)
+                 << "\n\tparent_option:                    " << parent_option 
+                 << "\n\tsub_option:                       " << sub_option 
+        );
+        clp_check::check_sub_option(parent_option,sub_option);
     }
 
 // ----------------------------------------------------------------------------------------
