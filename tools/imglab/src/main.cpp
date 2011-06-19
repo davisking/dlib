@@ -9,6 +9,7 @@
 #include <sstream>
 #include <dlib/compress_stream.h>
 #include <dlib/base64.h>
+#include <dlib/xml_parser.h>
 
 
 using namespace std;
@@ -95,15 +96,23 @@ namespace dlib
                     fout << "    <box top='" << b.rect.top() << "' "
                                  << "left='" << b.rect.left() << "' "
                                 << "width='" << b.rect.width() << "' "
-                               << "height='" << b.rect.height() << "'>\n";
+                               << "height='" << b.rect.height() << "'";
 
-                    if (b.has_label())
-                        fout << "      <label>" << b.label << "</label>\n";
-                    if (b.has_head())
-                        fout << "      <head x='"<< b.head.x() <<"' y='"<< b.head.y() <<"'/>\n";
+                    if (b.has_label() || b.has_head())
+                    {
+                        fout << ">\n";
 
-                    fout << "    </box>\n";
-                                            
+                        if (b.has_label())
+                            fout << "      <label>" << b.label << "</label>\n";
+                        if (b.has_head())
+                            fout << "      <head x='"<< b.head.x() <<"' y='"<< b.head.y() <<"'/>\n";
+
+                        fout << "    </box>\n";
+                    }
+                    else
+                    {
+                        fout << "/>\n";
+                    }
                 }
 
 
@@ -113,19 +122,196 @@ namespace dlib
                 if (!fout)
                     throw dlib::error("ERROR: Unable to write to " + filename + ".");
             }
-            fout << "</images>";
+            fout << "</images>\n";
             fout << "</dataset>";
         }
 
     // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+        class doc_handler : public document_handler
+        {
+            std::vector<std::string> ts;
+            image temp_image;
+            box temp_box;
+
+            image_dataset_metadata& metadata;
+
+        public:
+
+            doc_handler(
+                image_dataset_metadata& metadata_
+            ):
+                metadata(metadata_) 
+            {}
+
+
+            virtual void start_document (
+            )
+            {
+                metadata = image_dataset_metadata();
+                ts.clear();
+                temp_image = image();
+                temp_box = box();
+            }
+
+            virtual void end_document (
+            )
+            {
+            }
+
+            virtual void start_element ( 
+                const unsigned long line_number,
+                const std::string& name,
+                const dlib::attribute_list& atts
+            )
+            {
+                if (ts.size() == 0) 
+                {
+                    if (name != "dataset")
+                    {
+                        std::ostringstream sout;
+                        sout << "Invalid XML document.  Root tag must be <dataset>.  Found <" << name << "> instead.";
+                        throw dlib::error(sout.str());
+                    }
+                    else
+                    {
+                        ts.push_back(name);
+                        return;
+                    }
+                }
+
+
+                if (name == "box")
+                {
+                    if (atts.is_in_list("top")) temp_box.rect.top() = sa = atts["top"];
+                    else throw dlib::error("<box> missing required attribute 'top'");
+
+                    if (atts.is_in_list("left")) temp_box.rect.left() = sa = atts["left"];
+                    else throw dlib::error("<box> missing required attribute 'left'");
+
+                    if (atts.is_in_list("width")) temp_box.rect.right() = sa = atts["width"];
+                    else throw dlib::error("<box> missing required attribute 'width'");
+
+                    if (atts.is_in_list("height")) temp_box.rect.bottom() = sa = atts["height"];
+                    else throw dlib::error("<box> missing required attribute 'height'");
+
+                    temp_box.rect.bottom() += temp_box.rect.top()-1;
+                    temp_box.rect.right() += temp_box.rect.left()-1;
+                }
+                else if (name == "head" && ts.back() == "box")
+                {
+                    if (atts.is_in_list("x")) temp_box.head.x() = sa = atts["x"];
+                    else throw dlib::error("<head> missing required attribute 'x'");
+
+                    if (atts.is_in_list("y")) temp_box.head.y() = sa = atts["y"];
+                    else throw dlib::error("<head> missing required attribute 'y'");
+                }
+                else if (name == "image")
+                {
+                    temp_image.boxes.clear();
+
+                    if (atts.is_in_list("file")) temp_image.filename = atts["file"];
+                    else throw dlib::error("<image> missing required attribute 'file'");
+                }
+
+                ts.push_back(name);
+            }
+
+            virtual void end_element ( 
+                const unsigned long line_number,
+                const std::string& name
+            )
+            {
+                ts.pop_back();
+                if (ts.size() == 0)
+                    return;
+
+                if (name == "box" && ts.back() == "image")
+                {
+                    temp_image.boxes.push_back(temp_box);
+                    temp_box = box();
+                }
+                else if (name == "image" && ts.back() == "images")
+                {
+                    metadata.images.push_back(temp_image);
+                    temp_image = image();
+                }
+            }
+
+            virtual void characters ( 
+                const std::string& data
+            )
+            {
+                if (ts.size() == 2 && ts[1] == "name")
+                {
+                    metadata.name = trim(data);
+                }
+                else if (ts.size() == 2 && ts[1] == "comment")
+                {
+                    metadata.comment = trim(data);
+                }
+                else if (ts.size() >= 2 && ts[ts.size()-1] == "label" && 
+                                           ts[ts.size()-2] == "box")
+                {
+                    temp_box.label = trim(data);
+                }
+            }
+
+            virtual void processing_instruction (
+                const unsigned long ,
+                const std::string& ,
+                const std::string& 
+            )
+            {
+            }
+        };
+
+    // ----------------------------------------------------------------------------------------
+
+        class xml_error_handler : public error_handler
+        {
+        public:
+            virtual void error (
+                const unsigned long line_number
+            )
+            {
+                cout << "There is a non-fatal error on line " << line_number << " in the file we are parsing." << endl;
+            }
+
+            virtual void fatal_error (
+                const unsigned long line_number
+            )
+            {
+                std::ostringstream sout;
+                sout << "There is a fatal error on line " << line_number << " so parsing will now halt.";
+                throw dlib::error(sout.str());
+            }
+        };
+
+    // ------------------------------------------------------------------------------------
 
         void load_image_dataset_metadata (
-            image_dataset_metadata& images,
+            image_dataset_metadata& metadata,
             const std::string& filename
         )
         {
+            xml_error_handler eh;
+            doc_handler dh(metadata);
+
+            std::ifstream fin(filename.c_str());
+            if (!fin)
+                throw dlib::error("ERROR: unable to open " + filename + " for reading.");
+
+            xml_parser::kernel_1a parser;
+            parser.add_document_handler(dh);
+            parser.add_error_handler(eh);
+            parser.parse(fin);
         }
 
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
         // This function returns the contents of the file 'images.xsl'
@@ -225,6 +411,12 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
 
+        if (parser.number_of_arguments() == 1)
+        {
+            dlib::imglab::image_dataset_metadata metadata;
+            load_image_dataset_metadata(metadata, parser[0]);
+            save_image_dataset_metadata(metadata, "out.xml");
+        }
     }
     catch (exception& e)
     {
