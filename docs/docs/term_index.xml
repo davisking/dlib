@@ -553,6 +553,8 @@
 
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="sleep"/>
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="get_current_dir"/>
+         <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="set_current_dir"/>
+         <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="set_current_dir_error"/>
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="dir_create_error"/>
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="create_directory"/>
          <term file="dlib/misc_api/misc_api_kernel_abstract.h.html" name="timestamper"/>

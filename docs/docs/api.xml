@@ -594,6 +594,10 @@
                   <link>dlib/misc_api/misc_api_kernel_abstract.h.html#get_current_dir</link>
                </item>
                <item>
+                  <name>set_current_dir</name>
+                  <link>dlib/misc_api/misc_api_kernel_abstract.h.html#set_current_dir</link>
+               </item>
+               <item>
                   <name>create_directory</name>
                   <link>dlib/misc_api/misc_api_kernel_abstract.h.html#create_directory</link>
                </item>
