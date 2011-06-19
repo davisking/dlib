@@ -547,7 +547,10 @@ namespace dlib
                         for (unsigned long k = 0; k < num; ++k)
                         {
                             string_type name;
-                            name = temp[k];
+                            // Doing this instead of name = temp[k] seems to avoid a bug in g++ (Ubuntu/Linaro 4.5.2-8ubuntu4) 4.5.2
+                            // which results in name[0] having the wrong value.
+                            name.resize(1);
+                            name[0] = temp[k];
 
 
                             // make sure this name is defined
