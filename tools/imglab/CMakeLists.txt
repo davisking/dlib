@@ -16,6 +16,8 @@ ADD_EXECUTABLE(${target_name}
    src/main.cpp
    src/image_dataset_metadata.h
    src/image_dataset_metadata.cpp
+   src/metadata_editor.h
+   src/metadata_editor.cpp
 )
 
 

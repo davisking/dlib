@@ -1,5 +1,6 @@
 
 #include "image_dataset_metadata.h"
+#include "metadata_editor.h"
 
 #include <iostream>
 #include <fstream>
@@ -113,7 +114,7 @@ int main(int argc, char** argv)
 
         if (parser.option("h"))
         {
-            cout << "Usage: imglab [options] <image files/directories or XML file list>\n";
+            cout << "Usage: imglab [options] <image files/directories or XML file>\n";
             parser.print_options(cout);
             cout << endl << endl;
             return EXIT_SUCCESS;
@@ -127,9 +128,8 @@ int main(int argc, char** argv)
 
         if (parser.number_of_arguments() == 1)
         {
-            dlib::image_dataset_metadata::dataset meta;
-            load_image_dataset_metadata(meta, parser[0]);
-            save_image_dataset_metadata(meta, "out.xml");
+            metadata_editor editor(parser[0]);
+            editor.wait_until_closed();
         }
     }
     catch (exception& e)

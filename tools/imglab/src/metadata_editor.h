@@ -1,0 +1,49 @@
+// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
+#ifndef DLIB_METADATA_EdITOR_H__
+#define DLIB_METADATA_EdITOR_H__
+
+#include <dlib/gui_widgets.h>
+#include "image_dataset_metadata.h"
+
+// ----------------------------------------------------------------------------------------
+
+class metadata_editor : public dlib::drawable_window 
+{
+public:
+    metadata_editor(
+        const std::string& filename_
+    );
+
+    ~metadata_editor();
+
+private:
+
+    void file_save();
+    void file_save_as();
+    void remove_selected_images();
+
+    virtual void on_window_resized();
+    virtual void on_keydown (
+        unsigned long key,
+        bool is_printable,
+        unsigned long state
+    );
+
+    void on_lb_images_clicked(unsigned long idx); 
+    void select_image(unsigned long idx);
+    void save_metadata_to_file (const std::string& file);
+
+    std::string filename;
+    dlib::image_dataset_metadata::dataset metadata;
+
+    dlib::menu_bar mbar;
+    dlib::list_box lb_images;
+    unsigned long image_pos;
+};
+
+// ----------------------------------------------------------------------------------------
+
+
+#endif // DLIB_METADATA_EdITOR_H__
+
