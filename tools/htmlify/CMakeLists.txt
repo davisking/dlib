@@ -15,7 +15,7 @@ set (target_name htmlify)
 PROJECT(${target_name})
 
 # add all the cpp files we want to compile to this list.  This tells
-# cmake that they are part of our target (which is the exectuable named htmlify)
+# cmake that they are part of our target (which is the executable named htmlify)
 ADD_EXECUTABLE(${target_name} 
 htmlify.cpp
 to_xml.cpp
