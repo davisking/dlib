@@ -241,7 +241,7 @@ select_image(
         lb_images.select(idx);
         load_image(idx);
     }
-    else
+    else if (lb_images.size() == 0)
     {
         display.clear_overlay();
         array2d<unsigned char> empty_img;
