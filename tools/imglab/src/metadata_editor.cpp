@@ -63,7 +63,7 @@ metadata_editor(
 
     // set the size of this window.
     on_window_resized();
-    load_image_and_set_size(image_pos);
+    load_image_and_set_size(0);
     on_window_resized();
     if (image_pos < lb_images.size() )
         lb_images.select(image_pos);
@@ -234,8 +234,13 @@ select_image(
 
 
         lb_images.select(idx);
-        image_pos = idx;
         load_image(idx);
+    }
+    else
+    {
+        display.clear_overlay();
+        array2d<unsigned char> empty_img;
+        display.set_image(empty_img);
     }
 }
 
@@ -246,7 +251,6 @@ on_lb_images_clicked(
     unsigned long idx
 ) 
 { 
-    image_pos = idx; 
     load_image(idx);
 }
 
@@ -276,6 +280,8 @@ load_image(
     if (idx >= metadata.images.size())
         return;
 
+    image_pos = idx; 
+
     array2d<rgb_pixel> img;
     display.clear_overlay();
     try
@@ -301,6 +307,8 @@ load_image_and_set_size(
 {
     if (idx >= metadata.images.size())
         return;
+
+    image_pos = idx; 
 
     array2d<rgb_pixel> img;
     display.clear_overlay();
