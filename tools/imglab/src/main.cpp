@@ -409,15 +409,13 @@ int main(int argc, char** argv)
 
         parser.add_option("h","Displays this information.");
         parser.add_option("c","Create an XML file named <arg> listing a set of images.",1);
-        parser.add_option("d","Include all images files in directory <arg> in the new image file list.",1);
         parser.add_option("r","Search directories recursively for images.");
 
         parser.parse(argc, argv);
 
         const char* singles[] = {"h","c","r"};
         parser.check_one_time_options(singles);
-        parser.check_sub_option("c", "d");
-        parser.check_sub_option("d", "r");
+        parser.check_sub_option("c", "r");
 
         if (parser.option("h"))
         {
@@ -437,30 +435,33 @@ int main(int argc, char** argv)
             make_empty_file(filename);
             const std::string parent_dir = get_parent_directory(file(filename)).full_name();
 
+            unsigned long depth = 0;
+            if (parser.option("r"))
+                depth = 30;
+
             image_dataset_metadata metadata;
             metadata.name = "imglab dataset";
             metadata.comment = "Created by imglab tool.";
             for (unsigned long i = 0; i < parser.number_of_arguments(); ++i)
             {
-                const string temp = strip_path(file(parser[i]).full_name(), parent_dir);
-                metadata.images.push_back(image(temp));
-            }
-
-
-            for (unsigned long i = 0; i < parser.option("d").count(); ++i)
-            {
-                unsigned long depth = 0;
-                if (parser.option("r"))
-                    depth = 30;
-
-                std::vector<file> files = get_files_in_directory_tree(parser.option("d").argument(0,i), 
-                                                                      match_endings(".png .PNG .jpeg .JPEG .jpg .JPG .bmp .BMP .dng .DNG"),
-                                                                      depth);
-                sort(files.begin(), files.end());
-
-                for (unsigned long j = 0; j < files.size(); ++j)
+                try
                 {
-                    metadata.images.push_back(image(strip_path(files[j].full_name(), parent_dir)));
+                    const string temp = strip_path(file(parser[i]).full_name(), parent_dir);
+                    metadata.images.push_back(image(temp));
+                }
+                catch (dlib::file::file_not_found&)
+                {
+                    // then parser[i] should be a directory
+
+                    std::vector<file> files = get_files_in_directory_tree(parser[i], 
+                                                                          match_endings(".png .PNG .jpeg .JPEG .jpg .JPG .bmp .BMP .dng .DNG"),
+                                                                          depth);
+                    sort(files.begin(), files.end());
+
+                    for (unsigned long j = 0; j < files.size(); ++j)
+                    {
+                        metadata.images.push_back(image(strip_path(files[j].full_name(), parent_dir)));
+                    }
                 }
             }
 
