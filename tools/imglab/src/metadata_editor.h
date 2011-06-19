@@ -33,6 +33,7 @@ private:
     void on_lb_images_clicked(unsigned long idx); 
     void select_image(unsigned long idx);
     void save_metadata_to_file (const std::string& file);
+    void load_image(unsigned long idx);
 
     std::string filename;
     dlib::image_dataset_metadata::dataset metadata;
@@ -40,6 +41,10 @@ private:
     dlib::menu_bar mbar;
     dlib::list_box lb_images;
     unsigned long image_pos;
+
+    dlib::image_display display;
+    dlib::label overlay_label_name;
+    dlib::text_field overlay_label;
 };
 
 // ----------------------------------------------------------------------------------------

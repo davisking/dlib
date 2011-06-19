@@ -5,6 +5,10 @@
 #include <dlib/array.h>
 #include <dlib/queue.h>
 #include <dlib/static_set.h>
+#include <dlib/misc_api.h>
+#include <dlib/image_io.h>
+#include <dlib/array2d.h>
+#include <dlib/pixel.h>
 
 using namespace std;
 using namespace dlib;
@@ -15,11 +19,18 @@ metadata_editor::
 metadata_editor(
     const std::string& filename_
 ) : 
-    filename(filename_),
     mbar(*this),
     lb_images(*this),
-    image_pos(0)
+    image_pos(0),
+    display(*this),
+    overlay_label_name(*this),
+    overlay_label(*this)
 {
+    file metadata_file(filename_);
+    filename = metadata_file.full_name();
+    set_current_dir(get_parent_directory(metadata_file).full_name());
+    cout << "current dir: "<< get_current_dir() << endl;
+
     load_image_dataset_metadata(metadata, filename);
 
     dlib::array<std::string>::expand_1a files;
@@ -31,9 +42,10 @@ metadata_editor(
     lb_images.load(files);
     lb_images.enable_multiple_select();
 
-    select_image(0);
     lb_images.set_click_handler(*this, &metadata_editor::on_lb_images_clicked);
 
+    overlay_label_name.set_text("Next Label: ");
+    overlay_label.set_width(200);
 
     mbar.set_number_of_menus(1);
     mbar.set_menu_name(0,"File",'F');
@@ -47,10 +59,14 @@ metadata_editor(
     mbar.menu(0).add_menu_item(menu_item_text("Quit",static_cast<base_window&>(*this),&drawable_window::close_window,'Q'));
 
 
-    // set the size of this window
-    set_size(430,380);
+    // set the size of this window and center on the screen .
+    set_size(500,400);
+    unsigned long width, height;
+    get_display_size(width, height);
+    set_pos((width-500)/2, (height-400)/2);
 
     on_window_resized();
+    select_image(0);
 
     set_title("Image Dataset Metadata Editor");
     show();
@@ -151,6 +167,12 @@ on_window_resized(
 
     lb_images.set_pos(0,mbar.bottom()+1);
     lb_images.set_size(180, height - mbar.height());
+
+    overlay_label_name.set_pos(lb_images.right()+10, mbar.bottom() + (overlay_label.height()-overlay_label_name.height())/2+1);
+    overlay_label.set_pos(overlay_label_name.right(), mbar.bottom()+1);
+    display.set_pos(lb_images.right(), overlay_label.bottom()+3);
+
+    display.set_size(width - display.left(), height - display.top());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -165,7 +187,15 @@ on_keydown (
     drawable_window::on_keydown(key, is_printable, state);
 
     if (is_printable)
+    {
+        if (key == '\t')
+        {
+            overlay_label.give_input_focus();
+            overlay_label.select_all_text();
+        }
+
         return;
+    }
 
     if (key == base_window::KEY_UP)
     {
@@ -198,6 +228,7 @@ select_image(
 
         lb_images.select(idx);
         image_pos = idx;
+        load_image(idx);
     }
 }
 
@@ -209,7 +240,52 @@ on_lb_images_clicked(
 ) 
 { 
     image_pos = idx; 
+    load_image(idx);
 }
 
 // ----------------------------------------------------------------------------------------
+
+void metadata_editor::
+load_image(
+    unsigned long idx
+)
+{
+    if (idx >= metadata.images.size())
+        return;
+
+    array2d<rgb_pixel> img;
+    display.clear_overlay();
+    try
+    {
+        dlib::load_image(img, metadata.images[idx].filename);
+
+    }
+    catch (exception& e)
+    {
+        message_box("Error loading image", e.what());
+    }
+
+    if (display.width() < img.nc() ||
+        display.height() < img.nr() )
+    {
+        unsigned long screen_width, screen_height;
+        get_display_size(screen_width, screen_height);
+
+        unsigned long needed_width = display.left() + img.nc() + 4;
+        unsigned long needed_height = display.top() + img.nr() + 4;
+
+        if (needed_width < screen_width*0.8 &&
+            needed_height < screen_height*0.8)
+        {
+            set_size(needed_width, needed_height);
+            on_window_resized();
+        }
+    }
+
+
+    display.set_image(img);
+}
+
+// ----------------------------------------------------------------------------------------
+
 
