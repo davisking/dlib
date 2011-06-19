@@ -28,8 +28,10 @@ metadata_editor(
 {
     file metadata_file(filename_);
     filename = metadata_file.full_name();
+    // Make our current directory be the one that contains the metadata file.  We 
+    // do this because that file might contain relative paths to the image files
+    // we are supposed to be loading.
     set_current_dir(get_parent_directory(metadata_file).full_name());
-    cout << "current dir: "<< get_current_dir() << endl;
 
     load_image_dataset_metadata(metadata, filename);
 
@@ -56,19 +58,24 @@ metadata_editor(
     mbar.menu(0).add_menu_item(menu_item_separator());
     mbar.menu(0).add_menu_item(menu_item_text("Remove Selected Images",*this,&metadata_editor::remove_selected_images,'R'));
     mbar.menu(0).add_menu_item(menu_item_separator());
-    mbar.menu(0).add_menu_item(menu_item_text("Quit",static_cast<base_window&>(*this),&drawable_window::close_window,'Q'));
+    mbar.menu(0).add_menu_item(menu_item_text("Exit",static_cast<base_window&>(*this),&drawable_window::close_window,'x'));
 
 
-    // set the size of this window and center on the screen .
-    set_size(500,400);
-    unsigned long width, height;
-    get_display_size(width, height);
-    set_pos((width-500)/2, (height-400)/2);
-
+    // set the size of this window.
     on_window_resized();
-    select_image(0);
+    load_image_and_set_size(image_pos);
+    on_window_resized();
+    if (image_pos < lb_images.size() )
+        lb_images.select(image_pos);
 
-    set_title("Image Dataset Metadata Editor");
+    // make sure the window is centered on the screen.
+    unsigned long width, height;
+    get_size(width, height);
+    unsigned long screen_width, screen_height;
+    get_display_size(screen_width, screen_height);
+    set_pos((screen_width-width)/2, (screen_height-height)/2);
+
+    set_title("Image Labeler - " + metadata.name);
     show();
 } 
 
@@ -265,23 +272,47 @@ load_image(
         message_box("Error loading image", e.what());
     }
 
+    display.set_image(img);
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
+load_image_and_set_size(
+    unsigned long idx
+)
+{
+    if (idx >= metadata.images.size())
+        return;
+
+    array2d<rgb_pixel> img;
+    display.clear_overlay();
+    try
+    {
+        dlib::load_image(img, metadata.images[idx].filename);
+
+    }
+    catch (exception& e)
+    {
+        message_box("Error loading image", e.what());
+    }
+
     if (display.width() < img.nc() ||
         display.height() < img.nr() )
     {
         unsigned long screen_width, screen_height;
         get_display_size(screen_width, screen_height);
 
+
         unsigned long needed_width = display.left() + img.nc() + 4;
         unsigned long needed_height = display.top() + img.nr() + 4;
 
-        if (needed_width < screen_width*0.8 &&
-            needed_height < screen_height*0.8)
+        if (needed_width+50 < screen_width &&
+            needed_height+50 < screen_height)
         {
             set_size(needed_width, needed_height);
-            on_window_resized();
         }
     }
-
 
     display.set_image(img);
 }
