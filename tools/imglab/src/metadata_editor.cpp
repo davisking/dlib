@@ -4,6 +4,7 @@
 #include "metadata_editor.h"
 #include <dlib/array.h>
 #include <dlib/queue.h>
+#include <dlib/static_set.h>
 
 using namespace std;
 using namespace dlib;
@@ -102,6 +103,39 @@ file_save_as()
 void metadata_editor::
 remove_selected_images()
 {
+    dlib::queue<unsigned long>::kernel_1a list;
+    lb_images.get_selected(list);
+    list.reset();
+    while (list.move_next())
+    {
+        lb_images.unselect(list.element());
+    }
+
+    // remove all the selected items from metadata.images
+    dlib::static_set<unsigned long>::kernel_1a to_remove;
+    to_remove.load(list);
+    std::vector<dlib::image_dataset_metadata::image> images;
+    for (unsigned long i = 0; i < metadata.images.size(); ++i)
+    {
+        if (to_remove.is_member(i) == false)
+        {
+            images.push_back(metadata.images[i]);
+        }
+    }
+    images.swap(metadata.images);
+
+
+    // reload metadata into lb_images
+    dlib::array<std::string>::expand_1a files;
+    files.resize(metadata.images.size());
+    for (unsigned long i = 0; i < metadata.images.size(); ++i)
+    {
+        files[i] = metadata.images[i].filename;
+    }
+    lb_images.load(files);
+
+
+    select_image(0);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -116,7 +150,7 @@ on_window_resized(
     get_size(width, height);
 
     lb_images.set_pos(0,mbar.bottom()+1);
-    lb_images.set_size(150, height - mbar.height());
+    lb_images.set_size(180, height - mbar.height());
 }
 
 // ----------------------------------------------------------------------------------------
