@@ -14,6 +14,8 @@ PROJECT(${target_name})
 # cmake that they are part of our target (which is the executable named imglab)
 ADD_EXECUTABLE(${target_name} 
    src/main.cpp
+   src/image_dataset_metadata.h
+   src/image_dataset_metadata.cpp
 )
 
 
