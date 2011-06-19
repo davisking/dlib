@@ -129,10 +129,13 @@ remove_selected_images()
     dlib::queue<unsigned long>::kernel_1a list;
     lb_images.get_selected(list);
     list.reset();
+    unsigned long min_idx = lb_images.size();
     while (list.move_next())
     {
         lb_images.unselect(list.element());
+        min_idx = std::min(min_idx, list.element());
     }
+
 
     // remove all the selected items from metadata.images
     dlib::static_set<unsigned long>::kernel_1a to_remove;
@@ -158,7 +161,9 @@ remove_selected_images()
     lb_images.load(files);
 
 
-    select_image(0);
+    if (min_idx != 0)
+        min_idx--;
+    select_image(min_idx);
 }
 
 // ----------------------------------------------------------------------------------------
