@@ -252,6 +252,22 @@ on_lb_images_clicked(
 
 // ----------------------------------------------------------------------------------------
 
+std::vector<dlib::image_display::overlay_rect> get_overlays (
+    const dlib::image_dataset_metadata::image& data
+)
+{
+    std::vector<dlib::image_display::overlay_rect> temp(data.boxes.size());
+    for (unsigned long i = 0; i < temp.size(); ++i)
+    {
+        temp[i].rect = data.boxes[i].rect;
+        temp[i].label = data.boxes[i].label;
+        assign_pixel(temp[i].color, rgb_pixel(255,0,0));
+    }
+    return temp;
+}
+
+// ----------------------------------------------------------------------------------------
+
 void metadata_editor::
 load_image(
     unsigned long idx
@@ -273,6 +289,7 @@ load_image(
     }
 
     display.set_image(img);
+    display.add_overlay(get_overlays(metadata.images[idx]));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -315,6 +332,7 @@ load_image_and_set_size(
 
 
     display.set_image(img);
+    display.add_overlay(get_overlays(metadata.images[idx]));
 }
 
 // ----------------------------------------------------------------------------------------
