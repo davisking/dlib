@@ -419,9 +419,9 @@ int main(int argc, char** argv)
 
         if (parser.option("h"))
         {
-            cout << "Options:\n";
+            cout << "Usage: imglab [options] <image files/directories or XML file list>\n";
             parser.print_options(cout);
-            cout << endl;
+            cout << endl << endl;
             return EXIT_SUCCESS;
         }
 
