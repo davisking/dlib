@@ -9,6 +9,7 @@
 #include <dlib/dir_nav.h>
 
 
+typedef dlib::cmd_line_parser<char>::check_1a_c parser_type;
 
 using namespace std;
 using namespace dlib;
@@ -46,12 +47,57 @@ void make_empty_file (
 
 // ----------------------------------------------------------------------------------------
 
+void create_new_dataset (
+    const parser_type& parser
+)
+{
+    using namespace dlib::image_dataset_metadata;
+
+    const std::string filename = parser.option("c").argument();
+    // make sure the file exists so we can use the get_parent_directory() command to
+    // figure out it's parent directory.
+    make_empty_file(filename);
+    const std::string parent_dir = get_parent_directory(file(filename)).full_name();
+
+    unsigned long depth = 0;
+    if (parser.option("r"))
+        depth = 30;
+
+    dataset meta;
+    meta.name = "imglab dataset";
+    meta.comment = "Created by imglab tool.";
+    for (unsigned long i = 0; i < parser.number_of_arguments(); ++i)
+    {
+        try
+        {
+            const string temp = strip_path(file(parser[i]).full_name(), parent_dir);
+            meta.images.push_back(image(temp));
+        }
+        catch (dlib::file::file_not_found&)
+        {
+            // then parser[i] should be a directory
+
+            std::vector<file> files = get_files_in_directory_tree(parser[i], 
+                                                                  match_endings(".png .PNG .jpeg .JPEG .jpg .JPG .bmp .BMP .dng .DNG"),
+                                                                  depth);
+            sort(files.begin(), files.end());
+
+            for (unsigned long j = 0; j < files.size(); ++j)
+            {
+                meta.images.push_back(image(strip_path(files[j].full_name(), parent_dir)));
+            }
+        }
+    }
+
+    save_image_dataset_metadata(meta, filename);
+}
+
+// ----------------------------------------------------------------------------------------
 
 int main(int argc, char** argv)
 {
     try
     {
-        typedef dlib::cmd_line_parser<char>::check_1a_c parser_type;
 
         parser_type parser;
 
@@ -75,46 +121,7 @@ int main(int argc, char** argv)
 
         if (parser.option("c"))
         {
-            using namespace dlib::image_dataset_metadata;
-
-            const std::string filename = parser.option("c").argument();
-            // make sure the file exists so we can use the get_parent_directory() command to
-            // figure out it's parent directory.
-            make_empty_file(filename);
-            const std::string parent_dir = get_parent_directory(file(filename)).full_name();
-
-            unsigned long depth = 0;
-            if (parser.option("r"))
-                depth = 30;
-
-            dataset meta;
-            meta.name = "imglab dataset";
-            meta.comment = "Created by imglab tool.";
-            for (unsigned long i = 0; i < parser.number_of_arguments(); ++i)
-            {
-                try
-                {
-                    const string temp = strip_path(file(parser[i]).full_name(), parent_dir);
-                    meta.images.push_back(image(temp));
-                }
-                catch (dlib::file::file_not_found&)
-                {
-                    // then parser[i] should be a directory
-
-                    std::vector<file> files = get_files_in_directory_tree(parser[i], 
-                                                                          match_endings(".png .PNG .jpeg .JPEG .jpg .JPG .bmp .BMP .dng .DNG"),
-                                                                          depth);
-                    sort(files.begin(), files.end());
-
-                    for (unsigned long j = 0; j < files.size(); ++j)
-                    {
-                        meta.images.push_back(image(strip_path(files[j].full_name(), parent_dir)));
-                    }
-                }
-            }
-
-            save_image_dataset_metadata(meta, filename);
-
+            create_new_dataset(parser);
             return EXIT_SUCCESS;
         }
 
@@ -131,4 +138,6 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 }
+
+// ----------------------------------------------------------------------------------------
 
