@@ -34,12 +34,29 @@ namespace dlib
     );
     /*!
         ensures
-            - if (no errors occurr) then
+            - if (no errors occur) then
                 - returns the path to the current working directory
             - else
                 - returns ""
         throws
             - std::bad_alloc
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class set_current_dir_error : public error;
+
+    void set_current_dir (
+        const std::string& new_dir
+    );
+    /*!
+        ensures
+            - sets the current working directory to new_dir
+        throws
+            - std::bad_alloc
+            - set_current_dir_error
+              This exception is thrown if there is an error when attempting
+              to change the current working directory.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -85,7 +102,7 @@ namespace dlib
         /*!
             ensures
                 - returns a timestamp that measures the time in microseconds since an 
-                  arbitrary point in the past.  Note that this arbitray point remains
+                  arbitrary point in the past.  Note that this arbitrary point remains
                   the same between all calls to get_timestamp().
         !*/
     };

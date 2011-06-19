@@ -57,6 +57,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void set_current_dir (
+        const std::string& new_dir
+    )
+    {
+        if (chdir(new_dir.c_str()))
+        {
+            throw set_current_dir_error("Error changing current dir to '" + new_dir + "'");
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     uint64 timestamper::
     get_timestamp (
     ) const

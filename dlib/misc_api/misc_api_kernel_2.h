@@ -29,6 +29,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class set_current_dir_error : public error
+    {
+    public:
+        set_current_dir_error(
+            const std::string& a
+        ): error(a) {}
+    };
+
+    void set_current_dir (
+        const std::string& new_dir
+    );
+
+// ----------------------------------------------------------------------------------------
+
     class timestamper 
     {
     public:

@@ -4,6 +4,7 @@
 #define DLIB_MISC_API_KERNEL_1_CPp_
 
 #include "../platform.h"
+#include "../threads.h"
 
 #ifdef WIN32
 
@@ -30,9 +31,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace
+    {
+        mutex cwd_mutex;
+    }
+
     std::string get_current_dir (
     )
     {
+        // need to lock a mutex here because getting and setting the
+        // current working directory is not thread safe on windows.
+        auto_mutex lock(cwd_mutex);
         char buf[1024];
         if (GetCurrentDirectoryA(sizeof(buf),buf) == 0)
         {
@@ -41,6 +50,21 @@ namespace dlib
         else
         {
             return std::string(buf);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void set_current_dir (
+        const std::string& new_dir
+    )
+    {
+        // need to lock a mutex here because getting and setting the
+        // current working directory is not thread safe on windows.
+        auto_mutex lock(cwd_mutex);
+        if (SetCurrentDirectory(new_dir.c_str()) == 0)
+        {
+            throw set_current_dir_error("Error changing current dir to '" + new_dir + "'" + GetLastError());
         }
     }
 
