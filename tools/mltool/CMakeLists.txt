@@ -41,11 +41,6 @@ INSTALL(TARGETS ${target_name}
 	RUNTIME DESTINATION bin
 	)
 
-
 #set default build type to Release
-if(NOT CMAKE_BUILD_TYPE)
-   set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-      "Choose the type of build, options are: Debug Release
-      RelWithDebInfo MinSizeRel." FORCE)
-endif()
+include(../../dlib/release_build_by_default)
 
