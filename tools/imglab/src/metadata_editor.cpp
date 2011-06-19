@@ -297,22 +297,22 @@ load_image_and_set_size(
         message_box("Error loading image", e.what());
     }
 
-    if (display.width() < img.nc() ||
-        display.height() < img.nr() )
+
+    unsigned long screen_width, screen_height;
+    get_display_size(screen_width, screen_height);
+
+
+    unsigned long needed_width = display.left() + img.nc() + 4;
+    unsigned long needed_height = display.top() + img.nr() + 4;
+	if (needed_width < 300) needed_width = 300;
+	if (needed_height < 300) needed_height = 300;
+
+    if (needed_width+50 < screen_width &&
+        needed_height+50 < screen_height)
     {
-        unsigned long screen_width, screen_height;
-        get_display_size(screen_width, screen_height);
-
-
-        unsigned long needed_width = display.left() + img.nc() + 4;
-        unsigned long needed_height = display.top() + img.nr() + 4;
-
-        if (needed_width+50 < screen_width &&
-            needed_height+50 < screen_height)
-        {
-            set_size(needed_width, needed_height);
-        }
+        set_size(needed_width, needed_height);
     }
+
 
     display.set_image(img);
 }
