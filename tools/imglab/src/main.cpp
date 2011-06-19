@@ -5,6 +5,7 @@
 
 #include <dlib/cmd_line_parser.h>
 #include <dlib/geometry.h>
+#include <dlib/dir_nav.h>
 
 #include <sstream>
 #include <dlib/compress_stream.h>
@@ -366,6 +367,38 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+std::string strip_path (
+    const std::string& str,
+    const std::string& prefix
+)
+{
+    unsigned long i;
+    for (i = 0; i < str.size() && i < prefix.size(); ++i)
+    {
+        if (str[i] != prefix[i]) 
+            return str;
+    }
+
+    if (i < str.size() && (str[i] == '/' || str[i] == '\\'))
+        ++i;
+
+    return str.substr(i);
+}
+
+// ----------------------------------------------------------------------------------------
+
+void make_empty_file (
+    const std::string& filename
+)
+{
+    ofstream fout(filename.c_str());
+    if (!fout)
+        throw dlib::error("ERROR: Unable to open " + filename + " for writing.");
+}
+
+// ----------------------------------------------------------------------------------------
+
+
 int main(int argc, char** argv)
 {
     try
@@ -398,15 +431,40 @@ int main(int argc, char** argv)
         {
             using namespace dlib::imglab;
 
+            const std::string filename = parser.option("c").argument();
+            // make sure the file exists so we can use the get_parent_directory() command to
+            // figure out it's parent directory.
+            make_empty_file(filename);
+            const std::string parent_dir = get_parent_directory(file(filename)).full_name();
+
             image_dataset_metadata metadata;
             metadata.name = "imglab dataset";
             metadata.comment = "Created by imglab tool.";
             for (unsigned long i = 0; i < parser.number_of_arguments(); ++i)
             {
-                metadata.images.push_back(image(parser[i]));
+                const string temp = strip_path(file(parser[i]).full_name(), parent_dir);
+                metadata.images.push_back(image(temp));
             }
 
-            save_image_dataset_metadata(metadata, parser.option("c").argument());
+
+            for (unsigned long i = 0; i < parser.option("d").count(); ++i)
+            {
+                unsigned long depth = 0;
+                if (parser.option("r"))
+                    depth = 30;
+
+                std::vector<file> files = get_files_in_directory_tree(parser.option("d").argument(0,i), 
+                                                                      match_endings(".png .PNG .jpeg .JPEG .jpg .JPG .bmp .BMP .dng .DNG"),
+                                                                      depth);
+                sort(files.begin(), files.end());
+
+                for (unsigned long j = 0; j < files.size(); ++j)
+                {
+                    metadata.images.push_back(image(strip_path(files[j].full_name(), parent_dir)));
+                }
+            }
+
+            save_image_dataset_metadata(metadata, filename);
 
             return EXIT_SUCCESS;
         }
