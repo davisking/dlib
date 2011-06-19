@@ -2238,6 +2238,7 @@ namespace dlib
         last_selected(0)
     {
         set_vertical_scroll_increment(mfont->height());
+        set_horizontal_scroll_increment(mfont->height());
 
         style.reset(new list_box_style_default());
         enable_events();
