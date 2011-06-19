@@ -3228,9 +3228,16 @@ namespace dlib
             // if the new image has a different size when compared to the previous image
             // then we should readjust the total rectangle size.
             if (new_img.nr() != img.nr() || new_img.nc() != img.nc())
-                set_total_rect_size(new_img.nc(), new_img.nr());
+            {
+                if (zoom_in_scale != 1)
+                    set_total_rect_size(new_img.nc()*zoom_in_scale, new_img.nr()*zoom_in_scale);
+                else
+                    set_total_rect_size(new_img.nc()/zoom_out_scale, new_img.nr()/zoom_out_scale);
+            }
             else
+            {
                 parent.invalidate_rectangle(rect);
+            }
 
             assign_image_scaled(img,new_img);
         }
