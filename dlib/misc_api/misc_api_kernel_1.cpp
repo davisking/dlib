@@ -64,7 +64,7 @@ namespace dlib
         auto_mutex lock(cwd_mutex);
         if (SetCurrentDirectory(new_dir.c_str()) == 0)
         {
-            throw set_current_dir_error("Error changing current dir to '" + new_dir + "'" + GetLastError());
+            throw set_current_dir_error("Error changing current dir to '" + new_dir + "'");
         }
     }
 
