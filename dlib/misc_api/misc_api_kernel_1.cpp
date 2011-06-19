@@ -33,7 +33,22 @@ namespace dlib
 
     namespace
     {
-        mutex cwd_mutex;
+        mutex& cwd_mutex()
+        {
+            static mutex m;
+            return m;
+        }
+        // Make sure the above mutex gets constructed before main() 
+        // starts.  This way we can be pretty sure it will be constructed
+        // before any threads could possibly call set_current_dir() or
+        // get_current_dir() simultaneously.
+        struct construct_cwd_mutex
+        {
+            construct_cwd_mutex()
+            {
+                cwd_mutex();
+            }
+        } oaimvweoinvwe;
     }
 
     std::string get_current_dir (
@@ -41,7 +56,7 @@ namespace dlib
     {
         // need to lock a mutex here because getting and setting the
         // current working directory is not thread safe on windows.
-        auto_mutex lock(cwd_mutex);
+        auto_mutex lock(cwd_mutex());
         char buf[1024];
         if (GetCurrentDirectoryA(sizeof(buf),buf) == 0)
         {
@@ -61,7 +76,7 @@ namespace dlib
     {
         // need to lock a mutex here because getting and setting the
         // current working directory is not thread safe on windows.
-        auto_mutex lock(cwd_mutex);
+        auto_mutex lock(cwd_mutex());
         if (SetCurrentDirectory(new_dir.c_str()) == 0)
         {
             throw set_current_dir_error("Error changing current dir to '" + new_dir + "'");
