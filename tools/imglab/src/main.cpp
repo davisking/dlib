@@ -20,7 +20,7 @@ using namespace dlib;
 
 namespace dlib
 {
-    namespace imglab
+    namespace image_dataset_metadata
     {
         struct box
         {
@@ -45,7 +45,7 @@ namespace dlib
             std::vector<box> boxes;
         };
 
-        struct image_dataset_metadata
+        struct dataset
         {
             std::vector<image> images;
             std::string comment;
@@ -68,13 +68,13 @@ namespace dlib
         }
 
         void save_image_dataset_metadata (
-            const image_dataset_metadata& metadata,
+            const dataset& meta,
             const std::string& filename
         )
         {
             create_image_metadata_stylesheet_file();
 
-            const std::vector<image>& images = metadata.images;
+            const std::vector<image>& images = meta.images;
 
             ofstream fout(filename.c_str());
             if (!fout)
@@ -83,8 +83,8 @@ namespace dlib
             fout << "<?xml version='1.0' encoding='ISO-8859-1'?>\n";
             fout << "<?xml-stylesheet type='text/xsl' href='image_metadata_stylesheet.xsl'?>\n";
             fout << "<dataset>\n";
-            fout << "<name>" << metadata.name << "</name>\n";
-            fout << "<comment>" << metadata.comment << "</comment>\n";
+            fout << "<name>" << meta.name << "</name>\n";
+            fout << "<comment>" << meta.comment << "</comment>\n";
             fout << "<images>\n";
             for (unsigned long i = 0; i < images.size(); ++i)
             {
@@ -137,21 +137,21 @@ namespace dlib
             image temp_image;
             box temp_box;
 
-            image_dataset_metadata& metadata;
+            dataset& meta;
 
         public:
 
             doc_handler(
-                image_dataset_metadata& metadata_
+                dataset& metadata_
             ):
-                metadata(metadata_) 
+                meta(metadata_) 
             {}
 
 
             virtual void start_document (
             )
             {
-                metadata = image_dataset_metadata();
+                meta = dataset();
                 ts.clear();
                 temp_image = image();
                 temp_box = box();
@@ -236,7 +236,7 @@ namespace dlib
                 }
                 else if (name == "image" && ts.back() == "images")
                 {
-                    metadata.images.push_back(temp_image);
+                    meta.images.push_back(temp_image);
                     temp_image = image();
                 }
             }
@@ -247,11 +247,11 @@ namespace dlib
             {
                 if (ts.size() == 2 && ts[1] == "name")
                 {
-                    metadata.name = trim(data);
+                    meta.name = trim(data);
                 }
                 else if (ts.size() == 2 && ts[1] == "comment")
                 {
-                    metadata.comment = trim(data);
+                    meta.comment = trim(data);
                 }
                 else if (ts.size() >= 2 && ts[ts.size()-1] == "label" && 
                                            ts[ts.size()-2] == "box")
@@ -294,12 +294,12 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void load_image_dataset_metadata (
-            image_dataset_metadata& metadata,
+            dataset& meta,
             const std::string& filename
         )
         {
             xml_error_handler eh;
-            doc_handler dh(metadata);
+            doc_handler dh(meta);
 
             std::ifstream fin(filename.c_str());
             if (!fin)
@@ -427,7 +427,7 @@ int main(int argc, char** argv)
 
         if (parser.option("c"))
         {
-            using namespace dlib::imglab;
+            using namespace dlib::image_dataset_metadata;
 
             const std::string filename = parser.option("c").argument();
             // make sure the file exists so we can use the get_parent_directory() command to
@@ -439,15 +439,15 @@ int main(int argc, char** argv)
             if (parser.option("r"))
                 depth = 30;
 
-            image_dataset_metadata metadata;
-            metadata.name = "imglab dataset";
-            metadata.comment = "Created by imglab tool.";
+            dataset meta;
+            meta.name = "imglab dataset";
+            meta.comment = "Created by imglab tool.";
             for (unsigned long i = 0; i < parser.number_of_arguments(); ++i)
             {
                 try
                 {
                     const string temp = strip_path(file(parser[i]).full_name(), parent_dir);
-                    metadata.images.push_back(image(temp));
+                    meta.images.push_back(image(temp));
                 }
                 catch (dlib::file::file_not_found&)
                 {
@@ -460,21 +460,21 @@ int main(int argc, char** argv)
 
                     for (unsigned long j = 0; j < files.size(); ++j)
                     {
-                        metadata.images.push_back(image(strip_path(files[j].full_name(), parent_dir)));
+                        meta.images.push_back(image(strip_path(files[j].full_name(), parent_dir)));
                     }
                 }
             }
 
-            save_image_dataset_metadata(metadata, filename);
+            save_image_dataset_metadata(meta, filename);
 
             return EXIT_SUCCESS;
         }
 
         if (parser.number_of_arguments() == 1)
         {
-            dlib::imglab::image_dataset_metadata metadata;
-            load_image_dataset_metadata(metadata, parser[0]);
-            save_image_dataset_metadata(metadata, "out.xml");
+            dlib::image_dataset_metadata::dataset meta;
+            load_image_dataset_metadata(meta, parser[0]);
+            save_image_dataset_metadata(meta, "out.xml");
         }
     }
     catch (exception& e)
