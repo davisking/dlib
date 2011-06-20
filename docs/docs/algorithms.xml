@@ -59,6 +59,7 @@
                <item>resize_rect_height</item> 
                <item>move_rect</item> 
                <item>nearest_point</item> 
+               <item>distance_to_rect_edge</item> 
             </sub>
          </item>
          <item nolink="true">
@@ -655,6 +656,20 @@
             This function takes a <a href="#rectangle">rectangle</a> and a 
             <a href="#point">point</a> and returns the point in the given 
             rectangle that is nearest to the given point.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>distance_to_rect_edge</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="#rectangle">rectangle</a> and a 
+            <a href="#point">point</a> and returns the Manhattan distance between
+            the rectangle's edge and the point.
          </description>
                                  
       </component>

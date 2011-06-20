@@ -23,6 +23,7 @@
          <term file="dlib/geometry/rectangle_abstract.h.html" name="resize_rect_height"/>
          <term file="dlib/geometry/rectangle_abstract.h.html" name="centered_rect"/>
          <term file="dlib/geometry/rectangle_abstract.h.html" name="nearest_point"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="distance_to_rect_edge"/>
          <term file="dlib/geometry/rectangle_abstract.h.html" name="shrink_rect"/>
          <term file="dlib/geometry/rectangle_abstract.h.html" name="grow_rect"/>
 
