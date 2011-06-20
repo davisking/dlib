@@ -609,6 +609,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline long distance_to_rect_edge (
+        const rectangle& rect,
+        const point& p
+    );
+    /*!
+        ensures
+            - returns the Manhattan distance between the edge of rect and p.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T 
         >

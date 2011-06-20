@@ -355,6 +355,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline long distance_to_rect_edge (
+        const rectangle& rect,
+        const point& p
+    )
+    {
+        using std::max;
+        using std::min;
+        using std::abs;
+
+        const long dist_x = min(abs(p.x()-rect.left()), abs(p.x()-rect.right()));
+        const long dist_y = min(abs(p.y()-rect.top()),  abs(p.y()-rect.bottom()));
+
+        if (rect.contains(p))
+            return min(dist_x,dist_y);
+        else if (rect.left() <= p.x() && p.x() <= rect.right())
+            return dist_y;
+        else if (rect.top() <= p.y() && p.y() <= rect.bottom())
+            return dist_x;
+        else
+            return dist_x + dist_y;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline const point nearest_point (
         const rectangle& rect,
         const point& p
