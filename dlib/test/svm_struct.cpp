@@ -487,12 +487,12 @@ namespace
     void make_dataset (
         std::vector<sample_type>& samples,
         std::vector<scalar_type>& labels,
-        int num
+        int num,
+        dlib::rand& rnd
     )
     {
         samples.clear();
         labels.clear();
-        static dlib::rand rnd;
         for (int i = 0; i < 10; ++i)
         {
             for (int j = 0; j < num; ++j)
@@ -618,16 +618,18 @@ namespace
             std::vector<sample_type> samples;
             std::vector<scalar_type> labels;
 
+            dlib::rand rnd;
+
             dlog << LINFO << "test with 100 samples per class";
-            make_dataset(samples, labels, 100);
+            make_dataset(samples, labels, 100, rnd);
             run_test(samples, labels, 1.155);
 
             dlog << LINFO << "test with 1 sample per class";
-            make_dataset(samples, labels, 1);
+            make_dataset(samples, labels, 1, rnd);
             run_test(samples, labels, 0.251);
 
             dlog << LINFO << "test with 2 sample per class";
-            make_dataset(samples, labels, 2);
+            make_dataset(samples, labels, 2, rnd);
             run_test(samples, labels, 0.444);
         }
     } a;
