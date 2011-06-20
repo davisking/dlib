@@ -5663,7 +5663,10 @@ namespace dlib
     ): 
         scrollable_region(w),
         zoom_in_scale(1),
-        zoom_out_scale(1)
+        zoom_out_scale(1),
+        drawing_rect(true),
+        rect_is_selected(false),
+        selected_rect(0)
     { 
         enable_mouse_drag();
 
@@ -5797,7 +5800,11 @@ namespace dlib
             orect.top()    = orect.top()*zoom_in_scale/zoom_out_scale;
             orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
 
-            draw_rectangle(c, translate_rect(orect, origin), overlay_rects[i].color, area);
+            if (rect_is_selected && selected_rect == i)
+                draw_rectangle(c, translate_rect(orect, origin), rgb_pixel(0,255,0), area);
+            else
+                draw_rectangle(c, translate_rect(orect, origin), overlay_rects[i].color, area);
+
             if (overlay_rects[i].label.size() != 0)
             {
                 // make a rectangle that is at the spot we want to draw our string
@@ -5817,6 +5824,160 @@ namespace dlib
                       zoom_in_scale*overlay_lines[i].p2/zoom_out_scale + origin, 
                       overlay_lines[i].color, area);
         }
+
+        if (drawing_rect)
+            draw_rectangle(c, rect_to_draw, rgb_pixel(0,255,255), area);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    on_mouse_down (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y,
+        bool is_double_click
+    )
+    {
+        scrollable_region::on_mouse_down(btn, state, x, y, is_double_click);
+
+        if (rect.contains(x,y) == false || hidden || !enabled)
+            return;
+
+        if (!is_double_click && btn == base_window::LEFT && (state&base_window::CONTROL))
+        {
+            drawing_rect = true;
+            rect_anchor = point(x,y);
+
+            if (rect_is_selected)
+            {
+                rect_is_selected = false;
+                parent.invalidate_rectangle(rect);
+            }
+        }
+        else if (drawing_rect)
+        {
+            if (rect_is_selected)
+                rect_is_selected = false;
+
+            drawing_rect = false;
+            parent.invalidate_rectangle(rect);
+        }
+        else if (is_double_click)
+        {
+            const point origin(total_rect().tl_corner());
+            const bool rect_was_selected = rect_is_selected;
+            rect_is_selected = false;
+
+            long best_dist = std::numeric_limits<long>::max();
+            long best_idx = 0;
+
+            // check if this click landed on any of the overlay rectangles
+            for (unsigned long i = 0; i < overlay_rects.size(); ++i)
+            {
+                rectangle orect = overlay_rects[i].rect;
+                orect.left()   = orect.left()*zoom_in_scale/zoom_out_scale;
+                orect.right()  = orect.right()*zoom_in_scale/zoom_out_scale;
+                orect.top()    = orect.top()*zoom_in_scale/zoom_out_scale;
+                orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
+
+                orect = translate_rect(orect, origin);
+
+                const long dist = distance_to_rect_edge(orect, point(x,y));
+
+                if (dist < best_dist)
+                {
+                    best_dist = dist;
+                    best_idx = i;
+                }
+            }
+
+
+            if (best_dist < 10)
+            {
+                rect_is_selected = true;
+                selected_rect = best_idx;
+            }
+
+            if (rect_is_selected || rect_was_selected)
+                parent.invalidate_rectangle(rect);
+        }
+        else if (rect_is_selected)
+        {
+            rect_is_selected = false;
+            parent.invalidate_rectangle(rect);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    on_mouse_up (
+        unsigned long btn,
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        scrollable_region::on_mouse_up(btn,state,x,y);
+
+        if (drawing_rect && btn == base_window::LEFT && (state&base_window::CONTROL) &&
+            !hidden && enabled)
+        {
+            const point origin(total_rect().tl_corner());
+            point c1 = point(x,y) - origin;
+            point c2 = rect_anchor - origin;
+
+            if (zoom_in_scale != 1)
+            {
+                c1 = c1/(double)zoom_in_scale;
+                c2 = c2/(double)zoom_in_scale;
+            }
+            else if (zoom_out_scale != 1)
+            {
+                c1 = c1*(double)zoom_out_scale;
+                c2 = c2*(double)zoom_out_scale;
+            }
+
+            const rectangle new_rect(c1,c2);
+
+            if (new_rect.width() > 0 && new_rect.height() > 0)
+                add_overlay(overlay_rect(new_rect, rgb_pixel(255,0,0)));
+        }
+
+        if (drawing_rect)
+        {
+            drawing_rect = false;
+            parent.invalidate_rectangle(rect);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    on_mouse_move (
+        unsigned long state,
+        long x,
+        long y
+    )
+    {
+        scrollable_region::on_mouse_move(state,x,y);
+
+        if (drawing_rect)
+        {
+            if ((state&base_window::LEFT) && (state&base_window::CONTROL) && !hidden && enabled)
+            {
+                rectangle new_rect(point(x,y), rect_anchor);
+                parent.invalidate_rectangle(new_rect + rect_to_draw);
+                rect_to_draw = new_rect;
+            }
+            else
+            {
+                drawing_rect = false;
+                parent.invalidate_rectangle(rect);
+            }
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -5826,6 +5987,10 @@ namespace dlib
         unsigned long state
     )
     {
+        // disable mouse wheel if the user is drawing a rectangle
+        if (drawing_rect)
+            return;
+
         // if CONTROL is not being held down
         if ((state & base_window::CONTROL) == 0)
         {
@@ -5876,6 +6041,10 @@ namespace dlib
         unsigned long state
     )
     {
+        // disable mouse wheel if the user is drawing a rectangle
+        if (drawing_rect)
+            return;
+
         // if CONTROL is not being held down
         if ((state & base_window::CONTROL) == 0)
         {

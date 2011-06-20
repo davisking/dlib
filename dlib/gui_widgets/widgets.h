@@ -3200,11 +3200,24 @@ namespace dlib
                 - img.size() == 0
                 - overlay_rects.size() == 0
                 - overlay_lines.size() == 0
+                - drawing_rect == false
+                - rect_is_selected == false
 
             CONVENTION
                 - img == the image this object displays
                 - overlay_rects == the overlay rectangles this object displays
                 - overlay_lines == the overlay lines this object displays
+
+                - if (drawing_rect) then
+                    - the user is drawing a rectangle on the screen and is
+                      thus holding down CTRL and the left mouse button.
+                    - rect_anchor == the point on the screen where the user
+                      clicked to begin drawing the rectangle.  
+                    - rect_to_draw == the rectangle which should appear on the screen.
+
+                - if (rect_is_selected) then
+                    - selected_rect == the index in overlay_rects of the user selected
+                      rectangle.
         !*/
 
     public:
@@ -3305,6 +3318,27 @@ namespace dlib
             unsigned long state
         );
 
+        void on_mouse_down (
+            unsigned long btn,
+            unsigned long state,
+            long x,
+            long y,
+            bool is_double_click
+        );
+
+        void on_mouse_up (
+            unsigned long btn,
+            unsigned long state,
+            long x,
+            long y
+        );
+
+        void on_mouse_move (
+            unsigned long state,
+            long x,
+            long y
+        );
+
         array2d<rgb_alpha_pixel> img;
 
 
@@ -3313,6 +3347,11 @@ namespace dlib
 
         long zoom_in_scale;
         long zoom_out_scale;
+        bool drawing_rect;
+        point rect_anchor;
+        rectangle rect_to_draw;
+        bool rect_is_selected;
+        unsigned long selected_rect;
 
         // restricted functions
         image_display(image_display&);        // copy constructor
