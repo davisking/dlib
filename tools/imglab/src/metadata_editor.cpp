@@ -50,6 +50,7 @@ metadata_editor(
     overlay_label.set_width(200);
 
     display.set_overlay_rects_changed_handler(*this, &metadata_editor::on_overlay_rects_changed);
+    display.set_overlay_rect_selected_handler(*this, &metadata_editor::on_overlay_rect_selected);
     overlay_label.set_text_modified_handler(*this, &metadata_editor::on_overlay_label_changed);
 
     mbar.set_number_of_menus(1);
@@ -382,6 +383,17 @@ on_overlay_label_changed(
 )
 {
     display.set_default_overlay_rect_label(trim(overlay_label.text()));
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
+on_overlay_rect_selected(
+    const image_display::overlay_rect& orect
+)
+{
+    overlay_label.set_text(orect.label);
+    display.set_default_overlay_rect_label(orect.label);
 }
 
 // ----------------------------------------------------------------------------------------
