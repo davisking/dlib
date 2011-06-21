@@ -163,6 +163,7 @@ int main(int argc, char** argv)
         parser.check_sub_option("c", "r");
         parser.check_incompatible_options("c", "l");
         parser.check_incompatible_options("c", "rename");
+        parser.check_incompatible_options("l", "rename");
 
         if (parser.option("h"))
         {
