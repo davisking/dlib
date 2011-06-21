@@ -9,9 +9,12 @@
 #include <dlib/image_io.h>
 #include <dlib/array2d.h>
 #include <dlib/pixel.h>
+#include <sstream>
 
 using namespace std;
 using namespace dlib;
+
+extern const char* VERSION;
 
 // ----------------------------------------------------------------------------------------
 
@@ -53,8 +56,9 @@ metadata_editor(
     display.set_overlay_rect_selected_handler(*this, &metadata_editor::on_overlay_rect_selected);
     overlay_label.set_text_modified_handler(*this, &metadata_editor::on_overlay_label_changed);
 
-    mbar.set_number_of_menus(1);
+    mbar.set_number_of_menus(2);
     mbar.set_menu_name(0,"File",'F');
+    mbar.set_menu_name(1,"Help",'H');
 
 
     mbar.menu(0).add_menu_item(menu_item_text("Save",*this,&metadata_editor::file_save,'S'));
@@ -64,6 +68,7 @@ metadata_editor(
     mbar.menu(0).add_menu_item(menu_item_separator());
     mbar.menu(0).add_menu_item(menu_item_text("Exit",static_cast<base_window&>(*this),&drawable_window::close_window,'x'));
 
+    mbar.menu(1).add_menu_item(menu_item_text("About",*this,&metadata_editor::display_about,'A'));
 
     // set the size of this window.
     on_window_resized();
@@ -394,6 +399,28 @@ on_overlay_rect_selected(
 {
     overlay_label.set_text(orect.label);
     display.set_default_overlay_rect_label(orect.label);
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
+display_about(
+)
+{
+    std::ostringstream sout;
+    sout << wrap_string("Image Labeler v" + string(VERSION) + "." ,0,0) << endl << endl;
+    sout << wrap_string("This program is a tool for labeling images with rectangles. " ,0,0) << endl << endl;
+
+    sout << wrap_string("You can add new rectangles by holding the shift key, left clicking "
+                        "the mouse, and dragging it.  Hit tab to give input focus to the next "
+                        "label text field and supply a label for a rectangle.  Double clicking "
+                        "a rectangle selects it and the delete key removes it."
+                        ,0,0) << endl << endl;
+
+    sout << wrap_string("Finally, hold ctrl and scroll the mouse wheel to zoom while normal left click "
+                        "and drag allows you to navigate around the image.",0,0) << endl;
+
+    message_box("About Image Labeler",sout.str());
 }
 
 // ----------------------------------------------------------------------------------------

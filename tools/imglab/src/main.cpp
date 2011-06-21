@@ -11,6 +11,9 @@
 #include <dlib/dir_nav.h>
 
 
+const char* VERSION = "0.1";
+
+
 typedef dlib::cmd_line_parser<char>::check_1a_c parser_type;
 
 using namespace std;
@@ -151,6 +154,7 @@ int main(int argc, char** argv)
         parser.add_option("r","Search directories recursively for images.");
         parser.add_option("l","List all the labels in the given XML file.");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
+        parser.add_option("v","Display version.");
 
         parser.parse(argc, argv);
 
@@ -165,6 +169,15 @@ int main(int argc, char** argv)
             cout << "Usage: imglab [options] <image files/directories or XML file>\n";
             parser.print_options(cout);
             cout << endl << endl;
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("v"))
+        {
+            cout << "imglab v" << VERSION 
+                 << "\nCompiled: " << __TIME__ << " " << __DATE__ 
+                 << "\nWritten by Davis King\n";
+            cout << "Check for updates at http://dlib.net\n\n";
             return EXIT_SUCCESS;
         }
 

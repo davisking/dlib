@@ -39,6 +39,8 @@ private:
     void on_overlay_label_changed();
     void on_overlay_rect_selected(const dlib::image_display::overlay_rect& orect);
 
+    void display_about();
+
     std::string filename;
     dlib::image_dataset_metadata::dataset metadata;
 
