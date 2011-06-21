@@ -35,6 +35,8 @@ private:
     void save_metadata_to_file (const std::string& file);
     void load_image(unsigned long idx);
     void load_image_and_set_size(unsigned long idx);
+    void on_overlay_rects_changed();
+    void on_overlay_label_changed();
 
     std::string filename;
     dlib::image_dataset_metadata::dataset metadata;

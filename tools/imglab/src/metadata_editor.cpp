@@ -49,6 +49,9 @@ metadata_editor(
     overlay_label_name.set_text("Next Label: ");
     overlay_label.set_width(200);
 
+    display.set_overlay_rects_changed_handler(*this, &metadata_editor::on_overlay_rects_changed);
+    overlay_label.set_text_modified_handler(*this, &metadata_editor::on_overlay_label_changed);
+
     mbar.set_number_of_menus(1);
     mbar.set_menu_name(0,"File",'F');
 
@@ -350,4 +353,36 @@ load_image_and_set_size(
 
 // ----------------------------------------------------------------------------------------
 
+void metadata_editor::
+on_overlay_rects_changed(
+)
+{
+    using namespace dlib::image_dataset_metadata;
+    if (image_pos < metadata.images.size())
+    {
+        const std::vector<image_display::overlay_rect>& rects = display.get_overlay_rects();
+
+        std::vector<box>& boxes = metadata.images[image_pos].boxes;
+
+        boxes.clear();
+        for (unsigned long i = 0; i < rects.size(); ++i)
+        {
+            box temp;
+            temp.label = rects[i].label;
+            temp.rect = rects[i].rect;
+            boxes.push_back(temp);
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
+on_overlay_label_changed(
+)
+{
+    display.set_default_overlay_rect_label(trim(overlay_label.text()));
+}
+
+// ----------------------------------------------------------------------------------------
 
