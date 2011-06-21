@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <set>
 
 #include <dlib/cmd_line_parser.h>
 #include <dlib/dir_nav.h>
@@ -95,6 +96,30 @@ void create_new_dataset (
 
 // ----------------------------------------------------------------------------------------
 
+void print_all_labels (
+    const dlib::image_dataset_metadata::dataset& data
+)
+{
+    std::set<std::string> labels;
+    for (unsigned long i = 0; i < data.images.size(); ++i)
+    {
+        for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+        {
+            labels.insert(data.images[i].boxes[j].label);
+        }
+    }
+
+    for (std::set<std::string>::iterator i = labels.begin(); i != labels.end(); ++i)
+    {
+        if (i->size() != 0)
+        {
+            cout << *i << endl;
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
 int main(int argc, char** argv)
 {
     try
@@ -105,6 +130,7 @@ int main(int argc, char** argv)
         parser.add_option("h","Displays this information.");
         parser.add_option("c","Create an XML file named <arg> listing a set of images.",1);
         parser.add_option("r","Search directories recursively for images.");
+        parser.add_option("l","List all the labels in the given XML file.");
 
         parser.parse(argc, argv);
 
@@ -126,6 +152,20 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
 
+        if (parser.option("l"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The -l option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            print_all_labels(data);
+            return EXIT_SUCCESS;
+        }
+
         if (parser.number_of_arguments() == 1)
         {
             metadata_editor editor(parser[0]);
@@ -134,7 +174,7 @@ int main(int argc, char** argv)
     }
     catch (exception& e)
     {
-        cout << e.what() << endl;
+        cerr << e.what() << endl;
         return EXIT_FAILURE;
     }
 }
