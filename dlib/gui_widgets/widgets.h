@@ -3341,6 +3341,26 @@ namespace dlib
             event_handler = event_handler_;
         }
 
+        template <
+            typename T
+            >
+        void set_overlay_rect_selected_handler (
+            T& object,
+            void (T::*event_handler_)(const overlay_rect& orect)
+        )
+        {
+            auto_mutex M(m);
+            orect_selected_event_handler = make_mfp(object,event_handler_);
+        }
+
+        void set_overlay_rects_changed_handler (
+            const any_function<void(const overlay_rect& orect)>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            orect_selected_event_handler = event_handler_;
+        }
+
 
     private:
 
@@ -3402,6 +3422,7 @@ namespace dlib
         rgb_alpha_pixel default_rect_color;
         std::string default_rect_label;
         any_function<void()> event_handler;
+        any_function<void(const overlay_rect& orect)> orect_selected_event_handler;
 
         // restricted functions
         image_display(image_display&);        // copy constructor

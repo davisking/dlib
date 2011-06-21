@@ -2011,7 +2011,7 @@ namespace dlib
             >
         void set_graph_modified_handler (
             T& object,
-            void (T::*event_handler_)()
+            void (T::*event_handler)()
         );
         /*!
             requires
@@ -2550,7 +2550,7 @@ namespace dlib
             >
         void set_overlay_rects_changed_handler (
             T& object,
-            void (T::*event_handler_)()
+            void (T::*event_handler)()
         );
         /*
             requires
@@ -2572,6 +2572,42 @@ namespace dlib
             ensures
                 - the event_handler function is called when the user adds or removes 
                   an overlay rectangle.
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        */
+
+        template <
+            typename T
+            >
+        void set_overlay_rect_selected_handler (
+            T& object,
+            void (T::*event_handler)(const overlay_rect& orect)
+        );
+        /*
+            requires
+                - event_handler is a valid pointer to a member function in T 
+            ensures
+                - The event_handler function is called on object when the user selects
+                  an overlay rectangle by double clicking on it.  The selected rectangle 
+                  will be passed to event_handler().
+                - any previous calls to this function are overridden by this new call.  
+                  (i.e. you can only have one event handler associated with this 
+                  event at a time)
+            throws
+                - std::bad_alloc
+        */
+
+        void set_overlay_rects_changed_handler (
+            const any_function<void(const overlay_rect& orect)>& event_handler
+        );
+        /*
+            ensures
+                - The event_handler function is called when the user selects an overlay 
+                  rectangle by double clicking on it.  The selected rectangle will be 
+                  passed to event_handler().
                 - any previous calls to this function are overridden by this new call.  
                   (i.e. you can only have one event handler associated with this 
                   event at a time)

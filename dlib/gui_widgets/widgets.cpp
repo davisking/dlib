@@ -5922,6 +5922,8 @@ namespace dlib
             {
                 rect_is_selected = true;
                 selected_rect = best_idx;
+                if (orect_selected_event_handler.is_set())
+                    orect_selected_event_handler(overlay_rects[best_idx]);
             }
 
             if (rect_is_selected || rect_was_selected)
