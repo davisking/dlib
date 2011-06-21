@@ -120,6 +120,25 @@ void print_all_labels (
 
 // ----------------------------------------------------------------------------------------
 
+void rename_labels (
+    dlib::image_dataset_metadata::dataset& data,
+    const std::string& from,
+    const std::string& to
+)
+{
+    for (unsigned long i = 0; i < data.images.size(); ++i)
+    {
+        for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+        {
+            if (data.images[i].boxes[j].label == from)
+                data.images[i].boxes[j].label = to;
+        }
+    }
+
+}
+
+// ----------------------------------------------------------------------------------------
+
 int main(int argc, char** argv)
 {
     try
@@ -131,12 +150,15 @@ int main(int argc, char** argv)
         parser.add_option("c","Create an XML file named <arg> listing a set of images.",1);
         parser.add_option("r","Search directories recursively for images.");
         parser.add_option("l","List all the labels in the given XML file.");
+        parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
 
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r"};
+        const char* singles[] = {"h","c","r","l"};
         parser.check_one_time_options(singles);
         parser.check_sub_option("c", "r");
+        parser.check_incompatible_options("c", "l");
+        parser.check_incompatible_options("c", "rename");
 
         if (parser.option("h"))
         {
@@ -163,6 +185,24 @@ int main(int argc, char** argv)
             dlib::image_dataset_metadata::dataset data;
             load_image_dataset_metadata(data, parser[0]);
             print_all_labels(data);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rename"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rename option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            for (unsigned long i = 0; i < parser.option("rename").count(); ++i)
+            {
+                rename_labels(data, parser.option("rename").argument(0,i), parser.option("rename").argument(1,i));
+            }
+            save_image_dataset_metadata(data, parser[0]);
             return EXIT_SUCCESS;
         }
 
