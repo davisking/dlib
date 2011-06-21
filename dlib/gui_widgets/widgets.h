@@ -3304,6 +3304,44 @@ namespace dlib
         void clear_overlay (
         );
 
+        std::vector<overlay_rect> get_overlay_rects (
+        ) const;
+
+        void set_default_overlay_rect_label (
+            const std::string& label
+        );
+
+        std::string get_default_overlay_rect_label (
+        ) const;
+
+        void set_default_overlay_rect_color (
+            const rgb_alpha_pixel& color
+        );
+
+        rgb_alpha_pixel get_default_overlay_rect_color (
+        ) const;
+
+        template <
+            typename T
+            >
+        void set_overlay_rects_changed_handler (
+            T& object,
+            void (T::*event_handler_)()
+        )
+        {
+            auto_mutex M(m);
+            event_handler = make_mfp(object,event_handler_);
+        }
+
+        void set_overlay_rects_changed_handler (
+            const any_function<void()>& event_handler_
+        )
+        {
+            auto_mutex M(m);
+            event_handler = event_handler_;
+        }
+
+
     private:
 
         void draw (
@@ -3339,6 +3377,15 @@ namespace dlib
             long y
         );
 
+        void on_keydown (
+            unsigned long key,
+            bool is_printable,
+            unsigned long state
+        );
+
+        rgb_alpha_pixel invert_pixel (const rgb_alpha_pixel& p) const
+        { return rgb_alpha_pixel(255-p.red, 255-p.green, 255-p.blue, p.alpha); }
+
         array2d<rgb_alpha_pixel> img;
 
 
@@ -3352,6 +3399,9 @@ namespace dlib
         rectangle rect_to_draw;
         bool rect_is_selected;
         unsigned long selected_rect;
+        rgb_alpha_pixel default_rect_color;
+        std::string default_rect_label;
+        any_function<void()> event_handler;
 
         // restricted functions
         image_display(image_display&);        // copy constructor

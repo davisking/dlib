@@ -5661,12 +5661,13 @@ namespace dlib
     image_display(  
         drawable_window& w
     ): 
-        scrollable_region(w),
+        scrollable_region(w,KEYBOARD_EVENTS),
         zoom_in_scale(1),
         zoom_out_scale(1),
         drawing_rect(true),
         rect_is_selected(false),
-        selected_rect(0)
+        selected_rect(0),
+        default_rect_color(255,0,0,255)
     { 
         enable_mouse_drag();
 
@@ -5801,7 +5802,7 @@ namespace dlib
             orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
 
             if (rect_is_selected && selected_rect == i)
-                draw_rectangle(c, translate_rect(orect, origin), rgb_pixel(0,255,0), area);
+                draw_rectangle(c, translate_rect(orect, origin), invert_pixel(overlay_rects[i].color), area);
             else
                 draw_rectangle(c, translate_rect(orect, origin), overlay_rects[i].color, area);
 
@@ -5826,7 +5827,30 @@ namespace dlib
         }
 
         if (drawing_rect)
-            draw_rectangle(c, rect_to_draw, rgb_pixel(0,255,255), area);
+            draw_rectangle(c, rect_to_draw, invert_pixel(default_rect_color), area);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    on_keydown (
+        unsigned long key,
+        bool is_printable,
+        unsigned long state
+    )
+    {
+        scrollable_region::on_keydown(key,is_printable, state);
+
+        if (!is_printable && !hidden && enabled && rect_is_selected && 
+            (key == base_window::KEY_BACKSPACE || key == base_window::KEY_DELETE))
+        {
+            rect_is_selected = false;
+            overlay_rects.erase(overlay_rects.begin() + selected_rect);
+            parent.invalidate_rectangle(rect);
+
+            if (event_handler.is_set())
+                event_handler();
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -5845,7 +5869,7 @@ namespace dlib
         if (rect.contains(x,y) == false || hidden || !enabled)
             return;
 
-        if (!is_double_click && btn == base_window::LEFT && (state&base_window::CONTROL))
+        if (!is_double_click && btn == base_window::LEFT && (state&base_window::SHIFT))
         {
             drawing_rect = true;
             rect_anchor = point(x,y);
@@ -5894,7 +5918,7 @@ namespace dlib
             }
 
 
-            if (best_dist < 10)
+            if (best_dist < 13)
             {
                 rect_is_selected = true;
                 selected_rect = best_idx;
@@ -5912,6 +5936,58 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    std::vector<image_display::overlay_rect> image_display::
+    get_overlay_rects (
+    ) const
+    {
+        auto_mutex lock(m);
+        return overlay_rects;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    set_default_overlay_rect_label (
+        const std::string& label
+    )
+    {
+        auto_mutex lock(m);
+        default_rect_label = label;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    std::string image_display::
+    get_default_overlay_rect_label (
+    ) const
+    {
+        auto_mutex lock(m);
+        return default_rect_label;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    set_default_overlay_rect_color (
+        const rgb_alpha_pixel& color
+    )
+    {
+        auto_mutex lock(m);
+        default_rect_color = color;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    rgb_alpha_pixel image_display::
+    get_default_overlay_rect_color (
+    ) const
+    {
+        auto_mutex lock(m);
+        return default_rect_color;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void image_display::
     on_mouse_up (
         unsigned long btn,
@@ -5922,7 +5998,7 @@ namespace dlib
     {
         scrollable_region::on_mouse_up(btn,state,x,y);
 
-        if (drawing_rect && btn == base_window::LEFT && (state&base_window::CONTROL) &&
+        if (drawing_rect && btn == base_window::LEFT && (state&base_window::SHIFT) &&
             !hidden && enabled)
         {
             const point origin(total_rect().tl_corner());
@@ -5943,7 +6019,12 @@ namespace dlib
             const rectangle new_rect(c1,c2);
 
             if (new_rect.width() > 0 && new_rect.height() > 0)
-                add_overlay(overlay_rect(new_rect, rgb_pixel(255,0,0)));
+            {
+                add_overlay(overlay_rect(new_rect, default_rect_color, default_rect_label));
+
+                if (event_handler.is_set())
+                    event_handler();
+            }
         }
 
         if (drawing_rect)
@@ -5966,7 +6047,7 @@ namespace dlib
 
         if (drawing_rect)
         {
-            if ((state&base_window::LEFT) && (state&base_window::CONTROL) && !hidden && enabled)
+            if ((state&base_window::LEFT) && (state&base_window::SHIFT) && !hidden && enabled)
             {
                 rectangle new_rect(point(x,y), rect_anchor);
                 parent.invalidate_rectangle(new_rect + rect_to_draw);
