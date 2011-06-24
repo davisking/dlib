@@ -12,10 +12,20 @@
 
 <current>
 New Stuff:
+   - Added the check_sub_option() method to the command line parser check
+     object.
+   - Added match_endings to the dir_nav utils.
+   - Added a set_current_dir() function.
+   - Added the distance_to_rect_edge() routine.
+   - Added support for user drawn rectangle overlays and selectable overlays 
+     to the image_display widget.
  
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+   - Fixed a bug in the image_display widget.  If you switched it between
+     images of a different size while any kind of zoom was in effect
+     it could cause a segmentation fault.
 
 Other:
 
