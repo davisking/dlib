@@ -47,6 +47,7 @@
 
 #ifdef DLIB_PNG_SUPPORT
 #include "../image_loader/png_loader.cpp"
+#include "../image_saver/save_png.cpp"
 #endif
 
 #ifdef DLIB_JPEG_SUPPORT
