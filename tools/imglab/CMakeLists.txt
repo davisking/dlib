@@ -20,6 +20,8 @@ ADD_EXECUTABLE(${target_name}
    src/metadata_editor.cpp
    src/convert_pascal_voc.h
    src/convert_pascal_voc.cpp
+   src/convert_pascal_v1.h
+   src/convert_pascal_v1.cpp
    src/common.h
    src/common.cpp
 )
