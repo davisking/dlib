@@ -36,6 +36,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool file_exists (
+        const std::string& filename
+    )
+    {
+        try
+        {
+            dlib::file temp(filename);
+            return true;
+        }
+        catch (file::file_not_found&)
+        {
+            return false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     directory get_parent_directory (
         const directory& dir
     )
