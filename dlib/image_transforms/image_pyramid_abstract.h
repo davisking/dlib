@@ -69,7 +69,7 @@ namespace dlib
             ensures
                 - interprets p as a point in a parent image and returns the
                   point in a downsampled image which corresponds to p.
-                - This function is the inverse of point_up().  I.e. for an point P:
+                - This function is the inverse of point_up().  I.e. for a point P:
                   point_down(point_up(P)) == P
         !*/
 
@@ -81,7 +81,7 @@ namespace dlib
             ensures
                 - interprets p as a point in a downsampled image and returns the
                   point in a parent image which corresponds to p.
-                - This function is the inverse of point_down().  I.e. for an point P:
+                - This function is the inverse of point_down().  I.e. for a point P:
                   point_up(point_down(P)) == P
         !*/
 
