@@ -74,7 +74,7 @@ namespace
                     const int num = sa = words[4];
                     img.boxes.resize(num);
                 }
-                else if (words.size() > 4 && words[2] == "for" && words[3] == "object")
+                else if (words.size() > 4 && (words[2] == "for" || words[2] == "on") && words[3] == "object")
                 {
                     int idx = sa = words[4];
                     --idx;
