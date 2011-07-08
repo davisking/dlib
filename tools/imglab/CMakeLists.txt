@@ -22,6 +22,8 @@ ADD_EXECUTABLE(${target_name}
    src/convert_pascal_xml.cpp
    src/convert_pascal_v1.h
    src/convert_pascal_v1.cpp
+   src/convert_idl.h
+   src/convert_idl.cpp
    src/common.h
    src/common.cpp
 )

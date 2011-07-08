@@ -3,6 +3,7 @@
 #include "metadata_editor.h"
 #include "convert_pascal_xml.h"
 #include "convert_pascal_v1.h"
+#include "convert_idl.h"
 
 #include <iostream>
 #include <fstream>
@@ -125,7 +126,7 @@ int main(int argc, char** argv)
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("v","Display version.");
         parser.add_option("convert","Convert foreign image Annotations from <arg> format to the imglab format. "
-                          "Supported formats: pascal-xml, pascal-v1",1);
+                          "Supported formats: pascal-xml, pascal-v1, idl",1);
 
         parser.parse(argc, argv);
 
@@ -138,7 +139,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("l", "rename");
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "rename");
-        const char* convert_args[] = {"pascal-xml","pascal-v1"};
+        const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
 
         if (parser.option("h"))
@@ -166,6 +167,8 @@ int main(int argc, char** argv)
                     convert_pascal_xml(parser);
                 else if (parser.option("convert").argument() == "pascal-v1")
                     convert_pascal_v1(parser);
+                else if (parser.option("convert").argument() == "idl")
+                    convert_idl(parser);
             }
             else
             {
