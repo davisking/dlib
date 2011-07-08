@@ -142,6 +142,7 @@ namespace
                     b.rect = rectangle(p1,p2);
                     b.label = label;
                     img.boxes.push_back(b);
+                    saw_any_points = false;
                 }
                 data.images.push_back(img);
 
