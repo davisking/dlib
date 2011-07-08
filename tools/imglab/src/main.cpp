@@ -1,54 +1,22 @@
 
 #include "image_dataset_metadata.h"
 #include "metadata_editor.h"
+#include "convert_pascal_voc.h"
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <set>
 
-#include <dlib/cmd_line_parser.h>
 #include <dlib/dir_nav.h>
 
 
 const char* VERSION = "0.1";
 
 
-typedef dlib::cmd_line_parser<char>::check_1a_c parser_type;
 
 using namespace std;
 using namespace dlib;
-
-// ----------------------------------------------------------------------------------------
-
-std::string strip_path (
-    const std::string& str,
-    const std::string& prefix
-)
-{
-    unsigned long i;
-    for (i = 0; i < str.size() && i < prefix.size(); ++i)
-    {
-        if (str[i] != prefix[i]) 
-            return str;
-    }
-
-    if (i < str.size() && (str[i] == '/' || str[i] == '\\'))
-        ++i;
-
-    return str.substr(i);
-}
-
-// ----------------------------------------------------------------------------------------
-
-void make_empty_file (
-    const std::string& filename
-)
-{
-    ofstream fout(filename.c_str());
-    if (!fout)
-        throw dlib::error("ERROR: Unable to open " + filename + " for writing.");
-}
 
 // ----------------------------------------------------------------------------------------
 
@@ -155,15 +123,22 @@ int main(int argc, char** argv)
         parser.add_option("l","List all the labels in the given XML file.");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("v","Display version.");
+        parser.add_option("convert","Convert foreign image Annotations from <arg> format to the imglab format. "
+                          "Supported formats: pascal-voc",1);
 
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r","l"};
+        const char* singles[] = {"h","c","r","l","convert"};
         parser.check_one_time_options(singles);
-        parser.check_sub_option("c", "r");
+        const char* c_sub_ops[] = {"r", "convert"};
+        parser.check_sub_options("c", c_sub_ops);
         parser.check_incompatible_options("c", "l");
         parser.check_incompatible_options("c", "rename");
         parser.check_incompatible_options("l", "rename");
+        parser.check_incompatible_options("convert", "l");
+        parser.check_incompatible_options("convert", "rename");
+        const char* convert_args[] = {"pascal-voc"};
+        parser.check_option_arg_range("convert", convert_args);
 
         if (parser.option("h"))
         {
@@ -184,7 +159,17 @@ int main(int argc, char** argv)
 
         if (parser.option("c"))
         {
-            create_new_dataset(parser);
+            if (parser.option("convert"))
+            {
+                if (parser.option("convert").argument() == "pascal-voc")
+                {
+                    convert_pascal_voc(parser);
+                }
+            }
+            else
+            {
+                create_new_dataset(parser);
+            }
             return EXIT_SUCCESS;
         }
 
