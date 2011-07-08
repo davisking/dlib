@@ -126,7 +126,7 @@ int main(int argc, char** argv)
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("v","Display version.");
         parser.add_option("convert","Convert foreign image Annotations from <arg> format to the imglab format. "
-                          "Supported formats: pascal-xml, pascal-v1, idl",1);
+                          "Supported formats: pascal-xml, pascal-v1, idl.",1);
 
         parser.parse(argc, argv);
 
