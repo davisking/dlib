@@ -47,7 +47,7 @@ namespace dlib
         string::size_type pos = state->full_name.find_last_of(directory::get_separator());
         if (pos == string::npos)
         {
-            // no valid full path has no separtor characters.  
+            // no valid full path has no separator characters.  
             throw file_not_found("Unable to find file " + name);
         }
         state->name = state->full_name.substr(pos+1);
