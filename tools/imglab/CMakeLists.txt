@@ -18,8 +18,8 @@ ADD_EXECUTABLE(${target_name}
    src/image_dataset_metadata.cpp
    src/metadata_editor.h
    src/metadata_editor.cpp
-   src/convert_pascal_voc.h
-   src/convert_pascal_voc.cpp
+   src/convert_pascal_xml.h
+   src/convert_pascal_xml.cpp
    src/convert_pascal_v1.h
    src/convert_pascal_v1.cpp
    src/common.h

@@ -1,5 +1,5 @@
 
-#include "convert_pascal_voc.h"
+#include "convert_pascal_xml.h"
 #include "image_dataset_metadata.h"
 #include <iostream>
 #include <dlib/xml_parser.h>
@@ -163,11 +163,11 @@ namespace
 
 }
 
-void convert_pascal_voc(
+void convert_pascal_xml(
     const parser_type& parser
 )
 {
-    cout << "Convert from PASCAL VOC annotation format..." << endl;
+    cout << "Convert from PASCAL XML annotation format..." << endl;
 
     dlib::image_dataset_metadata::dataset dataset;
 
@@ -185,8 +185,8 @@ void convert_pascal_voc(
         try
         {
             parse_annotation_file(parser[i], img, name);
-            const string voc_root = get_parent_directory(get_parent_directory(file(parser[i]))).full_name();
-            const string img_path = voc_root + directory::get_separator() + "JPEGImages" + directory::get_separator();
+            const string root = get_parent_directory(get_parent_directory(file(parser[i]))).full_name();
+            const string img_path = root + directory::get_separator() + "JPEGImages" + directory::get_separator();
 
             dataset.name = name;
             img.filename = strip_path(img_path + img.filename,  parent_dir);
