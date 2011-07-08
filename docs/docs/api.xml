@@ -580,6 +580,10 @@
                   <name>get_parent_directory</name>
                   <link>dlib/dir_nav/dir_nav_extensions_abstract.h.html#get_parent_directory</link>
                </item>
+               <item>
+                  <name>file_exists</name>
+                  <link>dlib/dir_nav/dir_nav_extensions_abstract.h.html#file_exists</link>
+               </item>
             </sub>
          </item>
          <item>
