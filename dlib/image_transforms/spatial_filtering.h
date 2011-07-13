@@ -104,10 +104,110 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long size,
+        typename T,
+        typename in_image_type
+        >
+    inline void separable_3x3_filter_block_grayscale (
+        T (&block)[size][size],
+        const in_image_type& img,
+        const long& r,
+        const long& c,
+        const T& fe1, // separable filter end
+        const T& fm,  // separable filter middle 
+        const T& fe2 // separable filter end 2
+    ) 
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(shrink_rect(get_rect(img),1).contains(c,r) &&
+                    shrink_rect(get_rect(img),1).contains(c+size-1,r+size-1),
+            "\t void separable_3x3_filter_block_grayscale()"
+            << "\n\t The sub-window doesn't fit inside the given image."
+            << "\n\t get_rect(img):       " << get_rect(img) 
+            << "\n\t (c,r):               " << point(c,r) 
+            << "\n\t (c+size-1,r+size-1): " << point(c+size-1,r+size-1) 
+            );
+
+
+        T row_filt[size+2][size];
+        for (long rr = 0; rr < size+2; ++rr)
+        {
+            for (long cc = 0; cc < size; ++cc)
+            {
+                row_filt[rr][cc] = get_pixel_intensity(img[r+rr-1][c+cc-1])*fe1 + 
+                                   get_pixel_intensity(img[r+rr-1][c+cc])*fm + 
+                                   get_pixel_intensity(img[r+rr-1][c+cc+1])*fe2;
+            }
+        }
+
+        for (long rr = 0; rr < size; ++rr)
+        {
+            for (long cc = 0; cc < size; ++cc)
+            {
+                block[rr][cc] = (row_filt[rr][cc]*fe1 + 
+                                row_filt[rr+1][cc]*fm + 
+                                row_filt[rr+2][cc]*fe2)/256;
+            }
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long size,
+        typename T,
+        typename U,
+        typename in_image_type
+        >
+    inline void separable_3x3_filter_block_rgb (
+        T (&block)[size][size],
+        const in_image_type& img,
+        const long& r,
+        const long& c,
+        const U& fe1, // separable filter end
+        const U& fm,  // separable filter middle 
+        const U& fe2  // separable filter end 2
+    ) 
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(shrink_rect(get_rect(img),1).contains(c,r) &&
+                    shrink_rect(get_rect(img),1).contains(c+size-1,r+size-1),
+            "\t void separable_3x3_filter_block_grayscale()"
+            << "\n\t The sub-window doesn't fit inside the given image."
+            << "\n\t get_rect(img):       " << get_rect(img) 
+            << "\n\t (c,r):               " << point(c,r) 
+            << "\n\t (c+size-1,r+size-1): " << point(c+size-1,r+size-1) 
+            );
+
+        T row_filt[size+2][size];
+        for (long rr = 0; rr < size+2; ++rr)
+        {
+            for (long cc = 0; cc < size; ++cc)
+            {
+                row_filt[rr][cc].red   = img[r+rr-1][c+cc-1].red*fe1   + img[r+rr-1][c+cc].red*fm   + img[r+rr-1][c+cc+1].red*fe2;
+                row_filt[rr][cc].green = img[r+rr-1][c+cc-1].green*fe1 + img[r+rr-1][c+cc].green*fm + img[r+rr-1][c+cc+1].green*fe2;
+                row_filt[rr][cc].blue  = img[r+rr-1][c+cc-1].blue*fe1  + img[r+rr-1][c+cc].blue*fm  + img[r+rr-1][c+cc+1].blue*fe2;
+            }
+        }
+
+        for (long rr = 0; rr < size; ++rr)
+        {
+            for (long cc = 0; cc < size; ++cc)
+            {
+                block[rr][cc].red   = row_filt[rr][cc].red*fe1   + row_filt[rr+1][cc].red*fm   + row_filt[rr+2][cc].red*fe2;
+                block[rr][cc].green = row_filt[rr][cc].green*fe1 + row_filt[rr+1][cc].green*fm + row_filt[rr+2][cc].green*fe2;
+                block[rr][cc].blue  = row_filt[rr][cc].blue*fe1  + row_filt[rr+1][cc].blue*fm  + row_filt[rr+2][cc].blue*fe2;
+            }
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SPATIAL_FILTERINg_H_
-
-
 
 

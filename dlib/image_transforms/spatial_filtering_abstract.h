@@ -8,6 +8,8 @@
 namespace dlib
 {
 
+// ----------------------------------------------------------------------------------------
+
     template <
         typename in_image_type,
         typename out_image_type,
@@ -51,6 +53,76 @@ namespace dlib
             - #out_img.nr() == in_img.nr()
     !*/
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long size,
+        typename T,
+        typename in_image_type
+        >
+    inline void separable_3x3_filter_block_grayscale (
+        T (&block)[size][size],
+        const in_image_type& img,
+        const long& r,
+        const long& c,
+        const T& fe1, 
+        const T& fm,  
+        const T& fe2 
+    );
+    /*!
+        requires
+            - T should be a scalar type
+            - shrink_rect(get_rect(img),1).contains(c,r)
+            - shrink_rect(get_rect(img),1).contains(c+size-1,r+size-1)
+        ensures
+            - Filters the image in the sub-window of img defined by a rectangle 
+              with its upper left corner at (c,r) and lower right at (c+size-1,r+size-1).
+            - The output of the filter is stored in #block.  Note that img will be 
+              interpreted as a grayscale image.
+            - The filter used is defined by the separable filter [fe1 fm fe2].  So the
+              spatial filter is thus:
+                fe1*fe1  fe1*fm  fe2*fe1
+                fe1*fm   fm*fm   fe2*fm
+                fe1*fe2  fe2*fm  fe2*fe2
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long size,
+        typename T,
+        typename U,
+        typename in_image_type
+        >
+    inline void separable_3x3_filter_block_rgb (
+        T (&block)[size][size],
+        const in_image_type& img,
+        const long& r,
+        const long& c,
+        const U& fe1, 
+        const U& fm, 
+        const U& fe2
+    );
+    /*!
+        requires
+            - pixel_traits<typename in_image_type::type>::rgb == true
+            - T should be a struct with .red .green and .blue members.
+            - U should be a scalar type
+            - shrink_rect(get_rect(img),1).contains(c,r)
+            - shrink_rect(get_rect(img),1).contains(c+size-1,r+size-1)
+        ensures
+            - Filters the image in the sub-window of img defined by a rectangle 
+              with its upper left corner at (c,r) and lower right at (c+size-1,r+size-1).
+            - The output of the filter is stored in #block.  Note that the filter is applied
+              to each color component independently.
+            - The filter used is defined by the separable filter [fe1 fm fe2].  So the
+              spatial filter is thus:
+                fe1*fe1  fe1*fm  fe2*fe1
+                fe1*fm   fm*fm   fe2*fm
+                fe1*fe2  fe2*fm  fe2*fe2
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 
