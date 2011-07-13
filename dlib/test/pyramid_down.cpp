@@ -20,7 +20,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-void test_pyramid_down_graysclae()
+void test_pyramid_down_grayscale()
 {
     array2d<unsigned char> img, down;
     pyramid_down pyr;
@@ -136,6 +136,7 @@ rgb_pixel mean_pixel (
 
 //  ----------------------------------------------------------------------------
 
+template <typename pyramid_down_type>
 void test_pyramid_down_rgb2()
 {
     array2d<rgb_pixel> img, img3;
@@ -154,15 +155,26 @@ void test_pyramid_down_rgb2()
 
 
 
-    pyramid_down pyr;
+    pyramid_down_type pyr;
 
     pyr(img, img2);
     pyr(img, img3);
 
 
-    rect1 = pyr.rect_down(rect1);
-    rect2 = pyr.rect_down(rect2);
-    rect3 = pyr.rect_down(rect3);
+    DLIB_TEST(((rect1.tl_corner() - pyr.rect_down(pyr.rect_up(rect1,2),2).tl_corner()).length()) < 1);
+    DLIB_TEST(((rect1.br_corner() - pyr.rect_down(pyr.rect_up(rect1,2),2).br_corner()).length()) < 1);
+    DLIB_TEST(((rect2.tl_corner() - pyr.rect_down(pyr.rect_up(rect2,2),2).tl_corner()).length()) < 1);
+    DLIB_TEST(((rect2.br_corner() - pyr.rect_down(pyr.rect_up(rect2,2),2).br_corner()).length()) < 1);
+    DLIB_TEST(((rect3.tl_corner() - pyr.rect_down(pyr.rect_up(rect3,2),2).tl_corner()).length()) < 1);
+    DLIB_TEST(((rect3.br_corner() - pyr.rect_down(pyr.rect_up(rect3,2),2).br_corner()).length()) < 1);
+
+    rect1 = shrink_rect(pyr.rect_down(rect1),1);
+    rect2 = shrink_rect(pyr.rect_down(rect2),1);
+    rect3 = shrink_rect(pyr.rect_down(rect3),1);
+
+    DLIB_TEST(rect1.area() > 10);
+    DLIB_TEST(rect2.area() > 10);
+    DLIB_TEST(rect3.area() > 10);
 
     /*
     image_window my_window(img);
@@ -177,9 +189,9 @@ void test_pyramid_down_rgb2()
     */
 
 
-    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect1)) - 255/3) < 9);
-    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect2)) - 255/3) < 4);
-    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect1)) - 255/3) < 9);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect1)) - 255/3) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect2)) - 255/3) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect3)) - 255/3) < 3);
     assign_image(img4, img);
     DLIB_TEST(std::abs((int)mean(array_to_matrix(img4)) - mean(array_to_matrix(img2))) < 2);
 
@@ -189,21 +201,87 @@ void test_pyramid_down_rgb2()
     rgb_pixel mean3 = mean_pixel(img3, rect3);
     rgb_pixel mean_all_true = mean_pixel(img, get_rect(img));
     rgb_pixel mean_all = mean_pixel(img3, get_rect(img3));
-    DLIB_TEST(mean1.red > 232);
+    DLIB_TEST(mean1.red > 250);
     DLIB_TEST(mean1.green < 3);
     DLIB_TEST(mean1.blue < 3);
 
     DLIB_TEST(mean2.red < 3);
-    DLIB_TEST(mean2.green > 240);
+    DLIB_TEST(mean2.green > 250);
     DLIB_TEST(mean2.blue < 3);
 
-    DLIB_TEST(mean3.red < 4);
+    DLIB_TEST(mean3.red < 3);
     DLIB_TEST(mean3.green < 3);
-    DLIB_TEST(mean3.blue > 237);
+    DLIB_TEST(mean3.blue > 250);
 
     DLIB_TEST(std::abs((int)mean_all_true.red - mean_all.red) < 1);
     DLIB_TEST(std::abs((int)mean_all_true.green - mean_all.green) < 1);
     DLIB_TEST(std::abs((int)mean_all_true.blue - mean_all.blue) < 1);
+
+    //my_window.wait_until_closed();
+}
+
+
+// ----------------------------------------------------------------------------------------
+
+template <typename pyramid_down_type>
+void test_pyramid_down_grayscale2()
+{
+    array2d<unsigned char> img, img3;
+    array2d<unsigned char> img2, img4;
+
+
+    img.set_size(300,400);
+    assign_all_pixels(img, 0);
+    rectangle rect1 = centered_rect( 10,10, 14, 14);
+    rectangle rect2 = centered_rect( 100,100, 34, 42);
+    rectangle rect3 = centered_rect( 310,215, 65, 21);
+
+    draw_rectangle(img, rect1, 255);
+    draw_rectangle(img, rect2, 170);
+    draw_rectangle(img, rect3, 100);
+
+
+
+    pyramid_down_type pyr;
+
+    pyr(img, img2);
+    pyr(img, img3);
+
+
+    DLIB_TEST(((rect1.tl_corner() - pyr.rect_down(pyr.rect_up(rect1,2),2).tl_corner()).length()) < 1);
+    DLIB_TEST(((rect1.br_corner() - pyr.rect_down(pyr.rect_up(rect1,2),2).br_corner()).length()) < 1);
+    DLIB_TEST(((rect2.tl_corner() - pyr.rect_down(pyr.rect_up(rect2,2),2).tl_corner()).length()) < 1);
+    DLIB_TEST(((rect2.br_corner() - pyr.rect_down(pyr.rect_up(rect2,2),2).br_corner()).length()) < 1);
+    DLIB_TEST(((rect3.tl_corner() - pyr.rect_down(pyr.rect_up(rect3,2),2).tl_corner()).length()) < 1);
+    DLIB_TEST(((rect3.br_corner() - pyr.rect_down(pyr.rect_up(rect3,2),2).br_corner()).length()) < 1);
+
+    rect1 = shrink_rect(pyr.rect_down(rect1),1);
+    rect2 = shrink_rect(pyr.rect_down(rect2),1);
+    rect3 = shrink_rect(pyr.rect_down(rect3),1);
+
+    DLIB_TEST(rect1.area() > 10);
+    DLIB_TEST(rect2.area() > 10);
+    DLIB_TEST(rect3.area() > 10);
+
+    /*
+    image_window my_window(img);
+    image_window win2(img2);
+    image_window win3(img3);
+    win2.add_overlay(image_window::overlay_rect(rect1, rgb_pixel(255,0,0)));
+    win2.add_overlay(image_window::overlay_rect(rect2, rgb_pixel(255,0,0)));
+    win2.add_overlay(image_window::overlay_rect(rect3, rgb_pixel(255,0,0)));
+    win3.add_overlay(image_window::overlay_rect(rect1, rgb_pixel(255,0,0)));
+    win3.add_overlay(image_window::overlay_rect(rect2, rgb_pixel(255,0,0)));
+    win3.add_overlay(image_window::overlay_rect(rect3, rgb_pixel(255,0,0)));
+    */
+
+
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect1)) - 255) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect2)) - 170) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect3)) - 100) < 3);
+    assign_image(img4, img);
+    DLIB_TEST(std::abs((int)mean(array_to_matrix(img4)) - mean(array_to_matrix(img2))) < 2);
+
 
     //my_window.wait_until_closed();
 }
@@ -225,11 +303,43 @@ void test_pyramid_down_rgb2()
         )
         {
             print_spinner();
-            test_pyramid_down_graysclae();
+            test_pyramid_down_grayscale();
             print_spinner();
             test_pyramid_down_rgb();
+
+
             print_spinner();
-            test_pyramid_down_rgb2();
+            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down>();";
+            test_pyramid_down_rgb2<pyramid_down>();
+
+            print_spinner();
+            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down_3_2>();";
+            test_pyramid_down_rgb2<pyramid_down_3_2>();
+
+            print_spinner();
+            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down_4_3>();";
+            test_pyramid_down_rgb2<pyramid_down_4_3>();
+
+            print_spinner();
+            dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down_5_4>();";
+            test_pyramid_down_rgb2<pyramid_down_5_4>();
+
+
+            print_spinner();
+            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down>();";
+            test_pyramid_down_grayscale2<pyramid_down>();
+
+            print_spinner();
+            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down_3_2>();";
+            test_pyramid_down_grayscale2<pyramid_down_3_2>();
+
+            print_spinner();
+            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down_4_3>();";
+            test_pyramid_down_grayscale2<pyramid_down_4_3>();
+
+            print_spinner();
+            dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down_5_4>();";
+            test_pyramid_down_grayscale2<pyramid_down_5_4>();
         }
     } a;
 
