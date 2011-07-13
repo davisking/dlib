@@ -951,6 +951,8 @@
          <term file="imaging.html" name="load_image"/>
          <term file="imaging.html" name="save_dng"/>
          <term file="imaging.html" name="spatially_filter_image"/>
+         <term file="imaging.html" name="separable_3x3_filter_block_grayscale"/>
+         <term file="imaging.html" name="separable_3x3_filter_block_rgb"/>
          <term file="imaging.html" name="pyramid_down"/>
          <term file="imaging.html" name="threshold_image"/>
          <term file="imaging.html" name="auto_threshold_image"/>
