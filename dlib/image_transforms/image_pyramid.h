@@ -7,9 +7,12 @@
 #include "../pixel.h"
 #include "../array2d.h"
 #include "../geometry.h"
+#include "spatial_filtering.h"
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
 
     class pyramid_down : noncopyable
     {
@@ -317,6 +320,231 @@ namespace dlib
 
 
     };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class pyramid_down_3_2 : noncopyable
+    {
+    public:
+
+        template <typename T>
+        vector<double,2> point_down (
+            const vector<T,2>& p
+        ) const
+        {
+            const double ratio = 2.0/3.0;
+            //do return (p - vector<T,2>(1,1))*ratio;
+            return p*ratio - vector<double,2>(ratio,ratio);
+        }
+
+        template <typename T>
+        vector<double,2> point_up (
+            const vector<T,2>& p
+        ) const
+        {
+            const double ratio = 3.0/2.0;
+            return p*ratio + vector<T,2>(1,1);
+        }
+
+    // -----------------------------
+
+        template <typename T>
+        vector<double,2> point_down (
+            const vector<T,2>& p,
+            unsigned int levels
+        ) const
+        {
+            vector<double,2> temp = p;
+            for (unsigned int i = 0; i < levels; ++i)
+                temp = point_down(temp);
+            return temp;
+        }
+
+        template <typename T>
+        vector<double,2> point_up (
+            const vector<T,2>& p,
+            unsigned int levels
+        ) const
+        {
+            vector<double,2> temp = p;
+            for (unsigned int i = 0; i < levels; ++i)
+                temp = point_up(temp);
+            return temp;
+        }
+
+    // -----------------------------
+
+        rectangle rect_up (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+        }
+
+        rectangle rect_up (
+            const rectangle& rect,
+            unsigned int levels
+        ) const
+        {
+            return rectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+        }
+
+    // -----------------------------
+
+        rectangle rect_down (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+        }
+
+        rectangle rect_down (
+            const rectangle& rect,
+            unsigned int levels
+        ) const
+        {
+            return rectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+        }
+
+    // -----------------------------
+
+    private:
+        template <typename T, typename U>
+        struct both_images_rgb
+        {
+            const static bool value = pixel_traits<typename T::type>::rgb &&
+                                      pixel_traits<typename U::type>::rgb;
+        };
+    public:
+
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        typename disable_if<both_images_rgb<in_image_type,out_image_type> >::type operator() (
+            const in_image_type& original,
+            out_image_type& down
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
+                        is_same_object(original, down) == false, 
+                        "\t void pyramid_down_3_2::operator()"
+                        << "\n\t original.nr(): " << original.nr()
+                        << "\n\t original.nc(): " << original.nc()
+                        << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                        << "\n\t this:                           " << this
+                        );
+
+            COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
+            typedef typename promote<bp_type>::type ptype;
+            down.set_size(2*((original.nr()-2)/3), 2*((original.nc()-2)/3));
+
+
+            long rr = 1;
+            for (long r = 0; r < down.nr(); r+=2)
+            {
+                long cc = 1;
+                for (long c = 0; c < down.nc(); c+=2)
+                {
+                    ptype block[3][3];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate block 
+                    assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16));
+                    assign_pixel(down[r][c+1]   , (block[0][2]*9 + block[1][2]*3 + block[0][1]*3 + block[1][1])/(16));
+                    assign_pixel(down[r+1][c]   , (block[2][0]*9 + block[1][0]*3 + block[2][1]*3 + block[1][1])/(16));
+                    assign_pixel(down[r+1][c+1] , (block[2][2]*9 + block[1][2]*3 + block[2][1]*3 + block[1][1])/(16));
+
+                    cc += 3;
+                }
+                rr += 3;
+            }
+
+        }
+
+    private:
+        struct rgbptype 
+        {
+            uint32 red;
+            uint32 green;
+            uint32 blue;
+        };
+
+    public:
+    // ------------------------------------------
+    //       OVERLOAD FOR RGB TO RGB IMAGES
+    // ------------------------------------------
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        typename enable_if<both_images_rgb<in_image_type,out_image_type> >::type operator() (
+            const in_image_type& original,
+            out_image_type& down
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
+                        is_same_object(original, down) == false, 
+                        "\t void pyramid_down_3_2::operator()"
+                        << "\n\t original.nr(): " << original.nr()
+                        << "\n\t original.nc(): " << original.nc()
+                        << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                        << "\n\t this:                           " << this
+                        );
+
+            COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            down.set_size(2*((original.nr()-2)/3), 2*((original.nc()-2)/3));
+
+
+            long rr = 1;
+            for (long r = 0; r < down.nr(); r+=2)
+            {
+                long cc = 1;
+                for (long c = 0; c < down.nc(); c+=2)
+                {
+                    rgbptype block[3][3];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate block 
+                    down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
+                    down[r][c].green     = (block[0][0].green*9 + block[1][0].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
+                    down[r][c].blue      = (block[0][0].blue*9  + block[1][0].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
+
+                    down[r][c+1].red     = (block[0][2].red*9   + block[1][2].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
+                    down[r][c+1].green   = (block[0][2].green*9 + block[1][2].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
+                    down[r][c+1].blue    = (block[0][2].blue*9  + block[1][2].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
+
+                    down[r+1][c].red     = (block[2][0].red*9   + block[1][0].red*3   + block[2][1].red*3   + block[1][1].red)/(16*256);
+                    down[r+1][c].green   = (block[2][0].green*9 + block[1][0].green*3 + block[2][1].green*3 + block[1][1].green)/(16*256);
+                    down[r+1][c].blue    = (block[2][0].blue*9  + block[1][0].blue*3  + block[2][1].blue*3  + block[1][1].blue)/(16*256);
+
+                    down[r+1][c+1].red   = (block[2][2].red*9   + block[1][2].red*3   + block[2][1].red*3   + block[1][1].red)/(16*256);
+                    down[r+1][c+1].green = (block[2][2].green*9 + block[1][2].green*3 + block[2][1].green*3 + block[1][1].green)/(16*256);
+                    down[r+1][c+1].blue  = (block[2][2].blue*9  + block[1][2].blue*3  + block[2][1].blue*3  + block[1][1].blue)/(16*256);
+
+                    cc += 3;
+                }
+                rr += 3;
+            }
+        }
+
+    private:
+
+
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
 }
 
