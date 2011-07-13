@@ -147,7 +147,7 @@ namespace dlib
             {
                 block[rr][cc] = (row_filt[rr][cc]*fe1 + 
                                 row_filt[rr+1][cc]*fm + 
-                                row_filt[rr+2][cc]*fe2)/256;
+                                row_filt[rr+2][cc]*fe2);
             }
         }
 
