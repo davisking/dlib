@@ -954,6 +954,9 @@
          <term file="imaging.html" name="separable_3x3_filter_block_grayscale"/>
          <term file="imaging.html" name="separable_3x3_filter_block_rgb"/>
          <term file="imaging.html" name="pyramid_down"/>
+         <term file="imaging.html" name="pyramid_down_3_2"/>
+         <term file="imaging.html" name="pyramid_down_4_3"/>
+         <term file="imaging.html" name="pyramid_down_5_4"/>
          <term file="imaging.html" name="threshold_image"/>
          <term file="imaging.html" name="auto_threshold_image"/>
          <term file="imaging.html" name="png_loader"/>
