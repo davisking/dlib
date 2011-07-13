@@ -153,6 +153,45 @@ namespace dlib
 
     };
 
+// ----------------------------------------------------------------------------------------
+
+    class pyramid_down_3_2 : noncopyable
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a function object with an interface identical to pyramid_down (defined
+                at the top of this file) except that it downsamples images at a ratio of 3 to 2
+                instead of 2 to 1.
+        !*/
+    };
+
+
+// ----------------------------------------------------------------------------------------
+
+    class pyramid_down_4_3 : noncopyable
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a function object with an interface identical to pyramid_down (defined
+                at the top of this file) except that it downsamples images at a ratio of 4 to 3
+                instead of 2 to 1.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class pyramid_down_5_4 : noncopyable
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a function object with an interface identical to pyramid_down (defined
+                at the top of this file) except that it downsamples images at a ratio of 5 to 4
+                instead of 2 to 1.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_IMAGE_PYRaMID_ABSTRACT_H__
