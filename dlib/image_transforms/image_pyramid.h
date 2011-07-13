@@ -441,18 +441,21 @@ namespace dlib
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
+            const long size_in = 3;
+            const long size_out = 2;
+
             typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
             typedef typename promote<bp_type>::type ptype;
-            down.set_size(2*((original.nr()-2)/3), 2*((original.nc()-2)/3));
+            down.set_size(size_out*((original.nr()-2)/size_in), size_out*((original.nc()-2)/size_in));
 
 
             long rr = 1;
-            for (long r = 0; r < down.nr(); r+=2)
+            for (long r = 0; r < down.nr(); r+=size_out)
             {
                 long cc = 1;
-                for (long c = 0; c < down.nc(); c+=2)
+                for (long c = 0; c < down.nc(); c+=size_out)
                 {
-                    ptype block[3][3];
+                    ptype block[size_in][size_in];
                     separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
 
                     // bi-linearly interpolate block 
@@ -461,9 +464,9 @@ namespace dlib
                     assign_pixel(down[r+1][c]   , (block[2][0]*9 + block[1][0]*3 + block[2][1]*3 + block[1][1])/(16));
                     assign_pixel(down[r+1][c+1] , (block[2][2]*9 + block[1][2]*3 + block[2][1]*3 + block[1][1])/(16));
 
-                    cc += 3;
+                    cc += size_in;
                 }
-                rr += 3;
+                rr += size_in;
             }
 
         }
@@ -502,16 +505,19 @@ namespace dlib
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-            down.set_size(2*((original.nr()-2)/3), 2*((original.nc()-2)/3));
+            const long size_in = 3;
+            const long size_out = 2;
+
+            down.set_size(size_out*((original.nr()-2)/size_in), size_out*((original.nc()-2)/size_in));
 
 
             long rr = 1;
-            for (long r = 0; r < down.nr(); r+=2)
+            for (long r = 0; r < down.nr(); r+=size_out)
             {
                 long cc = 1;
-                for (long c = 0; c < down.nc(); c+=2)
+                for (long c = 0; c < down.nc(); c+=size_out)
                 {
-                    rgbptype block[3][3];
+                    rgbptype block[size_in][size_in];
                     separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
 
                     // bi-linearly interpolate block 
@@ -531,9 +537,9 @@ namespace dlib
                     down[r+1][c+1].green = (block[2][2].green*9 + block[1][2].green*3 + block[2][1].green*3 + block[1][1].green)/(16*256);
                     down[r+1][c+1].blue  = (block[2][2].blue*9  + block[1][2].blue*3  + block[2][1].blue*3  + block[1][1].blue)/(16*256);
 
-                    cc += 3;
+                    cc += size_in;
                 }
-                rr += 3;
+                rr += size_in;
             }
         }
 
