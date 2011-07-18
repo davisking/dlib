@@ -71,6 +71,7 @@ namespace dlib
     );
     /*!
         requires
+            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - T should be a scalar type
             - shrink_rect(get_rect(img),1).contains(c,r)
             - shrink_rect(get_rect(img),1).contains(c+size-1,r+size-1)
@@ -105,6 +106,7 @@ namespace dlib
     );
     /*!
         requires
+            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - pixel_traits<typename in_image_type::type>::rgb == true
             - T should be a struct with .red .green and .blue members.
             - U should be a scalar type
