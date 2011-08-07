@@ -36,7 +36,7 @@ namespace
 
         map_problem()
         {
-            data = randm(number_of_nodes(),std::pow(num_states,order+1), rnd);
+            data = randm(number_of_nodes(),(long)std::pow(num_states,(double)order+1), rnd);
         }
 
         unsigned long number_of_nodes (

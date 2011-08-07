@@ -67,12 +67,12 @@ namespace dlib
         COMPILE_TIME_ASSERT(num_states > 0);
 
 
-        DLIB_ASSERT(std::pow(num_states,order) < std::numeric_limits<unsigned long>::max(),
+        DLIB_ASSERT(std::pow(num_states,(double)order) < std::numeric_limits<unsigned long>::max(),
             "\t void find_max_factor_graph_viterbi()"
             << "\n\t The order is way too large for this algorithm to handle."
             << "\n\t order:      " << order
             << "\n\t num_states: " << num_states 
-            << "\n\t std::pow(num_states,order):                " << std::pow(num_states,order) 
+            << "\n\t std::pow(num_states,order):                " << std::pow(num_states,(double)order) 
             << "\n\t std::numeric_limits<unsigned long>::max(): " << std::numeric_limits<unsigned long>::max() 
             );
 
@@ -106,7 +106,7 @@ namespace dlib
         }
 
 
-        const unsigned long trellis_size = static_cast<unsigned long>(std::pow(num_states,order)); 
+        const unsigned long trellis_size = static_cast<unsigned long>(std::pow(num_states,(double)order)); 
         unsigned long init_ring_size = 1; 
 
         array2d<impl::viterbi_data> trellis;

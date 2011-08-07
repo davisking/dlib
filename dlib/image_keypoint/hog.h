@@ -346,8 +346,8 @@ namespace dlib
                             }
                             else  // if we should do some interpolation
                             {
-                                unsigned long quantized_angle_lower = std::floor(angle);
-                                unsigned long quantized_angle_upper = std::ceil(angle);
+                                unsigned long quantized_angle_lower = static_cast<unsigned long>(std::floor(angle));
+                                unsigned long quantized_angle_upper = static_cast<unsigned long>(std::ceil(angle));
 
                                 quantized_angle_lower %= num_orientation_bins;
                                 quantized_angle_upper %= num_orientation_bins;

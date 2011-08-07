@@ -34,8 +34,8 @@ namespace dlib
         */
         using namespace std;
 
-        const int height = std::floor(std::sqrt(area/width_to_height_ratio) + 0.5);
-        const int width  = std::floor(area/height + 0.5);
+        const int height = (int)std::floor(std::sqrt(area/width_to_height_ratio) + 0.5);
+        const int width  = (int)std::floor(area/height + 0.5);
 
         return centered_rect(0,0,width,height);
     }
