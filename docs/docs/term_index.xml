@@ -718,7 +718,7 @@
          <term file="dlib/gui_widgets/drawable_abstract.h.html" name="events_are_enabled"/>
 
          <term name="draw_line">
-            <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_line" name="in the drawable GUI object"/>
+            <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_line" name="for the GUI canvas object"/>
             <term link="imaging.html#draw_line" name="for image/array2d objects"/>
          </term>
 
@@ -760,7 +760,11 @@
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_button_up"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_checkered"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_image"/>
-         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="fill_rect"/>
+         <term name="fill_rect">
+            <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#fill_rect" name="for GUI canvas objects"/>
+            <term link="dlib/image_transforms/draw_abstract.h.html#fill_rect" name="for image/array2d objects"/>
+         </term>
+
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="fill_rect_with_vertical_gradient"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="fill_gradient_rounded"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_rounded_rectangle"/>

@@ -109,6 +109,7 @@
          <item>cv_image</item>
 
          <item>draw_line</item> 
+         <item>fill_rect</item> 
          <item>assign_image</item> 
          <item>assign_image_scaled</item> 
          <item>assign_all_pixels</item> 
@@ -661,7 +662,19 @@
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
          <description>        
-            This global function draws a line onto an image.
+            This global function draws a line on an image.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>fill_rect</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
+         <description>        
+            This global function draws a solid rectangle on an image.
          </description>
                                  
       </component>
