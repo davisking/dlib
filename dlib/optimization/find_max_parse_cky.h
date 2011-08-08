@@ -177,6 +177,8 @@ namespace dlib
                                     item.c = con;
                                     item.score = score;
                                     item.tag = possible_tags[m].first;
+                                    item.left = END_OF_TREE;
+                                    item.right = END_OF_TREE;
                                     back[r][c][possible_tags[m].first] = item;
                                 }
                             }
