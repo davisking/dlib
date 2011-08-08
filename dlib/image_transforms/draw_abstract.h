@@ -34,6 +34,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type,
+        typename pixel_type
+        >
+    void fill_rect (
+        image_type& img,
+        const rectangle& rect,
+        const pixel_type& pixel
+    );
+    /*!
+        requires
+            - pixel_traits<pixel_type> is defined
+        ensures
+            - fills the area defined by rect in the given image with the given pixel value.
+    !*/
+
+}
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DRAW_IMAGe_ABSTRACT

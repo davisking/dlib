@@ -145,6 +145,29 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type,
+        typename pixel_type
+        >
+    void fill_rect (
+        image_type& img,
+        const rectangle& rect,
+        const pixel_type& pixel
+    )
+    {
+        rectangle area = rect.intersect(get_rect(img));
+
+        for (long r = area.top(); r <= area.bottom(); ++r)
+        {
+            for (long c = area.left(); c <= area.right(); ++c)
+            {
+                assign_pixel(img[r][c], pixel);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DRAW_IMAGe_
