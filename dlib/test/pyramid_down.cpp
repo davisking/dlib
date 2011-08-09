@@ -91,26 +91,6 @@ void test_pyramid_down_rgb()
 
 //  ----------------------------------------------------------------------------
 
-template <typename image_type, typename pixel_type>
-void draw_rectangle (
-    image_type& img,
-    const rectangle& rect,
-    const pixel_type& p
-)
-{
-    rectangle area = rect.intersect(get_rect(img));
-
-    for (long r = area.top(); r <= area.bottom(); ++r)
-    {
-        for (long c = area.left(); c <= area.right(); ++c)
-        {
-            assign_pixel(img[r][c], p);
-        }
-    }
-}
-    
-//  ----------------------------------------------------------------------------
-
 template <typename image_type>
 rgb_pixel mean_pixel (
     const image_type& img,
@@ -149,9 +129,9 @@ void test_pyramid_down_rgb2()
     rectangle rect2 = centered_rect( 100,100, 34, 42);
     rectangle rect3 = centered_rect( 310,215, 65, 21);
 
-    draw_rectangle(img, rect1, rgb_pixel(255,0,0));
-    draw_rectangle(img, rect2, rgb_pixel(0,255,0));
-    draw_rectangle(img, rect3, rgb_pixel(0,0,255));
+    fill_rect(img, rect1, rgb_pixel(255,0,0));
+    fill_rect(img, rect2, rgb_pixel(0,255,0));
+    fill_rect(img, rect3, rgb_pixel(0,0,255));
 
 
 
@@ -236,9 +216,9 @@ void test_pyramid_down_grayscale2()
     rectangle rect2 = centered_rect( 100,100, 34, 42);
     rectangle rect3 = centered_rect( 310,215, 65, 21);
 
-    draw_rectangle(img, rect1, 255);
-    draw_rectangle(img, rect2, 170);
-    draw_rectangle(img, rect3, 100);
+    fill_rect(img, rect1, 255);
+    fill_rect(img, rect2, 170);
+    fill_rect(img, rect3, 100);
 
 
 
