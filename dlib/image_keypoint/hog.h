@@ -152,6 +152,55 @@ namespace dlib
             return rectangle(col, row, col+cell_size*block_size-1, row+cell_size*block_size-1);
         }
 
+        const point image_to_feat_space (
+            const point& p
+        ) const
+        {
+
+            const long half_block = block_size/2;
+            if ((block_size%2) == 0)
+            {
+                return point(((p.x()-1)/(long)cell_size - half_block)/(long)cell_stride,
+                             ((p.y()-1)/(long)cell_size - half_block)/(long)cell_stride);
+            }
+            else
+            {
+                return point(((p.x()-1-(long)cell_size/2)/(long)cell_size - half_block)/(long)cell_stride,
+                             ((p.y()-1-(long)cell_size/2)/(long)cell_size - half_block)/(long)cell_stride);
+            }
+        }
+
+        const rectangle image_to_feat_space (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(image_to_feat_space(rect.tl_corner()), image_to_feat_space(rect.br_corner()));
+        }
+
+        const point feat_to_image_space (
+            const point& p
+        ) const
+        {
+            const long half_block = block_size/2;
+            if ((block_size%2) == 0)
+            {
+                return point((p.x()*cell_stride + half_block)*cell_size + 1,
+                             (p.y()*cell_stride + half_block)*cell_size + 1);
+            }
+            else
+            {
+                return point((p.x()*cell_stride + half_block)*cell_size + 1 + cell_size/2,
+                             (p.y()*cell_stride + half_block)*cell_size + 1 + cell_size/2);
+            }
+        }
+
+        const rectangle feat_to_image_space (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(feat_to_image_space(rect.tl_corner()), feat_to_image_space(rect.br_corner()));
+        }
+
     private:
 
         template <

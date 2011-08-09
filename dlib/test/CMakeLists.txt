@@ -44,6 +44,7 @@ set (tests
    hash_map.cpp
    hash_set.cpp
    hash_table.cpp
+   hog_image.cpp
    image.cpp
    is_same_object.cpp
    kcentroid.cpp

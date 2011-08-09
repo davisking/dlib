@@ -189,6 +189,53 @@ namespace dlib
                   with a particular HOG block.
                 - The returned rectangle will be cell_size*block_size pixels wide and tall.
         !*/
+
+        const point image_to_feat_space (
+            const point& p
+        ) const;
+        /*!
+            ensures
+                - Each local feature is extracted from a certain point in the input image.
+                  This function returns the identity of the local feature corresponding
+                  to any particular image location p.  Or in other words, 
+                  let P == image_to_feat_space(p), then (*this)(P.y(),P.x()) == the local
+                  feature closest to, or centered at, the point p in the input image.  Note
+                  that some image points might not have corresponding feature locations.  
+                  E.g. border points or points outside the image.  In these cases the returned
+                  point will be outside get_rect(*this).
+        !*/
+
+        const rectangle image_to_feat_space (
+            const rectangle& rect
+        ) const;
+        /*!
+            ensures
+                - returns rectangle(image_to_feat_space(rect.tl_corner()), image_to_feat_space(rect.br_corner()));
+                  (i.e. maps a rectangle from image space to feature space)
+        !*/
+
+        const point feat_to_image_space (
+            const point& p
+        ) const;
+        /*!
+            ensures
+                - returns the location in the input image space corresponding to the center
+                  of the local feature at point p.  In other words, this function computes
+                  the inverse of image_to_feat_space().  Note that it may only do so approximately, 
+                  since more than one image location might correspond to the same local feature.  
+                  That is, image_to_feat_space() might not be invertible so this function gives 
+                  the closest possible result.
+        !*/
+
+        const rectangle feat_to_image_space (
+            const rectangle& rect
+        ) const;
+        /*!
+            ensures
+                - return rectangle(feat_to_image_space(rect.tl_corner()), feat_to_image_space(rect.br_corner()));
+                  (i.e. maps a rectangle from feature space to image space)
+        !*/
+
     };
 
 // ----------------------------------------------------------------------------------------

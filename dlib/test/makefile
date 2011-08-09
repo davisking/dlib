@@ -59,6 +59,7 @@ SRC += hash.cpp
 SRC += hash_map.cpp
 SRC += hash_set.cpp
 SRC += hash_table.cpp
+SRC += hog_image.cpp
 SRC += image.cpp
 SRC += is_same_object.cpp
 SRC += kcentroid.cpp
