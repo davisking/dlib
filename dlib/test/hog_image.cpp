@@ -78,8 +78,15 @@ namespace
             DLIB_TEST(hog1.feat_to_image_space(point(0,0)) == point(5,5));
             DLIB_TEST(hog2.feat_to_image_space(point(0,0)) == point(9,9));
 
+            DLIB_TEST(hog1.feat_to_image_space(point(1,1)) == point(8,8));
+            DLIB_TEST(hog2.feat_to_image_space(point(1,1)) == point(17,17));
+
             DLIB_TEST(hog1.image_to_feat_space(hog1.feat_to_image_space(point(0,0))) == point(0,0));
             DLIB_TEST(hog2.image_to_feat_space(hog2.feat_to_image_space(point(0,0))) == point(0,0));
+            DLIB_TEST(hog1.image_to_feat_space(hog1.feat_to_image_space(point(1,1))) == point(1,1));
+            DLIB_TEST(hog2.image_to_feat_space(hog2.feat_to_image_space(point(1,1))) == point(1,1));
+            DLIB_TEST(hog1.image_to_feat_space(hog1.feat_to_image_space(point(1,2))) == point(1,2));
+            DLIB_TEST(hog2.image_to_feat_space(hog2.feat_to_image_space(point(1,2))) == point(1,2));
         }
     } a;
 
