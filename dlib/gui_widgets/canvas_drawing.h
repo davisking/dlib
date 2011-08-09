@@ -564,8 +564,8 @@ namespace dlib
         // draw the polygon row by row
         for (unsigned long i = top_offset; i < left_boundary.size(); ++i)
         {
-            long left_x = std::ceil(left_boundary[i]);
-            long right_x = std::floor(right_boundary[i]);
+            long left_x = static_cast<long>(std::ceil(left_boundary[i]));
+            long right_x = static_cast<long>(std::floor(right_boundary[i]));
 
             left_x = max(left_x, valid_area.left());
             right_x = min(right_x, valid_area.right());
@@ -591,7 +591,7 @@ namespace dlib
             {
                 if (std::floor(left_boundary[i]) != left_x)
                 {
-                    const point p(std::floor(left_boundary[i]), i+top);
+                    const point p(static_cast<long>(std::floor(left_boundary[i])), i+top);
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = max_alpha-static_cast<unsigned char>((left_boundary[i]-p.x())*max_alpha);
                     if (valid_area.contains(p))
@@ -600,7 +600,7 @@ namespace dlib
             }
             else if (delta < 0)  // on the bottom side
             {
-                for (long x = std::ceil(left_boundary[i-1]); x < left_x; ++x)
+                for (long x = static_cast<long>(std::ceil(left_boundary[i-1])); x < left_x; ++x)
                 {
                     const point p(x, i+top);
                     rgb_alpha_pixel temp = alpha_pixel;
@@ -611,7 +611,7 @@ namespace dlib
             }
             else // on the top side
             {
-                const long old_left_x = std::ceil(left_boundary[i-1]);
+                const long old_left_x = static_cast<long>(std::ceil(left_boundary[i-1]));
                 for (long x = left_x; x < old_left_x; ++x)
                 {
                     const point p(x, i+top-1);
@@ -629,7 +629,7 @@ namespace dlib
             {
                 if (std::ceil(right_boundary[i]) != right_x)
                 {
-                    const point p(std::ceil(right_boundary[i]), i+top);
+                    const point p(static_cast<long>(std::ceil(right_boundary[i])), i+top);
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = max_alpha-static_cast<unsigned char>((p.x()-right_boundary[i])*max_alpha);
                     if (valid_area.contains(p))
@@ -638,7 +638,7 @@ namespace dlib
             }
             else if (delta < 0) // on the top side
             {
-                for (long x = std::floor(right_boundary[i-1])+1; x <= right_x; ++x)
+                for (long x = static_cast<long>(std::floor(right_boundary[i-1]))+1; x <= right_x; ++x)
                 {
                     const point p(x, i+top-1);
                     rgb_alpha_pixel temp = alpha_pixel;
@@ -649,7 +649,7 @@ namespace dlib
             }
             else // on the bottom side
             {
-                const long old_right_x = std::floor(right_boundary[i-1]);
+                const long old_right_x = static_cast<long>(std::floor(right_boundary[i-1]));
                 for (long x = right_x+1; x <= old_right_x; ++x)
                 {
                     const point p(x, i+top);
