@@ -197,12 +197,11 @@ namespace dlib
             ensures
                 - Each local feature is extracted from a certain point in the input image.
                   This function returns the identity of the local feature corresponding
-                  to any particular image location p.  Or in other words, 
-                  let P == image_to_feat_space(p), then (*this)(P.y(),P.x()) == the local
-                  feature closest to, or centered at, the point p in the input image.  Note
-                  that some image points might not have corresponding feature locations.  
-                  E.g. border points or points outside the image.  In these cases the returned
-                  point will be outside get_rect(*this).
+                  to the image location p.  Or in other words, let P == image_to_feat_space(p), 
+                  then (*this)(P.y(),P.x()) == the local feature closest to, or centered at, 
+                  the point p in the input image.  Note that some image points might not have 
+                  corresponding feature locations.  E.g. border points or points outside the 
+                  image.  In these cases the returned point will be outside get_rect(*this).
         !*/
 
         const rectangle image_to_feat_space (
