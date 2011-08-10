@@ -160,9 +160,9 @@ namespace
                 df3 = linear_trainer.train(samples_explict_bias, labels);
 
                 DLIB_TEST( std::abs(df2.basis_vectors(0)(9)) < 1e-7);
-                DLIB_TEST_MSG( max(abs(colm(df.basis_vectors(0),0,9) - colm(df2.basis_vectors(0),0,9))) < 1e-7, max(abs(colm(df.basis_vectors(0),0,9) - colm(df2.basis_vectors(0),0,9))));
+                DLIB_TEST_MSG( max(abs(colm(df.basis_vectors(0),0,9) - colm(df2.basis_vectors(0),0,9))) < 1e-6, max(abs(colm(df.basis_vectors(0),0,9) - colm(df2.basis_vectors(0),0,9))));
                 DLIB_TEST( std::abs(df.basis_vectors(0)(9) - df2.b) < 1e-7);
-                DLIB_TEST( max(abs(df.basis_vectors(0) - df3.basis_vectors(0))) < 1e-7);
+                DLIB_TEST( max(abs(df.basis_vectors(0) - df3.basis_vectors(0))) < 1e-6);
                 DLIB_TEST( std::abs(df.b - df3.b) < 1e-7);
             }
         }
@@ -184,7 +184,7 @@ namespace
 
         svm_c_linear_dcd_trainer<kernel_type>::optimizer_state state;
 
-        const double C = 3;
+        const double C = 1;
         linear_trainer.set_epsilon(1e-10);
         linear_trainer_cpa.set_epsilon(1e-10);
 
