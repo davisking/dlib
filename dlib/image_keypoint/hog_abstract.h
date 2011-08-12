@@ -120,6 +120,13 @@ namespace dlib
                 - this object is properly initialized
         !*/
 
+        void clear (
+        );
+        /*!
+            ensures
+                - this object will have its initial value
+        !*/
+
         template <
             typename image_type
             >
@@ -236,6 +243,40 @@ namespace dlib
         !*/
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        unsigned long T1,
+        unsigned long T2,
+        unsigned long T3,
+        unsigned long T4,
+        int           T5,
+        int           T6 
+        >
+    void serialize (
+        const hog_image<T1,T2,T3,T4,T5,T6>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support 
+    !*/
+
+    template <
+        unsigned long T1,
+        unsigned long T2,
+        unsigned long T3,
+        unsigned long T4,
+        int           T5,
+        int           T6 
+        >
+    void deserialize (
+        hog_image<T1,T2,T3,T4,T5,T6>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support 
+    !*/
 
 // ----------------------------------------------------------------------------------------
 

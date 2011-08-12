@@ -63,6 +63,14 @@ namespace dlib
             num_block_cols(0)
         {}
 
+        void clear (
+        )
+        {
+            num_block_rows = 0;
+            num_block_cols = 0;
+            hist_cells.clear();
+        }
+
         template <
             typename image_type
             >
@@ -200,6 +208,32 @@ namespace dlib
         {
             return rectangle(feat_to_image_space(rect.tl_corner()), feat_to_image_space(rect.br_corner()));
         }
+
+        template <
+            unsigned long T1,
+            unsigned long T2,
+            unsigned long T3,
+            unsigned long T4,
+            int           T5,
+            int           T6 
+            >
+        friend void serialize (
+            const hog_image<T1,T2,T3,T4,T5,T6>& item,
+            std::ostream& out
+        );
+
+        template <
+            unsigned long T1,
+            unsigned long T2,
+            unsigned long T3,
+            unsigned long T4,
+            int           T5,
+            int           T6 
+            >
+        friend void deserialize (
+            hog_image<T1,T2,T3,T4,T5,T6>& item,
+            std::istream& in 
+        );
 
     private:
 
@@ -429,6 +463,63 @@ namespace dlib
 
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        unsigned long T1,
+        unsigned long T2,
+        unsigned long T3,
+        unsigned long T4,
+        int           T5,
+        int           T6 
+        >
+    void serialize (
+        const hog_image<T1,T2,T3,T4,T5,T6>& item,
+        std::ostream& out
+    )
+    {
+        // serialize item.hist_cells
+        serialize(item.hist_cells.nc(),out);
+        serialize(item.hist_cells.nr(),out);
+        item.hist_cells.reset();
+        while (item.hist_cells.move_next())
+            serialize(item.hist_cells.element().values,out);
+        item.hist_cells.reset();
+
+
+
+        serialize(item.num_block_rows, out);
+        serialize(item.num_block_cols, out);
+    }
+
+    template <
+        unsigned long T1,
+        unsigned long T2,
+        unsigned long T3,
+        unsigned long T4,
+        int           T5,
+        int           T6 
+        >
+    void deserialize (
+        hog_image<T1,T2,T3,T4,T5,T6>& item,
+        std::istream& in 
+    )
+    {
+        // deserialize item.hist_cells
+        long nc, nr;
+        deserialize(nc,in);
+        deserialize(nr,in);
+        item.hist_cells.set_size(nr,nc);
+        while (item.hist_cells.move_next())
+            deserialize(item.hist_cells.element().values,in); 
+        item.hist_cells.reset();
+
+
+
+        deserialize(item.num_block_rows, in);
+        deserialize(item.num_block_cols, in);
+    }
 
 // ----------------------------------------------------------------------------------------
 

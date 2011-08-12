@@ -40,7 +40,7 @@ namespace
 
             assign_all_pixels(img, 0);
 
-            hog_image<3,3,1,4,hog_signed_gradient,hog_full_interpolation> hog1;    
+            hog_image<3,3,1,4,hog_signed_gradient,hog_full_interpolation> hog1, hog1_deserialized;    
             hog_image<4,4,2,4,hog_signed_gradient,hog_full_interpolation> hog2;    
 
             hog1.load(img);
@@ -87,6 +87,35 @@ namespace
             DLIB_TEST(hog2.image_to_feat_space(hog2.feat_to_image_space(point(1,1))) == point(1,1));
             DLIB_TEST(hog1.image_to_feat_space(hog1.feat_to_image_space(point(1,2))) == point(1,2));
             DLIB_TEST(hog2.image_to_feat_space(hog2.feat_to_image_space(point(1,2))) == point(1,2));
+
+
+
+            DLIB_TEST(hog1_deserialized.size() != hog1.size());
+            DLIB_TEST(hog1_deserialized.nr() != hog1.nr());
+            DLIB_TEST(hog1_deserialized.nc() != hog1.nc());
+            ostringstream sout;
+            serialize(hog1, sout);
+            istringstream sin(sout.str());
+            deserialize(hog1_deserialized, sin);
+
+            DLIB_TEST(hog1_deserialized.size() == hog1.size());
+            DLIB_TEST(hog1_deserialized.nr() == hog1.nr());
+            DLIB_TEST(hog1_deserialized.nc() == hog1.nc());
+            DLIB_TEST(hog1_deserialized(0,2) == hog1(0,2));
+            DLIB_TEST(hog1_deserialized.get_block_rect(1,2) == hog1.get_block_rect(1,2));
+            DLIB_TEST(hog1_deserialized.image_to_feat_space(hog1_deserialized.feat_to_image_space(point(0,0))) == point(0,0));
+            DLIB_TEST(hog1_deserialized.image_to_feat_space(hog1_deserialized.feat_to_image_space(point(1,1))) == point(1,1));
+            DLIB_TEST(hog1_deserialized.image_to_feat_space(hog1_deserialized.feat_to_image_space(point(1,2))) == point(1,2));
+
+
+
+            DLIB_TEST(hog1.size() > 1);
+            DLIB_TEST(hog1.nr() > 1);
+            DLIB_TEST(hog1.nc() > 1);
+            hog1.clear();
+            DLIB_TEST(hog1.size() == 0);
+            DLIB_TEST(hog1.nr() == 0);
+            DLIB_TEST(hog1.nc() == 0);
         }
     } a;
 
