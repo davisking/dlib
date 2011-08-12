@@ -158,6 +158,18 @@ namespace dlib
             return (val-mean())/std::sqrt(variance());
         }
 
+        template <typename U>
+        friend void serialize (
+            const running_stats<U>& item, 
+            std::ostream& out 
+        );
+
+        template <typename U>
+        friend void deserialize (
+            running_stats<U>& item, 
+            std::istream& in
+        ); 
+
     private:
         T sum;
         T sum_sqr;
@@ -166,6 +178,34 @@ namespace dlib
         T min_value;
         T max_value;
     };
+
+    template <typename T>
+    void serialize (
+        const running_stats<T>& item, 
+        std::ostream& out 
+    )
+    {
+        serialize(item.sum, out);
+        serialize(item.sum_sqr, out);
+        serialize(item.n, out);
+        serialize(item.maximum_n, out);
+        serialize(item.min_value, out);
+        serialize(item.max_value, out);
+    }
+
+    template <typename T>
+    void deserialize (
+        running_stats<T>& item, 
+        std::istream& in
+    ) 
+    {
+        deserialize(item.sum, in);
+        deserialize(item.sum_sqr, in);
+        deserialize(item.n, in);
+        deserialize(item.maximum_n, in);
+        deserialize(item.min_value, in);
+        deserialize(item.max_value, in);
+    }
 
 // ----------------------------------------------------------------------------------------
 
