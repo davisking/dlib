@@ -11,4 +11,4 @@
 ^docs/docs/old_log.txt$
 ^dlib/test/debug.txt$
 ^dlib/test/test$
-
+^dlib/test/makefile.bak$
