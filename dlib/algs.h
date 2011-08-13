@@ -151,7 +151,7 @@ namespace dlib
             - value <= 2^32 - 1
         ensures
             - returns the square root of value.  if the square root is not an
-                integer then it will be rounded up to the nearest integer.
+              integer then it will be rounded up to the nearest integer.
     !*/
     {
         unsigned long x;
