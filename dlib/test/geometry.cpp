@@ -346,6 +346,9 @@ namespace
 
         }
 
+
+        DLIB_TEST(rectangle() + point(5,4) + point(10,10) == rectangle(5,4,10,10));
+
     }
 
 

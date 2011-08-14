@@ -638,6 +638,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline rectangle operator+ (
+        const rectangle& r,
+        const point& p
+    );
+    /*!
+        ensures
+            - returns r + rectangle(p)
+              (i.e. returns the rectangle that contains both r and p)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline rectangle operator+ (
+        const point& p,
+        const rectangle& r
+    );
+    /*!
+        ensures
+            - returns r + rectangle(p)
+              (i.e. returns the rectangle that contains both r and p)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 namespace std
