@@ -967,6 +967,7 @@
          <term file="imaging.html" name="jpeg_loader"/>
 
          <term file="imaging.html" name="integral_image"/>
+         <term file="imaging.html" name="integral_image_generic"/>
          <term file="imaging.html" name="hessian_pyramid"/>
          <term file="imaging.html" name="compute_dominant_angle"/>
          <term file="imaging.html" name="compute_surf_descriptor"/>

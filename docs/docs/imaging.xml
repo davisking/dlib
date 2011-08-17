@@ -81,6 +81,7 @@
          <name>Keypoints and Descriptors</name>
 
          <item>integral_image</item>
+         <item>integral_image_generic</item>
          <item>hessian_pyramid</item>
          <item>compute_dominant_angle</item>
          <item>compute_surf_descriptor</item>
@@ -147,7 +148,7 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>integral_image</name>
+         <name>integral_image_generic</name>
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/integral_image_abstract.h</spec_file>
          <description>
@@ -157,6 +158,21 @@
                 normal image and then you can use the get_sum_of_area()
                 member function to compute sums of pixels in a given area in
                 constant time.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>integral_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file>dlib/image_transforms/integral_image_abstract.h</spec_file>
+         <description>
+            This is a specialization of the <a href="#integral_image_generic">integral_image_generic</a>
+            template for the case where sums of pixel values should be represented with 
+            longs.  E.g. if you use 8bit pixels in your original images then this is
+            the appropriate kind of integral image to use with them.
          </description>
                                  
       </component>
