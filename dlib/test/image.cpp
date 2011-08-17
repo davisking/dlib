@@ -703,13 +703,14 @@ namespace
     }
 
 
+    template <typename T, typename pixel_type>
     void test_integral_image (
     )
     {
         dlib::rand rnd;
 
-        array2d<unsigned char> img;
-        integral_image int_img;
+        array2d<pixel_type> img;
+        integral_image_generic<T> int_img;
 
         int_img.load(img);
         DLIB_TEST(int_img.nr() == 0);
@@ -725,7 +726,7 @@ namespace
             {
                 for (long c = 0; c < img.nc(); ++c)
                 {
-                    img[r][c] = rnd.get_random_8bit_number();
+                    img[r][c] = (int)rnd.get_random_8bit_number() - 100;
                 }
             }
 
@@ -734,14 +735,14 @@ namespace
             DLIB_TEST(int_img.nc() == img.nc());
 
             // make 200 random rectangles
-            for (int j = 0; j < 200; ++j)
+            for (int j = 0; j < 500; ++j)
             {
                 point p1(rnd.get_random_32bit_number()%img.nc(), rnd.get_random_32bit_number()%img.nr());
                 point p2(rnd.get_random_32bit_number()%img.nc(), rnd.get_random_32bit_number()%img.nr());
                 rectangle rect(p1,p2);
-                DLIB_TEST(int_img.get_sum_of_area(rect) == sum(subm(matrix_cast<long>(array_to_matrix(img)), rect)));
+                DLIB_TEST(int_img.get_sum_of_area(rect) == sum(subm(matrix_cast<T>(array_to_matrix(img)), rect)));
                 rect = rectangle(p1,p1);
-                DLIB_TEST(int_img.get_sum_of_area(rect) == sum(subm(matrix_cast<long>(array_to_matrix(img)), rect)));
+                DLIB_TEST(int_img.get_sum_of_area(rect) == sum(subm(matrix_cast<T>(array_to_matrix(img)), rect)));
             }
 
         }
@@ -763,7 +764,10 @@ namespace
         )
         {
             image_test();
-            test_integral_image();
+            test_integral_image<long, unsigned char>();
+            test_integral_image<double, int>();
+            test_integral_image<long, unsigned char>();
+            test_integral_image<double, float>();
         }
     } a;
 

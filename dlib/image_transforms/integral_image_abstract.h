@@ -13,9 +13,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class integral_image : noncopyable
+    template <
+        typename T
+        >
+    class integral_image_generic : noncopyable
     {
         /*!
+            REQUIREMENTS ON T
+                T should be a built in scalar type.  Moreover, it should
+                be capable of storing sums of whatever kind of pixel
+                you will be dealing with.
+
             INITIAL VALUE
                 - nr() == 0
                 - nc() == 0
@@ -29,7 +37,7 @@ namespace dlib
                 constant time.
         !*/
     public:
-        typedef long value_type;
+        typedef T value_type;
 
         const long nr(
         ) const;
@@ -52,7 +60,7 @@ namespace dlib
         /*!
             requires
                 - image_type == a type that implements the array2d/array2d_kernel_abstract.h interface
-                - pixel_traits<typename image_type::type>::is_unsigned == true 
+                - pixel_traits<typename image_type::type>::has_alpha == false 
             ensures
                 - #nr() == img.nr()
                 - #nc() == img.nc()
@@ -79,6 +87,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    typedef integral_image_generic<long> integral_image;
+
+// ----------------------------------------------------------------------------------------
+
     template <typename integral_image_type>
     typename integral_image_type::value_type haar_x (
         const integral_image_type& img,
@@ -88,8 +100,8 @@ namespace dlib
     /*!
         requires
             - get_rect(img).contains(centered_rect(p,width,width)) == true
-            - integral_image_type == a type that implements the integral_image interface 
-              defined above
+            - integral_image_type == a type that implements the integral_image_generic 
+              interface defined above
         ensures
             - returns the response of a Haar wavelet centered at the point p
               with the given width.  The wavelet is oriented along the X axis
@@ -113,8 +125,8 @@ namespace dlib
     /*!
         requires
             - get_rect(img).contains(centered_rect(p,width,width)) == true
-            - integral_image_type == a type that implements the integral_image interface 
-              defined above
+            - integral_image_type == a type that implements the integral_image_generic 
+              interface defined above
         ensures
             - returns the response of a Haar wavelet centered at the point p
               with the given width in the given image.  The wavelet is oriented 
