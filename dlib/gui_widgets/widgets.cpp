@@ -5797,9 +5797,18 @@ namespace dlib
         {
             rectangle orect = overlay_rects[i].rect;
             orect.left()   = orect.left()*zoom_in_scale/zoom_out_scale;
-            orect.right()  = orect.right()*zoom_in_scale/zoom_out_scale;
             orect.top()    = orect.top()*zoom_in_scale/zoom_out_scale;
-            orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
+            if (zoom_in_scale != 1)
+            {
+                // make it so the box surrounds the pixels when we zoom in.
+                orect.right()  = (orect.right()+1)*zoom_in_scale/zoom_out_scale;
+                orect.bottom() = (orect.bottom()+1)*zoom_in_scale/zoom_out_scale;
+            }
+            else
+            {
+                orect.right()  = orect.right()*zoom_in_scale/zoom_out_scale;
+                orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
+            }
 
             if (rect_is_selected && selected_rect == i)
                 draw_rectangle(c, translate_rect(orect, origin), invert_pixel(overlay_rects[i].color), area);
@@ -5902,9 +5911,18 @@ namespace dlib
             {
                 rectangle orect = overlay_rects[i].rect;
                 orect.left()   = orect.left()*zoom_in_scale/zoom_out_scale;
-                orect.right()  = orect.right()*zoom_in_scale/zoom_out_scale;
                 orect.top()    = orect.top()*zoom_in_scale/zoom_out_scale;
-                orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
+                if (zoom_in_scale != 1)
+                {
+                    // make it so the box surrounds the pixels when we zoom in.
+                    orect.right()  = (orect.right()+1)*zoom_in_scale/zoom_out_scale;
+                    orect.bottom() = (orect.bottom()+1)*zoom_in_scale/zoom_out_scale;
+                }
+                else
+                {
+                    orect.right()  = orect.right()*zoom_in_scale/zoom_out_scale;
+                    orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
+                }
 
                 orect = translate_rect(orect, origin);
 
@@ -6018,7 +6036,16 @@ namespace dlib
                 c2 = c2*(double)zoom_out_scale;
             }
 
-            const rectangle new_rect(c1,c2);
+            rectangle new_rect(c1,c2);
+            if (zoom_in_scale != 1)
+            {
+                // When we are zoomed in we adjust the rectangles a little so they
+                // are drown surrounding the pixels inside the rect.  This adjustment
+                // is necessary to make this code consistent with this goal.
+                new_rect.right() -= 1;
+                new_rect.bottom() -= 1;
+            }
+
 
             if (new_rect.width() > 0 && new_rect.height() > 0)
             {

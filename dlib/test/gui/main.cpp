@@ -796,6 +796,27 @@ int main()
 
     try
     {
+
+        image_window win;
+
+        array2d<unsigned char> img;
+        img.set_size(100,100);
+        assign_all_pixels(img,0);
+
+        fill_rect(img, rectangle(1,1,1,1), 255);
+        fill_rect(img, rectangle(1,3,2,5), 255);
+        fill_rect(img, rectangle(4,3,5,4), 255);
+        fill_rect(img, rectangle(9,9,13,10), 255);
+
+        win.set_image(img);
+
+        win.add_overlay(image_display::overlay_rect(rectangle(1,1,1,1), rgb_pixel(255,0,0)));
+        win.add_overlay(image_display::overlay_rect(rectangle(1,3,2,5), rgb_pixel(255,0,0)));
+        win.add_overlay(image_display::overlay_rect(rectangle(4,3,5,4), rgb_pixel(255,0,0)));
+        win.add_overlay(image_display::overlay_rect(rectangle(9,9,13,10), rgb_pixel(255,0,0)));
+
+
+
         w.set_pos (100,200);
         w.set_title("test window");
         w.show();
