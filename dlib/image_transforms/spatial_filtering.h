@@ -105,12 +105,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        long size,
+        long NR,
+        long NC,
         typename T,
         typename in_image_type
         >
     inline void separable_3x3_filter_block_grayscale (
-        T (&block)[size][size],
+        T (&block)[NR][NC],
         const in_image_type& img,
         const long& r,
         const long& c,
@@ -121,19 +122,19 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(shrink_rect(get_rect(img),1).contains(c,r) &&
-                    shrink_rect(get_rect(img),1).contains(c+size-1,r+size-1),
+                    shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1),
             "\t void separable_3x3_filter_block_grayscale()"
             << "\n\t The sub-window doesn't fit inside the given image."
             << "\n\t get_rect(img):       " << get_rect(img) 
             << "\n\t (c,r):               " << point(c,r) 
-            << "\n\t (c+size-1,r+size-1): " << point(c+size-1,r+size-1) 
+            << "\n\t (c+NC-1,r+NR-1): " << point(c+NC-1,r+NR-1) 
             );
 
 
-        T row_filt[size+2][size];
-        for (long rr = 0; rr < size+2; ++rr)
+        T row_filt[NR+2][NC];
+        for (long rr = 0; rr < NR+2; ++rr)
         {
-            for (long cc = 0; cc < size; ++cc)
+            for (long cc = 0; cc < NC; ++cc)
             {
                 row_filt[rr][cc] = get_pixel_intensity(img[r+rr-1][c+cc-1])*fe1 + 
                                    get_pixel_intensity(img[r+rr-1][c+cc])*fm + 
@@ -141,9 +142,9 @@ namespace dlib
             }
         }
 
-        for (long rr = 0; rr < size; ++rr)
+        for (long rr = 0; rr < NR; ++rr)
         {
-            for (long cc = 0; cc < size; ++cc)
+            for (long cc = 0; cc < NC; ++cc)
             {
                 block[rr][cc] = (row_filt[rr][cc]*fe1 + 
                                 row_filt[rr+1][cc]*fm + 
@@ -156,13 +157,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        long size,
+        long NR,
+        long NC,
         typename T,
         typename U,
         typename in_image_type
         >
     inline void separable_3x3_filter_block_rgb (
-        T (&block)[size][size],
+        T (&block)[NR][NC],
         const in_image_type& img,
         const long& r,
         const long& c,
@@ -173,18 +175,18 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(shrink_rect(get_rect(img),1).contains(c,r) &&
-                    shrink_rect(get_rect(img),1).contains(c+size-1,r+size-1),
+                    shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1),
             "\t void separable_3x3_filter_block_grayscale()"
             << "\n\t The sub-window doesn't fit inside the given image."
             << "\n\t get_rect(img):       " << get_rect(img) 
             << "\n\t (c,r):               " << point(c,r) 
-            << "\n\t (c+size-1,r+size-1): " << point(c+size-1,r+size-1) 
+            << "\n\t (c+NC-1,r+NR-1): " << point(c+NC-1,r+NR-1) 
             );
 
-        T row_filt[size+2][size];
-        for (long rr = 0; rr < size+2; ++rr)
+        T row_filt[NR+2][NC];
+        for (long rr = 0; rr < NR+2; ++rr)
         {
-            for (long cc = 0; cc < size; ++cc)
+            for (long cc = 0; cc < NC; ++cc)
             {
                 row_filt[rr][cc].red   = img[r+rr-1][c+cc-1].red*fe1   + img[r+rr-1][c+cc].red*fm   + img[r+rr-1][c+cc+1].red*fe2;
                 row_filt[rr][cc].green = img[r+rr-1][c+cc-1].green*fe1 + img[r+rr-1][c+cc].green*fm + img[r+rr-1][c+cc+1].green*fe2;
@@ -192,9 +194,9 @@ namespace dlib
             }
         }
 
-        for (long rr = 0; rr < size; ++rr)
+        for (long rr = 0; rr < NR; ++rr)
         {
-            for (long cc = 0; cc < size; ++cc)
+            for (long cc = 0; cc < NC; ++cc)
             {
                 block[rr][cc].red   = row_filt[rr][cc].red*fe1   + row_filt[rr+1][cc].red*fm   + row_filt[rr+2][cc].red*fe2;
                 block[rr][cc].green = row_filt[rr][cc].green*fe1 + row_filt[rr+1][cc].green*fm + row_filt[rr+2][cc].green*fe2;

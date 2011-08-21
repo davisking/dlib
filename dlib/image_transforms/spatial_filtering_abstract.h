@@ -56,12 +56,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        long size,
+        long NR,
+        long NC,
         typename T,
         typename in_image_type
         >
     inline void separable_3x3_filter_block_grayscale (
-        T (&block)[size][size],
+        T (&block)[NR][NC],
         const in_image_type& img,
         const long& r,
         const long& c,
@@ -74,10 +75,10 @@ namespace dlib
             - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
             - T should be a scalar type
             - shrink_rect(get_rect(img),1).contains(c,r)
-            - shrink_rect(get_rect(img),1).contains(c+size-1,r+size-1)
+            - shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1)
         ensures
             - Filters the image in the sub-window of img defined by a rectangle 
-              with its upper left corner at (c,r) and lower right at (c+size-1,r+size-1).
+              with its upper left corner at (c,r) and lower right at (c+NC-1,r+NR-1).
             - The output of the filter is stored in #block.  Note that img will be 
               interpreted as a grayscale image.
             - The filter used is defined by the separable filter [fe1 fm fe2].  So the
@@ -90,13 +91,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        long size,
+        long NR,
+        long NC,
         typename T,
         typename U,
         typename in_image_type
         >
     inline void separable_3x3_filter_block_rgb (
-        T (&block)[size][size],
+        T (&block)[NR][NC],
         const in_image_type& img,
         const long& r,
         const long& c,
@@ -111,10 +113,10 @@ namespace dlib
             - T should be a struct with .red .green and .blue members.
             - U should be a scalar type
             - shrink_rect(get_rect(img),1).contains(c,r)
-            - shrink_rect(get_rect(img),1).contains(c+size-1,r+size-1)
+            - shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1)
         ensures
             - Filters the image in the sub-window of img defined by a rectangle 
-              with its upper left corner at (c,r) and lower right at (c+size-1,r+size-1).
+              with its upper left corner at (c,r) and lower right at (c+NC-1,r+NR-1).
             - The output of the filter is stored in #block.  Note that the filter is applied
               to each color component independently.
             - The filter used is defined by the separable filter [fe1 fm fe2].  So the
