@@ -15,7 +15,7 @@
 #include "sockets_kernel_1.h"
 
 #include <windows.h>
-#include <Winsock2.h>
+#include <winsock2.h>
 
 #ifndef NI_MAXHOST
 #define NI_MAXHOST 1025
