@@ -2545,6 +2545,18 @@ namespace dlib
                   (i.e. when the user holds shift and adds them with the mouse)
         !*/
 
+        rectangle get_image_display_rect (
+        ) const;
+        /*!
+            ensures
+                - returns a rectangle R that tells you how big the image inside the
+                  display is when it appears on the screen.  Note that it takes the
+                  current zoom level into account.
+                    - R.width()  == the width of the displayed image
+                    - R.height() == the height of the displayed image
+                    - R.tl_corner() == (0,0)
+        !*/
+
         template <
             typename T
             >

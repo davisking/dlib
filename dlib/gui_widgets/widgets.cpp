@@ -5691,6 +5691,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    rectangle image_display::
+    get_image_display_rect (
+    ) const
+    {
+        if (zoom_in_scale != 1)
+        {
+            return rectangle(0,0, img.nc()*zoom_in_scale-1, img.nr()*zoom_in_scale-1);
+        }
+        else if (zoom_out_scale != 1)
+        {
+            return rectangle(0,0, img.nc()/zoom_out_scale-1, img.nr()/zoom_out_scale-1);
+        }
+        else
+        {
+            return dlib::get_rect(img);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void image_display::
     add_overlay (
         const overlay_rect& overlay
@@ -6207,9 +6227,7 @@ namespace dlib
     image_window::
     image_window(
     ) :
-        gui_img(*this),
-        nr(0),
-        nc(0)
+        gui_img(*this)
     {
         // show this window on the screen
         show();

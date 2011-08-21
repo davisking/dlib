@@ -3252,6 +3252,7 @@ namespace dlib
                 parent.invalidate_rectangle(rect);
             }
 
+            rect_is_selected = false;
             assign_image_scaled(img,new_img);
         }
 
@@ -3303,6 +3304,9 @@ namespace dlib
 
         void clear_overlay (
         );
+
+        rectangle get_image_display_rect (
+        ) const;
 
         std::vector<overlay_rect> get_overlay_rects (
         ) const;
@@ -3444,7 +3448,7 @@ namespace dlib
         template < typename image_type >
         image_window(
             const image_type& img
-        ) : gui_img(*this), nr(0), nc(0) { set_image(img); show(); }
+        ) : gui_img(*this) { set_image(img); show(); }
 
         ~image_window(
         );
@@ -3458,18 +3462,16 @@ namespace dlib
             auto_mutex M(wm);
             gui_img.set_image(img); 
 
-            // Only readjust the size of the window if the new image has a different size
-            // than the last image given to this object.
-            if (img.nr() != nr || img.nc() != nc)
+            const rectangle r = gui_img.get_image_display_rect();
+            if (image_rect != r)
             {
                 // set the size of this window to match the size of the input image
-                set_size(img.nc()+padding*2,img.nr()+padding*2);
+                set_size(r.width()+padding*2,r.height()+padding*2);
 
                 // call this to make sure everything else is setup properly
                 on_window_resized();
 
-                nr = img.nr();
-                nc = img.nc();
+                image_rect = r;
             }
         }
 
@@ -3502,7 +3504,7 @@ namespace dlib
         image_window& operator= (image_window&);
 
         image_display gui_img;
-        long nr, nc;
+        rectangle image_rect;
     };
 
 // ----------------------------------------------------------------------------------------
