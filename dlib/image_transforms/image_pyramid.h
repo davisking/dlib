@@ -446,14 +446,20 @@ namespace dlib
 
             typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
             typedef typename promote<bp_type>::type ptype;
-            down.set_size(size_out*((original.nr()-2)/size_in), size_out*((original.nc()-2)/size_in));
+            const long full_nr =  size_out*((original.nr()-2)/size_in);
+            const long part_nr = (size_out*(original.nr()-2))/size_in;
+            const long full_nc =  size_out*((original.nc()-2)/size_in);
+            const long part_nc = (size_out*(original.nc()-2))/size_in;
+            down.set_size(part_nr, part_nc);
 
 
             long rr = 1;
-            for (long r = 0; r < down.nr(); r+=size_out)
+            long r;
+            for (r = 0; r < full_nr; r+=size_out)
             {
                 long cc = 1;
-                for (long c = 0; c < down.nc(); c+=size_out)
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
                 {
                     ptype block[size_in][size_in];
                     separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
@@ -466,7 +472,40 @@ namespace dlib
 
                     cc += size_in;
                 }
+                if (part_nc - full_nc == 1)
+                {
+                    ptype block[size_in][2];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
+                    assign_pixel(down[r+1][c]   , (block[2][0]*9 + block[1][0]*3 + block[2][1]*3 + block[1][1])/(16*256));
+                }
                 rr += size_in;
+            }
+            if (part_nr - full_nr == 1)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    ptype block[2][size_in];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
+                    assign_pixel(down[r][c+1]   , (block[0][2]*9 + block[1][2]*3 + block[0][1]*3 + block[1][1])/(16*256));
+
+                    cc += size_in;
+                }
+                if (part_nc - full_nc == 1)
+                {
+                    ptype block[2][2];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
+                }
             }
 
         }
@@ -508,14 +547,20 @@ namespace dlib
             const long size_in = 3;
             const long size_out = 2;
 
-            down.set_size(size_out*((original.nr()-2)/size_in), size_out*((original.nc()-2)/size_in));
+            const long full_nr =  size_out*((original.nr()-2)/size_in);
+            const long part_nr = (size_out*(original.nr()-2))/size_in;
+            const long full_nc =  size_out*((original.nc()-2)/size_in);
+            const long part_nc = (size_out*(original.nc()-2))/size_in;
+            down.set_size(part_nr, part_nc);
 
 
             long rr = 1;
-            for (long r = 0; r < down.nr(); r+=size_out)
+            long r;
+            for (r = 0; r < full_nr; r+=size_out)
             {
                 long cc = 1;
-                for (long c = 0; c < down.nc(); c+=size_out)
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
                 {
                     rgbptype block[size_in][size_in];
                     separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
@@ -539,7 +584,52 @@ namespace dlib
 
                     cc += size_in;
                 }
+                if (part_nc - full_nc == 1)
+                {
+                    rgbptype block[size_in][2];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
+                    down[r][c].green     = (block[0][0].green*9 + block[1][0].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
+                    down[r][c].blue      = (block[0][0].blue*9  + block[1][0].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
+
+                    down[r+1][c].red     = (block[2][0].red*9   + block[1][0].red*3   + block[2][1].red*3   + block[1][1].red)/(16*256);
+                    down[r+1][c].green   = (block[2][0].green*9 + block[1][0].green*3 + block[2][1].green*3 + block[1][1].green)/(16*256);
+                    down[r+1][c].blue    = (block[2][0].blue*9  + block[1][0].blue*3  + block[2][1].blue*3  + block[1][1].blue)/(16*256);
+                }
                 rr += size_in;
+            }
+            if (part_nr - full_nr == 1)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    rgbptype block[2][size_in];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
+                    down[r][c].green     = (block[0][0].green*9 + block[1][0].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
+                    down[r][c].blue      = (block[0][0].blue*9  + block[1][0].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
+
+                    down[r][c+1].red     = (block[0][2].red*9   + block[1][2].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
+                    down[r][c+1].green   = (block[0][2].green*9 + block[1][2].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
+                    down[r][c+1].blue    = (block[0][2].blue*9  + block[1][2].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
+
+                    cc += size_in;
+                }
+                if (part_nc - full_nc == 1)
+                {
+                    rgbptype block[2][2];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
+                    down[r][c].green     = (block[0][0].green*9 + block[1][0].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
+                    down[r][c].blue      = (block[0][0].blue*9  + block[1][0].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
+                }
             }
         }
 
@@ -673,14 +763,20 @@ namespace dlib
 
             typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
             typedef typename promote<bp_type>::type ptype;
-            down.set_size(size_out*((original.nr()-2)/size_in), size_out*((original.nc()-2)/size_in));
+            const long full_nr =  size_out*((original.nr()-2)/size_in);
+            const long part_nr = (size_out*(original.nr()-2))/size_in;
+            const long full_nc =  size_out*((original.nc()-2)/size_in);
+            const long part_nc = (size_out*(original.nc()-2))/size_in;
+            down.set_size(part_nr, part_nc);
 
 
             long rr = 1;
-            for (long r = 0; r < down.nr(); r+=size_out)
+            long r;
+            for (r = 0; r < full_nr; r+=size_out)
             {
                 long cc = 1;
-                for (long c = 0; c < down.nc(); c+=size_out)
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
                 {
                     ptype block[size_in][size_in];
                     separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
@@ -699,7 +795,113 @@ namespace dlib
                     assign_pixel(down[r+2][c+2] , (block[3][3]*25 + block[2][3]*5 + block[3][2]*5 + block[2][2])/(36*256));
                     cc += size_in;
                 }
+                if (part_nc - full_nc == 2)
+                {
+                    ptype block[size_in][3];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*25 + block[1][0]*5 + block[0][1]*5 + block[1][1])/(36*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*5  + block[0][2]*5 + block[1][1]   + block[1][2])/(12*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*5  + block[2][0]*5 + block[1][1]   + block[2][1])/(12*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]    + block[1][2]   + block[2][1]   + block[2][2])/(4*256));
+
+                    assign_pixel(down[r+2][c]   , (block[3][0]*25 + block[2][0]*5 + block[3][1]*5 + block[2][1])/(36*256));
+                    assign_pixel(down[r+2][c+1] , (block[3][1]*5  + block[3][2]*5 + block[2][1]   + block[2][2])/(12*256));
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    ptype block[size_in][2];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*25 + block[1][0]*5 + block[0][1]*5 + block[1][1])/(36*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*5  + block[2][0]*5 + block[1][1]   + block[2][1])/(12*256));
+
+                    assign_pixel(down[r+2][c]   , (block[3][0]*25 + block[2][0]*5 + block[3][1]*5 + block[2][1])/(36*256));
+                }
+
+
                 rr += size_in;
+            }
+
+            if (part_nr - full_nr == 2)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    ptype block[3][size_in];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate block 
+                    assign_pixel(down[r][c]     , (block[0][0]*25 + block[1][0]*5 + block[0][1]*5 + block[1][1])/(36*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*5  + block[0][2]*5 + block[1][1]   + block[1][2])/(12*256));
+                    assign_pixel(down[r][c+2]   , (block[0][3]*25 + block[1][3]*5 + block[0][2]*5 + block[1][2])/(36*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*5  + block[2][0]*5 + block[1][1]   + block[2][1])/(12*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]    + block[1][2]   + block[2][1]   + block[2][2])/(4*256));
+                    assign_pixel(down[r+1][c+2] , (block[1][3]*5  + block[2][3]*5 + block[1][2]   + block[2][2])/(12*256));
+                    cc += size_in;
+                }
+                if (part_nc - full_nc == 2)
+                {
+                    ptype block[3][3];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*25 + block[1][0]*5 + block[0][1]*5 + block[1][1])/(36*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*5  + block[0][2]*5 + block[1][1]   + block[1][2])/(12*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*5  + block[2][0]*5 + block[1][1]   + block[2][1])/(12*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]    + block[1][2]   + block[2][1]   + block[2][2])/(4*256));
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    ptype block[3][2];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*25 + block[1][0]*5 + block[0][1]*5 + block[1][1])/(36*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*5  + block[2][0]*5 + block[1][1]   + block[2][1])/(12*256));
+                }
+            }
+            else if (part_nr - full_nr == 1)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    ptype block[2][size_in];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate block 
+                    assign_pixel(down[r][c]     , (block[0][0]*25 + block[1][0]*5 + block[0][1]*5 + block[1][1])/(36*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*5  + block[0][2]*5 + block[1][1]   + block[1][2])/(12*256));
+                    assign_pixel(down[r][c+2]   , (block[0][3]*25 + block[1][3]*5 + block[0][2]*5 + block[1][2])/(36*256));
+
+                    cc += size_in;
+                }
+                if (part_nc - full_nc == 2)
+                {
+                    ptype block[2][3];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*25 + block[1][0]*5 + block[0][1]*5 + block[1][1])/(36*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*5  + block[0][2]*5 + block[1][1]   + block[1][2])/(12*256));
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    ptype block[2][2];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*25 + block[1][0]*5 + block[0][1]*5 + block[1][1])/(36*256));
+                }
             }
 
         }
@@ -741,14 +943,20 @@ namespace dlib
             const long size_in = 4;
             const long size_out = 3;
 
-            down.set_size(size_out*((original.nr()-2)/size_in), size_out*((original.nc()-2)/size_in));
+            const long full_nr =  size_out*((original.nr()-2)/size_in);
+            const long part_nr = (size_out*(original.nr()-2))/size_in;
+            const long full_nc =  size_out*((original.nc()-2)/size_in);
+            const long part_nc = (size_out*(original.nc()-2))/size_in;
+            down.set_size(part_nr, part_nc);
 
 
             long rr = 1;
-            for (long r = 0; r < down.nr(); r+=size_out)
+            long r;
+            for (r = 0; r < full_nr; r+=size_out)
             {
                 long cc = 1;
-                for (long c = 0; c < down.nc(); c+=size_out)
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
                 {
                     rgbptype block[size_in][size_in];
                     separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
@@ -792,8 +1000,183 @@ namespace dlib
  
                     cc += size_in;
                 }
+                if (part_nc - full_nc == 2)
+                {
+                    rgbptype block[size_in][3];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*25   + block[1][0].red*5   + block[0][1].red*5   + block[1][1].red  )/(36*256);
+                    down[r][c].green     = (block[0][0].green*25 + block[1][0].green*5 + block[0][1].green*5 + block[1][1].green)/(36*256);
+                    down[r][c].blue      = (block[0][0].blue*25  + block[1][0].blue*5  + block[0][1].blue*5  + block[1][1].blue )/(36*256);
+ 
+                    down[r][c+1].red     = (block[0][1].red*5    + block[0][2].red*5   + block[1][1].red     + block[1][2].red  )/(12*256);
+                    down[r][c+1].green   = (block[0][1].green*5  + block[0][2].green*5 + block[1][1].green   + block[1][2].green)/(12*256);
+                    down[r][c+1].blue    = (block[0][1].blue*5   + block[0][2].blue*5  + block[1][1].blue    + block[1][2].blue )/(12*256);
+
+                    down[r+1][c].red     = (block[1][0].red*5    + block[2][0].red*5   + block[1][1].red     + block[2][1].red  )/(12*256);
+                    down[r+1][c].green   = (block[1][0].green*5  + block[2][0].green*5 + block[1][1].green   + block[2][1].green)/(12*256);
+                    down[r+1][c].blue    = (block[1][0].blue*5   + block[2][0].blue*5  + block[1][1].blue    + block[2][1].blue )/(12*256);
+ 
+                    down[r+1][c+1].red   = (block[1][1].red      + block[1][2].red     + block[2][1].red     + block[2][2].red  )/(4*256);
+                    down[r+1][c+1].green = (block[1][1].green    + block[1][2].green   + block[2][1].green   + block[2][2].green)/(4*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue     + block[1][2].blue    + block[2][1].blue    + block[2][2].blue )/(4*256);
+ 
+                    down[r+2][c].red     = (block[3][0].red*25   + block[2][0].red*5   + block[3][1].red*5   + block[2][1].red  )/(36*256);
+                    down[r+2][c].green   = (block[3][0].green*25 + block[2][0].green*5 + block[3][1].green*5 + block[2][1].green)/(36*256);
+                    down[r+2][c].blue    = (block[3][0].blue*25  + block[2][0].blue*5  + block[3][1].blue*5  + block[2][1].blue )/(36*256);
+ 
+                    down[r+2][c+1].red   = (block[3][1].red*5    + block[3][2].red*5   + block[2][1].red     + block[2][2].red  )/(12*256);
+                    down[r+2][c+1].green = (block[3][1].green*5  + block[3][2].green*5 + block[2][1].green   + block[2][2].green)/(12*256);
+                    down[r+2][c+1].blue  = (block[3][1].blue*5   + block[3][2].blue*5  + block[2][1].blue    + block[2][2].blue )/(12*256);
+                }
+                if (part_nc - full_nc == 1)
+                {
+                    rgbptype block[size_in][2];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*25   + block[1][0].red*5   + block[0][1].red*5   + block[1][1].red  )/(36*256);
+                    down[r][c].green     = (block[0][0].green*25 + block[1][0].green*5 + block[0][1].green*5 + block[1][1].green)/(36*256);
+                    down[r][c].blue      = (block[0][0].blue*25  + block[1][0].blue*5  + block[0][1].blue*5  + block[1][1].blue )/(36*256);
+ 
+                    down[r+1][c].red     = (block[1][0].red*5    + block[2][0].red*5   + block[1][1].red     + block[2][1].red  )/(12*256);
+                    down[r+1][c].green   = (block[1][0].green*5  + block[2][0].green*5 + block[1][1].green   + block[2][1].green)/(12*256);
+                    down[r+1][c].blue    = (block[1][0].blue*5   + block[2][0].blue*5  + block[1][1].blue    + block[2][1].blue )/(12*256);
+ 
+                    down[r+2][c].red     = (block[3][0].red*25   + block[2][0].red*5   + block[3][1].red*5   + block[2][1].red  )/(36*256);
+                    down[r+2][c].green   = (block[3][0].green*25 + block[2][0].green*5 + block[3][1].green*5 + block[2][1].green)/(36*256);
+                    down[r+2][c].blue    = (block[3][0].blue*25  + block[2][0].blue*5  + block[3][1].blue*5  + block[2][1].blue )/(36*256);
+                }
+
                 rr += size_in;
             }
+
+
+            if (part_nr - full_nr == 2)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    rgbptype block[3][size_in];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate block 
+                    down[r][c].red       = (block[0][0].red*25   + block[1][0].red*5   + block[0][1].red*5   + block[1][1].red  )/(36*256);
+                    down[r][c].green     = (block[0][0].green*25 + block[1][0].green*5 + block[0][1].green*5 + block[1][1].green)/(36*256);
+                    down[r][c].blue      = (block[0][0].blue*25  + block[1][0].blue*5  + block[0][1].blue*5  + block[1][1].blue )/(36*256);
+ 
+                    down[r][c+1].red     = (block[0][1].red*5    + block[0][2].red*5   + block[1][1].red     + block[1][2].red  )/(12*256);
+                    down[r][c+1].green   = (block[0][1].green*5  + block[0][2].green*5 + block[1][1].green   + block[1][2].green)/(12*256);
+                    down[r][c+1].blue    = (block[0][1].blue*5   + block[0][2].blue*5  + block[1][1].blue    + block[1][2].blue )/(12*256);
+
+                    down[r][c+2].red     = (block[0][3].red*25   + block[1][3].red*5   + block[0][2].red*5   + block[1][2].red  )/(36*256);
+                    down[r][c+2].green   = (block[0][3].green*25 + block[1][3].green*5 + block[0][2].green*5 + block[1][2].green)/(36*256);
+                    down[r][c+2].blue    = (block[0][3].blue*25  + block[1][3].blue*5  + block[0][2].blue*5  + block[1][2].blue )/(36*256);
+
+                    down[r+1][c].red     = (block[1][0].red*5    + block[2][0].red*5   + block[1][1].red     + block[2][1].red  )/(12*256);
+                    down[r+1][c].green   = (block[1][0].green*5  + block[2][0].green*5 + block[1][1].green   + block[2][1].green)/(12*256);
+                    down[r+1][c].blue    = (block[1][0].blue*5   + block[2][0].blue*5  + block[1][1].blue    + block[2][1].blue )/(12*256);
+ 
+                    down[r+1][c+1].red   = (block[1][1].red      + block[1][2].red     + block[2][1].red     + block[2][2].red  )/(4*256);
+                    down[r+1][c+1].green = (block[1][1].green    + block[1][2].green   + block[2][1].green   + block[2][2].green)/(4*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue     + block[1][2].blue    + block[2][1].blue    + block[2][2].blue )/(4*256);
+ 
+                    down[r+1][c+2].red   = (block[1][3].red*5    + block[2][3].red*5   + block[1][2].red     + block[2][2].red  )/(12*256);
+                    down[r+1][c+2].green = (block[1][3].green*5  + block[2][3].green*5 + block[1][2].green   + block[2][2].green)/(12*256);
+                    down[r+1][c+2].blue  = (block[1][3].blue*5   + block[2][3].blue*5  + block[1][2].blue    + block[2][2].blue )/(12*256);
+ 
+                    cc += size_in;
+                }
+                if (part_nc - full_nc == 2)
+                {
+                    rgbptype block[3][3];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*25   + block[1][0].red*5   + block[0][1].red*5   + block[1][1].red  )/(36*256);
+                    down[r][c].green     = (block[0][0].green*25 + block[1][0].green*5 + block[0][1].green*5 + block[1][1].green)/(36*256);
+                    down[r][c].blue      = (block[0][0].blue*25  + block[1][0].blue*5  + block[0][1].blue*5  + block[1][1].blue )/(36*256);
+ 
+                    down[r][c+1].red     = (block[0][1].red*5    + block[0][2].red*5   + block[1][1].red     + block[1][2].red  )/(12*256);
+                    down[r][c+1].green   = (block[0][1].green*5  + block[0][2].green*5 + block[1][1].green   + block[1][2].green)/(12*256);
+                    down[r][c+1].blue    = (block[0][1].blue*5   + block[0][2].blue*5  + block[1][1].blue    + block[1][2].blue )/(12*256);
+
+                    down[r+1][c].red     = (block[1][0].red*5    + block[2][0].red*5   + block[1][1].red     + block[2][1].red  )/(12*256);
+                    down[r+1][c].green   = (block[1][0].green*5  + block[2][0].green*5 + block[1][1].green   + block[2][1].green)/(12*256);
+                    down[r+1][c].blue    = (block[1][0].blue*5   + block[2][0].blue*5  + block[1][1].blue    + block[2][1].blue )/(12*256);
+ 
+                    down[r+1][c+1].red   = (block[1][1].red      + block[1][2].red     + block[2][1].red     + block[2][2].red  )/(4*256);
+                    down[r+1][c+1].green = (block[1][1].green    + block[1][2].green   + block[2][1].green   + block[2][2].green)/(4*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue     + block[1][2].blue    + block[2][1].blue    + block[2][2].blue )/(4*256);
+ 
+                }
+                if (part_nc - full_nc == 1)
+                {
+                    rgbptype block[3][2];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*25   + block[1][0].red*5   + block[0][1].red*5   + block[1][1].red  )/(36*256);
+                    down[r][c].green     = (block[0][0].green*25 + block[1][0].green*5 + block[0][1].green*5 + block[1][1].green)/(36*256);
+                    down[r][c].blue      = (block[0][0].blue*25  + block[1][0].blue*5  + block[0][1].blue*5  + block[1][1].blue )/(36*256);
+ 
+                    down[r+1][c].red     = (block[1][0].red*5    + block[2][0].red*5   + block[1][1].red     + block[2][1].red  )/(12*256);
+                    down[r+1][c].green   = (block[1][0].green*5  + block[2][0].green*5 + block[1][1].green   + block[2][1].green)/(12*256);
+                    down[r+1][c].blue    = (block[1][0].blue*5   + block[2][0].blue*5  + block[1][1].blue    + block[2][1].blue )/(12*256);
+                }
+            }
+            if (part_nr - full_nr == 1)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    rgbptype block[2][size_in];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate block 
+                    down[r][c].red       = (block[0][0].red*25   + block[1][0].red*5   + block[0][1].red*5   + block[1][1].red  )/(36*256);
+                    down[r][c].green     = (block[0][0].green*25 + block[1][0].green*5 + block[0][1].green*5 + block[1][1].green)/(36*256);
+                    down[r][c].blue      = (block[0][0].blue*25  + block[1][0].blue*5  + block[0][1].blue*5  + block[1][1].blue )/(36*256);
+ 
+                    down[r][c+1].red     = (block[0][1].red*5    + block[0][2].red*5   + block[1][1].red     + block[1][2].red  )/(12*256);
+                    down[r][c+1].green   = (block[0][1].green*5  + block[0][2].green*5 + block[1][1].green   + block[1][2].green)/(12*256);
+                    down[r][c+1].blue    = (block[0][1].blue*5   + block[0][2].blue*5  + block[1][1].blue    + block[1][2].blue )/(12*256);
+
+                    down[r][c+2].red     = (block[0][3].red*25   + block[1][3].red*5   + block[0][2].red*5   + block[1][2].red  )/(36*256);
+                    down[r][c+2].green   = (block[0][3].green*25 + block[1][3].green*5 + block[0][2].green*5 + block[1][2].green)/(36*256);
+                    down[r][c+2].blue    = (block[0][3].blue*25  + block[1][3].blue*5  + block[0][2].blue*5  + block[1][2].blue )/(36*256);
+
+                    cc += size_in;
+                }
+                if (part_nc - full_nc == 2)
+                {
+                    rgbptype block[2][3];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*25   + block[1][0].red*5   + block[0][1].red*5   + block[1][1].red  )/(36*256);
+                    down[r][c].green     = (block[0][0].green*25 + block[1][0].green*5 + block[0][1].green*5 + block[1][1].green)/(36*256);
+                    down[r][c].blue      = (block[0][0].blue*25  + block[1][0].blue*5  + block[0][1].blue*5  + block[1][1].blue )/(36*256);
+ 
+                    down[r][c+1].red     = (block[0][1].red*5    + block[0][2].red*5   + block[1][1].red     + block[1][2].red  )/(12*256);
+                    down[r][c+1].green   = (block[0][1].green*5  + block[0][2].green*5 + block[1][1].green   + block[1][2].green)/(12*256);
+                    down[r][c+1].blue    = (block[0][1].blue*5   + block[0][2].blue*5  + block[1][1].blue    + block[1][2].blue )/(12*256);
+                }
+                if (part_nc - full_nc == 1)
+                {
+                    rgbptype block[2][2];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*25   + block[1][0].red*5   + block[0][1].red*5   + block[1][1].red  )/(36*256);
+                    down[r][c].green     = (block[0][0].green*25 + block[1][0].green*5 + block[0][1].green*5 + block[1][1].green)/(36*256);
+                    down[r][c].blue      = (block[0][0].blue*25  + block[1][0].blue*5  + block[0][1].blue*5  + block[1][1].blue )/(36*256);
+                }
+            }
+
         }
 
     private:
@@ -926,14 +1309,20 @@ namespace dlib
 
             typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
             typedef typename promote<bp_type>::type ptype;
-            down.set_size(size_out*((original.nr()-2)/size_in), size_out*((original.nc()-2)/size_in));
+            const long full_nr =  size_out*((original.nr()-2)/size_in);
+            const long part_nr = (size_out*(original.nr()-2))/size_in;
+            const long full_nc =  size_out*((original.nc()-2)/size_in);
+            const long part_nc = (size_out*(original.nc()-2))/size_in;
+            down.set_size(part_nr, part_nc);
 
 
             long rr = 1;
-            for (long r = 0; r < down.nr(); r+=size_out)
+            long r;
+            for (r = 0; r < full_nr; r+=size_out)
             {
                 long cc = 1;
-                for (long c = 0; c < down.nc(); c+=size_out)
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
                 {
                     ptype block[size_in][size_in];
                     separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
@@ -961,7 +1350,246 @@ namespace dlib
 
                     cc += size_in;
                 }
+
+                if (part_nc - full_nc == 3)
+                {
+                    ptype block[size_in][4];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+2]   , (block[0][3]*35 + block[0][2]*21 + block[1][3]*5 + block[1][2]*3  )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]*25 + block[1][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+                    assign_pixel(down[r+1][c+2] , (block[1][2]*15 + block[1][3]*25 + block[2][2]*9  + block[2][3]*15)/(64*256));
+
+                    assign_pixel(down[r+2][c]   , (block[3][0]*35 + block[3][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+2][c+1] , (block[3][1]*25 + block[3][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+                    assign_pixel(down[r+2][c+2] , (block[3][2]*15 + block[3][3]*25 + block[2][2]*9  + block[2][3]*15)/(64*256));
+
+                    assign_pixel(down[r+3][c]   , (block[4][0]*49 + block[3][0]*7  + block[4][1]*7 + block[3][1]    )/(64*256));
+                    assign_pixel(down[r+3][c+1] , (block[4][1]*35 + block[4][2]*21 + block[3][1]*5 + block[3][2]*3  )/(64*256));
+                    assign_pixel(down[r+3][c+2] , (block[4][3]*35 + block[4][2]*21 + block[3][3]*5 + block[3][2]*3  )/(64*256));
+                }
+                else if (part_nc - full_nc == 2)
+                {
+                    ptype block[size_in][3];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]*25 + block[1][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+
+                    assign_pixel(down[r+2][c]   , (block[3][0]*35 + block[3][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+2][c+1] , (block[3][1]*25 + block[3][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+
+                    assign_pixel(down[r+3][c]   , (block[4][0]*49 + block[3][0]*7  + block[4][1]*7 + block[3][1]    )/(64*256));
+                    assign_pixel(down[r+3][c+1] , (block[4][1]*35 + block[4][2]*21 + block[3][1]*5 + block[3][2]*3  )/(64*256));
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    ptype block[size_in][2];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+
+                    assign_pixel(down[r+2][c]   , (block[3][0]*35 + block[3][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+
+                    assign_pixel(down[r+3][c]   , (block[4][0]*49 + block[3][0]*7  + block[4][1]*7 + block[3][1]    )/(64*256));
+                }
                 rr += size_in;
+            }
+
+            if (part_nr - full_nr == 3)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    ptype block[4][size_in];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+2]   , (block[0][3]*35 + block[0][2]*21 + block[1][3]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+3]   , (block[0][4]*49 + block[0][3]*7  + block[1][4]*7 + block[1][3]    )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]*25 + block[1][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+                    assign_pixel(down[r+1][c+2] , (block[1][2]*15 + block[1][3]*25 + block[2][2]*9  + block[2][3]*15)/(64*256));
+                    assign_pixel(down[r+1][c+3] , (block[1][3]*5  + block[1][4]*35 + block[2][3]*3  + block[2][4]*21)/(64*256));
+
+                    assign_pixel(down[r+2][c]   , (block[3][0]*35 + block[3][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+2][c+1] , (block[3][1]*25 + block[3][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+                    assign_pixel(down[r+2][c+2] , (block[3][2]*15 + block[3][3]*25 + block[2][2]*9  + block[2][3]*15)/(64*256));
+                    assign_pixel(down[r+2][c+3] , (block[3][3]*5  + block[3][4]*35 + block[2][3]*3  + block[2][4]*21)/(64*256));
+
+                    cc += size_in;
+                }
+
+                if (part_nc - full_nc == 3)
+                {
+                    ptype block[4][4];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+2]   , (block[0][3]*35 + block[0][2]*21 + block[1][3]*5 + block[1][2]*3  )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]*25 + block[1][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+                    assign_pixel(down[r+1][c+2] , (block[1][2]*15 + block[1][3]*25 + block[2][2]*9  + block[2][3]*15)/(64*256));
+
+                    assign_pixel(down[r+2][c]   , (block[3][0]*35 + block[3][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+2][c+1] , (block[3][1]*25 + block[3][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+                    assign_pixel(down[r+2][c+2] , (block[3][2]*15 + block[3][3]*25 + block[2][2]*9  + block[2][3]*15)/(64*256));
+
+                }
+                else if (part_nc - full_nc == 2)
+                {
+                    ptype block[4][3];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]*25 + block[1][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+
+                    assign_pixel(down[r+2][c]   , (block[3][0]*35 + block[3][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+2][c+1] , (block[3][1]*25 + block[3][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    ptype block[4][2];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+
+                    assign_pixel(down[r+2][c]   , (block[3][0]*35 + block[3][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                }
+            }
+            else if (part_nr - full_nr == 2)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    ptype block[3][size_in];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+2]   , (block[0][3]*35 + block[0][2]*21 + block[1][3]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+3]   , (block[0][4]*49 + block[0][3]*7  + block[1][4]*7 + block[1][3]    )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]*25 + block[1][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+                    assign_pixel(down[r+1][c+2] , (block[1][2]*15 + block[1][3]*25 + block[2][2]*9  + block[2][3]*15)/(64*256));
+                    assign_pixel(down[r+1][c+3] , (block[1][3]*5  + block[1][4]*35 + block[2][3]*3  + block[2][4]*21)/(64*256));
+
+                    cc += size_in;
+                }
+
+                if (part_nc - full_nc == 3)
+                {
+                    ptype block[3][4];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+2]   , (block[0][3]*35 + block[0][2]*21 + block[1][3]*5 + block[1][2]*3  )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]*25 + block[1][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+                    assign_pixel(down[r+1][c+2] , (block[1][2]*15 + block[1][3]*25 + block[2][2]*9  + block[2][3]*15)/(64*256));
+
+                }
+                else if (part_nc - full_nc == 2)
+                {
+                    ptype block[3][3];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                    assign_pixel(down[r+1][c+1] , (block[1][1]*25 + block[1][2]*15 + block[2][1]*15 + block[2][2]*9 )/(64*256));
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    ptype block[3][2];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+
+                    assign_pixel(down[r+1][c]   , (block[1][0]*35 + block[1][1]*5  + block[2][0]*21 + block[1][1]*3 )/(64*256));
+                }
+            }
+            else if (part_nr - full_nr == 1)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    ptype block[2][size_in];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+2]   , (block[0][3]*35 + block[0][2]*21 + block[1][3]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+3]   , (block[0][4]*49 + block[0][3]*7  + block[1][4]*7 + block[1][3]    )/(64*256));
+
+                    cc += size_in;
+                }
+
+                if (part_nc - full_nc == 3)
+                {
+                    ptype block[2][4];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+                    assign_pixel(down[r][c+2]   , (block[0][3]*35 + block[0][2]*21 + block[1][3]*5 + block[1][2]*3  )/(64*256));
+                }
+                else if (part_nc - full_nc == 2)
+                {
+                    ptype block[2][3];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                    assign_pixel(down[r][c+1]   , (block[0][1]*35 + block[0][2]*21 + block[1][1]*5 + block[1][2]*3  )/(64*256));
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    ptype block[2][2];
+                    separable_3x3_filter_block_grayscale(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    assign_pixel(down[r][c]     , (block[0][0]*49 + block[1][0]*7  + block[0][1]*7 + block[1][1]    )/(64*256));
+                }
             }
 
         }
@@ -1003,14 +1631,20 @@ namespace dlib
             const long size_in = 5;
             const long size_out = 4;
 
-            down.set_size(size_out*((original.nr()-2)/size_in), size_out*((original.nc()-2)/size_in));
+            const long full_nr =  size_out*((original.nr()-2)/size_in);
+            const long part_nr = (size_out*(original.nr()-2))/size_in;
+            const long full_nc =  size_out*((original.nc()-2)/size_in);
+            const long part_nc = (size_out*(original.nc()-2))/size_in;
+            down.set_size(part_nr, part_nc);
 
 
             long rr = 1;
-            for (long r = 0; r < down.nr(); r+=size_out)
+            long r;
+            for (r = 0; r < full_nr; r+=size_out)
             {
                 long cc = 1;
-                for (long c = 0; c < down.nc(); c+=size_out)
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
                 {
                     rgbptype block[size_in][size_in];
                     separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
@@ -1083,8 +1717,474 @@ namespace dlib
  
                     cc += size_in;
                 }
+
+                if (part_nc - full_nc == 3)
+                {
+                    rgbptype block[size_in][4];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+2].red     = (block[0][3].red*35   + block[0][2].red*21   + block[1][3].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+2].green   = (block[0][3].green*35 + block[0][2].green*21 + block[1][3].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+2].blue    = (block[0][3].blue*35  + block[0][2].blue*21  + block[1][3].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+1][c+1].red   = (block[1][1].red*25   + block[1][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+1][c+1].green = (block[1][1].green*25 + block[1][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue*25  + block[1][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+1][c+2].red   = (block[1][2].red*15   + block[1][3].red*25   + block[2][2].red*9    + block[2][3].red*15  )/(64*256);
+                    down[r+1][c+2].green = (block[1][2].green*15 + block[1][3].green*25 + block[2][2].green*9  + block[2][3].green*15)/(64*256);
+                    down[r+1][c+2].blue  = (block[1][2].blue*15  + block[1][3].blue*25  + block[2][2].blue*9   + block[2][3].blue*15 )/(64*256);
+
+                    down[r+2][c].red     = (block[3][0].red*35   + block[3][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+2][c].green   = (block[3][0].green*35 + block[3][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+2][c].blue    = (block[3][0].blue*35  + block[3][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+2][c+1].red   = (block[3][1].red*25   + block[3][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+2][c+1].green = (block[3][1].green*25 + block[3][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+2][c+1].blue  = (block[3][1].blue*25  + block[3][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+2][c+2].red   = (block[3][2].red*15   + block[3][3].red*25   + block[2][2].red*9    + block[2][3].red*15  )/(64*256);
+                    down[r+2][c+2].green = (block[3][2].green*15 + block[3][3].green*25 + block[2][2].green*9  + block[2][3].green*15)/(64*256);
+                    down[r+2][c+2].blue  = (block[3][2].blue*15  + block[3][3].blue*25  + block[2][2].blue*9   + block[2][3].blue*15 )/(64*256);
+
+                    down[r+3][c].red     = (block[4][0].red*49   + block[3][0].red*7    + block[4][1].red*7   + block[3][1].red      )/(64*256);
+                    down[r+3][c].green   = (block[4][0].green*49 + block[3][0].green*7  + block[4][1].green*7 + block[3][1].green    )/(64*256);
+                    down[r+3][c].blue    = (block[4][0].blue*49  + block[3][0].blue*7   + block[4][1].blue*7  + block[3][1].blue     )/(64*256);
+
+                    down[r+3][c+1].red   = (block[4][1].red*35   + block[4][2].red*21   + block[3][1].red*5   + block[3][2].red*3    )/(64*256);
+                    down[r+3][c+1].green = (block[4][1].green*35 + block[4][2].green*21 + block[3][1].green*5 + block[3][2].green*3  )/(64*256);
+                    down[r+3][c+1].blue  = (block[4][1].blue*35  + block[4][2].blue*21  + block[3][1].blue*5  + block[3][2].blue*3   )/(64*256);
+
+                    down[r+3][c+2].red   = (block[4][3].red*35   + block[4][2].red*21   + block[3][3].red*5   + block[3][2].red*3    )/(64*256);
+                    down[r+3][c+2].green = (block[4][3].green*35 + block[4][2].green*21 + block[3][3].green*5 + block[3][2].green*3  )/(64*256);
+                    down[r+3][c+2].blue  = (block[4][3].blue*35  + block[4][2].blue*21  + block[3][3].blue*5  + block[3][2].blue*3   )/(64*256);
+
+                }
+                else if (part_nc - full_nc == 2)
+                {
+                    rgbptype block[size_in][3];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+1][c+1].red   = (block[1][1].red*25   + block[1][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+1][c+1].green = (block[1][1].green*25 + block[1][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue*25  + block[1][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+2][c].red     = (block[3][0].red*35   + block[3][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+2][c].green   = (block[3][0].green*35 + block[3][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+2][c].blue    = (block[3][0].blue*35  + block[3][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+2][c+1].red   = (block[3][1].red*25   + block[3][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+2][c+1].green = (block[3][1].green*25 + block[3][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+2][c+1].blue  = (block[3][1].blue*25  + block[3][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+3][c].red     = (block[4][0].red*49   + block[3][0].red*7    + block[4][1].red*7   + block[3][1].red      )/(64*256);
+                    down[r+3][c].green   = (block[4][0].green*49 + block[3][0].green*7  + block[4][1].green*7 + block[3][1].green    )/(64*256);
+                    down[r+3][c].blue    = (block[4][0].blue*49  + block[3][0].blue*7   + block[4][1].blue*7  + block[3][1].blue     )/(64*256);
+
+                    down[r+3][c+1].red   = (block[4][1].red*35   + block[4][2].red*21   + block[3][1].red*5   + block[3][2].red*3    )/(64*256);
+                    down[r+3][c+1].green = (block[4][1].green*35 + block[4][2].green*21 + block[3][1].green*5 + block[3][2].green*3  )/(64*256);
+                    down[r+3][c+1].blue  = (block[4][1].blue*35  + block[4][2].blue*21  + block[3][1].blue*5  + block[3][2].blue*3   )/(64*256);
+
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    rgbptype block[size_in][2];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+2][c].red     = (block[3][0].red*35   + block[3][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+2][c].green   = (block[3][0].green*35 + block[3][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+2][c].blue    = (block[3][0].blue*35  + block[3][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+3][c].red     = (block[4][0].red*49   + block[3][0].red*7    + block[4][1].red*7   + block[3][1].red      )/(64*256);
+                    down[r+3][c].green   = (block[4][0].green*49 + block[3][0].green*7  + block[4][1].green*7 + block[3][1].green    )/(64*256);
+                    down[r+3][c].blue    = (block[4][0].blue*49  + block[3][0].blue*7   + block[4][1].blue*7  + block[3][1].blue     )/(64*256);
+                }
+
                 rr += size_in;
             }
+
+            if (part_nr - full_nr == 3)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    rgbptype block[4][size_in];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+2].red     = (block[0][3].red*35   + block[0][2].red*21   + block[1][3].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+2].green   = (block[0][3].green*35 + block[0][2].green*21 + block[1][3].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+2].blue    = (block[0][3].blue*35  + block[0][2].blue*21  + block[1][3].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+3].red     = (block[0][4].red*49   + block[0][3].red*7    + block[1][4].red*7    + block[1][3].red     )/(64*256);
+                    down[r][c+3].green   = (block[0][4].green*49 + block[0][3].green*7  + block[1][4].green*7  + block[1][3].green   )/(64*256);
+                    down[r][c+3].blue    = (block[0][4].blue*49  + block[0][3].blue*7   + block[1][4].blue*7   + block[1][3].blue    )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+1][c+1].red   = (block[1][1].red*25   + block[1][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+1][c+1].green = (block[1][1].green*25 + block[1][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue*25  + block[1][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+1][c+2].red   = (block[1][2].red*15   + block[1][3].red*25   + block[2][2].red*9    + block[2][3].red*15  )/(64*256);
+                    down[r+1][c+2].green = (block[1][2].green*15 + block[1][3].green*25 + block[2][2].green*9  + block[2][3].green*15)/(64*256);
+                    down[r+1][c+2].blue  = (block[1][2].blue*15  + block[1][3].blue*25  + block[2][2].blue*9   + block[2][3].blue*15 )/(64*256);
+
+                    down[r+1][c+3].red   = (block[1][3].red*5    + block[1][4].red*35   + block[2][3].red*3    + block[2][4].red*21  )/(64*256);
+                    down[r+1][c+3].green = (block[1][3].green*5  + block[1][4].green*35 + block[2][3].green*3  + block[2][4].green*21)/(64*256);
+                    down[r+1][c+3].blue  = (block[1][3].blue*5   + block[1][4].blue*35  + block[2][3].blue*3   + block[2][4].blue*21 )/(64*256);
+
+                    down[r+2][c].red     = (block[3][0].red*35   + block[3][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+2][c].green   = (block[3][0].green*35 + block[3][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+2][c].blue    = (block[3][0].blue*35  + block[3][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+2][c+1].red   = (block[3][1].red*25   + block[3][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+2][c+1].green = (block[3][1].green*25 + block[3][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+2][c+1].blue  = (block[3][1].blue*25  + block[3][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+2][c+2].red   = (block[3][2].red*15   + block[3][3].red*25   + block[2][2].red*9    + block[2][3].red*15  )/(64*256);
+                    down[r+2][c+2].green = (block[3][2].green*15 + block[3][3].green*25 + block[2][2].green*9  + block[2][3].green*15)/(64*256);
+                    down[r+2][c+2].blue  = (block[3][2].blue*15  + block[3][3].blue*25  + block[2][2].blue*9   + block[2][3].blue*15 )/(64*256);
+
+                    down[r+2][c+3].red   = (block[3][3].red*5    + block[3][4].red*35   + block[2][3].red*3    + block[2][4].red*21  )/(64*256);
+                    down[r+2][c+3].green = (block[3][3].green*5  + block[3][4].green*35 + block[2][3].green*3  + block[2][4].green*21)/(64*256);
+                    down[r+2][c+3].blue  = (block[3][3].blue*5   + block[3][4].blue*35  + block[2][3].blue*3   + block[2][4].blue*21 )/(64*256);
+
+                    cc += size_in;
+                }
+
+                if (part_nc - full_nc == 3)
+                {
+                    rgbptype block[4][4];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+2].red     = (block[0][3].red*35   + block[0][2].red*21   + block[1][3].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+2].green   = (block[0][3].green*35 + block[0][2].green*21 + block[1][3].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+2].blue    = (block[0][3].blue*35  + block[0][2].blue*21  + block[1][3].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+1][c+1].red   = (block[1][1].red*25   + block[1][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+1][c+1].green = (block[1][1].green*25 + block[1][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue*25  + block[1][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+1][c+2].red   = (block[1][2].red*15   + block[1][3].red*25   + block[2][2].red*9    + block[2][3].red*15  )/(64*256);
+                    down[r+1][c+2].green = (block[1][2].green*15 + block[1][3].green*25 + block[2][2].green*9  + block[2][3].green*15)/(64*256);
+                    down[r+1][c+2].blue  = (block[1][2].blue*15  + block[1][3].blue*25  + block[2][2].blue*9   + block[2][3].blue*15 )/(64*256);
+
+                    down[r+2][c].red     = (block[3][0].red*35   + block[3][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+2][c].green   = (block[3][0].green*35 + block[3][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+2][c].blue    = (block[3][0].blue*35  + block[3][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+2][c+1].red   = (block[3][1].red*25   + block[3][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+2][c+1].green = (block[3][1].green*25 + block[3][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+2][c+1].blue  = (block[3][1].blue*25  + block[3][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+2][c+2].red   = (block[3][2].red*15   + block[3][3].red*25   + block[2][2].red*9    + block[2][3].red*15  )/(64*256);
+                    down[r+2][c+2].green = (block[3][2].green*15 + block[3][3].green*25 + block[2][2].green*9  + block[2][3].green*15)/(64*256);
+                    down[r+2][c+2].blue  = (block[3][2].blue*15  + block[3][3].blue*25  + block[2][2].blue*9   + block[2][3].blue*15 )/(64*256);
+
+                }
+                else if (part_nc - full_nc == 2)
+                {
+                    rgbptype block[4][3];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+1][c+1].red   = (block[1][1].red*25   + block[1][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+1][c+1].green = (block[1][1].green*25 + block[1][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue*25  + block[1][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+2][c].red     = (block[3][0].red*35   + block[3][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+2][c].green   = (block[3][0].green*35 + block[3][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+2][c].blue    = (block[3][0].blue*35  + block[3][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+2][c+1].red   = (block[3][1].red*25   + block[3][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+2][c+1].green = (block[3][1].green*25 + block[3][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+2][c+1].blue  = (block[3][1].blue*25  + block[3][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    rgbptype block[4][2];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+2][c].red     = (block[3][0].red*35   + block[3][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+2][c].green   = (block[3][0].green*35 + block[3][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+2][c].blue    = (block[3][0].blue*35  + block[3][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+                }
+
+            }
+            else if (part_nr - full_nr == 2)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    rgbptype block[3][size_in];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+2].red     = (block[0][3].red*35   + block[0][2].red*21   + block[1][3].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+2].green   = (block[0][3].green*35 + block[0][2].green*21 + block[1][3].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+2].blue    = (block[0][3].blue*35  + block[0][2].blue*21  + block[1][3].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+3].red     = (block[0][4].red*49   + block[0][3].red*7    + block[1][4].red*7    + block[1][3].red     )/(64*256);
+                    down[r][c+3].green   = (block[0][4].green*49 + block[0][3].green*7  + block[1][4].green*7  + block[1][3].green   )/(64*256);
+                    down[r][c+3].blue    = (block[0][4].blue*49  + block[0][3].blue*7   + block[1][4].blue*7   + block[1][3].blue    )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+1][c+1].red   = (block[1][1].red*25   + block[1][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+1][c+1].green = (block[1][1].green*25 + block[1][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue*25  + block[1][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+1][c+2].red   = (block[1][2].red*15   + block[1][3].red*25   + block[2][2].red*9    + block[2][3].red*15  )/(64*256);
+                    down[r+1][c+2].green = (block[1][2].green*15 + block[1][3].green*25 + block[2][2].green*9  + block[2][3].green*15)/(64*256);
+                    down[r+1][c+2].blue  = (block[1][2].blue*15  + block[1][3].blue*25  + block[2][2].blue*9   + block[2][3].blue*15 )/(64*256);
+
+                    down[r+1][c+3].red   = (block[1][3].red*5    + block[1][4].red*35   + block[2][3].red*3    + block[2][4].red*21  )/(64*256);
+                    down[r+1][c+3].green = (block[1][3].green*5  + block[1][4].green*35 + block[2][3].green*3  + block[2][4].green*21)/(64*256);
+                    down[r+1][c+3].blue  = (block[1][3].blue*5   + block[1][4].blue*35  + block[2][3].blue*3   + block[2][4].blue*21 )/(64*256);
+
+                    cc += size_in;
+                }
+
+                if (part_nc - full_nc == 3)
+                {
+                    rgbptype block[3][4];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+2].red     = (block[0][3].red*35   + block[0][2].red*21   + block[1][3].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+2].green   = (block[0][3].green*35 + block[0][2].green*21 + block[1][3].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+2].blue    = (block[0][3].blue*35  + block[0][2].blue*21  + block[1][3].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+1][c+1].red   = (block[1][1].red*25   + block[1][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+1][c+1].green = (block[1][1].green*25 + block[1][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue*25  + block[1][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                    down[r+1][c+2].red   = (block[1][2].red*15   + block[1][3].red*25   + block[2][2].red*9    + block[2][3].red*15  )/(64*256);
+                    down[r+1][c+2].green = (block[1][2].green*15 + block[1][3].green*25 + block[2][2].green*9  + block[2][3].green*15)/(64*256);
+                    down[r+1][c+2].blue  = (block[1][2].blue*15  + block[1][3].blue*25  + block[2][2].blue*9   + block[2][3].blue*15 )/(64*256);
+
+                }
+                else if (part_nc - full_nc == 2)
+                {
+                    rgbptype block[3][3];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+
+                    down[r+1][c+1].red   = (block[1][1].red*25   + block[1][2].red*15   + block[2][1].red*15   + block[2][2].red*9   )/(64*256);
+                    down[r+1][c+1].green = (block[1][1].green*25 + block[1][2].green*15 + block[2][1].green*15 + block[2][2].green*9 )/(64*256);
+                    down[r+1][c+1].blue  = (block[1][1].blue*25  + block[1][2].blue*15  + block[2][1].blue*15  + block[2][2].blue*9  )/(64*256);
+
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    rgbptype block[3][2];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r+1][c].red     = (block[1][0].red*35   + block[1][1].red*5    + block[2][0].red*21   + block[1][1].red*3   )/(64*256);
+                    down[r+1][c].green   = (block[1][0].green*35 + block[1][1].green*5  + block[2][0].green*21 + block[1][1].green*3 )/(64*256);
+                    down[r+1][c].blue    = (block[1][0].blue*35  + block[1][1].blue*5   + block[2][0].blue*21  + block[1][1].blue*3  )/(64*256);
+                }
+
+            }
+            else if (part_nr - full_nr == 1)
+            {
+                long cc = 1;
+                long c;
+                for (c = 0; c < full_nc; c+=size_out)
+                {
+                    rgbptype block[2][size_in];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+2].red     = (block[0][3].red*35   + block[0][2].red*21   + block[1][3].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+2].green   = (block[0][3].green*35 + block[0][2].green*21 + block[1][3].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+2].blue    = (block[0][3].blue*35  + block[0][2].blue*21  + block[1][3].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+3].red     = (block[0][4].red*49   + block[0][3].red*7    + block[1][4].red*7    + block[1][3].red     )/(64*256);
+                    down[r][c+3].green   = (block[0][4].green*49 + block[0][3].green*7  + block[1][4].green*7  + block[1][3].green   )/(64*256);
+                    down[r][c+3].blue    = (block[0][4].blue*49  + block[0][3].blue*7   + block[1][4].blue*7   + block[1][3].blue    )/(64*256);
+
+                    cc += size_in;
+                }
+
+                if (part_nc - full_nc == 3)
+                {
+                    rgbptype block[2][4];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                    down[r][c+2].red     = (block[0][3].red*35   + block[0][2].red*21   + block[1][3].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+2].green   = (block[0][3].green*35 + block[0][2].green*21 + block[1][3].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+2].blue    = (block[0][3].blue*35  + block[0][2].blue*21  + block[1][3].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                }
+                else if (part_nc - full_nc == 2)
+                {
+                    rgbptype block[2][3];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                    down[r][c+1].red     = (block[0][1].red*35   + block[0][2].red*21   + block[1][1].red*5    + block[1][2].red*3   )/(64*256);
+                    down[r][c+1].green   = (block[0][1].green*35 + block[0][2].green*21 + block[1][1].green*5  + block[1][2].green*3 )/(64*256);
+                    down[r][c+1].blue    = (block[0][1].blue*35  + block[0][2].blue*21  + block[1][1].blue*5   + block[1][2].blue*3  )/(64*256);
+
+                }
+                else if (part_nc - full_nc == 1)
+                {
+                    rgbptype block[2][2];
+                    separable_3x3_filter_block_rgb(block, original, rr, cc, 3, 10, 3);
+
+                    // bi-linearly interpolate partial block 
+                    down[r][c].red       = (block[0][0].red*49   + block[1][0].red*7    + block[0][1].red*7    + block[1][1].red     )/(64*256);
+                    down[r][c].green     = (block[0][0].green*49 + block[1][0].green*7  + block[0][1].green*7  + block[1][1].green   )/(64*256);
+                    down[r][c].blue      = (block[0][0].blue*49  + block[1][0].blue*7   + block[0][1].blue*7   + block[1][1].blue    )/(64*256);
+
+                }
+
+            }
+
         }
 
     private:
