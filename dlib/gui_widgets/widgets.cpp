@@ -2305,6 +2305,7 @@ namespace dlib
                 << "\n\tindex:  " << index 
                 << "\n\tsize(): " << size() );
 
+        last_selected = index;
         items[index].is_selected = true;
         parent.invalidate_rectangle(rect);
     }
