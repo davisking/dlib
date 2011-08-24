@@ -51,6 +51,7 @@
                <item>point_rotator</item> 
                <item>get_rect</item> 
                <item>centered_rect</item> 
+               <item>center</item> 
                <item>shrink_rect</item> 
                <item>grow_rect</item> 
                <item>translate_rect</item> 
@@ -774,6 +775,18 @@
          <examples>
             <example>quantum_computing_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>center</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            Returns the center point of a <a href="#rectangle">rectangle</a>.
+         </description>
                                  
       </component>
 
