@@ -264,6 +264,18 @@ void test_pyramid_down_grayscale2()
 
 
     //my_window.wait_until_closed();
+
+
+
+    // make sure the coordinate mapping is invertible when it should be
+    for (long x = -10; x <= 10; ++x)
+    {
+        for (long y = -10; y <= 10; ++y)
+        {
+            DLIB_TEST_MSG(point(pyr.point_down(pyr.point_up(point(x,y)))) == point(x,y), 
+                          point(x,y) << "  " << pyr.point_up(point(x,y)) << "   " << pyr.point_down(pyr.point_up(point(x,y))));
+        }
+    }
 }
 
 
