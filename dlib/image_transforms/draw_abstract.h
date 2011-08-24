@@ -14,7 +14,7 @@ namespace dlib
         typename pixel_type
         >
     void draw_line (
-        image_type& c,
+        image_type& img,
         const point& p1,
         const point& p2,
         const pixel_type& val
