@@ -5,6 +5,7 @@
 
 #include "draw_abstract.h"
 #include "../algs.h"
+#include "../pixel.h"
 #include <cmath>
 
 namespace dlib
@@ -13,7 +14,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type,
+        typename pixel_type
         >
     void draw_line (
         long x1,
@@ -21,7 +23,7 @@ namespace dlib
         long x2,
         long y2,
         image_type& c,
-        typename image_type::type val
+        const pixel_type& val
     ) 
     {
         if (x1 == x2)
@@ -37,7 +39,7 @@ namespace dlib
                 if (y < 0 || y >= c.nr())
                     continue;
 
-                c[y][x1] = val;
+                assign_pixel(c[y][x1], val);
             }
         }
         else if (y1 == y2)
@@ -54,7 +56,7 @@ namespace dlib
                 if (x < 0 || x >= c.nc())
                     continue;
 
-                c[y1][x] = val;
+                assign_pixel(c[y1][x] , val);
             }
         }
         else
@@ -97,7 +99,7 @@ namespace dlib
                         continue;
 
 
-                    c[y][x] = val;
+                    assign_pixel(c[y][x] , val);
                 }         
             }
             else
@@ -136,11 +138,27 @@ namespace dlib
                     if (y < 0 || y >= c.nr())
                         continue;
 
-                    c[y][x] = val;
+                    assign_pixel(c[y][x] , val);
                 } 
             }
         }
 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type,
+        typename pixel_type
+        >
+    void draw_line (
+        image_type& c,
+        const point& p1,
+        const point& p2,
+        const pixel_type& val
+    ) 
+    {
+        draw_line(p1.x(),p1.y(),p2.x(),p2.y(),c,val);
     }
 
 // ----------------------------------------------------------------------------------------
