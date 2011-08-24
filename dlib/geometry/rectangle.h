@@ -355,7 +355,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    point center (
+    inline point center (
         const dlib::rectangle& rect
     )
     {
