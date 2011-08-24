@@ -404,6 +404,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    point center (
+        const dlib::rectangle& rect
+    );
+    /*!
+        ensures
+            - returns the center of the given rectangle
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     inline const rectangle centered_rect (
         const point& p,
         unsigned long width,
@@ -412,6 +422,7 @@ namespace dlib
     /*!
         ensures
             - returns a rectangle R such that:
+                - center(R) == p
                 - if (width == 0 || height == 0)
                     - R.width() == 0 
                     - R.height() == 0 
@@ -419,7 +430,6 @@ namespace dlib
                     - R.width() == width
                     - R.height() == height 
                 - R.tl_corner() == point(p.x()-width/2, p.y()-height/2)
-                - The center of R is a the point p 
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -433,6 +443,7 @@ namespace dlib
     /*!
         ensures
             - returns a rectangle R such that:
+                - center(R) == p
                 - if (width == 0 || height == 0)
                     - R.width() == 0 
                     - R.height() == 0 
@@ -440,7 +451,6 @@ namespace dlib
                     - R.width() == width
                     - R.height() == height 
                 - R.tl_corner() == point(x-width/2, y-height/2)
-                - The center of R is a the point (x,y)
     !*/
 
 // ----------------------------------------------------------------------------------------

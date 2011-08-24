@@ -355,6 +355,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    point center (
+        const dlib::rectangle& rect
+    )
+    {
+        point temp(rect.left() + rect.right() + 1,
+                   rect.top() + rect.bottom() + 1);
+
+        if (temp.x() < 0)
+            temp.x() -= 1;
+
+        if (temp.y() < 0)
+            temp.y() -= 1;
+
+        return temp/2;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline long distance_to_rect_edge (
         const rectangle& rect,
         const point& p
