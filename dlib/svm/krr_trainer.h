@@ -189,7 +189,8 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const
         {
-            scalar_type temp, temp2;
+            std::vector<scalar_type> temp;
+            scalar_type temp2;
             return do_train(vector_to_matrix(x), vector_to_matrix(y), false, temp, temp2);
         }
 
@@ -200,11 +201,11 @@ namespace dlib
         const decision_function<kernel_type> train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            scalar_type& looe
+            std::vector<scalar_type>& loo_values
         ) const
         {
             scalar_type temp;
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, looe, temp);
+            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, loo_values, temp);
         }
 
         template <
@@ -214,11 +215,11 @@ namespace dlib
         const decision_function<kernel_type> train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            scalar_type& looe,
+            std::vector<scalar_type>& loo_values,
             scalar_type& lambda_used 
         ) const
         {
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, looe, lambda_used);
+            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, loo_values, lambda_used);
         }
 
 
@@ -231,8 +232,8 @@ namespace dlib
         const decision_function<kernel_type> do_train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            bool output_looe,
-            scalar_type& best_looe,
+            const bool output_loo_values,
+            std::vector<scalar_type>& loo_values,
             scalar_type& the_lambda
         ) const
         {
@@ -311,8 +312,8 @@ namespace dlib
 
             decision_function<linear_kernel<matrix<scalar_type,0,0,mem_manager_type> > > lin_df;
 
-            if (output_looe)
-                lin_df = trainer.train(proj_x,y, best_looe, the_lambda);
+            if (output_loo_values)
+                lin_df = trainer.train(proj_x,y, loo_values, the_lambda);
             else
                 lin_df = trainer.train(proj_x,y);
 

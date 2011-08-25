@@ -133,7 +133,8 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const
         {
-            scalar_type temp, temp2;
+            std::vector<scalar_type> temp; 
+            scalar_type temp2;
             return do_train(vector_to_matrix(x), vector_to_matrix(y), false, temp, temp2);
         }
 
@@ -144,11 +145,11 @@ namespace dlib
         const decision_function<kernel_type> train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            scalar_type& looe
+            std::vector<scalar_type>& loo_values
         ) const
         {
             scalar_type temp;
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, looe, temp);
+            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, loo_values, temp);
         }
 
         template <
@@ -158,11 +159,11 @@ namespace dlib
         const decision_function<kernel_type> train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            scalar_type& looe,
+            std::vector<scalar_type>& loo_values,
             scalar_type& lambda_used 
         ) const
         {
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, looe, lambda_used);
+            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, loo_values, lambda_used);
         }
 
 
@@ -175,8 +176,8 @@ namespace dlib
         const decision_function<kernel_type> do_train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            bool output_looe,
-            scalar_type& best_looe,
+            const bool output_loo_values,
+            std::vector<scalar_type>& loo_values,
             scalar_type& the_lambda
         ) const
         {
@@ -279,7 +280,7 @@ namespace dlib
             // We can save some work by pre-multiplying the x vectors by trans(V)
             // and saving the result so we don't have to recompute it over and over later.
             matrix<column_matrix_type,0,1,mem_manager_type > Vx;
-            if (lambda == 0 || output_looe)
+            if (lambda == 0 || output_loo_values)
             {
                 // Save the transpose of V into a temporary because the subsequent matrix
                 // vector multiplies will be faster (because of better cache locality).
@@ -299,9 +300,11 @@ namespace dlib
 
             // If we need to automatically select a lambda then do so using the LOOE trick described
             // above.
+            bool did_loov = false;
+            scalar_type best_looe = std::numeric_limits<scalar_type>::max();
             if (lambda == 0)
             {
-                best_looe = std::numeric_limits<scalar_type>::max();
+                did_loov = true;
 
                 // Compute leave one out errors for a bunch of different lambdas and pick the best one.
                 for (long idx = 0; idx < lams.size(); ++idx)
@@ -342,16 +345,7 @@ namespace dlib
                     }
                 }
 
-                // mark that we saved the looe to best_looe already
-                output_looe = false;
                 best_looe /= x.size();
-
-                if (verbose)
-                {
-                    using namespace std;
-                    cout << "Using lambda: " << the_lambda << endl;
-                    cout << "LOO Error:    " << best_looe << endl;
-                }
             }
 
 
@@ -370,8 +364,10 @@ namespace dlib
 
             // If we haven't done this already and we are supposed to then compute the LOO error rate for 
             // the current lambda and store the result in best_looe.
-            if (output_looe)
+            if (output_loo_values)
             {
+                loo_values.resize(x.size());
+                did_loov = true;
                 best_looe = 0;
                 for (long i = 0; i < x.size(); ++i)
                 {
@@ -385,18 +381,26 @@ namespace dlib
                         loov = 0;
 
                     best_looe += loss(loov, y(i));
+                    loo_values[i] = loov;
                 }
 
                 best_looe /= x.size();
 
-                if (verbose)
-                {
-                    using namespace std;
-                    cout << "Using lambda: " << the_lambda << endl;
-                    cout << "LOO Error:    " << best_looe << endl;
-                }
+            }
+            else
+            {
+                loo_values.clear();
             }
 
+            if (verbose && did_loov)
+            {
+                using namespace std;
+                cout << "Using lambda:                " << the_lambda << endl;
+                if (use_regression_loss)
+                    cout << "LOO Mean Squared Error:      " << best_looe << endl;
+                else
+                    cout << "LOO Classification Accuracy: " << best_looe << endl;
+            }
 
             // convert w into a proper decision function
             decision_function<kernel_type> df;

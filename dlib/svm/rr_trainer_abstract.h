@@ -208,7 +208,7 @@ namespace dlib
         const decision_function<kernel_type> train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            scalar_type& looe
+            std::vector<scalar_type>& loo_values
         ) const;
         /*!
             requires
@@ -216,12 +216,10 @@ namespace dlib
             ensures
                 - returns train(x,y)
                   (i.e. executes train(x,y) and returns its result)
-                - if (will_use_regression_loss_for_loo_cv())
-                    - #looe == the mean squared error as determined by leave-one-out 
-                      cross-validation.  
-                - else
-                    - #looe == the fraction of samples misclassified as determined by
-                      leave-one-out cross-validation.
+                - #loo_values.size() == y.size()
+                - for all valid i:
+                    - #loo_values[i] == leave-one-out prediction for the value of y(i) based 
+                      on all the training samples other than (x(i),y(i)).
         !*/
 
         template <
@@ -231,7 +229,7 @@ namespace dlib
         const decision_function<kernel_type> train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            scalar_type& looe,
+            std::vector<scalar_type>& loo_values,
             scalar_type& lambda_used 
         ) const;
         /*!
@@ -240,12 +238,10 @@ namespace dlib
             ensures
                 - returns train(x,y)
                   (i.e. executes train(x,y) and returns its result)
-                - if (will_use_regression_loss_for_loo_cv())
-                    - #looe == the mean squared error as determined by leave-one-out 
-                      cross-validation.  
-                - else
-                    - #looe == the fraction of samples misclassified as determined by
-                      leave-one-out cross-validation.
+                - #loo_values.size() == y.size()
+                - for all valid i:
+                    - #loo_values[i] == leave-one-out prediction for the value of y(i) based 
+                      on all the training samples other than (x(i),y(i)).
                 - #lambda_used == the value of lambda used to generate the 
                   decision_function.  Note that this lambda value is always 
                   equal to get_lambda() if get_lambda() isn't 0.
