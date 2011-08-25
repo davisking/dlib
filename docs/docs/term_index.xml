@@ -131,6 +131,11 @@
          <term file="algorithms.html" name="point_rotator"/>
          <term file="algorithms.html" name="running_stats"/>
          <term file="algorithms.html" name="running_scalar_covariance"/>
+         <term file="algorithms.html" name="mean_sign_agreement"/>
+         <term file="algorithms.html" name="correlation"/>
+         <term file="algorithms.html" name="covariance"/>
+         <term file="algorithms.html" name="r_squared"/>
+         <term file="algorithms.html" name="mean_squared_error"/>
          <term file="algorithms.html" name="running_covariance"/>
          <term file="algorithms.html" name="random_subset_selector"/>
          <term file="algorithms.html" name="randomly_subsample"/>

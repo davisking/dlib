@@ -31,6 +31,11 @@
          <item>murmur_hash3</item> 
          <item>running_stats</item> 
          <item>running_scalar_covariance</item> 
+         <item>mean_sign_agreement</item> 
+         <item>correlation</item> 
+         <item>covariance</item> 
+         <item>r_squared</item> 
+         <item>mean_squared_error</item> 
          <item>running_covariance</item> 
          <item>random_subset_selector</item> 
          <item>randomly_subsample</item> 
@@ -292,6 +297,66 @@
          <description>
                 This object is a simple tool for computing the covariance of a 
                 sequence of scalar values.  
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>mean_sign_agreement</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+               This is a function for computing the probability that 
+               matching elements of two std::vectors have the same sign.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>correlation</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+               This is a function for computing the correlation between 
+               matching elements of two std::vectors.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>covariance</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+               This is a function for computing the covariance between 
+               matching elements of two std::vectors.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>r_squared</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+               This is a function for computing the R squared coefficient between 
+               matching elements of two std::vectors.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>mean_squared_error</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+               This is a function for computing the mean squared error between 
+               matching elements of two std::vectors.
          </description>
       </component>
       
