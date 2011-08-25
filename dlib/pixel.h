@@ -1169,9 +1169,9 @@ namespace dlib
     {
         try
         {
-            serialize(item.red,out);
-            serialize(item.green,out);
             serialize(item.blue,out);
+            serialize(item.green,out);
+            serialize(item.red,out);
         }
         catch (serialization_error& e)
         {
@@ -1188,9 +1188,9 @@ namespace dlib
     {
         try
         {
-            deserialize(item.red,in);
-            deserialize(item.green,in);
             deserialize(item.blue,in);
+            deserialize(item.green,in);
+            deserialize(item.red,in);
         }
         catch (serialization_error& e)
         {
