@@ -78,14 +78,16 @@ int main()
     // column is the output from the krr estimate.  
 
 
-    // Note that the krr_trainer has the ability to tell us the leave-one-out cross-validation
-    // accuracy.  The train() function has an optional 3rd argument and if we give it a double
-    // it will give us back the LOO error.
-    double loo_error;
-    trainer.train(samples, labels, loo_error);
-    cout << "mean squared LOO error: " << loo_error << endl;
+    // Note that the krr_trainer has the ability to tell us the leave-one-out predictions
+    // for each sample.  
+    std::vector<double> loo_values;
+    trainer.train(samples, labels, loo_values);
+    cout << "mean squared LOO error: " << mean_squared_error(labels,loo_values) << endl;
+    cout << "R^2 LOO value:          " << r_squared(labels,loo_values) << endl;
     // Which outputs the following:
-    // mean squared LOO error: 8.29563e-07
+    // mean squared LOO error: 8.29575e-07
+    // R^2 LOO value:          0.999995
+
 
 
 
