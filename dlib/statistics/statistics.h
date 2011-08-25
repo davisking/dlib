@@ -386,6 +386,137 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T, 
+        typename alloc
+        >
+    double mean_sign_agreement (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(a.size() == b.size(),
+                    "\t double mean_sign_agreement(a,b)"
+                    << "\n\t a and b must be the same length."
+                    << "\n\t a.size(): " << a.size()
+                    << "\n\t b.size(): " << b.size()
+        );
+
+        
+        double temp = 0;
+        for (unsigned long i = 0; i < a.size(); ++i)
+        {
+            if (a[i] >= 0 && b[i] >= 0 ||
+                a[i] < 0  && b[i] <  0)
+            {
+                temp += 1;
+            }
+        }
+
+        return temp/a.size();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename alloc
+        >
+    double correlation (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(a.size() == b.size() && a.size() > 1,
+                    "\t double correlation(a,b)"
+                    << "\n\t a and b must be the same length and have more than one element."
+                    << "\n\t a.size(): " << a.size()
+                    << "\n\t b.size(): " << b.size()
+        );
+
+        running_scalar_covariance<double> rs;
+        for (unsigned long i = 0; i < a.size(); ++i)
+        {
+            rs.add(a[i], b[i]);
+        }
+        return rs.correlation();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename alloc
+        >
+    double covariance (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(a.size() == b.size() && a.size() > 1,
+                    "\t double covariance(a,b)"
+                    << "\n\t a and b must be the same length and have more than one element."
+                    << "\n\t a.size(): " << a.size()
+                    << "\n\t b.size(): " << b.size()
+        );
+
+        running_scalar_covariance<double> rs;
+        for (unsigned long i = 0; i < a.size(); ++i)
+        {
+            rs.add(a[i], b[i]);
+        }
+        return rs.covariance();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename alloc
+        >
+    double r_squared (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(a.size() == b.size() && a.size() > 1,
+                    "\t double r_squared(a,b)"
+                    << "\n\t a and b must be the same length and have more than one element."
+                    << "\n\t a.size(): " << a.size()
+                    << "\n\t b.size(): " << b.size()
+        );
+
+        return std::pow(correlation(a,b),2.0);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename alloc
+        >
+    double mean_squared_error (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(a.size() == b.size(),
+                    "\t double mean_squared_error(a,b)"
+                    << "\n\t a and b must be the same length."
+                    << "\n\t a.size(): " << a.size()
+                    << "\n\t b.size(): " << b.size()
+        );
+
+        return mean(squared(matrix_cast<double>(vector_to_matrix(a))-matrix_cast<double>(vector_to_matrix(b))));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename matrix_type
         >
     class running_covariance
