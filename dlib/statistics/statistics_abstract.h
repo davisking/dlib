@@ -13,6 +13,100 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T, 
+        typename alloc
+        >
+    double mean_sign_agreement (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    );
+    /*!
+        requires
+            - a.size() == b.size()
+        ensures
+            - returns the number of times a[i] has the same sign as b[i] divided by
+              a.size().  So we return the probability that elements of a and b have
+              the same sign.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename alloc
+        >
+    double correlation (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    );
+    /*!
+        requires
+            - a.size() == b.size()
+            - a.size() > 1
+        ensures
+            - returns the correlation coefficient between all the elements of a and b.
+              (i.e. how correlated is a(i) with b(i))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename alloc
+        >
+    double covariance (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    );
+    /*!
+        requires
+            - a.size() == b.size()
+            - a.size() > 1
+        ensures
+            - returns the covariance between all the elements of a and b.
+              (i.e. how does a(i) vary with b(i))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename alloc
+        >
+    double r_squared (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    );
+    /*!
+        requires
+            - a.size() == b.size()
+            - a.size() > 1
+        ensures
+            - returns the R^2 coefficient of determination between all the elements of a and b.
+              This value is just the square of correlation(a,b).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename alloc
+        >
+    double mean_squared_error (
+        const std::vector<T,alloc>& a,
+        const std::vector<T,alloc>& b
+    );
+    /*!
+        requires
+            - a.size() == b.size()
+        ensures
+            - returns the mean squared error between all the elements of a and b.
+              (i.e. mean(squared(vector_to_matrix(a)-vector_to_matrix(b))))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T
         >
     class running_stats
@@ -307,100 +401,6 @@ namespace dlib
                   presented to this object via add().
         !*/
     };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T, 
-        typename alloc
-        >
-    double mean_sign_agreement (
-        const std::vector<T,alloc>& a,
-        const std::vector<T,alloc>& b
-    );
-    /*!
-        requires
-            - a.size() == b.size()
-        ensures
-            - returns the number of times a[i] has the same sign as b[i] divided by
-              a.size().  So we return the probability that elements of a and b have
-              the same sign.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T, 
-        typename alloc
-        >
-    double correlation (
-        const std::vector<T,alloc>& a,
-        const std::vector<T,alloc>& b
-    );
-    /*!
-        requires
-            - a.size() == b.size()
-            - a.size() > 1
-        ensures
-            - returns the correlation coefficient between all the elements of a and b.
-              (i.e. how correlated is a(i) with b(i))
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T, 
-        typename alloc
-        >
-    double covariance (
-        const std::vector<T,alloc>& a,
-        const std::vector<T,alloc>& b
-    );
-    /*!
-        requires
-            - a.size() == b.size()
-            - a.size() > 1
-        ensures
-            - returns the covariance between all the elements of a and b.
-              (i.e. how does a(i) vary with b(i))
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T, 
-        typename alloc
-        >
-    double r_squared (
-        const std::vector<T,alloc>& a,
-        const std::vector<T,alloc>& b
-    );
-    /*!
-        requires
-            - a.size() == b.size()
-            - a.size() > 1
-        ensures
-            - returns the R^2 coefficient of determination between all the elements of a and b.
-              This value is just the square of correlation(a,b).
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T, 
-        typename alloc
-        >
-    double mean_squared_error (
-        const std::vector<T,alloc>& a,
-        const std::vector<T,alloc>& b
-    );
-    /*!
-        requires
-            - a.size() == b.size()
-        ensures
-            - returns the mean squared error between all the elements of a and b.
-              (i.e. mean(squared(vector_to_matrix(a)-vector_to_matrix(b))))
-    !*/
 
 // ----------------------------------------------------------------------------------------
 
