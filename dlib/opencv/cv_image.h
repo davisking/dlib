@@ -16,6 +16,7 @@ namespace dlib
     {
     public:
         typedef pixel_type type;
+        typedef default_memory_manager mem_manager_type;
 
         cv_image (const IplImage* img) 
         {
