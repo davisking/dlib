@@ -284,6 +284,12 @@ namespace dlib
         unsigned long size (
         ) const { return static_cast<unsigned long>(nc_ * nr_); }
 
+        long width_step (
+        ) const
+        {
+            return nc_;
+        }
+
     private:
 
         // this object exists just so we can have a row type object that
@@ -348,10 +354,11 @@ namespace dlib
     }
 
     template <
-        typename T 
+        typename T,
+        typename mem_manager
         >
     void deserialize (
-        array2d<T>& item, 
+        array2d<T,mem_manager>& item, 
         std::istream& in
     )   
     {

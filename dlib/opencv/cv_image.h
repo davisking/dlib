@@ -61,6 +61,7 @@ namespace dlib
 
         long nr() const { return _nr; }
         long nc() const { return _nc; }
+        long width_step() const { return _widthStep; }
 
         cv_image& operator=( const cv_image& item)
         {
