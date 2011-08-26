@@ -9,6 +9,8 @@
 #include <dlib/interfaces/enumerable.h>
 #include <dlib/array2d.h>
 #include "tester.h"
+#include <dlib/pixel.h>
+#include <dlib/image_transforms.h>
 
 namespace  
 {
@@ -395,6 +397,157 @@ namespace
 
     }
 
+    void test_serialization()
+    {
+        // Do these tests because there are overloads of the serialize routines
+        // specifically for these types of pixel (except for unsigned short,  
+        // we do that because you can never have too many tests).
+        {
+            array2d<rgb_alpha_pixel> img, img2;
+            img.set_size(3,2);
+            assign_all_pixels(img, 5);
+            img[1][1].red = 9;
+            img[1][1].green = 8;
+            img[1][1].blue = 7;
+            img[1][1].alpha = 3;
+            ostringstream sout;
+            serialize(img, sout);
+            istringstream sin(sout.str());
+            deserialize(img2, sin);
+
+            DLIB_TEST(img2.nr() == 3);
+            DLIB_TEST(img2.nc() == 2);
+
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    DLIB_TEST(img[r][c].red == img2[r][c].red);
+                    DLIB_TEST(img[r][c].green == img2[r][c].green);
+                    DLIB_TEST(img[r][c].blue == img2[r][c].blue);
+                    DLIB_TEST(img[r][c].alpha == img2[r][c].alpha);
+                }
+            }
+        }
+        {
+            array2d<hsi_pixel> img, img2;
+            img.set_size(3,2);
+            assign_all_pixels(img, 5);
+            img[1][1].h = 9;
+            img[1][1].s = 2;
+            img[1][1].i = 3;
+            ostringstream sout;
+            serialize(img, sout);
+            istringstream sin(sout.str());
+            deserialize(img2, sin);
+
+            DLIB_TEST(img2.nr() == 3);
+            DLIB_TEST(img2.nc() == 2);
+
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    DLIB_TEST(img[r][c].h == img2[r][c].h);
+                    DLIB_TEST(img[r][c].s == img2[r][c].s);
+                    DLIB_TEST(img[r][c].i == img2[r][c].i);
+                }
+            }
+        }
+        {
+            array2d<bgr_pixel> img, img2;
+            img.set_size(3,2);
+            assign_all_pixels(img, 5);
+            img[1][1].red = 1;
+            img[1][1].green = 2;
+            img[1][1].blue = 3;
+            ostringstream sout;
+            serialize(img, sout);
+            istringstream sin(sout.str());
+            deserialize(img2, sin);
+
+            DLIB_TEST(img2.nr() == 3);
+            DLIB_TEST(img2.nc() == 2);
+
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    DLIB_TEST(img[r][c].red == img2[r][c].red);
+                    DLIB_TEST(img[r][c].green == img2[r][c].green);
+                    DLIB_TEST(img[r][c].blue == img2[r][c].blue);
+                }
+            }
+        }
+        {
+            array2d<rgb_pixel> img, img2;
+            img.set_size(3,2);
+            assign_all_pixels(img, 5);
+            img[1][1].red = 1;
+            img[1][1].green = 2;
+            img[1][1].blue = 3;
+            ostringstream sout;
+            serialize(img, sout);
+            istringstream sin(sout.str());
+            deserialize(img2, sin);
+
+            DLIB_TEST(img2.nr() == 3);
+            DLIB_TEST(img2.nc() == 2);
+
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    DLIB_TEST(img[r][c].red == img2[r][c].red);
+                    DLIB_TEST(img[r][c].green == img2[r][c].green);
+                    DLIB_TEST(img[r][c].blue == img2[r][c].blue);
+                }
+            }
+        }
+        {
+            array2d<unsigned short> img, img2;
+            img.set_size(3,2);
+            assign_all_pixels(img, 5);
+            img[1][1] = 9;
+            ostringstream sout;
+            serialize(img, sout);
+            istringstream sin(sout.str());
+            deserialize(img2, sin);
+
+            DLIB_TEST(img2.nr() == 3);
+            DLIB_TEST(img2.nc() == 2);
+
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    DLIB_TEST(img[r][c] == img2[r][c]);
+                }
+            }
+        }
+        {
+            array2d<unsigned char> img, img2;
+            img.set_size(3,2);
+            assign_all_pixels(img, 5);
+            img[1][1] = 9;
+            ostringstream sout;
+            serialize(img, sout);
+            istringstream sin(sout.str());
+            deserialize(img2, sin);
+
+            DLIB_TEST(img2.nr() == 3);
+            DLIB_TEST(img2.nc() == 2);
+
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    DLIB_TEST(img[r][c] == img2[r][c]);
+                }
+            }
+        }
+    }
+
 
     class array2d_tester : public tester
     {
@@ -409,7 +562,9 @@ namespace
         )
         {
             dlog << LINFO << "testing kernel_1a";
-            array2d_kernel_test<array2d<unsigned long> >  ();
+            array2d_kernel_test<array2d<unsigned long> >();
+            print_spinner();
+            test_serialization();
             print_spinner();
         }
     } a;
