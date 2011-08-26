@@ -166,7 +166,10 @@ namespace
 #ifdef DLIB_PNG_SUPPORT
         {
             array2d<rgb_alpha_pixel> img;
+            array2d<rgb_pixel> img2, img3;
             img.set_size(14,15);
+            img2.set_size(img.nr(),img.nc());
+            img3.set_size(img.nr(),img.nc());
             for (long r = 0; r < 14; ++r)
             {
                 for (long c = 0; c < 15; ++c)
@@ -189,6 +192,11 @@ namespace
             DLIB_TEST(img.nr() == 14);
             DLIB_TEST(img.nc() == 15);
 
+            assign_all_pixels(img2, 255);
+            assign_all_pixels(img3, 0);
+            load_png(img2, "test.png");
+            assign_image(img3, img);
+
             for (long r = 0; r < 14; ++r)
             {
                 for (long c = 0; c < 15; ++c)
@@ -197,6 +205,10 @@ namespace
                     DLIB_TEST(img[r][c].green == r*14 + c + 2);
                     DLIB_TEST(img[r][c].blue == r*14 + c + 3);
                     DLIB_TEST(img[r][c].alpha == r*14 + c + 4);
+
+                    DLIB_TEST(img2[r][c].red == img3[r][c].red);
+                    DLIB_TEST(img2[r][c].green == img3[r][c].green);
+                    DLIB_TEST(img2[r][c].blue == img3[r][c].blue);
                 }
             }
         }

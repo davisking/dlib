@@ -100,6 +100,9 @@ namespace dlib
             }
             else if (is_rgba() && bit_depth_ == 8)
             {
+                if (!pixel_traits<typename T::type>::has_alpha)
+                    assign_all_pixels(t,0);
+
                 for ( unsigned n = 0; n < height_;n++ )
                 {
                     const unsigned char* v = get_row( n );
@@ -116,6 +119,9 @@ namespace dlib
             }
             else if (is_rgba() && bit_depth_ == 16)
             {
+                if (!pixel_traits<typename T::type>::has_alpha)
+                    assign_all_pixels(t,0);
+
                 for ( unsigned n = 0; n < height_;n++ )
                 {
                     const uint16* v = (uint16*)get_row( n );
