@@ -13,6 +13,7 @@
 #include "optimization/optimization_least_squares.h"
 #include "optimization/max_cost_assignment.h"
 #include "optimization/max_sum_submatrix.h"
+#include "optimization/find_map_nmplp.h"
 
 #endif // DLIB_OPTIMIZATIOn_HEADER
 
