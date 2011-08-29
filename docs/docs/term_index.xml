@@ -267,7 +267,7 @@
          <term file="ml.html" name="radial_basis_kernel"/>
 
 
-         <term file="dlib/svm/sparse_vector_abstract.h.html" name="sparse_vectors"/>
+         <term file="ml.html" name="sparse vectors"/>
          <term file="ml.html" name="sparse_linear_kernel"/>
          <term file="ml.html" name="sparse_polynomial_kernel"/>
          <term file="ml.html" name="sparse_sigmoid_kernel"/>

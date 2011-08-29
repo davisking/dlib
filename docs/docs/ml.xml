@@ -210,10 +210,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>find_gamma_with_big_centroid_gap</item> 
          <item>compute_mean_squared_distance</item> 
          <item>kernel_matrix</item> 
-         <item>
-               <name>sparse vectors</name>
-               <link>dlib/svm/sparse_vector_abstract.h.html#sparse_vectors</link>
-         </item>
+         <item>sparse vectors</item>
 
          
 
@@ -975,6 +972,20 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>krr_classification_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>sparse vectors</name>
+         <file>dlib/svm.h</file>
+         <spec_file>dlib/svm/sparse_vector_abstract.h</spec_file>
+         <description>
+            In dlib, sparse vectors are represented using the container objects
+            in the C++ STL. This file defines various useful functions for operating 
+            on these sparse vectors.
+         </description>
       </component>
       
    <!-- ************************************************************************* -->
