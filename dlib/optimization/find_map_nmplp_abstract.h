@@ -122,11 +122,22 @@ namespace dlib
             - map_problem == an object with an interface compatible with the map_problem
               object defined at the top of this file.
         ensures
+            - This function is a tool for approximately solving the MAP problem in a graphical 
+              model or factor graph with pairwise potential functions.  That is, it attempts 
+              to solve a certain kind of optimization problem which can be defined as follows:
+                 maximize: f(X)
+                 where X is a set of integer valued variables and f(X) can be written
+                 as the sum of functions which each involve only two variables from X.
+            - #map_assignment == the result of the optimization.   
             - #map_assignment.size() == prob.number_of_nodes()
             - for all valid i:
                 - #map_assignment[prob.node_id(i)] < prob.num_states(i)
-                - #map_assignment[prob.node_id(i)] == approximate MAP assignment for node i.
-
+                - #map_assignment[prob.node_id(i)] == approximate MAP assignment for node/variable i.
+            - eps controls the stopping condition, smaller values of eps lead to more accurate 
+              solutions of the relaxed linear program but may take more iterations.  Note that
+              the algorithm will never execute more than max_iter iterations regardless of
+              the setting of eps.
+              
 
             - This function is an implementation of the NMPLP algorithm introduced in the 
               following paper:
