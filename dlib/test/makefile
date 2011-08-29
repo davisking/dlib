@@ -54,6 +54,7 @@ SRC += empirical_kernel_map.cpp
 SRC += entropy_coder.cpp
 SRC += entropy_encoder_model.cpp
 SRC += geometry.cpp
+SRC += find_map_nmplp.cpp
 SRC += graph.cpp
 SRC += hash.cpp
 SRC += hash_map.cpp
