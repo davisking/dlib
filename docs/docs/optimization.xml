@@ -49,6 +49,7 @@
          <item>solve_trust_region_subproblem</item> 
          <item>max_cost_assignment</item> 
          <item>max_sum_submatrix</item> 
+         <item>find_map_nmplp</item> 
       </section>
 
       <section>
@@ -455,6 +456,34 @@ subject to the following constraint:
               This function finds the submatrix within a user supplied matrix which has the largest sum.  It then
               zeros out that submatrix and repeats the process until no more maximal submatrices can 
               be found.   
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_map_nmplp</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/find_map_nmplp_abstract.h</spec_file>
+         <description>
+              This function is a tool for approximately solving the MAP problem in a graphical 
+              model or factor graph with pairwise potential functions.  That is, it attempts 
+              to solve a certain kind of optimization problem which can be defined as follows:
+<pre>
+   maximize: f(X)
+   where X is a set of integer valued variables and f(X) can be written
+   as the sum of functions which each involve only two variables from X.
+</pre>
+<br/>
+<br/>
+            This function is an implementation of the NMPLP algorithm introduced in the 
+            following paper:
+                <blockquote>
+                Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations 
+                by Amir Globerson Tommi Jaakkola
+                </blockquote>
+
          </description>
                                  
       </component>

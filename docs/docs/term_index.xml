@@ -55,6 +55,7 @@
          <term file="optimization.html" name="solve_least_squares_lm"/>
          <term file="optimization.html" name="find_min_trust_region"/>
          <term file="optimization.html" name="find_max_trust_region"/>
+         <term file="optimization.html" name="find_map_nmplp"/>
          <term file="optimization.html" name="solve_trust_region_subproblem"/>
          <term file="optimization.html" name="find_min_single_variable"/>
          <term file="optimization.html" name="find_min_using_approximate_derivatives"/>
