@@ -16,9 +16,14 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object represents a factor graph or graphical model.  In 
-                particular, this document defines the interface a MAP problem on
+                particular, this object defines the interface a MAP problem on
                 a factor graph must implement if it is to be solved using the 
                 find_map_nmplp() routine defined at the bottom of this file.  
+
+                Note that there is no dlib::map_problem object.  What you are
+                looking at here is simply the interface definition for a map problem.
+                You must implement your own version of this object for the problem
+                you wish to solve and then pass it to the find_map_nmplp() routine.
         !*/
 
     public:
@@ -31,9 +36,9 @@ namespace dlib
                     the nodes/variables in this factor graph.  
 
                     Note that you can't dereference the iterator and
-                    obtain a value.  The iterator is opaque to the user.
-                    It is used only as arguments to the other methods
-                    defined in this interface.
+                    obtain a value.  That is, the iterator is opaque to 
+                    the user.  It is used only as an argument to the other 
+                    methods defined in this interface.
             !*/
 
         public:
@@ -42,6 +47,23 @@ namespace dlib
             /*!
                 ensures
                     - constructs an iterator in an undefined state
+            !*/
+
+            node_iterator(
+                const node_iterator& item
+            );
+            /*!
+                ensures
+                    - #*this is a copy of item
+            !*/
+
+            node_iterator& operator= (
+                const node_iterator& item
+            );
+            /*!
+                ensures
+                    - #*this is a copy of item
+                    - returns #*this
             !*/
 
             bool operator== (
@@ -70,7 +92,7 @@ namespace dlib
                 ensures
                     - advances *this to the next node in the factor graph.
                     - returns a reference to the updated *this
-                      (i.e. this is the ++object form of operator++)
+                      (i.e. this is the ++object form of the increment operator)
             !*/
         };
 
@@ -89,6 +111,23 @@ namespace dlib
             /*!
                 ensures
                     - constructs an iterator in an undefined state
+            !*/
+
+            neighbor_iterator(
+                const neighbor_iterator& item
+            );
+            /*!
+                ensures
+                    - #*this is a copy of item
+            !*/
+
+            neighbor_iterator& operator= (
+                const neighbor_iterator& item
+            );
+            /*!
+                ensures
+                    - #*this is a copy of item
+                    - returns #*this
             !*/
 
             bool operator== (
@@ -117,7 +156,7 @@ namespace dlib
                 ensures
                     - advances *this to the next node in the factor graph.
                     - returns a reference to the updated *this
-                      (i.e. this is the ++object form of operator++)
+                      (i.e. this is the ++object form of the increment operator) 
             !*/
         };
 
