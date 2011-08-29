@@ -15,25 +15,110 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
+                This object represents a factor graph or graphical model.  In 
+                particular, this document defines the interface a MAP problem on
+                a factor graph must implement if it is to be solved using the 
+                find_map_nmplp() routine defined at the bottom of this file.  
         !*/
 
     public:
 
         class node_iterator
         {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a simple forward iterator for iterating over 
+                    the nodes/variables in this factor graph.  
+
+                    Note that you can't dereference the iterator and
+                    obtain a value.  The iterator is opaque to the user.
+                    It is used only as arguments to the other methods
+                    defined in this interface.
+            !*/
+
         public:
-            node_iterator();
-            bool operator== (const node_iterator& item) const; 
-            bool operator!= (const node_iterator& item) const;
-            node_iterator& operator++();
+            node_iterator(
+            );
+            /*!
+                ensures
+                    - constructs an iterator in an undefined state
+            !*/
+
+            bool operator== (
+                const node_iterator& item
+            ) const; 
+            /*!
+                ensures
+                    - returns true if *this and item both reference
+                      the same node in the factor graph and false 
+                      otherwise.
+            !*/
+
+            bool operator!= (
+                const node_iterator& item
+            ) const;
+            /*!
+                ensures
+                    - returns false if *this and item both reference
+                      the same node in the factor graph and true 
+                      otherwise.
+            !*/
+
+            node_iterator& operator++(
+            );
+            /*!
+                ensures
+                    - advances *this to the next node in the factor graph.
+                    - returns a reference to the updated *this
+                      (i.e. this is the ++object form of operator++)
+            !*/
         };
 
         class neighbor_iterator
         {
-            neighbor_iterator(); 
-            bool operator== (const neighbor_iterator& item) const; 
-            bool operator!= (const neighbor_iterator& item) const;
-            neighbor_iterator& operator++(); 
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a simple forward iterator for iterating over 
+                    the nodes/variables in this factor graph.  This version
+                    of the iterator is used for iterating over the neighbors
+                    of another node in the graph.
+            !*/
+
+            neighbor_iterator(
+            ); 
+            /*!
+                ensures
+                    - constructs an iterator in an undefined state
+            !*/
+
+            bool operator== (
+                const neighbor_iterator& item
+            ) const; 
+            /*!
+                ensures
+                    - returns true if *this and item both reference
+                      the same node in the factor graph and false 
+                      otherwise.
+            !*/
+
+            bool operator!= (
+                const neighbor_iterator& item
+            ) const;
+            /*!
+                ensures
+                    - returns false if *this and item both reference
+                      the same node in the factor graph and true 
+                      otherwise.
+            !*/
+
+            neighbor_iterator& operator++(
+            ); 
+            /*!
+                ensures
+                    - advances *this to the next node in the factor graph.
+                    - returns a reference to the updated *this
+                      (i.e. this is the ++object form of operator++)
+            !*/
         };
 
         unsigned long number_of_nodes (
@@ -46,36 +131,75 @@ namespace dlib
 
         node_iterator begin(
         ) const;
+        /*!
+            ensures
+                - returns an iterator to the first node in the graph.  If no such
+                  node exists then returns end().
+        !*/
 
         node_iterator end(
         ) const;
+        /*!
+            ensures
+                - returns an iterator to one past the last node in the graph.
+        !*/
 
         neighbor_iterator begin(
             const node_iterator& it
         ) const;
+        /*!
+            requires
+                - it == a valid iterator (i.e. it must be in the range [begin(), end()))
+            ensures
+                - returns an iterator to the first neighboring node of the node
+                  referenced by it.  If no such node exists then returns end(it).
+        !*/
 
         neighbor_iterator begin(
             const neighbor_iterator& it
         ) const;
+        /*!
+            requires
+                - it == a valid iterator. (i.e. it must be in the range 
+                  [begin(i), end(i)) where i is some valid iterator. ) 
+            ensures
+                - returns an iterator to the first neighboring node of the node
+                  referenced by it.  If no such node exists then returns end(it).
+        !*/
 
         neighbor_iterator end(
             const node_iterator& it
         ) const;
+        /*!
+            requires
+                - it == a valid iterator (i.e. it must be in the range [begin(), end()))
+            ensures
+                - returns an iterator to one past the last neighboring node of the node
+                  referenced by it.
+        !*/
 
         neighbor_iterator end(
             const neighbor_iterator& it
         ) const;
+        /*!
+            requires
+                - it == a valid iterator. (i.e. it must be in the range 
+                  [begin(i), end(i)) where i is some valid iterator. ) 
+            ensures
+                - returns an iterator to one past the last neighboring node of the node
+                  referenced by it.
+        !*/
 
         unsigned long node_id (
             const node_iterator& it
         ) const;
         /*!
             requires
-                - it == a valid iterator
+                - it == a valid iterator (i.e. it must be in the range [begin(), end()))
             ensures
                 - returns a number ID such that:
-                - 0 <= ID < number_of_nodes()
-                - ID == a number which uniquely identifies the node pointed to by it.
+                    - 0 <= ID < number_of_nodes()
+                    - ID == a number which uniquely identifies the node pointed to by it.
         !*/
 
         unsigned long node_id (
@@ -83,25 +207,52 @@ namespace dlib
         ) const;
         /*!
             requires
-                - it == a valid iterator
+                - it == a valid iterator. (i.e. it must be in the range 
+                  [begin(i), end(i)) where i is some valid iterator. ) 
             ensures
                 - returns a number ID such that:
-                - 0 <= ID < number_of_nodes()
-                - ID == a number which uniquely identifies the node pointed to by it.
+                    - 0 <= ID < number_of_nodes()
+                    - ID == a number which uniquely identifies the node pointed to by it.
         !*/
 
         unsigned long num_states (
             const node_iterator& it
         ) const;
+        /*!
+            requires
+                - it == a valid iterator (i.e. it must be in the range [begin(), end()))
+            ensures
+                - returns the number of states attainable by the node/variable referenced by it.
+        !*/
 
         unsigned long num_states (
             const neighbor_iterator& it
         ) const;
+        /*!
+            requires
+                - it == a valid iterator. (i.e. it must be in the range 
+                  [begin(i), end(i)) where i is some valid iterator. ) 
+            ensures
+                - returns the number of states attainable by the node/variable referenced by it.
+        !*/
 
+        // The next four functions all have the same contract.
         double factor_value (const node_iterator& it1,     const node_iterator& it2,     unsigned long s1, unsigned long s2) const;
         double factor_value (const neighbor_iterator& it1, const node_iterator& it2,     unsigned long s1, unsigned long s2) const;
         double factor_value (const node_iterator& it1,     const neighbor_iterator& it2, unsigned long s1, unsigned long s2) const;
         double factor_value (const neighbor_iterator& it1, const neighbor_iterator& it2, unsigned long s1, unsigned long s2) const;
+        /*!
+            requires
+                - it1 == a valid iterator
+                - it2 == a valid iterator
+                - 0 <= s1 < num_states(it1)
+                - 0 <= s2 < num_states(it2)
+                - it1 and it2 reference nodes which are neighbors in the factor graph
+            ensures
+                - returns the value of the factor/potential function for the given pair of 
+                  nodes, defined by it1 and it2, for the case where they take on the values
+                  s1 and s2 respectively.
+        !*/
 
     };
 
