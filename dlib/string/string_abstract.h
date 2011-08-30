@@ -528,7 +528,8 @@ namespace dlib
             - returns a vector V such that:
                 - V.size() == the number of substrings found in str.
                 - for all i: V[i] == The ith substring.  Note that it will not contain
-                  any delimiter characters (i.e. characters in delim). 
+                  any delimiter characters (i.e. characters in delim).  It will also
+                  never be an empty string.
                 - V contains the substrings in the order in which they appear in str.
                   That is, V[0] contains the first substring, V[1] the second, and
                   so on.
