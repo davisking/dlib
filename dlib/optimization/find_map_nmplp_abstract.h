@@ -311,6 +311,7 @@ namespace dlib
             - for all valid i: prob.num_states(i) >= 2
             - map_problem == an object with an interface compatible with the map_problem
               object defined at the top of this file.
+            - eps > 0
         ensures
             - This function is a tool for approximately solving the MAP problem in a graphical 
               model or factor graph with pairwise potential functions.  That is, it attempts 

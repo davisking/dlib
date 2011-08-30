@@ -24,6 +24,13 @@ namespace dlib
         double eps
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( eps > 0,
+                     "\t void find_map_nmplp()"
+                     << "\n\t eps must be greater than zero"
+                     << "\n\t eps:  " << eps 
+                );
+
         /*
             This function is an implementation of the NMPLP algorithm introduced in the 
             following paper:
