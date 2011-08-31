@@ -82,6 +82,7 @@ set (tests
    rand.cpp
    read_write_mutex.cpp
    reference_counter.cpp
+   scan_image.cpp
    sequence.cpp
    serialize.cpp
    set.cpp
