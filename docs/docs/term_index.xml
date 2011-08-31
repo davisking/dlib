@@ -986,6 +986,10 @@
          <term file="imaging.html" name="interest_point"/>
          <term file="imaging.html" name="surf_point"/>
 
+         <term file="imaging.html" name="scan_image"/>
+         <term file="dlib/image_processing/scan_image_abstract.h.html" name="all_images_same_size"/>
+         <term file="dlib/image_processing/scan_image_abstract.h.html" name="sum_of_rects_in_images"/>
+
 
 
          <term link="metaprogramming.html#DLIB_STACK_TRACE" name="DLIB_ENABLE_STACK_TRACE"/>

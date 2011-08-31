@@ -134,6 +134,7 @@
          <item>binary_union</item>
          <item>binary_difference</item>
          <item>binary_complement</item>
+         <item>scan_image</item>
       </section>
 
     </top>  
@@ -1055,6 +1056,21 @@
          <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
          <description>        
             This global function computes the complement of a binary image. 
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>scan_image</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_abstract.h</spec_file>
+         <description>        
+            This global function is a tool for sliding a set of rectangles
+            over an image space and finding the locations where the sum of pixels in
+            the rectangles exceeds a threshold.  It is useful for implementing
+            certain kinds of sliding window classifiers.
          </description>
                                  
       </component>
