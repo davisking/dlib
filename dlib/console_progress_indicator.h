@@ -131,7 +131,7 @@ namespace dlib
         if (cur_time != last_time)
         {
             last_time = cur_time;
-            double delta_t = cur_time - start_time;
+            double delta_t = static_cast<double>(cur_time - start_time);
             double delta_val = std::abs(cur - first_val);
 
             // don't do anything if cur is equal to first_val
