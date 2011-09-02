@@ -184,11 +184,12 @@ int main()
         // tell the trainer the parameters we want to use
         trainer.set_kernel(kernel_type(sigma));
 
-        double loo_error;
-        trainer.train(samples, labels, loo_error);
+        std::vector<double> loo_values; 
+        trainer.train(samples, labels, loo_values);
 
-        // Print sigma and the fraction of samples misclassified during LOO cross-validation.
-        cout << "sigma: " << sigma << "     LOO error: " << loo_error << endl;
+        // Print sigma and the fraction of samples correctly classified during LOO cross-validation.
+        const double classification_accuracy = mean_sign_agreement(labels, loo_values);
+        cout << "sigma: " << sigma << "     LOO accuracy: " << classification_accuracy << endl;
     }
 
 
