@@ -77,7 +77,7 @@ namespace dlib
         // need to lock a mutex here because getting and setting the
         // current working directory is not thread safe on windows.
         auto_mutex lock(cwd_mutex());
-        if (SetCurrentDirectory(new_dir.c_str()) == 0)
+        if (SetCurrentDirectoryA(new_dir.c_str()) == 0)
         {
             throw set_current_dir_error("Error changing current dir to '" + new_dir + "'");
         }
