@@ -71,6 +71,10 @@ namespace dlib
             hist_cells.clear();
         }
 
+        void copy_configuration (
+            const hog_image&
+        ){}
+
         template <
             typename image_type
             >

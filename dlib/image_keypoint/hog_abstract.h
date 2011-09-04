@@ -127,6 +127,20 @@ namespace dlib
                 - this object will have its initial value
         !*/
 
+        void copy_configuration (
+            const hog_image& item
+        );
+        /*!
+            ensures
+                - copies all the state information of item into *this except for state 
+                  information populated by load().  More precisely, given two hog_image 
+                  objects H1 and H2, the following sequence of instructions should always 
+                  result in both of them having the exact same state.
+                    H2.copy_configuration(H1);
+                    H1.load(img);
+                    H2.load(img);
+        !*/
+
         template <
             typename image_type
             >
