@@ -91,6 +91,12 @@ namespace dlib
         inline long nc (
         ) const { return num_block_cols; }
 
+        long get_num_dimensions (
+        ) const
+        {
+            return block_size*block_size*num_orientation_bins;
+        }
+
         inline const descriptor_type& operator() (
             long row,
             long col
