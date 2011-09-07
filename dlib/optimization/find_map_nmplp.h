@@ -35,7 +35,7 @@ namespace dlib
             This function is an implementation of the NMPLP algorithm introduced in the 
             following paper:
                 Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations 
-                by Amir Globerson Tommi Jaakkola
+                by Amir Globerson and Tommi Jaakkola
 
                 In particular, see the pseudocode in Figure 1.  The code in this function
                 follows what is described there.

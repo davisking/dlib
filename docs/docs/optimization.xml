@@ -481,7 +481,7 @@ subject to the following constraint:
             following paper:
                 <blockquote>
                 Fixing Max-Product: Convergent Message Passing Algorithms for MAP LP-Relaxations 
-                by Amir Globerson Tommi Jaakkola
+                by Amir Globerson and Tommi Jaakkola
                 </blockquote>
 
          </description>
