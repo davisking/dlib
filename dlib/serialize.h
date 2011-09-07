@@ -726,6 +726,76 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename alloc>
+    void serialize (
+        const std::vector<char,alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            const unsigned long size = static_cast<unsigned long>(item.size());
+            serialize(size,out); 
+            out.write(&item[0], item.size());
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::vector"); }
+    }
+
+    template <typename alloc>
+    void deserialize (
+        std::vector<char, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            unsigned long size;
+            deserialize(size,in); 
+            item.resize(size);
+            in.read(&item[0], item.size());
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::vector"); }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename alloc>
+    void serialize (
+        const std::vector<unsigned char,alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            const unsigned long size = static_cast<unsigned long>(item.size());
+            serialize(size,out); 
+            out.write((char*)&item[0], item.size());
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::vector"); }
+    }
+
+    template <typename alloc>
+    void deserialize (
+        std::vector<unsigned char, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            unsigned long size;
+            deserialize(size,in); 
+            item.resize(size);
+            in.read((char*)&item[0], item.size());
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::vector"); }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline void serialize (
         const std::string& item,
         std::ostream& out

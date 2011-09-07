@@ -504,6 +504,31 @@ namespace
     }
 
 
+    template <typename T>
+    void test_vector (
+    )
+    {
+        std::vector<T> a, b;
+
+        for (int i = -10; i < 30; ++i)
+        {
+            a.push_back(i);
+        }
+
+        ostringstream sout;
+        dlib::serialize(a, sout);
+        istringstream sin(sout.str());
+
+        dlib::deserialize(b, sin);
+
+
+        DLIB_TEST(a.size() == b.size());
+        DLIB_TEST(a.size() == 40);
+        for (unsigned long i = 0; i < a.size(); ++i)
+        {
+            DLIB_TEST(a[i] == b[i]);
+        }
+    }
 
 
 
@@ -526,6 +551,9 @@ namespace
         )
         {
             serialize_test();
+            test_vector<char>();
+            test_vector<unsigned char>();
+            test_vector<int>();
         }
     } a;
 
