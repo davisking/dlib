@@ -7,6 +7,7 @@
 #include "svm/svm_threaded.h"
 #include "svm/structural_svm_problem_threaded.h"
 #include "svm/structural_svm_distributed.h"
+#include "svm/structural_svm_object_detection_problem.h"
 
 #endif // DLIB_SVm_THREADED_HEADER
 
