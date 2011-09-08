@@ -19,8 +19,22 @@ namespace dlib
     class object_detector
     {
         /*!
-            WHAT THIS OBJECT REPRESENTS
+            REQUIREMENTS ON overlap_tester_type
+                overlap_tester_type must be a type with an interface compatible
+                with test_box_overlap.
 
+            REQUIREMENTS ON image_scanner_type
+                image_scanner_type must be an instance of the scan_image_pyramid
+                templated defined in dlib/image_processing/scan_image_pyramid_abstract.h
+                or an object with a compatible interface.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for detecting the positions of objects in 
+                an image.  In particular, it is a simple container to aggregate 
+                an instance of the scan_image_pyramid class, the weight vector 
+                needed by scan_image_pyramid, and finally an instance of 
+                test_box_overlap.  The test_box_overlap object is used to perform 
+                non-max suppression on the output of the scan_image_pyramid object.  
         !*/
     public:
         object_detector (
@@ -40,21 +54,23 @@ namespace dlib
         !*/
 
         object_detector (
-            const image_scanner_type& scanner_, 
-            const overlap_tester_type& overlap_tester_,
-            const matrix<double,0,1>& w_ 
+            const image_scanner_type& scanner, 
+            const overlap_tester_type& overlap_tester,
+            const matrix<double,0,1>& w 
         );
         /*!
             requires
-                - w_.size() == scanner_.get_num_dimensions() + 1
-                - scanner_.num_detection_templates() > 0
+                - w.size() == scanner.get_num_dimensions() + 1
+                - scanner.num_detection_templates() > 0
             ensures
-                - Initializes this detector... TODO describe
+                - When the operator() member function is called it will
+                  invoke scanner.detect(w,dets,w(w.size()-1)), suppress
+                  overlapping detections, and then report the results.
                 - when #*this is used to detect objects, the set of
                   output detections will never contain any overlaps
-                  with respect to overlap_tester_.  That is,  for all 
+                  with respect to overlap_tester.  That is, for all 
                   pairs of returned detections A and B, we will always
-                  have: overlap_tester_(A,B) == false
+                  have: overlap_tester(A,B) == false
         !*/
 
         object_detector& operator= (
@@ -74,8 +90,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-                - pixel_traits<typename image_type::type>::has_alpha == false
+                - img == an object which can be accepted by image_scanner_type::load()
             ensures
                 - performs object detection on the given image and returns a
                   vector which indicates the locations of all detected objects.
