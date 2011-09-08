@@ -55,7 +55,7 @@ namespace dlib
                 Finally, note that this object stores each row of data contiguously 
                 in memory, and the overall layout is in row major order.  However,
                 there might be padding at the end of each row.  To determine the
-                offset from one row to another you can use step_width(). 
+                offset from one row to another you can use width_step(). 
         !*/
 
 
@@ -210,7 +210,7 @@ namespace dlib
         /*!
             ensures
                 - returns the pointer offset to step from one row to another.
-                  That is, &item[0][0] + step_width(item) == &item[1][0].
+                  That is, &item[0][0] + item.width_step() == &item[1][0].
         !*/
 
     private:

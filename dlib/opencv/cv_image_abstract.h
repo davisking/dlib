@@ -147,7 +147,7 @@ namespace dlib
         /*!
             ensures
                 - returns the pointer offset to step from one row to another.
-                  That is, &item[0][0] + step_width(item) == &item[1][0].
+                  That is, &item[0][0] + item.width_step() == &item[1][0].
         !*/
     };
 
