@@ -78,6 +78,23 @@
       </section>
 
       <section>
+         <name>Object Detection</name>
+         <item>object_detector</item>
+         <item>scan_image</item>
+         <item>scan_image_pyramid</item>
+         <item>test_box_overlap</item>
+         <item nolink="true">
+            <name>Detection_Templates</name>
+            <sub>
+               <item>compute_box_dimensions</item>
+               <item>create_single_box_detection_template</item>
+               <item>create_overlapped_2x2_detection_template</item>
+               <item>create_grid_detection_template</item>
+            </sub>
+         </item>
+      </section>
+
+      <section>
          <name>Keypoints and Descriptors</name>
 
          <item>integral_image</item>
@@ -86,6 +103,7 @@
          <item>compute_dominant_angle</item>
          <item>compute_surf_descriptor</item>
          <item>hog_image</item>
+         <item>hashed_feature_image</item>
          <item>haar_x</item>
          <item>haar_y</item>
          <item>get_interest_points</item>
@@ -134,7 +152,6 @@
          <item>binary_union</item>
          <item>binary_difference</item>
          <item>binary_complement</item>
-         <item>scan_image</item>
       </section>
 
     </top>  
@@ -273,6 +290,23 @@
                     Histograms of Oriented Gradients for Human Detection
                     by Navneet Dalal and Bill Triggs
                 </blockquote>
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>hashed_feature_image</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/hashed_feature_image_abstract.h</spec_file>
+         <description>
+                This object is a tool for performing image feature extraction.  In
+                particular, it wraps another image feature extractor and converts
+                the wrapped image feature vectors into indicator vectors.  It does
+                this by hashing each feature vector and then returns a new vector 
+                which is zero everywhere except for the position determined by the 
+                hash.  
          </description>
                                  
       </component>
@@ -1076,7 +1110,115 @@
       </component>
             
    <!-- ************************************************************************* -->
-      
+
+      <component>
+         <name>scan_image_pyramid</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_pyramid_abstract.h</spec_file>
+         <description>        
+                This object is a tool for running a sliding window classifier over
+                an image pyramid.  This object can also be understood as a general 
+                tool for implementing the spatial pyramid models described in the paper:
+                <blockquote>
+                    Beyond Bags of Features: Spatial Pyramid Matching for Recognizing 
+                    Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
+                    and Jean Ponce
+                </blockquote>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>object_detector</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/object_detector_abstract.h</spec_file>
+         <description>        
+                This object is a tool for detecting the positions of objects in 
+                an image.  In particular, it is a simple container to aggregate 
+                an instance of the <a href="#scan_image_pyramid">scan_image_pyramid</a> 
+                class, the weight vector needed by scan_image_pyramid, and finally 
+                an instance of <a href="#test_box_overlap">test_box_overlap</a>.  The test_box_overlap 
+                object is used to perform non-max suppression on the output of the 
+                scan_image_pyramid object.  
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>test_box_overlap</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/box_overlap_testing_abstract.h</spec_file>
+         <description>        
+            This object is a simple function object for determining if two 
+            <a href="algorithms.html#rectangle">rectangles</a> overlap.  
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>compute_box_dimensions</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/detection_template_tools_abstract.h</spec_file>
+         <description>        
+            This function is a tool for computing a rectangle with a particular 
+            width/height ratio and area.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>create_single_box_detection_template</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/detection_template_tools_abstract.h</spec_file>
+         <description>        
+            This function is a tool for creating a detection template usable by 
+            the <a href="#scan_image_pyramid">scan_image_pyramid</a> object.  This
+            particular function creates a detection template with exactly one feature
+            extraction region.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>create_overlapped_2x2_detection_template</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/detection_template_tools_abstract.h</spec_file>
+         <description>        
+            This function is a tool for creating a detection template usable by 
+            the <a href="#scan_image_pyramid">scan_image_pyramid</a> object.  This
+            particular function creates a detection template with four overlapping feature
+            extraction regions.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>create_grid_detection_template</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/detection_template_tools_abstract.h</spec_file>
+         <description>        
+            This function is a tool for creating a detection template usable by 
+            the <a href="#scan_image_pyramid">scan_image_pyramid</a> object.  This
+            particular function creates a detection template with a grid of feature
+            extraction regions.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
    </components>
 
    <!-- ************************************************************************* -->

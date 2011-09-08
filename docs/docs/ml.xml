@@ -93,6 +93,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       <section>
          <name>Structured Prediction</name>
          <item>structural_svm_problem</item> 
+         <item>structural_svm_object_detection_problem</item> 
          <item>structural_svm_problem_threaded</item> 
          <item>svm_struct_controller_node</item> 
          <item>svm_struct_processing_node</item> 
@@ -2101,6 +2102,29 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             you have a multi-core CPU and the separation oracle takes a long time to compute.  Or even better, if you
             have multiple computers then you can use the <a href="#svm_struct_controller_node">svm_struct_controller_node</a>
             to distribute the work across many computers.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>structural_svm_object_detection_problem</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_object_detection_problem_abstract.h</spec_file>
+         <description>
+               This object is a tool for learning the parameter vector needed to use
+               a <a href="imaging.html#scan_image_pyramid">scan_image_pyramid</a> object.  
+
+            <p>
+               It learns the parameter vector by formulating the problem as a <a href="#structural_svm_problem">structural 
+               SVM problem</a>.  The general approach is similar to the method discussed in 
+               Learning to Localize Objects with Structured Output Regression by 
+               Matthew B. Blaschko and Christoph H. Lampert.  However, the method has 
+               been extended to datasets with multiple, potentially overlapping, objects 
+               per image and the measure of loss is different from what is described in 
+               the paper.  
+            </p>
          </description>
                                  
       </component>

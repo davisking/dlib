@@ -36,6 +36,7 @@
          <term file="dlib/optimization/optimization_oca_abstract.h.html" name="oca_problem"/>
          <term file="ml.html" name="structural_svm_problem"/>
          <term file="ml.html" name="structural_svm_problem_threaded"/>
+         <term file="ml.html" name="structural_svm_object_detection_problem"/>
          <term file="ml.html" name="svm_struct_controller_node"/>
          <term file="ml.html" name="svm_struct_processing_node"/>
 
@@ -979,6 +980,7 @@
          <term file="imaging.html" name="compute_dominant_angle"/>
          <term file="imaging.html" name="compute_surf_descriptor"/>
          <term file="imaging.html" name="hog_image"/>
+         <term file="imaging.html" name="hashed_feature_image"/>
          <term file="imaging.html" name="haar_x"/>
          <term file="imaging.html" name="haar_y"/>
          <term file="imaging.html" name="get_interest_points"/>
@@ -986,7 +988,14 @@
          <term file="imaging.html" name="interest_point"/>
          <term file="imaging.html" name="surf_point"/>
 
+         <term file="imaging.html" name="test_box_overlap"/>
+         <term file="imaging.html" name="object_detector"/>
          <term file="imaging.html" name="scan_image"/>
+         <term file="imaging.html" name="scan_image_pyramid"/>
+         <term file="imaging.html" name="compute_box_dimensions"/>
+         <term file="imaging.html" name="create_single_box_detection_template"/>
+         <term file="imaging.html" name="create_overlapped_2x2_detection_template"/>
+         <term file="imaging.html" name="create_grid_detection_template"/>
          <term file="dlib/image_processing/scan_image_abstract.h.html" name="all_images_same_size"/>
          <term file="dlib/image_processing/scan_image_abstract.h.html" name="sum_of_rects_in_images"/>
 
