@@ -12,30 +12,47 @@ namespace dlib
 
     class test_box_overlap
     {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a simple function object for determining if two rectangles
+                overlap.  
+        !*/
+
     public:
         test_box_overlap (
-        ) : overlap_thresh(0.5)
-        {}
+        );
+        /*!
+            ensures
+                - #get_overlap_thresh() == 0.5
+        !*/
 
         test_box_overlap (
-            double overlap_thresh_
-        ) : overlap_thresh(overlap_thresh_) {}
+            double overlap_thresh
+        );
+        /*!
+            requires
+                - 0 <= overlap_thresh <= 1
+            ensures
+                - #get_overlap_thresh() == overlap_thresh
+        !*/
 
         bool operator() (
             const dlib::rectangle& a,
             const dlib::rectangle& b
-        ) const
-        {
-            const double inner = a.intersect(b).area();
-            const double outer = (a+b).area();
-            if (inner/outer > overlap_thresh)
-                return true;
-            else
-                return false;
-        }
+        ) const;
+        /*!
+            ensures
+                - returns true if a.intersect(b).area()/(a+b).area > get_overlap_thresh()
+                  and false otherwise.  (i.e. returns true if a and b overlap enough)
+        !*/
 
         double get_overlap_thresh (
         ) const;
+        /*!
+            ensures
+                - returns the threshold used to determine if two rectangles overlap.
+
+        !*/
 
     };
 
