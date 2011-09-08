@@ -4,6 +4,7 @@
 #define DLIB_IMAGE_PROCESSInG_H___ 
 
 #include "image_processing/scan_image.h"
+#include "image_processing/scan_image_pyramid.h"
 
 #endif // DLIB_IMAGE_PROCESSInG_H___
 
