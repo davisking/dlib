@@ -6,6 +6,7 @@
 #include "image_processing/scan_image.h"
 #include "image_processing/scan_image_pyramid.h"
 #include "image_processing/detection_template_tools.h"
+#include "image_processing/object_detector.h"
 
 #endif // DLIB_IMAGE_PROCESSInG_H___
 
