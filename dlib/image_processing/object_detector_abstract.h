@@ -20,13 +20,12 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON overlap_tester_type
-                overlap_tester_type must be a type with an interface compatible
-                with test_box_overlap.
+                overlap_tester_type must be an implementation of the test_box_overlap
+                object defined in dlib/image_processing/box_overlap_testing_abstract.h.
 
             REQUIREMENTS ON image_scanner_type
-                image_scanner_type must be an instance of the scan_image_pyramid
-                templated defined in dlib/image_processing/scan_image_pyramid_abstract.h
-                or an object with a compatible interface.
+                image_scanner_type must be an implementation of 
+                dlib/image_processing/scan_image_pyramid_abstract.h
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for detecting the positions of objects in 
@@ -61,7 +60,7 @@ namespace dlib
         /*!
             requires
                 - w.size() == scanner.get_num_dimensions() + 1
-                - scanner.num_detection_templates() > 0
+                - scanner.get_num_detection_templates() > 0
             ensures
                 - When the operator() member function is called it will
                   invoke scanner.detect(w,dets,w(w.size()-1)), suppress
