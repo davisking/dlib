@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.42" date="Jun 24, 2011">
+New Stuff:
    - Added the check_sub_option() method to the command line parser check
      object.
    - Added match_endings to the dir_nav utils.
@@ -29,7 +42,7 @@ Bug fixes:
 
 Other:
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
