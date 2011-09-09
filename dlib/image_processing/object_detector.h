@@ -205,13 +205,8 @@ namespace dlib
             std::vector<std::pair<double, rectangle> > dets;
             const double thresh = w(scanner.get_num_dimensions());
 
-            std::cout << "!!!!! thresh: "<< thresh << std::endl;
-
             scanner.load(img);
             scanner.detect(w, dets, thresh);
-
-            std::cout << "dets.size(): "<< dets.size() << std::endl;
-
 
             for (unsigned long i = 0; i < dets.size() && final_dets.size() < 100; ++i)
             {

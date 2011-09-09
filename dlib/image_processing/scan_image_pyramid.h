@@ -212,7 +212,6 @@ namespace dlib
             if (levels >= max_pyramid_levels)
                 break;
         }
-        std::cout << "levels: " << levels << std::endl;
 
         if (feats.max_size() < levels)
             feats.set_max_size(levels);
@@ -518,29 +517,14 @@ namespace dlib
                     point p = point_dets[j].second;
                     p = feats[l].feat_to_image_space(p);
                     rectangle rect = translate_rect(det_templates[i].object_box, p);
-                    rectangle old_rect = rect; // TODO  remove later
                     rect = pyr.rect_up(rect, l);
-                    DLIB_CASSERT(pyr.rect_down(rect,l) == old_rect,"");
 
                     dets.push_back(std::make_pair(score, rect));
-                    {
-                        rectangle r = pyr.rect_down(rect,l);
-                        const point origin = center(r);
-                        DLIB_CASSERT(origin == p , origin << "  " << p);
-                        DLIB_CASSERT(feats[l].image_to_feat_space(origin) == point_dets[j].second, "");
-
-
-                    }
-
                 }
             }
         }
 
-
-        std::cout << "THRESH: " << thresh << std::endl;
-        std::cout << "NUM POINT DETS FOUND: " << dets.size() << std::endl;
         std::sort(dets.rbegin(), dets.rend(), compare_pair_rect);
-
     }
 
 // ----------------------------------------------------------------------------------------

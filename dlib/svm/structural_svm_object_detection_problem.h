@@ -104,9 +104,6 @@ namespace dlib
             std::vector<rectangle> mapped_rects;
             scanner.get_feature_vector(rects[idx], psi, mapped_rects);
             psi(scanner.get_num_dimensions()) = -1.0*rects[idx].size();
-            std::cout << "truth psi length: "<< length(psi) << std::endl;
-            std::cout << "max truth psi: "<< max(abs(psi)) << std::endl;
-            std::cout << "index of max truth psi: "<< index_of_max(abs(psi)) << std::endl;
 
             // check if any of the boxes overlap.  If they do then it is impossible for
             // us to learn to correctly classify this sample
@@ -149,9 +146,6 @@ namespace dlib
                 }
 
             }
-
-            //std::cout << "TRUTH PSI: "<< trans(psi) << std::endl;
-            //abort();
         }
 
         virtual void separation_oracle (
@@ -178,7 +172,7 @@ namespace dlib
             // on a truth rectangle.
             loss = rects[idx].size()*loss_per_error;
 
-            // Measure the risk loss augmented score for the detections which hit a truth rect.
+            // Measure the loss augmented score for the detections which hit a truth rect.
             std::vector<double> truth_score_hits(rects[idx].size(), 0);
 
             std::vector<rectangle> final_dets;
@@ -206,7 +200,6 @@ namespace dlib
             }
 
 
-            double expected_psi_dot_w = 0;
             // keep track of which truth boxes we have hit so far.
             std::vector<bool> hit_truth_table(rects[idx].size(), false);
             final_dets.clear();
@@ -230,13 +223,11 @@ namespace dlib
                         {
                             hit_truth_table[truth.second] = true;
                             final_dets.push_back(dets[i].second);
-                            expected_psi_dot_w += dets[i].first;
                             loss -= loss_per_error;
                         }
                         else
                         {
                             final_dets.push_back(dets[i].second);
-                            expected_psi_dot_w += dets[i].first;
                             loss += loss_per_error;
                         }
                     }
@@ -245,41 +236,16 @@ namespace dlib
                 {
                     // didn't hit anything
                     final_dets.push_back(dets[i].second);
-                    expected_psi_dot_w += dets[i].first;
                     loss += loss_per_error;
                 }
             }
 
             psi.set_size(get_num_dimensions());
             psi = 0;
-            //feature_vector_type other_psi;
-            //other_psi.set_size(get_num_dimensions());
-            //other_psi = 0;
-            //scanner.get_feature_vector(final_dets, other_psi);
             std::vector<rectangle> mapped_rects;
             scanner.get_feature_vector(final_dets, psi, mapped_rects);
-            DLIB_CASSERT(mapped_rects.size() == final_dets.size(),"");
-            if (std::abs(expected_psi_dot_w  - dot(psi,current_solution)) > 1e-8)
-            {
-                std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-                std::cout << "   psi dot w:          "<< dot(psi,current_solution) << std::endl;
-                std::cout << "   expected psi dot w: "<< expected_psi_dot_w << std::endl;
-                std::cout << "   final_dets.size(): "<< final_dets.size() << std::endl;
-                for (unsigned long i = 0; i < final_dets.size(); ++i)
-                {
-                    DLIB_CASSERT(final_dets[i] == mapped_rects[i], final_dets[i] << "   " << mapped_rects[i] << "   i: " << i);
-                }
-                abort();
-            }
-            for (unsigned long i = 0; i < final_dets.size(); ++i)
-            {
-                DLIB_CASSERT(final_dets[i] == mapped_rects[i], final_dets[i] << "   " << mapped_rects[i] << "   i: " << i);
-            }
-            psi(scanner.get_num_dimensions()) = -1.0*final_dets.size();
 
-            std::cout << "LOSS: "<< loss << std::endl;
-            std::cout << "   final_dets.size(): "<< final_dets.size() << std::endl;
-            //std::cout << "PSI: "<< trans(psi) << std::endl;
+            psi(scanner.get_num_dimensions()) = -1.0*final_dets.size();
         }
 
 
