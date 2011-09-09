@@ -20,7 +20,17 @@ namespace dlib
 
         test_box_overlap (
             double overlap_thresh_
-        ) : overlap_thresh(overlap_thresh_) {}
+        ) : overlap_thresh(overlap_thresh_) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 <= overlap_thresh && overlap_thresh <= 1, 
+                "\t test_box_overlap::test_box_overlap(overlap_thresh)"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t overlap_thresh:   " << overlap_thresh
+                << "\n\t this: " << this
+                );
+
+        }
 
         bool operator() (
             const dlib::rectangle& a,
