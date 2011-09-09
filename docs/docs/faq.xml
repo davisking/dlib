@@ -7,7 +7,7 @@
    <!-- ************************************************************************* -->
    <questions group="General">
       <question text="Why isn't serialization working?">
-         Here are the potabilities:
+         Here are the possibilities:
          <ul>
             <li>You are using a file stream and forgot to put it into binary mode.  
                You need to do something like this:
