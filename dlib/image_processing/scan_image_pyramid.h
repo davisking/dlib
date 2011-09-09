@@ -556,6 +556,19 @@ namespace dlib
         std::vector<rectangle>& mapped_rects
     ) const
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(get_num_detection_templates() > 0 &&
+                    is_loaded_with_image() &&
+                    psi.size() >= get_num_dimensions(), 
+            "\t void scan_image_pyramid::get_feature_vector()"
+            << "\n\t Invalid inputs were given to this function "
+            << "\n\t get_num_detection_templates(): " << get_num_detection_templates()
+            << "\n\t is_loaded_with_image(): " << is_loaded_with_image()
+            << "\n\t psi.size():             " << psi.size()
+            << "\n\t get_num_dimensions():   " << get_num_dimensions()
+            << "\n\t this: " << this
+            );
+
         psi = 0;
 
         mapped_rects.clear();
