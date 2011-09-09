@@ -66,7 +66,7 @@ namespace dlib
         );
         /*!
             requires
-                - images.size() == truth_rects.size()
+                - is_learning_problem(images, truth_rects)
                 - scanner.get_num_detection_templates() > 0
             ensures
                 - This object attempts to learn a mapping from the given images to the 

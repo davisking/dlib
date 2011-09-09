@@ -26,15 +26,25 @@ namespace dlib
             const image_scanner_type& scanner,
             const overlap_tester_type& overlap_tester,
             const image_array_type& images_,
-            const std::vector<std::vector<rectangle> >& rects_,
+            const std::vector<std::vector<rectangle> >& truth_rects,
             unsigned long num_threads = 2
         ) :
             structural_svm_problem_threaded<matrix<double,0,1> >(num_threads),
             boxes_overlap(overlap_tester),
             images(images_),
-            rects(rects_),
+            rects(truth_rects),
             overlap_eps(0.5)
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_learning_problem(images_, truth_rects) && 
+                         scanner.get_num_detection_templates() > 0,
+                "\t structural_svm_object_detection_problem::structural_svm_object_detection_problem()"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t scanner.get_num_detection_templates(): " << scanner.get_num_detection_templates()
+                << "\n\t is_learning_problem(images_,truth_rects): " << is_learning_problem(images_,truth_rects)
+                << "\n\t this: " << this
+                );
+
             scanner_config.copy_configuration(scanner);
 
             max_num_dets = 0;
@@ -50,6 +60,14 @@ namespace dlib
             double eps
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 < eps && eps < 1, 
+                "\t structural_svm_object_detection_problem::set_overlap_eps(eps)"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t eps:  " << eps 
+                << "\n\t this: " << this
+                );
+
             overlap_eps = eps;
         }
 
