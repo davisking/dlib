@@ -511,7 +511,7 @@ namespace dlib
                                 (temp.size() > 1 && temp[temp.size()-2] == '\\') ))
                             {
                                 buffer_token(DOUBLE_QUOTED_TEXT,temp);                         
-                                buffer_token(OTHER,'"');
+                                buffer_token(OTHER,"\"");
                                 break;
                             }
                             else
