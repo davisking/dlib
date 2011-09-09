@@ -16,6 +16,11 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is a simple function object for determining if two rectangles
                 overlap.  
+
+            THREAD SAFETY
+                Concurrent access to an instance of this object is safe provided that 
+                only const member functions are invoked.  Otherwise, access must be
+                protected by a mutex lock.
         !*/
 
     public:

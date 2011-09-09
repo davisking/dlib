@@ -98,6 +98,14 @@ namespace dlib
                 Finally, the cell_stride parameter controls how much overlap you get between
                 blocks.  The maximum amount of overlap is obtained when cell_stride == 1.
                 At the other extreme, you would have no overlap if cell_stride == block_size. 
+
+
+            THREAD SAFETY
+                Concurrent access to an instance of this object is not safe and should be protected
+                by a mutex lock except for the case where you are copying the configuration 
+                (via copy_configuration()) of a hog_image object to many other threads.  
+                In this case, it is safe to copy the configuration of a shared object so long
+                as no other operations are performed on it.
         !*/
 
     public:

@@ -76,6 +76,13 @@ namespace dlib
 
                 Finally, the sliding window classifiers described above are applied to every level 
                 of an image pyramid.  
+
+            THREAD SAFETY
+                Concurrent access to an instance of this object is not safe and should be protected
+                by a mutex lock except for the case where you are copying the configuration 
+                (via copy_configuration()) of a scan_image_pyramid object to many other threads.  
+                In this case, it is safe to copy the configuration of a shared object so long
+                as no other operations are performed on it.
         !*/
     public:
 

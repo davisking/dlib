@@ -37,6 +37,14 @@ namespace dlib
                 creating an indicator vector with multiple non-zero indicator features.
 
 
+            THREAD SAFETY
+                Concurrent access to an instance of this object is not safe and should be protected
+                by a mutex lock except for the case where you are copying the configuration 
+                (via copy_configuration()) of a hashed_feature_image object to many other threads.  
+                In this case, it is safe to copy the configuration of a shared object so long
+                as no other operations are performed on it.
+
+
             NOTATION 
                 let BASE_FE denote the base feature_extractor object contained inside 
                 the hashed_feature_image.
