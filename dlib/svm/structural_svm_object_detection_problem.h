@@ -161,16 +161,17 @@ namespace dlib
             std::vector<std::pair<double, rectangle> > dets;
             const double thresh = current_solution(scanner.get_num_dimensions());
 
-            const double loss_per_error = 1;
+            const double loss_per_false_alarm = 1;
+            const double loss_per_missed_target = 1;
             scanner.load(images[idx]);
 
-            scanner.detect(current_solution, dets, thresh-loss_per_error);
+            scanner.detect(current_solution, dets, thresh-loss_per_false_alarm);
 
 
             // The loss will measure the number of incorrect detections.  A detection is
             // incorrect if it doesn't hit a truth rectangle or if it is a duplicate detection
             // on a truth rectangle.
-            loss = rects[idx].size()*loss_per_error;
+            loss = rects[idx].size()*loss_per_missed_target;
 
             // Measure the loss augmented score for the detections which hit a truth rect.
             std::vector<double> truth_score_hits(rects[idx].size(), 0);
@@ -193,9 +194,9 @@ namespace dlib
                     // if this is the first time we have seen a detect which hit rects[truth.second]
                     const double score = dets[i].first - thresh;
                     if (truth_score_hits[truth.second] == 0)
-                        truth_score_hits[truth.second] += score - loss_per_error;
+                        truth_score_hits[truth.second] += score - loss_per_missed_target;
                     else
-                        truth_score_hits[truth.second] += score + loss_per_error;
+                        truth_score_hits[truth.second] += score + loss_per_false_alarm;
                 }
             }
 
@@ -223,12 +224,12 @@ namespace dlib
                         {
                             hit_truth_table[truth.second] = true;
                             final_dets.push_back(dets[i].second);
-                            loss -= loss_per_error;
+                            loss -= loss_per_missed_target;
                         }
                         else
                         {
                             final_dets.push_back(dets[i].second);
-                            loss += loss_per_error;
+                            loss += loss_per_false_alarm;
                         }
                     }
                 }
@@ -236,7 +237,7 @@ namespace dlib
                 {
                     // didn't hit anything
                     final_dets.push_back(dets[i].second);
-                    loss += loss_per_error;
+                    loss += loss_per_false_alarm;
                 }
             }
 
