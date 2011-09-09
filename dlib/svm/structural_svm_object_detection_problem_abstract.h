@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_ABSTRACT_H__
-#define DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_ABSTRACT_H__
+#undef DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_ABSTRACT_H__
+#ifdef DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_ABSTRACT_H__
 
 #include "../matrix.h"
 #include "structural_svm_problem_threaded_abstract.h"
@@ -45,15 +45,18 @@ namespace dlib
                 per image and the measure of loss is different from what is described in 
                 the paper.  
 
-                In particular, the loss is the number of false detections plus the number 
-                of missed targets.  A detection is considered a false detection if it doesn't
-                overlap with any of the ground truth rectangles or if it is a duplicate
-                detection of a truth rectangle.  A detection "misses a target" if it doesn't 
-                overlap with the truth rectangle for any target.  Finally, for the purposes 
-                of calculating loss, overlap is determined using the following formula, 
-                rectangles A and B overlap if and only if:
-                    A.intersect(B).area()/(A+B).area() > get_overlap_eps()
+                In particular, the loss is measured as follows:
+                    let FA == the number of false alarms produced by a labeling of an image.
+                    let MT == the number of targets missed by a labeling of an image.  
+                    Then the loss for a particular labeling is the quantity:
+                        FA*get_loss_per_false_alarm() + MT*get_loss_per_missed_target()
 
+                A detection is considered a false alarm if it doesn't overlap with any 
+                of the ground truth rectangles or if it is a duplicate detection of a 
+                truth rectangle.  Finally, for the purposes of calculating loss, overlap 
+                is determined using the following formula, rectangles A and B overlap 
+                if and only if:
+                    A.intersect(B).area()/(A+B).area() > get_overlap_eps()
         !*/
     public:
 
@@ -81,6 +84,8 @@ namespace dlib
                 - This object will use num_threads threads during the optimization 
                   procedure.  You should set this parameter equal to the number of 
                   available processing cores on your machine.
+                - #get_loss_per_missed_target() == 1
+                - #get_loss_per_false_alarm() == 1
         !*/
 
         void set_overlap_eps (
@@ -99,6 +104,43 @@ namespace dlib
             ensures
                 - returns the amount of overlap necessary for a detection to be considered
                   as overlapping with a ground truth rectangle.
+        !*/
+
+        double get_loss_per_missed_target (
+        ) const;
+        /*!
+            ensures
+                - returns the amount of loss experienced for failing to detect one of the
+                  targets.
+        !*/
+
+        void set_loss_per_missed_target (
+            double loss
+        );
+        /*!
+            requires
+                - loss > 0
+            ensures
+                - #get_loss_per_missed_target() == loss
+        !*/
+
+        double get_loss_per_false_alarm (
+        ) const;
+        /*!
+            ensures
+                - returns the amount of loss experienced for emitting a false alarm detection.
+                  Or in other words, the loss for generating a detection that doesn't correspond 
+                  to one of the truth rectangles.
+        !*/
+
+        void set_loss_per_false_alarm (
+            double loss
+        );
+        /*!
+            requires
+                - loss > 0
+            ensures
+                - #get_loss_per_false_alarm() == loss
         !*/
 
     };

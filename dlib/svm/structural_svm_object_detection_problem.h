@@ -3,6 +3,7 @@
 #ifndef DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_H__
 #define DLIB_STRUCTURAL_SVM_ObJECT_DETECTION_PROBLEM_H__
 
+#include "structural_svm_object_detection_problem_abstract.h"
 #include "../matrix.h"
 #include "structural_svm_problem_threaded.h"
 #include <sstream>
@@ -33,7 +34,9 @@ namespace dlib
             boxes_overlap(overlap_tester),
             images(images_),
             rects(truth_rects),
-            overlap_eps(0.5)
+            overlap_eps(0.5),
+            loss_per_false_alarm(1),
+            loss_per_missed_target(1)
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_learning_problem(images_, truth_rects) && 
@@ -62,7 +65,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(0 < eps && eps < 1, 
-                "\t structural_svm_object_detection_problem::set_overlap_eps(eps)"
+                "\t void structural_svm_object_detection_problem::set_overlap_eps(eps)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t eps:  " << eps 
                 << "\n\t this: " << this
@@ -75,6 +78,48 @@ namespace dlib
         ) const
         {
             return overlap_eps;
+        }
+
+        double get_loss_per_missed_target (
+        ) const
+        {
+            return loss_per_missed_target;
+        }
+
+        void set_loss_per_missed_target (
+            double loss
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(loss > 0, 
+                "\t void structural_svm_object_detection_problem::set_loss_per_missed_target(loss)"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t loss: " << loss
+                << "\n\t this: " << this
+                );
+
+            loss_per_missed_target = loss;
+        }
+
+        double get_loss_per_false_alarm (
+        ) const
+        {
+            return loss_per_false_alarm;
+        }
+
+        void set_loss_per_false_alarm (
+            double loss
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(loss > 0, 
+                "\t void structural_svm_object_detection_problem::set_loss_per_false_alarm(loss)"
+                << "\n\t Invalid inputs were given to this function "
+                << "\n\t loss: " << loss
+                << "\n\t this: " << this
+                );
+
+            loss_per_false_alarm = loss;
         }
 
     private:
@@ -161,8 +206,6 @@ namespace dlib
             std::vector<std::pair<double, rectangle> > dets;
             const double thresh = current_solution(scanner.get_num_dimensions());
 
-            const double loss_per_false_alarm = 1;
-            const double loss_per_missed_target = 1;
             scanner.load(images[idx]);
 
             scanner.detect(current_solution, dets, thresh-loss_per_false_alarm);
@@ -309,6 +352,8 @@ namespace dlib
 
         unsigned long max_num_dets;
         double overlap_eps;
+        double loss_per_false_alarm;
+        double loss_per_missed_target;
     };
 
 // ----------------------------------------------------------------------------------------
