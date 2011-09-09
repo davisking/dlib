@@ -58,8 +58,6 @@ namespace dlib
             const image_type& img
         );
 
-        bool has_image_statistics (
-        ) const;
 
         void copy_configuration (
             const feature_extractor& item
@@ -132,6 +130,8 @@ namespace dlib
 
     private:
 
+        inline bool has_image_statistics (
+        ) const;
 
         feature_extractor fe;
         typename feature_extractor::descriptor_type inv_stddev;
@@ -431,11 +431,9 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(0 <= row && row < nr() &&
-                    0 <= col && col < nc() &&
-                    has_image_statistics() == true,
+                    0 <= col && col < nc(),
             "\t descriptor_type hashed_feature_image::operator(row,col)"
             << "\n\t Invalid inputs were given to this function"
-            << "\n\t has_image_statistics(): " << has_image_statistics()
             << "\n\t row:  " << row
             << "\n\t col:  " << col 
             << "\n\t nr(): " << nr()
@@ -444,7 +442,11 @@ namespace dlib
             );
 
         hash_feats.resize(scales.size());
-        scaled_feats = pointwise_multiply(fe(row,col), inv_stddev);
+        if (has_image_statistics())
+            scaled_feats = pointwise_multiply(fe(row,col), inv_stddev);
+        else
+            scaled_feats = fe(row,col);
+
         for (long i = 0; i < scales.size(); ++i)
         {
             quantized_feats = matrix_cast<int32>(scales(i)*scaled_feats);

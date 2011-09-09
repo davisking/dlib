@@ -24,7 +24,6 @@ namespace dlib
             INITIAL VALUE
                  - size() == 0
                  - get_num_dimensions() == 1000
-                 - has_image_statistics() == false
                  - get_scales() == logspace(-1,1,3)
 
             WHAT THIS OBJECT REPRESENTS
@@ -77,10 +76,10 @@ namespace dlib
             ensures
                 - When a feature vector from BASE_FE is hashed, it is hashed into exactly 
                   get_scales().size() hash bins.  Each hash is computed as follows:
-                    - first normalize the feature vector
-                    - then multiply it by an element of get_scales()
-                    - then convert the resulting vector to a vector of dlib::int32
-                    - finally, hash the integer vector into a hash bin.
+                    - First normalize the feature vector.
+                    - Then multiply it by an element of get_scales().
+                    - Then convert the resulting vector to a vector of dlib::int32.
+                    - Finally, hash the integer vector into a hash bin.
                 - The size of the numbers in get_scales() determines how "big" the hash bins are.  
                   A very small scale value would result in all input vectors being hashed into the 
                   same bin, while larger scale values would result in only similar vectors 
@@ -97,22 +96,12 @@ namespace dlib
         );
         /*!
             requires
-                - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-                - pixel_traits<typename image_type::type>::has_alpha == false
+                - image_type == any type that can be supplied to feature_extractor::load() 
             ensures
-                - if (img is large enough to have at least two local features in it) then
-                    - #has_image_statistics() == true
-                - This function will accumulate image statistics across multiple calls. 
-                  Therefore, it can be beneficial to pass in many images.
-        !*/
-
-        bool has_image_statistics (
-        ) const;
-        /*!
-            ensures
-                - Part of the hashing step is to normalize the features produced by
-                  BASE_FE.  This function returns true if we have accumulated the necessary
-                  information to perform this normalization and false otherwise.
+                - Part of the hashing step is to normalize the features produced by BASE_FE.  
+                  This function will accumulate image statistics used to perform this normalization.
+                  Note that it will accumulate across multiple calls.  Therefore, it can be 
+                  beneficial to pass in many images.
         !*/
 
         void copy_configuration (
@@ -145,8 +134,7 @@ namespace dlib
         );
         /*!
             requires
-                - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-                - pixel_traits<typename image_type::type>::has_alpha == false
+                - image_type == any type that can be supplied to feature_extractor::load() 
             ensures
                 - performs BASE_FE.load(img)
                   i.e. does feature extraction.  The features can be accessed using
@@ -198,11 +186,10 @@ namespace dlib
         ) const;
         /*!
             requires
-                - has_image_statistics() == true
                 - 0 <= row < nr()
                 - 0 <= col < nc()
             ensures
-                - hashes BASE_FE(row,col) and returns resulting indicator vector. 
+                - hashes BASE_FE(row,col) and returns the resulting indicator vector. 
                 - Returns a vector V such that:
                     - V.size() == get_scales().size()
                     - for all valid i: 0 <= V[i].first < get_num_dimensions()
