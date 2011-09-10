@@ -762,6 +762,87 @@ namespace
 
     }
 
+    template <typename T>
+    void test_filtering(bool use_abs, unsigned long scale )
+    {
+        print_spinner();
+        dlog << LINFO << "test_filtering(" << use_abs << "," << scale << ")";
+        array2d<T> img, img2, img3;
+        img.set_size(10,11);
+
+        assign_all_pixels(img, 10);
+
+        int filter[3][3] = { 1,1,1,
+                             1,1,1,
+                             1,1,1};
+
+
+        assign_all_pixels(img2,3);
+        spatially_filter_image(img, img2, filter);
+
+        for (long r = 0; r<img2.nr(); ++r)
+        {
+            for (long c = 0; c<img2.nc(); ++c)
+            {
+                if (shrink_rect(get_rect(img2),1).contains(c,r))
+                {
+                    DLIB_TEST(img2[r][c] == 90);
+                }
+                else
+                {
+                    DLIB_TEST(img2[r][c] == 0);
+                }
+            }
+        }
+
+
+        assign_all_pixels(img2,3);
+        assign_all_pixels(img3,3);
+        spatially_filter_image(img, img2, filter);
+
+        int row_filter[] = {1,1,1};
+        int col_filter[] = {1,1,1};
+
+        spatially_filter_image(img, img3, row_filter, col_filter);
+
+        DLIB_TEST(array_to_matrix(img2) == array_to_matrix(img3));
+
+
+        dlib::rand  rnd;
+
+        for (int i = 0; i < 30; ++i)
+        {
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    img[r][c] = rnd.get_random_8bit_number();
+                }
+            }
+
+            row_filter[0] = ((int)rnd.get_random_8bit_number() - 100)/10;
+            row_filter[1] = ((int)rnd.get_random_8bit_number() - 100)/10;
+            row_filter[2] = ((int)rnd.get_random_8bit_number() - 100)/10;
+            col_filter[0] = ((int)rnd.get_random_8bit_number() - 100)/10;
+            col_filter[1] = ((int)rnd.get_random_8bit_number() - 100)/10;
+            col_filter[2] = ((int)rnd.get_random_8bit_number() - 100)/10;
+
+            for (long rr = 0; rr < 3; ++rr)
+            {
+                for (long cc = 0; cc < 3; ++cc)
+                {
+                    filter[rr][cc] = row_filter[cc]*col_filter[rr];
+                }
+            }
+
+            assign_all_pixels(img2,3);
+            assign_all_pixels(img3,3);
+            // Just make sure both filtering methods give the same results.
+            spatially_filter_image(img, img2, filter, scale, use_abs);
+            spatially_filter_image(img, img3, row_filter, col_filter, scale, use_abs);
+            DLIB_TEST(array_to_matrix(img2) == array_to_matrix(img3));
+        }
+    }
 
     class image_tester : public tester
     {
@@ -780,6 +861,15 @@ namespace
             test_integral_image<double, int>();
             test_integral_image<long, unsigned char>();
             test_integral_image<double, float>();
+
+            test_filtering<unsigned char>(false,1);
+            test_filtering<unsigned char>(true,1);
+            test_filtering<unsigned char>(false,3);
+            test_filtering<unsigned char>(true,3);
+            test_filtering<int>(false,1);
+            test_filtering<int>(true,1);
+            test_filtering<int>(false,3);
+            test_filtering<int>(true,3);
         }
     } a;
 
