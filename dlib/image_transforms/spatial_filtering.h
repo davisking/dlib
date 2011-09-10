@@ -8,6 +8,7 @@
 #include "../algs.h"
 #include "../assert.h"
 #include "../array2d.h"
+#include "../matrix.h"
 #include <limits>
 
 namespace dlib
@@ -18,14 +19,12 @@ namespace dlib
     template <
         typename in_image_type,
         typename out_image_type,
-        typename filter_type,
-        long M,
-        long N
+        typename EXP
         >
     void spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
-        const filter_type (&filter)[M][N],
+        const matrix_exp<EXP>& filter,
         unsigned long scale = 1,
         bool use_abs = false
     )
@@ -33,11 +32,14 @@ namespace dlib
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-        COMPILE_TIME_ASSERT(M%2 == 1);
-        COMPILE_TIME_ASSERT(N%2 == 1);
-        DLIB_ASSERT(scale > 0,
+        DLIB_ASSERT(scale > 0 &&
+                    filter.nr()%2 == 1 &&
+                    filter.nc()%2 == 1,
             "\tvoid spatially_filter_image()"
-            << "\n\tYou can't give a scale of zero"
+            << "\n\t You can't give a scale of zero or a filter with even dimensions"
+            << "\n\t scale: "<< scale
+            << "\n\t filter.nr(): "<< filter.nr()
+            << "\n\t filter.nc(): "<< filter.nc()
             );
         DLIB_ASSERT(is_same_object(in_img, out_img) == false,
             "\tvoid spatially_filter_image()"
@@ -55,13 +57,13 @@ namespace dlib
 
         out_img.set_size(in_img.nr(),in_img.nc());
 
-        zero_border_pixels(out_img, M/2, N/2); 
+        zero_border_pixels(out_img, filter.nc()/2, filter.nr()/2); 
 
         // figure out the range that we should apply the filter to
-        const long first_row = M/2;
-        const long first_col = N/2;
-        const long last_row = in_img.nr() - M/2;
-        const long last_col = in_img.nc() - N/2;
+        const long first_row = filter.nr()/2;
+        const long first_col = filter.nc()/2;
+        const long last_row = in_img.nr() - filter.nr()/2;
+        const long last_col = in_img.nc() - filter.nc()/2;
 
         // apply the filter to the image
         for (long r = first_row; r < last_row; ++r)
@@ -71,13 +73,13 @@ namespace dlib
                 typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
                 typename promote<bp_type>::type p;
                 typename promote<bp_type>::type temp = 0;
-                for (long m = 0; m < M; ++m)
+                for (long m = 0; m < filter.nr(); ++m)
                 {
-                    for (long n = 0; n < N; ++n)
+                    for (long n = 0; n < filter.nc(); ++n)
                     {
                         // pull out the current pixel and put it into p
-                        p = get_pixel_intensity(in_img[r-M/2+m][c-N/2+n]);
-                        temp += p*filter[m][n];
+                        p = get_pixel_intensity(in_img[r-filter.nr()/2+m][c-filter.nc()/2+n]);
+                        temp += p*filter(m,n);
                     }
                 }
 
@@ -108,15 +110,14 @@ namespace dlib
     template <
         typename in_image_type,
         typename out_image_type,
-        typename filter_type,
-        long M,
-        long N
+        typename EXP1,
+        typename EXP2
         >
     void spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
-        const filter_type (&row_filter)[N],
-        const filter_type (&col_filter)[M],
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter,
         unsigned long scale = 1,
         bool use_abs = false
     )
@@ -124,11 +125,18 @@ namespace dlib
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-        COMPILE_TIME_ASSERT(M%2 == 1);
-        COMPILE_TIME_ASSERT(N%2 == 1);
-        DLIB_ASSERT(scale > 0,
+        DLIB_ASSERT(scale > 0 &&
+                    row_filter.size()%2 == 1 &&
+                    col_filter.size()%2 == 1 &&
+                    is_vector(row_filter) &&
+                    is_vector(col_filter),
             "\tvoid spatially_filter_image()"
-            << "\n\tYou can't give a scale of zero"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t scale: "<< scale
+            << "\n\t row_filter.size(): "<< row_filter.size()
+            << "\n\t col_filter.size(): "<< col_filter.size()
+            << "\n\t is_vector(row_filter): "<< is_vector(row_filter)
+            << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
             );
         DLIB_ASSERT(is_same_object(in_img, out_img) == false,
             "\tvoid spatially_filter_image()"
@@ -146,13 +154,13 @@ namespace dlib
 
         out_img.set_size(in_img.nr(),in_img.nc());
 
-        zero_border_pixels(out_img, M/2, N/2); 
+        zero_border_pixels(out_img, row_filter.size()/2, col_filter.size()/2); 
 
         // figure out the range that we should apply the filter to
-        const long first_row = M/2;
-        const long first_col = N/2;
-        const long last_row = in_img.nr() - M/2;
-        const long last_col = in_img.nc() - N/2;
+        const long first_row = col_filter.size()/2;
+        const long first_col = row_filter.size()/2;
+        const long last_row = in_img.nr() - col_filter.size()/2;
+        const long last_col = in_img.nc() - row_filter.size()/2;
 
         typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
 
@@ -168,11 +176,11 @@ namespace dlib
             {
                 typename promote<bp_type>::type p;
                 typename promote<bp_type>::type temp = 0;
-                for (long n = 0; n < N; ++n)
+                for (long n = 0; n < row_filter.size(); ++n)
                 {
                     // pull out the current pixel and put it into p
-                    p = get_pixel_intensity(in_img[r][c-N/2+n]);
-                    temp += p*row_filter[n];
+                    p = get_pixel_intensity(in_img[r][c-row_filter.size()/2+n]);
+                    temp += p*row_filter(n);
                 }
                 temp_img[r][c] = temp;
             }
@@ -184,9 +192,9 @@ namespace dlib
             for (long c = first_col; c < last_col; ++c)
             {
                 typename promote<bp_type>::type temp = 0;
-                for (long m = 0; m < M; ++m)
+                for (long m = 0; m < col_filter.size(); ++m)
                 {
-                    temp += temp_img[r-M/2+m][c]*col_filter[m];
+                    temp += temp_img[r-col_filter.size()/2+m][c]*col_filter(m);
                 }
 
                 temp /= scale;

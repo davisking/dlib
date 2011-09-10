@@ -4,6 +4,7 @@
 #ifdef DLIB_SPATIAL_FILTERINg_ABSTRACT_
 
 #include "../pixel.h"
+#include "../matrix.h"
 
 namespace dlib
 {
@@ -13,14 +14,12 @@ namespace dlib
     template <
         typename in_image_type,
         typename out_image_type,
-        typename filter_type,
-        long M,
-        long N
+        typename EXP
         >
     void spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
-        const filter_type (&filter)[M][N],
+        const matrix_exp<EXP>& filter,
         unsigned long scale = 1,
         bool use_abs = false
     );
@@ -32,8 +31,8 @@ namespace dlib
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
             - is_same_object(in_img, out_img) == false 
             - scale > 0
-            - M % 2 == 1  (i.e. M must be odd)
-            - N % 2 == 1  (i.e. N must be odd)
+            - filter.nr() % 2 == 1  (i.e. must be odd)
+            - filter.nc() % 2 == 1  (i.e. must be odd)
         ensures
             - Applies the given spatial filter to in_img and stores the result in out_img.  Also 
               divides each resulting pixel by scale.  
@@ -57,15 +56,14 @@ namespace dlib
     template <
         typename in_image_type,
         typename out_image_type,
-        typename filter_type,
-        long M,
-        long N
+        typename EXP1,
+        typename EXP2
         >
     void spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
-        const filter_type (&row_filter)[N],
-        const filter_type (&col_filter)[M],
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter,
         unsigned long scale = 1,
         bool use_abs = false
     );
@@ -77,14 +75,16 @@ namespace dlib
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
             - is_same_object(in_img, out_img) == false 
             - scale > 0
-            - M % 2 == 1  (i.e. M must be odd)
-            - N % 2 == 1  (i.e. N must be odd)
+            - is_vector(row_filter) == true
+            - is_vector(col_filter) == true
+            - row_filter.size() % 2 == 1  (i.e. must be odd)
+            - col_filter.size() % 2 == 1  (i.e. must be odd)
         ensures
             - Applies the given separable spatial filter to in_img and stores the result in out_img.  
               Also divides each resulting pixel by scale.  Calling this function has the same
               effect as calling the regular spatially_filter_image() routine with a filter,
               FILT, defined as follows: 
-                - FILT[r][c] == col_filter[r]*row_filter[c]
+                - FILT(r,c) == col_filter(r)*row_filter(c)
             - pixel values after filtering that are > pixel_traits<out_image_type>::max() are
               set to pixel_traits<out_image_type>::max()
             - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
