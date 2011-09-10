@@ -772,9 +772,9 @@ namespace
 
         assign_all_pixels(img, 10);
 
-        int filter[3][3] = { 1,1,1,
-                             1,1,1,
-                             1,1,1};
+        int filter[3][3] = { {1,1,1},
+                             {1,1,1},
+                             {1,1,1}};
 
 
         assign_all_pixels(img2,3);
