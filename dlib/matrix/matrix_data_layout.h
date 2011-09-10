@@ -72,7 +72,7 @@ namespace dlib
     struct row_major_layout
     {
         // if a matrix is bigger than this many bytes then don't put it on the stack
-        const static size_t max_stack_based_size = 128;
+        const static size_t max_stack_based_size = 256;
 
         // this is a hack to avoid a compile time error in visual studio 8.  I would just 
         // use sizeof(T) and be done with it but that won't compile.  The idea here 
@@ -484,7 +484,7 @@ namespace dlib
     struct column_major_layout
     {
         // if a matrix is bigger than this many bytes then don't put it on the stack
-        const static size_t max_stack_based_size = 128;
+        const static size_t max_stack_based_size = 256;
 
 
         // this is a hack to avoid a compile time error in visual studio 8.  I would just 
