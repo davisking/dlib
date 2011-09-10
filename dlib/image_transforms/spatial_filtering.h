@@ -19,20 +19,21 @@ namespace dlib
     template <
         typename in_image_type,
         typename out_image_type,
-        typename EXP
+        typename EXP,
+        typename T
         >
     void spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP>& filter,
-        unsigned long scale = 1,
+        T scale,
         bool use_abs = false
     )
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-        DLIB_ASSERT(scale > 0 &&
+        DLIB_ASSERT(scale != 0 &&
                     filter.nr()%2 == 1 &&
                     filter.nc()%2 == 1,
             "\tvoid spatially_filter_image()"
@@ -85,17 +86,9 @@ namespace dlib
 
                 temp /= scale;
 
-                // Catch any underflow or apply abs as appropriate
-                if (temp < 0)
+                if (use_abs && temp < 0)
                 {
-                    if (use_abs)
-                    {
-                        temp = -temp;
-                    }
-                    else
-                    {
-                        temp = 0;
-                    }
+                    temp = -temp;
                 }
 
                 // save this pixel to the output image
@@ -105,32 +98,47 @@ namespace dlib
         }
     }
 
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP
+        >
+    void spatially_filter_image (
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP>& filter
+    )
+    {
+        spatially_filter_image(in_img,out_img,filter,1);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
         typename in_image_type,
         typename out_image_type,
         typename EXP1,
-        typename EXP2
+        typename EXP2,
+        typename T
         >
-    void spatially_filter_image (
+    void spatially_filter_image_separable (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP1>& row_filter,
         const matrix_exp<EXP2>& col_filter,
-        unsigned long scale = 1,
+        T scale,
         bool use_abs = false
     )
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
         COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
 
-        DLIB_ASSERT(scale > 0 &&
+        DLIB_ASSERT(scale != 0 &&
                     row_filter.size()%2 == 1 &&
                     col_filter.size()%2 == 1 &&
                     is_vector(row_filter) &&
                     is_vector(col_filter),
-            "\tvoid spatially_filter_image()"
+            "\tvoid spatially_filter_image_separable()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t scale: "<< scale
             << "\n\t row_filter.size(): "<< row_filter.size()
@@ -139,7 +147,7 @@ namespace dlib
             << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
             );
         DLIB_ASSERT(is_same_object(in_img, out_img) == false,
-            "\tvoid spatially_filter_image()"
+            "\tvoid spatially_filter_image_separable()"
             << "\n\tYou must give two different image objects"
             );
 
@@ -199,17 +207,9 @@ namespace dlib
 
                 temp /= scale;
 
-                // Catch any underflow or apply abs as appropriate
-                if (temp < 0)
+                if (use_abs && temp < 0)
                 {
-                    if (use_abs)
-                    {
-                        temp = -temp;
-                    }
-                    else
-                    {
-                        temp = 0;
-                    }
+                    temp = -temp;
                 }
 
                 // save this pixel to the output image
@@ -217,6 +217,22 @@ namespace dlib
                 assign_pixel_intensity(out_img[r][c], temp);
             }
         }
+    }
+
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP1,
+        typename EXP2
+        >
+    void spatially_filter_image_separable (
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter
+    )
+    {
+        spatially_filter_image_separable(in_img,out_img,row_filter,col_filter,1);
     }
 
 // ----------------------------------------------------------------------------------------

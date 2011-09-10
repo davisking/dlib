@@ -808,7 +808,7 @@ namespace
         row_filter = 1,1,1,1,1;
         col_filter = 1,1,1;
 
-        spatially_filter_image(img, img3, row_filter, col_filter);
+        spatially_filter_image_separable(img, img3, row_filter, col_filter);
 
         DLIB_TEST(array_to_matrix(img2) == array_to_matrix(img3));
 
@@ -840,8 +840,116 @@ namespace
             assign_all_pixels(img3,3);
             // Just make sure both filtering methods give the same results.
             spatially_filter_image(img, img2, filter, scale, use_abs);
-            spatially_filter_image(img, img3, row_filter, col_filter, scale, use_abs);
+            spatially_filter_image_separable(img, img3, row_filter, col_filter, scale, use_abs);
             DLIB_TEST(array_to_matrix(img2) == array_to_matrix(img3));
+        }
+
+        {
+            array2d<int> img, img2;
+            img.set_size(3,4);
+
+            matrix<int> filter(3,3);
+            filter = 1;
+            assign_all_pixels(img,-1);
+
+            spatially_filter_image(img,img2,filter);
+
+            DLIB_TEST(img2[0][0] == 0);
+            DLIB_TEST(img2[0][1] == 0);
+            DLIB_TEST(img2[0][2] == 0);
+            DLIB_TEST(img2[0][3] == 0);
+
+            DLIB_TEST(img2[1][0] == 0);
+            DLIB_TEST(img2[1][1] == -9);
+            DLIB_TEST(img2[1][2] == -9);
+            DLIB_TEST(img2[1][3] == 0);
+
+            DLIB_TEST(img2[2][0] == 0);
+            DLIB_TEST(img2[2][1] == 0);
+            DLIB_TEST(img2[2][2] == 0);
+            DLIB_TEST(img2[2][3] == 0);
+
+            assign_all_pixels(img,-1);
+
+            spatially_filter_image(img,img2,filter,2,true);
+
+            DLIB_TEST(img2[0][0] == 0);
+            DLIB_TEST(img2[0][1] == 0);
+            DLIB_TEST(img2[0][2] == 0);
+            DLIB_TEST(img2[0][3] == 0);
+
+            DLIB_TEST(img2[1][0] == 0);
+            DLIB_TEST(img2[1][1] == 4);
+            DLIB_TEST(img2[1][2] == 4);
+            DLIB_TEST(img2[1][3] == 0);
+
+            DLIB_TEST(img2[2][0] == 0);
+            DLIB_TEST(img2[2][1] == 0);
+            DLIB_TEST(img2[2][2] == 0);
+            DLIB_TEST(img2[2][3] == 0);
+
+            matrix<int> rowf(3,1), colf(3,1);
+            rowf = 1;
+            colf = 1;
+            assign_all_pixels(img,-1);
+
+            spatially_filter_image_separable(img,img2,rowf,colf);
+            DLIB_TEST(img2[0][0] == 0);
+            DLIB_TEST(img2[0][1] == 0);
+            DLIB_TEST(img2[0][2] == 0);
+            DLIB_TEST(img2[0][3] == 0);
+
+            DLIB_TEST(img2[1][0] == 0);
+            DLIB_TEST(img2[1][1] == -9);
+            DLIB_TEST(img2[1][2] == -9);
+            DLIB_TEST(img2[1][3] == 0);
+
+            DLIB_TEST(img2[2][0] == 0);
+            DLIB_TEST(img2[2][1] == 0);
+            DLIB_TEST(img2[2][2] == 0);
+            DLIB_TEST(img2[2][3] == 0);
+
+            spatially_filter_image_separable(img,img2,rowf,colf,1,true);
+            DLIB_TEST(img2[0][0] == 0);
+            DLIB_TEST(img2[0][1] == 0);
+            DLIB_TEST(img2[0][2] == 0);
+            DLIB_TEST(img2[0][3] == 0);
+
+            DLIB_TEST(img2[1][0] == 0);
+            DLIB_TEST(img2[1][1] == 9);
+            DLIB_TEST(img2[1][2] == 9);
+            DLIB_TEST(img2[1][3] == 0);
+
+            DLIB_TEST(img2[2][0] == 0);
+            DLIB_TEST(img2[2][1] == 0);
+            DLIB_TEST(img2[2][2] == 0);
+            DLIB_TEST(img2[2][3] == 0);
+        }
+        {
+            array2d<double> img, img2;
+            img.set_size(3,4);
+
+            matrix<double> filter(3,3);
+            filter = 1;
+            assign_all_pixels(img,-1);
+
+            spatially_filter_image(img,img2,filter,2);
+
+            DLIB_TEST(img2[0][0] == 0);
+            DLIB_TEST(img2[0][1] == 0);
+            DLIB_TEST(img2[0][2] == 0);
+            DLIB_TEST(img2[0][3] == 0);
+
+            DLIB_TEST(img2[1][0] == 0);
+            DLIB_TEST((img2[1][1] -  -4.5) < 1e-14);
+            DLIB_TEST((img2[1][2] -  -4.5) < 1e-14);
+            DLIB_TEST(img2[1][3] == 0);
+
+            DLIB_TEST(img2[2][0] == 0);
+            DLIB_TEST(img2[2][1] == 0);
+            DLIB_TEST(img2[2][2] == 0);
+            DLIB_TEST(img2[2][3] == 0);
+
         }
     }
 
