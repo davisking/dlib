@@ -136,6 +136,7 @@
          <item>equalize_histogram</item> 
          <item>get_histogram</item> 
          <item>spatially_filter_image</item> 
+         <item>spatially_filter_image_separable</item> 
          <item>separable_3x3_filter_block_grayscale</item> 
          <item>separable_3x3_filter_block_rgb</item> 
          <item>pyramid_down</item> 
@@ -889,6 +890,19 @@
          <description>        
             This global function performs spatial filtering on an image with a user
             supplied filter.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>spatially_filter_image_separable</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/spatial_filtering_abstract.h</spec_file>
+         <description>        
+            This global function performs spatial filtering on an image with a user
+            supplied separable filter.
          </description>
                                  
       </component>
