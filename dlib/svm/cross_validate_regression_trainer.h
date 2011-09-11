@@ -124,7 +124,7 @@ namespace dlib
                 const typename trainer_type::trained_function_type& df = trainer.train(x_train,y_train);
 
                 // do the training and testing
-                for (long j = 0; j < x_test.size(); ++j)
+                for (unsigned long j = 0; j < x_test.size(); ++j)
                 {
                     // compute error
                     const double output = df(x_test[j]);
