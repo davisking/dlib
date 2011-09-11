@@ -7,6 +7,7 @@
 #include "../matrix.h"
 #include "../geometry.h"
 #include <vector>
+#include "box_overlap_testing.h"
 
 namespace dlib
 {
@@ -15,7 +16,7 @@ namespace dlib
 
     template <
         typename image_scanner_type,
-        typename overlap_tester_type
+        typename overlap_tester_type = test_box_overlap
         >
     class object_detector
     {
