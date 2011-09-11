@@ -6,6 +6,7 @@
 #include <vector>
 #include "../matrix.h"
 #include "../statistics.h"
+#include "cross_validate_regression_trainer_abstract.h"
 
 namespace dlib
 {
@@ -17,7 +18,7 @@ namespace dlib
         typename sample_type,
         typename label_type
         >
-    label_type
+    matrix<double,1,2>
     test_regression_function (
         const reg_funct_type& reg_funct,
         const std::vector<sample_type>& x_test,
@@ -33,17 +34,22 @@ namespace dlib
                     << "\n\t is_learning_problem(x_test,y_test): " 
                     << is_learning_problem(x_test,y_test));
 
-        running_stats<label_type> rs;
+        running_stats<double> rs;
+        running_scalar_covariance<double> rc;
 
         for (unsigned long i = 0; i < x_test.size(); ++i)
         {
             // compute error
-            label_type temp = reg_funct(x_test[i]) - y_test[i];
+            const double output = reg_funct(x_test[i]);
+            const double temp = output - y_test[i];
 
             rs.add(temp*temp);
+            rc.add(output, y_test[i]);
         }
 
-        return rs.mean();
+        matrix<double,1,2> result;
+        result = rs.mean(), std::pow(rc.correlation(),2);
+        return result;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -53,7 +59,7 @@ namespace dlib
         typename sample_type,
         typename label_type 
         >
-    label_type 
+    matrix<double,1,2> 
     cross_validate_regression_trainer (
         const trainer_type& trainer,
         const std::vector<sample_type>& x,
@@ -78,11 +84,12 @@ namespace dlib
         const long num_in_test = x.size()/folds;
         const long num_in_train = x.size() - num_in_test;
 
+        running_stats<double> rs;
+        running_scalar_covariance<double> rc;
 
         std::vector<sample_type> x_test, x_train;
         std::vector<label_type> y_test, y_train;
 
-        running_stats<label_type> rs;
 
         long next_test_idx = 0;
 
@@ -114,8 +121,18 @@ namespace dlib
 
             try
             {
+                const typename trainer_type::trained_function_type& df = trainer.train(x_train,y_train);
+
                 // do the training and testing
-                rs.add(test_regression_function(trainer.train(x_train,y_train),x_test,y_test));
+                for (long j = 0; j < x_test.size(); ++j)
+                {
+                    // compute error
+                    const double output = df(x_test[j]);
+                    const double temp = output - y_test[j];
+
+                    rs.add(temp*temp);
+                    rc.add(output, y_test[j]);
+                }
             }
             catch (invalid_nu_error&)
             {
@@ -124,7 +141,9 @@ namespace dlib
 
         } // for (long i = 0; i < folds; ++i)
 
-        return rs.mean();
+        matrix<double,1,2> result;
+        result = rs.mean(), std::pow(rc.correlation(),2);
+        return result;
     }
 
 }

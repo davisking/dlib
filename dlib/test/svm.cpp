@@ -241,10 +241,14 @@ namespace
 
 
         randomize_samples(samples, labels);
-        dlog << LINFO << "KRR MSE: "<< cross_validate_regression_trainer(krr_test, samples, labels, 6);
-        dlog << LINFO << "SVR MSE: "<< cross_validate_regression_trainer(svr_test, samples, labels, 6);
-        DLIB_TEST(cross_validate_regression_trainer(krr_test, samples, labels, 6) < 1e-4);
-        DLIB_TEST(cross_validate_regression_trainer(svr_test, samples, labels, 6) < 1e-4);
+        dlog << LINFO << "KRR MSE and R-squared: "<< cross_validate_regression_trainer(krr_test, samples, labels, 6);
+        dlog << LINFO << "SVR MSE and R-squared: "<< cross_validate_regression_trainer(svr_test, samples, labels, 6);
+        matrix<double,1,2> cv = cross_validate_regression_trainer(krr_test, samples, labels, 6);
+        DLIB_TEST(cv(0) < 1e-4);
+        DLIB_TEST(cv(1) > 0.99);
+        cv = cross_validate_regression_trainer(svr_test, samples, labels, 6);
+        DLIB_TEST(cv(0) < 1e-4);
+        DLIB_TEST(cv(1) > 0.99);
 
         dlog << LINFO << "   end test_regression()";
     }
