@@ -94,6 +94,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <name>Structured Prediction</name>
          <item>structural_svm_problem</item> 
          <item>structural_svm_object_detection_problem</item> 
+         <item>structural_object_detection_trainer</item> 
          <item>structural_svm_problem_threaded</item> 
          <item>svm_struct_controller_node</item> 
          <item>svm_struct_processing_node</item> 
@@ -2126,6 +2127,25 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                per image and the measure of loss is different from what is described in 
                the paper.  
             </p>
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>structural_object_detection_trainer</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_object_detection_trainer_abstract.h</spec_file>
+         <description>
+               This object is a tool for learning to detect objects in images based on a set of labeled images.  
+               The training procedure produces an <a href="imaging.html#object_detector">object_detector</a> which
+               can be used to predict the locations of objects in new images. 
+               <p>
+               Note that this is just a convenience wrapper around the 
+               <a href="#structural_svm_object_detection_problem">structural_svm_object_detection_problem</a>
+               to make it look similar to all the other trainers in dlib.  
+               </p>
          </description>
                                  
       </component>
