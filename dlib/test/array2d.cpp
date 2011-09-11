@@ -545,6 +545,8 @@ namespace
                     DLIB_TEST(img[r][c] == img2[r][c]);
                 }
             }
+
+            DLIB_TEST((char*)&img[0][0] + img.width_step() == (char*)&img[1][0]);
         }
     }
 

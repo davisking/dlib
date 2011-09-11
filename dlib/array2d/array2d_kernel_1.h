@@ -287,7 +287,7 @@ namespace dlib
         long width_step (
         ) const
         {
-            return nc_;
+            return nc_*sizeof(T);
         }
 
     private:
