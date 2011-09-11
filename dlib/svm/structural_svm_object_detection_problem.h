@@ -7,9 +7,18 @@
 #include "../matrix.h"
 #include "structural_svm_problem_threaded.h"
 #include <sstream>
+#include "../string.h"
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    class impossible_labeling_error : public dlib::error 
+    { 
+    public: 
+        impossible_labeling_error(const std::string& msg) : dlib::error(msg) {};
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -160,11 +169,22 @@ namespace dlib
                     {
                         using namespace std;
                         ostringstream sout;
-                        sout << "impossible labeling found!" << endl;
+                        sout << "An impossible set of object labels was detected. This is happening because ";
+                        sout << "the truth labels for an image contain rectangles which overlap according to the ";
+                        sout << "overlap_tester_type supplied for non-max suppression.  To resolve this, you either need to ";
+                        sout << "relax the overlap tester so it doesn't mark these rectangles as overlapping ";
+                        sout << "or adjust the truth rectangles. ";
+
+                        // make sure the above string fits nicely into a command prompt window.
+                        string temp = sout.str();
+                        sout.str(""); sout << wrap_string(temp,0,0) << endl << endl;
+
+
+                        sout << "image index: "<< idx << endl;
+                        sout << "The offending rectangles are:\n";
                         sout << "rect1: "<< mapped_rects[i] << endl;
                         sout << "rect2: "<< mapped_rects[j] << endl;
-                        sout << "in image " << idx << endl;
-                        throw dlib::error(sout.str());
+                        throw dlib::impossible_labeling_error(sout.str());
                     }
                 }
             }
@@ -179,15 +199,29 @@ namespace dlib
                 {
                     using namespace std;
                     ostringstream sout;
-                    sout << "overlap_eps is too tight!" << endl;
-                    sout << "overlap_eps:    "<< overlap_eps << endl;
-                    sout << "mapped overlap: "<< area/total_area << endl;
-                    sout << "width/height:   "<< rects[idx][i].width()/(double)rects[idx][i].height() << endl;
-                    sout << "area:           "<< rects[idx][i].area() << endl;
-                    sout << "true rect:      "<< rects[idx][i] << endl;
-                    sout << "mapped rect:    "<< mapped_rects[i] << endl;
-                    sout << "in image        " << idx << endl;
-                    throw dlib::error(sout.str());
+                    sout << "An impossible set of object labels was detected.  This is happening because ";
+                    sout << "none of the sliding window detection templates is capable of matching the size ";
+                    sout << "and/or shape of one of the ground truth rectangles to within the required overlap_eps ";
+                    sout << "amount of overlap.  To resolve this you need to either lower the overlap_eps, add ";
+                    sout << "another detection template which can match the offending rectangle, or adjust the ";
+                    sout << "offending truth rectangle so that it can be matched by an existing detection template. ";
+                    sout << "It is also possible that the image pyramid you are using is too coarse.  E.g. if one of ";
+                    sout << "your existing detection templates has a matching width/height ratio and smaller area than the offending ";
+                    sout << "rectangle then a finer image pyramid would probably help.";
+
+
+                    // make sure the above string fits nicely into a command prompt window.
+                    string temp = sout.str();
+                    sout.str(""); sout << wrap_string(temp,0,0) << endl << endl;
+
+                    sout << "overlap_eps:             "<< overlap_eps << endl;
+                    sout << "best possible overlap:   " << area/total_area << endl;
+                    sout << "truth rect width/height: "<< rects[idx][i].width()/(double)rects[idx][i].height() << endl;
+                    sout << "truth rect area:         "<< rects[idx][i].area() << endl;
+                    sout << "truth rect:              "<< rects[idx][i] << endl;
+                    sout << "nearest detection template rect: "<< mapped_rects[i] << endl;
+                    sout << "image index              " << idx << endl;
+                    throw dlib::impossible_labeling_error(sout.str());
                 }
 
             }

@@ -12,6 +12,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class impossible_labeling_error : public dlib::error 
+    { 
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown by the structural_svm_object_detection_problem
+                when it detects that the image_scanner_type it is working with is incapable
+                of representing the truth rectangles it has been asked to predict.  
+
+                This kind of problem can happen when the overlap_tester_type indicates that
+                two ground truth rectangles overlap and are therefore not allowed to both
+                be output at the same time.  Or alternatively, if there are not enough
+                detection templates to cover the variety of truth rectangle shapes.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_scanner_type,
         typename overlap_tester_type,
