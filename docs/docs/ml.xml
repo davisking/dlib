@@ -2022,7 +2022,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/cross_validate_regression_trainer_abstract.h</spec_file>
          <description>
             Performs k-fold cross validation on a user supplied regression trainer object such
-            as the <a href="#svr_trainer">svr_trainer</a> and returns the mean squared error.
+            as the <a href="#svr_trainer">svr_trainer</a> and returns the mean squared error
+            and R-squared value.
          </description>
          <examples>
             <example>svr_ex.cpp.html</example>
@@ -2038,7 +2039,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/svm/cross_validate_regression_trainer_abstract.h</spec_file>
          <description>
             Tests a regression function (e.g. <a href="#decision_function">decision_function</a>)
-            and returns the mean squared error.
+            and returns the mean squared error and R-squared value.
          </description>
                                  
       </component>
