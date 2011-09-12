@@ -771,7 +771,7 @@
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_image"/>
          <term name="fill_rect">
             <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#fill_rect" name="for GUI canvas objects"/>
-            <term link="dlib/image_transforms/draw_abstract.h.html#fill_rect" name="for image/array2d objects"/>
+            <term link="imaging.html#fill_rect" name="for image/array2d objects"/>
          </term>
 
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="fill_rect_with_vertical_gradient"/>
