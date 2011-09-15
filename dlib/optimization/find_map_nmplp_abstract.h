@@ -323,7 +323,7 @@ namespace dlib
             - #map_assignment.size() == prob.number_of_nodes()
             - for all valid i:
                 - #map_assignment[prob.node_id(i)] < prob.num_states(i)
-                - #map_assignment[prob.node_id(i)] == approximate MAP assignment for node/variable i.
+                - #map_assignment[prob.node_id(i)] == The approximate MAP assignment for node/variable i.
             - eps controls the stopping condition, smaller values of eps lead to more accurate 
               solutions of the relaxed linear program but may take more iterations.  Note that
               the algorithm will never execute more than max_iter iterations regardless of
