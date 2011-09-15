@@ -214,13 +214,15 @@ namespace dlib
                     string temp = sout.str();
                     sout.str(""); sout << wrap_string(temp,0,0) << endl << endl;
 
+                    sout << "image index              "<< idx << endl;
                     sout << "overlap_eps:             "<< overlap_eps << endl;
-                    sout << "best possible overlap:   " << area/total_area << endl;
+                    sout << "best possible overlap:   "<< area/total_area << endl;
+                    sout << "truth rect:              "<< rects[idx][i] << endl;
                     sout << "truth rect width/height: "<< rects[idx][i].width()/(double)rects[idx][i].height() << endl;
                     sout << "truth rect area:         "<< rects[idx][i].area() << endl;
-                    sout << "truth rect:              "<< rects[idx][i] << endl;
-                    sout << "nearest detection template rect: "<< mapped_rects[i] << endl;
-                    sout << "image index              " << idx << endl;
+                    sout << "nearest detection template rect:              "<< mapped_rects[i] << endl;
+                    sout << "nearest detection template rect width/height: "<< mapped_rects[i].width()/(double)mapped_rects[i].height() << endl;
+                    sout << "nearest detection template rect area:         "<< mapped_rects[i].area() << endl;
                     throw dlib::impossible_labeling_error(sout.str());
                 }
 
