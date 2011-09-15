@@ -33,7 +33,7 @@ namespace dlib
             INITIAL VALUE
                 - get_num_detection_templates() == 0
                 - is_loaded_with_image() == false
-                - get_max_detections_per_template() == 2000
+                - get_max_detections_per_template() == 10000
                 - get_max_pyramid_levels() == 1000
 
             WHAT THIS OBJECT REPRESENTS

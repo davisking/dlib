@@ -180,7 +180,7 @@ namespace dlib
     scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
     scan_image_pyramid (
     ) : 
-        max_dets_per_template(2000),
+        max_dets_per_template(10000),
         max_pyramid_levels(1000)
     {
     }
