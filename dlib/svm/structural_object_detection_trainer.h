@@ -248,8 +248,11 @@ namespace dlib
             svm_prob.set_loss_per_missed_target(loss_per_missed_target);
             svm_prob.set_loss_per_false_alarm(loss_per_false_alarm);
             matrix<double,0,1> w;
+
+            // Run the optimizer to find the optimal w.
             solver(svm_prob,w);
 
+            // report the results of the training.
             return object_detector<image_scanner_type,overlap_tester_type>(scanner, overlap_tester, w);
         }
 
