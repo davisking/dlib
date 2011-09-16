@@ -8,6 +8,7 @@
 #include "scan_image_abstract.h"
 #include "../matrix.h"
 #include "../algs.h"
+#include "../rand.h"
 
 namespace dlib
 {
@@ -142,6 +143,8 @@ namespace dlib
         if (max_dets == 0)
             return;
 
+        dlib::rand rnd;
+
         typedef typename image_array_type::type::type pixel_type;
         typedef typename promote<pixel_type>::type ptype;
 
@@ -186,6 +189,7 @@ namespace dlib
         for (unsigned long i = 0; i < rects.size(); ++i)
             widths[i] = rects[i].second.width();
 
+        unsigned long count = 0;
 
         // Now do the bulk of the scanning work.
         for (long r = 0; r < images[0].nr(); ++r)
@@ -262,10 +266,25 @@ namespace dlib
 
                 if (cur_sum >= thresh)
                 {
-                    dets.push_back(std::make_pair(cur_sum, point(c,r)));
+                    ++count;
 
-                    if (dets.size() >= max_dets)
-                        return;
+                    if (dets.size() < max_dets)
+                    {
+                        dets.push_back(std::make_pair(cur_sum, point(c,r)));
+                    }
+                    else 
+                    {
+                        // The idea here is to cause us to randomly sample possible detection
+                        // locations throughout the image rather than just stopping the detection
+                        // procedure once we hit the max_dets limit. So this method will result
+                        // in a random subsample of all the detections >= thresh being in dets
+                        // at the end of scan_image().
+                        const unsigned long random_index = rnd.get_random_32bit_number()%count;
+                        if (random_index < dets.size())
+                        {
+                            dets[random_index] = std::make_pair(cur_sum, point(c,r));
+                        }
+                    }
                 }
             }
         }

@@ -85,6 +85,9 @@ namespace dlib
                   (note that dets is cleared before new detections are added by scan_image())
                 - for all valid i:
                     - #dets[i].first == sum_of_rects_in_images(images,rects,#dets[i].second) >= thresh
+            - if (there are more than max_dets locations that pass the threshold test) then
+                - #dets == a random subsample of all the locations which passed the threshold
+                  test.  
     !*/
 
 // ----------------------------------------------------------------------------------------
