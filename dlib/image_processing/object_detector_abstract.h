@@ -94,6 +94,9 @@ namespace dlib
             ensures
                 - performs object detection on the given image and returns a
                   vector which indicates the locations of all detected objects.
+                - The returned vector will be sorted in the sense that the highest
+                  confidence detections come first.  E.g. element 0 is the best detection,
+                  element 1 the next best, and so on.
         !*/
 
     };
