@@ -141,12 +141,14 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       <section>
          <name>Validation</name>
          <item>cross_validate_trainer</item> 
+         <item>cross_validate_object_detection_trainer</item> 
          <item>cross_validate_trainer_threaded</item> 
          <item>cross_validate_multiclass_trainer</item> 
          <item>cross_validate_regression_trainer</item> 
          <item>test_binary_decision_function</item> 
          <item>test_multiclass_decision_function</item> 
          <item>test_regression_function</item> 
+         <item>test_object_detection_function</item> 
       </section>
 
       <section>
@@ -2029,6 +2031,34 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>svr_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>cross_validate_object_detection_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_object_detection_trainer_abstract.h</spec_file>
+         <description>
+            Performs k-fold cross validation on a user supplied object detection trainer such
+            as the <a href="#structural_object_detection_trainer">structural_object_detection_trainer</a> 
+            and returns the precision and recall. 
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>test_object_detection_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_object_detection_trainer_abstract.h</spec_file>
+         <description>
+            Tests an object detector such
+            as the <a href="imaging.html#object_detector">object_detector</a> 
+            and returns the precision and recall. 
+         </description>
                                  
       </component>
       

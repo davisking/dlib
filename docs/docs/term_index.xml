@@ -220,10 +220,12 @@
          <term file="ml.html" name="train_probabilistic_decision_function"/>
          <term file="ml.html" name="probabilistic"/>
          <term file="ml.html" name="cross_validate_trainer"/>
+         <term file="ml.html" name="cross_validate_object_detection_trainer"/>
          <term file="ml.html" name="cross_validate_trainer_threaded"/>
          <term file="ml.html" name="cross_validate_multiclass_trainer"/>
          <term file="ml.html" name="cross_validate_regression_trainer"/>
          <term file="ml.html" name="test_binary_decision_function"/>
+         <term file="ml.html" name="test_object_detection_function"/>
          <term file="ml.html" name="test_multiclass_decision_function"/>
          <term file="ml.html" name="test_regression_function"/>
          <term link="ml.html#svm_nu_trainer" name="support vector machine"/>
