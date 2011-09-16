@@ -154,7 +154,7 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(scanner_.get_num_detection_templates() > 0 &&
-                    w_.size() == scanner.get_num_dimensions() + 1, 
+                    w_.size() == scanner_.get_num_dimensions() + 1, 
             "\t object_detector::object_detector(scanner_,overlap_tester,w_)"
             << "\n\t Invalid inputs were given to this function "
             << "\n\t scanner_.get_num_detection_templates(): " << scanner_.get_num_detection_templates()

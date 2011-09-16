@@ -130,6 +130,8 @@ namespace dlib
             >
         struct array_subset_helper
         {
+            typedef typename array_type::mem_manager_type mem_manager_type;
+
             array_subset_helper (
                 const array_type& array_,
                 const std::vector<unsigned long>& idx_set_
