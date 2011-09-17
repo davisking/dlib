@@ -49,7 +49,7 @@
          <item>solve_trust_region_subproblem</item> 
          <item>max_cost_assignment</item> 
          <item>max_sum_submatrix</item> 
-         <item>find_map_nmplp</item> 
+         <item>find_max_factor_graph_nmplp</item> 
       </section>
 
       <section>
@@ -463,9 +463,9 @@ subject to the following constraint:
    <!-- ************************************************************************* -->
       
       <component>
-         <name>find_map_nmplp</name>
+         <name>find_max_factor_graph_nmplp</name>
          <file>dlib/optimization.h</file>
-         <spec_file link="true">dlib/optimization/find_map_nmplp_abstract.h</spec_file>
+         <spec_file link="true">dlib/optimization/find_max_factor_graph_nmplp_abstract.h</spec_file>
          <description>
               This function is a tool for approximately solving the MAP problem in a graphical 
               model or factor graph with pairwise potential functions.  That is, it attempts 

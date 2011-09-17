@@ -38,7 +38,7 @@ set (tests
    empirical_kernel_map.cpp
    entropy_coder.cpp
    entropy_encoder_model.cpp
-   find_map_nmplp.cpp
+   find_max_factor_graph_nmplp.cpp
    geometry.cpp
    graph.cpp
    hash.cpp

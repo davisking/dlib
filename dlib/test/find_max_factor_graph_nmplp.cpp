@@ -15,7 +15,7 @@ namespace
     using namespace dlib;
     using namespace std;
 
-    logger dlog("test.find_map_nmplp");
+    logger dlog("test.find_max_factor_graph_nmplp");
 
 // ----------------------------------------------------------------------------------------
 
@@ -491,7 +491,7 @@ namespace
     template <
         typename map_problem
         >
-    void find_map_brute_force (
+    void find_max_factor_graph_brute_force (
         const map_problem& prob,
         std::vector<unsigned long>& map_assignment
     )
@@ -530,11 +530,11 @@ namespace
         print_spinner();
         std::vector<unsigned long> map_assignment1, map_assignment2;
         map_problem prob;
-        find_map_nmplp(prob, map_assignment1, 1000, 1e-8);
+        find_max_factor_graph_nmplp(prob, map_assignment1, 1000, 1e-8);
 
         const double score1 = find_total_score(prob, map_assignment1); 
 
-        find_map_brute_force(prob, map_assignment2);
+        find_max_factor_graph_brute_force(prob, map_assignment2);
         const double score2 = find_total_score(prob, map_assignment2); 
 
         dlog << LINFO << "score NMPLP: " << score1;
@@ -553,7 +553,7 @@ namespace
         print_spinner();
         std::vector<unsigned long> map_assignment1, map_assignment2;
         map_problem prob;
-        find_map_nmplp(prob, map_assignment1, 10, 1e-8);
+        find_max_factor_graph_nmplp(prob, map_assignment1, 10, 1e-8);
 
         const double score1 = find_total_score(prob, map_assignment1); 
 
@@ -576,13 +576,13 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    class test_find_map_nmplp : public tester
+    class test_find_max_factor_graph_nmplp : public tester
     {
     public:
-        test_find_map_nmplp (
+        test_find_max_factor_graph_nmplp (
         ) :
-            tester ("test_find_map_nmplp",
-                    "Runs tests on the find_map_nmplp routine.")
+            tester ("test_find_max_factor_graph_nmplp",
+                    "Runs tests on the find_max_factor_graph_nmplp routine.")
         {}
 
         void perform_test (
