@@ -16,7 +16,7 @@ namespace dlib
 
     namespace impl
     {
-        unsigned long number_of_truth_hits (
+        inline unsigned long number_of_truth_hits (
             const std::vector<rectangle>& truth_boxes,
             const std::vector<rectangle>& boxes,
             const double overlap_eps
