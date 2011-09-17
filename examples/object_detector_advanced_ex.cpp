@@ -165,7 +165,7 @@ public:
     // this object's operator() function and the images supplied to load().  In this example it's trivial.  
     // However, in general, you might create feature extractors which don't perform extraction at every 
     // possible image location (e.g. the hog_image) and thus result in some more complex mapping.  
-    inline const rectangle get_block_rect       ( long row, long col) const { return centered_rect(col,row,1,1); }
+    inline const rectangle get_block_rect       ( long row, long col) const { return centered_rect(col,row,3,3); }
     inline const point image_to_feat_space      ( const point& p) const { return p; } 
     inline const rectangle image_to_feat_space  ( const rectangle& rect) const { return rect; } 
     inline const point feat_to_image_space      ( const point& p) const { return p; } 
