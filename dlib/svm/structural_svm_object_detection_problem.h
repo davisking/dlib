@@ -204,7 +204,7 @@ namespace dlib
                     sout << "and/or shape of one of the ground truth rectangles to within the required overlap_eps ";
                     sout << "amount of overlap.  To resolve this you need to either lower the overlap_eps, add ";
                     sout << "another detection template which can match the offending rectangle, or adjust the ";
-                    sout << "offending truth rectangle so that it can be matched by an existing detection template. ";
+                    sout << "offending truth rectangle so it can be matched by an existing detection template. ";
                     sout << "It is also possible that the image pyramid you are using is too coarse.  E.g. if one of ";
                     sout << "your existing detection templates has a matching width/height ratio and smaller area than the offending ";
                     sout << "rectangle then a finer image pyramid would probably help.";
