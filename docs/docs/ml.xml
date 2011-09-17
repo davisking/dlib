@@ -2045,6 +2045,10 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             as the <a href="#structural_object_detection_trainer">structural_object_detection_trainer</a> 
             and returns the precision and recall. 
          </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+            <example>object_detector_advanced_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -2059,6 +2063,10 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             as the <a href="imaging.html#object_detector">object_detector</a> 
             and returns the precision and recall. 
          </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+            <example>object_detector_advanced_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -2177,6 +2185,10 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                to make it look similar to all the other trainers in dlib.  
                </p>
          </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+            <example>object_detector_advanced_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       

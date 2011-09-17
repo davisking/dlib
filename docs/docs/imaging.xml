@@ -1139,6 +1139,10 @@
                     and Jean Ponce
                 </blockquote>
          </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+            <example>object_detector_advanced_ex.cpp.html</example>
+         </examples>
                                  
       </component>
             
@@ -1157,6 +1161,10 @@
                 object is used to perform non-max suppression on the output of the 
                 scan_image_pyramid object.  
          </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+            <example>object_detector_advanced_ex.cpp.html</example>
+         </examples>
                                  
       </component>
             

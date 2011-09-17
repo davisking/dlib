@@ -116,6 +116,14 @@
             <name>Examples</name>
             <sub>
                <item>
+                  <name>Object_Detector</name>
+                  <link>object_detector_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Object_Detector_Advanced</name>
+                  <link>object_detector_advanced_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Config_File_Reader</name>
                   <link>config_reader_ex.cpp.html</link>
                </item>
