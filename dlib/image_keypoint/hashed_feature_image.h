@@ -21,11 +21,11 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                - scales == logspace(-1, 1, 3)
+                - inv_bin_sizes == logspace(-1, 1, 3)
                 - num_dims == 1000
 
             CONVENTION
-                - scales.size() > 0
+                - inv_bin_sizes.size() > 0
                 - num_dims == get_num_dimensions()
                 - if (has_image_statistics()) then
                     - rs[i] == the statistics of feature element i.  I.e. the stats of fe(r,c)(i)
@@ -44,11 +44,11 @@ namespace dlib
         void clear (
         );
 
-        void set_scales (
-            const matrix<double,1,0>& new_scales
+        void set_hash_bin_sizes (
+            const matrix<double,1,0>& bin_sizes 
         );
 
-        const matrix<double,1,0>& get_scales (
+        const matrix<double,1,0> get_hash_bin_sizes (
         ) const;
 
         template <
@@ -136,7 +136,7 @@ namespace dlib
         feature_extractor fe;
         typename feature_extractor::descriptor_type inv_stddev;
         std::vector<running_stats<double> > rs;
-        matrix<double,1,0> scales;
+        matrix<double,1,0> inv_bin_sizes;
         long num_dims;
 
         // Transient variables.  These are here just so they don't have to get constructed over
@@ -159,7 +159,7 @@ namespace dlib
         serialize(item.fe, out);
         serialize(item.inv_stddev, out);
         serialize(item.rs, out);
-        serialize(item.scales, out);
+        serialize(item.inv_bin_sizes, out);
         serialize(item.num_dims, out);
     }
 
@@ -172,7 +172,7 @@ namespace dlib
         deserialize(item.fe, in);
         deserialize(item.inv_stddev, in);
         deserialize(item.rs, in);
-        deserialize(item.scales, in);
+        deserialize(item.inv_bin_sizes, in);
         deserialize(item.num_dims, in);
     }
 
@@ -190,7 +190,7 @@ namespace dlib
     ) : 
         num_dims(1000) 
     {
-        scales = logspace(-1,1,3);
+        inv_bin_sizes = logspace(-1,1,3);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -204,7 +204,7 @@ namespace dlib
     {
         fe.clear();
         inv_stddev = 0;
-        scales = logspace(-1,1,3);
+        inv_bin_sizes = logspace(-1,1,3);
         rs.clear();
         num_dims = 1000;
     }
@@ -215,18 +215,24 @@ namespace dlib
         typename feature_extractor
         >
     void hashed_feature_image<feature_extractor>::
-    set_scales (
-        const matrix<double,1,0>& new_scales
+    set_hash_bin_sizes (
+        const matrix<double,1,0>& bin_sizes 
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(new_scales.size() > 0,
-            "\t void hashed_feature_image::set_scales()"
+        DLIB_ASSERT(bin_sizes.size() > 0,
+            "\t void hashed_feature_image::set_hash_bin_sizes()"
             << "\n\t size of new_scales should not be zero"
             << "\n\t this: " << this
             );
+        DLIB_ASSERT(min(bin_sizes) > 0,
+            "\t void hashed_feature_image::set_hash_bin_sizes()"
+            << "\n\t All bins must have sizes greater than zero."
+            << "\n\t min(bin_sizes): " << min(bin_sizes) 
+            << "\n\t this: " << this
+            );
 
-        scales = new_scales;
+        inv_bin_sizes = reciprocal(bin_sizes);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -234,11 +240,11 @@ namespace dlib
     template <
         typename feature_extractor
         >
-    const matrix<double,1,0>& hashed_feature_image<feature_extractor>::
-    get_scales (
+    const matrix<double,1,0> hashed_feature_image<feature_extractor>::
+    get_hash_bin_sizes (
     ) const
     {
-        return scales;
+        return reciprocal(inv_bin_sizes);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -313,7 +319,7 @@ namespace dlib
     {
         rs = item.rs;
         inv_stddev = item.inv_stddev;
-        scales = item.scales;
+        inv_bin_sizes = item.inv_bin_sizes;
         fe.copy_configuration(item.fe);
         num_dims = item.num_dims;
     }
@@ -441,15 +447,15 @@ namespace dlib
             << "\n\t this: " << this
             );
 
-        hash_feats.resize(scales.size());
+        hash_feats.resize(inv_bin_sizes.size());
         if (has_image_statistics())
             scaled_feats = pointwise_multiply(fe(row,col), inv_stddev);
         else
             scaled_feats = fe(row,col);
 
-        for (long i = 0; i < scales.size(); ++i)
+        for (long i = 0; i < inv_bin_sizes.size(); ++i)
         {
-            quantized_feats = matrix_cast<int32>(scales(i)*scaled_feats);
+            quantized_feats = matrix_cast<int32>(inv_bin_sizes(i)*scaled_feats);
             hash_feats[i] = std::make_pair(hash(quantized_feats)%num_dims,1);
         }
         return hash_feats;

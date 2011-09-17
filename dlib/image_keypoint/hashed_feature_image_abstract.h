@@ -24,7 +24,7 @@ namespace dlib
             INITIAL VALUE
                  - size() == 0
                  - get_num_dimensions() == 1000
-                 - get_scales() == logspace(-1,1,3)
+                 - get_hash_bin_sizes() == logspace(-1,1,3)
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for performing image feature extraction.  In
@@ -68,30 +68,31 @@ namespace dlib
                 - this object will have its initial value
         !*/
 
-        void set_scales (
-            const matrix<double,1,0>& new_scales
+        void set_hash_bin_sizes (
+            const matrix<double,1,0>& bin_sizes 
         );
         /*!
             requires
-                - new_scales.size() > 0
+                - bin_sizes.size() > 0
+                - min(bin_sizes) > 0
             ensures
-                - #get_scales() == new_scales
+                - #get_hash_bin_sizes() == bin_sizes 
         !*/
 
-        const matrix<double,1,0>& get_scales (
+        const matrix<double,1,0> get_hash_bin_sizes (
         ) const;
         /*!
             ensures
                 - When a feature vector from BASE_FE is hashed, it is hashed into exactly 
-                  get_scales().size() hash bins.  Each hash is computed as follows:
+                  get_hash_bin_sizes().size() hash bins.  Each hash is computed as follows:
                     - First normalize the feature vector.
-                    - Then multiply it by an element of get_scales().
+                    - Then divide it by an element of get_hash_bin_sizes().
                     - Then convert the resulting vector to a vector of dlib::int32.
                     - Finally, hash the integer vector into a hash bin.
-                - The size of the numbers in get_scales() determines how "big" the hash bins are.  
-                  A very small scale value would result in all input vectors being hashed into the 
-                  same bin, while larger scale values would result in only similar vectors 
-                  falling into the same bins.  However, a scale value too large would result in
+                - The size of the numbers in get_hash_bin_sizes() determines how big the hash 
+                  bins are.  A very large value would result in all input vectors being hashed 
+                  into the same bin, while smaller values would result in only similar vectors 
+                  falling into the same bins.  However, a value too small would result in
                   all vectors going into different bins.  In this case, the bins are too fine 
                   grained.
         !*/
@@ -199,7 +200,7 @@ namespace dlib
             ensures
                 - hashes BASE_FE(row,col) and returns the resulting indicator vector. 
                 - Returns a vector V such that:
-                    - V.size() == get_scales().size()
+                    - V.size() == get_hash_bin_sizes().size()
                     - for all valid i: 0 <= V[i].first < get_num_dimensions()
                     - if (BASE_FE(row,col) hashes into bin B) then
                         - V contains an element with .first == B and .second == 1
