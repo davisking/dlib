@@ -84,6 +84,7 @@ SRC += md5.cpp
 SRC += member_function_pointer.cpp
 SRC += metaprogramming.cpp
 SRC += multithreaded_object.cpp
+SRC += object_detector.cpp
 SRC += one_vs_all_trainer.cpp
 SRC += one_vs_one_trainer.cpp
 SRC += optimization.cpp

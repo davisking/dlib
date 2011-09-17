@@ -69,6 +69,7 @@ set (tests
    member_function_pointer.cpp
    metaprogramming.cpp
    multithreaded_object.cpp
+   object_detector.cpp
    one_vs_all_trainer.cpp
    one_vs_one_trainer.cpp
    optimization.cpp
