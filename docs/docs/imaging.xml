@@ -292,6 +292,9 @@
                     by Navneet Dalal and Bill Triggs
                 </blockquote>
          </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
@@ -309,6 +312,9 @@
                 which is zero everywhere except for the position determined by the 
                 hash.  
          </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+         </examples>
                                  
       </component>
 
