@@ -171,7 +171,7 @@ namespace dlib
         // make sure requires clause is not broken
         DLIB_ASSERT( is_learning_problem(images,truth_rects) == true &&
                      0 < overlap_eps && overlap_eps <= 1 &&
-                     1 < folds && folds <= images.size(),
+                     1 < folds && folds <= static_cast<long>(images.size()),
                     "\t matrix cross_validate_object_detection_trainer()"
                     << "\n\t invalid inputs were given to this function"
                     << "\n\t is_learning_problem(images,truth_rects): " << is_learning_problem(images,truth_rects)
@@ -191,7 +191,7 @@ namespace dlib
             std::vector<unsigned long> train_idx_set;
             std::vector<unsigned long> test_idx_set;
 
-            for (unsigned long i = 0; i < test_size; ++i)
+            for (long i = 0; i < test_size; ++i)
                 test_idx_set.push_back(test_idx++);
 
             unsigned long train_idx = test_idx%images.size();

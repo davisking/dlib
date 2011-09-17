@@ -199,7 +199,7 @@ namespace dlib
         const image_type& img
     )
     {
-        int levels = 0;
+        unsigned long levels = 0;
         rectangle rect = get_rect(img);
 
         // figure out how many pyramid levels we should be using based on the image size
