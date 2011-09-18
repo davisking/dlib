@@ -92,7 +92,7 @@ namespace dlib
             - This function is a tool for exactly solving the MAP problem in a chain-structured 
               graphical model or factor graph.  That is, it attempts to solve a certain kind of 
               optimization problem which can be defined as follows:
-                - Let X be a set of prob.number_of_nodes() integer valued variables, each taking
+                - Let X denote a set of prob.number_of_nodes() integer valued variables, each taking
                   a value in the range [0, map_problem::num_states).
                 - Let X(i) = the ith variable in X.
                 - Let F(i) = factor_value_i(X(i), X(i-1), ..., X(i-map_problem::order))
