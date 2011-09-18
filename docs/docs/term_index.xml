@@ -58,6 +58,7 @@
          <term file="optimization.html" name="find_min_trust_region"/>
          <term file="optimization.html" name="find_max_trust_region"/>
          <term file="optimization.html" name="find_max_factor_graph_nmplp"/>
+         <term file="optimization.html" name="find_max_factor_graph_viterbi"/>
          <term file="optimization.html" name="solve_trust_region_subproblem"/>
          <term file="optimization.html" name="find_min_single_variable"/>
          <term file="optimization.html" name="find_min_using_approximate_derivatives"/>

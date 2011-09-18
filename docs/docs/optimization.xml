@@ -50,6 +50,7 @@
          <item>max_cost_assignment</item> 
          <item>max_sum_submatrix</item> 
          <item>find_max_factor_graph_nmplp</item> 
+         <item>find_max_factor_graph_viterbi</item> 
       </section>
 
       <section>
@@ -484,6 +485,22 @@ subject to the following constraint:
                 by Amir Globerson and Tommi Jaakkola
                 </blockquote>
 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_max_factor_graph_viterbi</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/find_max_factor_graph_viterbi_abstract.h</spec_file>
+         <description>
+            This function is a tool for exactly solving the MAP problem in a chain-structured 
+            graphical model or factor graph.   In particular, it is an implementation of the classic Viterbi
+            algorithm for finding the maximizing assignment.  In addition to basic first order Markov
+            models, this function is also capable of finding the MAP assignment for higher order
+            Markov models.
          </description>
                                  
       </component>
