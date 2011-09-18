@@ -14,6 +14,7 @@
 #include "optimization/max_cost_assignment.h"
 #include "optimization/max_sum_submatrix.h"
 #include "optimization/find_max_factor_graph_nmplp.h"
+#include "optimization/find_max_factor_graph_viterbi.h"
 
 #endif // DLIB_OPTIMIZATIOn_HEADER
 
