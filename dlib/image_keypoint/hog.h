@@ -219,31 +219,39 @@ namespace dlib
             return rectangle(feat_to_image_space(rect.tl_corner()), feat_to_image_space(rect.br_corner()));
         }
 
-        template <
-            unsigned long T1,
-            unsigned long T2,
-            unsigned long T3,
-            unsigned long T4,
-            int           T5,
-            int           T6 
-            >
-        friend void serialize (
-            const hog_image<T1,T2,T3,T4,T5,T6>& item,
-            std::ostream& out
-        );
 
-        template <
-            unsigned long T1,
-            unsigned long T2,
-            unsigned long T3,
-            unsigned long T4,
-            int           T5,
-            int           T6 
-            >
-        friend void deserialize (
-            hog_image<T1,T2,T3,T4,T5,T6>& item,
-            std::istream& in 
-        );
+
+        // these _PRIVATE_ functions are only here as a workaround for a bug in visual studio 2005.  
+        void _PRIVATE_serialize (std::ostream& out) const
+        {
+            // serialize hist_cells
+            serialize(hist_cells.nc(),out);
+            serialize(hist_cells.nr(),out);
+            hist_cells.reset();
+            while (hist_cells.move_next())
+                serialize(hist_cells.element().values,out);
+            hist_cells.reset();
+
+
+            serialize(num_block_rows, out);
+            serialize(num_block_cols, out);
+        }
+
+        void _PRIVATE_deserialize (std::istream& in )
+        {
+            // deserialize item.hist_cells
+            long nc, nr;
+            deserialize(nc,in);
+            deserialize(nr,in);
+            hist_cells.set_size(nr,nc);
+            while (hist_cells.move_next())
+                deserialize(hist_cells.element().values,in); 
+            hist_cells.reset();
+
+
+            deserialize(num_block_rows, in);
+            deserialize(num_block_cols, in);
+        }
 
     private:
 
@@ -489,18 +497,7 @@ namespace dlib
         std::ostream& out
     )
     {
-        // serialize item.hist_cells
-        serialize(item.hist_cells.nc(),out);
-        serialize(item.hist_cells.nr(),out);
-        item.hist_cells.reset();
-        while (item.hist_cells.move_next())
-            serialize(item.hist_cells.element().values,out);
-        item.hist_cells.reset();
-
-
-
-        serialize(item.num_block_rows, out);
-        serialize(item.num_block_cols, out);
+        item._PRIVATE_serialize(out);
     }
 
     template <
@@ -516,19 +513,7 @@ namespace dlib
         std::istream& in 
     )
     {
-        // deserialize item.hist_cells
-        long nc, nr;
-        deserialize(nc,in);
-        deserialize(nr,in);
-        item.hist_cells.set_size(nr,nc);
-        while (item.hist_cells.move_next())
-            deserialize(item.hist_cells.element().values,in); 
-        item.hist_cells.reset();
-
-
-
-        deserialize(item.num_block_rows, in);
-        deserialize(item.num_block_cols, in);
+        item._PRIVATE_deserialize(in);
     }
 
 // ----------------------------------------------------------------------------------------
