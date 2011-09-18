@@ -12,12 +12,65 @@
 
 <current>
 New Stuff:
+   - Added a file_exists() function.
+   - Added separable_3x3_filter_block_grayscale
+   - Added separable_3x3_filter_block_rgb
+   - Added pyramid_down_5_4, pyramid_down_4_3, and pyramid_down_3_2
+   - Added fill_rect() for images.
+   - Added the following functions for computing statistics on vectors:
+     mean_sign_agreement(), correlation(), covariance(), r_squared(),
+     and mean_squared_error()
+   - Added the find_max_factor_graph_nmplp() function for performing approximate
+     MAP inference.
+   - Added the scan_image() routine.  It is a tool for sliding a set of rectangles
+     over an image space and finding the locations where the sum of pixels in
+     the rectangles exceeds a threshold.
+   - Added the hashed_feature_image object.
+   - Added the scan_image_pyramid object.
+   - Added the object_detector object.
+   - Added the structural_svm_object_detection_problem object.
+   - Added spatially_filter_image_separable()
+   - Added structural_object_detection_trainer
+   - Added the cross_validate_object_detection_trainer() and 
+     test_object_detection_function() routines.
+   - Added the find_max_factor_graph_viterbi() routine for performing MAP
+     inference in chain-structured factor graphs.
  
 Non-Backwards Compatible Changes:
+   - Changed the interface to the ridge regression trainer objects so that
+     they report the entire set of LOO prediction values rather than a
+     summary statistic like mean squared error.
+   - Changed the serialization routine for bgr_pixels to store the pixels
+     in BGR order rather than RGB.
+   - Changed the interface for the spatially_filter_image() routines to take the filter
+     as a matrix rather than C-array.  I also fixed a bug which showed up when using
+     non-square filters.  The bug would cause the edges of the output image to be incorrect.
+     Changed the behavior of spatially_filter_image().  Now it won't truncate signed 
+     pixel values to 0 if they go negative.
+   - Changed the test_regression_function() and cross_validate_regression_trainer()
+     routines so they return both the MSE and R-squared values rather than just the
+     MSE.
 
 Bug fixes:
+   - The image_display didn't display overlay rectangles quite right.  If you zoomed
+     in you could see that some of the pixels which are inside the rectangle were
+     outside the overlay.  Specifically, the right column and bottom row was outside
+     the overlay rectangle.  This has been fixed.  Now all pixels which are supposed
+     to be part of a rectangle are drawn as being inside the overlay rectangle.
+   - Fixed a bug pointed out by Martin Müllenhaupt which caused the windows socket
+     code to not compile when used with the mingw-cross-env project.
+   - Fixed a bug in the png_loader.  If you loaded an image with an
+     alpha channel into something without an alpha channel there were
+     uninitialized values being alpha blended into the image.
+   - Fixed a bug in the cpp_tokenizer that only shows up on newer versions of
+     gcc.  It wasn't tokenizing double quoted strings right.
 
 Other:
+   - Added a more complete set of functions for converting between image space 
+     and the downsampled hog grid.  So now you can convert from image to hog 
+     instead of just hog to image.
+   - Made the integral_image more general by making it templated on the
+     type of scalar used to store the sums.
 
 </current>
 
