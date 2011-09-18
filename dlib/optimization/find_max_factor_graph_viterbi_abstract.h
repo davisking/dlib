@@ -58,6 +58,7 @@ namespace dlib
                   (i.e. node_states contains unsigned longs)
                 - node_id < number_of_nodes()
                 - node_states.size() == min(node_id, order) + 1
+                - is_vector(node_states) == true
                 - max(node_states) < num_states
             ensures
                 - In a chain-structured graph, each node has a potential function associated with
