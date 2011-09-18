@@ -39,6 +39,7 @@ set (tests
    entropy_coder.cpp
    entropy_encoder_model.cpp
    find_max_factor_graph_nmplp.cpp
+   find_max_factor_graph_viterbi.cpp
    geometry.cpp
    graph.cpp
    hash.cpp

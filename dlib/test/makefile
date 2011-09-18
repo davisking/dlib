@@ -55,6 +55,7 @@ SRC += entropy_coder.cpp
 SRC += entropy_encoder_model.cpp
 SRC += geometry.cpp
 SRC += find_max_factor_graph_nmplp.cpp
+SRC += find_max_factor_graph_viterbi.cpp
 SRC += graph.cpp
 SRC += hash.cpp
 SRC += hash_map.cpp

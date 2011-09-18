@@ -76,6 +76,36 @@ namespace dlib
             << "\n\t std::numeric_limits<unsigned long>::max(): " << std::numeric_limits<unsigned long>::max() 
             );
 
+        if (prob.number_of_nodes() == 0)
+        {
+            map_assignment.clear();
+            return;
+        }
+
+        if (order == 0)
+        {
+            map_assignment.resize(prob.number_of_nodes());
+            for (unsigned long i = 0; i < map_assignment.size(); ++i)
+            {
+                matrix<unsigned long,1,1> node_state;
+                unsigned long best_state = 0;
+                double best_val = 0;
+                for (unsigned long s = 0; s < num_states; ++s)
+                {
+                    node_state(0) = s;
+                    const double temp = prob.factor_value(i,node_state);
+                    if (temp > best_val)
+                    {
+                        best_val = temp;
+                        best_state = s;
+                    }
+                }
+                map_assignment[i] = best_state;
+            }
+            return;
+        }
+
+
         const unsigned long trellis_size = static_cast<unsigned long>(std::pow(num_states,order)); 
         unsigned long init_ring_size = 1; 
 
