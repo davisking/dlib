@@ -491,7 +491,7 @@ namespace
     template <
         typename map_problem
         >
-    void find_max_factor_graph_brute_force (
+    void brute_force_find_max_factor_graph_nmplp (
         const map_problem& prob,
         std::vector<unsigned long>& map_assignment
     )
@@ -534,7 +534,7 @@ namespace
 
         const double score1 = find_total_score(prob, map_assignment1); 
 
-        find_max_factor_graph_brute_force(prob, map_assignment2);
+        brute_force_find_max_factor_graph_nmplp(prob, map_assignment2);
         const double score2 = find_total_score(prob, map_assignment2); 
 
         dlog << LINFO << "score NMPLP: " << score1;
