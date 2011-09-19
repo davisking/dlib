@@ -263,10 +263,10 @@ int main(int argc, char* argv[])
         /*
             It is also worth pointing out that you don't have to use dlib::array2d objects to 
             represent your images.  In fact, you can use any object, even something like a struct
-            of many images and other things, as the "image".  The only requirements on an image
+            of many images and other things as the "image".  The only requirements on an image
             are that it should be possible to pass it to scanner.load().  So if you can say 
-            scanner.load(images[0]), for example.  See the documentation for scan_image_pyramid::load() 
-            for the details.
+            scanner.load(images[0]), for example, then you are good to go.  See the documentation 
+            for scan_image_pyramid::load() for more details.
         */
 
 
