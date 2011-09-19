@@ -70,6 +70,14 @@ namespace dlib
         {
         }
 
+        rectangle (
+            const point& p1,
+            const point& p2
+        )
+        {
+            *this = rectangle(p1) + rectangle(p2);
+        }
+
         template <typename T>
         rectangle (
             const vector<T,2>& p1,
