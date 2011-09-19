@@ -357,8 +357,10 @@ namespace dlib
                 return sample.size();
             }
 
+            // This !is_built_in_scalar_type<typename T::type>::value is here to avoid an inexplicable bug in Vistual Studio 2005
             template <typename T>
-            typename enable_if<is_pair<typename T::type::value_type> ,unsigned long>::type max_index_plus_one (
+            typename enable_if_c<(!is_built_in_scalar_type<typename T::type>::value) && (is_pair<typename T::type::value_type>::value) ,unsigned long>::type 
+            max_index_plus_one (
                 const T& samples
             ) 
             {
