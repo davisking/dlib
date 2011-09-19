@@ -144,10 +144,15 @@
                </ul>
             </li>
 
-            <li><b>Bayesian Network Inference Algorithms</b>
+            <li><b>Graphical Model Inference Algorithms</b>
                <ul>
-                  <li><a href="bayes.html#bayesian_network_join_tree">join tree</a> algorithm for exact inference</li> 
-                  <li><a href="bayes.html#bayesian_network_gibbs_sampler">gibbs sampler</a> markov chain monte carlo algorithm</li>
+                  <li><a href="bayes.html#bayesian_network_join_tree">Join tree</a> algorithm for exact inference in 
+                  a Bayesian network.</li> 
+                  <li><a href="bayes.html#bayesian_network_gibbs_sampler">Gibbs sampler</a> markov chain monte 
+                  carlo algorithm for approximate inference in a Bayesian network.</li>
+                  <li>Routines for performing MAP inference in 
+                     <a href="optimization.html#find_max_factor_graph_viterbi">chain-structured</a> or 
+                     <a href="optimization.html#find_max_factor_graph_nmplp">general</a> factor graphs.</li>
                </ul>
             </li>
 
@@ -158,6 +163,7 @@
                   <li>Common image operations such as edge finding and morphological operations</li>
                   <li>Implementations of the <a href="imaging.html#get_surf_points">SURF</a>
                   and <a href="imaging.html#hog_image">HOG</a> feature extraction algorithms.</li>
+                  <li>Tools for <a href="imaging.html#object_detector">detecting objects</a> in images.</li>
                </ul>
             </li>
 

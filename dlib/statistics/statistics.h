@@ -406,8 +406,8 @@ namespace dlib
         double temp = 0;
         for (unsigned long i = 0; i < a.size(); ++i)
         {
-            if (a[i] >= 0 && b[i] >= 0 ||
-                a[i] < 0  && b[i] <  0)
+            if ((a[i] >= 0 && b[i] >= 0) ||
+                (a[i] < 0  && b[i] <  0))
             {
                 temp += 1;
             }

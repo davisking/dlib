@@ -1162,10 +1162,15 @@
                 This object is a tool for detecting the positions of objects in 
                 an image.  In particular, it is a simple container to aggregate 
                 an instance of the <a href="#scan_image_pyramid">scan_image_pyramid</a> 
-                class, the weight vector needed by scan_image_pyramid, and finally 
+                class, the weight vector needed by scan_image_pyramid, and  
                 an instance of <a href="#test_box_overlap">test_box_overlap</a>.  The test_box_overlap 
                 object is used to perform non-max suppression on the output of the 
                 scan_image_pyramid object.  
+                <p>
+                   Note that you can use the 
+                   <a href="ml.html#structural_object_detection_trainer">structural_object_detection_trainer</a>
+                   to learn the parameters of an object_detector.  See the example programs for an introduction.
+                </p>
          </description>
          <examples>
             <example>object_detector_ex.cpp.html</example>
