@@ -38,6 +38,8 @@ namespace dlib
         ensures
             - Applies the given spatial filter to in_img and stores the result in out_img.  Also 
               divides each resulting pixel by scale.  
+            - The intermediate filter computations will be carried out using variables of type EXP::type.
+              This is whatever scalar type is used inside the filter matrix. 
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
               any applicable color space conversion or value saturation is performed.
             - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
@@ -87,6 +89,8 @@ namespace dlib
               effect as calling the regular spatially_filter_image() routine with a filter,
               FILT, defined as follows: 
                 - FILT(r,c) == col_filter(r)*row_filter(c)
+            - The intermediate filter computations will be carried out using variables of type EXP1::type.
+              This is whatever scalar type is used inside the row_filter matrix. 
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
               any applicable color space conversion or value saturation is performed.
             - if (pixel_traits<typename in_image_type::type>::grayscale == false) then

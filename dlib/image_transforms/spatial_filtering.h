@@ -71,9 +71,9 @@ namespace dlib
         {
             for (long c = first_col; c < last_col; ++c)
             {
-                typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
-                typename promote<bp_type>::type p;
-                typename promote<bp_type>::type temp = 0;
+                typedef typename EXP::type ptype;
+                ptype p;
+                ptype temp = 0;
                 for (long m = 0; m < filter.nr(); ++m)
                 {
                     for (long n = 0; n < filter.nc(); ++n)
@@ -170,11 +170,11 @@ namespace dlib
         const long last_row = in_img.nr() - col_filter.size()/2;
         const long last_col = in_img.nc() - row_filter.size()/2;
 
-        typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
 
         typedef typename out_image_type::mem_manager_type mem_manager_type;
+        typedef typename EXP1::type ptype;
 
-        array2d<typename promote<bp_type>::type,mem_manager_type> temp_img;
+        array2d<ptype,mem_manager_type> temp_img;
         temp_img.set_size(in_img.nr(), in_img.nc());
 
         // apply the row filter
@@ -182,8 +182,8 @@ namespace dlib
         {
             for (long c = first_col; c < last_col; ++c)
             {
-                typename promote<bp_type>::type p;
-                typename promote<bp_type>::type temp = 0;
+                ptype p;
+                ptype temp = 0;
                 for (long n = 0; n < row_filter.size(); ++n)
                 {
                     // pull out the current pixel and put it into p
@@ -199,7 +199,7 @@ namespace dlib
         {
             for (long c = first_col; c < last_col; ++c)
             {
-                typename promote<bp_type>::type temp = 0;
+                ptype temp = 0;
                 for (long m = 0; m < col_filter.size(); ++m)
                 {
                     temp += temp_img[r-col_filter.size()/2+m][c]*col_filter(m);
