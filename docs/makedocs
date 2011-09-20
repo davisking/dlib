@@ -64,7 +64,12 @@ makedocs ()
 
     MAJOR_NUM=`cat $COUNTER_FILE` 
     MINOR_NUM=`cat $MINOR_COUTNER_FILE` 
-    RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
+    if [ "$1" = "makerel" ] 
+        then
+        RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
+    else
+        RELEASE=${MAJOR_NUM}.`echo ${MINOR_NUM}+1|bc`-RC
+    fi;
 
 # get XML versions of the change logs
     BASE_LOGGER_REVNUM=`echo $LOGGER_REVNUM - 1000 | bc`
@@ -202,7 +207,7 @@ makedocs ()
 
 
 # build all the html documentation
-makedocs
+makedocs $1
 
 # now make the table of contents for the chm file
 echo Generating the table of contents for the chm file

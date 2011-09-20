@@ -33,7 +33,7 @@ else
     echo $MINOR_NUM > $MINOR_COUTNER_FILE
 fi;
 
-./makedocs || exit 1
+./makedocs makerel || exit 1
 
 rm -rf release || report_failure
 mkdir release || report_failure
