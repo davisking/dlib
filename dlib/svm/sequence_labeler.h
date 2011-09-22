@@ -65,7 +65,7 @@ namespace dlib
             >
         struct hrlh_helper
         {
-            typedef double type;
+            typedef char type;
         };
 
         template <typename T>
@@ -88,7 +88,7 @@ namespace dlib
         };
 
         template <typename T>
-        struct has_reject_labeling <T,typename dlib::enable_if_c<sizeof(dlib::impl::has_reject_labeling_helper<T>(2.2)) == 1 >::type  >
+        struct has_reject_labeling <T,typename dlib::enable_if_c<sizeof(dlib::impl::has_reject_labeling_helper<T>('a')) == 1 >::type  >
         {
             static const bool value = true;
         };
