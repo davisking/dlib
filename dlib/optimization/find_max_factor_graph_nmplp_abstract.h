@@ -24,6 +24,12 @@ namespace dlib
                 looking at here is simply the interface definition for a map problem.
                 You must implement your own version of this object for the problem
                 you wish to solve and then pass it to the find_max_factor_graph_nmplp() routine.
+
+
+                Note also that a factor graph should not have any nodes which are 
+                neighbors with themselves.  Additionally, the graph is undirected. This
+                mean that if A is a neighbor of B then B must be a neighbor of A for
+                the map problem to be valid.
         !*/
 
     public:
