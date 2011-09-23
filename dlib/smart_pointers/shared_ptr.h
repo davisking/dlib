@@ -116,6 +116,16 @@ namespace dlib
             }
         };
 
+        struct default_deleter : public shared_ptr_deleter
+        {
+            void del(const void* p) { delete ((T*)p); }
+
+            void* get_deleter_void(const std::type_info&) const 
+            {
+                return 0;
+            }
+        };
+
     public:
 
         typedef T element_type;
@@ -136,6 +146,7 @@ namespace dlib
             try
             {
                 shared_node = new shared_ptr_node;
+                shared_node->del = new default_deleter;
             }
             catch (...)
             {
@@ -177,15 +188,8 @@ namespace dlib
                 if (shared_node->ref_count == 1)
                 {
                     // delete the data in the appropriate way
-                    if (shared_node->del)
-                    {
-                        shared_node->del->del(data);
-                        delete shared_node->del;
-                    }
-                    else
-                    {
-                        delete data;
-                    }
+                    shared_node->del->del(data);
+                    delete shared_node->del;
 
                     // notify any weak_ptrs that the data has now expired
                     if (shared_node->weak_node)
@@ -301,6 +305,7 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
             shared_node = new shared_ptr_node;
+            shared_node->del = new default_deleter;
             data = r.release();
         }
 
@@ -334,6 +339,7 @@ namespace dlib
 
             reset();
             shared_node = new shared_ptr_node;
+            shared_node->del = new default_deleter;
             data = r.release();
             return *this;
         }
