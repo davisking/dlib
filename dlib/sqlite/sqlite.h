@@ -80,6 +80,13 @@ namespace dlib
             const std::string& get_database_filename (
             ) const
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(is_open() == true,
+                    "\t std::string sqlite::database::get_database_filename()"
+                    << "\n\t The database must be opened before calling this routine."
+                    << "\n\t this: " << this
+                    );
+
                 return filename;
             }
 
@@ -111,6 +118,13 @@ namespace dlib
                 stmt(0),
                 sql_string(sql_statement)
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(db_.is_open() == true,
+                            "\t sqlite::statement::statement()"
+                            << "\n\t The database must be opened before calling this routine."
+                            << "\n\t this: " << this
+                );
+
                 int status = sqlite3_prepare_v2(db.get(), 
                                              sql_string.c_str(),
                                              sql_string.size()+1,
@@ -209,6 +223,14 @@ namespace dlib
                 unsigned long idx
             ) const
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(idx < get_num_columns(),
+                            "\t std::vector<char> sqlite::statement::get_column_as_blob()"
+                            << "\n\t Invalid column index."
+                            << "\n\t idx:  " << idx 
+                            << "\n\t this: " << this
+                );
+
                 const char* data = static_cast<const char*>(sqlite3_column_blob(stmt, idx));
                 const int size = sqlite3_column_bytes(stmt, idx);
 
@@ -221,6 +243,14 @@ namespace dlib
                 T& item
             ) const
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(idx < get_num_columns(),
+                            "\t void sqlite::statement::get_column_as_object()"
+                            << "\n\t Invalid column index."
+                            << "\n\t idx:  " << idx 
+                            << "\n\t this: " << this
+                );
+
                 const char* data = static_cast<const char*>(sqlite3_column_blob(stmt, idx));
                 const int size = sqlite3_column_bytes(stmt, idx);
                 std::istringstream sin(std::string(data,size));
@@ -231,6 +261,14 @@ namespace dlib
                 unsigned long idx
             ) const
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(idx < get_num_columns(),
+                            "\t std::string sqlite::statement::get_column_as_text()"
+                            << "\n\t Invalid column index."
+                            << "\n\t idx:  " << idx 
+                            << "\n\t this: " << this
+                );
+
                 const char* data = reinterpret_cast<const char*>(sqlite3_column_text(stmt, idx));
                 return std::string(data);
             }
@@ -239,6 +277,14 @@ namespace dlib
                 unsigned long idx
             ) const
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(idx < get_num_columns(),
+                            "\t double sqlite::statement::get_column_as_double()"
+                            << "\n\t Invalid column index."
+                            << "\n\t idx:  " << idx 
+                            << "\n\t this: " << this
+                );
+
                 return sqlite3_column_double(stmt, idx);
             }
 
@@ -246,6 +292,14 @@ namespace dlib
                 unsigned long idx
             ) const
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(idx < get_num_columns(),
+                            "\t int sqlite::statement::get_column_as_int()"
+                            << "\n\t Invalid column index."
+                            << "\n\t idx:  " << idx 
+                            << "\n\t this: " << this
+                );
+
                 return sqlite3_column_int(stmt, idx);
             }
 
@@ -253,6 +307,14 @@ namespace dlib
                 unsigned long idx
             ) const
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(idx < get_num_columns(),
+                            "\t int64 sqlite::statement::get_column_as_int64()"
+                            << "\n\t Invalid column index."
+                            << "\n\t idx:  " << idx 
+                            << "\n\t this: " << this
+                );
+
                 return sqlite3_column_int64(stmt, idx);
             }
 
@@ -260,6 +322,14 @@ namespace dlib
                 unsigned long idx
             ) const
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(idx < get_num_columns(),
+                            "\t std::string sqlite::statement::get_column_name()"
+                            << "\n\t Invalid column index."
+                            << "\n\t idx:  " << idx 
+                            << "\n\t this: " << this
+                );
+
                 return std::string(sqlite3_column_name(stmt,idx));
             }
 
@@ -281,6 +351,15 @@ namespace dlib
                 const std::vector<char>& item
             )
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
+                            "\t void sqlite::statement::bind_blob()"
+                            << "\n\t Invalid parameter id."
+                            << "\n\t parameter_id:           " << parameter_id 
+                            << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                            << "\n\t this:                   " << this
+                );
+
                 reset();
                 int status = sqlite3_bind_blob(stmt, parameter_id, &item[0], item.size(), SQLITE_TRANSIENT);
 
@@ -296,6 +375,15 @@ namespace dlib
                 const T& item
             )
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
+                            "\t void sqlite::statement::bind_object()"
+                            << "\n\t Invalid parameter id."
+                            << "\n\t parameter_id:           " << parameter_id 
+                            << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                            << "\n\t this:                   " << this
+                );
+
                 reset();
                 std::ostringstream sout;
                 serialize(item, sout);
@@ -313,6 +401,15 @@ namespace dlib
                 const double& item
             )
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
+                            "\t void sqlite::statement::bind_double()"
+                            << "\n\t Invalid parameter id."
+                            << "\n\t parameter_id:           " << parameter_id 
+                            << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                            << "\n\t this:                   " << this
+                );
+
                 reset();
                 int status = sqlite3_bind_double(stmt, parameter_id, item);
 
@@ -327,6 +424,15 @@ namespace dlib
                 const int& item
             )
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
+                            "\t void sqlite::statement::bind_int()"
+                            << "\n\t Invalid parameter id."
+                            << "\n\t parameter_id:           " << parameter_id 
+                            << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                            << "\n\t this:                   " << this
+                );
+
                 reset();
                 int status = sqlite3_bind_int(stmt, parameter_id, item);
 
@@ -341,6 +447,15 @@ namespace dlib
                 const int64& item
             )
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
+                            "\t void sqlite::statement::bind_int64()"
+                            << "\n\t Invalid parameter id."
+                            << "\n\t parameter_id:           " << parameter_id 
+                            << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                            << "\n\t this:                   " << this
+                );
+
                 reset();
                 int status = sqlite3_bind_int64(stmt, parameter_id, item);
 
@@ -354,6 +469,15 @@ namespace dlib
                 unsigned long parameter_id
             )
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
+                            "\t void sqlite::statement::bind_null()"
+                            << "\n\t Invalid parameter id."
+                            << "\n\t parameter_id:           " << parameter_id 
+                            << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                            << "\n\t this:                   " << this
+                );
+
                 reset();
                 int status = sqlite3_bind_null(stmt, parameter_id);
 
@@ -368,6 +492,15 @@ namespace dlib
                 const std::string& item
             )
             {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
+                            "\t void sqlite::statement::bind_text()"
+                            << "\n\t Invalid parameter id."
+                            << "\n\t parameter_id:           " << parameter_id 
+                            << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                            << "\n\t this:                   " << this
+                );
+
                 reset();
                 int status = sqlite3_bind_text(stmt, parameter_id, item.c_str(), -1, SQLITE_TRANSIENT);
 
@@ -410,6 +543,13 @@ namespace dlib
             const std::string& sql_statement
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_open() == true,
+                        "\t void sqlite::database::exec()"
+                        << "\n\t The database must be opened before calling this routine."
+                        << "\n\t this: " << this
+            );
+
             statement(*this, sql_statement).exec();
         }
 

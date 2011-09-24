@@ -23,7 +23,7 @@ namespace dlib
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
-                    This is the exception object used by the sqlite tools to indicate
+                    This is the exception object used by the SQLite tools to indicate
                     that an error has occurred.  An of the functions defined in this
                     file might throw this exception.
             !*/
@@ -37,6 +37,11 @@ namespace dlib
                 WHAT THIS OBJECT REPRESENTS
                     This object is a C++ wrapper around a SQLite database connection 
                     handle and therefore represents a SQLite database file. 
+
+                    Note that this wrapper is targeted at SQLite Version 3.
+
+                    Note also that whenever SQLite indicates an error has occurred 
+                    this object will throw the sqlite_error exception.
             !*/
 
         public:
@@ -52,6 +57,8 @@ namespace dlib
             );
             /*!
                 ensures
+                    - opens the indicated database file or creates a new
+                      database with the given name if one doesn't already exist.
                     - #get_database_filename() == file
                     - #is_open() == true
             !*/
@@ -72,8 +79,14 @@ namespace dlib
             );
             /*!
                 ensures
+                    - opens the indicated database file or creates a new
+                      database with the given name if one doesn't already exist.
                     - #get_database_filename() == file
                     - #is_open() == true
+                    - safely disposes of any previous SQLite database connection.  If
+                      any statement objects still exist which reference this database
+                      then the SQLite database connection won't be fully closed
+                      until those statement objects are also destroyed.  
             !*/
 
             bool is_open (
@@ -119,6 +132,9 @@ namespace dlib
                     C++ wrapper around a SQLite prepared statement.
 
 
+                    Note that whenever SQLite indicates an error has occurred this 
+                    object will throw the sqlite_error exception.
+
                 BINDABLE SQL PARAMETERS
                     Sometimes you want to execute a bunch of very similar SQL statements.
                     For example, you might need to execute many insert statements where each
@@ -158,6 +174,8 @@ namespace dlib
                 const std::string sql_statement
             );
             /*!
+                requires
+                    - db.is_open() == true
                 ensures
                     - The given SQL statement can be executed against the given 
                       database by calling exec().
