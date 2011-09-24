@@ -1475,7 +1475,7 @@ namespace dlib
         }
 
         matrix& operator += (
-            const T& val
+            const T val
         )
         {
             const long size = nr()*nc();
@@ -1486,7 +1486,7 @@ namespace dlib
         }
 
         matrix& operator -= (
-            const T& val
+            const T val
         )
         {
             const long size = nr()*nc();
@@ -1497,7 +1497,7 @@ namespace dlib
         }
 
         matrix& operator *= (
-            const T& a
+            const T a
         )
         {
             const long size = data.nr()*data.nc();
@@ -1507,7 +1507,7 @@ namespace dlib
         }
 
         matrix& operator /= (
-            const T& a
+            const T a
         )
         {
             const long size = data.nr()*data.nc();

@@ -1212,6 +1212,43 @@ namespace
             m2 = 1;
             m1 = subm(m2,0,0,3,3)*m1;
         }
+
+        {
+            matrix<int> m(2,1);
+
+            m = 3,3;
+            m /= m(0);
+
+            DLIB_TEST(m(0) == 1);
+            DLIB_TEST(m(1) == 1);
+        }
+        {
+            matrix<int> m(2,1);
+
+            m = 3,3;
+            m *= m(0);
+
+            DLIB_TEST(m(0) == 9);
+            DLIB_TEST(m(1) == 9);
+        }
+        {
+            matrix<int> m(2,1);
+
+            m = 3,3;
+            m -= m(0);
+
+            DLIB_TEST(m(0) == 0);
+            DLIB_TEST(m(1) == 0);
+        }
+        {
+            matrix<int> m(2,1);
+
+            m = 3,3;
+            m += m(0);
+
+            DLIB_TEST(m(0) == 6);
+            DLIB_TEST(m(1) == 6);
+        }
     }
 
 
