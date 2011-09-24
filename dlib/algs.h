@@ -433,6 +433,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A is_float_type
+
+        This is a template that can be used to determine if a type is one of the built
+        int floating point types (i.e. float, double, or long double).
+    !*/
+
+    template < typename T > struct is_float_type  { const static bool value = false; };
+    template <> struct is_float_type<float>       { const static bool value = true; };
+    template <> struct is_float_type<double>      { const static bool value = true; };
+    template <> struct is_float_type<long double> { const static bool value = true; };
+
+// ----------------------------------------------------------------------------------------
+
     /*!A is_convertible
 
         This is a template that can be used to determine if one type is convertible 
