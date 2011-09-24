@@ -57,6 +57,8 @@ set (DLIB_LINK_WITH_LIBPNG_STR
 "Disable this if you don't want to link against libpng" )
 set (DLIB_LINK_WITH_LIBJPEG_STR
 "Disable this if you don't want to link against libjpeg" )
+set (DLIB_LINK_WITH_SQLITE3_STR
+"Disable this if you don't want to link against sqlite3" )
 
 option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
 option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
@@ -66,6 +68,7 @@ option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
 option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
 option(DLIB_LINK_WITH_LIBPNG ${DLIB_LINK_WITH_LIBPNG_STR} ON)
 option(DLIB_LINK_WITH_LIBJPEG ${DLIB_LINK_WITH_LIBJPEG_STR} ON)
+option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
 
 
 add_library(dlib STATIC all/source.cpp )
@@ -186,6 +189,19 @@ if (NOT DLIB_ISO_CPP_ONLY)
       endif()
    endif()
 
+
+
+   if (DLIB_LINK_WITH_SQLITE3)
+      find_library(sqlite sqlite3)
+      # make sure sqlite3.h is in the include path
+      find_path(sqlite_path sqlite3.h)
+      if (sqlite AND sqlite_path)
+         get_filename_component(sqlite_path2 ${sqlite_path} PATH CACHE)
+         include_directories(${sqlite_path2})
+         set(dlib_needed_libraries ${dlib_needed_libraries} ${sqlite} )
+      endif()
+      mark_as_advanced(sqlite sqlite_path sqlite_path2)
+   endif()
 
 
    target_link_libraries(dlib ${dlib_needed_libraries} )
