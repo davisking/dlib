@@ -121,6 +121,26 @@
          <item>threshold_image</item>
          <item>auto_threshold_image</item>
       </section>
+
+      <section>
+         <name>Morphology</name>
+         <item>binary_dilation</item>
+         <item>binary_erosion</item>
+         <item>binary_open</item>
+         <item>binary_close</item>
+         <item>binary_intersection</item>
+         <item>binary_union</item>
+         <item>binary_difference</item>
+         <item>binary_complement</item>
+      </section>
+
+      <section>
+         <name>Filtering</name>
+         <item>spatially_filter_image</item> 
+         <item>spatially_filter_image_separable</item> 
+         <item>separable_3x3_filter_block_grayscale</item> 
+         <item>separable_3x3_filter_block_rgb</item> 
+      </section>
  
       <section>
          <name>Miscellaneous</name>
@@ -135,24 +155,12 @@
          <item>assign_border_pixels</item> 
          <item>equalize_histogram</item> 
          <item>get_histogram</item> 
-         <item>spatially_filter_image</item> 
-         <item>spatially_filter_image_separable</item> 
-         <item>separable_3x3_filter_block_grayscale</item> 
-         <item>separable_3x3_filter_block_rgb</item> 
          <item>pyramid_down</item> 
          <item>pyramid_down_3_2</item> 
          <item>pyramid_down_4_3</item> 
          <item>pyramid_down_5_4</item> 
          <item>zero_border_pixels</item> 
 
-         <item>binary_dilation</item>
-         <item>binary_erosion</item>
-         <item>binary_open</item>
-         <item>binary_close</item>
-         <item>binary_intersection</item>
-         <item>binary_union</item>
-         <item>binary_difference</item>
-         <item>binary_complement</item>
       </section>
 
     </top>  
