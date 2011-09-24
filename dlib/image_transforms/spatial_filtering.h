@@ -341,6 +341,110 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double gaussian (
+        double x, 
+        double sigma
+    )
+    /*!
+        requires
+            - sigma > 0
+        ensures
+            - computes and returns the value of a 1D Gaussian function with mean 0 
+              and standard deviation sigma at the given x value.
+    !*/
+    {
+        DLIB_ASSERT(sigma > 0,
+            "\tdouble gaussian(x)"
+            << "\n\t sigma must be bigger than 0"
+            << "\n\t sigma: " << sigma 
+        );
+        const double pi = 3.1415926535898;
+        return 1.0/(sigma*sigma*2*pi) * std::exp( -(x*x)/(2*sigma*sigma));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    matrix<T,0,1> create_gaussian_filter (
+        double sigma,
+        int size 
+    )
+    /*!
+        requires
+            - sigma > 0
+            - size > 0 
+            - size is an odd number
+        ensures
+            - returns a separable Gaussian filter F such that:
+                - is_vector(F) == true 
+                - F.size() == size 
+                - F is suitable for use with the spatially_filter_image_separable() routine
+                  and its use with this function corresponds to running a Gaussian filter 
+                  of sigma width over an image.
+    !*/
+    {
+        DLIB_ASSERT(sigma > 0 && size > 0 && (size%2)==1,
+            "\t matrix<T,0,1> create_gaussian_filter()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t sigma: " << sigma 
+            << "\n\t size:  " << size 
+        );
+
+        matrix<double,0,1> f(size);
+        for (long i = 0; i < f.size(); ++i)
+        {
+            f(i) = gaussian(i-size/2, sigma);
+        }
+
+        if (is_float_type<T>::value == false)
+        {
+            f /= f(0);
+            return matrix_cast<T>(round(f));
+        }
+        else
+        {
+            return matrix_cast<T>(f);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void gaussian_blur (
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        double sigma = 1,
+        int size = 7
+    )
+    {
+        DLIB_ASSERT(sigma > 0 && size > 0 && (size%2)==1 &&
+                    is_same_object(in_img, out_img) == false,
+            "\t void gaussian_blur()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t sigma: " << sigma 
+            << "\n\t size:  " << size 
+            << "\n\t is_same_object(in_img,out_img): " << is_same_object(in_img,out_img) 
+        );
+
+        typedef typename pixel_traits<typename out_image_type::type>::basic_pixel_type type;
+        typedef typename promote<type>::type ptype;
+
+        const matrix<ptype,0,1>& filt = create_gaussian_filter<ptype>(sigma, size);
+
+        ptype scale = sum(filt);
+        scale = scale*scale;
+
+        spatially_filter_image_separable(in_img, out_img, filt, filt, scale);
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SPATIAL_FILTERINg_H_

@@ -180,6 +180,80 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double gaussian (
+        double x, 
+        double sigma
+    );
+    /*!
+        requires
+            - sigma > 0
+        ensures
+            - computes and returns the value of a 1D Gaussian function with mean 0 
+              and standard deviation sigma at the given x value.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    matrix<T,0,1> create_gaussian_filter (
+        double sigma,
+        int size 
+    );
+    /*!
+        requires
+            - sigma > 0
+            - size > 0 
+            - size is an odd number
+        ensures
+            - returns a separable Gaussian filter F such that:
+                - is_vector(F) == true 
+                - F.size() == size 
+                - F is suitable for use with the spatially_filter_image_separable() routine
+                  and its use with this function corresponds to running a Gaussian filter 
+                  of sigma width over an image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void gaussian_blur (
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        double sigma = 1,
+        int size = 7
+    );
+    /*!
+        requires
+            - in_image_type  == is an implementation of array2d/array2d_kernel_abstract.h
+            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename in_image_type::type>::has_alpha == false
+            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - is_same_object(in_img, out_img) == false 
+            - sigma > 0
+            - size > 0
+            - size is an odd number
+        ensures
+            - Filters in_img with a Gaussian filter of sigma width.  The actual spatial filter will
+              be applied to pixel blocks that are size wide and size tall.  The results are stored
+              into #out_img.
+            - Pixel values are stored into out_img using the assign_pixel() function and therefore
+              any applicable color space conversion or value saturation is performed.
+            - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
+                - the pixel values are converted to the HSI color space and the filtering
+                  is done on the intensity channel only.
+            - Pixels close enough to the edge of in_img to not have the filter still fit 
+              inside the image are set to zero.
+            - #out_img.nc() == in_img.nc()
+            - #out_img.nr() == in_img.nr()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SPATIAL_FILTERINg_ABSTRACT_
