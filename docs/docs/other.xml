@@ -61,7 +61,42 @@
          <item>serialize</item> 
          <item>zero_extend_cast</item> 
          <item>make_mfp</item> 
+      </section>
       
+      <section>
+         <name>SQLite</name>
+         <item>database</item> 
+         <item>statement</item> 
+         <item>transaction</item> 
+         <item nolink="true">
+            <name>simple_queries</name>
+            <sub>
+               <item>
+                  <name>query_object</name>
+                  <link>dlib/sqlite/sqlite_tools_abstract.h.html#query_object</link>
+               </item>
+               <item>
+                  <name>query_text</name>
+                  <link>dlib/sqlite/sqlite_tools_abstract.h.html#query_text</link>
+               </item>
+               <item>
+                  <name>query_double</name>
+                  <link>dlib/sqlite/sqlite_tools_abstract.h.html#query_double</link>
+               </item>
+               <item>
+                  <name>query_int</name>
+                  <link>dlib/sqlite/sqlite_tools_abstract.h.html#query_int</link>
+               </item>
+               <item>
+                  <name>query_int64</name>
+                  <link>dlib/sqlite/sqlite_tools_abstract.h.html#query_int64</link>
+               </item>
+               <item>
+                  <name>query_blob</name>
+                  <link>dlib/sqlite/sqlite_tools_abstract.h.html#query_blob</link>
+               </item>
+            </sub>
+         </item>
       </section>
 
       <section>
@@ -876,6 +911,55 @@
                      
          </implementations>
                         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>database</name>
+         <file>dlib/sqlite.h</file>
+         <spec_file link="true">dlib/sqlite/sqlite_abstract.h</spec_file>
+         <description>
+                This object is a C++ wrapper around a SQLite database connection 
+                handle and therefore represents a <a href="http://www.sqlite.org">SQLite</a> database file. 
+
+               <p>
+                Note that this wrapper is targeted at SQLite Version 3.  To use it
+                you must make sure you link your application with SQLite.  
+               </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>statement</name>
+         <file>dlib/sqlite.h</file>
+         <spec_file link="true">dlib/sqlite/sqlite_abstract.h</spec_file>
+         <description>
+                This object represents a SQL statement which can be executed
+                against a <a href="#database">database</a> object.  In particular, this object is a
+                C++ wrapper around a <a href="http://www.sqlite.org">SQLite</a> prepared statement.
+               <p>
+                Note that this wrapper is targeted at SQLite Version 3.  To use it
+                you must make sure you link your application with SQLite.  
+               </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>transaction</name>
+         <file>dlib/sqlite.h</file>
+         <spec_file link="true">dlib/sqlite/sqlite_tools_abstract.h</spec_file>
+         <description>
+                This object is a tool for creating exception safe
+                <a href="#database">database</a> transactions.
+         </description>
+                                 
       </component>
             
    <!-- ************************************************************************* -->

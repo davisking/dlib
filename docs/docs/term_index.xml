@@ -1143,6 +1143,19 @@
          <term link="dlib/algs.h.html#general_return_codes" name="PORTINUSE"/>
 
          <term link="dlib/general_hash/general_hash.h.html" name="general_hash"/>
+
+
+         <term file="other.html" name="database"/>
+         <term file="other.html" name="statement"/>
+         <term file="other.html" name="transaction"/>
+         <term link="other.html#database" name="SQLite"/>
+         <term file="dlib/sqlite/sqlite_tools_abstract.h.html" name="query_object"/>
+         <term file="dlib/sqlite/sqlite_tools_abstract.h.html" name="query_text"/>
+         <term file="dlib/sqlite/sqlite_tools_abstract.h.html" name="query_double"/>
+         <term file="dlib/sqlite/sqlite_tools_abstract.h.html" name="query_int"/>
+         <term file="dlib/sqlite/sqlite_tools_abstract.h.html" name="query_int64"/>
+         <term file="dlib/sqlite/sqlite_tools_abstract.h.html" name="query_blob"/>
+         <term file="dlib/sqlite/sqlite_abstract.h.html" name="sqlite_error"/>
       </term_list>
    
    </body>
