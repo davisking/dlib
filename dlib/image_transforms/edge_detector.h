@@ -171,6 +171,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <typename T>
+        typename promote<T>::type square (const T& a)
+        { 
+            typedef typename promote<T>::type type;
+            return static_cast<T>(a)*static_cast<T>(a); 
+        }
+    }
+
     template <
         typename in_image_type,
         typename out_image_type
@@ -228,42 +238,44 @@ namespace dlib
         {
             for (long c = first_col; c < last_col; ++c)
             {
-                typedef typename in_image_type::type T;
+                typedef typename promote<typename in_image_type::type>::type T;
                 const T y = horz[r][c];
                 const T x = vert[r][c];
 
-                const T val = abs(horz[r][c]) + abs(vert[r][c]); 
+                using impl::square;
+
+                const T val = square(horz[r][c]) + square(vert[r][c]); 
 
                 const char ori = edge_orientation(x,y);
                 const unsigned char zero = 0;
                 switch (ori)
                 {
                     case '-':
-                        if (abs(horz[r-1][c])+abs(vert[r-1][c]) > val || abs(horz[r+1][c]) + abs(vert[r+1][c]) > val)
+                        if (square(horz[r-1][c])+square(vert[r-1][c]) > val || square(horz[r+1][c]) + square(vert[r+1][c]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , val);
+                            assign_pixel(out_img[r][c] , std::sqrt(val));
                         break;
 
                     case '|':
-                        if (abs(horz[r][c-1]) + abs(vert[r][c-1]) > val || abs(horz[r][c+1]) + abs(vert[r][c+1]) > val)
+                        if (square(horz[r][c-1]) + square(vert[r][c-1]) > val || square(horz[r][c+1]) + square(vert[r][c+1]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , val);
+                            assign_pixel(out_img[r][c] , std::sqrt(val));
                         break;
 
                     case '/':
-                        if (abs(horz[r-1][c-1]) + abs(vert[r-1][c-1]) > val || abs(horz[r+1][c+1]) + abs(vert[r+1][c+1]) > val)
+                        if (square(horz[r-1][c-1]) + square(vert[r-1][c-1]) > val || square(horz[r+1][c+1]) + square(vert[r+1][c+1]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , val);
+                            assign_pixel(out_img[r][c] , std::sqrt(val));
                         break;
 
                     case '\\':
-                        if (abs(horz[r+1][c-1]) + abs(vert[r+1][c-1]) > val || abs(horz[r-1][c+1]) + abs(vert[r-1][c+1]) > val)
+                        if (square(horz[r+1][c-1]) + square(vert[r+1][c-1]) > val || square(horz[r-1][c+1]) + square(vert[r-1][c+1]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , val);
+                            assign_pixel(out_img[r][c] , std::sqrt(val));
                         break;
 
                 }
