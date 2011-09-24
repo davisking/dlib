@@ -925,7 +925,12 @@
 
                <p>
                 Note that this wrapper is targeted at SQLite Version 3.  To use it
-                you must make sure you link your application with SQLite.  
+                you must make sure you link your application with SQLite.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.  This is assuming sqlite3 is properly installed on your system.
+               On ubuntu you can get it by installing the libsqlite3-dev package.  Or you can always
+               download the <a href="http://www.sqlite.org/download.html">SQLite source</a>
+               and compile it straight into your application (download the amalgamation). 
                </p>
          </description>
                                  
