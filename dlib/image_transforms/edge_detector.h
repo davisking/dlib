@@ -242,28 +242,28 @@ namespace dlib
                         if (abs(horz[r-1][c])+abs(vert[r-1][c]) > val || abs(horz[r+1][c]) + abs(vert[r+1][c]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , static_cast<unsigned long>(val));
+                            assign_pixel(out_img[r][c] , val);
                         break;
 
                     case '|':
                         if (abs(horz[r][c-1]) + abs(vert[r][c-1]) > val || abs(horz[r][c+1]) + abs(vert[r][c+1]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , static_cast<unsigned long>(val));
+                            assign_pixel(out_img[r][c] , val);
                         break;
 
                     case '/':
                         if (abs(horz[r-1][c-1]) + abs(vert[r-1][c-1]) > val || abs(horz[r+1][c+1]) + abs(vert[r+1][c+1]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , static_cast<unsigned long>(val));
+                            assign_pixel(out_img[r][c] , val);
                         break;
 
                     case '\\':
                         if (abs(horz[r+1][c-1]) + abs(vert[r+1][c-1]) > val || abs(horz[r-1][c+1]) + abs(vert[r-1][c+1]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , static_cast<unsigned long>(val));
+                            assign_pixel(out_img[r][c] , val);
                         break;
 
                 }
