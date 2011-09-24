@@ -462,6 +462,7 @@
          <term file="metaprogramming.html" name="is_const_type"/>
          <term file="metaprogramming.html" name="is_reference_type"/>
          <term file="metaprogramming.html" name="is_same_type"/>
+         <term file="metaprogramming.html" name="is_float_type"/>
          <term file="metaprogramming.html" name="is_same_object"/>
          <term file="metaprogramming.html" name="is_convertible"/>
          <term file="metaprogramming.html" name="is_complex"/>
@@ -966,6 +967,12 @@
          <term file="imaging.html" name="save_png"/>
          <term file="imaging.html" name="load_image"/>
          <term file="imaging.html" name="save_dng"/>
+         <term file="dlib/image_transforms/spatial_filtering_abstract.h.html" name="create_gaussian_filter"/>
+         <term name="gaussian">
+            <term link="dlib/image_transforms/spatial_filtering_abstract.h.html#gaussian" name="1D Gaussian"/>
+            <term link="dlib/image_keypoint/surf_abstract.h.html#gaussian" name="2D Gaussian"/>
+         </term>
+         <term file="imaging.html" name="gaussian_blur"/>
          <term file="imaging.html" name="spatially_filter_image"/>
          <term file="imaging.html" name="spatially_filter_image_separable"/>
          <term file="imaging.html" name="separable_3x3_filter_block_grayscale"/>

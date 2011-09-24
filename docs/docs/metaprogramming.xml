@@ -34,6 +34,7 @@
          <item>is_const_type</item>
          <item>is_reference_type</item>
          <item>is_same_type</item>
+         <item>is_float_type</item>
          <item>is_convertible</item>
          <item>is_complex</item>
          <item>is_function</item>
@@ -221,6 +222,19 @@
          <description>
             This is a template where is_same_type&lt;T,U&gt;::value == true when T and U are 
             the same type and false otherwise. 
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_float_type</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This is a template where is_float_type&lt;T&gt;::value == true when T is
+            a floating point type (i.e. float, double, or long double) and false otherwise.
          </description>
          
       </component>

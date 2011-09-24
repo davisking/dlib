@@ -136,6 +136,7 @@
 
       <section>
          <name>Filtering</name>
+         <item>gaussian_blur</item> 
          <item>spatially_filter_image</item> 
          <item>spatially_filter_image_separable</item> 
          <item>separable_3x3_filter_block_grayscale</item> 
@@ -904,6 +905,18 @@
          <description>        
             This global function performs spatial filtering on an image with a user
             supplied filter.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>gaussian_blur</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/spatial_filtering_abstract.h</spec_file>
+         <description>        
+            This global function blurs an image by convolving it with a Gaussian filter.
          </description>
                                  
       </component>
