@@ -90,7 +90,8 @@ namespace dlib
         ensures
             - #out_img.nr() = horz.nr()
             - #out_img.nc() = horz.nc()
-            - let edge_strength(r,c) == abs(horz[r][c]) + abs(vert[r][c])
+            - let edge_strength(r,c) == sqrt(pow(horz[r][c],2) + pow(vert[r][c],2))
+              (i.e. The Euclidean norm of the gradient)
             - for all valid r and c:
                 - if (edge_strength(r,c) is at a maximum with respect to its 2 neighboring
                   pixels along the line given by edge_orientation(vert[r][c],horz[r][c])) then
