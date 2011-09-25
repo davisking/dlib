@@ -18,7 +18,7 @@ New Stuff:
    - Image Processing
       - Added more tools for creating image pyramids.  See pyramid_down_5_4, 
         pyramid_down_4_3, and pyramid_down_3_2.
-      - Added more image filtering functions.
+      - Added more image filtering and morphology functions.
       - Added a set of tools for creating sliding window classifiers:
          - Added the scan_image() routine.  It is a tool for sliding a set of 
            rectangles over an image space and finding the locations where the sum 
@@ -33,6 +33,7 @@ New Stuff:
    - Added the following functions for computing statistics on vectors:
      mean_sign_agreement(), correlation(), covariance(), r_squared(),
      and mean_squared_error()
+   - Added a C++ wrapper for SQLite (see the new database and statement objects)
  
 Non-Backwards Compatible Changes:
    - Changed the interface to the ridge regression trainer objects so that they 
@@ -46,6 +47,9 @@ Non-Backwards Compatible Changes:
    - Changed the test_regression_function() and cross_validate_regression_trainer()
      routines so they return both the MSE and R-squared values rather than just the
      MSE.
+   - Changed suppress_non_maximum_edges() to use the L2 norm instead of L1 norm
+     for measuring the strength of an edge since this produces a slightly better
+     result.
 
 Bug fixes:
    - The image_display didn't display overlay rectangles quite right.  If you zoomed
@@ -62,6 +66,10 @@ Bug fixes:
      It wasn't tokenizing double quoted strings right.
    - Fixed a bug in spatially_filter_image() which showed up when using non-square 
      filters.  The bug would cause the edges of the output image to be incorrect.
+   - Fixed a bug in the matrix class.  Expressions of the form mat *= mat(0) would
+     evaluate incorrectly because the *= operator took the right hand side by reference
+     and thus experienced an aliasing problem.  The other op= operators had similar
+     problems and have also been fixed.
 
 Other:
    - Added a more complete set of methods for converting between image space and 
