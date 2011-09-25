@@ -202,7 +202,7 @@ namespace dlib
                 - executes the SQL statement get_sql_string() against the database
                   given to this object's constructor.
                 - If this was a select statement then you can obtain the resulting
-                  rows by calling move_next() and using the get_column_by_*() member
+                  rows by calling move_next() and using the get_column_as_*() member
                   functions.
         !*/
 
@@ -214,7 +214,7 @@ namespace dlib
             ensures
                 - if (there is a result row for this query) then
                     - #get_num_columns() == the number of columns in the result row.
-                    - The get_column_by_*() routines can be used to access the elements 
+                    - The get_column_as_*() routines can be used to access the elements 
                       of the row data.
                     - returns true
                 - else
