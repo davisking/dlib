@@ -987,6 +987,129 @@ namespace
         DLIB_TEST(img[2][2] == 1);
     }
 
+
+    void test_label_connected_blobs()
+    {
+        array2d<unsigned char> img;
+        img.set_size(400,401);
+
+        assign_all_pixels(img,0);
+
+        rectangle rect1, rect2, rect3;
+
+        rect1 = centered_rect(99,120, 50,70);
+        rect2 = centered_rect(199,80, 34,68);
+        rect3 = centered_rect(249,180, 120,78);
+
+        fill_rect(img, rect1, 255);
+        fill_rect(img, rect2, 255);
+        fill_rect(img, rect3, 255);
+
+        array2d<unsigned char> labels;
+        unsigned long num;
+        num = label_connected_blobs(img, 
+                                    zero_pixels_are_background(),
+                                    neighbors_8(),
+                                    connected_if_both_not_zero(),
+                                    labels);
+
+        DLIB_TEST(num == 4);
+        DLIB_TEST(labels.nr() == img.nr());
+        DLIB_TEST(labels.nc() == img.nc());
+
+        const unsigned char l1 = labels[rect1.top()][rect1.left()];
+        const unsigned char l2 = labels[rect2.top()][rect2.left()];
+        const unsigned char l3 = labels[rect3.top()][rect3.left()];
+
+        DLIB_TEST(l1 != 0 && l2 != 0 && l3 != 0);
+        DLIB_TEST(l1 != l2 && l1 != l3 && l2 != l3);
+
+        for (long r = 0; r < labels.nr(); ++r)
+        {
+            for (long c = 0; c < labels.nc(); ++c)
+            {
+                if (rect1.contains(c,r))
+                {
+                    DLIB_TEST(labels[r][c] == l1);
+                }
+                else if (rect2.contains(c,r))
+                {
+                    DLIB_TEST(labels[r][c] == l2);
+                }
+                else if (rect3.contains(c,r))
+                {
+                    DLIB_TEST(labels[r][c] == l3);
+                }
+                else
+                {
+                    DLIB_TEST(labels[r][c] == 0);
+                }
+            }
+        }
+    }
+
+    void test_label_connected_blobs2()
+    {
+        array2d<unsigned char> img;
+        img.set_size(400,401);
+
+        assign_all_pixels(img,0);
+
+        rectangle rect1, rect2, rect3;
+
+        rect1 = centered_rect(99,120, 50,70);
+        rect2 = centered_rect(199,80, 34,68);
+        rect3 = centered_rect(249,180, 120,78);
+
+        fill_rect(img, rect1, 255);
+        fill_rect(img, rect2, 253);
+        fill_rect(img, rect3, 255);
+
+        array2d<unsigned char> labels;
+        unsigned long num;
+        num = label_connected_blobs(img, 
+                                    nothing_is_background(),
+                                    neighbors_4(),
+                                    connected_if_equal(),
+                                    labels);
+
+        DLIB_TEST(num == 5);
+        DLIB_TEST(labels.nr() == img.nr());
+        DLIB_TEST(labels.nc() == img.nc());
+
+        const unsigned char l0 = labels[0][0];
+        const unsigned char l1 = labels[rect1.top()][rect1.left()];
+        const unsigned char l2 = labels[rect2.top()][rect2.left()];
+        const unsigned char l3 = labels[rect3.top()][rect3.left()];
+
+        DLIB_TEST(l0 != 0 && l1 != 0 && l2 != 0 && l3 != 0);
+        DLIB_TEST(l1 != l2 && l1 != l3 && l2 != l3 && 
+                  l0 != l1 && l0 != l2 && l0 != l3);
+
+        for (long r = 0; r < labels.nr(); ++r)
+        {
+            for (long c = 0; c < labels.nc(); ++c)
+            {
+                if (rect1.contains(c,r))
+                {
+                    DLIB_TEST(labels[r][c] == l1);
+                }
+                else if (rect2.contains(c,r))
+                {
+                    DLIB_TEST(labels[r][c] == l2);
+                }
+                else if (rect3.contains(c,r))
+                {
+                    DLIB_TEST(labels[r][c] == l3);
+                }
+                else
+                {
+                    DLIB_TEST(labels[r][c] == l0);
+                }
+            }
+        }
+    }
+
     class image_tester : public tester
     {
     public:
@@ -1015,6 +1138,9 @@ namespace
             test_filtering<int>(true,1);
             test_filtering<int>(false,3);
             test_filtering<int>(true,3);
+
+            test_label_connected_blobs();
+            test_label_connected_blobs2();
         }
     } a;
 
