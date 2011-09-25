@@ -153,6 +153,7 @@ namespace dlib
             - get_neighbors(point(c,r), neighbors) is a legal expression where neighbors 
               is of type std::vector<point>.
             - is_connected(img, point(c,r), point(c2,r2)) is a valid expression.
+            - is_same_object(img, label_img) == false
         ensures
             - This function labels each of the connected blobs in img with a unique integer 
               label.  
@@ -175,8 +176,11 @@ namespace dlib
                     - #label_img[r][c] == 0
                 - else
                     - #label_img[r][c] != 0
-            - returns max(array_to_matrix(label_img))+1
-              (i.e. returns a number one greater than the maximum blob id number)
+            - if (img.size() != 0) then 
+                - returns max(array_to_matrix(label_img))+1
+                  (i.e. returns a number one greater than the maximum blob id number)
+            - else
+                - returns 0
             - blob labels are contiguous, therefore, the number returned by this function is
               the number of blobs in the image (including the background blob).
             - It is guaranteed that is_connected() and is_background() will never be 

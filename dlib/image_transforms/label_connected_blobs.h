@@ -120,10 +120,20 @@ namespace dlib
         label_image_type& label_img
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_same_object(img, label_img) == false,
+            "\t unsigned long label_connected_blobs()"
+            << "\n\t The input image and output label image can't be the same object."
+            );
+
+
         std::stack<point> neighbors;
         label_img.set_size(img.nr(), img.nc());
         assign_all_pixels(label_img, 0);
         unsigned long next = 1;
+
+        if (img.size() == 0)
+            return 0;
 
         const rectangle area = get_rect(img);
 
