@@ -945,6 +945,15 @@
          <term file="imaging.html" name="binary_union"/>
          <term file="imaging.html" name="binary_complement"/>
          <term file="imaging.html" name="binary_difference"/>
+
+         <term file="imaging.html" name="label_connected_blobs"/>
+         <term file="imaging.html" name="neighbors_8"/>
+         <term file="imaging.html" name="neighbors_4"/>
+         <term file="imaging.html" name="connected_if_both_not_zero"/>
+         <term file="imaging.html" name="connected_if_equal"/>
+         <term file="imaging.html" name="zero_pixels_are_background"/>
+         <term file="imaging.html" name="nothing_is_background"/>
+
          <term file="imaging.html" name="binary_dilation"/>
          <term file="imaging.html" name="binary_erosion"/>
          <term file="imaging.html" name="binary_intersection"/>

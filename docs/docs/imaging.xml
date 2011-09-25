@@ -124,6 +124,7 @@
 
       <section>
          <name>Morphology</name>
+         <item>label_connected_blobs</item>
          <item>binary_dilation</item>
          <item>binary_erosion</item>
          <item>binary_open</item>
@@ -1035,6 +1036,18 @@
          <description>        
             This global function performs a simple binary thresholding on an image with a user
             supplied threshold.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>label_connected_blobs</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/label_connected_blobs_abstract.h</spec_file>
+         <description>        
+              This function labels each of the connected blobs in an image with a unique integer label.  
          </description>
                                  
       </component>
