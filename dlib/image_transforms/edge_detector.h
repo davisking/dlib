@@ -254,28 +254,28 @@ namespace dlib
                         if (square(horz[r-1][c])+square(vert[r-1][c]) > val || square(horz[r+1][c]) + square(vert[r+1][c]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , std::sqrt(val));
+                            assign_pixel(out_img[r][c] , std::sqrt((double)val));
                         break;
 
                     case '|':
                         if (square(horz[r][c-1]) + square(vert[r][c-1]) > val || square(horz[r][c+1]) + square(vert[r][c+1]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , std::sqrt(val));
+                            assign_pixel(out_img[r][c] , std::sqrt((double)val));
                         break;
 
                     case '/':
                         if (square(horz[r-1][c-1]) + square(vert[r-1][c-1]) > val || square(horz[r+1][c+1]) + square(vert[r+1][c+1]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , std::sqrt(val));
+                            assign_pixel(out_img[r][c] , std::sqrt((double)val));
                         break;
 
                     case '\\':
                         if (square(horz[r+1][c-1]) + square(vert[r+1][c-1]) > val || square(horz[r-1][c+1]) + square(vert[r-1][c+1]) > val)
                             assign_pixel(out_img[r][c] , zero);
                         else
-                            assign_pixel(out_img[r][c] , std::sqrt(val));
+                            assign_pixel(out_img[r][c] , std::sqrt((double)val));
                         break;
 
                 }
