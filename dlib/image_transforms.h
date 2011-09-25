@@ -12,6 +12,7 @@
 #include "image_transforms/draw.h"
 #include "image_transforms/integral_image.h"
 #include "image_transforms/image_pyramid.h"
+#include "image_transforms/label_connected_blobs.h"
 
 #endif // DLIB_IMAGE_TRANSFORMs_
 
