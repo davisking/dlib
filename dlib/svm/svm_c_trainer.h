@@ -311,13 +311,13 @@ namespace dlib
                 {
                     if(alpha(i) == Cneg)
                     {
-                        if (-df(i) > upper_bound)
-                            upper_bound = -df(i);
+                        if (-df(i) < lower_bound)
+                            lower_bound = -df(i);
                     }
                     else if(alpha(i) == 0)
                     {
-                        if (-df(i) < lower_bound)
-                            lower_bound = -df(i);
+                        if (-df(i) > upper_bound)
+                            upper_bound = -df(i);
                     }
                     else
                     {

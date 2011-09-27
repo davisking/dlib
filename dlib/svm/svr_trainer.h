@@ -316,8 +316,8 @@ namespace dlib
             long num_free = 0;
             scalar_type sum_free = 0;
 
-            scalar_type upper_bound;
-            scalar_type lower_bound;
+            scalar_type upper_bound = -numeric_limits<scalar_type>::infinity();
+            scalar_type lower_bound = numeric_limits<scalar_type>::infinity();
 
             find_min_and_max(df, upper_bound, lower_bound);
 
@@ -345,13 +345,13 @@ namespace dlib
                 {
                     if(alpha(i) == C)
                     {
-                        if (-df(i) > upper_bound)
-                            upper_bound = -df(i);
+                        if (-df(i) < lower_bound)
+                            lower_bound = -df(i);
                     }
                     else if(alpha(i) == 0)
                     {
-                        if (-df(i) < lower_bound)
-                            lower_bound = -df(i);
+                        if (-df(i) > upper_bound)
+                            upper_bound = -df(i);
                     }
                     else
                     {
