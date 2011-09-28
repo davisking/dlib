@@ -70,6 +70,8 @@ Bug fixes:
      evaluate incorrectly because the *= operator took the right hand side by reference
      and thus experienced an aliasing problem.  The other op= operators had similar
      problems and have also been fixed.
+   - Fixed a bug pointed out by Justin Solomon which could cause the svr_trainer and
+     svm_c_trainer to produce incorrect results in certain unusual cases.  
 
 Other:
    - Added a more complete set of methods for converting between image space and 
