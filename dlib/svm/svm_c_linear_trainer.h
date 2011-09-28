@@ -43,14 +43,16 @@ namespace dlib
             const in_sample_vector_type& samples_,
             const in_scalar_vector_type& labels_,
             const bool be_verbose_,
-            const scalar_type eps_
+            const scalar_type eps_,
+            const unsigned long max_iter
         ) :
             samples(samples_),
             labels(labels_),
             Cpos(C_pos),
             Cneg(C_neg),
             be_verbose(be_verbose_),
-            eps(eps_)
+            eps(eps_),
+            max_iterations(max_iter)
         {
             dot_prods.resize(samples.size());
             is_first_call = true;
@@ -87,6 +89,9 @@ namespace dlib
                 cout << "iter: " << num_iterations << endl;
                 cout << endl;
             }
+
+            if (num_iterations >= max_iterations)
+                return true;
 
             if (current_objective_value == 0)
                 return true;
@@ -292,6 +297,7 @@ namespace dlib
 
         const bool be_verbose;
         const scalar_type eps;
+        const unsigned long max_iterations;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -308,10 +314,12 @@ namespace dlib
         const in_sample_vector_type& samples,
         const in_scalar_vector_type& labels,
         const bool be_verbose,
-        const scalar_type eps
+        const scalar_type eps,
+        const unsigned char max_iterations
     )
     {
-        return oca_problem_c_svm<matrix_type, in_sample_vector_type, in_scalar_vector_type>(C_pos, C_neg, samples, labels, be_verbose, eps);
+        return oca_problem_c_svm<matrix_type, in_sample_vector_type, in_scalar_vector_type>(
+            C_pos, C_neg, samples, labels, be_verbose, eps, max_iterations);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -342,6 +350,7 @@ namespace dlib
             Cneg = 1;
             verbose = false;
             eps = 0.001;
+            max_iterations = 10000;
         }
 
         explicit svm_c_linear_trainer (
@@ -358,6 +367,9 @@ namespace dlib
 
             Cpos = C;
             Cneg = C;
+            verbose = false;
+            eps = 0.001;
+            max_iterations = 10000;
         }
 
         void set_epsilon (
@@ -377,6 +389,16 @@ namespace dlib
 
         const scalar_type get_epsilon (
         ) const { return eps; }
+
+        unsigned long get_max_iterations (
+        ) const { return max_iterations; }
+
+        void set_max_iterations (
+            unsigned long max_iter
+        ) 
+        {
+            max_iterations = max_iter;
+        }
 
         void be_verbose (
         )
@@ -522,7 +544,7 @@ namespace dlib
             w_type w;
 
             svm_objective = solver(
-                make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps), 
+                make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations), 
                 w);
 
             // put the solution into a decision function and then return it
@@ -546,6 +568,7 @@ namespace dlib
         oca solver;
         scalar_type eps;
         bool verbose;
+        unsigned long max_iterations;
     }; 
 
 // ----------------------------------------------------------------------------------------

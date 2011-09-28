@@ -51,6 +51,7 @@ namespace dlib
                 - #get_c_class2() == 1
                 - #get_epsilon() == 0.001
                 - this object will not be verbose unless be_verbose() is called
+                - #get_max_iterations() == 10000
         !*/
 
         explicit svm_c_linear_trainer (
@@ -67,6 +68,7 @@ namespace dlib
                 - #get_c_class2() == C
                 - #get_epsilon() == 0.001
                 - this object will not be verbose unless be_verbose() is called
+                - #get_max_iterations() == 10000
         !*/
 
         void set_epsilon (
@@ -86,6 +88,22 @@ namespace dlib
                 - returns the error epsilon that determines when training should stop.
                   Smaller values may result in a more accurate solution but take longer 
                   to execute.
+        !*/
+
+        void set_max_iterations (
+            unsigned long max_iter
+        );
+        /*!
+            ensures
+                - #get_max_iterations() == max_iter
+        !*/
+
+        unsigned long get_max_iterations (
+        ); 
+        /*!
+            ensures
+                - returns the maximum number of iterations the SVM optimizer is allowed to
+                  run before it is required to stop and return a result.
         !*/
 
         void be_verbose (

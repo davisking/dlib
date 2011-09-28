@@ -82,6 +82,19 @@ namespace dlib
             return ocas.get_epsilon();
         }
 
+        void set_max_iterations (
+            unsigned long max_iter
+        )
+        {
+            ocas.set_max_iterations(max_iter);
+        }
+
+        unsigned long get_max_iterations (
+        )
+        {
+            return ocas.get_max_iterations();
+        }
+
         void be_verbose (
         ) 
         { 
