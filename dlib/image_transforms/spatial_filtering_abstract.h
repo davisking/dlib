@@ -225,7 +225,7 @@ namespace dlib
         const in_image_type& in_img,
         out_image_type& out_img,
         double sigma = 1,
-        int size = 7
+        int max_size = 1001
     );
     /*!
         requires
@@ -235,12 +235,13 @@ namespace dlib
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
             - is_same_object(in_img, out_img) == false 
             - sigma > 0
-            - size > 0
-            - size is an odd number
+            - max_size > 0
+            - max_size is an odd number
         ensures
             - Filters in_img with a Gaussian filter of sigma width.  The actual spatial filter will
-              be applied to pixel blocks that are size wide and size tall.  The results are stored
-              into #out_img.
+              be applied to pixel blocks that are at most max_size wide and max_size tall (note that
+              this function will automatically select a smaller block size as appropriate).  The 
+              results are stored into #out_img.
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
               any applicable color space conversion or value saturation is performed.
             - if (pixel_traits<typename in_image_type::type>::grayscale == false) then

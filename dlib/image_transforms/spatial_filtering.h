@@ -369,33 +369,41 @@ namespace dlib
         >
     matrix<T,0,1> create_gaussian_filter (
         double sigma,
-        int size 
+        int max_size 
     )
     /*!
         requires
             - sigma > 0
-            - size > 0 
-            - size is an odd number
+            - max_size > 0 
+            - max_size is an odd number
         ensures
             - returns a separable Gaussian filter F such that:
                 - is_vector(F) == true 
-                - F.size() == size 
+                - F.size() <= max_size 
                 - F is suitable for use with the spatially_filter_image_separable() routine
                   and its use with this function corresponds to running a Gaussian filter 
                   of sigma width over an image.
     !*/
     {
-        DLIB_ASSERT(sigma > 0 && size > 0 && (size%2)==1,
+        DLIB_ASSERT(sigma > 0 && max_size > 0 && (max_size%2)==1,
             "\t matrix<T,0,1> create_gaussian_filter()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t sigma: " << sigma 
-            << "\n\t size:  " << size 
+            << "\n\t max_size:  " << max_size 
         );
 
-        matrix<double,0,1> f(size);
+        // Adjust the size so that the ratio of the gaussian values isn't huge.  
+        // This only matters when T is an integer type.  However, we do it for
+        // all types so that the behavior of this function is always relatively
+        // the same.
+        while (gaussian(0,sigma)/gaussian(max_size/2,sigma) > 50)
+            --max_size;
+
+
+        matrix<double,0,1> f(max_size);
         for (long i = 0; i < f.size(); ++i)
         {
-            f(i) = gaussian(i-size/2, sigma);
+            f(i) = gaussian(i-max_size/2, sigma);
         }
 
         if (is_float_type<T>::value == false)
@@ -419,22 +427,22 @@ namespace dlib
         const in_image_type& in_img,
         out_image_type& out_img,
         double sigma = 1,
-        int size = 7
+        int max_size = 1001
     )
     {
-        DLIB_ASSERT(sigma > 0 && size > 0 && (size%2)==1 &&
+        DLIB_ASSERT(sigma > 0 && max_size > 0 && (max_size%2)==1 &&
                     is_same_object(in_img, out_img) == false,
             "\t void gaussian_blur()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t sigma: " << sigma 
-            << "\n\t size:  " << size 
+            << "\n\t max_size:  " << max_size 
             << "\n\t is_same_object(in_img,out_img): " << is_same_object(in_img,out_img) 
         );
 
         typedef typename pixel_traits<typename out_image_type::type>::basic_pixel_type type;
         typedef typename promote<type>::type ptype;
 
-        const matrix<ptype,0,1>& filt = create_gaussian_filter<ptype>(sigma, size);
+        const matrix<ptype,0,1>& filt = create_gaussian_filter<ptype>(sigma, max_size);
 
         ptype scale = sum(filt);
         scale = scale*scale;
