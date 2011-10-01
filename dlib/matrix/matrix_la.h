@@ -1134,11 +1134,17 @@ convergence:
         typename matrix_exp<EXP>::matrix_type L(A.nr(),A.nc());
 
 #ifdef DLIB_USE_LAPACK
-        L = A;
-        lapack::potrf('L', L);
-        // mask out upper triangular area
-        return lowerm(L);
-#else
+        // Only call LAPACK if the matrix is big enough.  Otherwise,
+        // our own code is faster, especially for statically dimensioned 
+        // matrices.
+        if (A.nr() > 4)
+        {
+            L = A;
+            lapack::potrf('L', L);
+            // mask out upper triangular area
+            return lowerm(L);
+        }
+#endif
         typedef typename EXP::type T;
         set_all_elements(L,0);
 
@@ -1192,7 +1198,6 @@ convergence:
         }
 
         return L;
-#endif
 
     }
 
