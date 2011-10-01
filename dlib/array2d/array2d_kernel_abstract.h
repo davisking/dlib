@@ -124,6 +124,23 @@ namespace dlib
                 - std::bad_alloc 
         !*/
 
+        array2d (
+            long rows,
+            long cols 
+        );
+        /*!
+            requires
+                - cols > 0 && rows > 0 or
+                  cols == 0 && rows == 0
+            ensures
+                - #nc() == cols
+                - #nr() == rows
+                - #at_start() == true
+                - all elements in this array have initial values for their type
+            throws
+                - std::bad_alloc 
+        !*/
+
         virtual ~array2d (
         ); 
         /*!

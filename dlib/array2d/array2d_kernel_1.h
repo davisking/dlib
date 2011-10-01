@@ -143,6 +143,31 @@ namespace dlib
         {
         }
 
+        array2d(
+            long nr__,
+            long nc__
+        ) : 
+            nc_(0),
+            nr_(0),
+            rows(0),
+            data(0),
+            cur(0),
+            last(0),
+            at_start_(true)
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT((nc__ > 0 && nr__ > 0) ||
+                        (nc__ == 0 && nr__ == 0),
+                        "\t array2d::array2d(long nr__, long nc__)"
+                        << "\n\t You have to give a non zero nc and nr or just make both zero."
+                        << "\n\t this: " << this
+                        << "\n\t nc__: " << nc__ 
+                        << "\n\t nr__: " << nr__ 
+            );
+
+            set_size(nr__,nc__);
+        }
+
         virtual ~array2d (
         ) { clear(); }
 
