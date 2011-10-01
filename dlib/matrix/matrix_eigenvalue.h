@@ -18,6 +18,8 @@
 #include "lapack/syevr.h"
 #endif
 
+#define DLIB_LAPACK_EIGENVALUE_DECOMP_SIZE_THRESH 4
+
 namespace dlib 
 {
 
@@ -178,35 +180,41 @@ namespace dlib
             V = A;
 
 #ifdef DLIB_USE_LAPACK
-            e = 0;
+            if (A.nr() > DLIB_LAPACK_EIGENVALUE_DECOMP_SIZE_THRESH)
+            {
+                e = 0;
 
-            // We could compute the result using syev()
-            //lapack::syev('V', 'L', V,  d);
+                // We could compute the result using syev()
+                //lapack::syev('V', 'L', V,  d);
 
-            // Instead, we use syevr because its faster and maybe more stable.
-            matrix_type tempA(A);
-            matrix<lapack::integer,0,0,mem_manager_type,layout_type> isupz;
+                // Instead, we use syevr because its faster and maybe more stable.
+                matrix_type tempA(A);
+                matrix<lapack::integer,0,0,mem_manager_type,layout_type> isupz;
 
-            lapack::integer temp;
-            lapack::syevr('V','A','L',tempA,0,0,0,0,-1,temp,d,V,isupz);
-#else
+                lapack::integer temp;
+                lapack::syevr('V','A','L',tempA,0,0,0,0,-1,temp,d,V,isupz);
+            }
+#endif
             // Tridiagonalize.
             tred2();
 
             // Diagonalize.
             tql2();
-#endif
 
         } 
         else 
         {
 
 #ifdef DLIB_USE_LAPACK
-            matrix<type,0,0,mem_manager_type, column_major_layout> temp, vl, vr;
-            temp = A;
-            lapack::geev('N', 'V', temp, d, e, vl, vr);
-            V = vr;
-#else
+            if (A.nr() > DLIB_LAPACK_EIGENVALUE_DECOMP_SIZE_THRESH)
+            {
+                matrix<type,0,0,mem_manager_type, column_major_layout> temp, vl, vr;
+                temp = A;
+                lapack::geev('N', 'V', temp, d, e, vl, vr);
+                V = vr;
+                return;
+            }
+#endif
             H = A;
 
             ort.set_size(n);
@@ -216,7 +224,6 @@ namespace dlib
 
             // Reduce Hessenberg to real Schur form.
             hqr2();
-#endif
         }
     }
 
@@ -252,25 +259,27 @@ namespace dlib
         V = A;
 
 #ifdef DLIB_USE_LAPACK
-        e = 0;
+        if (A.nr() > DLIB_LAPACK_EIGENVALUE_DECOMP_SIZE_THRESH)
+        {
+            e = 0;
 
-        // We could compute the result using syev()
-        //lapack::syev('V', 'L', V,  d);
+            // We could compute the result using syev()
+            //lapack::syev('V', 'L', V,  d);
 
-        // Instead, we use syevr because its faster and maybe more stable.
-        matrix_type tempA(A);
-        matrix<lapack::integer,0,0,mem_manager_type,layout_type> isupz;
+            // Instead, we use syevr because its faster and maybe more stable.
+            matrix_type tempA(A);
+            matrix<lapack::integer,0,0,mem_manager_type,layout_type> isupz;
 
-        lapack::integer temp;
-        lapack::syevr('V','A','L',tempA,0,0,0,0,-1,temp,d,V,isupz);
-
-#else
+            lapack::integer temp;
+            lapack::syevr('V','A','L',tempA,0,0,0,0,-1,temp,d,V,isupz);
+            return;
+        }
+#endif
         // Tridiagonalize.
         tred2();
 
         // Diagonalize.
         tql2();
-#endif
 
     }
 

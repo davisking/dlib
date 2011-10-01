@@ -519,10 +519,13 @@ namespace dlib
                                float *B, const int ldb)
         {
 #ifdef DLIB_USE_BLAS
-            cblas_strsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
-#else
-            local_trsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
+            if (M > 4)
+            {
+                cblas_strsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
+                return;
+            }
 #endif
+            local_trsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
         }
 
         inline void cblas_trsm(const enum CBLAS_ORDER Order, const enum CBLAS_SIDE Side,
@@ -532,10 +535,13 @@ namespace dlib
                                double *B, const int ldb)
         {
 #ifdef DLIB_USE_BLAS
-            cblas_dtrsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
-#else
-            local_trsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
+            if (M > 4)
+            {
+                cblas_dtrsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
+                return;
+            }
 #endif
+            local_trsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
         }
 
         inline void cblas_trsm(const enum CBLAS_ORDER Order, const enum CBLAS_SIDE Side,
