@@ -178,7 +178,8 @@ namespace dlib
                     - #label_img[r][c] != 0
             - if (img.size() != 0) then 
                 - returns max(array_to_matrix(label_img))+1
-                  (i.e. returns a number one greater than the maximum blob id number)
+                  (i.e. returns a number one greater than the maximum blob id number, 
+                  this is the number of blobs found.)
             - else
                 - returns 0
             - blob labels are contiguous, therefore, the number returned by this function is
