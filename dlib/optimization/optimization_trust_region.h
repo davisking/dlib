@@ -108,14 +108,32 @@ namespace dlib
                 continue;
             }
 
+            using namespace blas_bindings;
+
             p = -gg;
             // Solve RR'*p = -g for p.
-            using namespace blas_bindings;
             // Solve R*q = -g for q where q = R'*p.
-            triangular_solver(CblasLeft, CblasLower, CblasNoTrans, CblasNonUnit, R, p);
+            if (R.nr() == 2)
+            {
+                p(0) = p(0)/R(0,0);
+                p(1) = (p(1)-R(1,0)*p(0))/R(1,1);
+            }
+            else
+            {
+                triangular_solver(CblasLeft, CblasLower, CblasNoTrans, CblasNonUnit, R, p);
+            }
             const T q_norm = length(p);
+
             // Solve R'*p = q for p.
-            triangular_solver(CblasLeft, CblasLower, CblasTrans, CblasNonUnit, R, p);
+            if (R.nr() == 2)
+            {
+                p(1) = p(1)/R(1,1);
+                p(0) = (p(0)-R(1,0)*p(1))/R(0,0);
+            }
+            else
+            {
+                triangular_solver(CblasLeft, CblasLower, CblasTrans, CblasNonUnit, R, p);
+            }
             const T p_norm = length(p);
 
             // check if we are done.  
@@ -233,6 +251,8 @@ namespace dlib
             << "\n\t radius:           " << radius
             );
 
+        const double initial_radius = radius;
+
         typedef typename funct_model::column_vector T;
         typedef typename T::type type;
         typedef typename T::mem_manager_type mem_manager_type;
@@ -280,7 +300,7 @@ namespace dlib
 
                 // something has gone horribly wrong if the radius has shrunk to zero.  So just
                 // give up if that happens.
-                if (static_cast<type>(radius) <= std::numeric_limits<type>::min())
+                if (radius <= initial_radius*std::numeric_limits<double>::epsilon())
                     break;
             }
             else
