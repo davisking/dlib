@@ -30,6 +30,12 @@ namespace dlib
                 neighbors with themselves.  Additionally, the graph is undirected. This
                 mean that if A is a neighbor of B then B must be a neighbor of A for
                 the map problem to be valid.
+
+
+                Finally, note that the "neighbor" relationship between nodes means the
+                following:  Two nodes are neighbors if and only if there is a potential 
+                function (implemented by the factor_value() method) which operates on 
+                the nodes.
         !*/
 
     public:
@@ -319,12 +325,14 @@ namespace dlib
               object defined at the top of this file.
             - eps > 0
         ensures
-            - This function is a tool for approximately solving the MAP problem in a graphical 
+            - This function is a tool for approximately solving the given MAP problem in a graphical 
               model or factor graph with pairwise potential functions.  That is, it attempts 
               to solve a certain kind of optimization problem which can be defined as follows:
                  maximize: f(X)
-                 where X is a set of integer valued variables and f(X) can be written
-                 as the sum of functions which each involve only two variables from X.
+                 where X is a set of integer valued variables and f(X) can be written as the 
+                 sum of functions which each involve only two variables from X.  In reference 
+                 to the prob object, the nodes in prob represent the variables in X and the 
+                 functions which are summed are represented by prob.factor_value().
             - #map_assignment == the result of the optimization.   
             - #map_assignment.size() == prob.number_of_nodes()
             - for all valid i:
