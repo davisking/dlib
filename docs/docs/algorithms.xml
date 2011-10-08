@@ -50,6 +50,7 @@
          <item nolink="true">
             <name>Geometry</name>
             <sub>
+               <item>border_enumerator</item> 
                <item>rectangle</item> 
                <item>vector</item> 
                <item>point</item> 
@@ -232,6 +233,19 @@
             This object represents a rectangular region inside a Cartesian 
             coordinate system.  It allows you to easily represent and manipulate
             rectangles.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>border_enumerator</name>
+         <file>dlib/geometry.h</file>
+         <spec_file>dlib/geometry/border_enumerator_abstract.h</spec_file>
+         <description>
+            This object is an <a href="containers.html#enumerable">enumerator</a> 
+            over the border <a href="#point">points</a> of a 
+            <a href="#rectangle">rectangle</a>.
          </description>
       </component>
             

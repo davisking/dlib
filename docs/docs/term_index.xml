@@ -103,6 +103,7 @@
          <term file="algorithms.html" name="disjoint_subsets"/>
          <term link="algorithms.html#disjoint_subsets" name="union-find"/>
          <term file="algorithms.html" name="rectangle"/>
+         <term file="algorithms.html" name="border_enumerator"/>
          <term file="algorithms.html" name="edge"/>
          <term file="algorithms.html" name="is_join_tree"/>
          <term file="algorithms.html" name="create_join_tree"/>
