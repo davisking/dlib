@@ -28,6 +28,7 @@
          <item>crc32</item> 
          <item>rand</item> 
          <item>hash</item> 
+         <item>disjoint_subsets</item> 
          <item>murmur_hash3</item> 
          <item>running_stats</item> 
          <item>running_scalar_covariance</item> 
@@ -258,6 +259,22 @@
       
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>disjoint_subsets</name>
+         <file>dlib/disjoint_subsets.h</file>
+         <spec_file link="true">dlib/disjoint_subsets/disjoint_subsets_abstract.h</spec_file>
+         <description>
+                This object represents a set of integers which is partitioned into
+                a number of disjoint subsets.  It supports the two fundamental operations
+                of finding which subset a particular integer belongs to as well as 
+                merging subsets. 
+         </description>
+
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
       <component>
          <name>running_stats</name>
          <file>dlib/statistics.h</file>

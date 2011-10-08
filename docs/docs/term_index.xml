@@ -100,6 +100,8 @@
          <term file="bayes.html" name="node_next_parent_assignment"/>
          <term file="bayes.html" name="node_cpt_filled_out"/>
 
+         <term file="algorithms.html" name="disjoint_subsets"/>
+         <term link="algorithms.html#disjoint_subsets" name="union-find"/>
          <term file="algorithms.html" name="rectangle"/>
          <term file="algorithms.html" name="edge"/>
          <term file="algorithms.html" name="is_join_tree"/>
