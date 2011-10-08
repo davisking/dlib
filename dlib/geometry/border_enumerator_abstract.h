@@ -3,7 +3,7 @@
 #undef DLIB_BORDER_EnUMERATOR_ABSTRACT_H_
 #ifdef DLIB_BORDER_EnUMERATOR_ABSTRACT_H_
 
-#include "rectangle.h"
+#include "rectangle_abstract.h"
 
 namespace dlib
 {
