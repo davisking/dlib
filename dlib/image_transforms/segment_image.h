@@ -76,7 +76,6 @@ namespace dlib
         DLIB_ASSERT(is_same_object(in_img, out_img) == false,
             "\t void segment_image()"
             << "\n\t The input images can't be the same object."
-            << "\n\t this: " << this
             );
 
         COMPILE_TIME_ASSERT(is_unsigned_type<ptype>::value && sizeof(ptype) <= 2);
