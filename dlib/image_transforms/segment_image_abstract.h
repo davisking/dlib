@@ -20,10 +20,10 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - image_type::type == an unsigned 8-bit or 16bit integer type. 
-            - image_type::type == unsigned integer type 
+            - in_image_type  == an implementation of array2d/array2d_kernel_abstract.h
+            - out_image_type == an implementation of array2d/array2d_kernel_abstract.h
+            - in_image_type::type  == an unsigned 8-bit or 16bit integer type. 
+            - out_image_type::type == unsigned integer type 
             - is_same_object(in_img, out_img) == false
         ensures
             - Attempts to segment in_img into regions which have some visual consistency to them.
