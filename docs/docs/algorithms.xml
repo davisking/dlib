@@ -25,21 +25,7 @@
       <section>
          <name>Tools</name>
          <item>bigint</item> 
-         <item>crc32</item> 
-         <item>rand</item> 
-         <item>hash</item> 
          <item>disjoint_subsets</item> 
-         <item>murmur_hash3</item> 
-         <item>running_stats</item> 
-         <item>running_scalar_covariance</item> 
-         <item>mean_sign_agreement</item> 
-         <item>correlation</item> 
-         <item>covariance</item> 
-         <item>r_squared</item> 
-         <item>mean_squared_error</item> 
-         <item>running_covariance</item> 
-         <item>random_subset_selector</item> 
-         <item>randomly_subsample</item> 
          <item nolink="true">
             <name>Quantum Computing</name>
             <sub>
@@ -91,8 +77,6 @@
          <item>hsort_array</item> 
          <item>isort_array</item> 
          <item>put_in_range</item> 
-         <item>md5</item> 
-         <item>median</item> 
          <item>qsort_array</item> 
          <item>square_root</item> 
          <item nolink="true">
@@ -106,6 +90,30 @@
          </item>
       </section>
 
+      <section>
+         <name>Statistics</name>
+         <item>rand</item> 
+         <item>median</item> 
+         <item>running_stats</item> 
+         <item>running_scalar_covariance</item> 
+         <item>mean_sign_agreement</item> 
+         <item>correlation</item> 
+         <item>covariance</item> 
+         <item>r_squared</item> 
+         <item>mean_squared_error</item> 
+         <item>running_covariance</item> 
+         <item>random_subset_selector</item> 
+         <item>randomly_subsample</item> 
+
+      </section>
+
+      <section>
+         <name>Hashing</name>
+         <item>md5</item> 
+         <item>crc32</item> 
+         <item>hash</item> 
+         <item>murmur_hash3</item> 
+      </section>
     </top>  
    </menu>
 
