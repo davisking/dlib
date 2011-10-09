@@ -14,6 +14,7 @@
 #include "image_transforms/image_pyramid.h"
 #include "image_transforms/label_connected_blobs.h"
 #include "image_transforms/randomly_color_image.h"
+#include "image_transforms/segment_image.h"
 
 #endif // DLIB_IMAGE_TRANSFORMs_
 
