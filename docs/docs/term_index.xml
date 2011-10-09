@@ -932,6 +932,7 @@
          <term link="dlib/image_transforms/thresholding_abstract.h.html" name="off_pixel"/>
     
 
+         <term file="imaging.html" name="randomly_color_image"/>
          <term file="imaging.html" name="assign_image"/>
          <term file="imaging.html" name="assign_image_scaled"/>
          <term file="imaging.html" name="assign_all_pixels"/>
@@ -950,6 +951,7 @@
          <term file="imaging.html" name="binary_difference"/>
 
          <term file="imaging.html" name="label_connected_blobs"/>
+         <term file="imaging.html" name="segment_image"/>
          <term file="imaging.html" name="neighbors_8"/>
          <term file="imaging.html" name="neighbors_4"/>
          <term file="imaging.html" name="connected_if_both_not_zero"/>

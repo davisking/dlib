@@ -125,6 +125,7 @@
       <section>
          <name>Morphology</name>
          <item>label_connected_blobs</item>
+         <item>segment_image</item>
          <item>binary_dilation</item>
          <item>binary_erosion</item>
          <item>binary_open</item>
@@ -148,6 +149,7 @@
          <name>Miscellaneous</name>
 
          <item>cv_image</item>
+         <item>randomly_color_image</item>
 
          <item>draw_line</item> 
          <item>fill_rect</item> 
@@ -482,6 +484,26 @@
             processing functions in dlib as well as the GUI tools for displaying
             images on the screen.
             </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
+         <name>randomly_color_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/randomly_color_image_abstract.h</spec_file>
+         <description>
+              Randomly generates a mapping from gray level pixel values
+              to the RGB pixel space and then uses this mapping to create
+              a colored version an image. 
+              <p>
+                 This function is useful for displaying the results of some image 
+                 segmentation.  For example, the output of <a href="#label_connected_blobs">label_connected_blobs</a>
+                 or <a href="#segment_image">segment_image</a>.
+              </p>
          </description>
                                  
       </component>
@@ -1048,6 +1070,22 @@
          <spec_file link="true">dlib/image_transforms/label_connected_blobs_abstract.h</spec_file>
          <description>        
               This function labels each of the connected blobs in an image with a unique integer label.  
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>segment_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/segment_image_abstract.h</spec_file>
+         <description>        
+              Attempts to segment an image into regions which have some visual consistency to them.
+              In particular, this function implements the algorithm described in the paper:
+              <blockquote>
+               Efficient Graph-Based Image Segmentation by Felzenszwalb and Huttenlocher.
+              </blockquote>
          </description>
                                  
       </component>
