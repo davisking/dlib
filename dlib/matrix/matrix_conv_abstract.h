@@ -58,7 +58,7 @@ namespace dlib
                 - R is the convolution of m1 with m2.  In particular, this function is 
                   equivalent to performing the following in matlab: R = conv2(m1,m2,'same').
                   In particular, this means the result will have the same dimensions as m1 and will
-                  contain the central part of the full convolution.  This means conv_same(m1,m2) is 
+                  contain the central part of the full convolution.  Therefore, conv_same(m1,m2) is 
                   equivalent to subm(conv(m1,m2), m2.nr()/2, m2.nc()/2, m1.nr(), m1.nc()).
                 - R::type == the same type that was in m1 and m2.
                 - R.nr() == m1.nr()
