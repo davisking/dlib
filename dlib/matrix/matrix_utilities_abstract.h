@@ -402,6 +402,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp flip (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - flips the matrix m from up to down and left to right and returns the 
+              result.  I.e. returns flipud(fliplr(m)).
+            - returns a matrix M such that:
+                - M::type == the same type that was in m
+                - M has the same dimensions as m
+                - for all valid r and c:
+                  M(r,c) == m(m.nr()-r-1, m.nc()-c-1)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename vector_type
         >
