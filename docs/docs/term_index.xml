@@ -320,8 +320,16 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag_exp"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diagm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="trans"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="flip"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="fliplr"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="flipud"/>
+
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="conv"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="conv_same"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="conv_valid"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr_same"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr_valid"/>
 
          <term file="dlib/matrix/symmetric_matrix_cache_abstract.h.html" name="symmetric_matrix_cache"/>
 
