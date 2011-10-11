@@ -611,6 +611,157 @@ namespace
 
 
 
+    template <
+        long D1,
+        long D2, 
+        long D3,
+        long D4
+        >
+    void test_conv()
+    {
+        dlog << LINFO << D1 << " " << D2 << " " << D3 << " " << D4;
+        matrix<int,D1,D1> a(1,1);
+        matrix<int,D2,D2> b(2,2); 
+        matrix<int,D3,D3> c(3,3); 
+        matrix<int,D4,D1> d(4,1);
+
+        a = 4;
+
+        b = 1,2,
+            3,4;
+
+        c = 1,2,3,
+            4,5,6,
+            7,8,9;
+
+        d = 1,
+            2,
+            3,
+            4;
+        
+        matrix<int> temp(4,4), temp2;
+        temp =     1,    4,    7,    6,
+                    7,   23,   33,   24,
+                    19,   53,   63,   42,
+                    21,   52,   59,   36;
+
+        DLIB_TEST(conv(b,c) == temp);
+        DLIB_TEST(conv(c,b) == temp);
+        DLIB_TEST(xcorr(c,flip(b)) == temp);
+
+        temp.set_size(2,2);
+        temp =   23,   33,
+                53,   63;
+        DLIB_TEST(conv_same(b,c) == temp);
+        DLIB_TEST(xcorr_same(b,flip(c)) == temp);
+
+        temp2.set_size(2,2);
+        temp2 = 63, 53,
+                33, 23;
+        DLIB_TEST(flip(temp) == temp2);
+        DLIB_TEST(flip(temp) == fliplr(flipud(temp)));
+
+        DLIB_TEST(conv_valid(b,c).nr() == 0);
+        DLIB_TEST(conv_valid(b,c).nc() == 0);
+
+        DLIB_TEST(conv_valid(c,b) == temp);
+        DLIB_TEST(xcorr_valid(c,flip(b)) == temp);
+
+        temp.set_size(1,1);
+        temp =  16;
+
+        DLIB_TEST(conv(a,a) == temp);
+        DLIB_TEST(conv_same(a,a) == temp);
+        DLIB_TEST(conv_valid(a,a) == temp);
+        DLIB_TEST(xcorr(a,a) == temp);
+        DLIB_TEST(xcorr_same(a,a) == temp);
+        DLIB_TEST(xcorr_valid(a,a) == temp);
+
+        temp.set_size(0,0);
+        DLIB_TEST(conv(temp,temp).nr() == 0);
+        DLIB_TEST(conv(temp,temp).nc() == 0);
+        DLIB_TEST(conv_same(temp,temp).nr() == 0);
+        DLIB_TEST(conv_same(temp,temp).nc() == 0);
+        DLIB_TEST_MSG(conv_valid(temp,temp).nr() == 0, conv_valid(temp,temp).nr());
+        DLIB_TEST(conv_valid(temp,temp).nc() == 0);
+        DLIB_TEST(conv(c,temp).nr() == 0);
+        DLIB_TEST(conv(c,temp).nc() == 0);
+        DLIB_TEST(conv_same(c,temp).nr() == 0);
+        DLIB_TEST(conv_same(c,temp).nc() == 0);
+        DLIB_TEST(conv_valid(c,temp).nr() == 0);
+        DLIB_TEST(conv_valid(c,temp).nc() == 0);
+        DLIB_TEST(conv(temp,c).nr() == 0);
+        DLIB_TEST(conv(temp,c).nc() == 0);
+        DLIB_TEST(conv_same(temp,c).nr() == 0);
+        DLIB_TEST(conv_same(temp,c).nc() == 0);
+        DLIB_TEST(conv_valid(temp,c).nr() == 0);
+        DLIB_TEST(conv_valid(temp,c).nc() == 0);
+
+        temp.set_size(5,2);
+        temp =     1,    2,
+                    5,    8,
+                    9,   14,
+                    13,   20,
+                    12,   16;
+        DLIB_TEST(conv(b,d) == temp);
+        DLIB_TEST(xcorr(b,flip(d)) == temp);
+
+        temp.set_size(2,2);
+        temp =    9,   14,
+                13,   20;
+        DLIB_TEST(conv_same(b,d) == temp);
+        DLIB_TEST(xcorr_same(b,flip(d)) == temp);
+
+        DLIB_TEST(conv_valid(b,d).nr() == 0);
+        DLIB_TEST(xcorr_valid(b,flip(d)).nr() == 0);
+        DLIB_TEST_MSG(conv_valid(b,d).nc() == 0, conv_valid(b,d).nc());
+        DLIB_TEST(xcorr_valid(b,flip(d)).nc() == 0);
+
+        temp.set_size(5,5);
+        temp =      1,     4,    10,    12,     9,
+                    8,    26,    56,    54,    36,
+                    30,    84,   165,   144,    90,
+                    56,   134,   236,   186,   108,
+                    49,   112,   190,   144,    81;
+
+        DLIB_TEST(conv(c,c) == temp);
+        DLIB_TEST(xcorr(c,flip(c)) == temp);
+        matrix<int> temp3 = c;
+        temp3 = conv(temp3,c);
+        DLIB_TEST(temp3 == temp);
+
+        temp3 = c;
+        temp3 = conv(c,temp3);
+        DLIB_TEST(temp3 == temp);
+
+
+        temp.set_size(3,3);
+        temp =     26,    56,    54,
+                    84,   165,   144,
+                    134,   236,   186;
+        DLIB_TEST(conv_same(c,c) == temp);
+        DLIB_TEST(xcorr_same(c,flip(c)) == temp);
+        temp3 = c;
+        temp3 = conv_same(c,temp3);
+        DLIB_TEST(temp3 == temp);
+        temp3 = c;
+        temp3 = conv_same(temp3,c);
+        DLIB_TEST(temp3 == temp);
+
+        temp.set_size(1,1);
+        temp = 165;
+        DLIB_TEST(conv_valid(c,c) == temp);
+        DLIB_TEST(xcorr_valid(c,flip(c)) == temp);
+        temp3 = c;
+        temp3 = conv_valid(c,temp3);
+        DLIB_TEST(temp3 == temp);
+        temp3 = c;
+        temp3 = conv_valid(temp3,c);
+        DLIB_TEST(temp3 == temp);
+
+
+    }
+
 
 
     class matrix_tester : public tester
@@ -625,6 +776,9 @@ namespace
         void perform_test (
         )
         {
+            test_conv<0,0,0,0>();
+            test_conv<1,2,3,4>();
+
             test_stuff();
             for (int i = 0; i < 10; ++i)
                 matrix_test();
