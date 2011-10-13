@@ -485,6 +485,7 @@
          <term link="metaprogramming.html#portability_macros" name="portability macros"/>
          <term file="metaprogramming.html" name="static_switch"/>
          <term file="metaprogramming.html" name="is_graph"/>
+         <term file="metaprogramming.html" name="is_array2d"/>
          <term file="metaprogramming.html" name="is_rand"/>
          <term file="metaprogramming.html" name="is_matrix"/>
          <term file="metaprogramming.html" name="is_std_vector"/>
