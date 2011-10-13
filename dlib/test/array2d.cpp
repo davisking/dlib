@@ -548,6 +548,10 @@ namespace
 
             DLIB_TEST((char*)&img[0][0] + img.width_step() == (char*)&img[1][0]);
         }
+
+        COMPILE_TIME_ASSERT(is_array2d<array2d<unsigned char> >::value == true);
+        COMPILE_TIME_ASSERT(is_array2d<array2d<float> >::value == true);
+        COMPILE_TIME_ASSERT(is_array2d<float>::value == false);
     }
 
 

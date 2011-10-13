@@ -489,6 +489,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T, typename MM>
+    struct is_array2d <array2d<T,MM> >  
+    {
+        const static bool value = true;
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_ARRAY2D_KERNEl_1_ 
