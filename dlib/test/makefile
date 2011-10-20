@@ -137,7 +137,7 @@ OBJ = $(TMP:.c=.o)
 
 $(TARGET): $(OBJ) 
 	@echo Linking $@
-	@$(CC) $(LFLAGS) $(OBJ) -o $@
+	@$(CC) $(OBJ) $(LFLAGS) -o $@
 	@echo Build Complete
 
 .cpp.o: $<
