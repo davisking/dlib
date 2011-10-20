@@ -131,7 +131,7 @@ namespace dlib
                 long max_use = 1;
                 if (lru_count.size() != 0)
                     max_use = max(vector_to_matrix(lru_count)) + 1;
-                lru_count.push_back(lru_count.size());
+                lru_count.push_back(max_use);
             }
         }
 
