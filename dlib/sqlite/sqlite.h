@@ -268,7 +268,10 @@ namespace dlib
             );
 
             const char* data = reinterpret_cast<const char*>(sqlite3_column_text(stmt, idx));
-            return std::string(data);
+            if (data != 0)
+                return std::string(data);
+            else
+                return std::string();
         }
 
         double get_column_as_double (
