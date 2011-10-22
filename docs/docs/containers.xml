@@ -388,6 +388,34 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#trans</link>
                      </item>
                      <item>
+                        <name>conv</name>
+                        <link>dlib/matrix/matrix_conv_abstract.h.html#conv</link>
+                     </item>
+                     <item>
+                        <name>conv_same</name>
+                        <link>dlib/matrix/matrix_conv_abstract.h.html#conv_same</link>
+                     </item>
+                     <item>
+                        <name>conv_valid</name>
+                        <link>dlib/matrix/matrix_conv_abstract.h.html#conv_valid</link>
+                     </item>
+                     <item>
+                        <name>xcorr</name>
+                        <link>dlib/matrix/matrix_conv_abstract.h.html#xcorr</link>
+                     </item>
+                     <item>
+                        <name>xcorr_same</name>
+                        <link>dlib/matrix/matrix_conv_abstract.h.html#xcorr_same</link>
+                     </item>
+                     <item>
+                        <name>xcorr_valid</name>
+                        <link>dlib/matrix/matrix_conv_abstract.h.html#xcorr_valid</link>
+                     </item>
+                     <item>
+                        <name>flip</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#flip</link>
+                     </item>
+                     <item>
                         <name>flipud</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#flipud</link>
                      </item>

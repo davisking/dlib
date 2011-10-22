@@ -25,20 +25,7 @@
       <section>
          <name>Tools</name>
          <item>bigint</item> 
-         <item>crc32</item> 
-         <item>rand</item> 
-         <item>hash</item> 
-         <item>murmur_hash3</item> 
-         <item>running_stats</item> 
-         <item>running_scalar_covariance</item> 
-         <item>mean_sign_agreement</item> 
-         <item>correlation</item> 
-         <item>covariance</item> 
-         <item>r_squared</item> 
-         <item>mean_squared_error</item> 
-         <item>running_covariance</item> 
-         <item>random_subset_selector</item> 
-         <item>randomly_subsample</item> 
+         <item>disjoint_subsets</item> 
          <item nolink="true">
             <name>Quantum Computing</name>
             <sub>
@@ -49,6 +36,7 @@
          <item nolink="true">
             <name>Geometry</name>
             <sub>
+               <item>border_enumerator</item> 
                <item>rectangle</item> 
                <item>vector</item> 
                <item>point</item> 
@@ -89,8 +77,6 @@
          <item>hsort_array</item> 
          <item>isort_array</item> 
          <item>put_in_range</item> 
-         <item>md5</item> 
-         <item>median</item> 
          <item>qsort_array</item> 
          <item>square_root</item> 
          <item nolink="true">
@@ -104,6 +90,30 @@
          </item>
       </section>
 
+      <section>
+         <name>Statistics</name>
+         <item>rand</item> 
+         <item>median</item> 
+         <item>running_stats</item> 
+         <item>running_scalar_covariance</item> 
+         <item>mean_sign_agreement</item> 
+         <item>correlation</item> 
+         <item>covariance</item> 
+         <item>r_squared</item> 
+         <item>mean_squared_error</item> 
+         <item>running_covariance</item> 
+         <item>random_subset_selector</item> 
+         <item>randomly_subsample</item> 
+
+      </section>
+
+      <section>
+         <name>Hashing</name>
+         <item>md5</item> 
+         <item>crc32</item> 
+         <item>hash</item> 
+         <item>murmur_hash3</item> 
+      </section>
     </top>  
    </menu>
 
@@ -237,6 +247,19 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>border_enumerator</name>
+         <file>dlib/geometry.h</file>
+         <spec_file>dlib/geometry/border_enumerator_abstract.h</spec_file>
+         <description>
+            This object is an <a href="containers.html#enumerable">enumerator</a> 
+            over the border <a href="#point">points</a> of a 
+            <a href="#rectangle">rectangle</a>.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>vector</name>
          <file>dlib/geometry.h</file>
          <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
@@ -258,6 +281,22 @@
       
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>disjoint_subsets</name>
+         <file>dlib/disjoint_subsets.h</file>
+         <spec_file link="true">dlib/disjoint_subsets/disjoint_subsets_abstract.h</spec_file>
+         <description>
+                This object represents a set of integers which is partitioned into
+                a number of disjoint subsets.  It supports the two fundamental operations
+                of finding which subset a particular integer belongs to as well as 
+                merging subsets. 
+         </description>
+
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
       <component>
          <name>running_stats</name>
          <file>dlib/statistics.h</file>

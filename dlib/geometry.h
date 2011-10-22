@@ -5,6 +5,7 @@
 
 #include "geometry/rectangle.h"
 #include "geometry/vector.h"
+#include "geometry/border_enumerator.h"
 
 #endif // DLIB_GEOMETRy_HEADER
 

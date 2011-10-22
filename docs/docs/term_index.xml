@@ -100,7 +100,10 @@
          <term file="bayes.html" name="node_next_parent_assignment"/>
          <term file="bayes.html" name="node_cpt_filled_out"/>
 
+         <term file="algorithms.html" name="disjoint_subsets"/>
+         <term link="algorithms.html#disjoint_subsets" name="union-find"/>
          <term file="algorithms.html" name="rectangle"/>
+         <term file="algorithms.html" name="border_enumerator"/>
          <term file="algorithms.html" name="edge"/>
          <term file="algorithms.html" name="is_join_tree"/>
          <term file="algorithms.html" name="create_join_tree"/>
@@ -317,8 +320,16 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag_exp"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diagm"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="trans"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="flip"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="fliplr"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="flipud"/>
+
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="conv"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="conv_same"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="conv_valid"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr_same"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr_valid"/>
 
          <term file="dlib/matrix/symmetric_matrix_cache_abstract.h.html" name="symmetric_matrix_cache"/>
 
@@ -474,6 +485,7 @@
          <term link="metaprogramming.html#portability_macros" name="portability macros"/>
          <term file="metaprogramming.html" name="static_switch"/>
          <term file="metaprogramming.html" name="is_graph"/>
+         <term file="metaprogramming.html" name="is_array2d"/>
          <term file="metaprogramming.html" name="is_rand"/>
          <term file="metaprogramming.html" name="is_matrix"/>
          <term file="metaprogramming.html" name="is_std_vector"/>
@@ -929,6 +941,7 @@
          <term link="dlib/image_transforms/thresholding_abstract.h.html" name="off_pixel"/>
     
 
+         <term file="imaging.html" name="randomly_color_image"/>
          <term file="imaging.html" name="assign_image"/>
          <term file="imaging.html" name="assign_image_scaled"/>
          <term file="imaging.html" name="assign_all_pixels"/>
@@ -947,6 +960,7 @@
          <term file="imaging.html" name="binary_difference"/>
 
          <term file="imaging.html" name="label_connected_blobs"/>
+         <term file="imaging.html" name="segment_image"/>
          <term file="imaging.html" name="neighbors_8"/>
          <term file="imaging.html" name="neighbors_4"/>
          <term file="imaging.html" name="connected_if_both_not_zero"/>

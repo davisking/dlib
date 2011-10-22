@@ -2670,7 +2670,7 @@ L350:
             integer isav;
             doublereal temp = 0, zero = 0, xsav = 0, xsum = 0, angbd = 0, dredg = 0, sredg = 0;
             integer iterc;
-            doublereal resid = 0, delsq = 0, ggsav = 0, tempa = 0, tempb = 0, ratio = 0, sqstp = 0, 
+            doublereal resid = 0, delsq = 0, ggsav = 0, tempa = 0, tempb = 0,  
                        redmax = 0, dredsq = 0, redsav = 0, onemin = 0, gredsq = 0, rednew = 0;
             integer itcsav = 0;
             doublereal rdprev = 0, rdnext = 0, stplen = 0, stepsq = 0;
@@ -2750,7 +2750,6 @@ L350:
 
             iterc = 0;
             nact = 0;
-            sqstp = zero;
             i__1 = n;
             for (i__ = 1; i__ <= i__1; ++i__) {
                 xbdi[i__] = zero;
@@ -3003,7 +3002,6 @@ L120:
                         xbdi[i__] = one;
                         goto L100;
                     }
-                    ratio = one;
                     /* Computing 2nd power */
                     d__1 = d__[i__];
                     /* Computing 2nd power */
@@ -3221,7 +3219,7 @@ L210:
             doublereal d__1, d__2, d__3;
 
             /* Local variables */
-            integer i__, j, k, jl, jp;
+            integer i__, j, k, jp;
             doublereal one, tau, temp;
             integer nptm;
             doublereal zero, alpha, tempa, tempb, ztest;
@@ -3267,7 +3265,6 @@ L210:
 
             /*     Apply the rotations that put zeros in the KNEW-th row of ZMAT. */
 
-            jl = 1;
             i__2 = nptm;
             for (j = 2; j <= i__2; ++j) {
                 if ((d__1 = zmat[knew + j * zmat_dim1], std::abs(d__1)) > ztest) {

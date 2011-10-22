@@ -384,6 +384,11 @@ namespace dlib
     {
         static const bool value = true;
     };
+    template <typename T>
+    struct is_const_type<const T&>
+    {
+        static const bool value = true;
+    };
 
 // ----------------------------------------------------------------------------------------
 

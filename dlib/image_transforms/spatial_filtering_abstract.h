@@ -36,8 +36,8 @@ namespace dlib
             - filter.nr() % 2 == 1  (i.e. must be odd)
             - filter.nc() % 2 == 1  (i.e. must be odd)
         ensures
-            - Applies the given spatial filter to in_img and stores the result in out_img.  Also 
-              divides each resulting pixel by scale.  
+            - Applies the given spatial filter to in_img and stores the result in out_img (i.e.
+              cross-correlates in_img with filter).  Also divides each resulting pixel by scale.  
             - The intermediate filter computations will be carried out using variables of type EXP::type.
               This is whatever scalar type is used inside the filter matrix. 
             - Pixel values are stored into out_img using the assign_pixel() function and therefore

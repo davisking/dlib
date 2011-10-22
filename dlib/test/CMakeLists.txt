@@ -34,6 +34,7 @@ set (tests
    data_io.cpp
    directed_graph.cpp
    discriminant_pca.cpp
+   disjoint_subsets.cpp
    ekm_and_lisf.cpp
    empirical_kernel_map.cpp
    entropy_coder.cpp

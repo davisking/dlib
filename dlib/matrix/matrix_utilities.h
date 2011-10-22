@@ -3969,6 +3969,44 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename M>
+    struct op_flip 
+    {
+        op_flip( const M& m_) : m(m_){}
+
+        const M& m;
+
+        const static long cost = M::cost;
+        const static long NR = M::NR;
+        const static long NC = M::NC;
+        typedef typename M::type type;
+        typedef typename M::const_ret_type const_ret_type;
+        typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
+
+        const_ret_type apply (long r, long c) const { return m(m.nr()-r-1, m.nc()-c-1); }
+
+        long nr () const { return m.nr(); }
+        long nc () const { return m.nc(); }
+
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
+
+    }; 
+
+    template <
+        typename M
+        >
+    const matrix_op<op_flip<M> > flip (
+        const matrix_exp<M>& m
+    )
+    {
+        typedef op_flip<M> op;
+        return matrix_op<op>(op(m.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T, long NR, long NC, typename MM, typename L>
     uint32 hash (
         const matrix<T,NR,NC,MM,L>& item,
