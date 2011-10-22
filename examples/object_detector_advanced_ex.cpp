@@ -221,8 +221,8 @@ int main(int argc, char* argv[])
             setup the parameters in the fe object.
             ...
         */
-        // The scanner will call fe.copy_configuration() to copy the state of fe
-        // into it's internal feature extractor.
+        // The scanner will use very_simple_feature_extractor::copy_configuration() to copy the state 
+        // of fe into its internal feature extractor.
         scanner.copy_configuration(fe);
 
 
