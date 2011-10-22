@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.43" date="Oct 21, 2011">
+New Stuff:
    - Two new routines for performing MAP inference in factor graphs:
       - For chain-structured graphs: find_max_factor_graph_viterbi()
       - For general graphs:          find_max_factor_graph_nmplp()
@@ -80,7 +93,7 @@ Other:
    - Made the integral_image more general by making it templated on the type of 
      scalar used to store the sums.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
