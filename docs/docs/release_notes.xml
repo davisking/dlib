@@ -37,8 +37,8 @@ New Stuff:
  
 Non-Backwards Compatible Changes:
    - Changed the interface to the ridge regression trainer objects so that they 
-     report the entire set of LOO prediction values rather than a summary statistic 
-     like mean squared error.
+     report the entire set of leave-one-out prediction values rather than a 
+     summary statistic like mean squared error.
    - Changed the serialization routine for bgr_pixels to store the pixels in BGR 
      order rather than RGB.
    - Changed the interface for the spatially_filter_image() routine to take the 
