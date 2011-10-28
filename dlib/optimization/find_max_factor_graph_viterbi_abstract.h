@@ -77,6 +77,7 @@ namespace dlib
                   nodes take on the values defined below:
                     - node_states(0) == the value of the node with ID node_id
                     - node_states(i) == the value of the node with ID node_id-i
+                - It is ok for this function to return a value of -std::numeric_limits<double>::infinity().
         !*/
 
     };
