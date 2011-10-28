@@ -62,11 +62,14 @@ namespace dlib
     )
     {
         using namespace dlib::impl;
-        const unsigned long order = map_problem::order;
-        const unsigned long num_states = map_problem::num_states;
-        COMPILE_TIME_ASSERT(num_states > 0);
+        const unsigned long order = prob.order();
+        const unsigned long num_states = prob.num_states();
 
 
+        DLIB_ASSERT(prob.num_states() > 0,
+            "\t void find_max_factor_graph_viterbi()"
+            << "\n\t The nodes in a factor graph have to be able to take on more than 0 states."
+            );
         DLIB_ASSERT(std::pow(num_states,(double)order) < std::numeric_limits<unsigned long>::max(),
             "\t void find_max_factor_graph_viterbi()"
             << "\n\t The order is way too large for this algorithm to handle."
@@ -144,32 +147,55 @@ namespace dlib
 
                 }
             }
-            else
+            else if (order == 1)
             {
-                matrix<unsigned long,1,order+1> node_states;
-                node_states = 0;
-
-                unsigned long count = 0;
-                for (unsigned long i = 0; i < trellis_size; ++i)
-                {
-                    unsigned long back_index = 0;
-                    double best_score = -std::numeric_limits<double>::infinity();
-                    for (unsigned long s = 0; s < num_states; ++s)
-                    {
-                        const double temp = prob.factor_value(node,node_states) + trellis[node-1][count%trellis_size].val;
-                        if (temp > best_score)
-                        {
-                            best_score = temp;
-                            back_index = count%trellis_size;
-                        }
-
-                        advance_state(node_states,num_states);
-                        ++count;
-                    }
-
-                    trellis[node][i].val = best_score;
-                    trellis[node][i].back_index = back_index;
+                /*
+                    WHAT'S THE DEAL WITH THIS PREPROCESSOR MACRO?
+                        Well, if we can declare the dimensions of node_states as a compile
+                        time constant then this function runs significantly faster.  So this macro
+                        is here to let us do that.  It just lets us avoid replicating this code
+                        block in the following if statements for different order sizes.
+                */
+#define DLIB_FMFGV_WORK                                                                                                     \
+                node_states = 0;                                                                                            \
+                unsigned long count = 0;                                                                                    \
+                for (unsigned long i = 0; i < trellis_size; ++i)                                                            \
+                {                                                                                                           \
+                    unsigned long back_index = 0;                                                                           \
+                    double best_score = -std::numeric_limits<double>::infinity();                                           \
+                    for (unsigned long s = 0; s < num_states; ++s)                                                          \
+                    {                                                                                                       \
+                        const double temp = prob.factor_value(node,node_states) + trellis[node-1][count%trellis_size].val;  \
+                        if (temp > best_score)                                                                              \
+                        {                                                                                                   \
+                            best_score = temp;                                                                              \
+                            back_index = count%trellis_size;                                                                \
+                        }                                                                                                   \
+                        advance_state(node_states,num_states);                                                              \
+                        ++count;                                                                                            \
+                    }                                                                                                       \
+                    trellis[node][i].val = best_score;                                                                      \
+                    trellis[node][i].back_index = back_index;                                                               \
                 }
+
+                matrix<unsigned long,1,2> node_states;
+                DLIB_FMFGV_WORK
+            }
+            else if (order == 2)
+            {
+                matrix<unsigned long,1,3> node_states;
+                DLIB_FMFGV_WORK
+            }
+            else if (order == 3)
+            {
+                matrix<unsigned long,1,4> node_states;
+                DLIB_FMFGV_WORK
+            }
+            else 
+            {
+                // The general case, here we don't define the size of node_states at compile time.
+                matrix<unsigned long,1,0> node_states(order+1);
+                DLIB_FMFGV_WORK
             }
         }
 

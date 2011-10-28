@@ -31,12 +31,12 @@ namespace
     class map_problem
     {
     public:
-        const static unsigned long order = O;
-        const static unsigned long num_states = NS;
+        unsigned long order() const { return O; }
+        unsigned long num_states() const { return NS; }
 
         map_problem()
         {
-            data = randm(number_of_nodes(),(long)std::pow(num_states,(double)order+1), rnd);
+            data = randm(number_of_nodes(),(long)std::pow(num_states(),(double)order()+1), rnd);
         }
 
         unsigned long number_of_nodes (
@@ -56,11 +56,11 @@ namespace
             if (node_states.size() == 1)
                 return data(node_id, node_states(0));
             else if (node_states.size() == 2)
-                return data(node_id, node_states(0) + node_states(1)*num_states);
+                return data(node_id, node_states(0) + node_states(1)*NS);
             else if (node_states.size() == 3)
-                return data(node_id, (node_states(0) + node_states(1)*num_states)*num_states + node_states(2));
+                return data(node_id, (node_states(0) + node_states(1)*NS)*NS + node_states(2));
             else 
-                return data(node_id, ((node_states(0) + node_states(1)*num_states)*num_states + node_states(2))*num_states + node_states(3));
+                return data(node_id, ((node_states(0) + node_states(1)*NS)*NS + node_states(2))*NS + node_states(3));
         }
 
         matrix<double> data;
@@ -78,8 +78,8 @@ namespace
     )
     {
         using namespace dlib::impl;
-        const int order = map_problem::order;
-        const int num_states = map_problem::num_states;
+        const int order = prob.order();
+        const int num_states = prob.num_states();
 
         map_assignment.resize(prob.number_of_nodes());
         double best_score = -std::numeric_limits<double>::infinity();
