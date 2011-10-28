@@ -26,7 +26,8 @@ namespace
     template <
         unsigned long O,
         unsigned long NS,
-        unsigned long num_nodes
+        unsigned long num_nodes,
+        bool all_negative 
         >
     class map_problem
     {
@@ -37,6 +38,8 @@ namespace
         map_problem()
         {
             data = randm(number_of_nodes(),(long)std::pow(num_states(),(double)order()+1), rnd);
+            if (all_negative)
+                data = -data;
         }
 
         unsigned long number_of_nodes (
@@ -110,18 +113,20 @@ namespace
     template <
         unsigned long order,
         unsigned long num_states,
-        unsigned long num_nodes
+        unsigned long num_nodes,
+        bool all_negative
         >
-    void do_test()
+    void do_test_()
     {
         dlog << LINFO << "order: "<< order 
-                      << "  num_states: " << num_states
-                      << "  num_nodes: " << num_nodes;
+                      << "  num_states:   " << num_states
+                      << "  num_nodes:    " << num_nodes
+                      << "  all_negative: " << all_negative;
 
         for (int i = 0; i < 25; ++i)
         {
             print_spinner();
-            map_problem<order,num_states,num_nodes> prob;
+            map_problem<order,num_states,num_nodes,all_negative> prob;
             std::vector<unsigned long> assign, assign2;
             brute_force_find_max_factor_graph_viterbi(prob, assign);
             find_max_factor_graph_viterbi(prob, assign2);
@@ -131,6 +136,26 @@ namespace
                           << trans(vector_to_matrix(assign2))
                           );
         }
+    }
+
+    template <
+        unsigned long order,
+        unsigned long num_states,
+        unsigned long num_nodes
+        >
+    void do_test()
+    {
+        do_test_<order,num_states,num_nodes,false>();
+    }
+
+    template <
+        unsigned long order,
+        unsigned long num_states,
+        unsigned long num_nodes
+        >
+    void do_test_negative()
+    {
+        do_test_<order,num_states,num_nodes,true>();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -151,11 +176,14 @@ namespace
             do_test<1,3,1>();
             do_test<1,3,2>();
             do_test<0,3,2>();
+            do_test_negative<0,3,2>();
 
             do_test<1,3,8>();
             do_test<2,3,7>();
+            do_test_negative<2,3,7>();
             do_test<3,3,8>();
             do_test<4,3,8>();
+            do_test_negative<4,3,8>();
             do_test<0,3,8>();
             do_test<4,3,1>();
             do_test<4,3,0>();

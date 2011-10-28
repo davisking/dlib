@@ -92,7 +92,7 @@ namespace dlib
             {
                 matrix<unsigned long,1,1> node_state;
                 unsigned long best_state = 0;
-                double best_val = 0;
+                double best_val = -std::numeric_limits<double>::infinity();
                 for (unsigned long s = 0; s < num_states; ++s)
                 {
                     node_state(0) = s;
