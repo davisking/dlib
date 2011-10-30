@@ -178,6 +178,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename sample_type
+        >
+    bool is_sequence_labeling_problem (
+        const std::vector<std::vector<sample_type> >& samples,
+        const std::vector<std::vector<unsigned long> >& labels
+    )
+    {
+        if (is_learning_problem(samples, labels))
+        {
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                if (samples[i].size() != labels[i].size())
+                    return false;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename trainer_type,
         typename in_sample_vector_type,
         typename in_scalar_vector_type

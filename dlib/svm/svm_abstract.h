@@ -62,6 +62,23 @@ namespace dlib
                     - x_labels(i) == -1 or +1
     !*/
 
+    template <
+        typename sample_type
+        >
+    bool is_sequence_labeling_problem (
+        const std::vector<std::vector<sample_type> >& samples,
+        const std::vector<std::vector<unsigned long> >& labels
+    );
+    /*!
+        ensures
+            - returns true if all of the following are true and false otherwise:
+                - is_learning_problem(samples, labels) == true
+                - for all valid i:
+                    - samples[i].size() == labels[i].size()
+                      (i.e. The size of a label sequence need to match the size of 
+                      its corresponding sample sequence)
+    !*/
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
