@@ -18,7 +18,7 @@ namespace dlib
     template <
         typename feature_extractor
         >
-    class structural_svm_sequence_labeling_problem : 
+    class structural_svm_sequence_labeling_problem : noncopyable,
         public structural_svm_problem_threaded<matrix<double,0,1>, 
                                                std::vector<std::pair<unsigned long,double> > >
     {
