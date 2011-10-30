@@ -7,6 +7,7 @@
 #include "../matrix.h"
 #include "one_vs_one_trainer.h"
 #include "cross_validate_multiclass_trainer_abstract.h"
+#include <sstream>
 
 namespace dlib
 {
@@ -67,6 +68,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class cross_validation_error : public dlib::error 
+    { 
+    public: 
+        cross_validation_error(const std::string& msg) : dlib::error(msg){};
+    };
+
     template <
         typename trainer_type,
         typename sample_type,
@@ -104,6 +111,15 @@ namespace dlib
         for (typename std::map<label_type,long>::iterator i = label_counts.begin(); i != label_counts.end(); ++i)
         {
             const long in_test = i->second/folds;
+            if (in_test == 0)
+            {
+                std::ostringstream sout;
+                sout << "In dlib::cross_validate_multiclass_trainer(), the number of folds was larger" << std::endl;
+                sout << "than the number of elements of one of the training classes." << std::endl;
+                sout << "  folds: "<< folds << std::endl;
+                sout << "  size of class " << i->first << ": "<< i->second << std::endl;
+                throw cross_validation_error(sout.str());
+            }
             num_in_test[i->first] = in_test; 
             num_in_train[i->first] = i->second - in_test;
         }

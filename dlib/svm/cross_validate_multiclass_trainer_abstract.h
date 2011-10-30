@@ -40,6 +40,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class cross_validation_error : public dlib::error 
+    { 
+        /*!
+            This is the exception class used by the cross_validate_multiclass_trainer() 
+            routine.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename trainer_type,
         typename sample_type,
@@ -74,6 +84,10 @@ namespace dlib
               samples in a class is not an even multiple of folds.  This is because each fold has the 
               same number of test samples in it and so if the number of samples in a class isn't a 
               multiple of folds then a few are not tested.  
+        throws
+            - cross_validation_error
+              This exception is thrown if one of the classes has fewer samples than
+              the number of requested folds.
     !*/
 
 }
