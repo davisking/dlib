@@ -199,15 +199,12 @@ namespace dlib
                 - 0 <= col < nc()
             ensures
                 - hashes BASE_FE(row,col) and returns the resulting indicator vector. 
+                  This vector will be represented as an unsorted sparse vector.
                 - Returns a vector V such that:
                     - V.size() == get_hash_bin_sizes().size()
                     - for all valid i: 0 <= V[i].first < get_num_dimensions()
                     - if (BASE_FE(row,col) hashes into bin B) then
                         - V contains an element with .first == B and .second == 1
-                - Note that the returned vector is represented as a sparse vector but 
-                  the indices are not in sorted order.   Moreover, there might even be 
-                  duplicate entires for a particular dimension.  This means you can't use 
-                  many of the sparse vector operations defined in dlib::sparse_vector.    
         !*/
 
         const rectangle get_block_rect (

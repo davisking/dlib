@@ -25,7 +25,7 @@ namespace dlib
 
             REQUIREMENTS ON feature_vector_type_ 
                 - feature_vector_type_ == a dlib::matrix capable of storing column vectors
-                  or a sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
+                  or an unsorted sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
 
             INITIAL VALUE
                 - get_epsilon() == 0.001
