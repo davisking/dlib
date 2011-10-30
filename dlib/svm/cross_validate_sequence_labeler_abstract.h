@@ -3,7 +3,6 @@
 #undef DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_ABSTRACT_H__
 #ifdef DLIB_CROSS_VALIDATE_SEQUENCE_LABeLER_ABSTRACT_H__
 
-#include "cross_validate_sequence_labeler_abstract.h"
 #include <vector>
 #include "../matrix.h"
 #include "svm.h"
