@@ -13,20 +13,40 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     /*!A sparse_vectors
+
         In dlib, sparse vectors are represented using the container objects
         in the C++ STL.  In particular, a sparse vector is any container that 
-        contains a sorted range of std::pair<key, scalar_value> objects where:
+        contains a range of std::pair<key, scalar_value> objects where:
             - key is an unsigned integral type 
             - scalar_value is float, double, or long double
+            - the std::pair objects have unique key values
+            - the std::pair objects are sorted such that small keys come first 
 
-        So examples of valid sparse vectors are:    
+        Therefore, if an object satisfies the above requirements we call it a
+        "sparse vector".  Additionally, we define the concept of an "unsorted sparse vector"
+        to be a sparse vector that doesn't necessarily have sorted or unique key values.  
+        Therefore, all sparse vectors are valid unsorted sparse vectors but not the other 
+        way around.  
+
+        An unsorted sparse vector with duplicate keys is always interpreted as
+        a vector where each dimension contains the sum of all corresponding elements 
+        of the unsorted sparse vector.  For example, an unsorted sparse vector 
+        with the elements { (3,1), (0, 4), (3,5) } represents the 4D vector:
+            [4, 0, 0, 1+5]
+
+
+
+        Examples of valid sparse vectors are:    
             - std::map<unsigned long, double>
             - std::vector<std::pair<unsigned long, float> > where the vector is sorted.
               (you could make sure it was sorted by applying std::sort to it)
 
 
-        This file defines a number of helper functions for doing normal vector
-        arithmetic things with sparse vectors.
+        Finally, by "dense vector" we mean a dlib::matrix object which represents
+        either a row or column vector.
+
+        The rest of this file defines a number of helper functions for doing normal 
+        vector arithmetic things with sparse vectors.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -54,8 +74,7 @@ namespace dlib
         );
         /*!
             requires
-                - a is a sorted range of std::pair objects
-                - b is a sorted range of std::pair objects
+                - a and b are sparse vectors
             ensures
                 - returns the squared distance between the vectors
                   a and b
@@ -72,8 +91,7 @@ namespace dlib
         );
         /*!
             requires
-                - a is a sorted range of std::pair objects
-                - b is a sorted range of std::pair objects
+                - a and b are sparse vectors
             ensures
                 - returns the squared distance between the vectors
                   a_scale*a and b_scale*b
@@ -88,8 +106,7 @@ namespace dlib
         );
         /*!
             requires
-                - a is a sorted range of std::pair objects
-                - b is a sorted range of std::pair objects
+                - a and b are sparse vectors
             ensures
                 - returns the distance between the vectors
                   a and b.  (i.e. std::sqrt(distance_squared(a,b)))
@@ -106,8 +123,7 @@ namespace dlib
         );
         /*!
             requires
-                - a is a sorted range of std::pair objects
-                - b is a sorted range of std::pair objects
+                - a and b are sparse vectors
             ensures
                 - returns the distance between the vectors
                   a_scale*a and b_scale*b.  (i.e. std::sqrt(distance_squared(a_scale,a,b_scale,b)))
@@ -143,7 +159,7 @@ namespace dlib
         );
         /*!
             requires
-                - a and b are valid sparse vectors (as defined at the top of this file).
+                - a and b are sparse vectors 
             ensures
                 - returns the dot product between the vectors a and b
         !*/
@@ -157,7 +173,7 @@ namespace dlib
         );
         /*!
             requires
-                - a is a valid sparse vector (as defined at the top of this file).
+                - a is an unsorted sparse vector
                 - is_vector(b) == true
             ensures
                 - returns the dot product between the vectors a and b
@@ -172,7 +188,7 @@ namespace dlib
         );
         /*!
             requires
-                - b is a valid sparse vector (as defined at the top of this file).
+                - b is an unsorted sparse vector
                 - is_vector(a) == true
             ensures
                 - returns the dot product between the vectors a and b
@@ -186,7 +202,7 @@ namespace dlib
         );
         /*!
             requires
-                - a is a sorted range of std::pair objects
+                - a is a sparse vector
             ensures
                 - returns dot(a,a) 
         !*/
@@ -199,7 +215,7 @@ namespace dlib
         );
         /*!
             requires
-                - a is a sorted range of std::pair objects
+                - a is a sparse vector
             ensures
                 - returns std::sqrt(length_squared(a,a))
         !*/
@@ -213,7 +229,7 @@ namespace dlib
         );
         /*!
             requires
-                - a is a sorted range of std::pair objects
+                - a is an unsorted sparse vector
             ensures
                 - #a == a*value
                   (i.e. multiplies every element of the vector a by value)
@@ -260,9 +276,12 @@ namespace dlib
         );
         /*!
             requires
-                - SRC == a matrix expression or a sparse vector
+                - SRC == a matrix expression or an unsorted sparse vector
                 - is_vector(dest) == true
-                - max_index_plus_one(src) <= dest.size()
+                - Let MAX denote the largest element index in src.
+                  Then we require that:
+                    - MAX < dest.size()
+                    - (i.e. dest needs to be big enough to contain all the elements of src)
             ensures
                 - #dest == dest + C*src
         !*/
@@ -277,9 +296,12 @@ namespace dlib
         );
         /*!
             requires
-                - SRC == a matrix expression or a sparse vector
+                - SRC == a matrix expression or an unsorted sparse vector
                 - is_vector(dest) == true
-                - max_index_plus_one(src) <= dest.size()
+                - Let MAX denote the largest element index in src.
+                  Then we require that:
+                    - MAX < dest.size()
+                    - (i.e. dest needs to be big enough to contain all the elements of src)
             ensures
                 - #dest == dest - C*src
         !*/
