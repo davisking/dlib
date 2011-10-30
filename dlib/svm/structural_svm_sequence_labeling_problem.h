@@ -48,13 +48,13 @@ namespace dlib
         void get_feature_vector(
             std::vector<std::pair<unsigned long, double> >& feats,
             const feature_extractor& fe,
-            unsigned long position,
-            const matrix_exp<EXP2>& label_states,
-            const std::vector<sample_type>& x
+            const std::vector<sample_type>& sequence,
+            const matrix_exp<EXP2>& candidate_labeling,
+            unsigned long position
         )
         {
             get_feats_functor funct(feats);
-            fe.get_features(funct, position, label_states, x);
+            fe.get_features(funct, sequence,candidate_labeling, position);
         }
 
     }
@@ -108,12 +108,12 @@ namespace dlib
 
             const int order = fe.order();
 
-            matrix<unsigned long,0,1> label_states; 
+            matrix<unsigned long,0,1> candidate_labeling; 
             for (unsigned long i = 0; i < sample.size(); ++i)
             {
-                label_states = rowm(vector_to_matrix(label), range(i, std::max((int)i-order,0)));
+                candidate_labeling = rowm(vector_to_matrix(label), range(i, std::max((int)i-order,0)));
 
-                fe_helpers::get_feature_vector(psi,fe,i,label_states, sample);
+                fe_helpers::get_feature_vector(psi,fe,sample,candidate_labeling, i);
             }
         }
 
@@ -132,12 +132,12 @@ namespace dlib
             unsigned long num_states() const { return fe.num_labels(); }
 
             map_prob(
-                const std::vector<sample_type>& sample_,
+                const std::vector<sample_type>& sequence_,
                 const std::vector<unsigned long>& label_,
                 const feature_extractor& fe_,
                 const matrix<double,0,1>& weights_
             ) :
-                sample(sample_),
+                sequence(sequence_),
                 label(label_),
                 fe(fe_),
                 weights(weights_)
@@ -147,7 +147,7 @@ namespace dlib
             unsigned long number_of_nodes(
             ) const
             {
-                return sample.size();
+                return sequence.size();
             }
 
             template <
@@ -165,10 +165,10 @@ namespace dlib
                 if (node_states(0) != label[node_id])
                     loss = 1;
 
-                return fe_helpers::dot(weights, fe, node_id, node_states, sample) + loss;
+                return fe_helpers::dot(weights, fe, sequence, node_states, node_id) + loss;
             }
 
-            const std::vector<sample_type>& sample;
+            const std::vector<sample_type>& sequence;
             const std::vector<unsigned long>& label;
             const feature_extractor& fe;
             const matrix<double,0,1>& weights;

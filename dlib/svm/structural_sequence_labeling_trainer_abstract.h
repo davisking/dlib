@@ -29,7 +29,7 @@ namespace dlib
 
         typedef sequence_labeler<feature_extractor> trained_function_type;
 
-        structural_sequence_labeling_trainer (
+        explicit structural_sequence_labeling_trainer (
             const feature_extractor& fe_
         ) : fe(fe_)
         {}

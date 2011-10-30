@@ -43,13 +43,13 @@ namespace dlib
         double dot(
             const matrix_exp<EXP>& lambda,
             const feature_extractor& fe,
-            unsigned long position,
-            const matrix_exp<EXP2>& label_states,
-            const std::vector<sample_type>& x
+            const std::vector<sample_type>& sequence,
+            const matrix_exp<EXP2>& candidate_labeling,
+            unsigned long position
         )
         {
             dot_functor<EXP> dot(lambda);
-            fe.get_features(dot, position, label_states, x);
+            fe.get_features(dot, sequence, candidate_labeling, position);
             return dot.value;
         }
 
@@ -79,7 +79,7 @@ namespace dlib
                 const feature_extractor& fe_,
                 const matrix<double,0,1>& weights_
             ) :
-                x(x_),
+                sequence(x_),
                 fe(fe_),
                 weights(weights_)
             {
@@ -88,7 +88,7 @@ namespace dlib
             unsigned long number_of_nodes(
             ) const
             {
-                return x.size();
+                return sequence.size();
             }
 
             template <
@@ -99,13 +99,13 @@ namespace dlib
                 const matrix_exp<EXP>& node_states
             ) const
             {
-                if (fe.reject_labeling(node_id, node_states, x))
+                if (fe.reject_labeling(sequence,  node_states, node_id))
                     return -std::numeric_limits<double>::infinity();
 
-                return fe_helpers::dot(weights, fe, node_id, node_states, x);
+                return fe_helpers::dot(weights, fe, sequence, node_states, node_id);
             }
 
-            const sample_sequence_type& x;
+            const sample_sequence_type& sequence;
             const feature_extractor& fe;
             const matrix<double,0,1>& weights;
         };
