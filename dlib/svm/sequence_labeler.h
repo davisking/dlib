@@ -57,7 +57,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename feature_extractor>
+    template <
+        typename feature_extractor
+        >
     class sequence_labeler
     {
     public:
@@ -151,6 +153,39 @@ namespace dlib
         feature_extractor fe;
         matrix<double,0,1> weights;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename feature_extractor
+        >
+    void serialize (
+        const sequence_labeler<feature_extractor>& item,
+        std::ostream& out
+    )
+    {
+        serialize(item.get_feature_extractor(), out);
+        serialize(item.get_weights(), out);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename feature_extractor
+        >
+    void deserialize (
+        sequence_labeler<feature_extractor>& item,
+        std::istream& in 
+    )
+    {
+        feature_extractor fe;
+        matrix<double,0,1> weights;
+
+        deserialize(fe, in);
+        deserialize(weights, in);
+
+        item = sequence_labeler<feature_extractor>(fe, weights);
+    }
 
 // ----------------------------------------------------------------------------------------
 

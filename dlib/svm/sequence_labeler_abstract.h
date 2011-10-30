@@ -56,6 +56,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename feature_extractor
+        >
+    void serialize (
+        const sequence_labeler<feature_extractor>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename feature_extractor
+        >
+    void deserialize (
+        sequence_labeler<feature_extractor>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SEQUENCE_LAbELER_ABSTRACT_H___
