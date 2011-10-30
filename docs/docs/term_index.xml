@@ -227,6 +227,7 @@
          <term file="ml.html" name="cross_validate_object_detection_trainer"/>
          <term file="ml.html" name="cross_validate_trainer_threaded"/>
          <term file="ml.html" name="cross_validate_multiclass_trainer"/>
+         <term file="dlib/svm/cross_validate_multiclass_trainer_abstract.h.html" name="cross_validation_error"/>
          <term file="ml.html" name="cross_validate_regression_trainer"/>
          <term file="ml.html" name="test_binary_decision_function"/>
          <term file="ml.html" name="test_object_detection_function"/>
