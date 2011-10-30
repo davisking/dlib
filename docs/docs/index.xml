@@ -141,6 +141,7 @@
                   <li>A kernelized <a href="ml.html#kkmeans">k-means</a> clustering algorithm</li>
                   <li><a href="ml.html#rbf_network_trainer">Radial Basis Function Networks</a></li>
                   <li><a href="ml.html#mlp">Multi layer perceptrons</a> </li>  
+                  <li><a href="ml.html#structural_sequence_labeling_trainer">Sequence labeling</a> </li>  
                </ul>
             </li>
 

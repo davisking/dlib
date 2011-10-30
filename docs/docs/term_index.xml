@@ -40,6 +40,9 @@
          <term file="ml.html" name="structural_object_detection_trainer"/>
          <term file="ml.html" name="svm_struct_controller_node"/>
          <term file="ml.html" name="svm_struct_processing_node"/>
+         <term file="ml.html" name="sequence_labeler"/>
+         <term file="ml.html" name="structural_svm_sequence_labeling_problem"/>
+         <term file="ml.html" name="structural_sequence_labeling_trainer"/>
 
          <term file="dlib/optimization/optimization_solve_qp2_using_smo_abstract.h.html" name="invalid_nu_error"/>
          <term file="dlib/optimization/optimization_solve_qp2_using_smo_abstract.h.html" name="maximum_nu"/>
@@ -204,6 +207,7 @@
          <term file="ml.html" name="randomize_samples"/>
          <term file="ml.html" name="simplify_linear_decision_function"/>
          <term file="ml.html" name="is_binary_classification_problem"/>
+         <term file="ml.html" name="is_sequence_labeling_problem"/>
          <term file="ml.html" name="is_learning_problem"/>
          <term file="ml.html" name="svm_nu_trainer"/>
          <term file="ml.html" name="svm_c_trainer"/>
@@ -225,6 +229,7 @@
          <term file="ml.html" name="probabilistic"/>
          <term file="ml.html" name="cross_validate_trainer"/>
          <term file="ml.html" name="cross_validate_object_detection_trainer"/>
+         <term file="ml.html" name="cross_validate_sequence_labeler"/>
          <term file="ml.html" name="cross_validate_trainer_threaded"/>
          <term file="ml.html" name="cross_validate_multiclass_trainer"/>
          <term file="dlib/svm/cross_validate_multiclass_trainer_abstract.h.html" name="cross_validation_error"/>
@@ -233,6 +238,7 @@
          <term file="ml.html" name="test_object_detection_function"/>
          <term file="ml.html" name="test_multiclass_decision_function"/>
          <term file="ml.html" name="test_regression_function"/>
+         <term file="ml.html" name="test_sequence_labeler"/>
          <term link="ml.html#svm_nu_trainer" name="support vector machine"/>
          <term link="ml.html#rvm_trainer" name="relevance vector machine"/>
          <term link="ml.html#krr_trainer" name="kernel ridge regression"/>
