@@ -9,6 +9,8 @@
 #include "svm/structural_svm_distributed.h"
 #include "svm/structural_svm_object_detection_problem.h"
 #include "svm/structural_object_detection_trainer.h"
+#include "svm/structural_svm_sequence_labeling_problem.h"
+#include "svm/structural_sequence_labeling_trainer.h"
 
 #endif // DLIB_SVm_THREADED_HEADER
 

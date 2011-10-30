@@ -34,12 +34,14 @@
 #include "svm/cross_validate_multiclass_trainer.h"
 #include "svm/cross_validate_regression_trainer.h"
 #include "svm/cross_validate_object_detection_trainer.h"
+#include "svm/cross_validate_sequence_labeler.h"
 
 #include "svm/one_vs_all_decision_function.h"
 #include "svm/one_vs_all_trainer.h"
 
 #include "svm/structural_svm_problem.h"
 #include "svm/svm_multiclass_linear_trainer.h"
+#include "svm/sequence_labeler.h"
 
 #endif // DLIB_SVm_HEADER
 
