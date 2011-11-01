@@ -112,7 +112,10 @@ namespace dlib
     public:
 
         sequence_labeler()
-        {}
+        {
+            weights.set_size(fe.num_features());
+            weights = 0;
+        }
 
         sequence_labeler(
             const feature_extractor& fe_,
@@ -120,7 +123,16 @@ namespace dlib
         ) :
             fe(fe_),
             weights(weights_)
-        {}
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(fe_.num_features() == weights_.size(),
+                "\t sequence_labeler::sequence_labeler()"
+                << "\n\t These sizes should match"
+                << "\n\t fe_.num_features(): " << fe_.num_features() 
+                << "\n\t weights_.size():    " << weights_.size() 
+                << "\n\t this: " << this
+                );
+        }
 
         const feature_extractor& get_feature_extractor (
         ) const { return fe; }
@@ -135,6 +147,13 @@ namespace dlib
             const sample_sequence_type& x
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(num_labels() > 0,
+                "\t labeled_sequence_type sequence_labeler::operator()(x)"
+                << "\n\t You can't have no labels."
+                << "\n\t this: " << this
+                );
+
             labeled_sequence_type y;
             find_max_factor_graph_viterbi(map_prob(x,fe,weights), y);
             return y;
@@ -145,6 +164,13 @@ namespace dlib
             labeled_sequence_type& y
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(num_labels() > 0,
+                "\t void sequence_labeler::label_sequence(x,y)"
+                << "\n\t You can't have no labels."
+                << "\n\t this: " << this
+                );
+
             find_max_factor_graph_viterbi(map_prob(x,fe,weights), y);
         }
 

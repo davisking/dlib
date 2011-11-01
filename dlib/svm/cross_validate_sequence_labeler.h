@@ -25,7 +25,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( is_sequence_labeling_problem(samples, labels) == true,
+        DLIB_ASSERT( is_sequence_labeling_problem(samples, labels) == true,
                     "\tmatrix test_sequence_labeler()"
                     << "\n\t invalid inputs were given to this function"
                     << "\n\t is_sequence_labeling_problem(samples, labels): " 
@@ -44,8 +44,8 @@ namespace dlib
                 const unsigned long truth = labels[i][j];
                 if (truth >= res.nr())
                 {
-                    // make res big enough for this unexpected label
-                    res = join_cols(res, zeros_matrix<double>(truth-res.nr()+1, res.nc()));
+                    // ignore labels the labeler doesn't know about.
+                    continue;
                 }
 
                 res(truth, pred[j]) += 1;
@@ -69,7 +69,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(is_sequence_labeling_problem(samples,labels) == true &&
+        DLIB_ASSERT(is_sequence_labeling_problem(samples,labels) == true &&
                     1 < folds && folds <= static_cast<long>(samples.size()),
             "\tmatrix cross_validate_sequence_labeler()"
             << "\n\t invalid inputs were given to this function"
@@ -77,6 +77,25 @@ namespace dlib
             << "\n\t folds:  " << folds 
             << "\n\t is_sequence_labeling_problem(samples,labels): " << is_sequence_labeling_problem(samples,labels)
             );
+
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < labels.size(); ++i)
+        {
+            for (unsigned long j = 0; j < labels[i].size(); ++j)
+            {
+                // make sure requires clause is not broken
+                DLIB_ASSERT(labels[i][j] < trainer.num_labels(),
+                            "\t matrix cross_validate_sequence_labeler()"
+                            << "\n\t The labels are invalid."
+                            << "\n\t labels[i][j]: " << labels[i][j] 
+                            << "\n\t trainer.num_labels(): " << trainer.num_labels()
+                            << "\n\t i: " << i 
+                            << "\n\t j: " << j 
+                );
+            }
+        }
+#endif
+
 
 
 
@@ -117,36 +136,7 @@ namespace dlib
             }
 
 
-            matrix<double> temp = test_sequence_labeler(trainer.train(x_train,y_train), x_test, y_test);
-
-            // Make sure res is always at least as big as temp.  This might not be the case
-            // because temp is sized differently depending on how many different kinds of labels 
-            // test_sequence_labeler() sees.
-            if (get_rect(res).contains(get_rect(temp)) == false)
-            {
-                if (res.size() == 0)
-                {
-                    res.set_size(temp.nr(), temp.nc());
-                    res = 0;
-                }
-
-                // Make res bigger by padding with zeros on the bottom or right if necessary.
-                if (res.nr() < temp.nr())
-                    res = join_cols(res, zeros_matrix<double>(temp.nr()-res.nc(), res.nc()));
-                if (res.nc() < temp.nc())
-                    res = join_rows(res, zeros_matrix<double>(res.nr(), temp.nc()-res.nc()));
-
-            }
-
-            // add temp to res
-            for (long r = 0; r < temp.nr(); ++r)
-            {
-                for (long c = 0; c < temp.nc(); ++c)
-                {
-                    res(r,c) += temp(r,c);
-                }
-            }
-
+            res += test_sequence_labeler(trainer.train(x_train,y_train), x_test, y_test);
 
         } // for (long i = 0; i < folds; ++i)
 
