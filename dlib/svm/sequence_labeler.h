@@ -125,7 +125,7 @@ namespace dlib
             weights(weights_)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(fe_.num_features() == weights_.size(),
+            DLIB_ASSERT(fe_.num_features() == static_cast<unsigned long>(weights_.size()),
                 "\t sequence_labeler::sequence_labeler()"
                 << "\n\t These sizes should match"
                 << "\n\t fe_.num_features(): " << fe_.num_features() 

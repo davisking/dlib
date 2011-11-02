@@ -42,7 +42,7 @@ namespace dlib
             for (unsigned long j = 0; j < pred.size(); ++j)
             {
                 const unsigned long truth = labels[i][j];
-                if (truth >= res.nr())
+                if (truth >= static_cast<unsigned long>(res.nr()))
                 {
                     // ignore labels the labeler doesn't know about.
                     continue;

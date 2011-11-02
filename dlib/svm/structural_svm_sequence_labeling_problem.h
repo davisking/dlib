@@ -76,9 +76,10 @@ namespace dlib
         structural_svm_sequence_labeling_problem(
             const std::vector<std::vector<sample_type> >& samples_,
             const std::vector<std::vector<unsigned long> >& labels_,
-            const feature_extractor& fe_        
+            const feature_extractor& fe_,
+            unsigned long num_threads = 2
         ) :
-            structural_svm_problem_threaded<matrix_type,feature_vector_type>(4),
+            structural_svm_problem_threaded<matrix_type,feature_vector_type>(num_threads),
             samples(samples_),
             labels(labels_),
             fe(fe_)
