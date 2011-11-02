@@ -112,9 +112,9 @@ namespace dlib
             ensures
                 - returns the error epsilon that determines when training should stop.
                   Smaller values may result in a more accurate solution but take longer 
-                  to execute.  You can think of this epsilon value as saying "solve the 
+                  to train.  You can think of this epsilon value as saying "solve the 
                   optimization problem until the average loss per sample is within epsilon 
-                  of it's optimal value".
+                  of its optimal value".
         !*/
 
         void set_max_cache_size (
