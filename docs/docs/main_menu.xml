@@ -116,6 +116,10 @@
             <name>Examples</name>
             <sub>
                <item>
+                  <name>Sequence_Labeling</name>
+                  <link>sequence_labeler_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Object_Detector</name>
                   <link>object_detector_ex.cpp.html</link>
                </item>

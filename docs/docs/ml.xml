@@ -1321,6 +1321,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                      Fei Sha and Fernando Pereira
                </blockquote>
          </description>
+         <examples>
+            <example>sequence_labeler_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -2091,6 +2094,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             as the <a href="#structural_sequence_labeling_trainer">structural_sequence_labeling_trainer</a>
             and returns a confusion matrix describing the results.
          </description>
+         <examples>
+            <example>sequence_labeler_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -2104,6 +2110,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             Tests a <a href="#sequence_labeler">sequence_labeler</a> on a set of data 
             and returns a confusion matrix describing the results.
          </description>
+         <examples>
+            <example>sequence_labeler_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -2308,6 +2317,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                to make it look similar to all the other trainers in dlib.  
                </p>
          </description>
+         <examples>
+            <example>sequence_labeler_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
