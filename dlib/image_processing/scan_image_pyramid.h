@@ -506,7 +506,7 @@ namespace dlib
             {
                 const point offset = -feats[l].image_to_feat_space(point(0,0));
                 for (unsigned long j = 0; j < region_rects.size(); ++j)
-                    region_rects[j] = make_pair(j, translate_rect(feats[l].image_to_feat_space(det_templates[i].rects[j]),offset)); 
+                    region_rects[j] = std::make_pair(j, translate_rect(feats[l].image_to_feat_space(det_templates[i].rects[j]),offset)); 
 
                 scan_image(point_dets, saliency_images, region_rects, thresh, max_dets_per_template); 
 
