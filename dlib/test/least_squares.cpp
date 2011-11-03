@@ -238,7 +238,7 @@ namespace
 
             ch = brown_start();
 
-            solve_least_squares(objective_delta_stop_strategy(1e-13, 80),
+            solve_least_squares(objective_delta_stop_strategy(1e-13, 300),
                                 &brown_residual,
                                 derivative(&brown_residual),
                                 range(1,20),
@@ -248,7 +248,7 @@ namespace
             dlog << LINFO << "brown der: " << length(brown_derivative(ch));
             dlog << LINFO << "brown error: " << length(ch - brown_solution());
 
-            DLIB_TEST(length(ch - brown_solution()) < 1e-5);
+            DLIB_TEST_MSG(length(ch - brown_solution()) < 1e-5,length(ch - brown_solution()) );
 
         }
         print_spinner();
