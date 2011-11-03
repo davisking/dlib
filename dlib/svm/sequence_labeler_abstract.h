@@ -94,8 +94,9 @@ namespace dlib
                     - returns true
                       (note that reject_labeling() is just an optional tool to allow you 
                       to overrule the normal labeling algorithm.  You don't have to use
-                      it.  So if you prefer you can set reject_labeling() to always return 
-                      false.)
+                      it.  So if you don't include a reject_labeling() method in your
+                      feature extractor it is the same as including one that always
+                      returns false.)
                 - else
                     - returns false
         !*/

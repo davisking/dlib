@@ -51,16 +51,6 @@ public:
         return num_label_states; 
     }
 
-    template <typename EXP>
-    bool reject_labeling (
-        const std::vector<sample_type>& x,
-        const matrix_exp<EXP>& y,
-        unsigned long position
-    ) const
-    {
-        return false;
-    }
-
     template <typename feature_setter, typename EXP>
     void get_features (
         feature_setter& set_feature,

@@ -57,6 +57,69 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <
+            typename T,
+            bool (T::*funct)(const std::vector<typename T::sample_type>&, const matrix_exp<matrix<unsigned long> >&, unsigned long)const
+            >
+        struct hrlh_helper
+        {
+            typedef double type;
+        };
+
+        template <typename T>
+        char has_reject_labeling_helper( typename hrlh_helper<T,&T::template reject_labeling<matrix<unsigned long> > >::type = 0 ) { return 0;}
+
+        struct two_bytes
+        {
+            char a[2]; 
+        };
+
+        template <typename T>
+        two_bytes has_reject_labeling_helper(int) { return two_bytes();}
+
+
+        // This is a template to tell you if a feature_extractor has a reject_labeling function or not.
+        template <typename T, typename U = void > 
+        struct has_reject_labeling 
+        {
+            static const bool value = false;
+        };
+
+        template <typename T>
+        struct has_reject_labeling <T,typename dlib::enable_if_c<sizeof(dlib::impl::has_reject_labeling_helper<T>(2.2)) == 1 >::type  >
+        {
+            static const bool value = true;
+        };
+
+
+        template <typename feature_extractor, typename EXP, typename sample_type>
+        typename enable_if<has_reject_labeling<feature_extractor>,bool>::type call_reject_labeling_if_exists (
+            const feature_extractor& fe,
+            const std::vector<sample_type>& x,
+            const matrix_exp<EXP>& y,
+            unsigned long position
+        )
+        {
+            return fe.reject_labeling(x, y, position);
+        }
+
+        template <typename feature_extractor, typename EXP, typename sample_type>
+        typename disable_if<has_reject_labeling<feature_extractor>,bool>::type call_reject_labeling_if_exists (
+            const feature_extractor& ,
+            const std::vector<sample_type>& ,
+            const matrix_exp<EXP>& ,
+            unsigned long 
+        )
+        {
+            return false;
+        }
+    }
+
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename feature_extractor
         >
@@ -99,7 +162,7 @@ namespace dlib
                 const matrix_exp<EXP>& node_states
             ) const
             {
-                if (fe.reject_labeling(sequence,  node_states, node_id))
+                if (dlib::impl::call_reject_labeling_if_exists(fe, sequence,  node_states, node_id))
                     return -std::numeric_limits<double>::infinity();
 
                 return fe_helpers::dot(weights, fe, sequence, node_states, node_id);
