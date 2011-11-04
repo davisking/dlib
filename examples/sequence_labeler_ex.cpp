@@ -48,8 +48,7 @@ using namespace dlib;
     In this example we will be working with a Hidden Markov Model where
     the hidden nodes and observation nodes both take on 3 different states. 
     The task will be to take a sequence of observations and predict the state
-    of the corresponding hidden nodes.  Therefore, the hidden nodes correspond
-    to the labels in this case.
+    of the corresponding hidden nodes.  
 */
 
 const unsigned long num_label_states = 3; 
@@ -78,9 +77,8 @@ public:
             - returns the dimensionality of the PSI() feature vector.  
     !*/
     {
-        // Recall that we are defining a HMM in this example program.  So in this case
-        // the PSI() vector should have the same dimensionality as the number of parameters
-        // in the HMM.  
+        // Recall that we are defining a HMM.  So in this case the PSI() vector 
+        // should have the same dimensionality as the number of parameters in the HMM.  
         return num_label_states*num_label_states + num_label_states*num_sample_states;
     }
 
@@ -145,7 +143,7 @@ public:
     !*/
     {
         // Again, the features below only define a simple HMM.  But in general, you can 
-        // perform a wide variety of sophisticated feature extraction here.
+        // use a wide variety of sophisticated feature extraction methods here.
 
         // Pull out an indicator feature for the type of transition between the
         // previous label and the current label.
@@ -190,7 +188,7 @@ void make_dataset (
               is given by transition_probabilities(H1,H2).
             - The probability of a hidden state H producing an observed state
               O is given by emission_probabilities(H,O).
-        - #samples.size() == labels.size() == dataset_size
+        - #samples.size() == #labels.size() == dataset_size
         - for all valid i:
             - #labels[i] is a randomly sampled sequence of hidden states from the
               given HMM.  #samples[i] is its corresponding randomly sampled sequence
@@ -204,7 +202,7 @@ int main()
     // We need a dataset to test the machine learning algorithms.  So we are going to 
     // define a HMM based on the following two matrices and then randomly sample a
     // set of data from it.  Then we will see if the machine learning method can
-    // recover the HMM from the training data. 
+    // recover the HMM model from the training data. 
 
 
     matrix<double> transition_probabilities(num_label_states, num_label_states);
@@ -231,7 +229,7 @@ int main()
         cout << "******************************" << endl;
     }
 
-    // Now we use the structural_sequence_labeling_trainer to learn our
+    // Next we use the structural_sequence_labeling_trainer to learn our
     // prediction model based on just the samples and labels.
     structural_sequence_labeling_trainer<feature_extractor> trainer;
     // This is the common SVM C parameter.  Larger values encourage the
