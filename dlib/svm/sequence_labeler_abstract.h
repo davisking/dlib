@@ -30,9 +30,10 @@ namespace dlib
                 is calculated.  It also defines how many output labels there are as 
                 well as the order of the model.  
 
-                Finally, note that PSI(x,y) is a sum of feature vectors, each extracted 
-                at one of the positions of the input sequence x.  Each of these constituent
-                feature vectors is defined by the get_features() method of this class.
+                Finally, note that PSI(x,y) is a sum of feature vectors, each derived 
+                from the entire input sequence x but only part of the label sequence y.
+                Each of these constituent feature vectors is defined by the get_features() 
+                method of this class.
         !*/
 
     public:
@@ -123,9 +124,9 @@ namespace dlib
                 - for all valid i:
                     - interprets y(i) as the label corresponding to x[position-i]
                 - This function computes the part of PSI() corresponding to the x[position]
-                  element of the input sequence.  The features are returned as a sparse
-                  vector by invoking set_feature().  For example, to set the feature with
-                  an index of 55 to the value of 1 this method would call:
+                  element of the input sequence.  Moreover, this part of PSI() is returned as 
+                  a sparse vector by invoking set_feature().  For example, to set the feature 
+                  with an index of 55 to the value of 1 this method would call:
                     set_feature(55);
                   Or equivalently:
                     set_feature(55,1);

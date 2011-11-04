@@ -33,7 +33,7 @@ namespace dlib
             - The confusion matrix C returned by this function has the following properties.
                 - C.nc() == labeler.num_labels()
                 - C.nr() == labeler.num_labels() 
-                - C(T,P) == the number of times a sample with label T was predicted
+                - C(T,P) == the number of times a sequence element with label T was predicted
                   to have a label of P.
             - Any samples with a label value >= labeler.num_labels() are ignored.  That 
               is, samples with labels the labeler hasn't ever seen before are ignored.
@@ -69,7 +69,7 @@ namespace dlib
             - The confusion matrix C returned by this function has the following properties.
                 - C.nc() == trainer.num_labels()
                 - C.nr() == trainer.num_labels() 
-                - C(T,P) == the number of times a sample with label T was predicted
+                - C(T,P) == the number of times a sequence element with label T was predicted
                   to have a label of P.
     !*/
 
