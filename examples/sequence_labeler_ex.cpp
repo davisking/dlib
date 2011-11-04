@@ -162,7 +162,7 @@ int main()
     matrix<double,0,1> true_hmm_model_weights = log(join_cols(reshape_to_column_vector(transition_probabilities),
                                                               reshape_to_column_vector(emission_probabilities)));
 
-    sequence_labeler<feature_extractor> labeler_true(feature_extractor(), true_hmm_model_weights); 
+    sequence_labeler<feature_extractor> labeler_true(true_hmm_model_weights); 
 
     confusion_matrix = test_sequence_labeler(labeler_true, samples, labels);
     cout << "\nTrue HMM model: " << endl;

@@ -186,6 +186,21 @@ namespace dlib
             weights = 0;
         }
 
+        explicit sequence_labeler(
+            const matrix<double,0,1>& weights_
+        ) : 
+            weights(weights_)
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(fe.num_features() == static_cast<unsigned long>(weights_.size()),
+                "\t sequence_labeler::sequence_labeler(weights_)"
+                << "\n\t These sizes should match"
+                << "\n\t fe.num_features(): " << fe.num_features() 
+                << "\n\t weights_.size():   " << weights_.size() 
+                << "\n\t this: " << this
+                );
+        }
+
         sequence_labeler(
             const feature_extractor& fe_,
             const matrix<double,0,1>& weights_
@@ -195,7 +210,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(fe_.num_features() == static_cast<unsigned long>(weights_.size()),
-                "\t sequence_labeler::sequence_labeler()"
+                "\t sequence_labeler::sequence_labeler(fe_,weights_)"
                 << "\n\t These sizes should match"
                 << "\n\t fe_.num_features(): " << fe_.num_features() 
                 << "\n\t weights_.size():    " << weights_.size() 

@@ -196,9 +196,22 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_weights().size() == fe.num_features()
+                - #get_feature_extractor() == feature_extractor() 
+                  (i.e. it will have its default value)
+                - #get_weights().size() == #get_feature_extractor().num_features()
                 - #get_weights() == 0
-                - #get_feature_extractor() will have an initial value for its type
+        !*/
+
+        explicit sequence_labeler(
+            const matrix<double,0,1>& weights
+        ); 
+        /*!
+            requires
+                - feature_extractor().num_features() == weights.size()
+            ensures
+                - #get_feature_extractor() == feature_extractor() 
+                  (i.e. it will have its default value)
+                - #get_weights() == weights
         !*/
 
         sequence_labeler(
