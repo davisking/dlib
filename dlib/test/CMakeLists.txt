@@ -87,6 +87,7 @@ set (tests
    reference_counter.cpp
    scan_image.cpp
    sequence.cpp
+   sequence_labeler.cpp
    serialize.cpp
    set.cpp
    sldf.cpp

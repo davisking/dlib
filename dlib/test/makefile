@@ -102,6 +102,7 @@ SRC += read_write_mutex.cpp
 SRC += reference_counter.cpp
 SRC += scan_image.cpp
 SRC += sequence.cpp
+SRC += sequence_labeler.cpp
 SRC += serialize.cpp
 SRC += set.cpp
 SRC += sldf.cpp
