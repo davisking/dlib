@@ -315,7 +315,7 @@ namespace dlib
         const in_scalar_vector_type& labels,
         const bool be_verbose,
         const scalar_type eps,
-        const unsigned char max_iterations
+        const unsigned long max_iterations
     )
     {
         return oca_problem_c_svm<matrix_type, in_sample_vector_type, in_scalar_vector_type>(
