@@ -85,9 +85,9 @@ namespace
 
         template <typename EXP>
         bool reject_labeling (
-            const std::vector<sample_type>& x,
-            const matrix_exp<EXP>& y,
-            unsigned long position
+            const std::vector<sample_type>& ,
+            const matrix_exp<EXP>& ,
+            unsigned long 
         ) const
         {
             called_rejct_labeling = true;

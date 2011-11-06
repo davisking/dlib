@@ -759,6 +759,7 @@ namespace
             matrix<double,N,N> v;
 
             matrix<double,M,N> a2;  
+            a2 = 0;
             a2 = tmp(a/2);
 
 

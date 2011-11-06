@@ -73,7 +73,7 @@ namespace dlib
             eps = eps_;
         }
 
-        const double get_epsilon (
+        double get_epsilon (
         ) const { return eps; }
 
         void set_max_cache_size (

@@ -155,7 +155,7 @@ namespace
         inline friend void serialize   ( const very_simple_feature_extractor& item, std::ostream& out)  { serialize(item.feat_image, out); }
         inline friend void deserialize ( very_simple_feature_extractor& item, std::istream& in ) { deserialize(item.feat_image, in); }
 
-        void copy_configuration ( const very_simple_feature_extractor& item){}
+        void copy_configuration ( const very_simple_feature_extractor& ){}
 
     private:
         array2d<unsigned char> feat_image;

@@ -93,7 +93,7 @@ namespace dlib
             eps = eps_;
         }
 
-        const scalar_type get_epsilon (
+        scalar_type get_epsilon (
         ) const { return eps; }
 
         void set_max_cache_size (
@@ -149,7 +149,7 @@ namespace dlib
             C = C_;
         }
 
-        const scalar_type get_c (
+        scalar_type get_c (
         ) const
         {
             return C;
