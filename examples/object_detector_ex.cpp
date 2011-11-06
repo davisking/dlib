@@ -82,7 +82,7 @@ void make_simple_test_data (
 
 // ----------------------------------------------------------------------------------------
 
-int main(int argc, char* argv[])
+int main()
 {  
     try
     {
