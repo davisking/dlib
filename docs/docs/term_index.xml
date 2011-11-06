@@ -276,6 +276,7 @@
          <term file="ml.html" name="probabilistic_decision_function"/>
          <term file="ml.html" name="probabilistic_function"/>
          <term file="ml.html" name="linear_kernel"/>
+         <term file="ml.html" name="histogram_intersection_kernel"/>
          <term file="ml.html" name="offset_kernel"/>
          <term file="ml.html" name="polynomial_kernel"/>
          <term file="ml.html" name="sigmoid_kernel"/>
@@ -285,6 +286,7 @@
          <term link="ml.html#sparse vectors" name="unsorted sparse vectors"/>
          <term file="ml.html" name="sparse vectors"/>
          <term file="ml.html" name="sparse_linear_kernel"/>
+         <term file="ml.html" name="sparse_histogram_intersection_kernel"/>
          <term file="ml.html" name="sparse_polynomial_kernel"/>
          <term file="ml.html" name="sparse_sigmoid_kernel"/>
          <term file="ml.html" name="sparse_radial_basis_kernel"/>

@@ -180,12 +180,14 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>polynomial_kernel</item>
          <item>sigmoid_kernel</item>
          <item>linear_kernel</item>
+         <item>histogram_intersection_kernel</item>
          <item>offset_kernel</item>
 
          <item>sparse_radial_basis_kernel</item>
          <item>sparse_polynomial_kernel</item>
          <item>sparse_sigmoid_kernel</item>
          <item>sparse_linear_kernel</item>
+         <item>sparse_histogram_intersection_kernel</item>
 
       </section>
 
@@ -1423,6 +1425,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
 
       <component>
+         <name>histogram_intersection_kernel</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
+         <description>
+                This object represents a histogram intersection kernel for use with
+                kernel learning machines.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>sigmoid_kernel</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/kernel_abstract.h</spec_file>
@@ -1466,17 +1481,14 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
-         <name>sparse_linear_kernel</name>
+         <name>sparse_histogram_intersection_kernel</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/sparse_kernel_abstract.h</spec_file>
          <description>
-                This object represents a linear function kernel for use with
+                This object represents a histogram intersection kernel kernel for use with
                 kernel learning machines that operate on 
                 <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
          </description>
-         <examples>
-            <example>svm_sparse_ex.cpp.html</example>
-         </examples>
                                  
       </component>
       
