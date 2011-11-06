@@ -313,6 +313,69 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    struct sparse_histogram_intersection_kernel
+    {
+        typedef typename T::value_type::second_type scalar_type;
+        typedef T sample_type;
+        typedef default_memory_manager mem_manager_type;
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const
+        { 
+            typename sample_type::const_iterator ai = a.begin();
+            typename sample_type::const_iterator bi = b.begin();
+
+            scalar_type sum = 0;
+            while (ai != a.end() && bi != b.end())
+            {
+                if (ai->first == bi->first)
+                {
+                    sum += std::min(ai->second , bi->second);
+                    ++ai;
+                    ++bi;
+                }
+                else if (ai->first < bi->first)
+                {
+                    ++ai;
+                }
+                else 
+                {
+                    ++bi;
+                }
+            }
+
+            return sum;
+        }
+
+        bool operator== (
+            const sparse_histogram_intersection_kernel& 
+        ) const
+        {
+            return true;
+        }
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const sparse_histogram_intersection_kernel<T>& item,
+        std::ostream& out
+    ){}
+
+    template <
+        typename T
+        >
+    void deserialize (
+        sparse_histogram_intersection_kernel<T>& item,
+        std::istream& in 
+    ){}
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_SPARSE_KERNEL

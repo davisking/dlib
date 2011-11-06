@@ -427,6 +427,71 @@ namespace dlib
     template <
         typename T
         >
+    struct histogram_intersection_kernel
+    {
+        /*!
+            REQUIREMENTS ON T
+                T must be a dlib::matrix object 
+
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a histogram intersection kernel kernel
+        !*/
+
+        typedef typename T::type scalar_type;
+        typedef T sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const;
+        /*!
+            requires
+                - is_vector(a) 
+                - is_vector(b) 
+                - a.size() == b.size()
+                - min(a) >= 0
+                - min(b) >= 0
+            ensures
+                - returns sum over all i: std::min(a(i), b(i)) 
+        !*/
+
+        bool operator== (
+            const histogram_intersection_kernel& k
+        ) const;
+        /*!
+            ensures
+                - returns true
+        !*/
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const histogram_intersection_kernel<T>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support for histogram_intersection_kernel
+    !*/
+
+    template <
+        typename T
+        >
+    void deserialize (
+        histogram_intersection_kernel<T>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support for histogram_intersection_kernel 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
     struct offset_kernel
     {
         /*!

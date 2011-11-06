@@ -403,6 +403,52 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
+    struct histogram_intersection_kernel
+    {
+        typedef typename T::type scalar_type;
+        typedef T sample_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+
+        scalar_type operator() (
+            const sample_type& a,
+            const sample_type& b
+        ) const
+        { 
+            scalar_type temp = 0;
+            for (long i = 0; i < a.size(); ++i)
+            {
+                temp += std::min(a(i), b(i));
+            }
+            return temp;
+        }
+
+        bool operator== (
+            const histogram_intersection_kernel& 
+        ) const
+        {
+            return true;
+        }
+    };
+
+    template <
+        typename T
+        >
+    void serialize (
+        const histogram_intersection_kernel<T>& ,
+        std::ostream& 
+    ){}
+
+    template <
+        typename T
+        >
+    void deserialize (
+        histogram_intersection_kernel<T>& ,
+        std::istream&  
+    ){}
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
     struct offset_kernel
     {
         typedef typename T::scalar_type scalar_type;
