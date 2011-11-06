@@ -12,10 +12,35 @@
 
 <current>
 New Stuff:
+   - Machine Learning
+      - Added the histogram intersection kernel for sparse and dense vectors.
+      - Added a set of tools to allow a user to easily learn to do sequence
+        labeling using dlib's structural SVM implementation.  See the new
+        sequence_labeler object and its associated example program for an 
+        introduction.
+   - Image processing:  
+      - Added segment_image()
+      - Added randomly_color_image()
+      - Added the border_enumerator
+   - Added the disjoint_subsets object, it is an implementation of the 
+     union-find algorithm/disjoint-set data structure.
+   - Added new matrix routines: conv(), conv_same(), conv_valid(), xcorr(),
+     xcorr_same(), xcorr_valid(), and flip().
  
 Non-Backwards Compatible Changes:
+   - Changed find_max_factor_graph_viterbi() so you can use run-time
+     defined order and num_states parameters.
 
 Bug fixes:
+   - The last dlib release added a max_iterations parameter to the
+     svm_c_linear_trainer and svm_c_ekm_trainer objects.  However,
+     there was a bug which made them only do at most 16 iterations,
+     which is too few to solve many problems.  This has been fixed.
+   - Fixed a bug in is_const_type.  It didn't work for reference types.
+   - Fixed a bug in the SQLite binding routine statement::get_column_as_text().  
+     It didn't work correctly if the column contained a NULL.
+   - Fixed a bug in find_max_factor_graph_viterbi() which occurred when a
+     zero order model had negative factor values.
 
 Other:
 
