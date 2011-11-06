@@ -256,12 +256,12 @@ namespace dlib
 
         template <typename U>
         bool aliases (
-            const matrix_exp<U>& item
+            const matrix_exp<U>& 
         ) const { return false; }
 
         template <typename U>
         bool destructively_aliases (
-            const matrix_exp<U>& item
+            const matrix_exp<U>& 
         ) const { return false; }
 
         long nr (

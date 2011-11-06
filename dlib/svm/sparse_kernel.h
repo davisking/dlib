@@ -299,16 +299,16 @@ namespace dlib
         typename T
         >
     void serialize (
-        const sparse_linear_kernel<T>& item,
-        std::ostream& out
+        const sparse_linear_kernel<T>& ,
+        std::ostream& 
     ){}
 
     template <
         typename T
         >
     void deserialize (
-        sparse_linear_kernel<T>& item,
-        std::istream& in 
+        sparse_linear_kernel<T>& ,
+        std::istream&  
     ){}
 
 // ----------------------------------------------------------------------------------------
@@ -362,16 +362,16 @@ namespace dlib
         typename T
         >
     void serialize (
-        const sparse_histogram_intersection_kernel<T>& item,
-        std::ostream& out
+        const sparse_histogram_intersection_kernel<T>& ,
+        std::ostream& 
     ){}
 
     template <
         typename T
         >
     void deserialize (
-        sparse_histogram_intersection_kernel<T>& item,
-        std::istream& in 
+        sparse_histogram_intersection_kernel<T>& ,
+        std::istream&  
     ){}
 
 // ----------------------------------------------------------------------------------------
