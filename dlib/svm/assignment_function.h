@@ -90,6 +90,14 @@ namespace dlib
                 );
         }
 
+        const feature_extractor& get_feature_extractor (
+        ) const { return fe; }
+
+        const matrix<double,0,1>& get_weights (
+        ) const { return weights; }
+
+        bool forces_assignment (
+        ) const { return force_assignment; }
 
         result_type operator()(
             const std::vector<lhs_type>& lhs,
@@ -156,7 +164,6 @@ namespace dlib
             return assignment;
         }
 
-
         result_type operator() (
             const sample_type& item
         ) const
@@ -171,6 +178,42 @@ namespace dlib
         matrix<double,0,1> weights;
         bool force_assignment;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename feature_extractor
+        >
+    void serialize (
+        const assignment_function<feature_extractor>& item,
+        std::ostream& out
+    )
+    {
+        serialize(item.get_feature_extractor(), out);
+        serialize(item.get_weights(), out);
+        serialize(item.forces_assignment(), out);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename feature_extractor
+        >
+    void deserialize (
+        assignment_function<feature_extractor>& item,
+        std::istream& in 
+    )
+    {
+        feature_extractor fe;
+        matrix<double,0,1> weights;
+        bool force_assignment;
+
+        deserialize(fe, in);
+        deserialize(weights, in);
+        deserialize(force_assignment, in);
+
+        item = assignment_function<feature_extractor>(fe, weights, force_assignment);
+    }
 
 // ----------------------------------------------------------------------------------------
 
