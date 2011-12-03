@@ -25,11 +25,11 @@ namespace dlib
         typedef matrix<double,0,1> matrix_type;
         typedef typename feature_extractor::feature_vector_type feature_vector_type;
 
-        typedef typename feature_extractor::lhs_type lhs_type;
-        typedef typename feature_extractor::rhs_type rhs_type;
+        typedef typename feature_extractor::lhs_element lhs_element;
+        typedef typename feature_extractor::rhs_element rhs_element;
 
 
-        typedef std::pair<std::vector<lhs_type>, std::vector<rhs_type> > sample_type;
+        typedef std::pair<std::vector<lhs_element>, std::vector<rhs_element> > sample_type;
 
         typedef std::vector<long> label_type;
 

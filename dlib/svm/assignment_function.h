@@ -20,11 +20,11 @@ namespace dlib
     {
     public:
 
-        typedef typename feature_extractor::lhs_type lhs_type;
-        typedef typename feature_extractor::rhs_type rhs_type;
+        typedef typename feature_extractor::lhs_element lhs_element;
+        typedef typename feature_extractor::rhs_element rhs_element;
 
 
-        typedef std::pair<std::vector<lhs_type>, std::vector<rhs_type> > sample_type;
+        typedef std::pair<std::vector<lhs_element>, std::vector<rhs_element> > sample_type;
 
         typedef std::vector<long> label_type;
         typedef label_type result_type;
@@ -100,8 +100,8 @@ namespace dlib
         ) const { return force_assignment; }
 
         result_type operator()(
-            const std::vector<lhs_type>& lhs,
-            const std::vector<rhs_type>& rhs 
+            const std::vector<lhs_element>& lhs,
+            const std::vector<rhs_element>& rhs 
         ) const
         /*!
             ensures
