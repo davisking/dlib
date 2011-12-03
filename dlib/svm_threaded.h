@@ -12,6 +12,9 @@
 #include "svm/structural_svm_sequence_labeling_problem.h"
 #include "svm/structural_sequence_labeling_trainer.h"
 
+#include "svm/structural_svm_assignment_problem.h"
+#include "svm/structural_assignment_trainer.h"
+
 #endif // DLIB_SVm_THREADED_HEADER
 
 
