@@ -68,12 +68,14 @@ namespace dlib
             psi_type& psi
         ) const 
         {
+            typename feature_extractor::feature_vector_type feats;
             psi = 0;
             for (unsigned long i = 0; i < sample.first.size(); ++i)
             {
                 if (label[i] != -1)
                 {
-                    psi += fe(sample.first[i], sample.second[label[i]]);
+                    fe.get_features(sample.first[i], sample.second[label[i]], feats);
+                    psi += feats;
                 }
             }
         }
@@ -95,11 +97,13 @@ namespace dlib
         ) const 
         {
             psi.clear();
+            typename feature_extractor::feature_vector_type feats;
             for (unsigned long i = 0; i < sample.first.size(); ++i)
             {
                 if (label[i] != -1)
                 {
-                    append_to_sparse_vect(psi, fe(sample.first[i], sample.second[label[i]]));
+                    fe.get_features(sample.first[i], sample.second[label[i]], feats);
+                    append_to_sparse_vect(psi, feats);
                 }
             }
         }
@@ -137,6 +141,8 @@ namespace dlib
             }
             cost.set_size(size, size);
 
+            typename feature_extractor::feature_vector_type feats;
+
             // now fill out the cost assignment matrix
             for (long r = 0; r < cost.nr(); ++r)
             {
@@ -146,7 +152,8 @@ namespace dlib
                     {
                         if (c < (long)samples[idx].second.size())
                         {
-                            cost(r,c) = dot(current_solution, fe(samples[idx].first[r], samples[idx].second[c]));
+                            fe.get_features(samples[idx].first[r], samples[idx].second[c], feats);
+                            cost(r,c) = dot(current_solution, feats);
 
                             // add in the loss since this corresponds to an incorrect prediction.
                             if (c != labels[idx][r])

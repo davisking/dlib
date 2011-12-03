@@ -126,6 +126,9 @@ namespace dlib
             }
             cost.set_size(size, size);
 
+            typedef typename feature_extractor::feature_vector_type feature_vector_type;
+            feature_vector_type feats;
+
             // now fill out the cost assignment matrix
             for (long r = 0; r < cost.nr(); ++r)
             {
@@ -133,7 +136,8 @@ namespace dlib
                 {
                     if (r < (long)lhs.size() && c < (long)rhs.size())
                     {
-                        cost(r,c) = dot(weights, fe(lhs[r], rhs[c]));
+                        fe.get_features(lhs[r], rhs[c], feats);
+                        cost(r,c) = dot(weights, feats);
                     }
                     else
                     {
