@@ -23,7 +23,7 @@ namespace dlib
                 The model used by sequence_labeler objects is the following.  
                 Given an input sequence x, predict an output label sequence y
                 such that:
-                    y == argmax_y dot(w, PSI(x,y))
+                    y == argmax_Y dot(w, PSI(x,Y))
                     Where w is a parameter vector.
 
                 Therefore, a feature extractor defines how the PSI(x,y) feature vector 
@@ -188,7 +188,7 @@ namespace dlib
                 The model used by this object is the following.  Given
                 an input sequence x, predict an output label sequence y
                 such that:
-                    y == argmax_y dot(get_weights(), PSI(x,y))
+                    y == argmax_Y dot(get_weights(), PSI(x,Y))
                     Where PSI() is defined by the feature_extractor template
                     argument.  
         !*/
