@@ -201,6 +201,74 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename lhs_type, 
+        typename rhs_type
+        >
+    bool is_assignment_problem (
+        const std::vector<std::pair<std::vector<lhs_type>, std::vector<rhs_type> > >& samples,
+        const std::vector<std::vector<long> >& labels
+    )
+    {
+        std::vector<bool> seen_label;
+
+        if (is_learning_problem(samples, labels))
+        {
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                if (samples[i].first.size() != labels[i].size())
+                    return false;
+
+                seen_label.assign(samples[i].second.size(), false);
+
+                for (unsigned long j = 0; j < labels[i].size(); ++j)
+                {
+                    if (!(-1 <= labels[i][j] && labels[i][j] < (long)samples[i].second.size()))
+                        return false;
+
+                    if (labels[i][j] != -1)
+                    {
+                        // check label uniqueness
+                        if (seen_label[labels[i][j]])
+                            return false;
+
+                        seen_label[labels[i][j]] = true;
+                    }
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename lhs_type, 
+        typename rhs_type
+        >
+    bool is_forced_assignment_problem (
+        const std::vector<std::pair<std::vector<lhs_type>, std::vector<rhs_type> > >& samples,
+        const std::vector<std::vector<long> >& labels
+    )
+    {
+        if (is_assignment_problem(samples, labels))
+        {
+            for (unsigned long i = 0; i < samples.size(); ++i)
+            {
+                const unsigned long N = sum(vector_to_matrix(labels[i]) != -1);
+                if (std::min(samples[i].first.size(), samples[i].second.size()) != N)
+                    return false;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename trainer_type,
         typename in_sample_vector_type,
         typename in_scalar_vector_type

@@ -79,6 +79,55 @@ namespace dlib
                       its corresponding sample sequence)
     !*/
 
+    template <
+        typename lhs_type, 
+        typename rhs_type
+        >
+    bool is_assignment_problem (
+        const std::vector<std::pair<std::vector<lhs_type>, std::vector<rhs_type> > >& samples,
+        const std::vector<std::vector<long> >& labels
+    );
+    /*!
+        ensures
+            - Note that an assignment problem is a task to associate each element of samples[i].first
+              to an element of samples[i].second, or to indicate that the element doesn't associate 
+              with anything.  Therefore, labels[i] should contain the association information for
+              samples[i].
+            - This function returns true if all of the following are true and false otherwise:
+                - is_learning_problem(samples, labels) == true
+                - for all valid i:
+                    - samples[i].first.size() == labels[i].size()
+                    - for all valid j:
+                        -1 <= labels[i][j] < samples[i].second.size()
+                        (a value of -1 indicates that samples[i].first[j] isn't associated with anything,
+                        all other values indicate the associating element of samples[i].second)
+                    - All elements of labels[i] which are not equal to -1 are unique.  That is,
+                      multiple elements of samples[i].first can't associate to the same element
+                      in samples[i].second.
+    !*/
+
+    template <
+        typename lhs_type, 
+        typename rhs_type
+        >
+    bool is_forced_assignment_problem (
+        const std::vector<std::pair<std::vector<lhs_type>, std::vector<rhs_type> > >& samples,
+        const std::vector<std::vector<long> >& labels
+    );
+    /*!
+        ensures
+            - A regular assignment problem is allowed to indicate that all elements of 
+              samples[i].first don't associate to anything.  However, a forced assignment
+              problem is required to always associate an element of samples[i].first to 
+              something in samples[i].second if there is an element of samples[i].second
+              that hasn't already been associated to something.  
+            - This function returns true if all of the following are true and false otherwise:
+                - is_assignment_problem(samples, labels) == true
+                - for all valid i:
+                    - let N denote the number of elements in labels[i] that are not equal to -1.
+                    - min(samples[i].first.size(), samples[i].second.size()) == N
+    !*/
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
