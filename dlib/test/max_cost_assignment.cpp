@@ -146,6 +146,7 @@ namespace
                 test_hungarian<short>();
                 test_hungarian<int>();
                 test_hungarian<long>();
+                test_hungarian<int64>();
             }
         }
     } a;
