@@ -34,6 +34,11 @@ namespace dlib
                 from the entire input sequence x but only part of the label sequence y.
                 Each of these constituent feature vectors is defined by the get_features() 
                 method of this class.
+
+            THREAD SAFETY
+                Instances of this object should be thread safe, that is, it should 
+                be safe for multiple threads to make concurrent calls to the member 
+                functions of this object.
         !*/
 
     public:
