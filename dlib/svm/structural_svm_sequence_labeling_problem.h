@@ -159,8 +159,12 @@ namespace dlib
                 const matrix_exp<EXP>& node_states
             ) const
             {
-                // Note that it is intentional that we don't call fe.reject_labeling() here
-                // because doing so would break the structural svm optimizer. 
+                /* TODO, uncomment this and setup some input validation to catch when rejection 
+                    is used incorrectly. 
+                if (dlib::impl::call_reject_labeling_if_exists(fe, sequence,  node_states, node_id))
+                    return -std::numeric_limits<double>::infinity();
+                */
+
 
                 double loss = 0;
                 if (node_states(0) != label[node_id])
