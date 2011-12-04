@@ -27,7 +27,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for learning to do sequence labeling based
                 on a set of training data.  The training procedure produces a
-                sequence_labeler object which can be use to predict the labels of
+                sequence_labeler object which can be used to predict the labels of
                 new data sequences.
 
                 Note that this is just a convenience wrapper around the 
