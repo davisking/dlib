@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.44" date="Nov 21, 2011">
+New Stuff:
    - Machine Learning
       - Added the histogram intersection kernel for sparse and dense vectors.
       - Added a set of tools to allow a user to easily learn to do sequence
@@ -44,7 +57,7 @@ Bug fixes:
 
 Other:
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
