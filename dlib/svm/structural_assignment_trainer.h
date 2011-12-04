@@ -29,6 +29,8 @@ namespace dlib
 
         typedef assignment_function<feature_extractor> trained_function_type;
 
+        bool forces_assignment(
+        ) const { return false; } // TODO
 
         const assignment_function<feature_extractor> train (  
             const std::vector<sample_type>& x,

@@ -23,6 +23,28 @@ namespace dlib
         const std::vector<typename assignment_function::label_type>& labels
     )
     {
+        // make sure requires clause is not broken
+#ifdef ENABLE_ASSERTS
+        if (assigner.forces_assignment())
+        {
+            DLIB_ASSERT(is_forced_assignment_problem(samples, labels),
+                "\t double test_assignment_function()"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t is_forced_assignment_problem(samples,labels): " << is_forced_assignment_problem(samples,labels)
+                << "\n\t is_assignment_problem(samples,labels):        " << is_assignment_problem(samples,labels)
+                << "\n\t is_learning_problem(samples,labels):          " << is_learning_problem(samples,labels)
+                );
+        }
+        else
+        {
+            DLIB_ASSERT(is_assignment_problem(samples, labels),
+                "\t double test_assignment_function()"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t is_assignment_problem(samples,labels): " << is_assignment_problem(samples,labels)
+                << "\n\t is_learning_problem(samples,labels):   " << is_learning_problem(samples,labels)
+                );
+        }
+#endif
         double total_right = 0;
         double total = 0;
         for (unsigned long i = 0; i < samples.size(); ++i)
@@ -55,6 +77,37 @@ namespace dlib
         const long folds
     )
     {
+        // make sure requires clause is not broken
+#ifdef ENABLE_ASSERTS
+        if (trainer.forces_assignment())
+        {
+            DLIB_ASSERT(is_forced_assignment_problem(samples, labels) &&
+                        1 < folds && folds <= static_cast<long>(samples.size()),
+                "\t double cross_validate_assignment_trainer()"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t samples.size(): " << samples.size() 
+                << "\n\t folds:  " << folds 
+                << "\n\t is_forced_assignment_problem(samples,labels): " << is_forced_assignment_problem(samples,labels)
+                << "\n\t is_assignment_problem(samples,labels):        " << is_assignment_problem(samples,labels)
+                << "\n\t is_learning_problem(samples,labels):          " << is_learning_problem(samples,labels)
+                );
+        }
+        else
+        {
+            DLIB_ASSERT(is_assignment_problem(samples, labels) &&
+                        1 < folds && folds <= static_cast<long>(samples.size()),
+                "\t double cross_validate_assignment_trainer()"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t samples.size(): " << samples.size() 
+                << "\n\t folds:  " << folds 
+                << "\n\t is_assignment_problem(samples,labels): " << is_assignment_problem(samples,labels)
+                << "\n\t is_learning_problem(samples,labels):   " << is_learning_problem(samples,labels)
+                );
+        }
+#endif
+
+
+
         typedef typename trainer_type::sample_type sample_type;
         typedef typename trainer_type::label_type label_type;
 
