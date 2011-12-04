@@ -44,6 +44,14 @@
          <term file="ml.html" name="structural_svm_sequence_labeling_problem"/>
          <term file="ml.html" name="structural_sequence_labeling_trainer"/>
 
+         <term file="ml.html" name="is_forced_assignment_problem"/>
+         <term file="ml.html" name="is_assignment_problem"/>
+         <term file="ml.html" name="assignment_function"/>
+         <term file="ml.html" name="test_assignment_function"/>
+         <term file="ml.html" name="cross_validate_assignment_trainer"/>
+         <term file="ml.html" name="structural_svm_assignment_problem"/>
+         <term file="ml.html" name="structural_assignment_trainer"/>
+
          <term file="dlib/optimization/optimization_solve_qp2_using_smo_abstract.h.html" name="invalid_nu_error"/>
          <term file="dlib/optimization/optimization_solve_qp2_using_smo_abstract.h.html" name="maximum_nu"/>
 

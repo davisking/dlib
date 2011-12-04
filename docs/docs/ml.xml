@@ -97,14 +97,21 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <sub>
                <item>structural_svm_sequence_labeling_problem</item> 
                <item>structural_svm_object_detection_problem</item> 
+               <item>structural_svm_assignment_problem</item> 
             </sub>
          </item>
-         <item>structural_svm_problem</item> 
+         <item nolink="true">
+            <name>Core Tools</name>
+            <sub>
+               <item>structural_svm_problem</item> 
+               <item>structural_svm_problem_threaded</item> 
+               <item>svm_struct_controller_node</item> 
+               <item>svm_struct_processing_node</item> 
+            </sub>
+         </item>
          <item>structural_object_detection_trainer</item> 
          <item>structural_sequence_labeling_trainer</item> 
-         <item>structural_svm_problem_threaded</item> 
-         <item>svm_struct_controller_node</item> 
-         <item>svm_struct_processing_node</item> 
+         <item>structural_assignment_trainer</item> 
       </section>
       <section>
          <name>Unsupervised</name>
@@ -153,11 +160,13 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>cross_validate_multiclass_trainer</item> 
          <item>cross_validate_regression_trainer</item> 
          <item>cross_validate_sequence_labeler</item> 
+         <item>cross_validate_assignment_trainer</item> 
          <item>test_binary_decision_function</item> 
          <item>test_multiclass_decision_function</item> 
          <item>test_regression_function</item> 
          <item>test_object_detection_function</item> 
          <item>test_sequence_labeler</item>
+         <item>test_assignment_function</item>
       </section>
 
       <section>
@@ -203,6 +212,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>multiclass_linear_decision_function</item>
          <item>one_vs_all_decision_function</item>
          <item>sequence_labeler</item>
+         <item>assignment_function</item>
       </section>
 
       <section>
@@ -220,6 +230,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
          <item>is_sequence_labeling_problem</item> 
+         <item>is_assignment_problem</item> 
+         <item>is_forced_assignment_problem</item> 
          <item>approximate_distance_function</item> 
          <item>is_learning_problem</item> 
          <item>select_all_distinct_labels</item> 
@@ -1332,6 +1344,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>assignment_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/assignment_function_abstract.h</spec_file>
+         <description>
+                This object is a tool for solving the optimal assignment problem given a 
+                user defined method for computing the quality of any particular assignment. 
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>multiclass_linear_decision_function</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
@@ -1558,6 +1583,32 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <description>
             This function takes a set of training data for a sequence labeling problem
             and reports back if it could possibly be a well formed sequence labeling problem.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_assignment_problem</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+            This function takes a set of training data for an assignment problem
+            and reports back if it could possibly be a well formed assignment problem.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_forced_assignment_problem</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_abstract.h</spec_file>
+         <description>
+            This function takes a set of training data for a forced assignment problem
+            and reports back if it could possibly be a well formed forced assignment problem.
          </description>
                                  
       </component>
@@ -2115,6 +2166,20 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>cross_validate_assignment_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_assignment_trainer_abstract.h</spec_file>
+         <description>
+            Performs k-fold cross validation on a user supplied assignment trainer object such
+            as the <a href="#structural_assignment_trainer">structural_assignment_trainer</a>
+            and returns the fraction of assignments predicted correctly.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>test_sequence_labeler</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/cross_validate_sequence_labeler_abstract.h</spec_file>
@@ -2125,6 +2190,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>sequence_labeler_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>test_assignment_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_assignment_trainer_abstract.h</spec_file>
+         <description>
+            Tests an <a href="#assignment_function">assignment_function</a> on a set of data 
+            and returns the fraction of assignments predicted correctly.
+         </description>
                                  
       </component>
       
@@ -2292,6 +2370,21 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>structural_svm_assignment_problem</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_assignment_problem_abstract.h</spec_file>
+         <description>
+                This object is a tool for learning the weight vector needed to use
+                an <a href="#assignment_function">assignment_function</a> object.  
+                It learns the parameter vector by 
+                formulating the problem as a <a href="#structural_svm_problem">structural SVM problem</a>.  
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>structural_object_detection_trainer</name>
          <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/structural_object_detection_trainer_abstract.h</spec_file>
@@ -2332,6 +2425,25 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>sequence_labeler_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>structural_assignment_trainer</name>
+         <file>dlib/svm_threaded.h</file>
+         <spec_file link="true">dlib/svm/structural_assignment_trainer_abstract.h</spec_file>
+         <description>
+                This object is a tool for learning to solve the assignment problem based
+                on a set of training data.  The training procedure produces an 
+                <a href="#assignment_function">assignment_function</a> object 
+                which can be used to predict the assignments of new data.
+
+                Note that this is just a convenience wrapper around the 
+                <a href="#structural_svm_assignment_problem">structural_svm_assignment_problem</a> 
+                to make it look similar to all the other trainers in dlib.  
+         </description>
                                  
       </component>
       
