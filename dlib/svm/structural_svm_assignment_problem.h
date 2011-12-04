@@ -6,7 +6,6 @@
 
 #include "structural_svm_assignment_problem_abstract.h"
 #include "../matrix.h"
-#include "assignment_function.h"
 #include <vector>
 #include "structural_svm_problem_threaded.h"
 
@@ -46,6 +45,31 @@ namespace dlib
             fe(fe_),
             force_assignment(force_assignment_)
         {
+            // make sure requires clause is not broken
+#ifdef ENABLE_ASSERTS
+            if (force_assignment)
+            {
+                DLIB_ASSERT(is_forced_assignment_problem(samples, labels),
+                            "\t structural_svm_assignment_problem::structural_svm_assignment_problem()"
+                            << "\n\t invalid inputs were given to this function"
+                            << "\n\t is_forced_assignment_problem(samples,labels): " << is_forced_assignment_problem(samples,labels)
+                            << "\n\t is_assignment_problem(samples,labels):        " << is_assignment_problem(samples,labels)
+                            << "\n\t is_learning_problem(samples,labels):          " << is_learning_problem(samples,labels)
+                            << "\n\t this: " << this
+                            );
+            }
+            else
+            {
+                DLIB_ASSERT(is_assignment_problem(samples, labels),
+                            "\t structural_svm_assignment_problem::structural_svm_assignment_problem()"
+                            << "\n\t invalid inputs were given to this function"
+                            << "\n\t is_assignment_problem(samples,labels): " << is_assignment_problem(samples,labels)
+                            << "\n\t is_learning_problem(samples,labels):   " << is_learning_problem(samples,labels)
+                            << "\n\t this: " << this
+                            );
+            }
+#endif
+
         }
 
     private:
