@@ -103,13 +103,6 @@ namespace dlib
             const std::vector<lhs_element>& lhs,
             const std::vector<rhs_element>& rhs 
         ) const
-        /*!
-            ensures
-                - returns a vector A such that:
-                    - A.size() == lhs.size()
-                    - if (A[i] != -1) then
-                        - lhs[i] is predicted to associate to rhs[A[i]]
-        !*/
         {
             using dlib::sparse_vector::dot;
             using dlib::dot;
