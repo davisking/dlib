@@ -57,7 +57,7 @@ namespace dlib
                   given labels.  In particular, it attempts to learn to predict labels[i] 
                   based on samples[i].  Or in other words, this object can be used to learn 
                   a parameter vector, w, such that an assignment_function declared as:
-                    assignment_function<feature_extractor> assigner(fe,w,force_assignment)
+                    assignment_function<feature_extractor> assigner(w,fe,force_assignment)
                   results in an assigner object which attempts to compute the following mapping:
                     labels[i] == labeler(samples[i])
                 - This object will use num_threads threads during the optimization 

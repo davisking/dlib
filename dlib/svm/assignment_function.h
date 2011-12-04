@@ -54,8 +54,8 @@ namespace dlib
         }
 
         assignment_function(
-            const feature_extractor& fe_,
-            const matrix<double,0,1>& weights_
+            const matrix<double,0,1>& weights_,
+            const feature_extractor& fe_
         ) :
             fe(fe_),
             weights(weights_),
@@ -63,7 +63,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(fe_.num_features() == static_cast<unsigned long>(weights_.size()),
-                "\t assignment_function::assignment_function(fe_,weights_)"
+                "\t assignment_function::assignment_function(weights_,fe_)"
                 << "\n\t These sizes should match"
                 << "\n\t fe_.num_features(): " << fe_.num_features() 
                 << "\n\t weights_.size():    " << weights_.size() 
@@ -72,8 +72,8 @@ namespace dlib
         }
 
         assignment_function(
-            const feature_extractor& fe_,
             const matrix<double,0,1>& weights_,
+            const feature_extractor& fe_,
             bool force_assignment_
         ) :
             fe(fe_),
@@ -82,7 +82,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(fe_.num_features() == static_cast<unsigned long>(weights_.size()),
-                "\t assignment_function::assignment_function(fe_,weights_,force_assignment_)"
+                "\t assignment_function::assignment_function(weights_,fe_,force_assignment_)"
                 << "\n\t These sizes should match"
                 << "\n\t fe_.num_features(): " << fe_.num_features() 
                 << "\n\t weights_.size():    " << weights_.size() 
@@ -209,7 +209,7 @@ namespace dlib
         deserialize(weights, in);
         deserialize(force_assignment, in);
 
-        item = assignment_function<feature_extractor>(fe, weights, force_assignment);
+        item = assignment_function<feature_extractor>(weights, fe, force_assignment);
     }
 
 // ----------------------------------------------------------------------------------------

@@ -161,8 +161,8 @@ namespace dlib
         !*/
 
         assignment_function(
-            const feature_extractor& fe,
-            const matrix<double,0,1>& weights
+            const matrix<double,0,1>& weights,
+            const feature_extractor& fe
         );
         /*!
             requires
@@ -174,8 +174,8 @@ namespace dlib
         !*/
 
         assignment_function(
-            const feature_extractor& fe,
             const matrix<double,0,1>& weights,
+            const feature_extractor& fe,
             bool force_assignment
         );
         /*!

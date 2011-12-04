@@ -202,15 +202,15 @@ namespace dlib
         }
 
         sequence_labeler(
-            const feature_extractor& fe_,
-            const matrix<double,0,1>& weights_
+            const matrix<double,0,1>& weights_,
+            const feature_extractor& fe_
         ) :
             fe(fe_),
             weights(weights_)
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(fe_.num_features() == static_cast<unsigned long>(weights_.size()),
-                "\t sequence_labeler::sequence_labeler(fe_,weights_)"
+                "\t sequence_labeler::sequence_labeler(weights_,fe_)"
                 << "\n\t These sizes should match"
                 << "\n\t fe_.num_features(): " << fe_.num_features() 
                 << "\n\t weights_.size():    " << weights_.size() 
@@ -294,7 +294,7 @@ namespace dlib
         deserialize(fe, in);
         deserialize(weights, in);
 
-        item = sequence_labeler<feature_extractor>(fe, weights);
+        item = sequence_labeler<feature_extractor>(weights, fe);
     }
 
 // ----------------------------------------------------------------------------------------

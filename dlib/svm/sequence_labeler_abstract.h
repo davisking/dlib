@@ -221,8 +221,8 @@ namespace dlib
         !*/
 
         sequence_labeler(
-            const feature_extractor& fe,
-            const matrix<double,0,1>& weights
+            const matrix<double,0,1>& weights,
+            const feature_extractor& fe
         ); 
         /*!
             requires

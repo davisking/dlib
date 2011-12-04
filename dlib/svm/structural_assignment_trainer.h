@@ -185,7 +185,7 @@ namespace dlib
 
             solver(prob, weights);
 
-            return assignment_function<feature_extractor>(fe,weights,force_assignment);
+            return assignment_function<feature_extractor>(weights,fe,force_assignment);
 
         }
 

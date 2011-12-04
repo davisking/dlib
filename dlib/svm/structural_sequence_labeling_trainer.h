@@ -182,7 +182,7 @@ namespace dlib
             prob.set_max_cache_size(max_cache_size);
             solver(prob, weights);
 
-            return sequence_labeler<feature_extractor>(fe,weights);
+            return sequence_labeler<feature_extractor>(weights,fe);
         }
 
     private:
