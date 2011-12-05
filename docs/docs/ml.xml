@@ -2435,10 +2435,11 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/structural_assignment_trainer_abstract.h</spec_file>
          <description>
-                This object is a tool for learning to solve the assignment problem based
-                on a set of training data.  The training procedure produces an 
-                <a href="#assignment_function">assignment_function</a> object 
-                which can be used to predict the assignments of new data.
+                This object is a tool for learning to solve an assignment problem based
+                on a training dataset of example assignments.  The training procedure produces an 
+                <a href="#assignment_function">assignment_function</a> object which can be used 
+                to predict the assignments of new data.
+
 
                 Note that this is just a convenience wrapper around the 
                 <a href="#structural_svm_assignment_problem">structural_svm_assignment_problem</a> 
