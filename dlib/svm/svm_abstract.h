@@ -99,8 +99,8 @@ namespace dlib
                     - samples[i].first.size() == labels[i].size()
                     - for all valid j:
                         -1 <= labels[i][j] < samples[i].second.size()
-                        (a value of -1 indicates that samples[i].first[j] isn't associated with anything,
-                        all other values indicate the associating element of samples[i].second)
+                        (A value of -1 indicates that samples[i].first[j] isn't associated with anything.
+                        All other values indicate the associating element of samples[i].second)
                     - All elements of labels[i] which are not equal to -1 are unique.  That is,
                       multiple elements of samples[i].first can't associate to the same element
                       in samples[i].second.

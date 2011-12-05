@@ -122,7 +122,7 @@ namespace dlib
                 m() is allowed to indicate that l doesn't map to anything, and in this 
                 case it is excluded from the sum.    
 
-                Finally, match_score() must be of the form: 
+                Finally, this object supports match_score() functions of the form: 
                     match_score(l,r) == dot(w, PSI(l,r))
                 where l is an element of LHS, r is an element of RHS, w is a parameter 
                 vector, and PSI() is defined by the feature_extractor template argument.  
@@ -211,15 +211,15 @@ namespace dlib
                 - When deciding how to match LHS to RHS, this object can operate in one of 
                   two modes.  In the default mode, this object will indicate that there is 
                   no match for an element of LHS if the best matching element of RHS would 
-                  result in a negative match_score().  However, in the "forced assignment mode", 
+                  result in a negative match_score().  However, in the "forced assignment mode",
                   this object will always make the assignment if there is an available 
-                  element in RHS regardless of the match_score().
+                  element in RHS, regardless of the match_score().
 
                   Another way to understand this distinction is to consider an example.  
-                  Suppose LHS and RHS both have 10 elements in them.  Then in the default
-                  mode, it is possible for this object to indicate that there are anywhere
-                  from 0 to 10 matches between LHS and RHS.  However, in forced assignment
-                  mode it will always indicate exactly 10 matches.   
+                  Suppose LHS and RHS both contain 10 elements.  Then in the default mode, 
+                  it is possible for this object to indicate that there are anywhere between 
+                  0 to 10 matches between LHS and RHS.  However, in forced assignment mode 
+                  it will always indicate exactly 10 matches.   
         !*/
 
         result_type operator()(
@@ -234,6 +234,9 @@ namespace dlib
                         - lhs[i] is predicted to associate to rhs[ASSIGN[i]].
                     - else
                         - lhs[i] doesn't associate with anything in rhs.
+                    - All values in ASSIGN which are not equal to -1 are unique.  
+                      That is, ASSIGN will never indicate that more than one element
+                      of lhs is assigned to a particular element of rhs.
         !*/
 
         result_type operator() (
