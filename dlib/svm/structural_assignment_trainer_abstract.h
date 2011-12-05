@@ -24,8 +24,8 @@ namespace dlib
                 the example_feature_extractor defined in dlib/svm/assignment_function_abstract.h.
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool for learning to solve the assignment problem based
-                on a set of training data.  The training procedure produces an 
+                This object is a tool for learning to solve an assignment problem based
+                on a training dataset of example assignments.  The training procedure produces an 
                 assignment_function object which can be used to predict the assignments of
                 new data.
 
