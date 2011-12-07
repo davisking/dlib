@@ -99,13 +99,16 @@ namespace dlib
         bool forces_assignment (
         ) const { return force_assignment; }
 
-        result_type operator()(
+        void predict_assignments (
             const std::vector<lhs_element>& lhs,
-            const std::vector<rhs_element>& rhs 
+            const std::vector<rhs_element>& rhs,
+            result_type& assignment
         ) const
         {
             using dlib::sparse_vector::dot;
             using dlib::dot;
+
+            assignment.clear();
 
             matrix<double> cost;
             unsigned long size;
@@ -139,7 +142,6 @@ namespace dlib
                 }
             }
 
-            std::vector<long> assignment;
 
             if (cost.size() != 0)
             {
@@ -157,8 +159,24 @@ namespace dlib
                 if (assignment[i] >= (long)rhs.size())
                     assignment[i] = -1;
             }
+        }
 
-            return assignment;
+        void predict_assignments (
+            const sample_type& item,
+            result_type& assignment
+        ) const
+        {
+            predict_assignments(item.first, item.second, assignment);
+        }
+
+        result_type operator()(
+            const std::vector<lhs_element>& lhs,
+            const std::vector<rhs_element>& rhs 
+        ) const
+        {
+            result_type temp;
+            predict_assignments(lhs,rhs,temp);
+            return temp;
         }
 
         result_type operator() (

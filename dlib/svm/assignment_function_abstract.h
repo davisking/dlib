@@ -247,6 +247,24 @@ namespace dlib
                 - returns (*this)(item.first, item.second);
         !*/
 
+        void predict_assignments (
+            const sample_type& item,
+            result_type& assignment
+        ) const;
+        /*!
+            ensures
+                - #assignment == (*this)(item)
+        !*/
+
+        void predict_assignments (
+            const std::vector<lhs_element>& lhs,
+            const std::vector<rhs_element>& rhs 
+            result_type& assignment
+        ) const;
+        /*!
+            ensures
+                - #assignment == (*this)(lhs,rhs)
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
