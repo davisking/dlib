@@ -29,6 +29,7 @@ SRC += any.cpp
 SRC += any_function.cpp
 SRC += array2d.cpp
 SRC += array.cpp
+SRC += assignment_learning.cpp
 SRC += base64.cpp
 SRC += bayes_nets.cpp
 SRC += bigint.cpp

@@ -14,6 +14,7 @@ set (tests
    any_function.cpp
    array2d.cpp
    array.cpp
+   assignment_learning.cpp
    base64.cpp
    bayes_nets.cpp
    bigint.cpp
