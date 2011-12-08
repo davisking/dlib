@@ -138,7 +138,10 @@ public:
                 set_feature(55,1);
               Therefore, the first argument to set_feature is the index of the feature 
               to be set while the second argument is the value the feature should take.
-            - This function only calls set_feature() once for each feature index.
+              Additionally, note that calling set_feature() multiple times with the same 
+              feature index does NOT overwrite the old value, it adds to the previous 
+              value.  For example, if you call set_feature(55) 3 times then it will
+              result in feature 55 having a value of 3.
             - This function only calls set_feature() with feature_index values < num_features()
     !*/
     {
