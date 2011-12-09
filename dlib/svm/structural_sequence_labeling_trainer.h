@@ -143,11 +143,14 @@ namespace dlib
         {
 
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_sequence_labeling_problem(x,y) == true,
+            DLIB_ASSERT(is_sequence_labeling_problem(x,y) == true &&
+                        contains_invalid_labeling(get_feature_extractor(), x, y) == false,
                         "\t sequence_labeler structural_sequence_labeling_trainer::train(x,y)"
                         << "\n\t invalid inputs were given to this function"
                         << "\n\t x.size(): " << x.size() 
                         << "\n\t is_sequence_labeling_problem(x,y): " << is_sequence_labeling_problem(x,y)
+                        << "\n\t contains_invalid_labeling(get_feature_extractor(),x,y): " << contains_invalid_labeling(get_feature_extractor(),x,y)
+                        << "\n\t this: " << this
             );
 
 #ifdef ENABLE_ASSERTS

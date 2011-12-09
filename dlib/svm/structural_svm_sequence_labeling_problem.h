@@ -85,11 +85,13 @@ namespace dlib
             fe(fe_)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_sequence_labeling_problem(samples,labels) == true,
+            DLIB_ASSERT(is_sequence_labeling_problem(samples,labels) == true &&
+                        contains_invalid_labeling(fe, samples, labels) == false,
                         "\t structural_svm_sequence_labeling_problem::structural_svm_sequence_labeling_problem()"
                         << "\n\t invalid inputs were given to this function"
                         << "\n\t samples.size(): " << samples.size() 
                         << "\n\t is_sequence_labeling_problem(samples,labels): " << is_sequence_labeling_problem(samples,labels)
+                        << "\n\t contains_invalid_labeling(fe,samples,labels): " << contains_invalid_labeling(fe,samples,labels)
                         << "\n\t this: " << this
                         );
 
@@ -187,12 +189,8 @@ namespace dlib
                 const matrix_exp<EXP>& node_states
             ) const
             {
-                /* TODO, uncomment this and setup some input validation to catch when rejection 
-                    is used incorrectly. 
                 if (dlib::impl::call_reject_labeling_if_exists(fe, sequence,  node_states, node_id))
                     return -std::numeric_limits<double>::infinity();
-                */
-
 
                 double loss = 0;
                 if (node_states(0) != label[node_id])

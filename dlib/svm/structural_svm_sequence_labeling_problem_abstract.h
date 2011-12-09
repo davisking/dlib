@@ -50,7 +50,8 @@ namespace dlib
         );
         /*!
             requires
-                - is_sequence_labeling_problem(samples, labels)
+                - is_sequence_labeling_problem(samples, labels) == true
+                - contains_invalid_labeling(fe, samples, labels) == false
                 - for all valid i and j: labels[i][j] < fe.num_labels()
             ensures
                 - This object attempts to learn a mapping from the given samples to the 

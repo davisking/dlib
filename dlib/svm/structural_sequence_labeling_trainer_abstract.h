@@ -197,7 +197,8 @@ namespace dlib
         ) const;
         /*!
             requires
-                - is_sequence_labeling_problem(x, y)
+                - is_sequence_labeling_problem(x, y) == true
+                - contains_invalid_labeling(get_feature_extractor(), x, y) == false
                 - for all valid i and j: y[i][j] < num_labels()
             ensures
                 - Uses the structural_svm_sequence_labeling_problem to train a 
