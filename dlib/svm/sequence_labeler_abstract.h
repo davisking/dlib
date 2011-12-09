@@ -168,6 +168,51 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename feature_extractor 
+        >
+    bool contains_invalid_labeling (
+        const feature_extractor& fe,
+        const std::vector<typename feature_extractor::sample_type>& x,
+        const std::vector<unsigned long>& y
+    );
+    /*!
+        requires
+            - feature_extractor must be an object that implements an interface compatible 
+              with the example_feature_extractor discussed above.
+        ensures
+            - if (x.size() != y.size() ||
+                fe.reject_labeling() rejects any of the labels in y) then
+                - returns true
+            - else
+                - returns false
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename feature_extractor 
+        >
+    bool contains_invalid_labeling (
+        const feature_extractor& fe,
+        const std::vector<std::vector<typename feature_extractor::sample_type> >& x,
+        const std::vector<std::vector<unsigned long> >& y
+    );
+    /*!
+        requires
+            - feature_extractor must be an object that implements an interface compatible 
+              with the example_feature_extractor discussed above.
+        ensures
+            - if (x.size() != y.size() ||
+                contains_invalid_labeling(fe,x[i],y[i]) == true for some i ) then
+                - returns true
+            - else
+                - returns false
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename feature_extractor
         >
     class sequence_labeler

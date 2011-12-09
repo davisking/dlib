@@ -123,7 +123,76 @@ namespace dlib
         }
     }
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
+    template <
+        typename feature_extractor 
+        >
+    typename enable_if<dlib::impl::has_reject_labeling<feature_extractor>,bool>::type contains_invalid_labeling (
+        const feature_extractor& fe,
+        const std::vector<typename feature_extractor::sample_type>& x,
+        const std::vector<unsigned long>& y
+    )
+    {
+        if (x.size() != y.size())
+            return true;
+
+        matrix<unsigned long,0,1> node_states;
+
+        for (unsigned long i = 0; i < x.size(); ++i)
+        {
+            node_states.set_size(std::min(fe.order(),i) + 1);
+            for (unsigned long j = 0; j < node_states.size(); ++j)
+                node_states(j) = y[i-j];
+
+            if (fe.reject_labeling(x, node_states, i))
+                return true;
+        }
+
+        return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename feature_extractor 
+        >
+    typename disable_if<dlib::impl::has_reject_labeling<feature_extractor>,bool>::type contains_invalid_labeling (
+        const feature_extractor& ,
+        const std::vector<typename feature_extractor::sample_type>& x,
+        const std::vector<unsigned long>& y 
+    )
+    {
+        if (x.size() != y.size())
+            return true;
+
+        return false;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename feature_extractor 
+        >
+    bool contains_invalid_labeling (
+        const feature_extractor& fe,
+        const std::vector<std::vector<typename feature_extractor::sample_type> >& x,
+        const std::vector<std::vector<unsigned long> >& y
+    )
+    {
+        if (x.size() != y.size())
+            return true;
+
+        for (unsigned long i = 0; i < x.size(); ++i)
+        {
+            if (contains_invalid_labeling(fe,x[i],y[i]))
+                return true;
+        }
+        return false;
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
