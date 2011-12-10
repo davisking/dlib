@@ -333,6 +333,8 @@ namespace dlib
             if (table.is_in_domain(a))
             {
                 table[a] += p;
+                if (table[a] > 1.0)
+                    table[a] = 1.0;
             }
             else
             {

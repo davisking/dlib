@@ -294,7 +294,8 @@ namespace dlib
                     - #size() == size() + 1
                     - #probability(a) == p
                 - else
-                    - #probability(a) == probability(a) + p
+                    - #probability(a) == min(probability(a) + p, 1.0)
+                      (i.e. does a saturating add)
                 - #has_entry_for(a) == true
         !*/
 
