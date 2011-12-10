@@ -268,6 +268,8 @@ namespace
     template <typename fe_type>
     void do_test()
     {
+        called_rejct_labeling = false;
+
         matrix<double> transition_probabilities(num_label_states, num_label_states);
         transition_probabilities = 0.05, 0.90, 0.05,
         0.05, 0.05, 0.90,
