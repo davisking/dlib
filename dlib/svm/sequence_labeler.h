@@ -143,7 +143,7 @@ namespace dlib
         for (unsigned long i = 0; i < x.size(); ++i)
         {
             node_states.set_size(std::min(fe.order(),i) + 1);
-            for (unsigned long j = 0; j < node_states.size(); ++j)
+            for (unsigned long j = 0; j < (unsigned long)node_states.size(); ++j)
                 node_states(j) = y[i-j];
 
             if (fe.reject_labeling(x, node_states, i))
