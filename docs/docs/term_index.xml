@@ -41,6 +41,7 @@
          <term file="ml.html" name="svm_struct_controller_node"/>
          <term file="ml.html" name="svm_struct_processing_node"/>
          <term file="ml.html" name="sequence_labeler"/>
+         <term file="dlib/svm/sequence_labeler_abstract.h.html" name="contains_invalid_labeling"/>
          <term file="ml.html" name="structural_svm_sequence_labeling_problem"/>
          <term file="ml.html" name="structural_sequence_labeling_trainer"/>
 
