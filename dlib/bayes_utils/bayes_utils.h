@@ -293,8 +293,8 @@ namespace dlib
             DLIB_ASSERT(0.0 <= p && p <= 1.0,
                         "\tvoid& joint_probability_table::set_probability(a,p)"
                         << "\n\tyou have given an invalid probability value"
-                        << "\n\ttp:   " << p 
-                        << "\n\tta:   " << a 
+                        << "\n\tp:    " << p 
+                        << "\n\ta:    " << a 
                         << "\n\tthis: " << this
             );
 
@@ -325,8 +325,8 @@ namespace dlib
             DLIB_ASSERT(0.0 <= p && p <= 1.0,
                         "\tvoid& joint_probability_table::add_probability(a,p)"
                         << "\n\tyou have given an invalid probability value"
-                        << "\n\ttp:   " << p 
-                        << "\n\tta:   " << a 
+                        << "\n\tp:    " << p 
+                        << "\n\ta:    " << a 
                         << "\n\tthis: " << this
             );
 
@@ -568,7 +568,7 @@ namespace dlib
             // make sure requires clause is not broken
             DLIB_ASSERT( value < num_values() && has_entry_for(value,ps) ,
                          "\tvoid conditional_probability_table::probability()"
-                         << "\n\tinvalid arguments to set_probability"
+                         << "\n\tinvalid arguments to probability"
                          << "\n\tvalue:        " << value 
                          << "\n\tnum_values(): " << num_values() 
                          << "\n\tps:           " << ps 
