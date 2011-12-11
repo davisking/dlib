@@ -226,8 +226,8 @@ void make_data (
     std::vector<column_vector> rhs;
     label_type mapping;
 
-    // In all the assignments to follow, we will only say an element of LHS 
-    // matches an element of RHS if the two are equal.  So A matches with A, 
+    // In all the assignments to follow, we will only say an element of the LHS 
+    // matches an element of the RHS if the two are equal.  So A matches with A, 
     // B with B, etc.  But never A with C, for example.
     // ------------------------
 
