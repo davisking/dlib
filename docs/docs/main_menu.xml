@@ -116,6 +116,10 @@
             <name>Examples</name>
             <sub>
                <item>
+                  <name>Assignment_Learning</name>
+                  <link>assignment_learning_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Sequence_Labeling</name>
                   <link>sequence_labeler_ex.cpp.html</link>
                </item>

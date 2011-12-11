@@ -1351,6 +1351,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 This object is a tool for solving the optimal assignment problem given a 
                 user defined method for computing the quality of any particular assignment. 
          </description>
+         <examples>
+            <example>assignment_learning_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -2174,6 +2177,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             as the <a href="#structural_assignment_trainer">structural_assignment_trainer</a>
             and returns the fraction of assignments predicted correctly.
          </description>
+         <examples>
+            <example>assignment_learning_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -2203,6 +2209,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             Tests an <a href="#assignment_function">assignment_function</a> on a set of data 
             and returns the fraction of assignments predicted correctly.
          </description>
+         <examples>
+            <example>assignment_learning_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -2445,6 +2454,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 <a href="#structural_svm_assignment_problem">structural_svm_assignment_problem</a> 
                 to make it look similar to all the other trainers in dlib.  
          </description>
+         <examples>
+            <example>assignment_learning_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
