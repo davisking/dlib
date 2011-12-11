@@ -7,6 +7,7 @@
 #include "structural_svm_assignment_problem_abstract.h"
 #include "../matrix.h"
 #include <vector>
+#include <iterator>
 #include "structural_svm_problem_threaded.h"
 
 // ----------------------------------------------------------------------------------------

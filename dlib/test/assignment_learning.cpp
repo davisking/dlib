@@ -11,6 +11,9 @@
 #include <dlib/rand.h>
 
 
+typedef dlib::matrix<double,3,1> lhs_element;
+typedef dlib::matrix<double,3,1> rhs_element;
+
 namespace  
 {
     using namespace test;
@@ -21,8 +24,6 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    typedef matrix<double,3,1> lhs_element;
-    typedef matrix<double,3,1> rhs_element;
 
 // ----------------------------------------------------------------------------------------
 
