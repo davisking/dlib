@@ -134,6 +134,9 @@
                   <li>A <a href="ml.html#svm_multiclass_linear_trainer">Multiclass SVM</a></li>
                   <li>A tool for solving the optimization problem associated with 
                      <a href="ml.html#structural_svm_problem">structural support vector machines</a>. </li> 
+                  <li>Structural SVM tools for <a href="ml.html#structural_sequence_labeling_trainer">sequence labeling</a> </li>  
+                  <li>Structural SVM tools for solving <a href="ml.html#structural_assignment_trainer">assignment problems</a> </li>  
+                  <li>Structural SVM tools for <a href="ml.html#structural_object_detection_trainer">object detection</a> in images </li>  
                   <li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li>
                   <li>An online <a href="ml.html#svm_pegasos">SVM classification</a> algorithm</li>
                   <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector</li> and
@@ -141,7 +144,6 @@
                   <li>A kernelized <a href="ml.html#kkmeans">k-means</a> clustering algorithm</li>
                   <li><a href="ml.html#rbf_network_trainer">Radial Basis Function Networks</a></li>
                   <li><a href="ml.html#mlp">Multi layer perceptrons</a> </li>  
-                  <li>Tools for <a href="ml.html#sequence_labeler">sequence labeling</a> </li>  
                </ul>
             </li>
 
