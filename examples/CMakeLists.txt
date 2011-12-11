@@ -35,6 +35,7 @@ ENDMACRO()
 
 
 #here we apply our macros 
+add_example(assignment_learning_ex)
 add_example(bayes_net_ex)
 add_example(bayes_net_from_disk_ex)
 add_example(bayes_net_gui_ex)
