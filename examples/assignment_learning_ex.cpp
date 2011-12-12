@@ -14,7 +14,7 @@
    
     The assignment problem can be optimally solved using the well known Hungarian 
     algorithm.  However, this algorithm requires the user to supply some function 
-    which measure the "goodness" of an individual association.  In many cases the 
+    which measures the "goodness" of an individual association.  In many cases the 
     best way to measure this goodness isn't obvious and therefore machine learning 
     methods are used.  
     
@@ -38,8 +38,8 @@ using namespace dlib;
     In an association problem, we will talk about the "Left Hand Set" (LHS) and the
     "Right Hand Set" (RHS).  The task will be to learn to map all elements of LHS to 
     unique elements of RHS.  If an element of LHS can't be mapped to a unique element of 
-    RHS for any reason (e.g. LHS is bigger than RHS) then it can also be mapped to the 
-    special -1 output indicating no mapping.
+    RHS for some reason (e.g. LHS is bigger than RHS) then it can also be mapped to the 
+    special -1 output, indicating no mapping to RHS.
 
     So the first step is to define the type of elements in each of these sets.  In the
     code below we will use column vectors in both LHS and RHS.  However, in general,
@@ -181,7 +181,7 @@ int main()
             cout << "predicted labels: " << trans(vector_to_matrix(predicted_assignments)) << endl;
         }
 
-        // We can also call this tool to compute the percentage of assignments predicted correctly.
+        // We can also use this tool to compute the percentage of assignments predicted correctly.
         cout << "training accuracy: " << test_assignment_function(assigner, samples, labels) << endl;
 
 
