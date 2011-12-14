@@ -14,6 +14,36 @@ namespace dlib
 
     template <
         typename dest_image_type,
+        typename src_pixel_type
+        >
+    typename enable_if<is_matrix<dest_image_type> >::type impl_assign_single_pixel (
+        dest_image_type& img,
+        long r,
+        long c,
+        const src_pixel_type& pix
+    )
+    {
+        assign_pixel(img(r,c), pix);
+    }
+
+    template <
+        typename dest_image_type,
+        typename src_pixel_type
+        >
+    typename disable_if<is_matrix<dest_image_type> >::type impl_assign_single_pixel (
+        dest_image_type& img,
+        long r,
+        long c,
+        const src_pixel_type& pix
+    )
+    {
+        assign_pixel(img[r][c], pix);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename dest_image_type,
         typename src_image_type
         >
     void impl_assign_image (
@@ -27,7 +57,7 @@ namespace dlib
         {
             for (long c = 0; c < src.nc(); ++c)
             {
-                assign_pixel(dest[r][c], src(r,c));
+                impl_assign_single_pixel(dest,r,c, src(r,c));
             }
         }
     }
@@ -82,7 +112,7 @@ namespace dlib
 
         if (src.size() == 1)
         {
-            assign_pixel(dest[0][0], src(0,0));
+            impl_assign_single_pixel(dest,0,0, src(0,0));
             return;
         }
 
@@ -126,7 +156,7 @@ namespace dlib
             {
                 const double val = get_pixel_intensity(src(r,c)) - lower;
 
-                assign_pixel(dest[r][c], scale*val + dest_min);
+                impl_assign_single_pixel(dest,r,c, scale*val + dest_min);
             }
         }
     }
