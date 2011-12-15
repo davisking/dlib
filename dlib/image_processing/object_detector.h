@@ -209,7 +209,7 @@ namespace dlib
             scanner.load(img);
             scanner.detect(w, dets, thresh);
 
-            for (unsigned long i = 0; i < dets.size() && final_dets.size() < 100; ++i)
+            for (unsigned long i = 0; i < dets.size(); ++i)
             {
                 if (overlaps_any_box(final_dets, dets[i].second))
                     continue;
