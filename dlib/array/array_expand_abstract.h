@@ -37,10 +37,10 @@ namespace dlib
                 ensures
                     - #size() == new_size
                     - #max_size() == max(new_size,max_size())
-                    - for all i < size():
+                    - for all i < size() && i < new_size:
                         - #(*this)[i] == (*this)[i]
-                          (i.e. all the original elements of *this are still present
-                          and at their same positions.)
+                          (i.e. All the original elements of *this which were at index
+                          values less than new_size are unmodified.)
                     - for all valid i >= size():
                         - #(*this)[i] has an undefined value
                           (i.e. any new elements of the array have an undefined value)
