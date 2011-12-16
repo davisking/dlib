@@ -15,13 +15,22 @@ namespace dlib
     {
         struct box
         {
-            box() : head(-0xFFFF,-0xFFFF) {}
+            box(
+            ) : 
+                head(-0xFFFF,-0xFFFF), 
+                difficult(false),
+                truncated(false),
+                occluded(false)
+            {}
 
             rectangle rect;
 
             // optional fields
             std::string label;
             point head; // a value of (-0xFFFF,-0xFFFF) indicates the field not supplied
+            bool difficult;
+            bool truncated;
+            bool occluded;
 
             bool has_head() const { return head != point(-0xFFFF,-0xFFFF); }
             bool has_label() const { return label.size() != 0; }

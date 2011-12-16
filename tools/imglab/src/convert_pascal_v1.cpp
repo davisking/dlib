@@ -76,9 +76,9 @@ namespace
                 }
                 else if (words.size() > 4 && (words[2] == "for" || words[2] == "on") && words[3] == "object")
                 {
-                    int idx = sa = words[4];
+                    long idx = sa = words[4];
                     --idx;
-                    if (idx >= img.boxes.size())
+                    if (idx >= (long)img.boxes.size())
                         throw dlib::error("Invalid object id number of " + words[4]);
 
                     if (words[0] == "Center" && words[1] == "point" && words.size() > 9)

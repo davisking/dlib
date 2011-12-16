@@ -49,9 +49,9 @@ namespace
         }
 
         virtual void start_element ( 
-            const unsigned long line_number,
+            const unsigned long ,
             const std::string& name,
-            const dlib::attribute_list& atts
+            const dlib::attribute_list& 
         )
         {
             if (ts.size() == 0 && name != "annotation") 
@@ -66,7 +66,7 @@ namespace
         }
 
         virtual void end_element ( 
-            const unsigned long line_number,
+            const unsigned long ,
             const std::string& name
         )
         {
@@ -105,6 +105,39 @@ namespace
                 else if (ts.back() == "name" && ts[ts.size()-2] == "object")
                 {
                     temp_box.label = trim(data);
+                }
+                else if (ts.back() == "difficult" && ts[ts.size()-2] == "object")
+                {
+                    if (trim(data) == "0" || trim(data) == "false")
+                    {
+                        temp_box.difficult = false;
+                    }
+                    else
+                    {
+                        temp_box.difficult = true;
+                    }
+                }
+                else if (ts.back() == "truncated" && ts[ts.size()-2] == "object")
+                {
+                    if (trim(data) == "0" || trim(data) == "false")
+                    {
+                        temp_box.truncated = false;
+                    }
+                    else
+                    {
+                        temp_box.truncated = true;
+                    }
+                }
+                else if (ts.back() == "occluded" && ts[ts.size()-2] == "object")
+                {
+                    if (trim(data) == "0" || trim(data) == "false")
+                    {
+                        temp_box.occluded = false;
+                    }
+                    else
+                    {
+                        temp_box.occluded = true;
+                    }
                 }
 
             }

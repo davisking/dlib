@@ -70,6 +70,12 @@ namespace dlib
                                  << "left='" << b.rect.left() << "' "
                                 << "width='" << b.rect.width() << "' "
                                << "height='" << b.rect.height() << "'";
+                    if (b.difficult)
+                        fout << " difficult='" << b.difficult << "'";
+                    if (b.truncated)
+                        fout << " truncated='" << b.truncated << "'";
+                    if (b.occluded)
+                        fout << " occluded='" << b.occluded << "'";
 
                     if (b.has_label() || b.has_head())
                     {
@@ -135,7 +141,7 @@ namespace dlib
             }
 
             virtual void start_element ( 
-                const unsigned long line_number,
+                const unsigned long ,
                 const std::string& name,
                 const dlib::attribute_list& atts
             )
@@ -170,6 +176,10 @@ namespace dlib
                     if (atts.is_in_list("height")) temp_box.rect.bottom() = sa = atts["height"];
                     else throw dlib::error("<box> missing required attribute 'height'");
 
+                    if (atts.is_in_list("difficult")) temp_box.difficult = sa = atts["difficult"];
+                    if (atts.is_in_list("truncated")) temp_box.truncated = sa = atts["truncated"];
+                    if (atts.is_in_list("occluded"))  temp_box.occluded  = sa = atts["occluded"];
+
                     temp_box.rect.bottom() += temp_box.rect.top()-1;
                     temp_box.rect.right() += temp_box.rect.left()-1;
                 }
@@ -193,7 +203,7 @@ namespace dlib
             }
 
             virtual void end_element ( 
-                const unsigned long line_number,
+                const unsigned long ,
                 const std::string& name
             )
             {
