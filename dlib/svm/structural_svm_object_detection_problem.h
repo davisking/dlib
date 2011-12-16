@@ -184,6 +184,9 @@ namespace dlib
                         sout << "The offending rectangles are:\n";
                         sout << "rect1: "<< mapped_rects[i] << endl;
                         sout << "rect2: "<< mapped_rects[j] << endl;
+                        sout << "overlap amount: " << 
+                            mapped_rects[i].intersect(mapped_rects[j]).area()/(double)( mapped_rects[i]+mapped_rects[j]).area()
+                            << endl;
                         throw dlib::impossible_labeling_error(sout.str());
                     }
                 }
