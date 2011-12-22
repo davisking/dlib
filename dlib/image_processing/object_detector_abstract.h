@@ -99,6 +99,29 @@ namespace dlib
                   element 1 the next best, and so on.
         !*/
 
+        template <
+            typename image_type
+            >
+        void operator() (
+            const image_type& img,
+            std::vector<std::pair<double, rectangle> >& dets 
+        ) const;
+        /*!
+            requires
+                - img == an object which can be accepted by image_scanner_type::load()
+            ensures
+                - performs object detection on the given image and stores the
+                  detected objects into #dets.  In particular, we will have that:
+                    - #dets is sorted such that the highest confidence detections 
+                      come first.  E.g. element 0 is the best detection, element 1 
+                      the next best, and so on.
+                    - #dets.size() == the number of detected objects.
+                    - #dets[i].first gives the "detection confidence", of the i-th 
+                      detection.  This is the detection value output by the scanner 
+                      minus the threshold, therefore this is a value > 0.
+                    - #dets[i].second == the bounding box for the i-th detection.
+        !*/
+
     };
 
 // ----------------------------------------------------------------------------------------

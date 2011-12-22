@@ -45,6 +45,14 @@ namespace dlib
             const image_type& img
         ) const;
 
+        template <
+            typename image_type
+            >
+        void operator() (
+            const image_type& img,
+            std::vector<std::pair<double, rectangle> >& final_dets
+        ) const;
+
         template <typename T, typename U>
         friend void serialize (
             const object_detector<T,U>& item,
@@ -67,6 +75,19 @@ namespace dlib
             for (unsigned long i = 0; i < rects.size(); ++i)
             {
                 if (boxes_overlap(rects[i], rect))
+                    return true;
+            }
+            return false;
+        }
+
+        bool overlaps_any_box (
+            const std::vector<std::pair<double,rectangle> >& rects,
+            const dlib::rectangle& rect
+        ) const
+        {
+            for (unsigned long i = 0; i < rects.size(); ++i)
+            {
+                if (boxes_overlap(rects[i].second, rect))
                     return true;
             }
             return false;
@@ -219,6 +240,41 @@ namespace dlib
         }
 
         return final_dets;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type,
+        typename overlap_tester_type
+        >
+    template <
+        typename image_type
+        >
+    void object_detector<image_scanner_type,overlap_tester_type>::
+    operator() (
+        const image_type& img,
+        std::vector<std::pair<double, rectangle> >& final_dets
+    ) const
+    {
+        final_dets.clear();
+        if (w.size() != 0)
+        {
+            std::vector<std::pair<double, rectangle> > dets;
+            const double thresh = w(scanner.get_num_dimensions());
+
+            scanner.load(img);
+            scanner.detect(w, dets, thresh);
+
+            for (unsigned long i = 0; i < dets.size(); ++i)
+            {
+                if (overlaps_any_box(final_dets, dets[i].second))
+                    continue;
+
+                dets[i].first -= thresh;
+                final_dets.push_back(dets[i]);
+            }
+        }
     }
 
 // ----------------------------------------------------------------------------------------
