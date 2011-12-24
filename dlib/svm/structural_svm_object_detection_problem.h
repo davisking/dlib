@@ -167,6 +167,10 @@ namespace dlib
                 {
                     if (boxes_overlap(mapped_rects[i], mapped_rects[j]))
                     {
+                        const double area_overlap = mapped_rects[i].intersect(mapped_rects[j]).area();
+                        const double match_amount = area_overlap/(double)( mapped_rects[i]+mapped_rects[j]).area();
+                        const double overlap_amount = area_overlap/std::min(mapped_rects[i].area(),mapped_rects[j].area());
+
                         using namespace std;
                         ostringstream sout;
                         sout << "An impossible set of object labels was detected. This is happening because ";
@@ -184,9 +188,8 @@ namespace dlib
                         sout << "The offending rectangles are:\n";
                         sout << "rect1: "<< mapped_rects[i] << endl;
                         sout << "rect2: "<< mapped_rects[j] << endl;
-                        sout << "overlap amount: " << 
-                            mapped_rects[i].intersect(mapped_rects[j]).area()/(double)( mapped_rects[i]+mapped_rects[j]).area()
-                            << endl;
+                        sout << "match amount:   " << match_amount << endl;
+                        sout << "overlap amount: " << overlap_amount << endl;
                         throw dlib::impossible_labeling_error(sout.str());
                     }
                 }
