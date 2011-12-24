@@ -289,10 +289,22 @@ namespace dlib
                   been reached).
         !*/
 
+        const rectangle get_best_matching_rect (
+            const rectangle& rect
+        ) const;
+        /*!
+            requires
+                - is_loaded_with_image() == true
+                - get_num_detection_templates() > 0
+            ensures
+                - Since scan_image_pyramid is a sliding window classifier system, not all possible rectangles 
+                  can be represented.  Therefore, this function allows you to supply a rectangle and obtain the
+                  nearest possible sliding window rectangle.
+        !*/
+
         void get_feature_vector (
             const std::vector<rectangle>& rects,
-            feature_vector_type& psi,
-            std::vector<rectangle>& mapped_rects
+            feature_vector_type& psi
         ) const;
         /*!
             requires
@@ -305,7 +317,6 @@ namespace dlib
                 - if (rects was produced by a call to detect(), i.e. rects contains the contents of dets) then
                     - #psi == the sum of feature vectors corresponding to the sliding window locations contained
                       in rects.
-                    - #mapped_rects == rects
                     - Let w denote the w vector given to detect(), then we have:
                         - dot(w,#psi) == sum of scores of the dets produced by detect()
                 - else
@@ -313,8 +324,8 @@ namespace dlib
                       be output by detect().  So in the case where rects contains rectangles which could not arise
                       from a call to detect(), this function will map the rectangles in rects to the nearest possible 
                       object boxes and then store the sum of feature vectors for the mapped rectangles into #psi.
-                    - for all valid i: #mapped_rects[i] == the rectangle rects[i] gets mapped to for feature extraction.
-                - #mapped_rects.size() == rects.size()
+                    - for all valid i: get_best_matching_rect(rects[i]) == the rectangle rects[i] gets mapped to for 
+                      feature extraction.
         !*/
 
     };

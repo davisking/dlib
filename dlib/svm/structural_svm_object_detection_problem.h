@@ -156,7 +156,11 @@ namespace dlib
             scanner.load(images[idx]);
             psi.set_size(get_num_dimensions());
             std::vector<rectangle> mapped_rects;
-            scanner.get_feature_vector(truth_rects[idx], psi, mapped_rects);
+            scanner.get_feature_vector(truth_rects[idx], psi);
+            for (unsigned long i = 0; i < truth_rects[idx].size(); ++i)
+            {
+                mapped_rects.push_back(scanner.get_best_matching_rect(truth_rects[idx][i]));
+            }
             psi(scanner.get_num_dimensions()) = -1.0*truth_rects[idx].size();
 
             // check if any of the boxes overlap.  If they do then it is impossible for
@@ -328,8 +332,7 @@ namespace dlib
 
             psi.set_size(get_num_dimensions());
             psi = 0;
-            std::vector<rectangle> mapped_rects;
-            scanner.get_feature_vector(final_dets, psi, mapped_rects);
+            scanner.get_feature_vector(final_dets, psi);
 
             psi(scanner.get_num_dimensions()) = -1.0*final_dets.size();
         }
