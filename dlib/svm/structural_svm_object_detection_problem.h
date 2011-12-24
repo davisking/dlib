@@ -36,34 +36,34 @@ namespace dlib
             const image_scanner_type& scanner,
             const overlap_tester_type& overlap_tester,
             const image_array_type& images_,
-            const std::vector<std::vector<rectangle> >& truth_rects,
+            const std::vector<std::vector<rectangle> >& truth_rects_,
             unsigned long num_threads = 2
         ) :
             structural_svm_problem_threaded<matrix<double,0,1> >(num_threads),
             boxes_overlap(overlap_tester),
             images(images_),
-            rects(truth_rects),
+            truth_rects(truth_rects_),
             overlap_eps(0.5),
             loss_per_false_alarm(1),
             loss_per_missed_target(1)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_learning_problem(images_, truth_rects) && 
+            DLIB_ASSERT(is_learning_problem(images_, truth_rects_) && 
                          scanner.get_num_detection_templates() > 0,
                 "\t structural_svm_object_detection_problem::structural_svm_object_detection_problem()"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t scanner.get_num_detection_templates(): " << scanner.get_num_detection_templates()
-                << "\n\t is_learning_problem(images_,truth_rects): " << is_learning_problem(images_,truth_rects)
+                << "\n\t is_learning_problem(images_,truth_rects_): " << is_learning_problem(images_,truth_rects_)
                 << "\n\t this: " << this
                 );
 
             scanner_config.copy_configuration(scanner);
 
             max_num_dets = 0;
-            for (unsigned long i = 0; i < rects.size(); ++i)
+            for (unsigned long i = 0; i < truth_rects.size(); ++i)
             {
-                if (rects.size() > max_num_dets)
-                    max_num_dets = rects.size();
+                if (truth_rects.size() > max_num_dets)
+                    max_num_dets = truth_rects.size();
             }
             max_num_dets = max_num_dets*3 + 10;
         }
@@ -156,8 +156,8 @@ namespace dlib
             scanner.load(images[idx]);
             psi.set_size(get_num_dimensions());
             std::vector<rectangle> mapped_rects;
-            scanner.get_feature_vector(rects[idx], psi, mapped_rects);
-            psi(scanner.get_num_dimensions()) = -1.0*rects[idx].size();
+            scanner.get_feature_vector(truth_rects[idx], psi, mapped_rects);
+            psi(scanner.get_num_dimensions()) = -1.0*truth_rects[idx].size();
 
             // check if any of the boxes overlap.  If they do then it is impossible for
             // us to learn to correctly classify this sample
@@ -199,8 +199,8 @@ namespace dlib
             // truth rectangles.
             for (unsigned long i = 0; i < mapped_rects.size(); ++i)
             {
-                const double area = (rects[idx][i].intersect(mapped_rects[i])).area();
-                const double total_area = (rects[idx][i] + mapped_rects[i]).area();
+                const double area = (truth_rects[idx][i].intersect(mapped_rects[i])).area();
+                const double total_area = (truth_rects[idx][i] + mapped_rects[i]).area();
                 if (area/total_area <= overlap_eps)
                 {
                     using namespace std;
@@ -223,9 +223,9 @@ namespace dlib
                     sout << "image index              "<< idx << endl;
                     sout << "overlap_eps:             "<< overlap_eps << endl;
                     sout << "best possible overlap:   "<< area/total_area << endl;
-                    sout << "truth rect:              "<< rects[idx][i] << endl;
-                    sout << "truth rect width/height: "<< rects[idx][i].width()/(double)rects[idx][i].height() << endl;
-                    sout << "truth rect area:         "<< rects[idx][i].area() << endl;
+                    sout << "truth rect:              "<< truth_rects[idx][i] << endl;
+                    sout << "truth rect width/height: "<< truth_rects[idx][i].width()/(double)truth_rects[idx][i].height() << endl;
+                    sout << "truth rect area:         "<< truth_rects[idx][i].area() << endl;
                     sout << "nearest detection template rect:              "<< mapped_rects[i] << endl;
                     sout << "nearest detection template rect width/height: "<< mapped_rects[i].width()/(double)mapped_rects[i].height() << endl;
                     sout << "nearest detection template rect area:         "<< mapped_rects[i].area() << endl;
@@ -256,10 +256,10 @@ namespace dlib
             // The loss will measure the number of incorrect detections.  A detection is
             // incorrect if it doesn't hit a truth rectangle or if it is a duplicate detection
             // on a truth rectangle.
-            loss = rects[idx].size()*loss_per_missed_target;
+            loss = truth_rects[idx].size()*loss_per_missed_target;
 
             // Measure the loss augmented score for the detections which hit a truth rect.
-            std::vector<double> truth_score_hits(rects[idx].size(), 0);
+            std::vector<double> truth_score_hits(truth_rects[idx].size(), 0);
 
             std::vector<rectangle> final_dets;
             // The point of this loop is to fill out the truth_score_hits array. 
@@ -268,7 +268,7 @@ namespace dlib
                 if (overlaps_any_box(final_dets, dets[i].second))
                     continue;
 
-                const std::pair<double,unsigned int> truth = find_max_overlap(rects[idx], dets[i].second);
+                const std::pair<double,unsigned int> truth = find_max_overlap(truth_rects[idx], dets[i].second);
 
                 final_dets.push_back(dets[i].second);
 
@@ -276,7 +276,7 @@ namespace dlib
                 // if hit truth rect
                 if (truth_overlap > overlap_eps)
                 {
-                    // if this is the first time we have seen a detect which hit rects[truth.second]
+                    // if this is the first time we have seen a detect which hit truth_rects[truth.second]
                     const double score = dets[i].first - thresh;
                     if (truth_score_hits[truth.second] == 0)
                         truth_score_hits[truth.second] += score - loss_per_missed_target;
@@ -287,7 +287,7 @@ namespace dlib
 
 
             // keep track of which truth boxes we have hit so far.
-            std::vector<bool> hit_truth_table(rects[idx].size(), false);
+            std::vector<bool> hit_truth_table(truth_rects[idx].size(), false);
             final_dets.clear();
             // Now figure out which detections jointly maximize the loss and detection score sum.  We
             // need to take into account the fact that allowing a true detection in the output, while 
@@ -298,7 +298,7 @@ namespace dlib
                 if (overlaps_any_box(final_dets, dets[i].second))
                     continue;
 
-                const std::pair<double,unsigned int> truth = find_max_overlap(rects[idx], dets[i].second);
+                const std::pair<double,unsigned int> truth = find_max_overlap(truth_rects[idx], dets[i].second);
 
                 const double truth_overlap = truth.first;
                 if (truth_overlap > overlap_eps)
@@ -336,13 +336,13 @@ namespace dlib
 
 
         bool overlaps_any_box (
-            const std::vector<rectangle>& rects,
+            const std::vector<rectangle>& truth_rects,
             const dlib::rectangle& rect
         ) const
         {
-            for (unsigned long i = 0; i < rects.size(); ++i)
+            for (unsigned long i = 0; i < truth_rects.size(); ++i)
             {
-                if (boxes_overlap(rects[i], rect))
+                if (boxes_overlap(truth_rects[i], rect))
                     return true;
             }
             return false;
@@ -390,7 +390,7 @@ namespace dlib
         image_scanner_type scanner_config;
 
         const image_array_type& images;
-        const std::vector<std::vector<rectangle> >& rects;
+        const std::vector<std::vector<rectangle> >& truth_rects;
 
         unsigned long max_num_dets;
         double overlap_eps;
