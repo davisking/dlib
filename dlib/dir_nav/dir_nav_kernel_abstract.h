@@ -162,6 +162,17 @@ namespace dlib
                     - returns false
         !*/
 
+        bool operator != (
+            const file& rhs
+        ) const;
+        /*!
+            ensures
+                - if (*this and rhs represent the same file) then
+                    - returns false 
+                - else
+                    - returns true 
+        !*/
+
         bool operator < (
             const file& item
         ) const;
@@ -390,6 +401,17 @@ namespace dlib
                     - returns true
                 - else
                     - returns false
+        !*/
+
+        bool operator != (
+            const directory& rhs
+        ) const;
+        /*!
+            ensures
+                - if (*this and rhs represent the same directory) then
+                    - returns false 
+                - else
+                    - returns true 
         !*/
 
         bool operator < (

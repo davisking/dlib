@@ -153,6 +153,10 @@ namespace dlib
             const file& rhs
         ) const;
 
+        bool operator != (
+            const file& rhs
+        ) const { return !(*this == rhs); }
+
         inline bool operator < (
             const file& item
         ) const { return full_name() < item.full_name(); }
@@ -303,6 +307,10 @@ namespace dlib
         bool operator == (
             const directory& rhs
         ) const;
+
+        bool operator != (
+            const directory& rhs
+        ) const { return !(*this == rhs); }
 
         inline bool operator < (
             const directory& item
