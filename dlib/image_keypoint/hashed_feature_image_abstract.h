@@ -3,6 +3,7 @@
 #undef DLIB_HASHED_IMAGE_FEATUrES_ABSTRACT_H__
 #ifdef DLIB_HASHED_IMAGE_FEATUrES_ABSTRACT_H__
 
+#include "../lsh/projection_hash_abstract.h"
 #include <vector>
 #include "../matrix.h"
 #include "../statistics.h"
@@ -13,7 +14,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename feature_extractor
+        typename feature_extractor,
+        typename hash_function_type = projection_hash
         >
     class hashed_feature_image : noncopyable
     {
@@ -21,10 +23,11 @@ namespace dlib
             REQUIREMENTS ON feature_extractor 
                 - must be an object with an interface compatible with dlib::hog_image
 
+            REQUIREMENTS ON hash_function_type 
+                - must be an object with an interface compatible with projection_hash 
+
             INITIAL VALUE
                  - size() == 0
-                 - get_num_dimensions() == 1000
-                 - get_hash_bin_sizes() == logspace(-1,1,3)
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for performing image feature extraction.  In
@@ -32,9 +35,7 @@ namespace dlib
                 the wrapped image feature vectors into indicator vectors.  It does
                 this by hashing each feature vector into the range [0, get_num_dimensions()-1]
                 and then returns a new vector which is zero everywhere except for
-                the position determined by the hash.  Additionally, this object can be
-                configured to hash each feature vector into multiple bins, thereby 
-                creating an indicator vector with multiple non-zero indicator features.
+                the position determined by the hash. 
 
 
             THREAD SAFETY
@@ -68,49 +69,20 @@ namespace dlib
                 - this object will have its initial value
         !*/
 
-        void set_hash_bin_sizes (
-            const matrix<double,1,0>& bin_sizes 
+        void set_hash (
+            const hash_function_type& hash
         );
         /*!
-            requires
-                - bin_sizes.size() > 0
-                - min(bin_sizes) > 0
             ensures
-                - #get_hash_bin_sizes() == bin_sizes 
+                - #get_hash() == hash
         !*/
 
-        const matrix<double,1,0> get_hash_bin_sizes (
+        const hash_function_type& get_hash (
         ) const;
         /*!
             ensures
-                - When a feature vector from BASE_FE is hashed, it is hashed into exactly 
-                  get_hash_bin_sizes().size() hash bins.  Each hash is computed as follows:
-                    - First normalize the feature vector.
-                    - Then divide it by an element of get_hash_bin_sizes().
-                    - Then convert the resulting vector to a vector of dlib::int32.
-                    - Finally, hash the integer vector into a hash bin.
-                - The size of the numbers in get_hash_bin_sizes() determines how big the hash 
-                  bins are.  A very large value would result in all input vectors being hashed 
-                  into the same bin, while smaller values would result in only similar vectors 
-                  falling into the same bins.  However, a value too small would result in
-                  all vectors going into different bins.  In this case, the bins are too fine 
-                  grained.
-        !*/
-
-        template <
-            typename image_type
-            >
-        void accumulate_image_statistics (
-            const image_type& img
-        );
-        /*!
-            requires
-                - image_type == any type that can be supplied to feature_extractor::load() 
-            ensures
-                - Part of the hashing step is to normalize the features produced by BASE_FE.  
-                  This function will accumulate image statistics used to perform this normalization.
-                  Note that it will accumulate across multiple calls.  Therefore, it can be 
-                  beneficial to pass in many images.
+                - returns the hash function used by this object to hash
+                  base feature vectors into integers.
         !*/
 
         void copy_configuration (
@@ -176,19 +148,8 @@ namespace dlib
         /*!
             ensures
                 - returns the dimensionality of the feature vectors returned by operator().  
-                  In this case, this is the number of hash bins.
+                  In this case, this is the number of hash bins.  That is, get_hash().num_hash_bins()
         !*/
-
-        void set_num_dimensions (
-            long new_num_dims
-        );
-        /*!
-            requires
-                - new_num_dims > 0
-            ensures
-                - #get_num_dimensions() == new_num_dims
-        !*/
-
         const descriptor_type& operator() (
             long row,
             long col
@@ -197,14 +158,15 @@ namespace dlib
             requires
                 - 0 <= row < nr()
                 - 0 <= col < nc()
+                - It must be legal to evaluate expressions of the form: get_hash()(BASE_FE(row,col))
+                  (e.g. the hash function must be properly configured to process the feature
+                  vectors produced by the base feature extractor)
             ensures
                 - hashes BASE_FE(row,col) and returns the resulting indicator vector. 
-                  This vector will be represented as an unsorted sparse vector.
-                - Returns a vector V such that:
-                    - V.size() == get_hash_bin_sizes().size()
-                    - for all valid i: 0 <= V[i].first < get_num_dimensions()
-                    - if (BASE_FE(row,col) hashes into bin B) then
-                        - V contains an element with .first == B and .second == 1
+                - To be precise, this function returns a sparse vector V such that:
+                    - V.size() == 1 
+                    - V[0].first == get_hash()(BASE_FE(row,col))
+                    - V[0].second == 1 
         !*/
 
         const rectangle get_block_rect (
