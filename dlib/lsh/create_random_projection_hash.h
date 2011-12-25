@@ -14,12 +14,36 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename vector_type>
+    template <
+        typename vector_type
+        >
     projection_hash create_random_projection_hash (
         const vector_type& v,
         const int bits
     ) 
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(0 < bits && bits <= 32 &&
+                    v.size() > 1,
+            "\t projection_hash create_random_projection_hash()"
+            << "\n\t Invalid arguments were given to this function."
+            << "\n\t bits: " << bits
+            << "\n\t v.size(): " << v.size() 
+            );
+
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < v.size(); ++i)
+        {
+            DLIB_ASSERT(v[0].size() == v[i].size() && v[i].size() > 0 && is_col_vector(v[i]), 
+                    "\t projection_hash create_random_projection_hash()"
+                   << "\n\t Invalid arguments were given to this function."
+                   << "\n\t m(0).size(): " << v[0].size()
+                   << "\n\t m("<<i<<").size(): " << v[i].size() 
+                   << "\n\t is_col_vector(v["<<i<<"]): " << is_col_vector(v[i]) 
+                );
+        }
+#endif
+
 
         // compute a whitening matrix
         matrix<double> whiten = trans(chol(pinv(covariance(vector_to_matrix(v)))));

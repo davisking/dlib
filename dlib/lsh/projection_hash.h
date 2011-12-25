@@ -23,7 +23,17 @@ namespace dlib
         projection_hash(
             const matrix_exp<EXP1>& proj_,
             const matrix_exp<EXP2>& offset_
-        ) : proj(proj_), offset(offset_) {}
+        ) : proj(proj_), offset(offset_) 
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(proj.nr() == offset.nr(),
+                "\t projection_hash::projection_hash()"
+                << "\n\t Invalid arguments were given to this function."
+                << "\n\t proj.nr():   " << proj.nr() 
+                << "\n\t offset.nr(): " << offset.nr() 
+                );
+
+        }
 
         const matrix<double>& get_projection_matrix (
         ) const { return proj; }
@@ -31,10 +41,10 @@ namespace dlib
         const matrix<double,0,1>& get_offset_matrix (
         ) const { return offset; }
 
-        unsigned long size (
+        unsigned long num_hash_bins (
         ) const
         {
-            return (unsigned long)std::pow(2, offset.size());
+            return static_cast<unsigned long>(std::pow(2, offset.size()));
         }
 
         template <typename EXP>
@@ -42,6 +52,17 @@ namespace dlib
             const matrix_exp<EXP>& v
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_col_vector(v) && 
+                        v.size() == get_projection_matrix().nc() &&
+                        v.size() > 0,
+                "\t unsigned long projection_hash::operator()(v)"
+                << "\n\t Invalid arguments were given to this function."
+                << "\n\t is_col_vector(v):             " << is_col_vector(v) 
+                << "\n\t get_projection_matrix().nc(): " << get_projection_matrix().nc() 
+                << "\n\t v.size():                     " << v.size() 
+                );
+
             return do_hash(proj*matrix_cast<double>(v) + offset);
         }
 
