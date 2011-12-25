@@ -4,8 +4,6 @@
 #ifdef DLIB_PROJECTION_HASh_ABSTRACT_H__
 
 #include "../matrix.h"
-#include "../rand.h"
-#include <vector>
 
 namespace dlib
 {
@@ -53,14 +51,6 @@ namespace dlib
     void deserialize (
         projection_hash& item,
         std::istream& in 
-    );
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename vector_type>
-    projection_hash create_random_projection_hash (
-        const vector_type& v,
-        const int bits
     );
 
 // ----------------------------------------------------------------------------------------

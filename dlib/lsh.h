@@ -5,6 +5,7 @@
 
 
 #include "lsh/projection_hash.h"
+#include "lsh/create_random_projection_hash.h"
 
 
 #endif // DLIB_LSh_
