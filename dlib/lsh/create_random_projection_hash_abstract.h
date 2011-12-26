@@ -22,8 +22,8 @@ namespace dlib
         requires
             - 0 < bits <= 32
             - v.size() > 1
-            - vector_type == a std::vector containing dlib::matrix objects, each 
-              representing a column vector of the same size.
+            - vector_type == a std::vector or compatible type containing dlib::matrix 
+              objects, each representing a column vector of the same size.
             - for all valid i, j:
                 - is_col_vector(v[i]) == true 
                 - v[i].size() > 0
