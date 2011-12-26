@@ -60,6 +60,24 @@ namespace dlib
                 - #get_loss_per_false_alarm() == 1
                 - This object will attempt to learn a model for the given
                   scanner object when train() is called.
+                - if (overlap_tester_type == test_box_overlap) then
+                    - #auto_set_overlap_tester() == true
+                - else
+                    - #auto_set_overlap_tester() == false
+        !*/
+
+        bool auto_set_overlap_tester (
+        ) const;
+        /*!
+            ensures
+                - if (this object will automatically determine an appropriate 
+                  state for the overlap tester used for non-max suppression.) then
+                    - returns true
+                    - In this case, it is determined using the find_tight_overlap_tester() 
+                      routine based on the truth_rects given to the 
+                      structural_object_detection_trainer::train() method.  
+                - else
+                    - returns false
         !*/
 
         void set_overlap_tester (
@@ -68,11 +86,14 @@ namespace dlib
         /*!
             ensures
                 - #get_overlap_tester() == tester
+                - #auto_set_overlap_tester() == false
         !*/
 
         overlap_tester_type get_overlap_tester (
         ) const;
         /*!
+            requires
+                - auto_set_overlap_tester() == false
             ensures
                 - returns the overlap tester object which will be used to perform non-max suppression.
                   In particular, this function returns the overlap tester which will populate the
