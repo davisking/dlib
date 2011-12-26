@@ -5,7 +5,6 @@
 
 #include "image_feature_sampling_abstract.h"
 #include "../statistics.h"
-#include "../image_transforms.h"
 
 namespace dlib
 {
@@ -34,11 +33,17 @@ namespace dlib
 
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            assign_image(temp_img, images[i]);
-
-            while (temp_img.nr() > 10 && temp_img.nc() > 10)
+            bool at_pyramid_top = true;
+            while (true)
             {
-                fe.load(temp_img);
+                if (at_pyramid_top)
+                    fe.load(images[i]);
+                else
+                    fe.load(temp_img);
+                
+                if (fe.size() == 0)
+                    break;
+
                 for (long r = 0; r < fe.nr(); ++r)
                 {
                     for (long c = 0; c < fe.nc(); ++c)
@@ -54,8 +59,16 @@ namespace dlib
                     }
                 }
 
-                pyr(temp_img, temp_img2);
-                temp_img2.swap(temp_img);
+                if (at_pyramid_top)
+                {
+                    at_pyramid_top = false;
+                    pyr(images[i], temp_img);
+                }
+                else
+                {
+                    pyr(temp_img, temp_img2);
+                    swap(temp_img2,temp_img);
+                }
             }
         }
         return basis;

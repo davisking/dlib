@@ -29,6 +29,7 @@ namespace dlib
               dlib::hog_image
             - image_array_type == an implementation of dlib/array/array_kernel_abstract.h
               and it must contain image objects which can be passed to pyr() and fe.load()
+              and are swappable by global swap().
         ensures
             - creates an image pyramid for each image in images and performs feature
               extraction on each pyramid level.  Then selects a random subsample of at 
