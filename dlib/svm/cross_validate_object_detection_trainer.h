@@ -205,7 +205,7 @@ namespace dlib
 
 
             impl::array_subset_helper<image_array_type> array_subset(images, train_idx_set);
-            const typename trainer_type::trained_function_type& detector = trainer.train(array_subset, training_rects);
+            typename trainer_type::trained_function_type detector = trainer.train(array_subset, training_rects);
             for (unsigned long i = 0; i < test_idx_set.size(); ++i)
             {
                 const std::vector<rectangle>& hits = detector(images[test_idx_set[i]]);
