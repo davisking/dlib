@@ -156,10 +156,12 @@ namespace dlib
             scanner.load(images[idx]);
             psi.set_size(get_num_dimensions());
             std::vector<rectangle> mapped_rects;
-            scanner.get_feature_vector(truth_rects[idx], psi);
+
+            psi = 0;
             for (unsigned long i = 0; i < truth_rects[idx].size(); ++i)
             {
                 mapped_rects.push_back(scanner.get_best_matching_rect(truth_rects[idx][i]));
+                scanner.get_feature_vector(truth_rects[idx][i], psi);
             }
             psi(scanner.get_num_dimensions()) = -1.0*truth_rects[idx].size();
 
@@ -332,7 +334,8 @@ namespace dlib
 
             psi.set_size(get_num_dimensions());
             psi = 0;
-            scanner.get_feature_vector(final_dets, psi);
+            for (unsigned long i = 0; i < final_dets.size(); ++i)
+                scanner.get_feature_vector(final_dets[i], psi);
 
             psi(scanner.get_num_dimensions()) = -1.0*final_dets.size();
         }

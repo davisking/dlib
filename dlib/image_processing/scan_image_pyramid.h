@@ -85,7 +85,7 @@ namespace dlib
         ) const;
 
         void get_feature_vector (
-            const std::vector<rectangle>& rects,
+            const rectangle& rect,
             feature_vector_type& psi
         ) const;
 
@@ -646,7 +646,7 @@ namespace dlib
         >
     void scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
     get_feature_vector (
-        const std::vector<rectangle>& rects,
+        const rectangle& rect,
         feature_vector_type& psi
     ) const
     {
@@ -663,31 +663,25 @@ namespace dlib
             << "\n\t this: " << this
             );
 
-        psi = 0;
-
-
         pyramid_type pyr;
-        for (unsigned long i = 0; i < rects.size(); ++i)
-        {
-            rectangle mapped_rect;
-            detection_template best_template;
-            unsigned long best_level;
-            get_mapped_rect_and_metadata (rects[i], mapped_rect, best_template, best_level);
+        rectangle mapped_rect;
+        detection_template best_template;
+        unsigned long best_level;
+        get_mapped_rect_and_metadata (rect, mapped_rect, best_template, best_level);
 
-            for (unsigned long j = 0; j < best_template.rects.size(); ++j)
+        for (unsigned long j = 0; j < best_template.rects.size(); ++j)
+        {
+            const rectangle rect = best_template.rects[j];
+            const unsigned long template_region_id = j;
+            const unsigned long offset = feats_config.get_num_dimensions()*template_region_id;
+            for (long r = rect.top(); r <= rect.bottom(); ++r)
             {
-                const rectangle rect = best_template.rects[j];
-                const unsigned long template_region_id = j;
-                const unsigned long offset = feats_config.get_num_dimensions()*template_region_id;
-                for (long r = rect.top(); r <= rect.bottom(); ++r)
+                for (long c = rect.left(); c <= rect.right(); ++c)
                 {
-                    for (long c = rect.left(); c <= rect.right(); ++c)
+                    const typename feature_extractor_type::descriptor_type& descriptor = feats[best_level](r,c);
+                    for (unsigned long k = 0; k < descriptor.size(); ++k)
                     {
-                        const typename feature_extractor_type::descriptor_type& descriptor = feats[best_level](r,c);
-                        for (unsigned long k = 0; k < descriptor.size(); ++k)
-                        {
-                            psi(descriptor[k].first + offset) += descriptor[k].second;
-                        }
+                        psi(descriptor[k].first + offset) += descriptor[k].second;
                     }
                 }
             }

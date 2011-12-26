@@ -303,7 +303,7 @@ namespace dlib
         !*/
 
         void get_feature_vector (
-            const std::vector<rectangle>& rects,
+            const rectangle& rects,
             feature_vector_type& psi
         ) const;
         /*!
@@ -312,20 +312,21 @@ namespace dlib
                 - get_num_detection_templates() > 0
                 - psi.size() >= get_num_dimensions()
             ensures
-                - This function allows you to determine the feature vector used for a sliding window location
-                  or the sum of such vectors for a set of locations.
-                - if (rects was produced by a call to detect(), i.e. rects contains the contents of dets) then
-                    - #psi == the sum of feature vectors corresponding to the sliding window locations contained
-                      in rects.
-                    - Let w denote the w vector given to detect(), then we have:
-                        - dot(w,#psi) == sum of scores of the dets produced by detect()
+                - This function allows you to determine the feature vector used for a sliding window location.
+                  Note that this vector is added to psi.
+                - if (rect was produced by a call to detect(), i.e. rect contains an element of dets) then
+                    - #psi == psi + the feature vector corresponding to the sliding window location indicated 
+                      by rect.
+                    - Let w denote the w vector given to detect(), then if we assigned psi to 0 before calling
+                      get_feature_vector() then we have:
+                        - dot(w,#psi) == the score produced by detect() for rect.
+                    - get_best_matching_rect(rect) == rect
                 - else
                     - Since scan_image_pyramid is a sliding window classifier system, not all possible rectangles can 
-                      be output by detect().  So in the case where rects contains rectangles which could not arise
-                      from a call to detect(), this function will map the rectangles in rects to the nearest possible 
-                      object boxes and then store the sum of feature vectors for the mapped rectangles into #psi.
-                    - for all valid i: get_best_matching_rect(rects[i]) == the rectangle rects[i] gets mapped to for 
-                      feature extraction.
+                      be output by detect().  So in the case where rect could not arise from a call to detect(), this 
+                      function will map rect to the nearest possible object box and then add the feature vector for 
+                      the mapped rectangle into #psi.
+                    - get_best_matching_rect(rect) == the rectangle rect gets mapped to for feature extraction.
         !*/
 
     };
