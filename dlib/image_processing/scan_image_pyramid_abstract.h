@@ -66,7 +66,7 @@ namespace dlib
                         - Then the feature vector for a sliding window is an M*N dimensional vector
                           [F(1) F(2) F(3) ... F(N)] (i.e. it is a concatenation of the N vectors).
                           This feature vector can be thought of as a collection of N "bags of features",
-                          each bag coming from a spatial location determined one of the enveloping 
+                          each bag coming from a spatial location determined by one of the enveloping 
                           rectangles. 
                           
                    3. A weight vector and a threshold value.  The dot product between the weight
