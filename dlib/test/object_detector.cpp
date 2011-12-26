@@ -2,6 +2,7 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 
+#include <dlib/statistics.h>
 #include <sstream>
 #include <string>
 #include <cstdlib>
@@ -35,6 +36,42 @@ namespace
     void swap(funny_image& a, funny_image& b)
     {
         a.img.swap(b.img);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_array_type,
+        typename detector_type
+        >
+    void validate_some_object_detector_stuff (
+        const image_array_type& images,
+        detector_type& detector
+    )
+    {
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            std::vector<rectangle> dets = detector(images[i]);
+            std::vector<std::pair<double,rectangle> > dets2;
+
+            detector(images[i], dets2);
+
+            matrix<double,0,1> psi(detector.get_w().size());
+            const double thresh = detector.get_w()(detector.get_w().size()-1);
+
+            DLIB_TEST(dets.size() == dets2.size());
+            for (unsigned long j = 0; j < dets.size(); ++j)
+            {
+                DLIB_TEST(dets[j] == dets2[j].second);
+
+                psi = 0;
+                detector.get_scanner().get_feature_vector(dets[j], psi);
+
+                const double check_score = dot(psi,detector.get_w()) - thresh;
+                DLIB_TEST(std::abs(check_score - dets2[j].first) < 1e-10);
+            }
+
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -229,10 +266,11 @@ namespace
         image_scanner_type scanner;
         const rectangle object_box = compute_box_dimensions(1,35*35);
         scanner.add_detection_template(object_box, create_grid_detection_template(object_box,2,2));
+        setup_hashed_features(scanner, images, 9);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);  
-        trainer.set_overlap_tester(test_box_overlap(0));
-        const object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
+        trainer.set_overlap_tester(test_box_overlap(0,0));
+        object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
@@ -247,6 +285,8 @@ namespace
             matrix<double> res = test_object_detection_function(detector, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
             DLIB_TEST(sum(res) == 2);
+
+            validate_some_object_detector_stuff(images, detector);
         }
     }
 
@@ -270,8 +310,7 @@ namespace
         scanner.set_max_pyramid_levels(1);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(0);  
-        trainer.set_overlap_tester(test_box_overlap(0));
-        const object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
+        object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
@@ -290,6 +329,7 @@ namespace
             matrix<double> res = test_object_detection_function(detector, images, object_locations);
             dlog << LINFO << "Test detector (precision,recall): " << res;
             DLIB_TEST(sum(res) == 2);
+            validate_some_object_detector_stuff(images, detector);
         }
     }
 
@@ -362,8 +402,7 @@ namespace
         scanner.set_max_pyramid_levels(1);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4);  
-        trainer.set_overlap_tester(test_box_overlap(0));
-        const object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
+        object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
 
         matrix<double> res = test_object_detection_function(detector, images, object_locations);
         dlog << LINFO << "Test detector (precision,recall): " << res;
