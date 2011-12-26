@@ -71,6 +71,30 @@ namespace dlib
                   with respect to overlap_tester.  That is, for all 
                   pairs of returned detections A and B, we will always
                   have: overlap_tester(A,B) == false
+                - #get_w() == w
+                - #get_overlap_tester() == overlap_tester
+                - #get_scanner() == scanner
+        !*/
+
+        const matrix<double,0,1>& get_w (
+        ) const;
+        /*!
+            ensures
+                - returns the weight vector used by this object
+        !*/
+
+        const overlap_tester_type& get_overlap_tester (
+        ) const;
+        /*!
+            ensures
+                - returns the overlap tester used by this object
+        !*/
+
+        const image_scanner_type& get_scanner (
+        ) const;
+        /*!
+            ensures
+                - returns the image scanner used by this object.  
         !*/
 
         object_detector& operator= (
@@ -97,6 +121,9 @@ namespace dlib
                 - The returned vector will be sorted in the sense that the highest
                   confidence detections come first.  E.g. element 0 is the best detection,
                   element 1 the next best, and so on.
+                - #get_scanner() will have been loaded with img. Therefore, you can call
+                  #get_scanner().get_feature_vector() to obtain the feature vectors for
+                  the resulting object detection boxes.
         !*/
 
         template <
@@ -120,6 +147,9 @@ namespace dlib
                       detection.  This is the detection value output by the scanner 
                       minus the threshold, therefore this is a value > 0.
                     - #dets[i].second == the bounding box for the i-th detection.
+                - #get_scanner() will have been loaded with img. Therefore, you can call
+                  #get_scanner().get_feature_vector() to obtain the feature vectors for
+                  the resulting object detection boxes.
         !*/
 
     };

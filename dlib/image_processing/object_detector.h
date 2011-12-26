@@ -34,6 +34,15 @@ namespace dlib
             const matrix<double,0,1>& w_ 
         );
 
+        const matrix<double,0,1>& get_w (
+        ) const;
+
+        const overlap_tester_type& get_overlap_tester (
+        ) const;
+
+        const image_scanner_type& get_scanner (
+        ) const;
+
         object_detector& operator= (
             const object_detector& item 
         );
@@ -275,6 +284,45 @@ namespace dlib
                 final_dets.push_back(dets[i]);
             }
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type,
+        typename overlap_tester_type
+        >
+    const matrix<double,0,1>& object_detector<image_scanner_type,overlap_tester_type>::
+    get_w (
+    ) const
+    {
+        return w;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type,
+        typename overlap_tester_type
+        >
+    const overlap_tester_type& object_detector<image_scanner_type,overlap_tester_type>::
+    get_overlap_tester (
+    ) const
+    {
+        return boxes_overlap;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type,
+        typename overlap_tester_type
+        >
+    const image_scanner_type& object_detector<image_scanner_type,overlap_tester_type>::
+    get_scanner (
+    ) const
+    {
+        return scanner;
     }
 
 // ----------------------------------------------------------------------------------------
