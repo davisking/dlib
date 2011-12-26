@@ -620,8 +620,8 @@ namespace dlib
                   following properties: 
                     - Z.nr() == out_vector_size()
                     - Z.nc() == 1
-                    - the expected value of each element of Z is 0 
-                    - the expected variance of each element of Z is 1
+                    - the mean of each element of Z is 0 
+                    - the variance of each element of Z is 1
                     - Z == pointwise_multiply(x-means(), std_devs());
         !*/
 
@@ -796,8 +796,8 @@ namespace dlib
                   following properties: 
                     - Z.nr() == out_vector_size()
                     - Z.nc() == 1
-                    - the expected value of each element of Z is 0 
-                    - the expected variance of each element of Z is 1
+                    - the mean of each element of Z is 0 
+                    - the variance of each element of Z is 1
                     - Z == pca_matrix()*pointwise_multiply(x-means(), std_devs());
         !*/
 
