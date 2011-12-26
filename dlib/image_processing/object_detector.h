@@ -52,7 +52,7 @@ namespace dlib
             >
         std::vector<rectangle> operator() (
             const image_type& img
-        ) const;
+        );
 
         template <
             typename image_type
@@ -60,7 +60,7 @@ namespace dlib
         void operator() (
             const image_type& img,
             std::vector<std::pair<double, rectangle> >& final_dets
-        ) const;
+        );
 
         template <typename T, typename U>
         friend void serialize (
@@ -104,7 +104,7 @@ namespace dlib
 
         overlap_tester_type boxes_overlap;
         matrix<double,0,1> w;
-        mutable image_scanner_type scanner;
+        image_scanner_type scanner;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -228,7 +228,7 @@ namespace dlib
     std::vector<rectangle> object_detector<image_scanner_type,overlap_tester_type>::
     operator() (
         const image_type& img
-    ) const
+    ) 
     {
         std::vector<rectangle> final_dets;
         if (w.size() != 0)
@@ -264,7 +264,7 @@ namespace dlib
     operator() (
         const image_type& img,
         std::vector<std::pair<double, rectangle> >& final_dets
-    ) const
+    ) 
     {
         final_dets.clear();
         if (w.size() != 0)

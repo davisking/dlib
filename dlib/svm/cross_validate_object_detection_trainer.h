@@ -73,7 +73,7 @@ namespace dlib
         typename image_array_type
         >
     const matrix<double,1,2> test_object_detection_function (
-        const object_detector_type& detector,
+        object_detector_type& detector,
         const image_array_type& images,
         const std::vector<std::vector<rectangle> >& truth_rects,
         const double overlap_eps = 0.5

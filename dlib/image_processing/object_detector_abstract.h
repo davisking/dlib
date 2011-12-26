@@ -111,7 +111,7 @@ namespace dlib
             >
         std::vector<rectangle> operator() (
             const image_type& img
-        ) const;
+        );
         /*!
             requires
                 - img == an object which can be accepted by image_scanner_type::load()
@@ -132,7 +132,7 @@ namespace dlib
         void operator() (
             const image_type& img,
             std::vector<std::pair<double, rectangle> >& dets 
-        ) const;
+        );
         /*!
             requires
                 - img == an object which can be accepted by image_scanner_type::load()
