@@ -15,7 +15,7 @@ namespace dlib
 
     template <
         typename feature_extractor,
-        typename hash_function_type = projection_hash
+        typename hash_function_type_ = projection_hash
         >
     class hashed_feature_image : noncopyable
     {
@@ -23,7 +23,7 @@ namespace dlib
             REQUIREMENTS ON feature_extractor 
                 - must be an object with an interface compatible with dlib::hog_image
 
-            REQUIREMENTS ON hash_function_type 
+            REQUIREMENTS ON hash_function_type_ 
                 - must be an object with an interface compatible with projection_hash 
 
             INITIAL VALUE
@@ -53,6 +53,8 @@ namespace dlib
 
     public:
 
+        typedef feature_extractor feature_extractor_type;
+        typedef hash_function_type_ hash_function_type;
         typedef std::vector<std::pair<unsigned int,double> > descriptor_type;
 
         hashed_feature_image (

@@ -17,12 +17,14 @@ namespace dlib
 
     template <
         typename feature_extractor,
-        typename hash_function_type = projection_hash
+        typename hash_function_type_ = projection_hash
         >
     class hashed_feature_image : noncopyable
     {
 
     public:
+        typedef feature_extractor feature_extractor_type;
+        typedef hash_function_type_ hash_function_type;
 
         typedef std::vector<std::pair<unsigned int,double> > descriptor_type;
 
