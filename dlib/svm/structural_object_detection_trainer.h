@@ -45,7 +45,7 @@ namespace dlib
             eps = 0.3;
             num_threads = 2;
             max_cache_size = 40;
-            overlap_eps = 0.5;
+            match_eps = 0.5;
             loss_per_missed_target = 1;
             loss_per_false_alarm = 1;
 
@@ -155,25 +155,25 @@ namespace dlib
             return C;
         }
 
-        void set_overlap_eps (
+        void set_match_eps (
             double eps
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(0 < eps && eps < 1, 
-                "\t void structural_object_detection_trainer::set_overlap_eps(eps)"
+                "\t void structural_object_detection_trainer::set_match_eps(eps)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t eps:  " << eps 
                 << "\n\t this: " << this
                 );
 
-            overlap_eps = eps;
+            match_eps = eps;
         }
 
-        double get_overlap_eps (
+        double get_match_eps (
         ) const
         {
-            return overlap_eps;
+            return match_eps;
         }
 
         double get_loss_per_missed_target (
@@ -244,7 +244,7 @@ namespace dlib
             svm_prob.set_c(C);
             svm_prob.set_epsilon(eps);
             svm_prob.set_max_cache_size(max_cache_size);
-            svm_prob.set_overlap_eps(overlap_eps);
+            svm_prob.set_match_eps(match_eps);
             svm_prob.set_loss_per_missed_target(loss_per_missed_target);
             svm_prob.set_loss_per_false_alarm(loss_per_false_alarm);
             matrix<double,0,1> w;
@@ -265,7 +265,7 @@ namespace dlib
         double C;
         oca solver;
         double eps;
-        double overlap_eps;
+        double match_eps;
         bool verbose;
         unsigned long num_threads;
         unsigned long max_cache_size;

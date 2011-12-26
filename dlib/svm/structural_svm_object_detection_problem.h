@@ -43,7 +43,7 @@ namespace dlib
             boxes_overlap(overlap_tester),
             images(images_),
             truth_rects(truth_rects_),
-            overlap_eps(0.5),
+            match_eps(0.5),
             loss_per_false_alarm(1),
             loss_per_missed_target(1)
         {
@@ -68,25 +68,25 @@ namespace dlib
             max_num_dets = max_num_dets*3 + 10;
         }
 
-        void set_overlap_eps (
+        void set_match_eps (
             double eps
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(0 < eps && eps < 1, 
-                "\t void structural_svm_object_detection_problem::set_overlap_eps(eps)"
+                "\t void structural_svm_object_detection_problem::set_match_eps(eps)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t eps:  " << eps 
                 << "\n\t this: " << this
                 );
 
-            overlap_eps = eps;
+            match_eps = eps;
         }
 
-        double get_overlap_eps (
+        double get_match_eps (
         ) const
         {
-            return overlap_eps;
+            return match_eps;
         }
 
         double get_loss_per_missed_target (
@@ -199,25 +199,25 @@ namespace dlib
                 }
             }
 
-            // make sure the mapped rectangles are within overlap_eps of the
+            // make sure the mapped rectangles are within match_eps of the
             // truth rectangles.
             for (unsigned long i = 0; i < mapped_rects.size(); ++i)
             {
                 const double area = (truth_rects[idx][i].intersect(mapped_rects[i])).area();
                 const double total_area = (truth_rects[idx][i] + mapped_rects[i]).area();
-                if (area/total_area <= overlap_eps)
+                if (area/total_area <= match_eps)
                 {
                     using namespace std;
                     ostringstream sout;
                     sout << "An impossible set of object labels was detected.  This is happening because ";
                     sout << "none of the sliding window detection templates is capable of matching the size ";
-                    sout << "and/or shape of one of the ground truth rectangles to within the required overlap_eps ";
-                    sout << "amount of overlap.  To resolve this you need to either lower the overlap_eps, add ";
+                    sout << "and/or shape of one of the ground truth rectangles to within the required match_eps ";
+                    sout << "amount of alignment.  To resolve this you need to either lower the match_eps, add ";
                     sout << "another detection template which can match the offending rectangle, or adjust the ";
                     sout << "offending truth rectangle so it can be matched by an existing detection template. ";
                     sout << "It is also possible that the image pyramid you are using is too coarse.  E.g. if one of ";
-                    sout << "your existing detection templates has a matching width/height ratio and smaller area than the offending ";
-                    sout << "rectangle then a finer image pyramid would probably help.";
+                    sout << "your existing detection templates has a matching width/height ratio and smaller area ";
+                    sout << "than the offending rectangle then a finer image pyramid would probably help.";
 
 
                     // make sure the above string fits nicely into a command prompt window.
@@ -225,8 +225,8 @@ namespace dlib
                     sout.str(""); sout << wrap_string(temp,0,0) << endl << endl;
 
                     sout << "image index              "<< idx << endl;
-                    sout << "overlap_eps:             "<< overlap_eps << endl;
-                    sout << "best possible overlap:   "<< area/total_area << endl;
+                    sout << "match_eps:               "<< match_eps << endl;
+                    sout << "best possible match:     "<< area/total_area << endl;
                     sout << "truth rect:              "<< truth_rects[idx][i] << endl;
                     sout << "truth rect width/height: "<< truth_rects[idx][i].width()/(double)truth_rects[idx][i].height() << endl;
                     sout << "truth rect area:         "<< truth_rects[idx][i].area() << endl;
@@ -272,13 +272,13 @@ namespace dlib
                 if (overlaps_any_box(final_dets, dets[i].second))
                     continue;
 
-                const std::pair<double,unsigned int> truth = find_max_overlap(truth_rects[idx], dets[i].second);
+                const std::pair<double,unsigned int> truth = find_best_match(truth_rects[idx], dets[i].second);
 
                 final_dets.push_back(dets[i].second);
 
-                const double truth_overlap = truth.first;
+                const double truth_match = truth.first;
                 // if hit truth rect
-                if (truth_overlap > overlap_eps)
+                if (truth_match > match_eps)
                 {
                     // if this is the first time we have seen a detect which hit truth_rects[truth.second]
                     const double score = dets[i].first - thresh;
@@ -302,10 +302,10 @@ namespace dlib
                 if (overlaps_any_box(final_dets, dets[i].second))
                     continue;
 
-                const std::pair<double,unsigned int> truth = find_max_overlap(truth_rects[idx], dets[i].second);
+                const std::pair<double,unsigned int> truth = find_best_match(truth_rects[idx], dets[i].second);
 
-                const double truth_overlap = truth.first;
-                if (truth_overlap > overlap_eps)
+                const double truth_match = truth.first;
+                if (truth_match > match_eps)
                 {
                     if (truth_score_hits[truth.second] >= 0)
                     {
@@ -351,22 +351,22 @@ namespace dlib
             return false;
         }
 
-        std::pair<double,unsigned int> find_max_overlap(
+        std::pair<double,unsigned int> find_best_match(
             const std::vector<rectangle>& boxes,
             const rectangle rect
         ) const
         /*!
             ensures
-                - determines which rectangle in boxes overlaps rect the most and
-                  returns the amount of this overlap.  Specifically, the overlap is
+                - determines which rectangle in boxes matches rect the most and
+                  returns the amount of this match.  Specifically, the match is
                   a number O with the following properties:
                     - 0 <= O <= 1
-                    - Let R be the maximum overlap rectangle in boxes, then
-                      O == (R.intersect(rect)).area() / (R + rect).area
-                    - O == 0 if there is no overlap with any rectangle.
+                    - Let R be the maximum matching rectangle in boxes, then
+                      O == (R.intersect(rect)).area() / (R + rect).area()
+                    - O == 0 if there is no match with any rectangle.
         !*/
         {
-            double overlap = 0;
+            double match = 0;
             unsigned int best_idx = 0;
             for (unsigned long i = 0; i < boxes.size(); ++i)
             {
@@ -374,16 +374,16 @@ namespace dlib
                 const unsigned long area = rect.intersect(boxes[i]).area();
                 if (area != 0)
                 {
-                    const double new_overlap = area / static_cast<double>((rect + boxes[i]).area());
-                    if (new_overlap > overlap)
+                    const double new_match = area / static_cast<double>((rect + boxes[i]).area());
+                    if (new_match > match)
                     {
-                        overlap = new_overlap;
+                        match = new_match;
                         best_idx = i;
                     }
                 }
             }
 
-            return std::make_pair(overlap,best_idx);
+            return std::make_pair(match,best_idx);
         }
 
 
@@ -396,7 +396,7 @@ namespace dlib
         const std::vector<std::vector<rectangle> >& truth_rects;
 
         unsigned long max_num_dets;
-        double overlap_eps;
+        double match_eps;
         double loss_per_false_alarm;
         double loss_per_missed_target;
     };

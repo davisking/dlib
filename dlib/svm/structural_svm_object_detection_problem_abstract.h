@@ -68,12 +68,12 @@ namespace dlib
                     Then the loss for a particular labeling is the quantity:
                         FA*get_loss_per_false_alarm() + MT*get_loss_per_missed_target()
 
-                A detection is considered a false alarm if it doesn't overlap with any 
+                A detection is considered a false alarm if it doesn't match with any 
                 of the ground truth rectangles or if it is a duplicate detection of a 
-                truth rectangle.  Finally, for the purposes of calculating loss, overlap 
-                is determined using the following formula, rectangles A and B overlap 
+                truth rectangle.  Finally, for the purposes of calculating loss, a match 
+                is determined using the following formula, rectangles A and B match 
                 if and only if:
-                    A.intersect(B).area()/(A+B).area() > get_overlap_eps()
+                    A.intersect(B).area()/(A+B).area() > get_match_eps()
         !*/
     public:
 
@@ -98,7 +98,7 @@ namespace dlib
                     object_detector<image_scanner_type,overlap_tester_type> detector(scanner,overlap_tester,w)
                   results in a detector object which attempts to compute the following mapping:
                     truth_rects[i] == detector(images[i])
-                - #get_overlap_eps() == 0.5
+                - #get_match_eps() == 0.5
                 - This object will use num_threads threads during the optimization 
                   procedure.  You should set this parameter equal to the number of 
                   available processing cores on your machine.
@@ -106,22 +106,25 @@ namespace dlib
                 - #get_loss_per_false_alarm() == 1
         !*/
 
-        void set_overlap_eps (
+        void set_match_eps (
             double eps
         );
         /*!
             requires
                 - 0 < eps < 1
             ensures
-                - #get_overlap_eps() == eps
+                - #get_match_eps() == eps
         !*/
 
-        double get_overlap_eps (
+        double get_match_eps (
         ) const;
         /*!
             ensures
-                - returns the amount of overlap necessary for a detection to be considered
-                  as overlapping with a ground truth rectangle.
+                - returns the amount of alignment necessary for a detection to be considered
+                  as matching with a ground truth rectangle.  The precise formula for determining
+                  if two rectangles match each other is the following, rectangles A and B match 
+                  if and only if:
+                    A.intersect(B).area()/(A+B).area() > get_match_eps()
         !*/
 
         double get_loss_per_missed_target (

@@ -55,7 +55,7 @@ namespace dlib
                 - #get_epsilon() == 0.3
                 - #get_num_threads() == 2
                 - #get_max_cache_size() == 40
-                - #get_overlap_eps() == 0.5
+                - #get_match_eps() == 0.5
                 - #get_loss_per_missed_target() == 1
                 - #get_loss_per_false_alarm() == 1
                 - This object will attempt to learn a model for the given
@@ -190,25 +190,25 @@ namespace dlib
                   better generalization. 
         !*/
 
-        void set_overlap_eps (
+        void set_match_eps (
             double eps
         );
         /*!
             requires
                 - 0 < eps < 1
             ensures
-                - #get_overlap_eps() == eps
+                - #get_match_eps() == eps
         !*/
 
-        double get_overlap_eps (
+        double get_match_eps (
         ) const;
         /*!
             ensures
-                - returns the amount of overlap necessary for a detection to be considered
-                  as overlapping with a ground truth rectangle.  If it doesn't overlap then
+                - returns the amount of alignment necessary for a detection to be considered
+                  as matching with a ground truth rectangle.  If it doesn't match then
                   it is considered to be a false alarm.  To define this precisely, let
-                  A and B be two rectangles, then A and B overlap if and only if:
-                    A.intersect(B).area()/(A+B).area() > get_overlap_eps()
+                  A and B be two rectangles, then A and B match if and only if:
+                    A.intersect(B).area()/(A+B).area() > get_match_eps()
         !*/
 
         double get_loss_per_missed_target (
