@@ -104,6 +104,7 @@
          <item>running_covariance</item> 
          <item>random_subset_selector</item> 
          <item>randomly_subsample</item> 
+         <item>randomly_sample_image_features</item> 
 
       </section>
 
@@ -113,6 +114,8 @@
          <item>crc32</item> 
          <item>hash</item> 
          <item>murmur_hash3</item> 
+         <item>projection_hash</item> 
+         <item>create_random_projection_hash</item> 
       </section>
     </top>  
    </menu>
@@ -198,6 +201,33 @@
             This function takes a block of memory and returns a 32bit hash.  The 
             hashing algorithm used is Austin Appleby's excellent 
             <a href="http://code.google.com/p/smhasher/">MurmurHash3</a>. 
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>projection_hash</name>
+         <file>dlib/lsh.h</file>
+         <spec_file>dlib/lsh/projection_hash_abstract.h</spec_file>
+         <description>
+                This is a tool for hashing elements of a vector space into the integers.  
+                It is intended to represent locality sensitive hashing functions such as 
+                the popular <a href="#create_random_projection_hash">random projection hashing</a> method.
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>create_random_projection_hash</name>
+         <file>dlib/lsh.h</file>
+         <spec_file>dlib/lsh/create_random_projection_hash_abstract.h</spec_file>
+         <description>
+            Creates a random projection based locality sensitive 
+            <a href="#projection_hash">hashing function</a>.
          </description>
          
       </component>
@@ -423,6 +453,20 @@
          <description>
             This is a set of convenience functions for 
             creating <a href="#random_subset_selector">random subsets</a> of data.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>randomly_sample_image_features</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/image_feature_sampling_abstract.h</spec_file>
+         <description>
+            Given a feature extractor such as the <a href="imaging.html#hog_image">hog_image</a>,
+            this routine selects a random subsample of local image feature vectors 
+            from a set of images.  
          </description>
                                  
       </component>

@@ -9,7 +9,6 @@
    <body>
       <term_list>
 
-   <!-- ************* DLIB-ML STUFF **************** -->
 
          <term file="dlib/rand/rand_float_abstract.h.html" name="get_random_float"/>
          <term link="compile.html" name="DLIB_REVISION"/>
@@ -112,6 +111,9 @@
          <term file="bayes.html" name="node_next_parent_assignment"/>
          <term file="bayes.html" name="node_cpt_filled_out"/>
 
+         <term file="algorithms.html" name="projection_hash"/>
+         <term file="algorithms.html" name="create_random_projection_hash"/>
+         <term file="algorithms.html" name="randomly_sample_image_features"/>
          <term file="algorithms.html" name="disjoint_subsets"/>
          <term link="algorithms.html#disjoint_subsets" name="union-find"/>
          <term file="algorithms.html" name="rectangle"/>
@@ -554,9 +556,6 @@
 
          <term link="intro.html#Creating Objects" name="debugging modes: enable/disable"/>
 
-   <!-- ******************************************** -->
-   <!-- ************* GENERAL STUFF **************** -->
-   <!-- ******************************************** -->
 
          <term file="other.html" name="console_progress_indicator"/>
 
@@ -1050,8 +1049,13 @@
          <term file="imaging.html" name="create_single_box_detection_template"/>
          <term file="imaging.html" name="create_overlapped_2x2_detection_template"/>
          <term file="imaging.html" name="create_grid_detection_template"/>
+         <term file="imaging.html" name="determine_object_boxes"/>
+         <term file="imaging.html" name="setup_grid_detection_templates"/>
+         <term file="imaging.html" name="setup_hashed_features"/>
          <term file="dlib/image_processing/scan_image_abstract.h.html" name="all_images_same_size"/>
          <term file="dlib/image_processing/scan_image_abstract.h.html" name="sum_of_rects_in_images"/>
+         <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="find_tight_overlap_tester"/>
+         <term file="dlib/image_processing/scan_image_pyramid_tools_abstract.h.html" name="image_hash_construction_failure"/>
 
 
 

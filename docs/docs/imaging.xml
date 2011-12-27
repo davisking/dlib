@@ -84,12 +84,16 @@
          <item>scan_image_pyramid</item>
          <item>test_box_overlap</item>
          <item nolink="true">
-            <name>Detection_Templates</name>
+            <name>Scan Image Pyramid Tools</name>
             <sub>
                <item>compute_box_dimensions</item>
                <item>create_single_box_detection_template</item>
                <item>create_overlapped_2x2_detection_template</item>
                <item>create_grid_detection_template</item>
+
+               <item>determine_object_boxes</item>
+               <item>setup_grid_detection_templates</item>
+               <item>setup_hashed_features</item>
             </sub>
          </item>
       </section>
@@ -1319,6 +1323,59 @@
             particular function creates a detection template with a grid of feature
             extraction regions.
          </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>determine_object_boxes</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_pyramid_tools_abstract.h</spec_file>
+         <description>        
+            The <a href="#scan_image_pyramid">scan_image_pyramid</a> object represents a sliding
+            window classifier system.  For it to work correctly it needs to be given a set of
+            object boxes which define the size and shape of each sliding window and these windows
+            need to be able to match the sizes and shapes of targets the user wishes to detect.
+            Therefore, the determine_object_boxes() routine is a tool for computing a set of object boxes
+            which can meet this requirement.
+
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>setup_grid_detection_templates</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_pyramid_tools_abstract.h</spec_file>
+         <description>        
+            This routine uses <a href="#determine_object_boxes">determine_object_boxes</a> to obtain a set of
+              object boxes and then adds them to a <a href="#scan_image_pyramid">scan_image_pyramid</a> object 
+              as detection templates.  It also uses <a href="#create_grid_detection_template">create_grid_detection_template</a>
+               to create each feature extraction region.  Therefore, the detection templates will extract
+              features from a regular grid inside each object box.
+         </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>setup_hashed_features</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_pyramid_tools_abstract.h</spec_file>
+         <description>        
+            This is a tool for configuring the <a href="#hashed_feature_image">hashed_feature_image</a> object
+            with a random <a href="algorithms.html#projection_hash">projection hash</a>. 
+         </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+         </examples>
                                  
       </component>
             
