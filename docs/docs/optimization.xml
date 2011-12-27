@@ -442,6 +442,10 @@ subject to the following constraint:
             and jobs and you need to decide which workers to assign to which jobs. Some workers are better at 
             certain jobs than others. So you would like to find out how to assign them all to jobs such that 
             overall productivity is maximized. You can use this routine to solve this problem and others like it. 
+            <p>
+               Note that dlib also contains a <a href="ml.html#structural_assignment_trainer">machine learning</a>
+               method for learning the cost function needed to use the Hungarian algorithm.
+            </p>
 
          </description>
                                  
