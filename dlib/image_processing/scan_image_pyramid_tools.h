@@ -112,18 +112,6 @@ namespace dlib
         const std::vector<rectangle>& rects,
         double min_match_score
     )
-    /*!
-        requires
-            - 0 < min_match_score <= 1
-            - image_scanner_type == an implementation of the scan_image_pyramid
-              object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
-        ensures
-            - returns a set of object boxes which, when used as detection
-              templates with the given scanner, can attain at least
-              min_match_score alignment with every element of rects.  Note that
-              the alignment between two rectangles A and B is defined as
-                (A.intersect(B).area())/(double)(A+B).area()
-    !*/
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(0 < min_match_score && min_match_score <= 1,
