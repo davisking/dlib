@@ -88,7 +88,8 @@ namespace dlib
             << "\n\t images.size(): " << images.size() 
             );
 
-        setup_hashed_features(scanner, images, feature_extractor(), bits, num_samples);
+        feature_extractor fe;
+        setup_hashed_features(scanner, images, fe, bits, num_samples);
     }
 
 // ----------------------------------------------------------------------------------------
