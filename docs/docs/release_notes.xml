@@ -12,13 +12,42 @@
 
 <current>
 New Stuff:
+   - Machine Learning
+      - Added a set of tools for learning to solve the assignment problem.
+        See the structural_assignment_trainer and its associated example
+        program for an introduction.
+      - Added some random projection based locality sensitive hashing tools.
+      - Added tools to simplify creating scan_image_pyramid objects.  See
+        the object_detector_ex.cpp example program for details.
  
 Non-Backwards Compatible Changes:
    - Changed the serialization format for rand objects.
+   - Changed the order of arguments for the sequence_labeler's constructor.
+   - Object Detection Changes
+      - Some parts of the object detection tools have been refactored.  In particular, 
+        the interfaces of the scan_image_pyramid and structural_object_detection_trainer 
+        have been changed slightly to improve usability.
+      - Made the test_box_overlap a little more flexible.  This change breaks
+        backwards compatibility with the previous version though.
+      - The hashed_feature_image object has been made more general.  It now 
+        uses a user supplied hashing function rather than its own hashing 
+        implementation.
+      - Removed constness from the operator() member functions of the 
+        object_detector.
 
 Bug fixes:
+   - Changed the add_probability() method of joint_probability_table so
+     it does a saturating add rather than a normal add.  This ensures the
+     probability value stays exactly &lt;= 1.  Previously, floating point
+     rounding error could cause it to be slightly above 1 and would therefore
+     cause some asserts to misfire during debugging mode.
+   - The object_detector had code in it which limited the number of outputs
+     to 100 rectangles.  This has been removed.
 
 Other:
+   - dlib::rand can now generate Gaussian random numbers.
+   - The structural_object_detection_trainer will now automatically setup
+     appropriate non-max suppression parameters if the user doesn't supply them. 
 
 </current>
 
