@@ -75,7 +75,7 @@ namespace dlib
         // figure out what the offset values should be
         for (int itr = 0; itr < offset.size(); ++itr)
         {
-            counts.assign(std::pow(2,bits), 0);
+            counts.assign(std::pow(2.0,bits), 0);
             // count the popularity of each hash value
             for (unsigned long i = 0; i < h.size(); ++i)
             {

@@ -44,7 +44,7 @@ namespace dlib
         unsigned long num_hash_bins (
         ) const
         {
-            return static_cast<unsigned long>(std::pow(2, offset.size()));
+            return static_cast<unsigned long>(std::pow(2.0, offset.size()));
         }
 
         template <typename EXP>
