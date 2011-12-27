@@ -95,7 +95,7 @@ namespace dlib
 
     namespace impl
     {
-        bool compare_first (
+        inline bool compare_first (
             const std::pair<unsigned long,rectangle>& a,
             const std::pair<unsigned long,rectangle>& b
         )
