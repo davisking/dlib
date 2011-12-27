@@ -160,7 +160,10 @@ namespace
 
 
             for (int i =0; i < 1000; ++i)
+            {
                 r.get_random_32bit_number();
+                r.get_random_gaussian();
+            }
 
             ostringstream sout;
             serialize(r, sout);
@@ -172,6 +175,7 @@ namespace
             for (int i =0; i < 1000; ++i)
             {
                 DLIB_TEST(r.get_random_32bit_number() == r2.get_random_32bit_number());
+                DLIB_TEST(r.get_random_gaussian() == r2.get_random_gaussian());
             }
         }
 
