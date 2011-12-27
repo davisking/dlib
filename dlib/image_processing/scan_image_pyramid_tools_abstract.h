@@ -131,6 +131,33 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_scanner_type
+        >
+    void setup_grid_detection_templates (
+        image_scanner_type& scanner,
+        const std::vector<std::vector<rectangle> >& rects,
+        unsigned int cells_x,
+        unsigned int cells_y,
+        double min_match_score = 0.75
+    );
+    /*!
+        requires
+            - cells_x > 0
+            - cells_y > 0
+            - 0 < min_match_score <= 1
+            - image_scanner_type == an implementation of the scan_image_pyramid
+              object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
+        ensures
+            - uses determine_object_boxes(scanner,rects,min_match_score) to obtain a set of
+              object boxes and then adds them to the given scanner object as detection templates.
+              Also uses create_grid_detection_template(object_box, cells_x, cells_y) to create
+              each feature extraction region.  Therefore, the detection templates will extract
+              features from a regular grid inside each object box.
+    !*/
+    
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SCAN_IMaGE_PYRAMID_TOOLS_ABSTRACT_H__

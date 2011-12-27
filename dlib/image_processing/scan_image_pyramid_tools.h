@@ -205,6 +205,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename image_scanner_type>
+    void setup_grid_detection_templates (
+        image_scanner_type& scanner,
+        const std::vector<std::vector<rectangle> >& rects,
+        unsigned int cells_x,
+        unsigned int cells_y,
+        double min_match_score = 0.75
+    )
+    {
+        const std::vector<rectangle>& object_boxes = determine_object_boxes(scanner, rects, min_match_score);
+        for (unsigned long i = 0; i < object_boxes.size(); ++i)
+        {
+            scanner.add_detection_template(object_boxes[i], create_grid_detection_template(object_boxes[i], cells_x, cells_y));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SCAN_IMaGE_PYRAMID_TOOLS_H__
