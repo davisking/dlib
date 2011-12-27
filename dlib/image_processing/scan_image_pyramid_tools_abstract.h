@@ -86,6 +86,51 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_scanner_type
+        >
+    std::vector<rectangle> determine_object_boxes (
+        const image_scanner_type& scanner,
+        const std::vector<rectangle>& rects,
+        double min_match_score
+    );
+    /*!
+        requires
+            - 0 < min_match_score <= 1
+            - image_scanner_type == an implementation of the scan_image_pyramid
+              object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
+        ensures
+            - returns a set of object boxes which, when used as detection
+              templates with the given scanner, can attain at least
+              min_match_score alignment with every element of rects.  Note that
+              the alignment between two rectangles A and B is defined as
+                (A.intersect(B).area())/(double)(A+B).area()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type
+        >
+    std::vector<rectangle> determine_object_boxes (
+        const image_scanner_type& scanner,
+        const std::vector<std::vector<rectangle> >& rects,
+        double min_match_score
+    );
+    /*!
+        requires
+            - 0 < min_match_score <= 1
+            - image_scanner_type == an implementation of the scan_image_pyramid
+              object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
+        ensures
+            - copies all rectangles in rects into a std::vector<rectangle> object, call it
+              R.  Then this function returns determine_object_boxes(scanner,R,min_match_score).
+              That is, it just called the version of determine_object_boxes() defined above
+              and returns the results.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SCAN_IMaGE_PYRAMID_TOOLS_ABSTRACT_H__
