@@ -199,7 +199,8 @@ int main()
 
         typedef scan_image_pyramid<pyramid_down_5_4, very_simple_feature_extractor> image_scanner_type;
         image_scanner_type scanner;
-        // Setup the sliding window box.  Lets use a window with the same shape as the white boxes we
+        // Instead of using setup_grid_detection_templates() like in object_detector_ex.cpp, lets manually
+        // setup the sliding window box.  We use a window with the same shape as the white boxes we
         // are trying to detect.
         const rectangle object_box = compute_box_dimensions(1,    // width/height ratio
                                                             70*70 // box area
@@ -234,10 +235,6 @@ int main()
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(4); // Set this to the number of processing cores on your machine. 
 
-        // This line tells the algorithm that it is never OK for two detections to overlap.  So
-        // this controls how the non-max suppression is performed and in general you can set this up
-        // any way you like. 
-        trainer.set_overlap_tester(test_box_overlap(0));
 
         // The trainer will try and find the detector which minimizes the number of detection mistakes.
         // This function controls how it decides if a detection output is a mistake or not.  The bigger
@@ -246,7 +243,7 @@ int main()
         // see that the detections aren't exactly on top of the white squares anymore.  See the documentation
         // for the structural_object_detection_trainer and structural_svm_object_detection_problem objects
         // for a more detailed discussion of this parameter.  
-        trainer.set_overlap_eps(0.95);
+        trainer.set_match_eps(0.95);
 
 
         object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
