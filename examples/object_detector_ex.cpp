@@ -155,9 +155,9 @@ int main()
         typedef scan_image_pyramid<pyramid_down, feature_extractor_type> image_scanner_type;
         image_scanner_type scanner;
 
-        // The hashed_feature_image feature extractor needs to be supplied with a hash function capable 
-        // of hashing the outputs of the hog_image.  Calling this function will set it up for us.  The 10
-        // here indicates that the hash will hash hog vectors into the range [0, pow(2,10)).  Therefore,
+        // The hashed_feature_image in the scanner needs to be supplied with a hash function capable 
+        // of hashing the outputs of the hog_image.  Calling this function will set it up for us.  The 
+        // 10 here indicates that it will hash hog vectors into the range [0, pow(2,10)).  Therefore,
         // the feature vectors output by the hashed_feature_image will have dimension pow(2,10).
         setup_hashed_features(scanner, images, 10);
 
