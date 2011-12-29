@@ -176,9 +176,6 @@ namespace dlib
             long col
         ) const;
         /*!
-            requires
-                - 0 <= row < nr()
-                - 0 <= col < nc()
             ensures
                 - returns BASE_FE.get_block_rect(row,col)
                   I.e. returns a rectangle that tells you what part of the original image is associated

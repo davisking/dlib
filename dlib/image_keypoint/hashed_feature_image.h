@@ -108,6 +108,7 @@ namespace dlib
 
     private:
 
+        array2d<unsigned long> feats;
         feature_extractor fe;
         hash_function_type phash;
 
@@ -126,6 +127,7 @@ namespace dlib
         std::ostream& out
     )
     {
+        serialize(item.feats, out);
         serialize(item.fe, out);
         serialize(item.phash, out);
     }
@@ -136,6 +138,7 @@ namespace dlib
         std::istream& in 
     )
     {
+        deserialize(item.feats, in);
         deserialize(item.fe, in);
         deserialize(item.phash, in);
     }
@@ -169,6 +172,7 @@ namespace dlib
     {
         fe.clear();
         phash = hash_function_type();
+        feats.clear();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -241,7 +245,18 @@ namespace dlib
         const image_type& img
     )
     {
-        fe.load(img);
+        feature_extractor fe_temp;
+        fe_temp.copy_configuration(fe);
+        fe_temp.load(img);
+
+        feats.set_size(fe_temp.nr(), fe_temp.nc());
+        for (long r = 0; r < feats.nr(); ++r)
+        {
+            for (long c = 0; c < feats.nc(); ++c)
+            {
+                feats[r][c] = phash(fe_temp(r,c));
+            }
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -254,7 +269,7 @@ namespace dlib
     size (
     ) const
     {
-        return fe.size();
+        return feats.size();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -267,7 +282,7 @@ namespace dlib
     nr (
     ) const
     {
-        return fe.nr();
+        return feats.nr();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -280,7 +295,7 @@ namespace dlib
     nc (
     ) const
     {
-        return fe.nc();
+        return feats.nc();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -320,7 +335,7 @@ namespace dlib
             << "\n\t this: " << this
             );
 
-        hash_feats[0] = std::make_pair(phash(fe(row,col)),1);
+        hash_feats[0] = std::make_pair(feats[row][col],1);
         return hash_feats;
     }
 
@@ -336,18 +351,6 @@ namespace dlib
         long col
     ) const
     {
-        // make sure requires clause is not broken
-        DLIB_ASSERT(0 <= row && row < nr() &&
-                    0 <= col && col < nc(),
-            "\t rectangle hashed_feature_image::get_block_rect(row,col)"
-            << "\n\t Invalid inputs were given to this function"
-            << "\n\t row:  " << row
-            << "\n\t col:  " << col 
-            << "\n\t nr(): " << nr()
-            << "\n\t nc(): " << nc()
-            << "\n\t this: " << this
-            );
-
         return fe.get_block_rect(row,col);
     }
 
