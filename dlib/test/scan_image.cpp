@@ -28,6 +28,30 @@ namespace
     // should start with "test."
     logger dlog("test.scan_image");
 
+// ----------------------------------------------------------------------------------------
+
+    template <typename image_type1, typename image_type2>
+    void sum_filter_i (
+        const image_type1& img,
+        image_type2& out,
+        const rectangle& rect
+    )
+    {
+        typedef typename image_type1::type pixel_type;
+        typedef typename promote<pixel_type>::type ptype;
+        integral_image_generic<ptype> iimg;
+        iimg.load(img);
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                const rectangle temp = translate_rect(rect, point(c,r)).intersect(get_rect(iimg));
+                if (temp.is_empty() == false)
+                    out[r][c] += iimg.get_sum_of_area(temp);
+            }
+        }
+
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -366,6 +390,58 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename pixel_type>
+    void test_sum_filter (
+    )
+    {
+        dlib::rand rnd;
+
+        for (int k = 0; k < 20; ++k)
+        {
+            print_spinner();
+
+            array2d<pixel_type> img(1 + rnd.get_random_32bit_number()%100,
+                                    1 + rnd.get_random_32bit_number()%100);
+
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    img[r][c] = 100*(rnd.get_random_double()-0.5);
+                }
+            }
+
+            array2d<long> test1(img.nr(), img.nc());
+            array2d<double> test2(img.nr(), img.nc());
+            array2d<long> test1_i(img.nr(), img.nc());
+            array2d<double> test2_i(img.nr(), img.nc());
+
+            assign_all_pixels(test1, 0);
+            assign_all_pixels(test2, 0);
+            assign_all_pixels(test1_i, 0);
+            assign_all_pixels(test2_i, 0);
+
+            for (int i = 0; i < 10; ++i)
+            {
+                const long width  = rnd.get_random_32bit_number()%10 + 1;
+                const long height = rnd.get_random_32bit_number()%10 + 1;
+                const point p(rnd.get_random_32bit_number()%img.nc(),
+                              rnd.get_random_32bit_number()%img.nr());
+
+                const rectangle rect = centered_rect(p, width, height);
+                sum_filter(img, test1, rect);
+                sum_filter(img, test2, rect);
+                sum_filter(img, test1_i, rect);
+                sum_filter(img, test2_i, rect);
+
+                DLIB_TEST(array_to_matrix(test1) == array_to_matrix(test1_i));
+                DLIB_TEST(array_to_matrix(test2) == array_to_matrix(test2_i));
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class scan_image_tester : public tester
     {
     public:
@@ -384,6 +460,9 @@ namespace
             run_test3<unsigned char>(-1);
             run_test3<double>(1);
             run_test3<double>(-1);
+
+            test_sum_filter<unsigned char>();
+            test_sum_filter<double>();
         }
     } a;
 
