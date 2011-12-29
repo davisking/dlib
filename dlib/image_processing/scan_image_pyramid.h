@@ -549,12 +549,10 @@ namespace dlib
     ) const
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(get_num_detection_templates() > 0 &&
-                    is_loaded_with_image(),
+        DLIB_ASSERT(get_num_detection_templates() > 0 ,
             "\t const rectangle scan_image_pyramid::get_best_matching_rect()"
             << "\n\t Invalid inputs were given to this function "
             << "\n\t get_num_detection_templates(): " << get_num_detection_templates()
-            << "\n\t is_loaded_with_image(): " << is_loaded_with_image()
             << "\n\t this: " << this
             );
 
@@ -588,12 +586,15 @@ namespace dlib
         const dlib::vector<double,2> p(rect.width(), rect.height());
 
         // for all the levels
-        for (unsigned long l = 0; l < feats.size(); ++l)
+        for (unsigned long l = 0; l < max_pyramid_levels; ++l)
         {
             // Run the center point through the feature/image space transformation just to make
             // sure we exactly replicate the procedure for shifting an object_box used elsewhere 
             // in this file.
-            const point origin = feats[l].feat_to_image_space(feats[l].image_to_feat_space(center(pyr.rect_down(rect,l))));
+            const rectangle temp = pyr.rect_down(rect,l);
+            if (temp.area() <= 1) 
+                break;
+            const point origin = feats_config.feat_to_image_space(feats_config.image_to_feat_space(center(temp)));
 
             for (unsigned long t = 0; t < det_templates.size(); ++t)
             {
@@ -617,24 +618,22 @@ namespace dlib
         }
 
 
-        // Now get the features out of feats[best_level].  But first translate best_template 
-        // into the right spot (it should be centered at the location determined by rect)
-        // and convert it into the feature image coordinate system.
+        // Now we translate best_template into the right spot (it should be centered at the location 
+        // determined by rect) and convert it into the feature image coordinate system.
         rect = pyr.rect_down(rect,best_level);
-        const point offset = -feats[best_level].image_to_feat_space(point(0,0));
-        const point origin = feats[best_level].image_to_feat_space(center(rect)) + offset;
+        const point offset = -feats_config.image_to_feat_space(point(0,0));
+        const point origin = feats_config.image_to_feat_space(center(rect)) + offset;
         for (unsigned long k = 0; k < best_template.rects.size(); ++k)
         {
             rectangle temp = best_template.rects[k];
-            temp = feats[best_level].image_to_feat_space(temp);
+            temp = feats_config.image_to_feat_space(temp);
             temp = translate_rect(temp, origin);
-            temp = get_rect(feats[best_level]).intersect(temp);
             best_template.rects[k] = temp;
         }
 
         // The input rectangle was mapped to one of the detection templates.  Reverse the process
         // to figure out what the mapped rectangle is in the original input space.
-        mapped_rect = translate_rect(best_template.object_box, feats[best_level].feat_to_image_space(origin-offset));
+        mapped_rect = translate_rect(best_template.object_box, feats_config.feat_to_image_space(origin-offset));
         mapped_rect = pyr.rect_up(mapped_rect, best_level);
     }
 
@@ -671,7 +670,7 @@ namespace dlib
 
         for (unsigned long j = 0; j < best_template.rects.size(); ++j)
         {
-            const rectangle rect = best_template.rects[j];
+            const rectangle rect = best_template.rects[j].intersect(get_rect(feats[best_level]));
             const unsigned long template_region_id = j;
             const unsigned long offset = feats_config.get_num_dimensions()*template_region_id;
             for (long r = rect.top(); r <= rect.bottom(); ++r)

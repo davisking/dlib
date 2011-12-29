@@ -294,7 +294,6 @@ namespace dlib
         ) const;
         /*!
             requires
-                - is_loaded_with_image() == true
                 - get_num_detection_templates() > 0
             ensures
                 - Since scan_image_pyramid is a sliding window classifier system, not all possible rectangles 
