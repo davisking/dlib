@@ -489,17 +489,16 @@ namespace dlib
         for (unsigned long l = 0; l < feats.size(); ++l)
         {
             for (unsigned long i = 0; i < saliency_images.size(); ++i)
-                saliency_images[i].set_size(feats[l].nr(), feats[l].nc());
-
-            // build saliency images for pyramid level l 
-            for (long r = 0; r < feats[l].nr(); ++r)
             {
-                for (long c = 0; c < feats[l].nc(); ++c)
+                saliency_images[i].set_size(feats[l].nr(), feats[l].nc());
+                const unsigned long offset = feats_config.get_num_dimensions()*i;
+
+                // build saliency images for pyramid level l 
+                for (long r = 0; r < feats[l].nr(); ++r)
                 {
-                    const typename feature_extractor_type::descriptor_type& descriptor = feats[l](r,c);
-                    for (unsigned long i = 0; i < saliency_images.size(); ++i)
+                    for (long c = 0; c < feats[l].nc(); ++c)
                     {
-                        const unsigned long offset = feats_config.get_num_dimensions()*i;
+                        const typename feature_extractor_type::descriptor_type& descriptor = feats[l](r,c);
 
                         double sum = 0;
                         for (unsigned long k = 0; k < descriptor.size(); ++k)
