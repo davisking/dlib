@@ -8,6 +8,7 @@
 #include "structural_svm_problem_threaded.h"
 #include <sstream>
 #include "../string.h"
+#include "../array.h"
 
 namespace dlib
 {
@@ -57,13 +58,16 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            scanner_config.copy_configuration(scanner);
+            scanners.set_max_size(images.size());
+            scanners.set_size(images.size());
 
             max_num_dets = 0;
             for (unsigned long i = 0; i < truth_rects.size(); ++i)
             {
                 if (truth_rects.size() > max_num_dets)
                     max_num_dets = truth_rects.size();
+
+                scanners[i].copy_configuration(scanner);
             }
             max_num_dets = max_num_dets*3 + 10;
         }
@@ -135,7 +139,7 @@ namespace dlib
         virtual long get_num_dimensions (
         ) const 
         {
-            return scanner_config.get_num_dimensions() + 
+            return scanners[0].get_num_dimensions() + 
                 1;// for threshold
         }
 
@@ -150,10 +154,8 @@ namespace dlib
             feature_vector_type& psi 
         ) const 
         {
-            image_scanner_type scanner;
-            scanner.copy_configuration(scanner_config);
+            const image_scanner_type& scanner = get_scanner(idx);
 
-            scanner.load(images[idx]);
             psi.set_size(get_num_dimensions());
             std::vector<rectangle> mapped_rects;
 
@@ -248,13 +250,11 @@ namespace dlib
             feature_vector_type& psi
         ) const 
         {
-            image_scanner_type scanner;
-            scanner.copy_configuration(scanner_config);
+            const image_scanner_type& scanner = get_scanner(idx);
 
             std::vector<std::pair<double, rectangle> > dets;
             const double thresh = current_solution(scanner.get_num_dimensions());
 
-            scanner.load(images[idx]);
 
             scanner.detect(current_solution, dets, thresh-loss_per_false_alarm);
 
@@ -390,10 +390,18 @@ namespace dlib
         }
 
 
+        const image_scanner_type& get_scanner (long idx) const
+        {
+            if (scanners[idx].is_loaded_with_image() == false)
+                scanners[idx].load(images[idx]);
+
+            return scanners[idx];
+        }
+
 
         overlap_tester_type boxes_overlap;
 
-        image_scanner_type scanner_config;
+        mutable typename array<image_scanner_type>::kernel_2a scanners;
 
         const image_array_type& images;
         const std::vector<std::vector<rectangle> >& truth_rects;
