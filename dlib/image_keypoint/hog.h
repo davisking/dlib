@@ -145,18 +145,6 @@ namespace dlib
             long col
         ) const
         {
-            // make sure requires clause is not broken
-            DLIB_ASSERT( 0 <= row && row < nr() &&
-                         0 <= col && col < nc(),
-                "\t rectangle hog_image::get_block_rect()"
-                << "\n\t invalid row or col argument"
-                << "\n\t row:  " << row
-                << "\n\t col:  " << col 
-                << "\n\t nr(): " << nr() 
-                << "\n\t nc(): " << nc() 
-                << "\n\t this: " << this
-                );
-
             row *= cell_stride;
             col *= cell_stride;
 

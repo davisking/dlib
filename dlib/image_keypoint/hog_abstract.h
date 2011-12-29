@@ -219,12 +219,10 @@ namespace dlib
             long col
         ) const;
         /*!
-            requires
-                - 0 <= row < nr()
-                - 0 <= col < nc()
             ensures
                 - returns a rectangle that tells you what part of the original image is associated
-                  with a particular HOG block.
+                  with a particular HOG block.  That is, what part of the input image is associated
+                  with (*this)(row,col).
                 - The returned rectangle will be cell_size*block_size pixels wide and tall.
         !*/
 
