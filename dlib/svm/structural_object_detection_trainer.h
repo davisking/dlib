@@ -255,16 +255,13 @@ namespace dlib
 
             if (auto_overlap_tester)
             {
-                image_scanner_type local_scanner;
-                local_scanner.copy_configuration(scanner);
                 std::vector<std::vector<rectangle> > mapped_rects(truth_rects.size());
                 for (unsigned long i = 0; i < truth_rects.size(); ++i)
                 {
-                    local_scanner.load(images[i]);
                     mapped_rects[i].resize(truth_rects[i].size());
                     for (unsigned long j = 0; j < truth_rects[i].size(); ++j)
                     {
-                        mapped_rects[i][j] = local_scanner.get_best_matching_rect(truth_rects[i][j]);
+                        mapped_rects[i][j] = scanner.get_best_matching_rect(truth_rects[i][j]);
                     }
                 }
 
