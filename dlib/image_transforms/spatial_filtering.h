@@ -358,8 +358,8 @@ namespace dlib
             << "\n\t sigma must be bigger than 0"
             << "\n\t sigma: " << sigma 
         );
-        const double pi = 3.1415926535898;
-        return 1.0/(sigma*sigma*2*pi) * std::exp( -(x*x)/(2*sigma*sigma));
+        const double sqrt_2_pi = 2.5066282746310002416123552393401041626930;
+        return 1.0/(sigma*sqrt_2_pi) * std::exp( -(x*x)/(2*sigma*sigma));
     }
 
 // ----------------------------------------------------------------------------------------

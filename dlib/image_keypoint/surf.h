@@ -66,8 +66,8 @@ namespace dlib
             << "\n\t sig must be bigger than 0"
             << "\n\t sig: " << sig 
         );
-        const double pi = 3.1415926535898;
-        return 1.0/(sig*sig*2*pi) * std::exp( -(x*x + y*y)/(2*sig*sig));
+        const double sqrt_2_pi = 2.5066282746310002416123552393401041626930;
+        return 1.0/(sig*sqrt_2_pi) * std::exp( -(x*x + y*y)/(2*sig*sig));
     }
 
 // ----------------------------------------------------------------------------------------
