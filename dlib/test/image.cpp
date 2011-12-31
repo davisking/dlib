@@ -1155,6 +1155,139 @@ namespace
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void downsample_image (
+        const unsigned long downsample,
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        bool add_to
+    )
+    {
+        out_img.set_size((in_img.nr()+downsample-1)/downsample,
+                         (in_img.nc()+downsample-1)/downsample);
+
+        for (long r = 0; r < out_img.nr(); ++r)
+        {
+            for (long c = 0; c < out_img.nc(); ++c)
+            {
+                if (add_to)
+                    out_img[r][c] += in_img[r*downsample][c*downsample];
+                else
+                    out_img[r][c] = in_img[r*downsample][c*downsample];
+            }
+        }
+    }
+
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP1,
+        typename EXP2,
+        typename T
+        >
+    void spatially_filter_image_separable_down_simple (
+        const unsigned long downsample,
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter,
+        T scale,
+        bool use_abs = false,
+        bool add_to = false
+    )
+    {
+        out_image_type temp;
+        spatially_filter_image_separable(in_img, temp, row_filter, col_filter, scale, use_abs, false);
+        downsample_image(downsample, temp, out_img, add_to);
+    }
+
+
+
+
+    template <unsigned long downsample>
+    void test_downsampled_filtering_helper(long row_filt_size, long col_filt_size)
+    {
+        print_spinner();
+        dlog << LTRACE << "***********************************";
+        dlog << LTRACE << "downsample: " << downsample;
+        dlog << LTRACE << "row_filt_size: "<< row_filt_size;
+        dlog << LTRACE << "col_filt_size: "<< col_filt_size;
+        dlib::rand rnd;
+        array2d<int> out1, out2;
+        for (long nr = 0; nr < 3; ++nr)
+        {
+            for (long nc = 0; nc < 3; ++nc)
+            {
+                dlog << LTRACE << "nr: "<< nr;
+                dlog << LTRACE << "nc: "<< nc;
+                array2d<unsigned char> img(25+nr,25+nc);
+                for (int k = 0; k < 5; ++k)
+                {
+                    for (long r = 0; r < img.nr(); ++r)
+                    {
+                        for (long c = 0; c < img.nc(); ++c)
+                        {
+                            img[r][c] = rnd.get_random_8bit_number();
+                        }
+                    }
+
+                    matrix<int,0,1> row_filter(row_filt_size);
+                    matrix<int,0,1> col_filter(col_filt_size);
+
+                    row_filter = matrix_cast<int>(10*randm(row_filt_size,1, rnd));
+                    col_filter = matrix_cast<int>(10*randm(col_filt_size,1, rnd));
+
+                    row_filter -= 3;
+                    col_filter -= 3;
+
+
+                    spatially_filter_image_separable_down_simple(downsample, img, out1, row_filter, col_filter,1 );
+                    spatially_filter_image_separable_down(downsample, img, out2, row_filter, col_filter);
+
+                    DLIB_TEST(get_rect(out1) == get_rect(out2));
+                    DLIB_TEST(array_to_matrix(out1) == array_to_matrix(out2));
+
+                    spatially_filter_image_separable_down_simple(downsample, img, out1, row_filter, col_filter,3, true, true );
+                    spatially_filter_image_separable_down(downsample, img, out2, row_filter, col_filter, 3, true, true);
+
+                    DLIB_TEST(get_rect(out1) == get_rect(out2));
+                    DLIB_TEST(array_to_matrix(out1) == array_to_matrix(out2));
+
+                }
+            }
+        }
+    }
+
+    void test_downsampled_filtering()
+    {
+        test_downsampled_filtering_helper<1>(5,5);
+        test_downsampled_filtering_helper<2>(5,5);
+        test_downsampled_filtering_helper<3>(5,5);
+        test_downsampled_filtering_helper<1>(3,5);
+        test_downsampled_filtering_helper<2>(3,5);
+        test_downsampled_filtering_helper<3>(3,5);
+        test_downsampled_filtering_helper<1>(5,3);
+        test_downsampled_filtering_helper<2>(5,3);
+        test_downsampled_filtering_helper<3>(5,3);
+
+        test_downsampled_filtering_helper<1>(3,3);
+        test_downsampled_filtering_helper<2>(3,3);
+        test_downsampled_filtering_helper<3>(3,3);
+
+        test_downsampled_filtering_helper<1>(1,1);
+        test_downsampled_filtering_helper<2>(1,1);
+        test_downsampled_filtering_helper<3>(1,1);
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+
     class image_tester : public tester
     {
     public:
@@ -1186,6 +1319,7 @@ namespace
 
             test_label_connected_blobs();
             test_label_connected_blobs2();
+            test_downsampled_filtering();
         }
     } a;
 

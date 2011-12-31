@@ -113,6 +113,49 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP1,
+        typename EXP2,
+        typename T
+        >
+    void spatially_filter_image_separable_down (
+        const unsigned long downsample,
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter,
+        T scale = 1,
+        bool use_abs = false,
+        bool add_to = false
+    );
+    /*!
+        requires
+            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename in_image_type::type>::has_alpha == false
+            - pixel_traits<typename out_image_type::type>::has_alpha == false 
+            - is_same_object(in_img, out_img) == false 
+            - T must be some scalar type
+            - scale != 0
+            - is_vector(row_filter) == true
+            - is_vector(col_filter) == true
+            - row_filter.size() % 2 == 1  (i.e. must be odd)
+            - col_filter.size() % 2 == 1  (i.e. must be odd)
+            - downsample > 0
+        ensures
+            - This function is equivalent to calling 
+              spatially_filter_image_separable(in_img,out_img,row_filter,col_filter,scale,use_abs,add_to)
+              and then downsampling the output image by a factor of downsample.  Therefore, 
+              we will have that:
+                - #out_img.nr() == ceil((double)in_img.nr()/downsample)
+                - #out_img.nc() == ceil((double)in_img.nc()/downsample)
+                - #out_img[r][c] == filtered pixel corresponding to in_img[r*downsample][c*downsample]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         long NR,
         long NC,
         typename T,

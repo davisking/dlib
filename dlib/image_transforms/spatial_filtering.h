@@ -254,6 +254,149 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP1,
+        typename EXP2,
+        typename T
+        >
+    void spatially_filter_image_separable_down (
+        const unsigned long downsample,
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter,
+        T scale,
+        bool use_abs = false,
+        bool add_to = false
+    )
+    {
+        COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+        DLIB_ASSERT(downsample > 0 &&
+                    scale != 0 &&
+                    row_filter.size()%2 == 1 &&
+                    col_filter.size()%2 == 1 &&
+                    is_vector(row_filter) &&
+                    is_vector(col_filter),
+            "\tvoid spatially_filter_image_separable_down()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t downsample: "<< downsample
+            << "\n\t scale: "<< scale
+            << "\n\t row_filter.size(): "<< row_filter.size()
+            << "\n\t col_filter.size(): "<< col_filter.size()
+            << "\n\t is_vector(row_filter): "<< is_vector(row_filter)
+            << "\n\t is_vector(col_filter): "<< is_vector(col_filter)
+            );
+        DLIB_ASSERT(is_same_object(in_img, out_img) == false,
+            "\tvoid spatially_filter_image_separable_down()"
+            << "\n\tYou must give two different image objects"
+            );
+
+
+
+        // if there isn't any input image then don't do anything
+        if (in_img.size() == 0)
+        {
+            out_img.clear();
+            return;
+        }
+
+        out_img.set_size((long)(std::ceil((double)in_img.nr()/downsample)),
+                         (long)(std::ceil((double)in_img.nc()/downsample)));
+
+        const double col_border = std::floor(col_filter.size()/2.0);
+        const double row_border = std::floor(row_filter.size()/2.0);
+
+        // figure out the range that we should apply the filter to
+        const long first_row = (long)std::ceil(col_border/downsample);
+        const long first_col = (long)std::ceil(row_border/downsample);
+        const long last_row  = (long)std::ceil((in_img.nr() - col_border)/downsample);
+        const long last_col  = (long)std::ceil((in_img.nc() - row_border)/downsample);
+
+        // zero border pixels
+        border_enumerator be(get_rect(out_img), rectangle(first_col, first_row, last_col-1, last_row-1));
+        while (be.move_next())
+        {
+            out_img[be.element().y()][be.element().x()] = 0;
+        }
+
+        typedef typename EXP1::type ptype;
+
+        typedef typename out_image_type::mem_manager_type mem_manager_type;
+        array2d<ptype,mem_manager_type> temp_img;
+        temp_img.set_size(in_img.nr(), out_img.nc());
+
+        // apply the row filter
+        for (long r = 0; r < temp_img.nr(); ++r)
+        {
+            for (long c = first_col; c < last_col; ++c)
+            {
+                ptype p;
+                ptype temp = 0;
+                for (long n = 0; n < row_filter.size(); ++n)
+                {
+                    // pull out the current pixel and put it into p
+                    p = get_pixel_intensity(in_img[r][c*downsample-row_filter.size()/2+n]);
+                    temp += p*row_filter(n);
+                }
+                temp_img[r][c] = temp;
+            }
+        }
+
+        // apply the column filter 
+        for (long r = first_row; r < last_row; ++r)
+        {
+            for (long c = first_col; c < last_col; ++c)
+            {
+                ptype temp = 0;
+                for (long m = 0; m < col_filter.size(); ++m)
+                {
+                    temp += temp_img[r*downsample-col_filter.size()/2+m][c]*col_filter(m);
+                }
+
+                temp /= scale;
+
+                if (use_abs && temp < 0)
+                {
+                    temp = -temp;
+                }
+
+                // save this pixel to the output image
+                if (add_to == false)
+                {
+                    assign_pixel(out_img[r][c], in_img[r*downsample][c*downsample]);
+                    assign_pixel_intensity(out_img[r][c], temp);
+                }
+                else
+                {
+                    assign_pixel(out_img[r][c], temp + get_pixel_intensity(out_img[r][c]));
+                }
+            }
+        }
+    }
+
+    template <
+        typename in_image_type,
+        typename out_image_type,
+        typename EXP1,
+        typename EXP2
+        >
+    void spatially_filter_image_separable_down (
+        const unsigned long downsample,
+        const in_image_type& in_img,
+        out_image_type& out_img,
+        const matrix_exp<EXP1>& row_filter,
+        const matrix_exp<EXP2>& col_filter
+    )
+    {
+        spatially_filter_image_separable_down(downsample,in_img,out_img,row_filter,col_filter,1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         long NR,
         long NC,
         typename T,
