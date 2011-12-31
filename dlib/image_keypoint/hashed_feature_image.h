@@ -245,18 +245,17 @@ namespace dlib
         const image_type& img
     )
     {
-        feature_extractor fe_temp;
-        fe_temp.copy_configuration(fe);
-        fe_temp.load(img);
+        fe.load(img);
 
-        feats.set_size(fe_temp.nr(), fe_temp.nc());
+        feats.set_size(fe.nr(), fe.nc());
         for (long r = 0; r < feats.nr(); ++r)
         {
             for (long c = 0; c < feats.nc(); ++c)
             {
-                feats[r][c] = phash(fe_temp(r,c));
+                feats[r][c] = phash(fe(r,c));
             }
         }
+        fe.unload();
     }
 
 // ----------------------------------------------------------------------------------------

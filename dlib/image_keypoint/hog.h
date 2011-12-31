@@ -86,6 +86,9 @@ namespace dlib
             load_impl(array_to_matrix(img));
         }
 
+        inline void unload(
+        ) { clear(); }
+
         inline unsigned long size (
         ) const { return static_cast<unsigned long>(nr()*nc()); }
 

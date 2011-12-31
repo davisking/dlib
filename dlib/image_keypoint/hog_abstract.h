@@ -169,6 +169,25 @@ namespace dlib
                     - #size() > 0
         !*/
 
+        inline void unload (
+        );
+        /*!
+            ensures
+                - #nr() == 0
+                - #nc() == 0
+                - clears only the state information which is populated by load().  For 
+                  example, let H be a hog_image object.  Then consider the two sequences 
+                  of instructions:
+                    Sequence 1:
+                        H.load(img);      
+                        H.unload();
+                        H.load(img);
+
+                    Sequence 2:
+                        H.load(img);
+                  Both sequence 1 and sequence 2 should have the same effect on H.  
+        !*/
+
         inline unsigned long size (
         ) const;
         /*!
