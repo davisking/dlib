@@ -466,7 +466,7 @@ namespace
                 const point shift(4,5);
 
                 be = border_enumerator(translate_rect(get_rect(img),shift),bs);
-                DLIB_TEST(be.at_start() == false);
+                DLIB_TEST(be.at_start() == true);
                 DLIB_TEST(be.current_element_valid() == false);
                 while (be.move_next())
                 {
@@ -544,6 +544,7 @@ namespace
         )
         {
             geometry_test();
+            test_border_enumerator();
         }
     } a;
 
