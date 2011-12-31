@@ -49,6 +49,19 @@ namespace dlib
                   (i.e. the number of points in the border area of rect)
         !*/
 
+        border_enumerator(
+            const rectangle& rect,
+            const rectangle& non_border_region
+        );
+        /*!
+            ensures
+                - This object will enumerate over all points which are in rect but
+                  not in non_border_region.  
+                - current_element_valid() == false 
+                - at_start() == true
+                - size() == rect.area() - rect.intersect(non_border_region).area() 
+        !*/
+
         bool at_start (
         ) const;
         /*!

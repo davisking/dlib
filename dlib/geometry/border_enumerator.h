@@ -17,6 +17,7 @@ namespace dlib
         border_enumerator(
         ) 
         {
+            reset();
         }
 
         border_enumerator(
@@ -29,17 +30,51 @@ namespace dlib
             reset();
         }
 
+        border_enumerator(
+            const rectangle& rect_,
+            const rectangle& non_border_region
+        ) : 
+            rect(rect_),
+            inner_rect(non_border_region.intersect(rect))
+        {
+            reset();
+        }
+
         void reset (
         ) 
         {
-            p = rect.tl_corner();
+            // make the four rectangles that surround inner_rect and intersect them
+            // with rect.
+            bleft   = rect.intersect(rectangle(std::numeric_limits<long>::min(),
+                                               std::numeric_limits<long>::min(),
+                                               inner_rect.left()-1,
+                                               std::numeric_limits<long>::max()));
+
+            bright  = rect.intersect(rectangle(inner_rect.right()+1,
+                                               std::numeric_limits<long>::min(),
+                                               std::numeric_limits<long>::max(),
+                                               std::numeric_limits<long>::max()));
+
+            btop    = rect.intersect(rectangle(inner_rect.left(),
+                                               std::numeric_limits<long>::min(),
+                                               inner_rect.right(),
+                                               inner_rect.top()-1));
+
+            bbottom = rect.intersect(rectangle(inner_rect.left(),
+                                               inner_rect.bottom()+1,
+                                               inner_rect.right(),
+                                               std::numeric_limits<long>::max()));
+
+            p = bleft.tl_corner();
             p.x() -= 1;
+
+            mode = atleft;
         }
 
         bool at_start (
         ) const
         {
-            point temp = rect.tl_corner();
+            point temp = bleft.tl_corner();
             temp.x() -=1;
             return temp == p;
         }
@@ -47,23 +82,47 @@ namespace dlib
         bool current_element_valid(
         ) const
         {
-            return rect.contains(p) && !inner_rect.contains(p);
+            return rect.contains(p);
         }
 
         bool move_next()
         {
-            p.x() += 1;
-            if (p.x() > rect.right())
+            if (mode == atleft)
             {
-                p.y() += 1;
-                p.x() = rect.left();
+                if (advance_point(bleft, p))
+                    return true;
+                    
+                mode = attop;
+                p = btop.tl_corner();
+                p.x() -= 1;
             }
-            else if (inner_rect.contains(p))
+            if (mode == attop)
             {
-                p.x() = inner_rect.right()+1;
+                if (advance_point(btop, p))
+                    return true;
+                    
+                mode = atright;
+                p = bright.tl_corner();
+                p.x() -= 1;
+            }
+            if (mode == atright)
+            {
+                if (advance_point(bright, p))
+                    return true;
+                    
+                mode = atbottom;
+                p = bbottom.tl_corner();
+                p.x() -= 1;
             }
 
-            return current_element_valid();
+            if (advance_point(bbottom, p))
+                return true;
+
+            // put p outside rect since there are no more points to enumerate
+            p = rect.br_corner();
+            p.x() += 1;
+                    
+            return false;
         }
 
         unsigned long size (
@@ -87,9 +146,36 @@ namespace dlib
 
     private:
 
+        bool advance_point (
+            const rectangle& r,
+            point& p
+        ) const
+        {
+            p.x() += 1;
+            if (p.x() > r.right())
+            {
+                p.x() = r.left();
+                p.y() += 1;
+            }
+
+            return r.contains(p);
+        }
+
         point p;
         rectangle rect;
         rectangle inner_rect;  // the non-border regions of rect
+
+        enum emode
+        {
+            atleft,
+            atright,
+            atbottom,
+            attop
+        };
+
+        emode mode;
+
+        rectangle btop, bleft, bright, bbottom;
     };
 
 // ----------------------------------------------------------------------------------------

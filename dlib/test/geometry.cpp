@@ -526,6 +526,93 @@ namespace
             }
         }
 
+        {
+            matrix<bool,4,5> hits, truth;
+            const rectangle rect = rectangle(1,1,4,3); 
+
+            border_enumerator be(rect, rectangle(2,2, 3, 3));
+            DLIB_TEST(be.size() == 8);
+            hits = false;
+            while (be.move_next())
+            {
+                DLIB_TEST(rect.contains(be.element()));
+                hits(be.element().y(), be.element().x()) = true;
+            }
+            DLIB_TEST(be.current_element_valid() == false);
+            DLIB_TEST(be.size() == 8);
+            truth = false;
+            truth(1,1) = truth(1,2) = truth(1,3) = truth(1,4) = truth(2,1) =
+                truth(3,1) = truth(2,4) = truth(3,4) = true;
+            DLIB_TEST_MSG(truth == hits, truth << endl << hits);
+
+
+            
+
+            be = border_enumerator(rect, rectangle(0,0, 9, 9));
+            DLIB_TEST(be.size() == 0);
+            hits = false;
+            while (be.move_next())
+            {
+                DLIB_TEST(rect.contains(be.element()));
+                hits(be.element().y(), be.element().x()) = true;
+            }
+            DLIB_TEST(be.current_element_valid() == false);
+            DLIB_TEST(be.size() == 0);
+            truth = false;
+            DLIB_TEST(truth == hits);
+
+
+
+            be = border_enumerator(rect, rectangle(0,0, 3, 9));
+            DLIB_TEST(be.size() == 3);
+            hits = false;
+            while (be.move_next())
+            {
+                DLIB_TEST(rect.contains(be.element()));
+                hits(be.element().y(), be.element().x()) = true;
+            }
+            DLIB_TEST(be.current_element_valid() == false);
+            DLIB_TEST(be.size() == 3);
+            truth = false;
+            truth(1,4) = truth(2,4) = truth(3,4) = true;
+            DLIB_TEST(truth == hits);
+
+
+
+
+            be = border_enumerator(rect, rectangle(2,1, 4, 3));
+            DLIB_TEST(be.size() == 3);
+            hits = false;
+            while (be.move_next())
+            {
+                DLIB_TEST(rect.contains(be.element()));
+                hits(be.element().y(), be.element().x()) = true;
+            }
+            DLIB_TEST(be.current_element_valid() == false);
+            DLIB_TEST(be.size() == 3);
+            truth = false;
+            truth(1,1) = truth(2,1) = truth(3,1) = true;
+            DLIB_TEST(truth == hits);
+
+
+
+            be = border_enumerator(rect, rectangle(1,1, 5, 2));
+            DLIB_TEST(be.size() == 4);
+            hits = false;
+            while (be.move_next())
+            {
+                DLIB_TEST(rect.contains(be.element()));
+                hits(be.element().y(), be.element().x()) = true;
+            }
+            DLIB_TEST(be.current_element_valid() == false);
+            DLIB_TEST(be.size() == 4);
+            truth = false;
+            truth(3,1) = truth(3,2) = truth(3,3) = truth(3,4) = true;
+            DLIB_TEST(truth == hits);
+
+
+
+        }
 
     }
 
