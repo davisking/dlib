@@ -493,6 +493,33 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline const rectangle shrink_rect (
+        const rectangle& rect,
+        long width,
+        long height
+    );
+    /*!
+        ensures
+            - returns rectangle(rect.left()+width, rect.top()+height, rect.right()-width, rect.bottom()-height)
+              (i.e. shrinks the given rectangle by shrinking its left and right borders by width
+              and its top and bottom borders by height. )
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline const rectangle grow_rect (
+        const rectangle& rect,
+        long width,
+        long height
+    );
+    /*!
+        ensures
+            - return shrink_rect(rect, -width, -height)
+              (i.e. grows the given rectangle by expanding its border)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const rectangle translate_rect (
         const rectangle& rect,
         const point& p
