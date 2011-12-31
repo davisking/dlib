@@ -924,6 +924,23 @@ namespace
             DLIB_TEST(img2[2][1] == 0);
             DLIB_TEST(img2[2][2] == 0);
             DLIB_TEST(img2[2][3] == 0);
+
+            assign_all_pixels(img2, 3);
+            spatially_filter_image_separable(img,img2,rowf,colf,1,true, true);
+            DLIB_TEST(img2[0][0] == 0);
+            DLIB_TEST(img2[0][1] == 0);
+            DLIB_TEST(img2[0][2] == 0);
+            DLIB_TEST(img2[0][3] == 0);
+
+            DLIB_TEST(img2[1][0] == 0);
+            DLIB_TEST_MSG(img2[1][1] == 9+3, img2[1][1] );
+            DLIB_TEST(img2[1][2] == 9+3);
+            DLIB_TEST(img2[1][3] == 0);
+
+            DLIB_TEST(img2[2][0] == 0);
+            DLIB_TEST(img2[2][1] == 0);
+            DLIB_TEST(img2[2][2] == 0);
+            DLIB_TEST(img2[2][3] == 0);
         }
         {
             array2d<double> img, img2;
@@ -941,8 +958,36 @@ namespace
             DLIB_TEST(img2[0][3] == 0);
 
             DLIB_TEST(img2[1][0] == 0);
-            DLIB_TEST((img2[1][1] -  -4.5) < 1e-14);
-            DLIB_TEST((img2[1][2] -  -4.5) < 1e-14);
+            DLIB_TEST(std::abs(img2[1][1] -  -4.5) < 1e-14);
+            DLIB_TEST(std::abs(img2[1][2] -  -4.5) < 1e-14);
+            DLIB_TEST(img2[1][3] == 0);
+
+            DLIB_TEST(img2[2][0] == 0);
+            DLIB_TEST(img2[2][1] == 0);
+            DLIB_TEST(img2[2][2] == 0);
+            DLIB_TEST(img2[2][3] == 0);
+
+        }
+        {
+            array2d<double> img, img2;
+            img.set_size(3,4);
+            img2.set_size(3,4);
+            assign_all_pixels(img2, 8);
+
+            matrix<double> filter(3,3);
+            filter = 1;
+            assign_all_pixels(img,-1);
+
+            spatially_filter_image(img,img2,filter,2, false, true);
+
+            DLIB_TEST(img2[0][0] == 0);
+            DLIB_TEST(img2[0][1] == 0);
+            DLIB_TEST(img2[0][2] == 0);
+            DLIB_TEST(img2[0][3] == 0);
+
+            DLIB_TEST(img2[1][0] == 0);
+            DLIB_TEST(std::abs(img2[1][1] -  -4.5 - 8) < 1e-14);
+            DLIB_TEST(std::abs(img2[1][2] -  -4.5 - 8) < 1e-14);
             DLIB_TEST(img2[1][3] == 0);
 
             DLIB_TEST(img2[2][0] == 0);

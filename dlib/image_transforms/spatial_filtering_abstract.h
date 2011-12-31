@@ -22,7 +22,8 @@ namespace dlib
         out_image_type& out_img,
         const matrix_exp<EXP>& filter,
         T scale = 1,
-        bool use_abs = false
+        bool use_abs = false,
+        bool add_to = false
     );
     /*!
         requires
@@ -41,14 +42,16 @@ namespace dlib
             - The intermediate filter computations will be carried out using variables of type EXP::type.
               This is whatever scalar type is used inside the filter matrix. 
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
-              any applicable color space conversion or value saturation is performed.
+              any applicable color space conversion or value saturation is performed.  Note that if 
+              add_to is true then the filtered output value will be added to out_img rather than 
+              overwriting the original value.
             - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
                 - the pixel values are converted to the HSI color space and the filtering
                   is done on the intensity channel only.
             - if (use_abs == true) then
                 - pixel values after filtering that are < 0 are converted to their absolute values.
             - Pixels close enough to the edge of in_img to not have the filter still fit 
-              inside the image are set to zero.
+              inside the image are always set to zero.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
     !*/
@@ -68,7 +71,8 @@ namespace dlib
         const matrix_exp<EXP1>& row_filter,
         const matrix_exp<EXP2>& col_filter,
         T scale = 1,
-        bool use_abs = false
+        bool use_abs = false,
+        bool add_to = false
     );
     /*!
         requires
@@ -92,14 +96,16 @@ namespace dlib
             - The intermediate filter computations will be carried out using variables of type EXP1::type.
               This is whatever scalar type is used inside the row_filter matrix. 
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
-              any applicable color space conversion or value saturation is performed.
+              any applicable color space conversion or value saturation is performed.  Note that if 
+              add_to is true then the filtered output value will be added to out_img rather than 
+              overwriting the original value.
             - if (pixel_traits<typename in_image_type::type>::grayscale == false) then
                 - the pixel values are converted to the HSI color space and the filtering
                   is done on the intensity channel only.
             - if (use_abs == true) then
                 - pixel values after filtering that are < 0 are converted to their absolute values
             - Pixels close enough to the edge of in_img to not have the filter still fit 
-              inside the image are set to zero.
+              inside the image are always set to zero.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
     !*/

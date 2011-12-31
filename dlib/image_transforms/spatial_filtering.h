@@ -27,7 +27,8 @@ namespace dlib
         out_image_type& out_img,
         const matrix_exp<EXP>& filter,
         T scale,
-        bool use_abs = false
+        bool use_abs = false,
+        bool add_to = false
     )
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
@@ -92,8 +93,15 @@ namespace dlib
                 }
 
                 // save this pixel to the output image
-                assign_pixel(out_img[r][c], in_img[r][c]);
-                assign_pixel_intensity(out_img[r][c], temp);
+                if (add_to == false)
+                {
+                    assign_pixel(out_img[r][c], in_img[r][c]);
+                    assign_pixel_intensity(out_img[r][c], temp);
+                }
+                else
+                {
+                    assign_pixel(out_img[r][c], temp + get_pixel_intensity(out_img[r][c]));
+                }
             }
         }
     }
@@ -127,7 +135,8 @@ namespace dlib
         const matrix_exp<EXP1>& row_filter,
         const matrix_exp<EXP2>& col_filter,
         T scale,
-        bool use_abs = false
+        bool use_abs = false,
+        bool add_to = false
     )
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
@@ -213,8 +222,15 @@ namespace dlib
                 }
 
                 // save this pixel to the output image
-                assign_pixel(out_img[r][c], in_img[r][c]);
-                assign_pixel_intensity(out_img[r][c], temp);
+                if (add_to == false)
+                {
+                    assign_pixel(out_img[r][c], in_img[r][c]);
+                    assign_pixel_intensity(out_img[r][c], temp);
+                }
+                else
+                {
+                    assign_pixel(out_img[r][c], temp + get_pixel_intensity(out_img[r][c]));
+                }
             }
         }
     }
