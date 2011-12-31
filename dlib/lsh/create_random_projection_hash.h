@@ -7,6 +7,7 @@
 #include "projection_hash.h"
 #include "../matrix.h"
 #include "../rand.h"
+#include "../statistics.h"
 #include <vector>
 
 namespace dlib
@@ -44,9 +45,12 @@ namespace dlib
         }
 #endif
 
+        running_covariance<matrix<double> > rc;
+        for (unsigned long i = 0; i < v.size(); ++i)
+            rc.add(matrix_cast<double>(v[i]));
 
         // compute a whitening matrix
-        matrix<double> whiten = trans(chol(pinv(covariance(vector_to_matrix(v)))));
+        matrix<double> whiten = trans(chol(pinv(rc.covariance())));
 
 
         // hashes
@@ -88,7 +92,7 @@ namespace dlib
             temp.clear();
             for (unsigned long i = 0; i < v.size(); ++i)
             {
-                vals[i] = dot(rowm(proj,itr), v[i]);
+                vals[i] = dot(rowm(proj,itr), matrix_cast<double>(v[i]));
                 if (h[i] == max_h)
                     temp.push_back(vals[i]);
             }
