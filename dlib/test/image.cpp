@@ -1190,7 +1190,7 @@ namespace
         typename EXP2,
         typename T
         >
-    void spatially_filter_image_separable_down_simple (
+    void test_spatially_filter_image_separable_down_simple (
         const unsigned long downsample,
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -1246,13 +1246,13 @@ namespace
                     col_filter -= 3;
 
 
-                    spatially_filter_image_separable_down_simple(downsample, img, out1, row_filter, col_filter,1 );
+                    test_spatially_filter_image_separable_down_simple(downsample, img, out1, row_filter, col_filter,1 );
                     spatially_filter_image_separable_down(downsample, img, out2, row_filter, col_filter);
 
                     DLIB_TEST(get_rect(out1) == get_rect(out2));
                     DLIB_TEST(array_to_matrix(out1) == array_to_matrix(out2));
 
-                    spatially_filter_image_separable_down_simple(downsample, img, out1, row_filter, col_filter,3, true, true );
+                    test_spatially_filter_image_separable_down_simple(downsample, img, out1, row_filter, col_filter,3, true, true );
                     spatially_filter_image_separable_down(downsample, img, out2, row_filter, col_filter, 3, true, true);
 
                     DLIB_TEST(get_rect(out1) == get_rect(out2));
