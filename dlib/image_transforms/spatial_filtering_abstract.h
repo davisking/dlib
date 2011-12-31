@@ -157,6 +157,9 @@ namespace dlib
                 - #out_img[r][c] == filtered pixel corresponding to in_img[r*downsample][c*downsample]
             - returns a rectangle which indicates what pixels in #out_img are considered 
               non-border pixels and therefore contain output from the filter.
+            - Note that the first row and column of non-zero padded data are the following
+                - first_row == ceil(floor(col_filter.size()/2.0)/downsample)
+                - first_col == ceil(floor(row_filter.size()/2.0)/downsample)
     !*/
 
 // ----------------------------------------------------------------------------------------
