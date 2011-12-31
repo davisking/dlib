@@ -22,7 +22,7 @@ namespace dlib
         typename EXP,
         typename T
         >
-    void spatially_filter_image (
+    rectangle spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP>& filter,
@@ -54,7 +54,7 @@ namespace dlib
         if (in_img.size() == 0)
         {
             out_img.clear();
-            return;
+            return rectangle();
         }
 
         out_img.set_size(in_img.nr(),in_img.nc());
@@ -66,6 +66,8 @@ namespace dlib
         const long first_col = filter.nc()/2;
         const long last_row = in_img.nr() - filter.nr()/2;
         const long last_col = in_img.nc() - filter.nc()/2;
+
+        const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
 
         // apply the filter to the image
         for (long r = first_row; r < last_row; ++r)
@@ -104,6 +106,8 @@ namespace dlib
                 }
             }
         }
+
+        return non_border;
     }
 
     template <
@@ -111,13 +115,13 @@ namespace dlib
         typename out_image_type,
         typename EXP
         >
-    void spatially_filter_image (
+    rectangle spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP>& filter
     )
     {
-        spatially_filter_image(in_img,out_img,filter,1);
+        return spatially_filter_image(in_img,out_img,filter,1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -129,7 +133,7 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    void spatially_filter_image_separable (
+    rectangle spatially_filter_image_separable (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP1>& row_filter,
@@ -166,7 +170,7 @@ namespace dlib
         if (in_img.size() == 0)
         {
             out_img.clear();
-            return;
+            return rectangle();
         }
 
         out_img.set_size(in_img.nr(),in_img.nc());
@@ -179,6 +183,7 @@ namespace dlib
         const long last_row = in_img.nr() - col_filter.size()/2;
         const long last_col = in_img.nc() - row_filter.size()/2;
 
+        const rectangle non_border = rectangle(first_col, first_row, last_col-1, last_row-1);
 
         typedef typename out_image_type::mem_manager_type mem_manager_type;
         typedef typename EXP1::type ptype;
@@ -233,6 +238,7 @@ namespace dlib
                 }
             }
         }
+        return non_border;
     }
 
     template <
@@ -241,14 +247,14 @@ namespace dlib
         typename EXP1,
         typename EXP2
         >
-    void spatially_filter_image_separable (
+    rectangle spatially_filter_image_separable (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP1>& row_filter,
         const matrix_exp<EXP2>& col_filter
     )
     {
-        spatially_filter_image_separable(in_img,out_img,row_filter,col_filter,1);
+        return spatially_filter_image_separable(in_img,out_img,row_filter,col_filter,1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -260,7 +266,7 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    void spatially_filter_image_separable_down (
+    rectangle spatially_filter_image_separable_down (
         const unsigned long downsample,
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -300,7 +306,7 @@ namespace dlib
         if (in_img.size() == 0)
         {
             out_img.clear();
-            return;
+            return rectangle();
         }
 
         out_img.set_size((long)(std::ceil((double)in_img.nr()/downsample)),
@@ -312,11 +318,12 @@ namespace dlib
         // figure out the range that we should apply the filter to
         const long first_row = (long)std::ceil(col_border/downsample);
         const long first_col = (long)std::ceil(row_border/downsample);
-        const long last_row  = (long)std::ceil((in_img.nr() - col_border)/downsample);
-        const long last_col  = (long)std::ceil((in_img.nc() - row_border)/downsample);
+        const long last_row  = (long)std::ceil((in_img.nr() - col_border)/downsample) - 1;
+        const long last_col  = (long)std::ceil((in_img.nc() - row_border)/downsample) - 1;
 
         // zero border pixels
-        border_enumerator be(get_rect(out_img), rectangle(first_col, first_row, last_col-1, last_row-1));
+        const rectangle non_border = rectangle(first_col, first_row, last_col, last_row);
+        border_enumerator be(get_rect(out_img), non_border );
         while (be.move_next())
         {
             out_img[be.element().y()][be.element().x()] = 0;
@@ -331,7 +338,7 @@ namespace dlib
         // apply the row filter
         for (long r = 0; r < temp_img.nr(); ++r)
         {
-            for (long c = first_col; c < last_col; ++c)
+            for (long c = non_border.left(); c <= non_border.right(); ++c)
             {
                 ptype p;
                 ptype temp = 0;
@@ -346,9 +353,9 @@ namespace dlib
         }
 
         // apply the column filter 
-        for (long r = first_row; r < last_row; ++r)
+        for (long r = non_border.top(); r <= non_border.bottom(); ++r)
         {
-            for (long c = first_col; c < last_col; ++c)
+            for (long c = non_border.left(); c <= non_border.right(); ++c)
             {
                 ptype temp = 0;
                 for (long m = 0; m < col_filter.size(); ++m)
@@ -375,6 +382,8 @@ namespace dlib
                 }
             }
         }
+
+        return non_border;
     }
 
     template <
@@ -383,7 +392,7 @@ namespace dlib
         typename EXP1,
         typename EXP2
         >
-    void spatially_filter_image_separable_down (
+    rectangle spatially_filter_image_separable_down (
         const unsigned long downsample,
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -391,7 +400,7 @@ namespace dlib
         const matrix_exp<EXP2>& col_filter
     )
     {
-        spatially_filter_image_separable_down(downsample,in_img,out_img,row_filter,col_filter,1);
+        return spatially_filter_image_separable_down(downsample,in_img,out_img,row_filter,col_filter,1);
     }
 
 // ----------------------------------------------------------------------------------------

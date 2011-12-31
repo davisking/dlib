@@ -778,7 +778,8 @@ namespace
                   1,1,1,1,1;
 
         assign_all_pixels(img2,3);
-        spatially_filter_image(img, img2, filter2);
+        rectangle brect = spatially_filter_image(img, img2, filter2);
+        DLIB_TEST(brect == shrink_rect(get_rect(img), filter2.nc()/2, filter2.nr()/2));
 
         const rectangle rect(2,1,img.nc()-3,img.nr()-2);
 
@@ -800,7 +801,8 @@ namespace
 
         assign_all_pixels(img2,3);
         assign_all_pixels(img3,3);
-        spatially_filter_image(img, img2, filter2);
+        brect = spatially_filter_image(img, img2, filter2);
+        DLIB_TEST(brect == shrink_rect(get_rect(img), filter2.nc()/2, filter2.nr()/2));
 
         matrix<int,1,5> row_filter;
         matrix<int,1,3> col_filter;
@@ -839,9 +841,13 @@ namespace
             assign_all_pixels(img2,3);
             assign_all_pixels(img3,3);
             // Just make sure both filtering methods give the same results.
-            spatially_filter_image(img, img2, filter, scale, use_abs);
-            spatially_filter_image_separable(img, img3, row_filter, col_filter, scale, use_abs);
+            rectangle brect1, brect2;
+            brect1 = spatially_filter_image(img, img2, filter, scale, use_abs);
+            brect2 = spatially_filter_image_separable(img, img3, row_filter, col_filter, scale, use_abs);
             DLIB_TEST(array_to_matrix(img2) == array_to_matrix(img3));
+
+            DLIB_TEST(brect1 == shrink_rect(get_rect(img), filter.nc()/2, filter.nr()/2));
+            DLIB_TEST(brect1 == brect2);
         }
 
         {

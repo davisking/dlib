@@ -17,7 +17,7 @@ namespace dlib
         typename EXP,
         typename T
         >
-    void spatially_filter_image (
+    rectangle spatially_filter_image (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP>& filter,
@@ -54,6 +54,8 @@ namespace dlib
               inside the image are always set to zero.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
+            - returns a rectangle which indicates what pixels in #out_img are considered 
+              non-border pixels and therefore contain output from the filter.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -65,7 +67,7 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    void spatially_filter_image_separable (
+    rectangle spatially_filter_image_separable (
         const in_image_type& in_img,
         out_image_type& out_img,
         const matrix_exp<EXP1>& row_filter,
@@ -108,6 +110,8 @@ namespace dlib
               inside the image are always set to zero.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
+            - returns a rectangle which indicates what pixels in #out_img are considered 
+              non-border pixels and therefore contain output from the filter.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -119,7 +123,7 @@ namespace dlib
         typename EXP2,
         typename T
         >
-    void spatially_filter_image_separable_down (
+    rectangle spatially_filter_image_separable_down (
         const unsigned long downsample,
         const in_image_type& in_img,
         out_image_type& out_img,
@@ -151,6 +155,8 @@ namespace dlib
                 - #out_img.nr() == ceil((double)in_img.nr()/downsample)
                 - #out_img.nc() == ceil((double)in_img.nc()/downsample)
                 - #out_img[r][c] == filtered pixel corresponding to in_img[r*downsample][c*downsample]
+            - returns a rectangle which indicates what pixels in #out_img are considered 
+              non-border pixels and therefore contain output from the filter.
     !*/
 
 // ----------------------------------------------------------------------------------------
