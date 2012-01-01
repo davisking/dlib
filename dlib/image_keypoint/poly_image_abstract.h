@@ -21,12 +21,12 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for extracting local feature descriptors from an image.
-                In particular, it fits a polynomial to every local pixel patch in an image and
-                allows you to query the coefficients of this polynomial.  The coefficients 
+                In particular, it fits polynomials to local pixel patches and allows you to 
+                query the coefficients of these polynomials.  Additionally, the coefficients 
                 are intensity normalized by dividing them by the constant term of the fitted 
                 polynomial and then the constant term is discarded. 
 
-                Additionally, the user can specify a downsampling rate.  If the template argument
+                Finally, the user can specify a downsampling rate.  If the template argument
                 Downsample is set to 1 then feature extraction is performed at every pixel of
                 an input image (except for a small area around the image border).  However,
                 if Downsample is set to 2 then feature extraction is only performed at every
