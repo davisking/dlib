@@ -19,6 +19,8 @@ New Stuff:
       - Added some random projection based locality sensitive hashing tools.
       - Added tools to simplify creating scan_image_pyramid objects.  See
         the object_detector_ex.cpp example program for details.
+   - Image Processing
+      - Added sum_filter() and spatially_filter_image_separable_down()
  
 Non-Backwards Compatible Changes:
    - Changed the serialization format for rand objects.
@@ -34,6 +36,8 @@ Non-Backwards Compatible Changes:
         implementation.
       - Removed constness from the operator() member functions of the 
         object_detector.
+   - Fixed improper normalization in the gaussian() functions.  The
+     normalization constant was being computed incorrectly.
 
 Bug fixes:
    - Changed the add_probability() method of joint_probability_table so
@@ -43,11 +47,15 @@ Bug fixes:
      cause some asserts to misfire during debugging mode.
    - The object_detector had code in it which limited the number of outputs
      to 100 rectangles.  This has been removed.
+   - Fixed improper normalization in the gaussian() functions.  The
+     normalization constant was being computed incorrectly.
 
 Other:
    - dlib::rand can now generate Gaussian random numbers.
    - The structural_object_detection_trainer will now automatically setup
      appropriate non-max suppression parameters if the user doesn't supply them. 
+   - The structural_object_detection_trainer has been optimized and now runs
+     significantly faster than in previous dlib releases.
 
 </current>
 
