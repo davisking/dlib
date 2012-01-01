@@ -28,7 +28,9 @@ namespace dlib
 
             REQUIREMENTS ON Feature_extractor_type
                 - must be an object with an interface compatible with the hashed_feature_image 
-                  object defined in dlib/image_keypoint/hashed_feature_image_abstract.h.
+                  object defined in dlib/image_keypoint/hashed_feature_image_abstract.h or 
+                  with the nearest_neighbor_feature_image object defined in 
+                  dlib/image_keypoint/nearest_neighbor_feature_image_abstract.h
 
             INITIAL VALUE
                 - get_num_detection_templates() == 0
