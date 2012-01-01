@@ -329,7 +329,7 @@
       <component>
          <name>poly_image</name>
          <file>dlib/image_keypoint.h</file>
-         <spec_file link="true">dlib/image_keypoint/hog_abstract.h</spec_file>
+         <spec_file link="true">dlib/image_keypoint/poly_image_abstract.h</spec_file>
          <description>
                 This object is a tool for extracting local feature descriptors from an image.
                 In particular, it fits polynomials to local pixel patches and
