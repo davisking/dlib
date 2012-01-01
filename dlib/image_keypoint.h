@@ -6,6 +6,7 @@
 #include "image_keypoint/surf.h"
 #include "image_keypoint/hessian_pyramid.h"
 #include "image_keypoint/hog.h"
+#include "image_keypoint/poly_image.h"
 #include "image_keypoint/hashed_feature_image.h"
 #include "image_keypoint/nearest_neighbor_feature_image.h"
 
