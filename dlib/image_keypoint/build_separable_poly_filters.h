@@ -19,8 +19,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     std::vector<std::vector<separable_filter_type> > build_separable_poly_filters (
-        const long window_size,
-        const long order = 2
+        const long order,
+        const long window_size
     ) 
     /*!
         requires
@@ -137,8 +137,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     std::vector<std::vector<separable_int32_filter_type> > build_separable_int32_poly_filters (
+        const long order,
         const long window_size,
-        const long order = 2,
         const double max_range = 300.0
     ) 
     /*!
@@ -150,7 +150,7 @@ namespace dlib
             - the "first" element is the row_filter, the second is the col_filter.
     !*/
     {
-        const std::vector<std::vector<separable_filter_type> >& filters = build_separable_poly_filters(window_size, order);
+        const std::vector<std::vector<separable_filter_type> >& filters = build_separable_poly_filters(order, window_size);
         std::vector<std::vector<separable_int32_filter_type> > int_filters(filters.size());
 
         for (unsigned long i = 0; i < filters.size(); ++i)

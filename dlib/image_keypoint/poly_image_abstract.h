@@ -19,11 +19,6 @@ namespace dlib
             REQUIREMENTS ON TEMPLATE PARAMETERS 
                 - downsample >= 1
 
-            INITIAL VALUE
-                 - size() == 0
-                 - get_order() == 3
-                 - get_window_size() == 13
-
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for extracting local feature descriptors from an image.
                 In particular, it fits a polynomial to every local pixel patch in an image and
@@ -54,7 +49,23 @@ namespace dlib
         ); 
         /*!
             ensures
-                - this object is properly initialized
+                - #get_order() == 3
+                - #get_window_size() == 13
+                - #size() == 0
+        !*/
+
+        poly_image(
+            long order,
+            long window_size
+        );
+        /*!
+            requires
+                - 1 <= order <= 6
+                - window_size >= 3 && window_size is odd
+            ensures
+                - #get_order() == order
+                - #get_window_size() == window_size
+                - #size() == 0
         !*/
 
         void clear (

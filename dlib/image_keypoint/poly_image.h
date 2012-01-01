@@ -25,6 +25,14 @@ namespace dlib
     public:
         typedef matrix<double, 0, 1> descriptor_type;
 
+        poly_image(
+            long order_,
+            long window_size_
+        )
+        {
+            setup(order_, window_size_);
+        }
+
         poly_image (
         ) 
         {
@@ -40,7 +48,7 @@ namespace dlib
             border_size = (long)std::ceil(std::floor(window_size/2.0)/downsample);
             num_rows = 0;
             num_cols = 0;
-            filters = build_separable_poly_filters(window_size, order);
+            filters = build_separable_poly_filters(order, window_size);
         }
 
         long get_order (
@@ -77,7 +85,7 @@ namespace dlib
             border_size = (long)std::ceil(std::floor(window_size/2.0)/downsample);
             num_rows = 0;
             num_cols = 0;
-            filters = build_separable_poly_filters(window_size, order);
+            filters = build_separable_poly_filters(order, window_size);
         }
 
         void copy_configuration (
@@ -221,25 +229,31 @@ namespace dlib
 
         friend void serialize (const poly_image& item, std::ostream& out) 
         {
+            int version = 1;
+            serialize(version, out);
             serialize(item.poly_coef, out);
             serialize(item.order, out);
             serialize(item.window_size, out);
             serialize(item.border_size, out);
             serialize(item.num_rows, out);
             serialize(item.num_cols, out);
+            serialize(item.filters, out);
         }
 
         friend void deserialize (poly_image& item, std::istream& in )
         {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw dlib::serialization_error("Unexpected version found while deserializing dlib::poly_image");
+
             deserialize(item.poly_coef, in);
             deserialize(item.order, in);
             deserialize(item.window_size, in);
             deserialize(item.border_size, in);
             deserialize(item.num_rows, in);
             deserialize(item.num_cols, in);
-
-            // just rebuild the filters instead of loading them
-            item.filters = build_separable_poly_filters(item.window_size, item.order);
+            deserialize(item.filters, in);
         }
 
     private:
