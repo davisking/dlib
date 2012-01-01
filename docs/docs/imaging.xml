@@ -332,10 +332,8 @@
          <spec_file link="true">dlib/image_keypoint/hog_abstract.h</spec_file>
          <description>
                 This object is a tool for extracting local feature descriptors from an image.
-                In particular, it fits a polynomial to every local pixel patch in an image and
-                allows you to query the coefficients of this polynomial.  The coefficients 
-                are intensity normalized by dividing them by the constant term of the fitted 
-                polynomial and then the constant term is discarded. 
+                In particular, it fits polynomials to local pixel patches and
+                allows you to query the coefficients of these polynomials.  
          </description>
                                  
       </component>
