@@ -17,12 +17,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        long downsample
+        long Downsample
         >
     class poly_image : noncopyable
     {
-        COMPILE_TIME_ASSERT(downsample >= 1);
+        COMPILE_TIME_ASSERT(Downsample >= 1);
     public:
+        const static long downsample = Downsample;
         typedef matrix<double, 0, 1> descriptor_type;
 
         poly_image(

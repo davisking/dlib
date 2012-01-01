@@ -11,13 +11,13 @@
 namespace dlib
 {
     template <
-        long downsample
+        long Downsample
         >
     class poly_image : noncopyable
     {
         /*!
             REQUIREMENTS ON TEMPLATE PARAMETERS 
-                - downsample >= 1
+                - Downsample >= 1
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for extracting local feature descriptors from an image.
@@ -27,10 +27,10 @@ namespace dlib
                 polynomial and then the constant term is discarded. 
 
                 Additionally, the user can specify a downsampling rate.  If the template argument
-                downsample is set to 1 then feature extraction is performed at every pixel of
+                Downsample is set to 1 then feature extraction is performed at every pixel of
                 an input image (except for a small area around the image border).  However,
-                if downsample is set to 2 then feature extraction is only performed at every
-                other pixel location.  More generally, if downsample is set to N then feature
+                if Downsample is set to 2 then feature extraction is only performed at every
+                other pixel location.  More generally, if Downsample is set to N then feature
                 extraction is performed only every N pixels.  
                 
             THREAD SAFETY
@@ -44,6 +44,7 @@ namespace dlib
     public:
 
         typedef matrix<double, 0, 1> descriptor_type;
+        const static long downsample = Downsample;
 
         poly_image (
         ); 
