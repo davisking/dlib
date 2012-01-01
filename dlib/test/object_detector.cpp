@@ -292,6 +292,92 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_1_poly (
+    )
+    {        
+        print_spinner();
+        dlog << LINFO << "test_1_poly()";
+
+        typedef array<array2d<unsigned char> >::expand_1b  grayscale_image_array_type;
+        grayscale_image_array_type images;
+        std::vector<std::vector<rectangle> > object_locations;
+        make_simple_test_data(images, object_locations);
+
+        typedef hashed_feature_image<poly_image<2> > feature_extractor_type;
+        typedef scan_image_pyramid<pyramid_down, feature_extractor_type> image_scanner_type;
+        image_scanner_type scanner;
+        const rectangle object_box = compute_box_dimensions(1,35*35);
+        scanner.add_detection_template(object_box, create_grid_detection_template(object_box,2,2));
+        setup_hashed_features(scanner, images, 9);
+        structural_object_detection_trainer<image_scanner_type> trainer(scanner);
+        trainer.set_num_threads(4);  
+        trainer.set_overlap_tester(test_box_overlap(0,0));
+        object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
+
+        matrix<double> res = test_object_detection_function(detector, images, object_locations);
+        dlog << LINFO << "Test detector (precision,recall): " << res;
+        DLIB_TEST(sum(res) == 2);
+
+        {
+            ostringstream sout;
+            serialize(detector, sout);
+            istringstream sin(sout.str());
+            object_detector<image_scanner_type> d2;
+            deserialize(d2, sin);
+            matrix<double> res = test_object_detection_function(detector, images, object_locations);
+            dlog << LINFO << "Test detector (precision,recall): " << res;
+            DLIB_TEST(sum(res) == 2);
+
+            validate_some_object_detector_stuff(images, detector);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_1_poly_nn (
+    )
+    {        
+        print_spinner();
+        dlog << LINFO << "test_1_poly_nn()";
+
+        typedef array<array2d<unsigned char> >::expand_1b  grayscale_image_array_type;
+        grayscale_image_array_type images;
+        std::vector<std::vector<rectangle> > object_locations;
+        make_simple_test_data(images, object_locations);
+
+        typedef nearest_neighbor_feature_image<poly_image<5> > feature_extractor_type;
+        typedef scan_image_pyramid<pyramid_down, feature_extractor_type> image_scanner_type;
+        image_scanner_type scanner;
+
+        setup_grid_detection_templates(scanner, object_locations, 2, 2);
+        feature_extractor_type nnfe;
+        nnfe.set_basis(randomly_sample_image_features(images, pyramid_down(), poly_image<5>(), 80));
+        scanner.copy_configuration(nnfe);
+
+        structural_object_detection_trainer<image_scanner_type> trainer(scanner);
+        trainer.set_num_threads(4);  
+        object_detector<image_scanner_type> detector = trainer.train(images, object_locations);
+
+        matrix<double> res = test_object_detection_function(detector, images, object_locations);
+        dlog << LINFO << "Test detector (precision,recall): " << res;
+        DLIB_TEST(sum(res) == 2);
+
+        {
+            ostringstream sout;
+            serialize(detector, sout);
+            istringstream sin(sout.str());
+            object_detector<image_scanner_type> d2;
+            deserialize(d2, sin);
+            matrix<double> res = test_object_detection_function(detector, images, object_locations);
+            dlog << LINFO << "Test detector (precision,recall): " << res;
+            DLIB_TEST(sum(res) == 2);
+
+            validate_some_object_detector_stuff(images, detector);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_2 (
     )
     {        
@@ -439,6 +525,8 @@ namespace
         )
         {
             test_1();
+            test_1_poly();
+            test_1_poly_nn();
             test_2();
             test_3();
         }
