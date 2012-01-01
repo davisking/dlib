@@ -118,7 +118,7 @@ namespace dlib
                       objects via Feature_extractor_type::load().
                     - image_type objects can be used with Pyramid_type.  That is,
                       if pyr is an object of type Pyramid_type while img1 and img2
-                      are objects of image_type.  Then pyr(img1,img2) should be
+                      are objects of image_type, then pyr(img1,img2) should be
                       a valid expression which downsamples img1 into img2.
             ensures
                 - #is_loaded_with_image() == true
