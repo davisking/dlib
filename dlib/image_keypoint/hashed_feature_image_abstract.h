@@ -152,6 +152,7 @@ namespace dlib
                 - returns the dimensionality of the feature vectors returned by operator().  
                   In this case, this is the number of hash bins.  That is, get_hash().num_hash_bins()
         !*/
+
         const descriptor_type& operator() (
             long row,
             long col
