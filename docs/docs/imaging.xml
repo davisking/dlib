@@ -99,22 +99,28 @@
       </section>
 
       <section>
-         <name>Keypoints and Descriptors</name>
-
-         <item>integral_image</item>
-         <item>integral_image_generic</item>
-         <item>hessian_pyramid</item>
-         <item>compute_dominant_angle</item>
-         <item>compute_surf_descriptor</item>
-         <item>hog_image</item>
-         <item>hashed_feature_image</item>
-         <item>haar_x</item>
-         <item>haar_y</item>
-         <item>get_interest_points</item>
+         <name>Feature Extraction</name>
          <item>get_surf_points</item>
-         <item>interest_point</item>
-         <item>surf_point</item>
+         <item nolink="true">
+            <name>SURF Tools</name>
+            <sub>
+               <item>hessian_pyramid</item>
+               <item>compute_surf_descriptor</item>
+               <item>haar_x</item>
+               <item>haar_y</item>
+               <item>get_interest_points</item>
+               <item>interest_point</item>
+               <item>surf_point</item>
+               <item>compute_dominant_angle</item>
+            </sub>
+         </item>
+
+         <item>hog_image</item>
+         <item>poly_image</item>
+         <item>hashed_feature_image</item>
+         <item>nearest_neighbor_feature_image</item>
       </section>
+
 
       <section>
          <name>Edges and Thresholds</name>
@@ -170,6 +176,8 @@
          <item>pyramid_down_4_3</item> 
          <item>pyramid_down_5_4</item> 
          <item>zero_border_pixels</item> 
+         <item>integral_image</item>
+         <item>integral_image_generic</item>
 
       </section>
 
@@ -319,6 +327,22 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>poly_image</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/hog_abstract.h</spec_file>
+         <description>
+                This object is a tool for extracting local feature descriptors from an image.
+                In particular, it fits a polynomial to every local pixel patch in an image and
+                allows you to query the coefficients of this polynomial.  The coefficients 
+                are intensity normalized by dividing them by the constant term of the fitted 
+                polynomial and then the constant term is discarded. 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>hashed_feature_image</name>
          <file>dlib/image_keypoint.h</file>
          <spec_file link="true">dlib/image_keypoint/hashed_feature_image_abstract.h</spec_file>
@@ -329,10 +353,41 @@
                 this by hashing each feature vector and then returns a new vector 
                 which is zero everywhere except for the position determined by the 
                 hash.  
+
+               <br/><br/>
+                The following feature extractors can be wrapped by the hashed_feature_image:
+               <ul style="margin-top:0em"> 
+                  <li><a href="#hog_image">hog_image</a></li>
+                  <li><a href="#poly_image">poly_image</a></li>
+               </ul>
          </description>
          <examples>
             <example>object_detector_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>nearest_neighbor_feature_image</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/nearest_neighbor_feature_image_abstract.h</spec_file>
+         <description>
+                This object is a tool for performing image feature extraction.  In
+                particular, it wraps another image feature extractor and converts
+                the wrapped image feature vectors into sparse indicator vectors.  It does
+                this by finding the nearest neighbor for each feature vector and returning an
+                indicator vector that is zero everywhere except for the position indicated by 
+                the nearest neighbor.  
+
+               <br/><br/>
+               The following feature extractors can be wrapped by the nearest_neighbor_feature_image:
+               <ul style="margin-top:0em"> 
+                  <li><a href="#hog_image">hog_image</a></li>
+                  <li><a href="#poly_image">poly_image</a></li>
+               </ul>
+         </description>
                                  
       </component>
 
@@ -1250,6 +1305,13 @@
                     Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
                     and Jean Ponce
                 </blockquote>
+
+               <br/><br/>
+               The following feature extractors can be used with the scan_image_pyramid object:
+               <ul style="margin-top:0em"> 
+                  <li><a href="#hashed_feature_image">hashed_feature_image</a></li>
+                  <li><a href="#nearest_neighbor_feature_image">nearest_neighbor_feature_image</a></li>
+               </ul>
          </description>
          <examples>
             <example>object_detector_ex.cpp.html</example>

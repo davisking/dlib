@@ -834,9 +834,16 @@ function BigToggle(node)
        </li>
    </xsl:template>   
    <xsl:template match="ul">
-      <ul>
-         <xsl:apply-templates/>
-       </ul>
+      <xsl:if test="@style">
+         <ul style="{@style}">
+            <xsl:apply-templates/>
+         </ul>
+      </xsl:if>
+      <xsl:if test="not(@style)">
+         <ul>
+            <xsl:apply-templates/>
+         </ul>
+      </xsl:if>
    </xsl:template>   
    <xsl:template match="u">
       <u>
