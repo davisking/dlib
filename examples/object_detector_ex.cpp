@@ -118,7 +118,8 @@ int main()
                       work.  However, to understand this example, all you need to know is that the 
                       feature extractor associates a vector with each location in an image.  This 
                       vector is supposed to capture information which describes how parts of the 
-                      image look in a way that is relevant to the problem you are trying to solve.
+                      image look.  Importantly, it should do this in a way that is relevant to the 
+                      problem you are trying to solve.
 
                    2. A detection template.  This is a rectangle which defines the shape of a 
                       sliding window (the object_box), as well as a set of rectangles which
