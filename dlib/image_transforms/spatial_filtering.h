@@ -671,10 +671,10 @@ namespace dlib
         const long width = rect.width();
 
 
-        // Now do the bulk of the scanning work.
+        // Now do the bulk of the filtering work.
         for (long r = 0; r < img.nr(); ++r)
         {
-            // set to sum at point(-1,r). i.e. should be equal to sum_of_rects_in_images(images, rects, point(-1,r))
+            // set to sum at point(-1,r). i.e. should be equal to sum(array_to_matrix(img), translate_rect(rect, point(-1,r)))
             // We compute it's value in the next loop.
             ptype cur_sum = 0; 
 
