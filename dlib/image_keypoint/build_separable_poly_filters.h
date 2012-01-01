@@ -18,7 +18,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    std::vector<std::vector<separable_filter_type> > build_separable_poly_filters (
+    inline std::vector<std::vector<separable_filter_type> > build_separable_poly_filters (
         const long order,
         const long window_size
     ) 
@@ -136,7 +136,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    std::vector<std::vector<separable_int32_filter_type> > build_separable_int32_poly_filters (
+    inline std::vector<std::vector<separable_int32_filter_type> > build_separable_int32_poly_filters (
         const long order,
         const long window_size,
         const double max_range = 300.0
