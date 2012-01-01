@@ -32,7 +32,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for performing image feature extraction.  In
                 particular, it wraps another image feature extractor and converts
-                the wrapped image feature vectors into indicator vectors.  It does
+                the wrapped image feature vectors into sparse indicator vectors.  It does
                 this by hashing each feature vector into the range [0, get_num_dimensions()-1]
                 and then returns a new vector which is zero everywhere except for
                 the position determined by the hash. 
