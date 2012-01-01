@@ -7,6 +7,7 @@
 #include "image_keypoint/hessian_pyramid.h"
 #include "image_keypoint/hog.h"
 #include "image_keypoint/hashed_feature_image.h"
+#include "image_keypoint/nearest_neighbor_feature_image.h"
 
 #endif // DLIB_IMAGE_KEYPOINt_H_
 
