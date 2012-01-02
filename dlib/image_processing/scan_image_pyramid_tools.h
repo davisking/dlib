@@ -60,6 +60,7 @@ namespace dlib
 
         hashed_feature_image<feature_extractor, projection_hash> hfe;
         hfe.set_hash(phash);
+        hfe.copy_configuration(fe);
         scanner.copy_configuration(hfe);
     }
 
