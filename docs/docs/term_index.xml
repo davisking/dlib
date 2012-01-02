@@ -1055,6 +1055,7 @@
          <term file="imaging.html" name="create_grid_detection_template"/>
          <term file="imaging.html" name="determine_object_boxes"/>
          <term file="imaging.html" name="setup_grid_detection_templates"/>
+         <term file="imaging.html" name="setup_grid_detection_templates_verbose"/>
          <term file="imaging.html" name="setup_hashed_features"/>
          <term file="dlib/image_processing/scan_image_abstract.h.html" name="all_images_same_size"/>
          <term file="dlib/image_processing/scan_image_abstract.h.html" name="sum_of_rects_in_images"/>

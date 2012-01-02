@@ -93,6 +93,7 @@
 
                <item>determine_object_boxes</item>
                <item>setup_grid_detection_templates</item>
+               <item>setup_grid_detection_templates_verbose</item>
                <item>setup_hashed_features</item>
             </sub>
          </item>
@@ -1451,6 +1452,19 @@
             <example>object_detector_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>setup_grid_detection_templates_verbose</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_pyramid_tools_abstract.h</spec_file>
+         <description>        
+            This function is identical to <a href="#setup_grid_detection_templates">setup_grid_detection_templates</a>
+            except that it also outputs information regarding the selected detection templates
+            to standard out.
+         </description>
       </component>
             
    <!-- ************************************************************************* -->
