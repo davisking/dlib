@@ -158,6 +158,27 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_scanner_type
+        >
+    void setup_grid_detection_templates_verbose (
+        image_scanner_type& scanner,
+        const std::vector<std::vector<rectangle> >& rects,
+        unsigned int cells_x,
+        unsigned int cells_y,
+        double min_match_score = 0.75
+    );
+    /*!
+        requires
+            - cells_x > 0
+            - cells_y > 0
+            - 0 < min_match_score <= 1
+            - image_scanner_type == an implementation of the scan_image_pyramid
+              object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
+        ensures
+            - this function is identical to setup_grid_detection_templates() except
+              that it also outputs the selected detection templates to standard out.
+    !*/
 }
 
 #endif // DLIB_SCAN_IMaGE_PYRAMID_TOOLS_ABSTRACT_H__
