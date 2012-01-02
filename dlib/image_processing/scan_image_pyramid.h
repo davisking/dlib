@@ -138,6 +138,15 @@ namespace dlib
             unsigned long& best_level
         ) const;
 
+        double get_match_score (
+            rectangle r1,
+            rectangle r2
+        ) const
+        {
+            // make the rectangles overlap as much as possible before computing the match score.
+            r1 = move_rect(r1, r2.tl_corner());
+            return (r1.intersect(r2).area())/(double)(r1 + r2).area();
+        }
 
         feature_extractor_type feats_config; // just here to hold configuration.  use it to populate the feats elements.
         typename array<feature_extractor_type>::kernel_2a feats;
@@ -580,9 +589,8 @@ namespace dlib
         // Figure out the pyramid level which best matches rect against one of our 
         // detection template object boxes.
         best_level = 0;
-        double match_score = std::numeric_limits<double>::infinity();
+        double best_match_score = -1;
 
-        const dlib::vector<double,2> p(rect.width(), rect.height());
 
         // for all the levels
         for (unsigned long l = 0; l < max_pyramid_levels; ++l)
@@ -605,11 +613,10 @@ namespace dlib
                 rectangle mapped_rect = translate_rect(det_templates[t].object_box, origin);
                 mapped_rect = pyr.rect_up(mapped_rect, l);
 
-                const dlib::vector<double,2> p2(mapped_rect.width(),
-                                                mapped_rect.height());
-                if ((p-p2).length() < match_score)
+                const double match_score = get_match_score(mapped_rect, rect);
+                if (match_score > best_match_score)
                 {
-                    match_score = (p-p2).length();
+                    best_match_score = match_score;
                     best_level = l;
                     best_template = det_templates[t];
                 }
