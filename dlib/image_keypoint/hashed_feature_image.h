@@ -247,14 +247,22 @@ namespace dlib
     {
         fe.load(img);
 
-        feats.set_size(fe.nr(), fe.nc());
-        for (long r = 0; r < feats.nr(); ++r)
+        if (fe.size() != 0)
         {
-            for (long c = 0; c < feats.nc(); ++c)
+            feats.set_size(fe.nr(), fe.nc());
+            for (long r = 0; r < feats.nr(); ++r)
             {
-                feats[r][c] = phash(fe(r,c));
+                for (long c = 0; c < feats.nc(); ++c)
+                {
+                    feats[r][c] = phash(fe(r,c));
+                }
             }
         }
+        else
+        {
+            feats.set_size(0,0);
+        }
+
         fe.unload();
     }
 
