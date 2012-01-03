@@ -148,6 +148,32 @@ namespace dlib
             return (r1.intersect(r2).area())/(double)(r1 + r2).area();
         }
 
+        void test_coordinate_transforms()
+        {
+            for (long x = -10; x <= 10; x += 10)
+            {
+                for (long y = -10; y <= 10; y += 10)
+                {
+                    const rectangle rect = centered_rect(x,y,5,6);
+                    rectangle a;
+
+                    a = feats_config.image_to_feat_space(rect);
+                    if (a.width()  > 10000000 || a.height() > 10000000 )
+                    {
+                        DLIB_CASSERT(false, "The image_to_feat_space() routine is outputting rectangles of an implausibly "
+                                     << "\nlarge size.  This means there is probably a bug in your feature extractor.");
+                    }
+                    a = feats_config.feat_to_image_space(rect);
+                    if (a.width()  > 10000000 || a.height() > 10000000 )
+                    {
+                        DLIB_CASSERT(false, "The feat_to_image_space() routine is outputting rectangles of an implausibly "
+                                     << "\nlarge size.  This means there is probably a bug in your feature extractor.");
+                    }
+                }
+            }
+            
+        }
+
         feature_extractor_type feats_config; // just here to hold configuration.  use it to populate the feats elements.
         typename array<feature_extractor_type>::kernel_2a feats;
         std::vector<detection_template> det_templates;
@@ -318,7 +344,8 @@ namespace dlib
         const feature_extractor_type& fe
     )
     {
-        return feats_config.copy_configuration(fe);
+        test_coordinate_transforms();
+        feats_config.copy_configuration(fe);
     }
 
 // ----------------------------------------------------------------------------------------
