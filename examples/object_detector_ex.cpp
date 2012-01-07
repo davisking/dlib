@@ -88,7 +88,7 @@ void make_simple_test_data (
         {
             for (long c = 0; c < images[i].nc(); ++c)
             {
-                images[i][r][c] = put_in_range(0,255,images[i][r][c] + 50*rnd.get_random_gaussian());
+                images[i][r][c] = put_in_range(0,255,images[i][r][c] + 40*rnd.get_random_gaussian());
             }
         }
     }
