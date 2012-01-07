@@ -74,6 +74,17 @@ namespace dlib
         inline unsigned long get_max_detections_per_template (
         ) const;
 
+        void set_min_pyramid_layer_size (
+            unsigned long width,
+            unsigned long height 
+        );
+
+        inline unsigned long get_min_pyramid_layer_width (
+        ) const;
+
+        inline unsigned long get_min_pyramid_layer_height (
+        ) const;
+
         void set_max_detections_per_template (
             unsigned long max_dets
         );
@@ -180,6 +191,8 @@ namespace dlib
         std::vector<detection_template> det_templates;
         unsigned long max_dets_per_template;
         unsigned long max_pyramid_levels;
+        unsigned long min_pyramid_layer_width;
+        unsigned long min_pyramid_layer_height;
 
     };
 
@@ -196,6 +209,8 @@ namespace dlib
         serialize(item.det_templates, out);
         serialize(item.max_dets_per_template, out);
         serialize(item.max_pyramid_levels, out);
+        serialize(item.min_pyramid_layer_width, out);
+        serialize(item.min_pyramid_layer_height, out);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -211,6 +226,8 @@ namespace dlib
         deserialize(item.det_templates, in);
         deserialize(item.max_dets_per_template, in);
         deserialize(item.max_pyramid_levels, in);
+        deserialize(item.min_pyramid_layer_width, in);
+        deserialize(item.min_pyramid_layer_height, in);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -227,7 +244,9 @@ namespace dlib
     scan_image_pyramid (
     ) : 
         max_dets_per_template(10000),
-        max_pyramid_levels(1000)
+        max_pyramid_levels(1000),
+        min_pyramid_layer_width(20),
+        min_pyramid_layer_height(20)
     {
     }
 
@@ -250,14 +269,12 @@ namespace dlib
 
         // figure out how many pyramid levels we should be using based on the image size
         pyramid_type pyr;
-        while (rect.width() > 20 && rect.height() > 20)
+        do
         {
             rect = pyr.rect_down(rect);
             ++levels;
-
-            if (levels >= max_pyramid_levels)
-                break;
-        }
+        } while (rect.width() >= min_pyramid_layer_width && rect.height() >= min_pyramid_layer_height &&
+                 levels < max_pyramid_levels);
 
         if (feats.max_size() < levels)
             feats.set_max_size(levels);
@@ -364,6 +381,8 @@ namespace dlib
         det_templates = item.det_templates;
         max_dets_per_template = item.max_dets_per_template;
         max_pyramid_levels = item.max_pyramid_levels;
+        min_pyramid_layer_width = item.min_pyramid_layer_width;
+        min_pyramid_layer_height = item.min_pyramid_layer_height;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -721,6 +740,57 @@ namespace dlib
             }
         }
 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type,
+        typename Feature_extractor_type
+        >
+    void scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
+    set_min_pyramid_layer_size (
+        unsigned long width,
+        unsigned long height 
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(width > 0 && height > 0 ,
+            "\t void scan_image_pyramid::set_min_pyramid_layer_size()"
+            << "\n\t These sizes can't be zero. "
+            << "\n\t width:  " << width 
+            << "\n\t height: " << height 
+            << "\n\t this:   " << this
+            );
+
+        min_pyramid_layer_width = width;
+        min_pyramid_layer_height = height;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type,
+        typename Feature_extractor_type
+        >
+    unsigned long scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
+    get_min_pyramid_layer_width (
+    ) const
+    {
+        return min_pyramid_layer_width;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type,
+        typename Feature_extractor_type
+        >
+    unsigned long scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
+    get_min_pyramid_layer_height (
+    ) const
+    {
+        return min_pyramid_layer_height;
     }
 
 // ----------------------------------------------------------------------------------------

@@ -37,6 +37,8 @@ namespace dlib
                 - is_loaded_with_image() == false
                 - get_max_detections_per_template() == 10000
                 - get_max_pyramid_levels() == 1000
+                - get_min_pyramid_layer_width() == 20
+                - get_min_pyramid_layer_height() == 20
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for running a sliding window classifier over
@@ -236,6 +238,39 @@ namespace dlib
                 - max_levels > 0
             ensures
                 - #get_max_pyramid_levels() == max_levels
+        !*/
+
+        void set_min_pyramid_layer_size (
+            unsigned long width,
+            unsigned long height 
+        );
+        /*!
+            requires
+                - width > 0
+                - height > 0
+            ensures
+                - #get_min_pyramid_layer_width() == width
+                - #get_min_pyramid_layer_height() == height
+        !*/
+
+        inline unsigned long get_min_pyramid_layer_width (
+        ) const;
+        /*!
+            ensures
+                - returns the smallest allowable width of an image in the image pyramid.
+                  All pyramids will always include the original input image, however, no
+                  pyramid levels will be created which have a width smaller than the
+                  value returned by this function.
+        !*/
+
+        inline unsigned long get_min_pyramid_layer_height (
+        ) const;
+        /*!
+            ensures
+                - returns the smallest allowable height of an image in the image pyramid.
+                  All pyramids will always include the original input image, however, no
+                  pyramid levels will be created which have a height smaller than the
+                  value returned by this function.
         !*/
 
         unsigned long get_max_detections_per_template (
