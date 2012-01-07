@@ -132,6 +132,7 @@ namespace dlib
         }
 
         void get_mapped_rect_and_metadata (
+            const unsigned long number_pyramid_levels,
             rectangle rect,
             rectangle& mapped_rect,
             detection_template& best_template,
@@ -594,7 +595,7 @@ namespace dlib
         rectangle mapped_rect;
         detection_template best_template;
         unsigned long best_level;
-        get_mapped_rect_and_metadata(rect, mapped_rect, best_template, best_level);
+        get_mapped_rect_and_metadata(max_pyramid_levels, rect, mapped_rect, best_template, best_level);
         return mapped_rect;
     }
 
@@ -606,6 +607,7 @@ namespace dlib
         >
     void scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
     get_mapped_rect_and_metadata (
+        const unsigned long number_pyramid_levels,
         rectangle rect,
         rectangle& mapped_rect,
         detection_template& best_template,
@@ -620,7 +622,7 @@ namespace dlib
 
 
         // for all the levels
-        for (unsigned long l = 0; l < max_pyramid_levels; ++l)
+        for (unsigned long l = 0; l < number_pyramid_levels; ++l)
         {
             // Run the center point through the feature/image space transformation just to make
             // sure we exactly replicate the procedure for shifting an object_box used elsewhere 
@@ -699,7 +701,7 @@ namespace dlib
         rectangle mapped_rect;
         detection_template best_template;
         unsigned long best_level;
-        get_mapped_rect_and_metadata (rect, mapped_rect, best_template, best_level);
+        get_mapped_rect_and_metadata (feats.size(), rect, mapped_rect, best_template, best_level);
 
         for (unsigned long j = 0; j < best_template.rects.size(); ++j)
         {
