@@ -60,7 +60,7 @@ namespace dlib
         void operator() (
             const image_type& img,
             std::vector<std::pair<double, rectangle> >& final_dets,
-            double adjust_threshold
+            double adjust_threshold = 0
         );
 
         template <typename T, typename U>
