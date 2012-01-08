@@ -59,7 +59,8 @@ namespace dlib
             >
         void operator() (
             const image_type& img,
-            std::vector<std::pair<double, rectangle> >& final_dets
+            std::vector<std::pair<double, rectangle> >& final_dets,
+            double adjust_threshold
         );
 
         template <typename T, typename U>
@@ -263,14 +264,15 @@ namespace dlib
     void object_detector<image_scanner_type,overlap_tester_type>::
     operator() (
         const image_type& img,
-        std::vector<std::pair<double, rectangle> >& final_dets
+        std::vector<std::pair<double, rectangle> >& final_dets,
+        double adjust_threshold
     ) 
     {
         final_dets.clear();
         if (w.size() != 0)
         {
             std::vector<std::pair<double, rectangle> > dets;
-            const double thresh = w(scanner.get_num_dimensions());
+            const double thresh = w(scanner.get_num_dimensions()) + adjust_threshold;
 
             scanner.load(img);
             scanner.detect(w, dets, thresh);

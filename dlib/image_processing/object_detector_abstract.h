@@ -131,7 +131,8 @@ namespace dlib
             >
         void operator() (
             const image_type& img,
-            std::vector<std::pair<double, rectangle> >& dets 
+            std::vector<std::pair<double, rectangle> >& dets,
+            double adjust_threshold = 0
         );
         /*!
             requires
@@ -150,6 +151,9 @@ namespace dlib
                 - #get_scanner() will have been loaded with img. Therefore, you can call
                   #get_scanner().get_feature_vector() to obtain the feature vectors for
                   the resulting object detection boxes.
+                - The detection threshold is adjusted by having adjust_threshold added
+                  to it.  Therefore, an adjust_threshold value > 0 makes detecting
+                  objects harder while a negative one makes it easier.
         !*/
 
     };
