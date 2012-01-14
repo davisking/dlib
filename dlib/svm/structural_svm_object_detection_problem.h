@@ -267,6 +267,9 @@ namespace dlib
             // Measure the loss augmented score for the detections which hit a truth rect.
             std::vector<double> truth_score_hits(truth_rects[idx].size(), 0);
 
+            // keep track of which truth boxes we have hit so far.
+            std::vector<bool> hit_truth_table(truth_rects[idx].size(), false);
+
             std::vector<rectangle> final_dets;
             // The point of this loop is to fill out the truth_score_hits array. 
             for (unsigned long i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
@@ -284,16 +287,20 @@ namespace dlib
                 {
                     // if this is the first time we have seen a detect which hit truth_rects[truth.second]
                     const double score = dets[i].first - thresh;
-                    if (truth_score_hits[truth.second] == 0)
-                        truth_score_hits[truth.second] += score - loss_per_missed_target;
+                    if (hit_truth_table[truth.second] == false)
+                    {
+                        hit_truth_table[truth.second] = true;
+                        truth_score_hits[truth.second] += score;
+                    }
                     else
+                    {
                         truth_score_hits[truth.second] += score + loss_per_false_alarm;
+                    }
                 }
             }
 
+            hit_truth_table.assign(hit_truth_table.size(), false);
 
-            // keep track of which truth boxes we have hit so far.
-            std::vector<bool> hit_truth_table(truth_rects[idx].size(), false);
             final_dets.clear();
             // Now figure out which detections jointly maximize the loss and detection score sum.  We
             // need to take into account the fact that allowing a true detection in the output, while 
@@ -309,7 +316,7 @@ namespace dlib
                 const double truth_match = truth.first;
                 if (truth_match > match_eps)
                 {
-                    if (truth_score_hits[truth.second] >= 0)
+                    if (truth_score_hits[truth.second] > loss_per_missed_target)
                     {
                         if (!hit_truth_table[truth.second])
                         {
