@@ -118,6 +118,7 @@ namespace dlib
             requires
                 - EXP::type == unsigned long
                   (i.e. y contains unsigned longs)
+                - reject_labeling(x,y,position) == false
                 - position < x.size()
                 - y.size() == min(position, order) + 1
                 - is_vector(y) == true
