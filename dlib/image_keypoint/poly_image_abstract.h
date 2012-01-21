@@ -53,11 +53,13 @@ namespace dlib
                 - #get_order() == 3
                 - #get_window_size() == 13
                 - #size() == 0
+                - #uses_normalization() == true
         !*/
 
         poly_image(
             long order,
-            long window_size
+            long window_size,
+            bool normalization = true
         );
         /*!
             requires
@@ -67,6 +69,7 @@ namespace dlib
                 - #get_order() == order
                 - #get_window_size() == window_size
                 - #size() == 0
+                - #uses_normalization() == normalization
         !*/
 
         void clear (
@@ -113,12 +116,12 @@ namespace dlib
                   and false otherwise. 
         !*/
 
-        void set_normalization (
+        void set_uses_normalization (
             bool normalization
         );
         /*!
             ensures
-                - uses_normalization() == normalization
+                - #uses_normalization() == normalization
         !*/
 
         void copy_configuration (

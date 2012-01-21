@@ -28,10 +28,12 @@ namespace dlib
 
         poly_image(
             long order_,
-            long window_size_
+            long window_size_,
+            bool normalization = true
         )
         {
             setup(order_, window_size_);
+            set_uses_normalization(normalization);
         }
 
         poly_image (
@@ -93,7 +95,7 @@ namespace dlib
         bool uses_normalization (
         ) const { return normalize; }
 
-        void set_normalization (
+        void set_uses_normalization (
             bool normalization
         )
         {
