@@ -76,14 +76,14 @@ int main(int argc, char** argv)
             const point p4 = rotate_point(center, rect.br_corner(), ang);
 
             // Draw the sides of the box as red lines
-            my_window.add_overlay(image_window::overlay_line(p1, p2, rgb_pixel(255,0,0)));
-            my_window.add_overlay(image_window::overlay_line(p1, p3, rgb_pixel(255,0,0)));
-            my_window.add_overlay(image_window::overlay_line(p4, p2, rgb_pixel(255,0,0)));
-            my_window.add_overlay(image_window::overlay_line(p4, p3, rgb_pixel(255,0,0)));
+            my_window.add_overlay(p1, p2, rgb_pixel(255,0,0));
+            my_window.add_overlay(p1, p3, rgb_pixel(255,0,0));
+            my_window.add_overlay(p4, p2, rgb_pixel(255,0,0));
+            my_window.add_overlay(p4, p3, rgb_pixel(255,0,0));
 
             // Draw a line from the center to the top side so we can see how the box is oriented.
             // Also make this line green.
-            my_window.add_overlay(image_window::overlay_line(center, (p1+p2)/2, rgb_pixel(0,255,0)));
+            my_window.add_overlay(center, (p1+p2)/2, rgb_pixel(0,255,0));
         }
 
         // wait until the user closes the window before we let the program 

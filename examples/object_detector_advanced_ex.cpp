@@ -281,7 +281,7 @@ int main()
             for (unsigned long j = 0; j < rects.size(); ++j)
             {
                 // Add each detection as a red box.
-                win.add_overlay(image_display::overlay_rect(rects[j], rgb_pixel(255,0,0)));
+                win.add_overlay(rects[j], rgb_pixel(255,0,0));
             }
 
             cout << "Hit enter to see the next image.";
