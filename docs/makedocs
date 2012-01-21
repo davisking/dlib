@@ -87,6 +87,7 @@ makedocs ()
     mkdir docs/cache
     mv cache.$$/dlib docs/cache/
     mv cache.$$/examples docs/cache/
+    mv cache.$$/tools docs/cache/
     rm -rf cache.$$
 
 

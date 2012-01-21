@@ -51,6 +51,7 @@ mkdir $RELDIR
 cd $RELDIR || report_failure
 cp -r ../../docs/cache/dlib . || report_failure
 cp -r ../../docs/cache/examples . || report_failure
+cp -r ../../docs/cache/tools . || report_failure
 
 echo Version: $RELEASE >> dlib/README.txt
 echo "Date:    `date`" >> dlib/README.txt
