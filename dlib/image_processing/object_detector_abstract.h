@@ -51,6 +51,9 @@ namespace dlib
         /*!
             ensures
                 - #*this is a copy of item
+                - #get_scanner() == item.get_scanner()
+                  (note that only the "configuration" of item.get_scanner() is copied.
+                  I.e. the copy is done using copy_configuration())
         !*/
 
         object_detector (
@@ -74,6 +77,8 @@ namespace dlib
                 - #get_w() == w
                 - #get_overlap_tester() == overlap_tester
                 - #get_scanner() == scanner
+                  (note that only the "configuration" of scanner is copied.
+                  I.e. the copy is done using copy_configuration())
         !*/
 
         const matrix<double,0,1>& get_w (
@@ -103,6 +108,9 @@ namespace dlib
         /*!
             ensures
                 - #*this is a copy of item
+                - #get_scanner() == item.get_scanner()
+                  (note that only the "configuration" of item.get_scanner() is 
+                  copied.  I.e. the copy is done using copy_configuration())
                 - returns #*this
         !*/
 
