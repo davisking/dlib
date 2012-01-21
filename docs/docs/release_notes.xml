@@ -12,6 +12,7 @@
 
 <current>
 New Stuff:
+   - Added tools for timing blocks of code
    - Machine Learning
       - Added a set of tools for learning to solve the assignment problem.
         See the structural_assignment_trainer and its associated example
