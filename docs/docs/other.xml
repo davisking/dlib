@@ -62,7 +62,7 @@
          <item>zero_extend_cast</item> 
          <item>make_mfp</item> 
          <item>TIME_THIS</item> 
-         <item>timing</item> 
+         <item>timing code blocks</item> 
       </section>
       
       <section>
@@ -1055,7 +1055,7 @@
    <!-- ************************************************************************* -->
 
       <component>
-         <name>timing</name>
+         <name>timing code blocks</name>
          <file>dlib/timing.h</file>
          <spec_file>dlib/timing.h</spec_file>
          <description>        
