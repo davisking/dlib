@@ -51,8 +51,10 @@ namespace dlib
             << "\n\t images.size(): " << images.size() 
             );
 
+        pyramid pyr;
+
         const random_subset_selector<typename feature_extractor::descriptor_type>& samps = 
-            randomly_sample_image_features(images, pyramid(), fe, num_samples);
+            randomly_sample_image_features(images, pyr, fe, num_samples);
 
         if (samps.size() <= 1)
             throw dlib::image_hash_construction_failure("Images too small, not able to gather enough samples to make hash");

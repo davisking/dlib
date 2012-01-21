@@ -393,7 +393,9 @@ namespace
 
         setup_grid_detection_templates(scanner, object_locations, 2, 2);
         feature_extractor_type nnfe;
-        nnfe.set_basis(randomly_sample_image_features(images, pyramid_down(), poly_image<5>(), 80));
+        pyramid_down pyr_down;
+        poly_image<5> polyi;
+        nnfe.set_basis(randomly_sample_image_features(images, pyr_down, polyi, 80));
         scanner.copy_configuration(nnfe);
 
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
