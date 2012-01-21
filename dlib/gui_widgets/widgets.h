@@ -3479,9 +3479,21 @@ namespace dlib
             const overlay_rect& overlay
         );
 
+        template <typename pixel_type>
+        void add_overlay(const rectangle& r, pixel_type p) 
+        { add_overlay(image_display::overlay_rect(r,p)); }
+
+        template <typename pixel_type>
+        void add_overlay(const rectangle& r, pixel_type p, const std::string& l) 
+        { add_overlay(image_display::overlay_rect(r,p,l)); }
+
         void add_overlay (
             const overlay_line& overlay
         );
+
+        template <typename pixel_type>
+        void add_overlay(const point& p1, const point& p2, pixel_type p) 
+        { add_overlay(image_display::overlay_line(p1,p2,p)); }
 
         void add_overlay (
             const std::vector<overlay_rect>& overlay

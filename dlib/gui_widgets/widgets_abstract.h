@@ -2701,6 +2701,27 @@ namespace dlib
                   that it will be displayed. 
         !*/
 
+        template <typename pixel_type>
+        void add_overlay(
+            const rectangle& r, 
+            pixel_type p
+        );
+        /*!
+            ensures
+                - performs: add_overlay(overlay_rect(r,p));
+        !*/
+
+        template <typename pixel_type>
+        void add_overlay(
+            const rectangle& r, 
+            pixel_type p, 
+            const std::string& l
+        );
+        /*!
+            ensures
+                - performs: add_overlay(overlay_rect(r,p,l));
+        !*/
+
         void add_overlay (
             const overlay_line& overlay
         );
@@ -2708,6 +2729,17 @@ namespace dlib
             ensures
                 - adds the given overlay line into this object such
                   that it will be displayed. 
+        !*/
+
+        template <typename pixel_type>
+        void add_overlay(
+            const point& p1,
+            const point& p2,
+            pixel_type p
+        );
+        /*!
+            ensures
+                - performs: add_overlay(overlay_line(p1,p2,p));
         !*/
 
         void add_overlay (
