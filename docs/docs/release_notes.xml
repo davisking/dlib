@@ -16,11 +16,12 @@ New Stuff:
       - Added a set of tools for learning to solve the assignment problem.
         See the structural_assignment_trainer and its associated example
         program for an introduction.
-      - Added some random projection based locality sensitive hashing tools.
+      - Added random projection based locality sensitive hashing tools.
       - Added tools to simplify creating scan_image_pyramid objects.  See
         the object_detector_ex.cpp example program for details.
    - Image Processing
       - Added sum_filter() and spatially_filter_image_separable_down()
+      - New feature extractors: poly_image, nearest_neighbor_feature_image
  
 Non-Backwards Compatible Changes:
    - Changed the serialization format for rand objects.
@@ -56,6 +57,9 @@ Other:
      appropriate non-max suppression parameters if the user doesn't supply them. 
    - The structural_object_detection_trainer has been optimized and now runs
      significantly faster than in previous dlib releases.
+   - The tools folder containing htmlify, imglab, and mltool is now included
+     in the dlib release archive files.  Previously, these tools were only 
+     available directly from source control.
 
 </current>
 
