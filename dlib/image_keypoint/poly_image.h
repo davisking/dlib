@@ -228,7 +228,7 @@ namespace dlib
             long col
         ) const
         {
-            return centered_rect(downsample*point(col+border_size, row+border_size), 
+            return centered_rect(Downsample*point(col+border_size, row+border_size), 
                                  window_size, window_size);
         }
 
@@ -236,7 +236,7 @@ namespace dlib
             const point& p
         ) const
         {
-            return p/downsample - point(border_size, border_size);
+            return p/Downsample - point(border_size, border_size);
         }
 
         const rectangle image_to_feat_space (
@@ -250,7 +250,7 @@ namespace dlib
             const point& p
         ) const
         {
-            return (p + point(border_size, border_size))*downsample;
+            return (p + point(border_size, border_size))*Downsample;
         }
 
         const rectangle feat_to_image_space (
