@@ -213,11 +213,7 @@ int main()
             // Put the image and detections into the window.
             win.clear_overlay();
             win.set_image(images[i]);
-            for (unsigned long j = 0; j < rects.size(); ++j)
-            {
-                // Add each detection as a red box.
-                win.add_overlay(rects[j], rgb_pixel(255,0,0));
-            }
+            win.add_overlay(rects, rgb_pixel(255,0,0));
 
             cout << "Hit enter to see the next image.";
             cin.get();
