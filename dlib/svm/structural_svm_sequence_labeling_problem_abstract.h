@@ -40,10 +40,10 @@ namespace dlib
         !*/
 
     public:
-        typedef typename feature_extractor::sample_type sample_type;
+        typedef typename feature_extractor::sequence_type sequence_type;
 
         structural_svm_sequence_labeling_problem(
-            const std::vector<std::vector<sample_type> >& samples,
+            const std::vector<sequence_type>& samples,
             const std::vector<std::vector<unsigned long> >& labels,
             const feature_extractor& fe,
             unsigned long num_threads = 2

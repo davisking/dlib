@@ -42,8 +42,9 @@ namespace dlib
         !*/
 
     public:
-        // This should be the type of elements in the input sequence
-        typedef the_type_of_elements_of_x sample_type;
+        // This should be the type used to represent an input sequence.  It can be
+        // anything so long as it has a .size() which returns the length of the sequence.
+        typedef the_type_used_to_represent_a_sequence sequence_type;
 
         example_feature_extractor (
         ); 
@@ -81,7 +82,7 @@ namespace dlib
 
         template <typename EXP>
         bool reject_labeling (
-            const std::vector<sample_type>& x,
+            const sequence_type& x,
             const matrix_exp<EXP>& y,
             unsigned long position
         ) const;
@@ -110,7 +111,7 @@ namespace dlib
         template <typename feature_setter, typename EXP>
         void get_features (
             feature_setter& set_feature,
-            const std::vector<sample_type>& x,
+            const sequence_type& x,
             const matrix_exp<EXP>& y,
             unsigned long position
         ) const;
@@ -173,7 +174,7 @@ namespace dlib
         >
     bool contains_invalid_labeling (
         const feature_extractor& fe,
-        const std::vector<typename feature_extractor::sample_type>& x,
+        const typename feature_extractor::sequence_type& x,
         const std::vector<unsigned long>& y
     );
     /*!
@@ -195,7 +196,7 @@ namespace dlib
         >
     bool contains_invalid_labeling (
         const feature_extractor& fe,
-        const std::vector<std::vector<typename feature_extractor::sample_type> >& x,
+        const std::vector<typename feature_extractor::sequence_type>& x,
         const std::vector<std::vector<unsigned long> >& y
     );
     /*!
@@ -243,8 +244,7 @@ namespace dlib
         !*/
 
     public:
-        typedef typename feature_extractor::sample_type sample_type;
-        typedef std::vector<sample_type> sample_sequence_type;
+        typedef typename feature_extractor::sequence_type sample_sequence_type;
         typedef std::vector<unsigned long> labeled_sequence_type;
 
         sequence_labeler(

@@ -178,10 +178,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sample_type
+        typename sequence_type 
         >
     bool is_sequence_labeling_problem (
-        const std::vector<std::vector<sample_type> >& samples,
+        const std::vector<sequence_type>& samples,
         const std::vector<std::vector<unsigned long> >& labels
     )
     {

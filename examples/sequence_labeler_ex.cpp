@@ -67,9 +67,10 @@ class feature_extractor
     */
 
 public:
-    // This defines the type used to represent the elements of an observed 
-    // sequence.  You can use any type here.  
-    typedef unsigned long sample_type; 
+    // This defines the type used to represent the observed sequence.  You can use 
+    // any type here so long as it has a .size() which returns the number of things
+    // in the sequence.  
+    typedef std::vector<unsigned long> sequence_type; 
 
     unsigned long num_features() const
     /*!
@@ -111,7 +112,7 @@ public:
     template <typename feature_setter, typename EXP>
     void get_features (
         feature_setter& set_feature,
-        const std::vector<sample_type>& x,
+        const sequence_type& x,
         const matrix_exp<EXP>& y,
         unsigned long position
     ) const

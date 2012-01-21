@@ -44,11 +44,11 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        template <typename feature_extractor, typename sample_type, typename EXP2> 
+        template <typename feature_extractor, typename sequence_type, typename EXP2> 
         void get_feature_vector(
             std::vector<std::pair<unsigned long, double> >& feats,
             const feature_extractor& fe,
-            const std::vector<sample_type>& sequence,
+            const sequence_type& sequence,
             const matrix_exp<EXP2>& candidate_labeling,
             unsigned long position
         )
@@ -71,10 +71,10 @@ namespace dlib
         typedef matrix<double,0,1> matrix_type;
         typedef std::vector<std::pair<unsigned long, double> > feature_vector_type;
 
-        typedef typename feature_extractor::sample_type sample_type;
+        typedef typename feature_extractor::sequence_type sequence_type;
 
         structural_svm_sequence_labeling_problem(
-            const std::vector<std::vector<sample_type> >& samples_,
+            const std::vector<sequence_type>& samples_,
             const std::vector<std::vector<unsigned long> >& labels_,
             const feature_extractor& fe_,
             unsigned long num_threads = 2
@@ -130,7 +130,7 @@ namespace dlib
         }
 
         void get_joint_feature_vector (
-            const std::vector<sample_type>& sample, 
+            const sequence_type& sample, 
             const std::vector<unsigned long>& label,
             feature_vector_type& psi
         ) const 
@@ -163,7 +163,7 @@ namespace dlib
             unsigned long num_states() const { return fe.num_labels(); }
 
             map_prob(
-                const std::vector<sample_type>& sequence_,
+                const sequence_type& sequence_,
                 const std::vector<unsigned long>& label_,
                 const feature_extractor& fe_,
                 const matrix<double,0,1>& weights_
@@ -199,7 +199,7 @@ namespace dlib
                 return fe_helpers::dot(weights, fe, sequence, node_states, node_id) + loss;
             }
 
-            const std::vector<sample_type>& sequence;
+            const sequence_type& sequence;
             const std::vector<unsigned long>& label;
             const feature_extractor& fe;
             const matrix<double,0,1>& weights;
@@ -225,7 +225,7 @@ namespace dlib
             get_joint_feature_vector(samples[idx], y, psi);
         }
 
-        const std::vector<std::vector<sample_type> >& samples;
+        const std::vector<sequence_type>& samples;
         const std::vector<std::vector<unsigned long> >& labels;
         const feature_extractor& fe;
     };

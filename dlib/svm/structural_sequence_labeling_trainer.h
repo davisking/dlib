@@ -20,8 +20,7 @@ namespace dlib
     class structural_sequence_labeling_trainer
     {
     public:
-        typedef typename feature_extractor::sample_type sample_type;
-        typedef std::vector<sample_type> sample_sequence_type;
+        typedef typename feature_extractor::sequence_type sample_sequence_type;
         typedef std::vector<unsigned long> labeled_sequence_type;
 
         typedef sequence_labeler<feature_extractor> trained_function_type;

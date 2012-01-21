@@ -39,11 +39,11 @@ namespace dlib
             double value;
         };
 
-        template <typename feature_extractor, typename EXP, typename sample_type, typename EXP2> 
+        template <typename feature_extractor, typename EXP, typename sequence_type, typename EXP2> 
         double dot(
             const matrix_exp<EXP>& lambda,
             const feature_extractor& fe,
-            const std::vector<sample_type>& sequence,
+            const sequence_type& sequence,
             const matrix_exp<EXP2>& candidate_labeling,
             unsigned long position
         )
@@ -61,7 +61,7 @@ namespace dlib
     {
         template <
             typename T,
-            bool (T::*funct)(const std::vector<typename T::sample_type>&, const matrix_exp<matrix<unsigned long> >&, unsigned long)const
+            bool (T::*funct)(const typename T::sequence_type&, const matrix_exp<matrix<unsigned long> >&, unsigned long)const
             >
         struct hrlh_helper
         {
@@ -100,10 +100,10 @@ namespace dlib
         };
 
 
-        template <typename feature_extractor, typename EXP, typename sample_type>
+        template <typename feature_extractor, typename EXP, typename sequence_type>
         typename enable_if<has_reject_labeling<feature_extractor>,bool>::type call_reject_labeling_if_exists (
             const feature_extractor& fe,
-            const std::vector<sample_type>& x,
+            const sequence_type& x,
             const matrix_exp<EXP>& y,
             unsigned long position
         )
@@ -111,10 +111,10 @@ namespace dlib
             return fe.reject_labeling(x, y, position);
         }
 
-        template <typename feature_extractor, typename EXP, typename sample_type>
+        template <typename feature_extractor, typename EXP, typename sequence_type>
         typename disable_if<has_reject_labeling<feature_extractor>,bool>::type call_reject_labeling_if_exists (
             const feature_extractor& ,
-            const std::vector<sample_type>& ,
+            const sequence_type& ,
             const matrix_exp<EXP>& ,
             unsigned long 
         )
@@ -131,7 +131,7 @@ namespace dlib
         >
     typename enable_if<dlib::impl::has_reject_labeling<feature_extractor>,bool>::type contains_invalid_labeling (
         const feature_extractor& fe,
-        const std::vector<typename feature_extractor::sample_type>& x,
+        const typename feature_extractor::sequence_type& x,
         const std::vector<unsigned long>& y
     )
     {
@@ -160,7 +160,7 @@ namespace dlib
         >
     typename disable_if<dlib::impl::has_reject_labeling<feature_extractor>,bool>::type contains_invalid_labeling (
         const feature_extractor& ,
-        const std::vector<typename feature_extractor::sample_type>& x,
+        const typename feature_extractor::sequence_type& x,
         const std::vector<unsigned long>& y 
     )
     {
@@ -177,7 +177,7 @@ namespace dlib
         >
     bool contains_invalid_labeling (
         const feature_extractor& fe,
-        const std::vector<std::vector<typename feature_extractor::sample_type> >& x,
+        const std::vector<typename feature_extractor::sequence_type>& x,
         const std::vector<std::vector<unsigned long> >& y
     )
     {
@@ -201,8 +201,7 @@ namespace dlib
     class sequence_labeler
     {
     public:
-        typedef typename feature_extractor::sample_type sample_type;
-        typedef std::vector<sample_type> sample_sequence_type;
+        typedef typename feature_extractor::sequence_type sample_sequence_type;
         typedef std::vector<unsigned long> labeled_sequence_type;
 
     private:

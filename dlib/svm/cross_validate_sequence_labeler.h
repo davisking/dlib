@@ -16,11 +16,11 @@ namespace dlib
 
     template <
         typename sequence_labeler_type,
-        typename sample_type
+        typename sequence_type 
         >
     const matrix<double> test_sequence_labeler (
         const sequence_labeler_type& labeler,
-        const std::vector<std::vector<sample_type> >& samples,
+        const std::vector<sequence_type>& samples,
         const std::vector<std::vector<unsigned long> >& labels
     )
     {
@@ -59,11 +59,11 @@ namespace dlib
 
     template <
         typename trainer_type,
-        typename sample_type
+        typename sequence_type
         >
     const matrix<double> cross_validate_sequence_labeler (
         const trainer_type& trainer,
-        const std::vector<std::vector<sample_type> >& samples,
+        const std::vector<sequence_type>& samples,
         const std::vector<std::vector<unsigned long> >& labels,
         const long folds
     )
@@ -102,7 +102,7 @@ namespace dlib
         const long num_in_test = samples.size()/folds;
         const long num_in_train = samples.size() - num_in_test;
 
-        std::vector<std::vector<sample_type> > x_test, x_train;
+        std::vector<sequence_type> x_test, x_train;
         std::vector<std::vector<unsigned long> > y_test, y_train;
 
 
