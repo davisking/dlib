@@ -1035,6 +1035,7 @@
          <term file="imaging.html" name="compute_dominant_angle"/>
          <term file="imaging.html" name="compute_surf_descriptor"/>
          <term file="imaging.html" name="hog_image"/>
+         <term file="imaging.html" name="fine_hog_image"/>
          <term file="imaging.html" name="poly_image"/>
          <term file="imaging.html" name="hashed_feature_image"/>
          <term file="imaging.html" name="nearest_neighbor_feature_image"/>

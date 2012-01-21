@@ -21,7 +21,8 @@ New Stuff:
         the object_detector_ex.cpp example program for details.
    - Image Processing
       - Added sum_filter() and spatially_filter_image_separable_down()
-      - New feature extractors: poly_image, nearest_neighbor_feature_image
+      - New feature extractors: poly_image, nearest_neighbor_feature_image, and
+        fine_hog_image
  
 Non-Backwards Compatible Changes:
    - Changed the serialization format for rand objects.

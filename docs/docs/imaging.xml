@@ -117,6 +117,7 @@
          </item>
 
          <item>hog_image</item>
+         <item>fine_hog_image</item>
          <item>poly_image</item>
          <item>hashed_feature_image</item>
          <item>nearest_neighbor_feature_image</item>
@@ -328,6 +329,19 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>fine_hog_image</name>
+         <file>dlib/image_keypoint.h</file>
+         <spec_file link="true">dlib/image_keypoint/fine_hog_image_abstract.h</spec_file>
+         <description>
+            This object is a version of the <a href="#hog_image">hog_image</a> that 
+            allows you to extract HOG features at a finer resolution.  
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>poly_image</name>
          <file>dlib/image_keypoint.h</file>
          <spec_file link="true">dlib/image_keypoint/poly_image_abstract.h</spec_file>
@@ -357,6 +371,7 @@
                 The following feature extractors can be wrapped by the hashed_feature_image:
                <ul style="margin-top:0em"> 
                   <li><a href="#hog_image">hog_image</a></li>
+                  <li><a href="#fine_hog_image">fine_hog_image</a></li>
                   <li><a href="#poly_image">poly_image</a></li>
                </ul>
          </description>
@@ -384,6 +399,7 @@
                The following feature extractors can be wrapped by the nearest_neighbor_feature_image:
                <ul style="margin-top:0em"> 
                   <li><a href="#hog_image">hog_image</a></li>
+                  <li><a href="#fine_hog_image">fine_hog_image</a></li>
                   <li><a href="#poly_image">poly_image</a></li>
                </ul>
          </description>
