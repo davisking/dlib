@@ -487,8 +487,8 @@
          <term file="metaprogramming.html" name="DLIB_CASSERT"/>
          <term file="metaprogramming.html" name="COMPILE_TIME_ASSERT"/>
          <term file="metaprogramming.html" name="DLIB_ASSERT_HAS_STANDARD_LAYOUT"/>
-         <term file="metaprogramming.html" name="TIME_THIS"/>
-         <term link="metaprogramming.html#TIME_THIS" name="TIME_THIS_TO"/>
+         <term file="other.html" name="TIME_THIS"/>
+         <term link="other.html#TIME_THIS" name="TIME_THIS_TO"/>
          <term file="metaprogramming.html" name="_dT"/>
          <term file="metaprogramming.html" name="is_pointer_type"/>
          <term file="metaprogramming.html" name="is_const_type"/>

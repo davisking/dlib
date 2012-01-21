@@ -71,7 +71,6 @@
          <item>DLIB_ASSERT_HAS_STANDARD_LAYOUT</item> 
          <item>ASSERT_ARE_NOT_SAME_TYPE</item> 
          <item>_dT</item> 
-         <item>TIME_THIS</item> 
          <item>is_same_object</item> 
          <item>assign_zero_if_built_in_scalar_type</item>
          <item>wrap_function</item>
@@ -698,27 +697,6 @@
          <description>        
             This is a template that allows you to turn a global function into a 
             function object.  See the specs for more details. 
-         </description>
-                                 
-      </component>
-            
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>TIME_THIS</name>
-         <file>dlib/time_this.h</file>
-         <spec_file>dlib/time_this.h</spec_file>
-         <description>        
-            <p>
-            This is a macro function for timing blocks of code.  Its form is <tt>TIME_THIS(whatever you want to time)</tt>
-            It's pretty straight forward. It just prints the time it took to std::cout.
-            </p>
-            <p>
-            There is another version of this function called TIME_THIS_TO which takes as a parameter an ostream
-            object to write its output to.  Its form is <tt>TIME_THIS_TO(what you want to time, the output stream)</tt>;
-            </p>
-            
          </description>
                                  
       </component>

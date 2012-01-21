@@ -61,6 +61,7 @@
          <item>serialize</item> 
          <item>zero_extend_cast</item> 
          <item>make_mfp</item> 
+         <item>TIME_THIS</item> 
       </section>
       
       <section>
@@ -1030,6 +1031,28 @@
       </component>
             
    <!-- ************************************************************************* -->
+
+      <component>
+         <name>TIME_THIS</name>
+         <file>dlib/time_this.h</file>
+         <spec_file>dlib/time_this.h</spec_file>
+         <description>        
+            <p>
+            This is a macro function for timing blocks of code.  Its form is <tt>TIME_THIS(whatever you want to time)</tt>
+            It's pretty straight forward. It just prints the time it took to std::cout.
+            </p>
+            <p>
+            There is another version of this function called TIME_THIS_TO which takes as a parameter an ostream
+            object to write its output to.  Its form is <tt>TIME_THIS_TO(what you want to time, the output stream)</tt>;
+            </p>
+            
+         </description>
+                                 
+      </component>
+            
+
+   <!-- ************************************************************************* -->
+
       
    </components>
 
