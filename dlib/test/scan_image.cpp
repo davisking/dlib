@@ -407,7 +407,7 @@ namespace
             {
                 for (long c = 0; c < img.nc(); ++c)
                 {
-                    img[r][c] = 100*(rnd.get_random_double()-0.5);
+                    img[r][c] = static_cast<pixel_type>(100*(rnd.get_random_double()-0.5));
                 }
             }
 

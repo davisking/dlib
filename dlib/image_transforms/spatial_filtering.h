@@ -708,7 +708,7 @@ namespace dlib
                 // add in the new right side of the rect and subtract the old right side.
                 cur_sum = cur_sum + column_sum[c+width] - column_sum[c];
 
-                out[r][c] += cur_sum;
+                out[r][c] += static_cast<typename image_type2::type>(cur_sum);
             }
         }
     }

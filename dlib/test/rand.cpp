@@ -175,7 +175,7 @@ namespace
             for (int i =0; i < 1000; ++i)
             {
                 DLIB_TEST(r.get_random_32bit_number() == r2.get_random_32bit_number());
-                DLIB_TEST(r.get_random_gaussian() == r2.get_random_gaussian());
+                DLIB_TEST(std::abs(r.get_random_gaussian() - r2.get_random_gaussian()) < 1e-15);
             }
         }
 
