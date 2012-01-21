@@ -67,7 +67,7 @@ int main(int argc, char** argv)
             const unsigned long box_size = static_cast<unsigned long>(sp[i].p.scale*20);
             const double ang = sp[i].angle;
             const point center(sp[i].p.center);
-            rectangle rect = centered_rect(center, box_size, box_size); 
+            const rectangle rect = centered_rect(center, box_size, box_size); 
 
             // Rotate the 4 corners of the rectangle 
             const point p1 = rotate_point(center, rect.tl_corner(), ang);
