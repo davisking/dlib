@@ -43,6 +43,7 @@ namespace dlib
         void clear (
         )
         {
+            normalize = true;
             poly_coef.clear();
             order = 3;
             window_size = 13;
@@ -89,10 +90,21 @@ namespace dlib
             filters = build_separable_poly_filters(order, window_size);
         }
 
+        bool uses_normalization (
+        ) const { return normalize; }
+
+        void set_normalization (
+            bool normalization
+        )
+        {
+            normalize = normalization;
+        }
+
         void copy_configuration (
             const poly_image& item
         )
         {
+            normalize = item.normalize;
             if (order != item.order || 
                 window_size != item.window_size)
             {
@@ -116,26 +128,39 @@ namespace dlib
             des.set_size(get_num_dimensions());
 
 
-            array2d<float> coef0;
-            rectangle rect = filter_image(img, coef0, filters[0]);
-            num_rows = rect.height();
-            num_cols = rect.width();
-
-            for (unsigned long i = 1; i < filters.size(); ++i)
+            if (normalize)
             {
-                filter_image(img, poly_coef[i-1], filters[i]);
+                array2d<float> coef0;
+                rectangle rect = filter_image(img, coef0, filters[0]);
+                num_rows = rect.height();
+                num_cols = rect.width();
 
-                // intensity normalize everything
-                for (long r = 0; r < coef0.nr(); ++r)
+                for (unsigned long i = 1; i < filters.size(); ++i)
                 {
-                    for (long c = 0; c < coef0.nc(); ++c)
+                    filter_image(img, poly_coef[i-1], filters[i]);
+
+                    // intensity normalize everything
+                    for (long r = 0; r < coef0.nr(); ++r)
                     {
-                        if (coef0[r][c] >= 1)
-                            poly_coef[i-1][r][c] /= coef0[r][c];
-                        else
-                            poly_coef[i-1][r][c] = 0;
+                        for (long c = 0; c < coef0.nc(); ++c)
+                        {
+                            if (coef0[r][c] >= 1)
+                                poly_coef[i-1][r][c] /= coef0[r][c];
+                            else
+                                poly_coef[i-1][r][c] = 0;
+                        }
                     }
                 }
+            }
+            else
+            {
+                rectangle rect;
+                for (unsigned long i = 0; i < filters.size(); ++i)
+                {
+                    rect = filter_image(img, poly_coef[i], filters[i]);
+                }
+                num_rows = rect.height();
+                num_cols = rect.width();
             }
         }
 
@@ -158,8 +183,15 @@ namespace dlib
         long get_num_dimensions (
         ) const
         {
-            // -1 because we discard the constant term of the polynomial.
-            return filters.size()-1;
+            if (normalize)
+            {
+                // -1 because we discard the constant term of the polynomial.
+                return filters.size()-1;
+            }
+            else
+            {
+                return filters.size();
+            }
         }
 
         inline const descriptor_type& operator() (
@@ -238,6 +270,7 @@ namespace dlib
             serialize(item.border_size, out);
             serialize(item.num_rows, out);
             serialize(item.num_cols, out);
+            serialize(item.normalize, out);
             serialize(item.filters, out);
         }
 
@@ -254,6 +287,7 @@ namespace dlib
             deserialize(item.border_size, in);
             deserialize(item.num_rows, in);
             deserialize(item.num_cols, in);
+            deserialize(item.normalize, in);
             deserialize(item.filters, in);
         }
 
@@ -285,6 +319,7 @@ namespace dlib
         long num_rows;
         long num_cols;
 
+        bool normalize;
 
         mutable descriptor_type des;
     };
