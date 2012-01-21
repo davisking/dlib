@@ -40,6 +40,9 @@ Non-Backwards Compatible Changes:
         object_detector.
    - Fixed improper normalization in the gaussian() functions.  The
      normalization constant was being computed incorrectly.
+   - Sequence labeling feature extractors must now define a sequence_type
+     typedef instead of sample_type.  This change allows the user to use any 
+     type of sequence, not just std::vector objects.
 
 Bug fixes:
    - Changed the add_probability() method of joint_probability_table so
