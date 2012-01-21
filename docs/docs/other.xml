@@ -62,6 +62,7 @@
          <item>zero_extend_cast</item> 
          <item>make_mfp</item> 
          <item>TIME_THIS</item> 
+         <item>timing</item> 
       </section>
       
       <section>
@@ -1046,6 +1047,21 @@
             object to write its output to.  Its form is <tt>TIME_THIS_TO(what you want to time, the output stream)</tt>;
             </p>
             
+         </description>
+                                 
+      </component>
+            
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>timing</name>
+         <file>dlib/timing.h</file>
+         <spec_file>dlib/timing.h</spec_file>
+         <description>        
+               This is a set of set of functions for timing blocks of code.  Unlike
+               <a href="#TIME_THIS">TIME_THIS</a>, it can be used to find the cumulative
+               time spent on a block which is executed multiple times.
          </description>
                                  
       </component>
