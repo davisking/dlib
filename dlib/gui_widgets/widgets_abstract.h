@@ -2722,6 +2722,17 @@ namespace dlib
                 - performs: add_overlay(overlay_rect(r,p,l));
         !*/
 
+        template <typename pixel_type>
+        void add_overlay(
+            const std::vector<rectangle>& r,
+            pixel_type p
+        );
+        /*!
+            ensures
+                - adds the given set of rectangles into this object such
+                  that they will be displayed with the color specific by p. 
+        !*/
+
         void add_overlay (
             const overlay_line& overlay
         );
