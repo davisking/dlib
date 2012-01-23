@@ -18,8 +18,8 @@ New Stuff:
         See the structural_assignment_trainer and its associated example
         program for an introduction.
       - Added random projection based locality sensitive hashing tools.
-      - Added tools to simplify creating scan_image_pyramid objects.  See
-        the object_detector_ex.cpp example program for details.
+      - Added tools to simplify the creation of scan_image_pyramid objects.  
+        See the object_detector_ex.cpp example program for details.
    - Image Processing
       - Added sum_filter() and spatially_filter_image_separable_down()
       - New feature extractors: poly_image, nearest_neighbor_feature_image, and
