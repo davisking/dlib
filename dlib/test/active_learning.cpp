@@ -151,7 +151,7 @@ namespace
             // When we pick the best/front ranked element then the active learning method
             // shouldn't do much worse than random selection (and often much better).
             DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, max_min_margin, 25, true) >= 0.97);
-            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, ratio_margin, 25, true) >= 0.97);
+            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, ratio_margin, 25, true) >= 0.96);
             // However, picking the worst ranked element should do way worse than random
             // selection.
             DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, max_min_margin, 25, false) < 0.8);
