@@ -331,6 +331,29 @@
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="complex_matrix"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="normalize"/>
 
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="abs"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="acos"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="asin"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="atan"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="ceil"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="conj"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="cos"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="cosh"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="cubed"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="exp"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="floor"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="imag"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="log10"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="log"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="norm"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="pow"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="real"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="sinh"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="sin"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="sqrt"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="tanh"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="tan"/>
+
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="linspace"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="logspace"/>
