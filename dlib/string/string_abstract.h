@@ -115,6 +115,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    std::string pad_int_with_zeros (
+        int i,
+        unsigned long width = 6
+    );
+    /*!
+        ensures
+            - converts i into a string of at least width characters in length.  If
+              necessary, the string will be padded with leading zeros to get
+              to width characters.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename charT,
         typename traits,

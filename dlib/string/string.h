@@ -4,9 +4,11 @@
 #define DLIB_STRINg_ 
 
 #include "string_abstract.h"
+#include <sstream>
 #include "../algs.h"
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include "../error.h"
 #include "../assert.h"
 #include "../uintn.h"
@@ -256,6 +258,18 @@ namespace dlib
         return sout.str();
     }
 #endif
+
+// ----------------------------------------------------------------------------------------
+
+    inline std::string pad_int_with_zeros (
+        int i,
+        unsigned long width = 6
+    )
+    {
+        std::ostringstream sout;
+        sout << std::setw(width) << std::setfill('0') << i;
+        return sout.str();
+    }
 
 // ----------------------------------------------------------------------------------------
 
