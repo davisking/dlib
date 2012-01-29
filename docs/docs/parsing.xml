@@ -43,6 +43,7 @@
          <item>string_cast</item>
          <item>string_assign</item>
          <item>cast_to_string</item>
+         <item>pad_int_with_zeros</item>
          <item>cast_to_wstring</item>
          <item>wrap_string</item>
          <item>narrow</item> 
@@ -267,6 +268,18 @@
             cast_to_string is a templated function which makes it easy to convert arbitrary objects to 
             std::string strings.  The types supported are any types that can be written to std::ostream via 
             operator&lt;&lt;.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>pad_int_with_zeros</name>
+         <file>dlib/string.h</file>
+         <spec_file link="true">dlib/string/string_abstract.h</spec_file>
+         <description>        
+            Converts an integer into a string and pads it with leading zeros.
          </description>
                                  
       </component>

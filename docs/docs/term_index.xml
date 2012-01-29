@@ -1167,6 +1167,7 @@
          <term file="parsing.html" name="wrap_string"/>
          <term file="parsing.html" name="xml_parser"/>
          <term file="parsing.html" name="cast_to_string"/>
+         <term file="parsing.html" name="pad_int_with_zeros"/>
          <term file="parsing.html" name="toupper"/>
          <term file="parsing.html" name="tolower"/>
          <term file="parsing.html" name="trim"/>
