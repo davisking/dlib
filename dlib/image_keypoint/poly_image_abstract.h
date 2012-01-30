@@ -54,12 +54,14 @@ namespace dlib
                 - #get_window_size() == 13
                 - #size() == 0
                 - #uses_normalization() == true
+                - #is_rotationally_invariant() == false 
         !*/
 
         poly_image(
             long order,
             long window_size,
-            bool normalization = true
+            bool normalization = true,
+            bool rotation_invariance = false
         );
         /*!
             requires
@@ -70,6 +72,7 @@ namespace dlib
                 - #get_window_size() == window_size
                 - #size() == 0
                 - #uses_normalization() == normalization
+                - #is_rotationally_invariant() == rotation_invariance
         !*/
 
         void clear (
@@ -122,6 +125,23 @@ namespace dlib
         /*!
             ensures
                 - #uses_normalization() == normalization
+        !*/
+
+        bool is_rotationally_invariant (
+        );
+        /*!
+            ensures
+                - returns true if the feature extractor will adjust the output so that it
+                  is rotationally invariant.  This is done by rotating each patch such that
+                  the gradient vector always points in the same direction.
+        !*/
+
+        void set_is_rotationally_invariant (
+            bool rotation_invariance
+        );
+        /*!
+            ensures
+                - #is_rotationally_invariant() == rotation_invariance
         !*/
 
         void copy_configuration (

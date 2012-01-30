@@ -60,8 +60,8 @@ namespace dlib
 
                 if (X.nc() > 5)
                 {
-                    X(cnt, 3) = x*y;
-                    X(cnt, 4) = x*x;
+                    X(cnt, 3) = x*x;
+                    X(cnt, 4) = x*y;
                     X(cnt, 5) = y*y;
                 }
                 if (X.nc() > 9)
