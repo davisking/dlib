@@ -116,13 +116,9 @@ int main(int argc, char** argv)
         const clp::option_type& option_in = parser.option("in");
         const clp::option_type& option_out = parser.option("out");
 
-        // Figure out what the compression level should be.  The default is 2.
-        int compression_level = 2;
-        // If the user supplied the -l option then use whatever value they gave for the level.
-        // Note that we use the string_assign object, sa, to convert the string returned
-        // by argument() to an int.
-        if (parser.option("l"))
-            compression_level = sa = parser.option("l").argument();
+        // Figure out what the compression level should be.  If the user didn't supply
+        // this command line option then a value of 2 will be used. 
+        int compression_level = get_option(parser,"l",2);
 
 
 

@@ -10,7 +10,6 @@
 
 
 #include "dlib/config_reader.h"
-#include "dlib/string.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -96,13 +95,18 @@ int main()
         cout << cr.block("user1").block("details")["editor"] << endl;
 
         
-        // Note that you can use the string_assign object, sa, to easily convert fields 
-        // into non-string types.  For example, the config file has an integer id 
-        // field that could be converted into an int like so:
-        int id1 = sa = cr.block("user1")["id"];
-        int id2 = sa = cr.block("user2")["id"];
+        // Note that you can use get_option() to easily convert fields into 
+        // non-string types.  For example, the config file has an integer id 
+        // field that can be converted into an int like so:
+        int id1 = get_option(cr,"user1.id",0); 
+        int id2 = get_option(cr,"user2.id",0); 
         cout << "user1's id is " << id1 << endl;
         cout << "user2's id is " << id2 << endl;
+        // The third argument to get_option() is the default value returned if 
+        // the config reader doesn't contain a corresponding entry.  So for 
+        // example, the following prints 321 since there is no user3.
+        int id3 = get_option(cr,"user3.id",321); 
+        cout << "user3's id is " << id3 << endl;
 
     }
     catch (exception& e)
