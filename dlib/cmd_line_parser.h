@@ -9,6 +9,7 @@
 #include "cmd_line_parser/cmd_line_parser_check_1.h"
 #include "cmd_line_parser/cmd_line_parser_check_c.h"
 #include <string>
+#include "cmd_line_parser/get_option.h"
 
 #include "map.h"
 #include "sequence.h"

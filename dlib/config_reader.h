@@ -6,6 +6,7 @@
 #include "config_reader/config_reader_kernel_1.h"
 #include "map.h"
 #include "tokenizer.h"
+#include "cmd_line_parser/get_option.h"
 
 #include "algs.h"
 #include "is_kind.h"

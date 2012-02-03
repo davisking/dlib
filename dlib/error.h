@@ -52,7 +52,8 @@ namespace dlib
         EIMAGE_SAVE,
         ECAST_TO_STRING,
         ESTRING_CAST,
-        EUTF8_TO_UTF32
+        EUTF8_TO_UTF32,
+        EOPTION_PARSE
     };
 
 // ----------------------------------------------------------------------------------------
@@ -165,6 +166,7 @@ namespace dlib
             else if ( type == ECAST_TO_STRING) return "ECAST_TO_STRING";
             else if ( type == ESTRING_CAST) return "ESTRING_CAST";
             else if ( type == EUTF8_TO_UTF32) return "EUTF8_TO_UTF32";
+            else if ( type == EOPTION_PARSE) return "EOPTION_PARSE";
             else return "undefined error type";
         }
 
