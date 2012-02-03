@@ -514,7 +514,7 @@ Dynamic Libraries in C++</a>, and
                            You could do this using code similar to the following:
 
                            <code_box>
-dlib::<a href="other.html#byte_orderer">byte_orderer</a>::kernel_1a bo;
+dlib::<a href="other.html#byte_orderer">byte_orderer</a> bo;
 ...
 bo.host_to_big(my_uint);
 my_out_stream.write((char*)&amp;my_uint, sizeof(my_uint));
