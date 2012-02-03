@@ -90,7 +90,7 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 1,
+            DLIB_ASSERT(current_n() > 0,
                 "\tT running_stats::max"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
@@ -103,7 +103,7 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 1,
+            DLIB_ASSERT(current_n() > 0,
                 "\tT running_stats::min"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
