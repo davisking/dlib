@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+ 
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.45" date="Jan 29, 2012">
+New Stuff:
    - Added tools for timing blocks of code
    - Machine Learning
       - Added a set of tools for learning to solve the assignment problem.
@@ -66,7 +79,7 @@ Other:
      in the dlib release archive files.  Previously, these tools were only 
      available directly from source control.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
