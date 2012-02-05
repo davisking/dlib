@@ -487,6 +487,15 @@
                   </implementation>
                </implementations>
             </extension>
+
+            <extension>
+               <name>get_option</name>
+               <spec_file>dlib/cmd_line_parser/get_option_abstract.h</spec_file>
+               <description>This extension provides a convenience function for accessing the 
+                  options to a command line argument or a <a href="#config_reader">config_reader</a>.  It 
+                  is automatically #included when using the command line parser or config reader.
+                  </description>
+            </extension>
          </extensions>              
                                     
                         
