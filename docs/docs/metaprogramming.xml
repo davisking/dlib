@@ -47,6 +47,7 @@
          <item>is_graph</item>
          <item>is_rand</item>
          <item>is_matrix</item>
+         <item>is_config_reader</item>
          <item>is_std_vector</item>
          <item>is_pair</item>
          <item>is_directed_graph</item>
@@ -392,6 +393,20 @@
             This is a template where is_matrix&lt;T&gt;::value == true when T
             is a <a href="containers.html#matrix">matrix</a> object or some kind
             of matrix expression.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_config_reader</name>
+         <file>dlib/is_kind.h</file>
+         <spec_file link="true">dlib/is_kind.h</spec_file>
+         <description>
+            This is a template where is_config_reader&lt;T&gt;::value == true when T
+            is a <a href="parsing.html#config_reader">config_reader</a> or
+            config_reader_thread_safe object.
          </description>
          
       </component>

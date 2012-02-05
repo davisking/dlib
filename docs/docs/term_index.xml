@@ -536,6 +536,7 @@
          <term file="metaprogramming.html" name="is_array2d"/>
          <term file="metaprogramming.html" name="is_rand"/>
          <term file="metaprogramming.html" name="is_matrix"/>
+         <term file="metaprogramming.html" name="is_config_reader"/>
          <term file="metaprogramming.html" name="is_std_vector"/>
          <term file="metaprogramming.html" name="is_pair"/>
          <term file="metaprogramming.html" name="is_directed_graph"/>
