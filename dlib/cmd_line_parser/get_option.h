@@ -170,7 +170,7 @@ namespace dlib
         const char* default_value
     )
     {
-        return get_option(parser, cr, std::string(default_value));
+        return get_option(parser, cr, option_name, std::string(default_value));
     }
 
 // ----------------------------------------------------------------------------------------
