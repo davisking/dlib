@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <dlib/config_reader.h>
+#include <dlib/cmd_line_parser.h>
 
 #include "tester.h"
 
@@ -391,6 +392,85 @@ namespace
     }
 
 
+    void test_get_option()
+    {
+        const char* argv[100];            
+        int argc;
+
+        // program --opt 4 -d dude 
+        argv[0] = "program";
+        argv[1] = "--opt";
+        argv[2] = "4";
+        argv[3] = "-d";
+        argv[4] = "dude";
+        argc = 5;
+
+        std::ostringstream sout;
+        sout << "block#comment { { } \n";
+        sout << "{ \n";
+        sout << "  opt = 5 \n";
+        sout << "  a = 6 \n";
+        sout << "  d = joel \n";
+        sout << "  subblock {} \n";
+        sout << "} \n";
+        sout << " \n";
+        sout << " \n";
+        sout << "opt = 8 \n";
+        sout << "d = davis \n";
+        sout << "a = 50 \n";
+        sout << " # comment \n";
+
+        std::istringstream sin(sout.str());
+
+        config_reader cr(sin);
+
+        dlib::cmd_line_parser<char>::kernel_1a_c parser;
+
+        parser.add_option("opt","",1);
+        parser.add_option("d","",1);
+        parser.add_option("a","",1);
+        parser.add_option("b","",1);
+        parser.parse(argc, argv);
+
+        DLIB_TEST(get_option(cr, "d", "default") == "davis");
+        DLIB_TEST(get_option(cr, "opt", "default") == "8");
+        DLIB_TEST(get_option(cr, "opt", 1) == 8);
+        DLIB_TEST(get_option(cr, "optasdf", 1) == 1);
+        DLIB_TEST(get_option(cr, "optasdf", 1.1) == 1.1);
+        DLIB_TEST(get_option(cr.block("block"), "d", "default") == "joel");
+        DLIB_TEST(get_option(cr.block("block"), "opt", "default") == "5");
+        DLIB_TEST(get_option(cr.block("block"), "opt", 1) == 5);
+        DLIB_TEST(get_option(cr.block("block").block("subblock"), "d", "default") == "default");
+        DLIB_TEST(get_option(cr.block("block").block("subblock"), "opt", "default") == "default");
+        DLIB_TEST(get_option(cr.block("block").block("subblock"), "opt", 1) == 1);
+        DLIB_TEST(get_option(cr, "block.d", "default") == "joel");
+        DLIB_TEST(get_option(cr, "block.opt", "default") == "5");
+        DLIB_TEST(get_option(cr, "block.opt", 1) == 5);
+        DLIB_TEST(get_option(cr, "block.asdf.d", "default") == "default");
+        DLIB_TEST(get_option(cr, "block.asdf.opt", "default") == "default");
+        DLIB_TEST(get_option(cr, "block.asdf.opt", 2) == 2);
+        DLIB_TEST(get_option(cr, "block.subblock.d", "default") == "default");
+        DLIB_TEST(get_option(cr, "block.subblock.opt", "default") == "default");
+        DLIB_TEST(get_option(cr, "block.subblock.opt", 2) == 2);
+
+        DLIB_TEST(get_option(parser, "opt", 99) == 4);
+        DLIB_TEST(get_option(parser, "d", "stuff") == "dude");
+        DLIB_TEST(get_option(parser, "a", "stuff") == "stuff");
+        DLIB_TEST(get_option(parser, "a", 99) == 99);
+
+        DLIB_TEST(get_option(parser, cr, "d", "default") == "dude");
+        DLIB_TEST(get_option(cr, parser, "d", "default") == "dude");
+        DLIB_TEST(get_option(parser, cr, "a", 2) == 50);
+        DLIB_TEST(get_option(cr, parser, "a", 2) == 50);
+        DLIB_TEST(get_option(parser, cr, "opt", 2) == 4);
+        DLIB_TEST(get_option(cr, parser, "opt", 2) == 4);
+        DLIB_TEST(get_option(parser, cr, "b", 2) == 2);
+        DLIB_TEST(get_option(cr, parser, "b", 2) == 2);
+
+        DLIB_TEST(get_option(parser, cr.block("block"), "a", 2) == 6);
+        DLIB_TEST(get_option(cr.block("block"), parser, "a", 2) == 6);
+    }
+
 
     class config_reader_tester : public tester
     {
@@ -417,6 +497,10 @@ namespace
             dlog << LINFO << "testing config_reader_thread_safe";
             print_spinner();
             config_reader_test<config_reader_thread_safe>();
+
+            dlog << LINFO << "testing get_option()";
+            print_spinner();
+            test_get_option();
         }
     } a;
 
