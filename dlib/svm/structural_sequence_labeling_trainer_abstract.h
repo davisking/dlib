@@ -190,6 +190,31 @@ namespace dlib
                   better generalization. 
         !*/
 
+        double get_loss (
+            unsigned long label
+        ) const;
+        /*!
+            requires
+                - label < num_labels()
+            ensures
+                - returns the loss incurred when a sequence element with the given
+                  label is misclassified.  This value controls how much we care about
+                  correctly classifying this type of label.  Larger loss values indicate
+                  that we care more strongly than smaller values.
+        !*/
+
+        void set_loss (
+            unsigned long label,
+            double value
+        );
+        /*!
+            requires
+                - label < num_labels()
+                - value >= 0
+            ensures
+                - #get_loss(label) == value
+        !*/
+
         const sequence_labeler<feature_extractor> train(
             const std::vector<sample_sequence_type>& x,
             const std::vector<labeled_sequence_type>& y

@@ -64,6 +64,40 @@ namespace dlib
                 - This object will use num_threads threads during the optimization 
                   procedure.  You should set this parameter equal to the number of 
                   available processing cores on your machine.
+                - #num_labels() == fe.num_labels()
+                - for all valid i: #get_loss(i) == 1
+        !*/
+
+        unsigned long num_labels (
+        ) const;
+        /*!
+            ensures
+                - returns the number of possible labels in this learning problem
+        !*/
+
+        double get_loss (
+            unsigned long label
+        ) const;
+        /*!
+            requires
+                - label < num_labels()
+            ensures
+                - returns the loss incurred when a sequence element with the given
+                  label is misclassified.  This value controls how much we care about
+                  correctly classifying this type of label.  Larger loss values indicate
+                  that we care more strongly than smaller values.
+        !*/
+
+        void set_loss (
+            unsigned long label,
+            double value
+        );
+        /*!
+            requires
+                - label < num_labels()
+                - value >= 0
+            ensures
+                - #get_loss(label) == value
         !*/
     };
 

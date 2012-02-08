@@ -114,6 +114,45 @@ namespace dlib
             }
 #endif
 
+            loss_values.assign(num_labels(), 1);
+
+        }
+
+        unsigned long num_labels (
+        ) const { return fe.num_labels(); }
+
+        double get_loss (
+            unsigned long label
+        ) const 
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(label < num_labels(),
+                        "\t void structural_svm_sequence_labeling_problem::get_loss()"
+                        << "\n\t invalid inputs were given to this function"
+                        << "\n\t label:        " << label 
+                        << "\n\t num_labels(): " << num_labels() 
+                        << "\n\t this:         " << this
+                        );
+
+            return loss_values[label]; 
+        }
+
+        void set_loss (
+            unsigned long label,
+            double value
+        )  
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(label < num_labels() && value >= 0,
+                        "\t void structural_svm_sequence_labeling_problem::set_loss()"
+                        << "\n\t invalid inputs were given to this function"
+                        << "\n\t label:        " << label 
+                        << "\n\t num_labels(): " << num_labels() 
+                        << "\n\t value:        " << value 
+                        << "\n\t this:         " << this
+                        );
+
+            loss_values[label] = value;
         }
 
     private:
@@ -166,12 +205,14 @@ namespace dlib
                 const sequence_type& sequence_,
                 const std::vector<unsigned long>& label_,
                 const feature_extractor& fe_,
-                const matrix<double,0,1>& weights_
+                const matrix<double,0,1>& weights_,
+                const std::vector<double>& loss_values_
             ) :
                 sequence(sequence_),
                 label(label_),
                 fe(fe_),
-                weights(weights_)
+                weights(weights_),
+                loss_values(loss_values_)
             {
             }
 
@@ -194,7 +235,7 @@ namespace dlib
 
                 double loss = 0;
                 if (node_states(0) != label[node_id])
-                    loss = 1;
+                    loss = loss_values[label[node_id]];
 
                 return fe_helpers::dot(weights, fe, sequence, node_states, node_id) + loss;
             }
@@ -203,6 +244,7 @@ namespace dlib
             const std::vector<unsigned long>& label;
             const feature_extractor& fe;
             const matrix<double,0,1>& weights;
+            const std::vector<double>& loss_values;
         };
 
         virtual void separation_oracle (
@@ -213,13 +255,13 @@ namespace dlib
         ) const
         {
             std::vector<unsigned long> y;
-            find_max_factor_graph_viterbi(map_prob(samples[idx],labels[idx],fe,current_solution), y);
+            find_max_factor_graph_viterbi(map_prob(samples[idx],labels[idx],fe,current_solution,loss_values), y);
 
             loss = 0;
             for (unsigned long i = 0; i < y.size(); ++i)
             {
                 if (y[i] != labels[idx][i])
-                    loss += 1;
+                    loss += loss_values[labels[idx][i]];
             }
 
             get_joint_feature_vector(samples[idx], y, psi);
@@ -228,6 +270,7 @@ namespace dlib
         const std::vector<sequence_type>& samples;
         const std::vector<std::vector<unsigned long> >& labels;
         const feature_extractor& fe;
+        std::vector<double> loss_values;
     };
 
 // ----------------------------------------------------------------------------------------

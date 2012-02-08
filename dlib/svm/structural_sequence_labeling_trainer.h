@@ -134,6 +134,40 @@ namespace dlib
             return C;
         }
 
+        double get_loss (
+            unsigned long label
+        ) const 
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(label < num_labels(),
+                        "\t void structural_sequence_labeling_trainer::get_loss()"
+                        << "\n\t invalid inputs were given to this function"
+                        << "\n\t label:        " << label 
+                        << "\n\t num_labels(): " << num_labels() 
+                        << "\n\t this:         " << this
+                        );
+
+            return loss_values[label]; 
+        }
+
+        void set_loss (
+            unsigned long label,
+            double value
+        )  
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(label < num_labels() && value >= 0,
+                        "\t void structural_sequence_labeling_trainer::set_loss()"
+                        << "\n\t invalid inputs were given to this function"
+                        << "\n\t label:        " << label 
+                        << "\n\t num_labels(): " << num_labels() 
+                        << "\n\t value:        " << value 
+                        << "\n\t this:         " << this
+                        );
+
+            loss_values[label] = value;
+        }
+
 
         const sequence_labeler<feature_extractor> train(
             const std::vector<sample_sequence_type>& x,
@@ -182,6 +216,9 @@ namespace dlib
             prob.set_epsilon(eps);
             prob.set_c(C);
             prob.set_max_cache_size(max_cache_size);
+            for (unsigned long i = 0; i < loss_values.size(); ++i)
+                prob.set_loss(i,loss_values[i]);
+
             solver(prob, weights);
 
             return sequence_labeler<feature_extractor>(weights,fe);
@@ -195,6 +232,7 @@ namespace dlib
         bool verbose;
         unsigned long num_threads;
         unsigned long max_cache_size;
+        std::vector<double> loss_values;
 
         void set_defaults ()
         {
@@ -203,6 +241,7 @@ namespace dlib
             eps = 0.1;
             num_threads = 2;
             max_cache_size = 40;
+            loss_values.assign(num_labels(), 1);
         }
 
         feature_extractor fe;
