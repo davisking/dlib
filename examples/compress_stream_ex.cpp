@@ -109,21 +109,13 @@ int main(int argc, char** argv)
             return 0;
         }
 
-        // Make some references to the options inside the parser.  This is just
-        // for convenience so we don't have to type out the longer form below.  
-        const clp::option_type& option_c = parser.option("c");
-        const clp::option_type& option_d = parser.option("d");
-        const clp::option_type& option_in = parser.option("in");
-        const clp::option_type& option_out = parser.option("out");
-
         // Figure out what the compression level should be.  If the user didn't supply
         // this command line option then a value of 2 will be used. 
         int compression_level = get_option(parser,"l",2);
 
 
-
         // make sure one of the c or d options was given
-        if (!option_c && !option_d)
+        if (!parser.option("c") && !parser.option("d"))
         {
             cout << "Error in command line:\n   You must specify either the c option or the d option.\n";
             cout << "\nTry the -h option for more information." << endl;
@@ -136,9 +128,9 @@ int main(int argc, char** argv)
 
         // check if the user told us the input file and if they did then 
         // get the file name
-        if (option_in)
+        if (parser.option("in"))
         {
-            in_file = option_in.argument();
+            in_file = parser.option("in").argument();
         }
         else
         {
@@ -150,9 +142,9 @@ int main(int argc, char** argv)
 
         // check if the user told us the output file and if they did then 
         // get the file name
-        if (option_out)
+        if (parser.option("out"))
         {
-            out_file = option_out.argument();
+            out_file = parser.option("out").argument();
         }
         else
         {
@@ -182,7 +174,7 @@ int main(int argc, char** argv)
 
 
         // now perform the actual compression or decompression.
-        if (option_c)
+        if (parser.option("c"))
         {
             // save the compression level to the output file
             serialize(compression_level, fout);
