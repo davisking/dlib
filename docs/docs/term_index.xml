@@ -258,6 +258,7 @@
          <term link="ml.html#krr_trainer" name="regularized least squares"/>
          <term link="ml.html#krr_trainer" name="least squares SVM"/>
          <term file="ml.html" name="krls"/>
+         <term file="ml.html" name="rls"/>
          <term file="ml.html" name="kcentroid"/>
          <term file="ml.html" name="linearly_independent_subset_finder"/>
          <term file="ml.html" name="fill_lisf"/>

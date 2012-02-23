@@ -84,6 +84,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <name>Regression</name>
          <item>mlp</item> 
          <item>krls</item>
+         <item>rls</item>
          <item>krr_trainer</item> 
          <item>rr_trainer</item> 
          <item>svr_trainer</item> 
@@ -528,6 +529,25 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <example>krls_ex.cpp.html</example>
             <example>krls_filter_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rls</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/rls_abstract.h</spec_file>
+         <description>
+            This is an implementation of the linear version of the recursive least 
+            squares algorithm.  It accepts training points incrementally and, at 
+            each step, maintains the solution to the following optimization problem:
+            <blockquote>
+               find w minimizing: 0.5*dot(w,w) + C*sum_i(y_i - trans(x_i)*w)^2
+            </blockquote>
+            Where (x_i,y_i) are training pairs.  x_i is some vector and y_i is a target
+            scalar value.
+         </description>
                                  
       </component>
       
