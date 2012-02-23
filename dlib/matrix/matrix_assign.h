@@ -116,6 +116,12 @@ namespace dlib
             const static int value = column_matrix;
         };
 
+        template <typename T, typename MM, typename L>
+        struct matrix_type_id<matrix<T,1,1,MM,L> >
+        {
+            const static int value = column_matrix;
+        };
+
         template <typename T, long NC, typename MM, typename L>
         struct matrix_type_id<matrix<T,1,NC,MM,L> >
         {
