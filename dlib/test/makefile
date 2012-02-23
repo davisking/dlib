@@ -101,6 +101,7 @@ SRC += queue.cpp
 SRC += rand.cpp
 SRC += read_write_mutex.cpp
 SRC += reference_counter.cpp
+SRC += rls.cpp
 SRC += scan_image.cpp
 SRC += sequence.cpp
 SRC += sequence_labeler.cpp
