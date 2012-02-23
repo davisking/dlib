@@ -5,6 +5,7 @@
 
 #include "svm/svm.h"
 #include "svm/krls.h"
+#include "svm/rls.h"
 #include "svm/kcentroid.h"
 #include "svm/kcentroid_overloads.h"
 #include "svm/kkmeans.h"
