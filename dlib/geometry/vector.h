@@ -1289,6 +1289,38 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class point_transform
+    {
+    public:
+        point_transform (
+            const double& angle,
+            const dlib::vector<double,2>& translate_
+        )
+        {
+            sin_angle = std::sin(angle);
+            cos_angle = std::cos(angle);
+            translate = translate_;
+        }
+
+        template <typename T>
+        const dlib::vector<T,2> operator() (
+            const dlib::vector<T,2>& p
+        ) const
+        {
+            double x = cos_angle*p.x() - sin_angle*p.y();
+            double y = sin_angle*p.x() + cos_angle*p.y();
+
+            return dlib::vector<double,2>(x,y) + translate;
+        }
+
+    private:
+        double sin_angle;
+        double cos_angle;
+        dlib::vector<double,2> translate;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     const dlib::vector<T,2> rotate_point (
         const dlib::vector<T,2>& center,

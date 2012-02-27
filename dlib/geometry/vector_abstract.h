@@ -433,6 +433,41 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class point_transform
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an object that takes 2D points or vectors and 
+                rotates them around the origin by a given angle and then
+                translates them.
+        !*/
+    public:
+        point_transform (
+            const double& angle,
+            const dlib::vector<double,2>& translate
+        )
+        /*!
+            ensures
+                - When (*this)(p) is invoked it will return a point P such that:
+                    - P is the point p rotated counter-clockwise around the origin 
+                      angle radians and then shifted by having translate added to it.
+                      (Note that this is counter clockwise with respect to the normal
+                      coordinate system with positive y going up and positive x going
+                      to the right)
+        !*/
+
+        template <typename T>
+        const dlib::vector<T,2> operator() (
+            const dlib::vector<T,2>& p
+        ) const;
+        /*!
+            ensures
+                - rotates p, then translates it and returns the result
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     class point_rotator
     {
         /*!
