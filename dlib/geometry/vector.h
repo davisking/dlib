@@ -1362,8 +1362,8 @@ namespace dlib
          double angle
     )
     {
-        const double ca = cos(angle);
-        const double sa = sin(angle);
+        const double ca = std::cos(angle);
+        const double sa = std::sin(angle);
 
         matrix<double,2,2> m;
         m = ca, -sa,
