@@ -1321,6 +1321,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class point_transform_affine
+    {
+    public:
+        point_transform_affine (
+            const matrix<double,2,2>& m_,
+            const dlib::vector<double,2>& b_
+        ) :m(m_), b(b_)
+        {
+        }
+
+        const dlib::vector<double,2> operator() (
+            const dlib::vector<double,2>& p
+        ) const
+        {
+            return m*p + b;
+        }
+
+    private:
+        matrix<double,2,2> m;
+        dlib::vector<double,2> b;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     const dlib::vector<T,2> rotate_point (
         const dlib::vector<T,2>& center,
@@ -1330,6 +1354,21 @@ namespace dlib
     {
         point_rotator rot(angle);
         return rot(p-center)+center;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline matrix<double,2,2> rotation_matrix (
+         double angle
+    )
+    {
+        const double ca = cos(angle);
+        const double sa = sin(angle);
+
+        matrix<double,2,2> m;
+        m = ca, -sa,
+            sa, ca;
+        return m;
     }
 
 // ----------------------------------------------------------------------------------------

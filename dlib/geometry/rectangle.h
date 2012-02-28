@@ -381,6 +381,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline dlib::vector<double,2> dcenter (
+        const dlib::rectangle& rect
+    )
+    {
+        dlib::vector<double,2> temp(rect.left() + rect.right(),
+                                    rect.top() + rect.bottom());
+
+        return temp/2.0;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline long distance_to_rect_edge (
         const rectangle& rect,
         const point& p

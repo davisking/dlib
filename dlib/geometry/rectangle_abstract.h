@@ -414,6 +414,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    dlib::vector<double,2> dcenter (
+        const dlib::rectangle& rect
+    );
+    /*!
+        ensures
+            - returns the center of the given rectangle using a real valued vector.  
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     inline const rectangle centered_rect (
         const point& p,
         unsigned long width,
