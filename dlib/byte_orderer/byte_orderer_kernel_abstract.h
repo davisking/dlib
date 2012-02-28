@@ -142,13 +142,6 @@ namespace dlib
                   to host byte order.
         !*/
 
-
-    private:
-
-        // restricted functions
-        byte_orderer(const byte_orderer&);        // copy constructor
-        byte_orderer& operator=(const byte_orderer&);    // assignment operator
-
     };    
 }
 

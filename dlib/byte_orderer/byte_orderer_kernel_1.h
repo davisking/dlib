@@ -164,11 +164,6 @@ namespace dlib
         }
 
         bool little_endian;
-
-        // restricted functions
-        byte_orderer(const byte_orderer&);        // copy constructor
-        byte_orderer& operator=(const byte_orderer&);    // assignment operator
-
     };    
 
     // make flip not do anything at all for chars
