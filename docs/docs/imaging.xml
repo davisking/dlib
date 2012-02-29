@@ -158,6 +158,14 @@
          <item>sum_filter</item> 
          <item>spatially_filter_image_separable_down</item> 
       </section>
+
+      <section>
+         <name>Scaling and Rotating</name>
+         <item>pyramid_down</item> 
+         <item>pyramid_down_3_2</item> 
+         <item>pyramid_down_4_3</item> 
+         <item>pyramid_down_5_4</item> 
+      </section>
  
       <section>
          <name>Miscellaneous</name>
@@ -173,10 +181,6 @@
          <item>assign_border_pixels</item> 
          <item>equalize_histogram</item> 
          <item>get_histogram</item> 
-         <item>pyramid_down</item> 
-         <item>pyramid_down_3_2</item> 
-         <item>pyramid_down_4_3</item> 
-         <item>pyramid_down_5_4</item> 
          <item>zero_border_pixels</item> 
          <item>integral_image</item>
          <item>integral_image_generic</item>
