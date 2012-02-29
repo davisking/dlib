@@ -42,9 +42,13 @@
                <item>point</item> 
                <item>rotate_point</item> 
                <item>point_rotator</item> 
+               <item>point_transform</item> 
+               <item>point_transform_affine</item> 
+               <item>rotation_matrix</item> 
                <item>get_rect</item> 
                <item>centered_rect</item> 
                <item>center</item> 
+               <item>dcenter</item> 
                <item>shrink_rect</item> 
                <item>grow_rect</item> 
                <item>translate_rect</item> 
@@ -941,6 +945,21 @@
    <!-- ************************************************************************* -->
 
       <component>
+         <name>dcenter</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            Returns the center point of a <a href="#rectangle">rectangle</a>.  This
+            is a version of <a href="#center">center()</a> which returns a double version 
+            of the point rather than one which uses integers to represent the 
+            result.  Therefore, it is slightly more accurate.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>centered_rect</name>
          <file>dlib/geometry.h</file>
          <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
@@ -1000,6 +1019,45 @@
          <description>        
             This is an object that rotates a 2D <a href="#vector">vector</a> or 
             <a href="#point">point</a> object about the origin.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>point_transform</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <description>        
+            This is an object that rotates a 2D <a href="#vector">vector</a> or 
+            <a href="#point">point</a> object about the origin and then adds a 
+            displacement vector.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>point_transform_affine</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <description>        
+            This is an object that applies an affine transformation to a <a href="#vector">vector</a> or 
+            <a href="#point">point</a>.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>rotation_matrix</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <description>        
+            This is a method for creating 2D rotation matrices.
          </description>
                                  
       </component>

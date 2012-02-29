@@ -15,17 +15,18 @@
 
          <term file="dlib/algs.h.html" name="stack_based_memory_block"/>
 
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="move_rect"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="translate_rect"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="resize_rect"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="resize_rect_width"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="resize_rect_height"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="centered_rect"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="center"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="nearest_point"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="distance_to_rect_edge"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="shrink_rect"/>
-         <term file="dlib/geometry/rectangle_abstract.h.html" name="grow_rect"/>
+         <term file="algorithms.html" name="move_rect"/>
+         <term file="algorithms.html" name="translate_rect"/>
+         <term file="algorithms.html" name="resize_rect"/>
+         <term file="algorithms.html" name="resize_rect_width"/>
+         <term file="algorithms.html" name="resize_rect_height"/>
+         <term file="algorithms.html" name="centered_rect"/>
+         <term file="algorithms.html" name="center"/>
+         <term file="algorithms.html" name="nearest_point"/>
+         <term file="algorithms.html" name="distance_to_rect_edge"/>
+         <term file="algorithms.html" name="shrink_rect"/>
+         <term file="algorithms.html" name="grow_rect"/>
+         <term file="algorithms.html" name="dcenter"/>
 
 
          <term file="dlib/optimization/optimization_abstract.h.html" name="central_differences"/>
@@ -150,6 +151,9 @@
          <term file="algorithms.html" name="point"/>
          <term file="algorithms.html" name="rotate_point"/>
          <term file="algorithms.html" name="point_rotator"/>
+         <term file="algorithms.html" name="point_transform"/>
+         <term file="algorithms.html" name="point_transform_affine"/>
+         <term file="algorithms.html" name="rotation_matrix"/>
          <term file="algorithms.html" name="running_stats"/>
          <term file="algorithms.html" name="running_scalar_covariance"/>
          <term file="algorithms.html" name="mean_sign_agreement"/>
