@@ -26,7 +26,7 @@
             An example makefile that uses this library can be found here: 
             <a href="dlib/test/makefile">dlib/test/makefile</a>.  It is the makefile used to build the regression 
             test suite for this library.  There is also a 
-            <web> <a href="http://www.cmake.org">CMake</a> </web> <chm>CMake</chm> makefile that builds the 
+            <a href="http://www.cmake.org">CMake</a> makefile that builds the 
             regression test suite at <a href="dlib/test/CMakeLists.txt.html">dlib/test/CMakeLists.txt</a> and another
             CMake makefile that builds all the example programs at 
             <a href="examples/CMakeLists.txt.html">examples/CMakeLists.txt</a>
@@ -47,6 +47,59 @@
             Finally, note that <a href="dlib/revision.h.html">dlib/revision.h</a> defines DLIB_MAJOR_VERSION
             and DLIB_MINOR_VERSION which are #defines you can use to see what version of dlib you have.  
          </p>
+
+        <center><h1>Examples</h1></center>
+
+
+        <h2>Compiling on Any Operating System Using CMake</h2>
+        The simplest way to compile the example programs is to use <a href="http://www.cmake.org">CMake</a>.  
+        You can do this by typing the following on the command line.
+<code_box>
+cd examples
+mkdir build
+cd build
+cmake ..
+</code_box>
+Then cmake will create whatever is needed to compile the examples on your computer.  If you are using Linux 
+or a Mac it will create a makefile and then you can compile everything by typing:
+<code_box>
+make
+</code_box>
+Or on windows, if you have Visual Studio installed, it will make a Visual Studio project which you can then open
+and compile by clicking the build button.
+
+        <h2>Compiling on Linux From Command Line</h2>
+        From within the examples folder, you can compile any of the examples with a single command like so:
+<code_box>
+g++ -O3 -I.. -lpthread -lX11 ../dlib/all/source.cpp example_program_name.cpp
+</code_box>
+        Note also that not all examples require this much work.  For example, the svm_ex.cpp example
+        can be compiled with just:
+<code_box>
+g++ -O3 -I.. svm_ex.cpp
+</code_box>
+
+On non-Linux systems like Solaris, you might have to link to other libraries.  For example, I have seen systems
+where it was also necessary to supply -lnsl or -lsocket options to g++.  Additionally, the X11 development
+library isn't installed on Ubuntu by default.  So if you require it and are using Ubuntu you can install
+it by typing:
+<code_box>
+sudo apt-get install libx11-dev
+</code_box>
+
+        <h2>Compiling on Windows using gcc</h2>
+        <p>
+            The commands for gcc on windows are the same as above but you may also have to link 
+            (via the -l option) to the following libraries: gdi32, comctl32, user32, ws2_32, or imm32.
+        </p>
+
+        <h2>Compiling on Windows using Visual Studio</h2>
+        <p>
+           All you need to do is create an empty console project. Then add dlib/all/source.cpp to it and add the
+           folder containing the dlib folder to the #include search path.  Then you can compile any example program 
+           by adding it to your project.  
+        </p>
+
 
         <center><h1>Preprocessor Directives</h1></center>
 
@@ -100,32 +153,6 @@
            and waits DLIB_THREAD_POOL_TIMEOUT milliseconds before totally terminating and releasing its resources back
            to the operating system.  The default timeout used by this library is 30,000 milliseconds (30 seconds).  You
            may however change this to whatever you like by defining DLIB_THREAD_POOL_TIMEOUT to some new value.  
-        </p>
-
-
-        <center><h1>Compiler Notes</h1></center>
-
-
-
-        <h2>gcc</h2>
-        <p>
-        I generally use the newest version of gcc but most other versions of gcc work just fine also.
-        </p>
-        <p>
-        The command line I generally use is "g++ -D NO_MAKEFILE -lnsl -lpthread file.cpp" I think you need to
-        tell it to link nsl to make the threading stuff work right, I honestly can't remember what part of 
-        the library requires it I have just been doing it for so long :)
-        </p>
-        <p>
-        If you are using the sockets stuff then on some platforms you need to supply the -lsocket option.  Or if you are using the gui stuff you will need to supply the -lX11 option.
-        </p>
-        <p>
-           If you compile on solaris you have to give the -lsocket 
-           option if you use the sockets API.
-        </p>
-        <h2>gcc on windows</h2>
-        <p>
-            The commands for gcc on windows are the same as above but you may also have to link (via the -l option) to the following libraries: gdi32, comctl32, user32, ws2_32, or imm32.
         </p>
 
 
