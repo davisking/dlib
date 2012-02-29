@@ -1355,7 +1355,9 @@ namespace dlib
         requires
             - m.size() > 0
         ensures
-            - returns the value of the smallest element of m
+            - returns the value of the smallest element of m.  If m contains complex
+              elements then the element returned is the one with the smallest norm
+              according to std::norm().
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1367,7 +1369,9 @@ namespace dlib
         requires
             - m.size() > 0
         ensures
-            - returns the value of the biggest element of m
+            - returns the value of the biggest element of m.  If m contains complex
+              elements then the element returned is the one with the largest norm
+              according to std::norm().
     !*/
 
 // ----------------------------------------------------------------------------------------

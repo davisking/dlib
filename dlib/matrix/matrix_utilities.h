@@ -64,6 +64,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <typename T>
+        const T& magnitude (const T& item) { return item; }
+        template <typename T>
+        T magnitude (const std::complex<T>& item) { return std::norm(item); }
+    }
+
     template <
         typename EXP
         >
@@ -87,9 +95,9 @@ namespace dlib
             for (long c = 0; c < m.nc(); ++c)
             {
                 type temp = m(r,c);
-                if (temp > max_val)
+                if (dlib::impl::magnitude(temp) > dlib::impl::magnitude(max_val))
                     max_val = temp;
-                if (temp < min_val)
+                if (dlib::impl::magnitude(temp) < dlib::impl::magnitude(min_val))
                     min_val = temp;
             }
         }
@@ -118,7 +126,7 @@ namespace dlib
         for (long i = 1; i < m.size(); ++i)
         {
             type temp = m(i);
-            if (temp > val)
+            if (dlib::impl::magnitude(temp) > dlib::impl::magnitude(val))
             {
                 val = temp;
                 best_idx = i;
@@ -150,7 +158,7 @@ namespace dlib
         for (long i = 1; i < m.size(); ++i)
         {
             type temp = m(i);
-            if (temp < val)
+            if (dlib::impl::magnitude(temp) < dlib::impl::magnitude(val))
             {
                 val = temp;
                 best_idx = i;
@@ -181,7 +189,7 @@ namespace dlib
             for (long c = 0; c < m.nc(); ++c)
             {
                 type temp = m(r,c);
-                if (temp > val)
+                if (dlib::impl::magnitude(temp) > dlib::impl::magnitude(val))
                     val = temp;
             }
         }
@@ -210,7 +218,7 @@ namespace dlib
             for (long c = 0; c < m.nc(); ++c)
             {
                 type temp = m(r,c);
-                if (temp < val)
+                if (dlib::impl::magnitude(temp) < dlib::impl::magnitude(val))
                     val = temp;
             }
         }
