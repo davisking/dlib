@@ -10,6 +10,16 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T>
+        const T& conj(const T& item) { return item; }
+        template <typename T>
+        std::complex<T> conj(const std::complex<T>& item) { return std::conj(item); }
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2, bool flip_m2 = false>
@@ -55,7 +65,7 @@ namespace dlib
                 for (long cc = min_cc; cc <= max_cc; ++cc)
                 {
                     if (flip_m2)
-                        temp += m1(rr,cc)*m2(m2.nr()-r+rr-1, m2.nc()-c+cc-1);
+                        temp += m1(rr,cc)*dlib::impl::conj(m2(m2.nr()-r+rr-1, m2.nc()-c+cc-1));
                     else
                         temp += m1(rr,cc)*m2(r-rr,c-cc);
                 }
@@ -147,7 +157,7 @@ namespace dlib
                 for (long cc = min_cc; cc <= max_cc; ++cc)
                 {
                     if (flip_m2)
-                        temp += m1(rr,cc)*m2(m2.nr()-r+rr-1, m2.nc()-c+cc-1);
+                        temp += m1(rr,cc)*dlib::impl::conj(m2(m2.nr()-r+rr-1, m2.nc()-c+cc-1));
                     else
                         temp += m1(rr,cc)*m2(r-rr,c-cc);
                 }
@@ -242,7 +252,7 @@ namespace dlib
                 for (long cc = min_cc; cc <= max_cc; ++cc)
                 {
                     if (flip_m2)
-                        temp += m1(rr,cc)*m2(m2.nr()-r+rr-1, m2.nc()-c+cc-1);
+                        temp += m1(rr,cc)*dlib::impl::conj(m2(m2.nr()-r+rr-1, m2.nc()-c+cc-1));
                     else
                         temp += m1(rr,cc)*m2(r-rr,c-cc);
                 }

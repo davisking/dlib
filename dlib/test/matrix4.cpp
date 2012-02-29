@@ -760,6 +760,19 @@ namespace
         DLIB_TEST(temp3 == temp);
 
 
+        for (int i = 0; i < 3; ++i)
+        {
+            dlib::rand rnd;
+            matrix<complex<int> > a, b;
+            a = complex_matrix(matrix_cast<int>(round(20*randm(2,7,rnd))), 
+                               matrix_cast<int>(round(20*randm(2,7,rnd))));
+            b = complex_matrix(matrix_cast<int>(round(20*randm(3,2,rnd))), 
+                               matrix_cast<int>(round(20*randm(3,2,rnd))));
+
+            DLIB_TEST(xcorr(a,b)       == conv(a, flip(conj(b))));
+            DLIB_TEST(xcorr_valid(a,b) == conv_valid(a, flip(conj(b))));
+            DLIB_TEST(xcorr_same(a,b)  == conv_same(a, flip(conj(b))));
+        }
     }
 
 

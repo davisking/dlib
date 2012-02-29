@@ -38,7 +38,8 @@ namespace dlib
         ensures
             - returns a matrix R such that:
                 - R is the cross-correlation of m1 with m2.  In particular, this
-                  function returns conv(m1,flip(m2)).
+                  function returns conv(m1,flip(m2)) if the matrices contain real
+                  elements and conv(m1,flip(conj(m2))) if they are complex.
                 - R::type == the same type that was in m1 and m2.
                 - R.nr() == m1.nr()+m2.nr()-1
                 - R.nc() == m1.nc()+m2.nc()-1
@@ -77,7 +78,8 @@ namespace dlib
         ensures
             - returns a matrix R such that:
                 - R is the cross-correlation of m1 with m2.  In particular, this
-                  function returns conv_same(m1,flip(m2)).
+                  function returns conv_same(m1,flip(m2)) if the matrices contain real
+                  elements and conv_same(m1,flip(conj(m2))) if they are complex.
                 - R::type == the same type that was in m1 and m2.
                 - R.nr() == m1.nr()
                 - R.nc() == m1.nc()
@@ -119,7 +121,8 @@ namespace dlib
         ensures
             - returns a matrix R such that:
                 - R is the cross-correlation of m1 with m2.  In particular, this
-                  function returns conv_valid(m1,flip(m2)).
+                  function returns conv_valid(m1,flip(m2)) if the matrices contain real
+                  elements and conv_valid(m1,flip(conj(m2))) if they are complex.
                 - R::type == the same type that was in m1 and m2.
                 - if (m1 has larger dimensions than m2) then
                     - R.nr() == m1.nr()-m2.nr()+1
