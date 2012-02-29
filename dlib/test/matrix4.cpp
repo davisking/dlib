@@ -775,6 +775,15 @@ namespace
         }
     }
 
+    void test_complex()
+    {
+        matrix<complex<double> > a, b;
+
+        a = complex_matrix(linspace(1,7,7), linspace(2,8,7));
+        b = complex_matrix(linspace(4,10,7), linspace(2,8,7));
+
+        DLIB_TEST(mean(a) == complex<double>(4, 5));
+    }
 
 
     class matrix_tester : public tester
@@ -795,6 +804,8 @@ namespace
             test_stuff();
             for (int i = 0; i < 10; ++i)
                 matrix_test();
+
+            test_complex();
         }
     } a;
 

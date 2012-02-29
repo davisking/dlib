@@ -1669,11 +1669,24 @@ namespace dlib
     template <
         typename EXP
         >
-    inline const typename matrix_exp<EXP>::type mean (
+    inline const typename disable_if<is_complex<typename EXP::type>, typename matrix_exp<EXP>::type>::type mean (
         const matrix_exp<EXP>& m
     )
     {
         return sum(m)/(m.nr()*m.nc());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    inline const typename enable_if<is_complex<typename EXP::type>, typename matrix_exp<EXP>::type>::type mean (
+        const matrix_exp<EXP>& m
+    )
+    {
+        typedef typename EXP::type::value_type type;
+        return sum(m)/(type)(m.nr()*m.nc());
     }
 
 // ----------------------------------------------------------------------------------------
