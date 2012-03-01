@@ -321,7 +321,7 @@ namespace dlib
         typename background_type
         >
     void transform_image (
-        const image_type& img,
+        const image_type& in_img,
         image_type& out_img,
         const interpolation_type& interp,
         const point_mapping_type& map_point,
@@ -332,14 +332,14 @@ namespace dlib
         requires
             - get_rect(out_img).contains(area) == true
         ensures
-            - map_point maps from out_img to img
+            - map_point maps from out_img to in_img
     !*/
     {
         for (long r = area.top(); r <= area.bottom(); ++r)
         {
             for (long c = area.left(); c <= area.right(); ++c)
             {
-                if (!interp(img, map_point(dlib::vector<double,2>(c,r)), out_img[r][c]))
+                if (!interp(in_img, map_point(dlib::vector<double,2>(c,r)), out_img[r][c]))
                     set_background(out_img[r][c]);
             }
         }
@@ -354,14 +354,14 @@ namespace dlib
         typename background_type
         >
     void transform_image (
-        const image_type& img,
+        const image_type& in_img,
         image_type& out_img,
         const interpolation_type& interp,
         const point_mapping_type& map_point,
         const background_type& set_background
     )
     {
-        transform_image(img, out_img, interp, map_point, set_background, get_rect(out_img));
+        transform_image(in_img, out_img, interp, map_point, set_background, get_rect(out_img));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -372,13 +372,13 @@ namespace dlib
         typename point_mapping_type
         >
     void transform_image (
-        const image_type& img,
+        const image_type& in_img,
         image_type& out_img,
         const interpolation_type& interp,
         const point_mapping_type& map_point
     )
     {
-        transform_image(img, out_img, interp, map_point, black_background(), get_rect(out_img));
+        transform_image(in_img, out_img, interp, map_point, black_background(), get_rect(out_img));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -388,13 +388,13 @@ namespace dlib
         typename interpolation_type
         >
     void rotate_image (
-        const image_type& img,
+        const image_type& in_img,
         image_type& out_img,
         double angle,
         const interpolation_type& interp
     )
     {
-        const rectangle rimg = get_rect(img);
+        const rectangle rimg = get_rect(in_img);
 
 
         // figure out bounding box for rotated rectangle
@@ -407,7 +407,7 @@ namespace dlib
 
         const matrix<double,2,2> R = rotation_matrix(angle);
 
-        transform_image(img, out_img, interp, 
+        transform_image(in_img, out_img, interp, 
                         point_transform_affine(R, -R*dcenter(get_rect(out_img)) + dcenter(rimg)));
     }
 
@@ -418,12 +418,12 @@ namespace dlib
         typename image_type
         >
     void rotate_image (
-        const image_type& img,
+        const image_type& in_img,
         image_type& out_img,
         double angle
     )
     {
-        rotate_image(img, out_img, angle, interpolate_quadratic());
+        rotate_image(in_img, out_img, angle, interpolate_quadratic());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -432,11 +432,11 @@ namespace dlib
         typename image_type
         >
     void flip_image_left_right (
-        const image_type& img,
+        const image_type& in_img,
         image_type& out_img
     )
     {
-        assign_image(out_img, fliplr(array_to_matrix(img)));
+        assign_image(out_img, fliplr(array_to_matrix(in_img)));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -445,11 +445,11 @@ namespace dlib
         typename image_type
         >
     void flip_image_up_down (
-        const image_type& img,
+        const image_type& in_img,
         image_type& out_img
     )
     {
-        assign_image(out_img, flipud(array_to_matrix(img)));
+        assign_image(out_img, flipud(array_to_matrix(in_img)));
     }
 
 // ----------------------------------------------------------------------------------------
