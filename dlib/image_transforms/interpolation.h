@@ -55,11 +55,9 @@ namespace dlib
             const dlib::vector<T,2>& p,
             typename image_type::type& result
         ) const
-        /*!
-            ensures
-                - returns true if there was a point to interpolate 
-        !*/
         {
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+
             const long top    = static_cast<long>(std::floor(p.y()));
             const long bottom = static_cast<long>(std::ceil (p.y()));
             const long left   = static_cast<long>(std::floor(p.x()));
@@ -93,11 +91,9 @@ namespace dlib
             const dlib::vector<T,2>& p,
             typename image_type::type& result
         ) const
-        /*!
-            ensures
-                - returns true if there was a point to interpolate 
-        !*/
         {
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+
             const long top    = static_cast<long>(std::floor(p.y()));
             const long bottom = static_cast<long>(std::ceil (p.y()));
             const long left   = static_cast<long>(std::floor(p.x()));
@@ -159,11 +155,9 @@ namespace dlib
             const dlib::vector<T,2>& p,
             typename image_type::type& result
         ) const
-        /*!
-            ensures
-                - returns true if there was a point to interpolate 
-        !*/
         {
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+
             const point pp(p);
 
             // if the interpolation goes outside img 
@@ -194,11 +188,9 @@ namespace dlib
             const dlib::vector<T,2>& p,
             typename image_type::type& result
         ) const
-        /*!
-            ensures
-                - returns true if there was a point to interpolate 
-        !*/
         {
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+
             const point pp(p);
 
             // if the interpolation goes outside img 
@@ -328,13 +320,19 @@ namespace dlib
         const background_type& set_background,
         const rectangle& area
     )
-    /*!
-        requires
-            - get_rect(out_img).contains(area) == true
-        ensures
-            - map_point maps from out_img to in_img
-    !*/
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( get_rect(out_img).contains(area) == true &&
+                     is_same_object(in_img, out_img) == false ,
+            "\t void transform_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t get_rect(out_img).contains(area): " << get_rect(out_img).contains(area)
+            << "\n\t get_rect(out_img): " << get_rect(out_img)
+            << "\n\t area:              " << area
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
+
         for (long r = area.top(); r <= area.bottom(); ++r)
         {
             for (long c = area.left(); c <= area.right(); ++c)
@@ -361,6 +359,13 @@ namespace dlib
         const background_type& set_background
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void transform_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
         transform_image(in_img, out_img, interp, map_point, set_background, get_rect(out_img));
     }
 
@@ -378,6 +383,14 @@ namespace dlib
         const point_mapping_type& map_point
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void transform_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
+
         transform_image(in_img, out_img, interp, map_point, black_background(), get_rect(out_img));
     }
 
@@ -394,6 +407,13 @@ namespace dlib
         const interpolation_type& interp
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void rotate_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
         const rectangle rimg = get_rect(in_img);
 
 
@@ -423,6 +443,13 @@ namespace dlib
         double angle
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void rotate_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
         rotate_image(in_img, out_img, angle, interpolate_quadratic());
     }
 
@@ -436,6 +463,13 @@ namespace dlib
         image_type& out_img
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void rotate_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
         assign_image(out_img, fliplr(array_to_matrix(in_img)));
     }
 
@@ -449,6 +483,13 @@ namespace dlib
         image_type& out_img
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void rotate_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
         assign_image(out_img, flipud(array_to_matrix(in_img)));
     }
 
