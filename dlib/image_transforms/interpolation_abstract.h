@@ -334,6 +334,7 @@ namespace dlib
             - #out_img.nr() == in_img.nr()
             - #out_img.nc() == in_img.nc()
             - #out_img == a copy of in_img which has been flipped from left to right.  
+              (i.e. it is flipped as if viewed though a mirror)
     !*/
 
 // ----------------------------------------------------------------------------------------
