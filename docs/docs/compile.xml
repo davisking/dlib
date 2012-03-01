@@ -73,7 +73,7 @@ and compile by clicking the build button.
 <code_box>
 g++ -O3 -I.. -lpthread -lX11 ../dlib/all/source.cpp example_program_name.cpp
 </code_box>
-        Note also that not all examples require this much work.  For example, the svm_ex.cpp example
+        Note that not all examples require this much work.  For example, the svm_ex.cpp example
         can be compiled with just:
 <code_box>
 g++ -O3 -I.. svm_ex.cpp
@@ -91,6 +91,8 @@ sudo apt-get install libx11-dev
         <p>
             The commands for gcc on windows are the same as above but you may also have to link 
             (via the -l option) to the following libraries: gdi32, comctl32, user32, ws2_32, or imm32.
+            However, it's worth pointing out that Visual Studio Express is free and a much better choice for
+            windows development than gcc.
         </p>
 
         <h2>Compiling on Windows using Visual Studio</h2>
