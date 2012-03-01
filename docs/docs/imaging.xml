@@ -165,6 +165,14 @@
          <item>pyramid_down_3_2</item> 
          <item>pyramid_down_4_3</item> 
          <item>pyramid_down_5_4</item> 
+
+         <item>interpolate_nearest_neighbor</item> 
+         <item>interpolate_bilinear</item> 
+         <item>interpolate_quadratic</item> 
+         <item>transform_image</item> 
+         <item>rotate_image</item> 
+         <item>flip_image_left_right</item> 
+         <item>flip_image_up_down</item> 
       </section>
  
       <section>
@@ -1142,7 +1150,92 @@
          </description>
                                  
       </component>
-            
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>interpolate_nearest_neighbor</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+                This object is a tool for performing nearest neighbor interpolation
+                on an image.  
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>interpolate_bilinear</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+                This object is a tool for performing bilinear interpolation
+                on an image.  
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>interpolate_quadratic</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+                This object is a tool for performing quadratic interpolation
+                on an image.  
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>transform_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This routine is a tool for transforming images using some kind of point mapping
+            function (e.g. <a href="algorithms.html#point_transform_affine">point_transform_affine</a>)
+            and pixel interpolation tool (e.g. <a href="#interpolate_quadratic">interpolate_quadratic</a>).
+            An example application of this routine is for image rotation.  Indeed, it is how 
+            <a href="#rotate_image">rotate_image</a> is implemented.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rotate_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This is a routine for rotating an image. 
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>flip_image_left_right</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This is a routine which can flip an image from left to right. (e.g. as 
+            if viewed through a mirror).
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>flip_image_up_down</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This routine flips an image upside down.
+         </description>
+      </component>
+
    <!-- ************************************************************************* -->
       
       <component>

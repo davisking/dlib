@@ -1062,6 +1062,17 @@
          <term file="imaging.html" name="png_loader"/>
          <term file="imaging.html" name="jpeg_loader"/>
 
+         <term file="imaging.html" name="interpolate_nearest_neighbor"/>
+         <term file="imaging.html" name="interpolate_bilinear"/>
+         <term file="imaging.html" name="interpolate_quadratic"/>
+         <term file="imaging.html" name="transform_image"/>
+         <term file="imaging.html" name="rotate_image"/>
+         <term file="imaging.html" name="flip_image_left_right"/>
+         <term file="imaging.html" name="flip_image_up_down"/>
+         <term file="dlib/image_transforms/interpolation_abstract.h.html" name="black_background"/>
+         <term file="dlib/image_transforms/interpolation_abstract.h.html" name="white_background"/>
+         <term file="dlib/image_transforms/interpolation_abstract.h.html" name="no_background"/>
+
          <term file="imaging.html" name="integral_image"/>
          <term file="imaging.html" name="integral_image_generic"/>
          <term file="imaging.html" name="hessian_pyramid"/>
