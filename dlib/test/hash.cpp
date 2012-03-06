@@ -76,6 +76,37 @@ namespace
         DLIB_TEST(final == 0xB0F57EE3);
     }
 
+    void murmur_hash_128_test()
+    {
+        uint8 key[256];
+        uint64 hashes[256*2];
+        uint32 final = 0;
+
+        memset(key,0,sizeof(key));
+        memset(hashes,0,sizeof(hashes));
+
+        // Hash keys of the form {0}, {0,1}, {0,1,2}... up to N=255,using 256-N as
+        // the seed.
+        for(int i = 0; i < 256; i++)
+        {
+            key[i] = (uint8)i;
+
+            const std::pair<uint64,uint64> temp = murmur_hash3_128bit(key,i,256-i);
+            hashes[2*i]   = temp.first;
+            hashes[2*i+1] = temp.second;
+        }
+
+        byte_orderer bo;
+        bo.host_to_little(hashes);
+        final = static_cast<uint32>(murmur_hash3_128bit(hashes,sizeof(hashes),0).first);
+
+        // using ostringstream to avoid compiler error in visual studio 2005
+        ostringstream sout;
+        sout << hex << final;
+        dlog << LINFO << "final 64: "<< sout.str();
+        DLIB_TEST(final == 0x6384BA69);
+    }
+
     class test_hash : public tester
     {
     public:
@@ -91,6 +122,7 @@ namespace
             print_spinner();
 
             murmur_hash_test();
+            murmur_hash_128_test();
 
             std::string str1 = "some random string";
             matrix<unsigned char> mat(2,2);

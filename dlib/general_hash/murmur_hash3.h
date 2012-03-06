@@ -5,6 +5,7 @@
 
 #include "murmur_hash3_abstract.h"
 #include "../uintn.h"
+#include <utility>
 
 namespace dlib
 {
@@ -28,7 +29,9 @@ namespace dlib
 #include <stdlib.h>
 
 #define DLIB_ROTL32(x,y)	_rotl(x,y)
+#define DLIB_ROTL64(x,y)	_rotl64(x,y)
 
+#define DLIB_BIG_CONSTANT(x) (x)
 
     // Other compilers
 
@@ -41,8 +44,15 @@ namespace dlib
         return (x << r) | (x >> (32 - r));
     }
 
-#define	DLIB_ROTL32(x,y)	murmur_rotl32(x,y)
+    inline uint64 murmur_rotl64 ( uint64 x, int8 r )
+    {
+        return (x << r) | (x >> (64 - r));
+    }
 
+#define	DLIB_ROTL32(x,y)	murmur_rotl32(x,y)
+#define DLIB_ROTL64(x,y)	murmur_rotl64(x,y)
+
+#define DLIB_BIG_CONSTANT(x) (x##LLU)
 
 #endif // !defined(_MSC_VER)
 
@@ -72,10 +82,36 @@ namespace dlib
         return temp.val;
     }
 
+    DLIB_FORCE_INLINE uint64 murmur_getblock ( const uint64 * p, int i )
+    {
+        return p[i];
+    }
+
+    DLIB_FORCE_INLINE uint64 murmur_getblock_byte_swap ( const uint64 * p, int i )
+    {
+        union 
+        {
+            uint8 bytes[8];
+            uint64 val;
+        } temp;
+
+        const uint8* pp = reinterpret_cast<const uint8*>(p + i);
+        temp.bytes[0] = pp[7];
+        temp.bytes[1] = pp[6];
+        temp.bytes[2] = pp[5];
+        temp.bytes[3] = pp[4];
+        temp.bytes[4] = pp[3];
+        temp.bytes[5] = pp[2];
+        temp.bytes[6] = pp[1];
+        temp.bytes[7] = pp[0];
+
+        return temp.val;
+    }
+
 // ----------------------------------------------------------------------------------------
     // Finalization mix - force all bits of a hash block to avalanche
 
-    DLIB_FORCE_INLINE uint32 fmix ( uint32 h )
+    DLIB_FORCE_INLINE uint32 murmur_fmix ( uint32 h )
     {
         h ^= h >> 16;
         h *= 0x85ebca6b;
@@ -88,10 +124,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    DLIB_FORCE_INLINE uint64 murmur_fmix ( uint64 k )
+    {
+        k ^= k >> 33;
+        k *= DLIB_BIG_CONSTANT(0xff51afd7ed558ccd);
+        k ^= k >> 33;
+        k *= DLIB_BIG_CONSTANT(0xc4ceb9fe1a85ec53);
+        k ^= k >> 33;
+
+        return k;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline uint32 murmur_hash3 ( 
         const void * key, 
-        int len, 
-        uint32 seed = 0
+        const int len, 
+        const uint32 seed = 0
     )
     {
         const uint8 * data = (const uint8*)key;
@@ -164,12 +213,119 @@ namespace dlib
 
         h1 ^= len;
 
-        h1 = fmix(h1);
+        h1 = murmur_fmix(h1);
 
         return h1;
     } 
 
 // ----------------------------------------------------------------------------------------
+
+    inline std::pair<uint64,uint64> murmur_hash3_128bit ( 
+        const void* key, 
+        const int len,
+        const uint32 seed = 0
+    )
+    {
+        const uint8 * data = (const uint8*)key;
+        const int nblocks = len / 16;
+
+        uint64 h1 = seed;
+        uint64 h2 = seed;
+
+        uint64 c1 = DLIB_BIG_CONSTANT(0x87c37b91114253d5);
+        uint64 c2 = DLIB_BIG_CONSTANT(0x4cf5ad432745937f);
+
+        //----------
+        // body
+
+        const uint64 * blocks = (const uint64 *)(data);
+
+        bool is_little_endian = true;
+        uint32 endian_test = 1;
+        if (*reinterpret_cast<unsigned char*>(&endian_test) != 1)
+            is_little_endian = false;
+
+
+        if (is_little_endian)
+        {
+            for(int i = 0; i < nblocks; i++)
+            {
+                uint64 k1 = murmur_getblock(blocks,i*2+0);
+                uint64 k2 = murmur_getblock(blocks,i*2+1);
+
+                k1 *= c1; k1  = DLIB_ROTL64(k1,31); k1 *= c2; h1 ^= k1;
+
+                h1 = DLIB_ROTL64(h1,27); h1 += h2; h1 = h1*5+0x52dce729;
+
+                k2 *= c2; k2  = DLIB_ROTL64(k2,33); k2 *= c1; h2 ^= k2;
+
+                h2 = DLIB_ROTL64(h2,31); h2 += h1; h2 = h2*5+0x38495ab5;
+            }
+        }
+        else
+        {
+            for(int i = 0; i < nblocks; i++)
+            {
+                uint64 k1 = murmur_getblock_byte_swap(blocks,i*2+0);
+                uint64 k2 = murmur_getblock_byte_swap(blocks,i*2+1);
+
+                k1 *= c1; k1  = DLIB_ROTL64(k1,31); k1 *= c2; h1 ^= k1;
+
+                h1 = DLIB_ROTL64(h1,27); h1 += h2; h1 = h1*5+0x52dce729;
+
+                k2 *= c2; k2  = DLIB_ROTL64(k2,33); k2 *= c1; h2 ^= k2;
+
+                h2 = DLIB_ROTL64(h2,31); h2 += h1; h2 = h2*5+0x38495ab5;
+            }
+        }
+
+        //----------
+        // tail
+
+        const uint8 * tail = (const uint8*)(data + nblocks*16);
+
+        uint64 k1 = 0;
+        uint64 k2 = 0;
+
+        switch(len & 15)
+        {
+            case 15: k2 ^= uint64(tail[14]) << 48;
+            case 14: k2 ^= uint64(tail[13]) << 40;
+            case 13: k2 ^= uint64(tail[12]) << 32;
+            case 12: k2 ^= uint64(tail[11]) << 24;
+            case 11: k2 ^= uint64(tail[10]) << 16;
+            case 10: k2 ^= uint64(tail[ 9]) << 8;
+            case  9: k2 ^= uint64(tail[ 8]) << 0;
+                     k2 *= c2; k2  = DLIB_ROTL64(k2,33); k2 *= c1; h2 ^= k2;
+
+            case  8: k1 ^= uint64(tail[ 7]) << 56;
+            case  7: k1 ^= uint64(tail[ 6]) << 48;
+            case  6: k1 ^= uint64(tail[ 5]) << 40;
+            case  5: k1 ^= uint64(tail[ 4]) << 32;
+            case  4: k1 ^= uint64(tail[ 3]) << 24;
+            case  3: k1 ^= uint64(tail[ 2]) << 16;
+            case  2: k1 ^= uint64(tail[ 1]) << 8;
+            case  1: k1 ^= uint64(tail[ 0]) << 0;
+                     k1 *= c1; k1  = DLIB_ROTL64(k1,31); k1 *= c2; h1 ^= k1;
+        };
+
+        //----------
+        // finalization
+
+        h1 ^= len; h2 ^= len;
+
+        h1 += h2;
+        h2 += h1;
+
+        h1 = murmur_fmix(h1);
+        h2 = murmur_fmix(h2);
+
+        h1 += h2;
+        h2 += h1;
+
+        return std::make_pair(h1,h2);
+    }
+
 
 }
 
