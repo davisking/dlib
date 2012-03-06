@@ -118,6 +118,7 @@
          <item>crc32</item> 
          <item>hash</item> 
          <item>murmur_hash3</item> 
+         <item>murmur_hash3_128bit</item> 
          <item>projection_hash</item> 
          <item>create_random_projection_hash</item> 
       </section>
@@ -203,6 +204,20 @@
          <spec_file>dlib/general_hash/murmur_hash3_abstract.h</spec_file>
          <description>
             This function takes a block of memory and returns a 32bit hash.  The 
+            hashing algorithm used is Austin Appleby's excellent 
+            <a href="http://code.google.com/p/smhasher/">MurmurHash3</a>. 
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>murmur_hash3_128bit</name>
+         <file>dlib/hash.h</file>
+         <spec_file>dlib/general_hash/murmur_hash3_abstract.h</spec_file>
+         <description>
+            This function takes a block of memory and returns a 128bit hash.  The 
             hashing algorithm used is Austin Appleby's excellent 
             <a href="http://code.google.com/p/smhasher/">MurmurHash3</a>. 
          </description>

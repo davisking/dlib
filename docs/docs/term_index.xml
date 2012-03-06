@@ -940,6 +940,7 @@
          <term file="algorithms.html" name="bigint"/>
          <term file="algorithms.html" name="crc32"/>
          <term file="algorithms.html" name="murmur_hash3"/>
+         <term file="algorithms.html" name="murmur_hash3_128bit"/>
          <term file="algorithms.html" name="hash"/>
 
 
