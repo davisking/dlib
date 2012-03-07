@@ -78,15 +78,22 @@ namespace dlib
         !*/
 
         void resize(
-            unsigned long new_size, 
-            const T& c = T()
+            unsigned long new_size
         ); 
         /*!
             ensures
                 - #size() == new_size
-                - any element with index between 0 and new_size - 1 which was in the 
-                  circular_buffer before the call to resize() retains its value and index.
-                  All other elements have a value given by c.
+        !*/
+
+        void assign(
+            unsigned long new_size, 
+            const T& value
+        ); 
+        /*!
+            ensures
+                - #size() == new_size 
+                - for all valid i:
+                    - (*this)[i] == value
         !*/
 
         unsigned long size(

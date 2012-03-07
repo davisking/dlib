@@ -59,8 +59,20 @@ namespace dlib
             return data[(i+offset)%data.size()]; 
         }
 
-        void resize(unsigned long size, const T& value = T()) { data.resize(size,value); }
-        void assign(unsigned long size, const T& value) { data.assign(size,value); }
+        void resize(unsigned long size) 
+        {  
+            offset = 0;
+            data.resize(size); 
+        }
+
+        void assign(
+            unsigned long size, 
+            const T& value
+        ) 
+        { 
+            offset = 0;
+            data.assign(size,value); 
+        }
 
         unsigned long size() const { return data.size(); }
 
@@ -125,6 +137,13 @@ namespace dlib
             );
             return (*this)[size()-1];
         }
+
+        void swap( circular_buffer& item)
+        {
+            std::swap(item.offset, offset);
+            data.swap(item.data);
+        }
+
 
     private:
         std::vector<T> data;
