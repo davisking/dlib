@@ -29,11 +29,11 @@ namespace dlib
                 - size() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a circular buffer.  This means that when objects
-                are pushed onto one of its ends it does not grow in size.  Instead,
-                it shifts all elements over one to make room for the new element
-                and the element at the opposing end falls off the buffer and is
-                lost.
+                This object is a circular buffer of objects of type T.  This means 
+                that when objects are pushed onto one of its ends it does not grow 
+                in size.  Instead, it shifts all elements over one to make room for 
+                the new element and the element at the opposing end falls off the 
+                buffer and is lost.
         !*/
 
     public:
