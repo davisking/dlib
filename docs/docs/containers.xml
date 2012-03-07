@@ -594,6 +594,7 @@
          <item>std_vector_c</item> 
          <item>static_map</item> 
          <item>sliding_buffer</item>
+         <item>circular_buffer</item>
          <item>tuple</item>
          <item>reference_wrapper</item>
          <item nolink="true">
@@ -808,7 +809,8 @@
          <spec_file>dlib/sliding_buffer/sliding_buffer_kernel_abstract.h</spec_file>
          <description>
             This object represents an array with the ability to rotate its contents
-                        left or right. 
+            left or right.  Note that the size of this object is always a power of two.
+            If you need arbitrary sized objects then use a <a href="#circular_buffer">circular_buffer</a>.
          </description>
          
          <implementations>
@@ -835,7 +837,20 @@
       
    <!-- ************************************************************************* -->
       
-      <component checked="true">
+      <component>
+         <name>circular_buffer</name>
+         <file>dlib/sliding_buffer.h</file>
+         <spec_file>dlib/sliding_buffer/circular_buffer_abstract.h</spec_file>
+         <description>
+            This object represents a simple sliding buffer which can contain
+            and arbitrary number of elements.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      
+      <component>
          <name>array2d</name>
          <file>dlib/array2d.h</file>
          <spec_file>dlib/array2d/array2d_kernel_abstract.h</spec_file>

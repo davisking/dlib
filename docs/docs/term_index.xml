@@ -984,6 +984,7 @@
          <term file="containers.html" name="sequence"/>
          <term file="containers.html" name="shared_ptr_thread_safe"/>
          <term file="containers.html" name="sliding_buffer"/>
+         <term file="containers.html" name="circular_buffer"/>
          <term file="containers.html" name="static_map"/>
          <term file="containers.html" name="static_set"/>
 
