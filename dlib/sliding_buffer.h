@@ -6,6 +6,7 @@
 
 #include "sliding_buffer/sliding_buffer_kernel_1.h"
 #include "sliding_buffer/sliding_buffer_kernel_c.h"
+#include "sliding_buffer/circular_buffer.h"
 
 
 
