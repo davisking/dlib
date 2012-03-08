@@ -6,6 +6,27 @@
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    void serialize (
+        const kalman_filter& item, 
+        std::ostream& out 
+    );   
+    /*!
+        provides serialization support 
+    !*/
+
+    void deserialize (
+        kalman_filter& item, 
+        std::istream& in
+    );   
+    /*!
+        provides deserialization support 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_KALMAN_FiLTER_ABSTRACT_H__

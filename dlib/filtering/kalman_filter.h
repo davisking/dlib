@@ -82,6 +82,37 @@ namespace dlib
             return xb;
         }
 
+        friend inline void serialize(const kalman_filter& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.got_first_meas, out);
+            serialize(item.x, out);
+            serialize(item.xb, out);
+            serialize(item.P, out);
+            serialize(item.H, out);
+            serialize(item.A, out);
+            serialize(item.Q, out);
+            serialize(item.R, out);
+        }
+
+        friend inline void deserialize(kalman_filter& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw dlib::serialization_error("Unknown version number found while deserializing kalman_filter object.");
+
+            deserialize(item.got_first_meas, in);
+            deserialize(item.x, in);
+            deserialize(item.xb, in);
+            deserialize(item.P, in);
+            deserialize(item.H, in);
+            deserialize(item.A, in);
+            deserialize(item.Q, in);
+            deserialize(item.R, in);
+        }
+
     private:
 
         bool got_first_meas;

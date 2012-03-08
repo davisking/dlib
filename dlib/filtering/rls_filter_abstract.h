@@ -70,6 +70,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void serialize (
+        const rls_filter& item, 
+        std::ostream& out 
+    );   
+    /*!
+        provides serialization support 
+    !*/
+
+    void deserialize (
+        rls_filter& item, 
+        std::istream& in
+    );   
+    /*!
+        provides deserialization support 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+
 }
 
 #endif // DLIB_RLS_FiLTER_ABSTRACT_H__

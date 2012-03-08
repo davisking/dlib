@@ -135,6 +135,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    void serialize (
+        const rls& item, 
+        std::ostream& out 
+    );   
+    /*!
+        provides serialization support 
+    !*/
+
+    void deserialize (
+        rls& item, 
+        std::istream& in
+    );   
+    /*!
+        provides deserialization support 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RLs_ABSTRACT_H__

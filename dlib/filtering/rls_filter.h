@@ -130,6 +130,31 @@ namespace dlib
             return next;
         }
 
+        friend inline void serialize(const rls_filter& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.count, out);
+            serialize(item.size, out);
+            serialize(item.filter, out);
+            serialize(item.next, out);
+            serialize(item.data, out);
+        }
+
+        friend inline void deserialize(rls_filter& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw dlib::serialization_error("Unknown version number found while deserializing rls_filter object.");
+
+            deserialize(item.count, in);
+            deserialize(item.size, in);
+            deserialize(item.filter, in);
+            deserialize(item.next, in);
+            deserialize(item.data, in);
+        }
+
     private:
 
         unsigned long count;

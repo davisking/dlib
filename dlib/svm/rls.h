@@ -143,6 +143,29 @@ namespace dlib
             return df;
         }
 
+        friend inline void serialize(const rls& item, std::ostream& out)
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.w, out);
+            serialize(item.R, out);
+            serialize(item.C, out);
+            serialize(item.forget_factor, out);
+        }
+
+        friend inline void deserialize(rls& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw dlib::serialization_error("Unknown version number found while deserializing rls object.");
+
+            deserialize(item.w, in);
+            deserialize(item.R, in);
+            deserialize(item.C, in);
+            deserialize(item.forget_factor, in);
+        }
+
     private:
 
         void add_eye_to_inv(
