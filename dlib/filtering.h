@@ -4,6 +4,7 @@
 #define DLIB_FILTERiNG_HEADER
 
 #include "filtering/kalman_filter.h"
+#include "filtering/rls_filter.h"
 
 #endif // DLIB_FILTERiNG_HEADER
 
