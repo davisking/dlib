@@ -25,10 +25,11 @@ namespace dlib
                 This object can also be configured to use exponential forgetting.  This is
                 where each training example is weighted by pow(forget_factor, i), where i 
                 indicates the sample's age.  So older samples are weighted less in the 
-                least squares solution and therefore become forgotten after some time.  Note
-                also that this forgetting applies to the regularizer as well.  So if forgetting
-                is used then this object slowly converts itself to an unregularized version 
-                of recursive least squares.
+                least squares solution and therefore become forgotten after some time.  
+                Therefore, with forgetting, this object solves the following optimization
+                problem at each step:
+                    find w minimizing: 0.5*dot(w,w) + C*sum_i pow(forget_factor, i)*(y_i - trans(x_i)*w)^2
+                Where i starts at 0 and i==0 corresponds to the most recent training point.
         !*/
 
     public:

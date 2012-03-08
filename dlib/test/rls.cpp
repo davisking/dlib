@@ -25,7 +25,7 @@ namespace
     {
         dlib::rand rnd;
 
-        running_stats<double> rs1, rs2, rs3, rs4;
+        running_stats<double> rs1, rs2, rs3, rs4, rs5;
 
         for (int k = 0; k < 2; ++k)
         {
@@ -51,6 +51,32 @@ namespace
                         matrix<double> w = pinv(1.0/C*identity_matrix<double>(X.nc()) + trans(X)*X)*trans(X)*Y;
 
                         rs1.add(length(r.get_w() - w));
+                    }
+
+                    {
+                        matrix<double> X = randm(size,num_vars,rnd);
+                        matrix<double,0,1> Y = randm(size,1,rnd);
+
+                        matrix<double,0,1> G(size,1);
+
+                        const double C = 10000;
+                        const double forget_factor = 0.8;
+                        rls r(forget_factor, C);
+                        for (long i = 0; i < Y.size(); ++i)
+                        {
+                            r.train(trans(rowm(X,i)), Y(i));
+
+                            G(i) = std::pow(forget_factor, i/2.0);
+                        }
+
+                        G = flipud(G);
+
+                        X = diagm(G)*X;
+                        Y = diagm(G)*Y;
+
+                        matrix<double> w = pinv(1.0/C*identity_matrix<double>(X.nc()) + trans(X)*X)*trans(X)*Y;
+
+                        rs5.add(length(r.get_w() - w));
                     }
 
                     {
@@ -124,20 +150,24 @@ namespace
         dlog << LINFO << "rs2.mean(): " << rs2.mean();
         dlog << LINFO << "rs3.mean(): " << rs3.mean();
         dlog << LINFO << "rs4.mean(): " << rs4.mean();
+        dlog << LINFO << "rs5.mean(): " << rs5.mean();
         dlog << LINFO << "rs1.max(): " << rs1.max();
         dlog << LINFO << "rs2.max(): " << rs2.max();
         dlog << LINFO << "rs3.max(): " << rs3.max();
         dlog << LINFO << "rs4.max(): " << rs4.max();
+        dlog << LINFO << "rs5.max(): " << rs5.max();
 
         DLIB_TEST_MSG(rs1.mean() < 1e-10, rs1.mean());
         DLIB_TEST_MSG(rs2.mean() < 1e-9, rs2.mean());
         DLIB_TEST_MSG(rs3.mean() < 1e-6, rs3.mean());
         DLIB_TEST_MSG(rs4.mean() < 1e-6, rs4.mean());
+        DLIB_TEST_MSG(rs5.mean() < 1e-3, rs5.mean());
 
         DLIB_TEST_MSG(rs1.max() < 1e-10, rs1.max());
         DLIB_TEST_MSG(rs2.max() < 1e-6,  rs2.max());
         DLIB_TEST_MSG(rs3.max() < 0.001, rs3.max());
         DLIB_TEST_MSG(rs4.max() < 0.01,  rs4.max());
+        DLIB_TEST_MSG(rs5.max() < 0.1,  rs5.max());
         
     }
 

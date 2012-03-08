@@ -81,8 +81,16 @@ namespace dlib
                 w = 0;
             }
 
+            // multiply by forget factor and incorporate x*trans(x) into R.
             const double l = 1.0/forget_factor;
-            R = l*R - (l*l*R*x*trans(x)*trans(R))/(1 + l*trans(x)*R*x);
+            const double temp = 1 + l*trans(x)*R*x;
+            matrix<double,0,1> tmp = R*x;
+            R = l*R - l*l*(tmp*trans(tmp))/temp;
+
+            // Since we multiplied by the forget factor, we need to add (1-forget_factor) of the
+            // identity matrix back in to keep the regularization alive.  
+            add_eye_to_inv(R, (1-forget_factor)/C);
+
             // R should always be symmetric.  This line improves numeric stability of this algorithm.
             R = 0.5*(R + trans(R));
 
@@ -136,6 +144,23 @@ namespace dlib
         }
 
     private:
+
+        void add_eye_to_inv(
+            matrix<double>& m,
+            double C
+        )
+        /*!
+            ensures
+                - Let m == inv(M)
+                - this function returns inv(M + C*identity_matrix<double>(m.nr()))
+        !*/
+        {
+            for (long r = 0; r < m.nr(); ++r)
+            {
+                m = m - colm(m,r)*trans(colm(m,r))/(1/C + m(r,r));
+            }
+        }
+
 
         matrix<double,0,1> w;
         matrix<double> R;
