@@ -3,7 +3,7 @@
 #ifndef DLIB_ARRAY2D_SERIALIZE_PIXEL_OvERLOADS_H__
 #define DLIB_ARRAY2D_SERIALIZE_PIXEL_OvERLOADS_H__
 
-#include "array2d_kernel_1.h"
+#include "array2d_kernel.h"
 #include "../pixel.h"
 
 namespace dlib
