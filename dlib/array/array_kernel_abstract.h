@@ -41,12 +41,10 @@ namespace dlib
                 order (*this)[0], (*this)[1], (*this)[2], ...
 
             WHAT THIS OBJECT REPRESENTS
-                array contains items of type T
-
-                This object represents an ordered array of items, each item is 
-                associated with an integer value.   
-                The items are numbered from 0 though size() - 1 and
-                the operator[] functions run in constant time    
+                This object represents an ordered 1-dimensional array of items, 
+                each item is associated with an integer value.  The items are 
+                numbered from 0 though size() - 1 and the operator[] functions 
+                run in constant time.  
 
                 Also note that unless specified otherwise, no member functions
                 of this object throw exceptions.
