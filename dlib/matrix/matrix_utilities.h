@@ -1885,6 +1885,26 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename EXP
+        >
+    const matrix_op<op_uniform_matrix_3<typename EXP::type> > zeros_matrix (
+        const matrix_exp<EXP>& mat
+    )
+    {
+        DLIB_ASSERT(mat.nr() > 0 && mat.nc() > 0, 
+            "\tconst matrix_exp zeros_matrix(mat)"
+            << "\n\t nr and nc have to be bigger than 0"
+            << "\n\t mat.nr(): " << mat.nr()
+            << "\n\t mat.nc(): " << mat.nc()
+            );
+        typedef typename EXP::type T;
+        typedef op_uniform_matrix_3<T> op;
+        return matrix_op<op>(op(mat.nr(), mat.nc(), 0));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T
         >
     const matrix_op<op_uniform_matrix_3<T> > ones_matrix (
@@ -1900,6 +1920,26 @@ namespace dlib
             );
         typedef op_uniform_matrix_3<T> op;
         return matrix_op<op>(op(nr, nc, 1));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    const matrix_op<op_uniform_matrix_3<typename EXP::type> > ones_matrix (
+        const matrix_exp<EXP>& mat
+    )
+    {
+        DLIB_ASSERT(mat.nr() > 0 && mat.nc() > 0, 
+            "\tconst matrix_exp ones_matrix(mat)"
+            << "\n\t nr and nc have to be bigger than 0"
+            << "\n\t mat.nr(): " << mat.nr()
+            << "\n\t mat.nc(): " << mat.nc()
+            );
+        typedef typename EXP::type T;
+        typedef op_uniform_matrix_3<T> op;
+        return matrix_op<op>(op(mat.nr(), mat.nc(), 1));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2049,6 +2089,24 @@ namespace dlib
             );
         typedef op_identity_matrix_2<T> op;
         return matrix_diag_op<op>(op(size));
+    }
+
+    template <
+        typename EXP 
+        >
+    const matrix_diag_op<op_identity_matrix_2<typename EXP::type> > identity_matrix (
+        const matrix_exp<EXP>& mat
+    )
+    {
+        DLIB_ASSERT(mat.nr() == mat.nc(), 
+            "\tconst matrix_exp identity_matrix(mat)"
+            << "\n\t mat must be a square matrix."
+            << "\n\t mat.nr(): " << mat.nr() 
+            << "\n\t mat.nc(): " << mat.nc() 
+            );
+        typedef typename EXP::type T;
+        typedef op_identity_matrix_2<T> op;
+        return matrix_diag_op<op>(op(mat.nr()));
     }
 
 // ----------------------------------------------------------------------------------------

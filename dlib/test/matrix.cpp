@@ -65,6 +65,8 @@ namespace
             DLIB_TEST(mi.nc() == m.nr());
             DLIB_TEST((equal(round_zeros(mi*m,0.000001) , identity_matrix<double,5>())));
             DLIB_TEST((equal(round_zeros(m*mi,0.000001) , identity_matrix<double,5>())));
+            DLIB_TEST((equal(round_zeros(mi*m,0.000001) , identity_matrix(m))));
+            DLIB_TEST((equal(round_zeros(m*mi,0.000001) , identity_matrix(m))));
         }
         {
             matrix<double,5,0,MM> m(5,5);
@@ -1041,8 +1043,11 @@ namespace
         }
 
         {
+            matrix<double> mat(4,5);
             DLIB_TEST((uniform_matrix<double>(4,5,1) == ones_matrix<double>(4,5)));
+            DLIB_TEST((uniform_matrix<double>(4,5,1) == ones_matrix(mat)));
             DLIB_TEST((uniform_matrix<double>(4,5,0) == zeros_matrix<double>(4,5)));
+            DLIB_TEST((uniform_matrix<double>(4,5,0) == zeros_matrix(mat)));
             DLIB_TEST((uniform_matrix<float>(4,5,1) == ones_matrix<float>(4,5)));
             DLIB_TEST((uniform_matrix<float>(4,5,0) == zeros_matrix<float>(4,5)));
             DLIB_TEST((uniform_matrix<complex<double> >(4,5,1) == ones_matrix<complex<double> >(4,5)));

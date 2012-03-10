@@ -247,6 +247,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp ones_matrix (
+        const matrix_exp& mat
+    );
+    /*!
+        requires
+            - mat.nr() > 0 && mat.nc() > 0
+        ensures
+            - Let T denote the type of element in mat. Then this function
+              returns uniform_matrix<T>(mat.nr(), mat.nc(), 1)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T
         >
@@ -263,6 +276,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp zeros_matrix (
+        const matrix_exp& mat
+    );
+    /*!
+        requires
+            - mat.nr() > 0 && mat.nc() > 0
+        ensures
+            - Let T denote the type of element in mat. Then this function
+              returns uniform_matrix<T>(mat.nr(), mat.nc(), 0)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T
         >
@@ -275,6 +301,19 @@ namespace dlib
             - nr > 0 && nc > 0
         ensures
             - returns uniform_matrix<T>(nr, nc, 0)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp identity_matrix (
+        const matrix_exp& mat
+    );
+    /*!
+        requires
+            - mat.nr() == mat.nc()
+        ensures
+            - returns an identity matrix with the same dimensions as mat and
+              containing the same type of elements as mat.
     !*/
 
 // ----------------------------------------------------------------------------------------
