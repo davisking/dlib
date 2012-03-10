@@ -9,8 +9,8 @@
    <body>
          <br/><br/>
          <p>
-         Many of these containers were inspired by the RESOLVE/C++ course sequence at Ohio State.  As such, most of 
-         the objects do not support copying in any form, only swapping is allowed. That is, when objects 
+         Many of these containers were inspired by the RESOLVE/C++ course sequence at Ohio State.  As such, 
+         many of the objects do not support copying in any form, only swapping is allowed. That is, when objects 
          are added or removed from any of these containers they are swapped in and out, not copied. 
          </p>
 
@@ -20,17 +20,6 @@
          It also means you can store objects that are not copyable inside these containers, which is not 
          something you can do with the STL.  
          </p>
-
-         <p>
-         To use any of these containers all you need to do is #include the file indicated in the 
-         short section about the component you would like to use. Then pick which implementation you 
-         would like and typedef it to something nice. Here is an example of creating a typedef for 
-         a set of integers using the first kernel implementation. <br/>
-         <tt>typedef dlib::set&lt;int&gt;::kernel_1a set_of_ints;</tt>.  Or as another example,
-         if you wanted to make an expandable array of ints you might say <br/>
-         <tt>typedef dlib::array&lt;int&gt;::expand_1d_c array_of_ints;</tt>. 
-         </p>
-
 
          <p>
          Note that it is assumed by these containers that swap() and operator&lt; do not throw.  They
@@ -644,162 +633,15 @@
 
    <components>
    
-      <component checked="true">
+      <component>
          <name>array</name>
          <file>dlib/array.h</file>
          <spec_file>dlib/array/array_kernel_abstract.h</spec_file>
          <description>
-            This object is just like a C style array and the accessor functions operate 
+            This object is just like a 1-dimensional C style array and the accessor functions operate 
             in constant time. 
          </description>
-         
-         <implementations>
-            <implementation>
-               <name>array_kernel_1</name>
-               <file>dlib/array/array_kernel_1.h</file>
-               <description> 
-                  This implementation is done using an array of pointers, each of which point to 
-                  small sections of the array. This implementation allows the array to use only 
-                  about as much memory as it needs at any given time.
-                  It does not use the <a href="other.html#memory_manager">memory_manager</a> at all. 
-
-               </description> 
-
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for array_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation>          
-
-            <implementation>
-               <name>array_kernel_2</name>
-               <file>dlib/array/array_kernel_2.h</file>
-               <description> 
-                  This implementation is done using a single array of max_size() elements.  So this
-                  is just a simple layer on top of a C style array.
-                  It uses the <a href="other.html#memory_manager">memory_manager</a> for all 
-                  memory allocations. 
-
-               </description> 
-
-               <typedefs>
-                  <typedef>
-                     <name>kernel_2a</name>
-                     <description>is a typedef for array_kernel_2</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation>          
-
-         </implementations>
-         
-         <extensions>
-            <extension>
-               <name>array_sort</name>
-               <spec_file>dlib/array/array_sort_abstract.h</spec_file>
-               <description> 
-                  This extension gives an array the ability to sort its contents.
-               </description> 
-
-               <implementations>
-                  <implementation>
-                     <name>array_sort_1</name>
-                     <file>dlib/array/array_sort_1.h</file>
-                     <description> 
-                        This is a version of the QuickSort algorithm. It swaps the entire array into a C 
-                        style array, sorts it and then swaps it back into the array object.
-                     </description> 
-
-                     <typedefs>
-                        <typedef>
-                           <name>sort_1a</name>
-                           <description>is a typedef for array_kernel_1a extended by array_sort_1</description>
-                        </typedef>
-                        <typedef>
-                           <name>sort_1b</name>
-                           <description>is a typedef for array_kernel_2a extended by array_sort_1</description>
-                        </typedef>
-                     </typedefs>                
-                     
-                  </implementation> 
-                  <implementation>
-                     <name>array_sort_2</name>
-                     <file>dlib/array/array_sort_2.h</file>
-                     <description> 
-                        This is a version of the QuickSort algorithm.
-                     </description> 
-
-                     <typedefs>
-                        <typedef>
-                           <name>sort_2a</name>
-                           <description>is a typedef for array_kernel_1a extended by array_sort_2</description>
-                        </typedef>
-                        <typedef>
-                           <name>sort_2b</name>
-                           <description>is a typedef for array_kernel_2a extended by array_sort_2</description>
-                        </typedef>
-                     </typedefs>                
-                     
-                  </implementation>          
-               </implementations>
-   
-               
-            </extension>
-
-
-
-            <extension>
-               <name>array_expand</name>
-               <spec_file>dlib/array/array_expand_abstract.h</spec_file>
-               <description> 
-                This extension gives an array the ability to expand its size() beyond
-                its max_size() without clearing out all its elements.  It also adds a set of pop/push_back()
-                functions similar to the ones in the std::vector object.
-               </description> 
-
-               <implementations>
-                  <implementation>
-                     <name>array_expand_1</name>
-                     <file>dlib/array/array_expand_1.h</file>
-                     <description> 
-                        This is implemented by creating a new bigger array if max_size() isn't big enough,
-                        swapping everything into that new array, and then swapping that array with *this.
-                     </description> 
-
-                     <typedefs>
-                        <typedef>
-                           <name>expand_1a</name>
-                           <description>is a typedef for array_sort_1a extended by array_expand_1</description>
-                        </typedef>
-                        <typedef>
-                           <name>expand_1b</name>
-                           <description>is a typedef for array_sort_1b extended by array_expand_1</description>
-                        </typedef>
-                        <typedef>
-                           <name>expand_1c</name>
-                           <description>is a typedef for array_sort_2a extended by array_expand_1</description>
-                        </typedef>
-                        <typedef>
-                           <name>expand_1d</name>
-                           <description>is a typedef for array_sort_2b extended by array_expand_1</description>
-                        </typedef>
-                     </typedefs>                
-                     
-                  </implementation> 
-               </implementations>
-   
-               
-            </extension>
-
-
-         </extensions>
-               
       </component>
-      
-      
       
    <!-- ************************************************************************* -->
       
