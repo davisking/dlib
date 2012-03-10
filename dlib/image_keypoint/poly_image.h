@@ -627,7 +627,7 @@ namespace dlib
 
         std::vector<std::vector<separable_filter_type> > filters;
 
-        dlib::array<array2d<float> >::expand_1b poly_coef;
+        dlib::array<array2d<float> > poly_coef;
         long order;
         long window_size;
         long border_size;

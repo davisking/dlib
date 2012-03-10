@@ -101,8 +101,7 @@ int main()
     try
     {
         // The first thing we do is create the set of 3 images discussed above.  
-        typedef array<array2d<unsigned char> >::expand_1b  grayscale_image_array_type;
-        grayscale_image_array_type images;
+        array<array2d<unsigned char> > images;
         std::vector<std::vector<rectangle> > object_locations;
         make_simple_test_data(images, object_locations);
 

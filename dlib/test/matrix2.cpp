@@ -166,7 +166,7 @@ namespace
 
         std::vector<double> stdv(4);
         std_vector_c<double> stdv_c(4);
-        dlib::array<double>::expand_1a_c arr;
+        dlib::array<double> arr;
         arr.resize(4);
         for (long i = 0; i < 4; ++i)
             stdv[i] = stdv_c[i] = arr[i] = i+1;

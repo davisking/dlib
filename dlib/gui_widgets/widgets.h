@@ -1306,7 +1306,7 @@ namespace dlib
 
         unsigned long selected_tab_;
 
-        array<tab_data>::kernel_2a_c tabs;
+        array<tab_data> tabs;
 
         const long left_pad;
         const long right_pad;
@@ -1817,7 +1817,7 @@ namespace dlib
         };
 
         bool ms_enabled;
-        typename array<data<S> >::kernel_2a_c items;
+        array<data<S> > items;
         any_function<void(unsigned long)> event_handler;
         any_function<void(unsigned long)> single_click_event_handler;
         unsigned long last_selected;
@@ -2150,7 +2150,7 @@ namespace dlib
             point underline_p2;
         };
 
-        array<menu_data>::kernel_2a_c menus;
+        array<menu_data> menus;
         unsigned long open_menu;
 
         // restricted functions
@@ -3178,8 +3178,8 @@ namespace dlib
         );
 
         array2d<data_type> grid;
-        array<unsigned long>::kernel_2a_c col_width;
-        array<unsigned long>::kernel_2a_c row_height;
+        array<unsigned long> col_width;
+        array<unsigned long> row_height;
         bool has_focus;
         long active_col;
         long active_row;

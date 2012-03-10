@@ -408,7 +408,7 @@ namespace dlib
 
         overlap_tester_type boxes_overlap;
 
-        mutable typename array<image_scanner_type>::kernel_2a scanners;
+        mutable array<image_scanner_type> scanners;
 
         const image_array_type& images;
         const std::vector<std::vector<rectangle> >& truth_rects;

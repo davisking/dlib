@@ -128,7 +128,7 @@ namespace
             start();
 
 
-            array<scoped_ptr<connection> >::expand_1a_c cons;
+            array<scoped_ptr<connection> > cons;
             std::vector<long> bytes_received(6,0);
             scoped_ptr<connection> con_temp;
             

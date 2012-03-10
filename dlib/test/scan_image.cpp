@@ -68,7 +68,7 @@ namespace
     {
         typedef typename image_array_type::type::type pixel_type;
         typedef typename promote<pixel_type>::type ptype;
-        typename array<integral_image_generic<ptype> >::kernel_2a iimg;
+        array<integral_image_generic<ptype> > iimg;
         iimg.set_max_size(images.size());
         iimg.set_size(images.size());
 
@@ -222,7 +222,7 @@ namespace
         fill_rect(img, rect, 255); 
 
 
-        array<array2d<unsigned char> >::expand_1b images;
+        array<array2d<unsigned char> > images;
         std::vector<std::pair<unsigned int, rectangle> > rects;
         for (int i = 0; i < 10; ++i)
         {
@@ -276,7 +276,7 @@ namespace
         fill_rect(img, rect, 255); 
 
 
-        array<array2d<unsigned char> >::expand_1b images;
+        array<array2d<unsigned char> > images;
         std::vector<std::pair<unsigned int, rectangle> > rects;
         for (int i = 0; i < 10; ++i)
         {
@@ -326,7 +326,7 @@ namespace
 
         rnd.set_seed("235");
 
-        typename array<array2d<pixel_type> >::expand_1b images;
+        array<array2d<pixel_type> > images;
         images.resize(1);
         images[0].set_size(200,180);
 

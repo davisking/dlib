@@ -270,12 +270,12 @@ namespace dlib
 
         }
 
-        typename array<scoped_ptr<kcentroid<kernel_type> > >::expand_1b_c centers;
+        array<scoped_ptr<kcentroid<kernel_type> > > centers;
         kcentroid<kernel_type> kc;
         scalar_type min_change;
 
         // temp variables
-        array<unsigned long>::expand_1b_c assignments;
+        array<unsigned long> assignments;
     };
 
 // ----------------------------------------------------------------------------------------

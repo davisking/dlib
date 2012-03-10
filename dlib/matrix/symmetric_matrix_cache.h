@@ -222,8 +222,8 @@ namespace dlib
         !*/
 
 
-        mutable typename array<matrix<type,0,1,typename M::mem_manager_type> >::expand_1a cache;
-        mutable typename array<long>::expand_1a references;
+        mutable array<matrix<type,0,1,typename M::mem_manager_type> > cache;
+        mutable array<long> references;
         matrix<type,0,1,typename M::mem_manager_type> diag_cache;
         mutable std::vector<long> lookup;
         mutable std::vector<long> rlookup;

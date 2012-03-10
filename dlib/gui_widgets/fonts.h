@@ -600,7 +600,7 @@ namespace dlib
 
         bool bitmap_to_letter( array2d<char>& bitmap, unichar enc, unsigned long width, int x_offset, int y_offset );
 
-        array<letter>::expand_1b_c gl;
+        array<letter> gl;
         unichar default_char; // if (is_intialized == true), then this MUST be an actual glyph
         bool is_initialized;
         rectangle fbb;

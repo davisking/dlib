@@ -310,7 +310,7 @@ namespace dlib
         long initial_step_size;
 
         typedef array2d<double> image_type;
-        typedef array<image_type>::expand_1d pyramid_type;
+        typedef array<image_type> pyramid_type;
 
         pyramid_type pyramid;
     };

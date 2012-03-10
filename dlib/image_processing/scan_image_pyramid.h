@@ -187,7 +187,7 @@ namespace dlib
         }
 
         feature_extractor_type feats_config; // just here to hold configuration.  use it to populate the feats elements.
-        typename array<feature_extractor_type>::kernel_2a feats;
+        array<feature_extractor_type> feats;
         std::vector<detection_template> det_templates;
         unsigned long max_dets_per_template;
         unsigned long max_pyramid_levels;
@@ -534,7 +534,7 @@ namespace dlib
 
         dets.clear();
 
-        array<array2d<double> >::kernel_2a saliency_images;
+        array<array2d<double> > saliency_images;
         saliency_images.set_max_size(get_num_components_per_detection_template());
         saliency_images.set_size(get_num_components_per_detection_template());
         std::vector<std::pair<unsigned int,rectangle> > region_rects(get_num_components_per_detection_template()); 
