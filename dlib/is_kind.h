@@ -75,6 +75,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
+    struct is_array : public default_is_kind_value  
+    {
+        /*!
+            - if (T is an implementation of array/array_kernel_abstract.h) then
+                - is_array<T>::value == true
+            - else
+                - is_array<T>::value == false
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
     struct is_std_vector : public default_is_kind_value  
     {
         /*!

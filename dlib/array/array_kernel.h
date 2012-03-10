@@ -8,6 +8,7 @@
 #include "../algs.h"
 #include "../serialize.h"
 #include "../sort.h"
+#include "../is_kind.h"
 
 namespace dlib
 {
@@ -741,6 +742,14 @@ namespace dlib
             exchange(item,(*this)[this->size()-1]);
         }
     }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename MM>
+    struct is_array <array<T,MM> >  
+    {
+        const static bool value = true;
+    };
 
 // ----------------------------------------------------------------------------------------
 

@@ -35,6 +35,7 @@ namespace
     {        
         dlib::rand rnd;
 
+        DLIB_TEST(is_array<array>::value == true);
 
         array a1, a2;
 
@@ -606,6 +607,8 @@ namespace
         a.push_back(temp);
         DLIB_TEST(a.size() == 6);
         DLIB_TEST(a[5].whatever == 99);
+
+        DLIB_TEST(is_array<array<stuff> >::value == true);
     }
 
 
@@ -627,6 +630,8 @@ namespace
             // test a checking version first for good measure
             print_spinner();
             array_expand_test<array<unsigned long> >();
+
+            DLIB_TEST(is_array<int>::value == false);
         }
     } a;
 
