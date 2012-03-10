@@ -165,6 +165,7 @@
          <item>pyramid_down_3_2</item> 
          <item>pyramid_down_4_3</item> 
          <item>pyramid_down_5_4</item> 
+         <item>pyramid_disable</item> 
 
          <item>interpolate_nearest_neighbor</item> 
          <item>interpolate_bilinear</item> 
@@ -1121,6 +1122,23 @@
          <description>        
                This is a simple function object to help create image pyramids.  It 
                downsamples an image by a ratio of 3 to 2.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>pyramid_disable</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
+         <description>        
+               This object downsamples an image at a ratio of infinity to 1.  That
+               means it always outputs an image of size zero.  This is useful because
+               it can be supplied to routines which take a pyramid_down function object
+               and it will essentially disable pyramid processing.  This way, a pyramid
+               oriented function can be turned into a regular routine which processes
+               just the original undownsampled image.
          </description>
                                  
       </component>
