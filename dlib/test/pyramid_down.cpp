@@ -281,6 +281,31 @@ void test_pyramid_down_grayscale2()
 
 // ----------------------------------------------------------------------------------------
 
+template <typename pyramid_down_type>
+void test_pyramid_down_small_sizes()
+{
+    // just make sure it doesn't get messed up with small images.  This test
+    // is only really useful if asserts are enabled.
+    pyramid_down_type pyr;
+
+    for (int size = 0; size < 20; ++size)
+    {
+        array2d<unsigned char> img1(size,size);
+        array2d<rgb_pixel> img2(size,size);
+
+        array2d<unsigned char> out1;
+        array2d<rgb_pixel> out2;
+
+        assign_all_pixels(img1, 0);
+        assign_all_pixels(img2, 0);
+
+        pyr(img1, out1);
+        pyr(img2, out2);
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
 
     class test_pyramid_down : public tester
     {
@@ -299,6 +324,17 @@ void test_pyramid_down_grayscale2()
             print_spinner();
             test_pyramid_down_rgb();
 
+            print_spinner();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down>();";
+            test_pyramid_down_small_sizes<pyramid_down>();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down_3_2>();";
+            test_pyramid_down_small_sizes<pyramid_down_3_2>();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down_4_3>();";
+            test_pyramid_down_small_sizes<pyramid_down_4_3>();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_down_5_4>();";
+            test_pyramid_down_small_sizes<pyramid_down_5_4>();
+            dlog << LINFO << "call test_pyramid_down_small_sizes<pyramid_disable>();";
+            test_pyramid_down_small_sizes<pyramid_disable>();
 
             print_spinner();
             dlog << LINFO << "call test_pyramid_down_rgb2<pyramid_down>();";

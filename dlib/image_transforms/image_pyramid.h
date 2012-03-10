@@ -113,11 +113,8 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
-                        is_same_object(original, down) == false, 
+            DLIB_ASSERT(is_same_object(original, down) == false, 
                         "\t void pyramid_disable::operator()"
-                        << "\n\t original.nr(): " << original.nr()
-                        << "\n\t original.nc(): " << original.nc()
                         << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
                         << "\n\t this:                           " << this
                         );
@@ -235,17 +232,20 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
-                        is_same_object(original, down) == false, 
+            DLIB_ASSERT( is_same_object(original, down) == false, 
                         "\t void pyramid_down::operator()"
-                        << "\n\t original.nr(): " << original.nr()
-                        << "\n\t original.nc(): " << original.nc()
                         << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
                         << "\n\t this:                           " << this
                         );
 
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            if (original.nr() <= 8 || original.nc() <= 8)
+            {
+                down.clear();
+                return;
+            }
 
             typedef typename pixel_traits<typename in_image_type::type>::basic_pixel_type bp_type;
             typedef typename promote<bp_type>::type ptype;
@@ -328,17 +328,20 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
-                        is_same_object(original, down) == false, 
+            DLIB_ASSERT( is_same_object(original, down) == false, 
                         "\t void pyramid_down::operator()"
-                        << "\n\t original.nr(): " << original.nr()
-                        << "\n\t original.nc(): " << original.nc()
                         << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
                         << "\n\t this:                           " << this
                         );
 
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            if (original.nr() <= 8 || original.nc() <= 8)
+            {
+                down.clear();
+                return;
+            }
 
             array2d<rgbptype> temp_img;
             temp_img.set_size(original.nr(), (original.nc()-3)/2);
@@ -548,17 +551,20 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
-                        is_same_object(original, down) == false, 
+            DLIB_ASSERT(is_same_object(original, down) == false, 
                         "\t void pyramid_down_3_2::operator()"
-                        << "\n\t original.nr(): " << original.nr()
-                        << "\n\t original.nc(): " << original.nc()
                         << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
                         << "\n\t this:                           " << this
                         );
 
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            if (original.nr() <= 8 || original.nc() <= 8)
+            {
+                down.clear();
+                return;
+            }
 
             const long size_in = 3;
             const long size_out = 2;
@@ -651,17 +657,20 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
-                        is_same_object(original, down) == false, 
+            DLIB_ASSERT( is_same_object(original, down) == false, 
                         "\t void pyramid_down_3_2::operator()"
-                        << "\n\t original.nr(): " << original.nr()
-                        << "\n\t original.nc(): " << original.nc()
                         << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
                         << "\n\t this:                           " << this
                         );
 
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            if (original.nr() <= 8 || original.nc() <= 8)
+            {
+                down.clear();
+                return;
+            }
 
             const long size_in = 3;
             const long size_out = 2;
@@ -865,17 +874,20 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
-                        is_same_object(original, down) == false, 
+            DLIB_ASSERT( is_same_object(original, down) == false, 
                         "\t void pyramid_down_4_3::operator()"
-                        << "\n\t original.nr(): " << original.nr()
-                        << "\n\t original.nc(): " << original.nc()
                         << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
                         << "\n\t this:                           " << this
                         );
 
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            if (original.nr() <= 8 || original.nc() <= 8)
+            {
+                down.clear();
+                return;
+            }
 
             const long size_in = 4;
             const long size_out = 3;
@@ -1047,17 +1059,20 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
-                        is_same_object(original, down) == false, 
+            DLIB_ASSERT(is_same_object(original, down) == false, 
                         "\t void pyramid_down_4_3::operator()"
-                        << "\n\t original.nr(): " << original.nr()
-                        << "\n\t original.nc(): " << original.nc()
                         << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
                         << "\n\t this:                           " << this
                         );
 
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            if (original.nr() <= 8 || original.nc() <= 8)
+            {
+                down.clear();
+                return;
+            }
 
             const long size_in = 4;
             const long size_out = 3;
@@ -1411,17 +1426,20 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
-                        is_same_object(original, down) == false, 
+            DLIB_ASSERT(is_same_object(original, down) == false, 
                         "\t void pyramid_down_5_4::operator()"
-                        << "\n\t original.nr(): " << original.nr()
-                        << "\n\t original.nc(): " << original.nc()
                         << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
                         << "\n\t this:                           " << this
                         );
 
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            if (original.nr() <= 8 || original.nc() <= 8)
+            {
+                down.clear();
+                return;
+            }
 
             const long size_in = 5;
             const long size_out = 4;
@@ -1735,17 +1753,20 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
-                        is_same_object(original, down) == false, 
+            DLIB_ASSERT(is_same_object(original, down) == false, 
                         "\t void pyramid_down_5_4::operator()"
-                        << "\n\t original.nr(): " << original.nr()
-                        << "\n\t original.nc(): " << original.nc()
                         << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
                         << "\n\t this:                           " << this
                         );
 
             COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
             COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            if (original.nr() <= 8 || original.nc() <= 8)
+            {
+                down.clear();
+                return;
+            }
 
             const long size_in = 5;
             const long size_out = 4;
