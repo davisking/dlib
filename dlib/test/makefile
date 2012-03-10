@@ -55,6 +55,7 @@ SRC += ekm_and_lisf.cpp
 SRC += empirical_kernel_map.cpp
 SRC += entropy_coder.cpp
 SRC += entropy_encoder_model.cpp
+SRC += filtering.cpp
 SRC += find_max_factor_graph_nmplp.cpp
 SRC += find_max_factor_graph_viterbi.cpp
 SRC += geometry.cpp
