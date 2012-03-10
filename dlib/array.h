@@ -3,7 +3,7 @@
 #ifndef DLIB_ARRAy_
 #define DLIB_ARRAy_
 
-#include "array/array_kernel_2.h"
+#include "array/array_kernel.h"
 
 #endif // DLIB_ARRAy_
 
