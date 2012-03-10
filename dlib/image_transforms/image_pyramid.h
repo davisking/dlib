@@ -14,6 +14,125 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class pyramid_disable : noncopyable
+    {
+    public:
+
+        template <typename T>
+        vector<double,2> point_down (
+            const vector<T,2>& 
+        ) const
+        {
+            return vector<double,2>(0,0);
+        }
+
+        template <typename T>
+        vector<double,2> point_up (
+            const vector<T,2>& 
+        ) const
+        {
+            return vector<double,2>(0,0);
+        }
+
+    // -----------------------------
+
+        template <typename T>
+        vector<double,2> point_down (
+            const vector<T,2>& p,
+            unsigned int levels
+        ) const
+        {
+            if (levels == 0)
+                return p;
+            else
+                return vector<double,2>(0,0);
+        }
+
+        template <typename T>
+        vector<double,2> point_up (
+            const vector<T,2>& p,
+            unsigned int levels
+        ) const
+        {
+            if (levels == 0)
+                return p;
+            else
+                return vector<double,2>(0,0);
+        }
+
+    // -----------------------------
+
+        rectangle rect_up (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(point_up(rect.tl_corner()), point_up(rect.br_corner()));
+        }
+
+        rectangle rect_up (
+            const rectangle& rect,
+            unsigned int levels
+        ) const
+        {
+            return rectangle(point_up(rect.tl_corner(),levels), point_up(rect.br_corner(),levels));
+        }
+
+    // -----------------------------
+
+        rectangle rect_down (
+            const rectangle& rect
+        ) const
+        {
+            return rectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
+        }
+
+        rectangle rect_down (
+            const rectangle& rect,
+            unsigned int levels
+        ) const
+        {
+            return rectangle(point_down(rect.tl_corner(),levels), point_down(rect.br_corner(),levels));
+        }
+
+    // -----------------------------
+
+    public:
+
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        void operator() (
+            // we do this #ifdef stuff to avoid compiler warnings about unused variables.
+#ifdef ENABLE_ASSERTS
+            const in_image_type& original,
+#else
+            const in_image_type& ,
+#endif
+            out_image_type& down
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(original.nr() > 10 && original.nc() > 10 &&
+                        is_same_object(original, down) == false, 
+                        "\t void pyramid_disable::operator()"
+                        << "\n\t original.nr(): " << original.nr()
+                        << "\n\t original.nc(): " << original.nc()
+                        << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                        << "\n\t this:                           " << this
+                        );
+
+            COMPILE_TIME_ASSERT( pixel_traits<typename in_image_type::type>::has_alpha == false );
+            COMPILE_TIME_ASSERT( pixel_traits<typename out_image_type::type>::has_alpha == false );
+
+            down.clear();
+        }
+    };
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
     class pyramid_down : noncopyable
     {
     public:

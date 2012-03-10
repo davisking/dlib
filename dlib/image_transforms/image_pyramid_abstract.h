@@ -192,6 +192,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class pyramid_disable : noncopyable
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a function object with an interface identical to pyramid_down (defined
+                at the top of this file) except that it downsamples images at a ratio of infinity
+                to 1.  That means it always outputs images of size 0 regardless of the size
+                of the inputs.  This is useful as a method for disabling the image pyramid
+                feature of a routine which uses an image pyramid. 
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_IMAGE_PYRaMID_ABSTRACT_H__
