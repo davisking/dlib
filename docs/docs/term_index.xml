@@ -539,6 +539,7 @@
          <term file="metaprogramming.html" name="static_switch"/>
          <term file="metaprogramming.html" name="is_graph"/>
          <term file="metaprogramming.html" name="is_array2d"/>
+         <term file="metaprogramming.html" name="is_array"/>
          <term file="metaprogramming.html" name="is_rand"/>
          <term file="metaprogramming.html" name="is_matrix"/>
          <term file="metaprogramming.html" name="is_config_reader"/>
