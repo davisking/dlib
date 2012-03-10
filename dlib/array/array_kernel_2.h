@@ -1,5 +1,5 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
-// License: GNU LGPL   See LICENSE.txt for the full license.
+// License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_ARRAY_KERNEl_2_
 #define DLIB_ARRAY_KERNEl_2_
 
@@ -7,6 +7,7 @@
 #include "../interfaces/enumerable.h"
 #include "../algs.h"
 #include "../serialize.h"
+#include "../sort.h"
 
 namespace dlib
 {
@@ -15,7 +16,7 @@ namespace dlib
         typename T,
         typename mem_manager = default_memory_manager 
         >
-    class array_kernel_2 : public enumerable<T>
+    class array : public enumerable<T>
     {
 
         /*!
@@ -49,10 +50,35 @@ namespace dlib
 
     public:
 
+        // These typedefs are here for backwards compatibility with old versions of dlib.
+        typedef array kernel_1a;
+        typedef array kernel_1a_c;
+        typedef array kernel_2a;
+        typedef array kernel_2a_c;
+        typedef array sort_1a;
+        typedef array sort_1a_c;
+        typedef array sort_1b;
+        typedef array sort_1b_c;
+        typedef array sort_2a;
+        typedef array sort_2a_c;
+        typedef array sort_2b;
+        typedef array sort_2b_c;
+        typedef array expand_1a;
+        typedef array expand_1a_c;
+        typedef array expand_1b;
+        typedef array expand_1b_c;
+        typedef array expand_1c;
+        typedef array expand_1c_c;
+        typedef array expand_1d;
+        typedef array expand_1d_c;
+
+
+
+
         typedef T type;
         typedef mem_manager mem_manager_type;
 
-        array_kernel_2 (
+        array (
         ) :
             array_size(0),
             max_array_size(0),
@@ -62,7 +88,7 @@ namespace dlib
             _at_start(true)
         {}
 
-        virtual ~array_kernel_2 (
+        ~array (
         ); 
 
         void clear (
@@ -88,7 +114,7 @@ namespace dlib
         );
 
         void swap (
-            array_kernel_2& item
+            array& item
         );
 
         // functions from the enumerable interface
@@ -113,6 +139,30 @@ namespace dlib
         bool move_next (
         ) const;
 
+        void sort (
+        );
+
+        void resize (
+            unsigned long new_size
+        );
+
+        const T& back (
+        ) const;
+
+        T& back (
+        );
+
+        void pop_back (
+        );
+
+        void pop_back (
+            T& item
+        );
+
+        void push_back (
+            T& item
+        );
+
     private:
 
         typename mem_manager::template rebind<T>::other pool;
@@ -127,8 +177,8 @@ namespace dlib
         mutable bool _at_start;
 
         // restricted functions
-        array_kernel_2(array_kernel_2<T>&);        // copy constructor
-        array_kernel_2<T>& operator=(array_kernel_2<T>&);    // assignment operator        
+        array(array<T>&);        // copy constructor
+        array<T>& operator=(array<T>&);    // assignment operator        
 
     };
 
@@ -137,8 +187,8 @@ namespace dlib
         typename mem_manager 
         >
     inline void swap (
-        array_kernel_2<T,mem_manager>& a, 
-        array_kernel_2<T,mem_manager>& b 
+        array<T,mem_manager>& a, 
+        array<T,mem_manager>& b 
     ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
@@ -148,7 +198,7 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array_kernel_2<T,mem_manager>& item,  
+        const array<T,mem_manager>& item,  
         std::ostream& out
     )
     {
@@ -162,7 +212,7 @@ namespace dlib
         }
         catch (serialization_error e)
         { 
-            throw serialization_error(e.info + "\n   while serializing object of type array_kernel_2"); 
+            throw serialization_error(e.info + "\n   while serializing object of type array"); 
         }
     }
 
@@ -171,7 +221,7 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        array_kernel_2<T,mem_manager>& item,  
+        array<T,mem_manager>& item,  
         std::istream& in
     )
     {
@@ -188,7 +238,7 @@ namespace dlib
         catch (serialization_error e)
         { 
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type array_kernel_2"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type array"); 
         }
     }
 
@@ -202,8 +252,8 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    array_kernel_2<T,mem_manager>::
-    ~array_kernel_2 (
+    array<T,mem_manager>::
+    ~array (
     )
     {
         if (array_elements)
@@ -218,7 +268,7 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    void array_kernel_2<T,mem_manager>::
+    void array<T,mem_manager>::
     clear (
     )
     {
@@ -240,11 +290,20 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    const T& array_kernel_2<T,mem_manager>::
+    const T& array<T,mem_manager>::
     operator[] (
         unsigned long pos
     ) const
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( pos < this->size() , 
+            "\tconst T& array::operator[]"
+            << "\n\tpos must < size()" 
+            << "\n\tpos: " << pos 
+            << "\n\tsize(): " << this->size()
+            << "\n\tthis: " << this
+            );
+
         return array_elements[pos];
     }
 
@@ -254,11 +313,20 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    T& array_kernel_2<T,mem_manager>::
+    T& array<T,mem_manager>::
     operator[] (
         unsigned long pos
     ) 
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( pos < this->size() , 
+            "\tT& array::operator[]"
+            << "\n\tpos must be < size()" 
+            << "\n\tpos: " << pos 
+            << "\n\tsize(): " << this->size()
+            << "\n\tthis: " << this
+            );
+
         return array_elements[pos];
     }
 
@@ -268,11 +336,20 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    void array_kernel_2<T,mem_manager>::
+    void array<T,mem_manager>::
     set_size (
         unsigned long size
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(( size <= this->max_size() ),
+            "\tvoid array::set_size"
+            << "\n\tsize must be <= max_size()"
+            << "\n\tsize: " << size 
+            << "\n\tmax size: " << this->max_size()
+            << "\n\tthis: " << this
+            );
+
         reset();
         array_size = size;
         if (size > 0)
@@ -287,7 +364,7 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    unsigned long array_kernel_2<T,mem_manager>::
+    unsigned long array<T,mem_manager>::
     size (
     ) const
     {
@@ -300,7 +377,7 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    void array_kernel_2<T,mem_manager>::
+    void array<T,mem_manager>::
     set_max_size(
         unsigned long max
     )
@@ -340,7 +417,7 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    unsigned long array_kernel_2<T,mem_manager>::
+    unsigned long array<T,mem_manager>::
     max_size (
     ) const
     {
@@ -353,9 +430,9 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    void array_kernel_2<T,mem_manager>::
+    void array<T,mem_manager>::
     swap (
-        array_kernel_2<T,mem_manager>& item
+        array<T,mem_manager>& item
     )
     {
         unsigned long    array_size_temp        = item.array_size;
@@ -386,7 +463,7 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    bool array_kernel_2<T,mem_manager>::
+    bool array<T,mem_manager>::
     at_start (
     ) const
     {
@@ -399,7 +476,7 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    void array_kernel_2<T,mem_manager>::
+    void array<T,mem_manager>::
     reset (
     ) const
     {
@@ -413,7 +490,7 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    bool array_kernel_2<T,mem_manager>::
+    bool array<T,mem_manager>::
     current_element_valid (
     ) const
     {
@@ -426,10 +503,17 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    const T& array_kernel_2<T,mem_manager>::
+    const T& array<T,mem_manager>::
     element (
     ) const
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(this->current_element_valid(),
+            "\tconst T& array::element()"
+            << "\n\tThe current element must be valid if you are to access it."
+            << "\n\tthis: " << this
+            );
+
         return *pos;
     }
 
@@ -439,10 +523,17 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    T& array_kernel_2<T,mem_manager>::
+    T& array<T,mem_manager>::
     element (
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(this->current_element_valid(),
+            "\tT& array::element()"
+            << "\n\tThe current element must be valid if you are to access it."
+            << "\n\tthis: " << this
+            );
+
         return *pos;
     }
 
@@ -452,7 +543,7 @@ namespace dlib
         typename T,
         typename mem_manager
         >
-    bool array_kernel_2<T,mem_manager>::
+    bool array<T,mem_manager>::
     move_next (
     ) const
     {
@@ -481,6 +572,173 @@ namespace dlib
             {
                 return false;
             }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//                              Yet more functions
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename mem_manager
+        >
+    void array<T,mem_manager>::
+    sort (
+    )
+    {
+        if (this->size() > 1)
+        {
+            // call the quick sort function for arrays that is in algs.h
+            dlib::qsort_array(*this,0,this->size()-1);
+        }
+        this->reset();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename mem_manager
+        >
+    void array<T,mem_manager>::
+    resize (
+        unsigned long new_size
+    )
+    {
+        if (this->max_size() < new_size)
+        {
+            array temp;
+            temp.set_max_size(new_size);
+            temp.set_size(new_size);
+            for (unsigned long i = 0; i < this->size(); ++i)
+            {
+                exchange((*this)[i],temp[i]);
+            }
+            temp.swap(*this);
+        }
+        else
+        {
+            this->set_size(new_size);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename mem_manager
+        >
+    T& array<T,mem_manager>::
+    back (
+    ) 
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( this->size() > 0 , 
+                      "\tT& array::back()"
+                      << "\n\tsize() must be bigger than 0" 
+                      << "\n\tsize(): " << this->size()
+                      << "\n\tthis:   " << this
+        );
+
+        return (*this)[this->size()-1];
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename mem_manager
+        >
+    const T& array<T,mem_manager>::
+    back (
+    ) const
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( this->size() > 0 , 
+                      "\tconst T& array::back()"
+                      << "\n\tsize() must be bigger than 0" 
+                      << "\n\tsize(): " << this->size()
+                      << "\n\tthis:   " << this
+        );
+
+        return (*this)[this->size()-1];
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename mem_manager
+        >
+    void array<T,mem_manager>::
+    pop_back (
+        T& item
+    ) 
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( this->size() > 0 , 
+                      "\tvoid array::pop_back()"
+                      << "\n\tsize() must be bigger than 0" 
+                      << "\n\tsize(): " << this->size()
+                      << "\n\tthis:   " << this
+        );
+
+        exchange(item,(*this)[this->size()-1]);
+        this->set_size(this->size()-1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename mem_manager
+        >
+    void array<T,mem_manager>::
+    pop_back (
+    ) 
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( this->size() > 0 , 
+                      "\tvoid array::pop_back()"
+                      << "\n\tsize() must be bigger than 0" 
+                      << "\n\tsize(): " << this->size()
+                      << "\n\tthis:   " << this
+        );
+
+        this->set_size(this->size()-1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename mem_manager
+        >
+    void array<T,mem_manager>::
+    push_back (
+        T& item
+    ) 
+    {
+        if (this->max_size() == this->size())
+        {
+            // double the size of the array
+            array temp;
+            temp.set_max_size(this->size()*2 + 1);
+            temp.set_size(this->size()+1);
+            for (unsigned long i = 0; i < this->size(); ++i)
+            {
+                exchange((*this)[i],temp[i]);
+            }
+            exchange(item,temp[temp.size()-1]);
+            temp.swap(*this);
+        }
+        else
+        {
+            this->set_size(this->size()+1);
+            exchange(item,(*this)[this->size()-1]);
         }
     }
 
