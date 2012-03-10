@@ -638,8 +638,7 @@
          <file>dlib/array.h</file>
          <spec_file>dlib/array/array_kernel_abstract.h</spec_file>
          <description>
-            This object is just like a 1-dimensional C style array and the accessor functions operate 
-            in constant time. 
+             This object represents a 1-Dimensional array of objects.
          </description>
       </component>
       
