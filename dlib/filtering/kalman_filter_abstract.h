@@ -3,6 +3,8 @@
 #undef DLIB_KALMAN_FiLTER_ABSTRACT_H__
 #ifdef DLIB_KALMAN_FiLTER_ABSTRACT_H__
 
+#include "../serialize.h"
+#include "../matrix.h"
 
 namespace dlib
 {
@@ -23,6 +25,14 @@ namespace dlib
                 measurements > 0
 
             WHAT THIS OBJECT REPRESENTS
+                This object implements the Kalman filter, which is a tool for 
+                recursively estimating the state of a process given measurements
+                related to that process.  To use this tool you will have to 
+                be familiar with the workings of the Kalman filter.  An excellent
+                introduction can be found in the paper:
+                    An Introduction to the Kalman Filter
+                    by Greg Welch and Gary Bishop
+
         !*/
 
     public:
@@ -39,125 +49,135 @@ namespace dlib
             - #get_current_estimation_error_covariance() == the identity matrix
         !*/
 
-        void set_observation_model ( const matrix<double,measurements,states>& H_) { H = H_; }
-        void set_transition_model  ( const matrix<double,states,states>& A_) { A = A_; }
-        void set_process_noise     ( const matrix<double,states,states>& Q_) { Q = Q_; }
-        void set_measurement_noise ( const matrix<double,measurements,measurements>& R_) { R = R_; }
-        void set_estimation_error_covariance( const matrix<double,states,states>& P_) { P = P_; }
+        void set_observation_model ( 
+            const matrix<double,measurements,states>& H
+        );
+        /*!
+            ensures
+                - #get_observation_model() == H
+        !*/
+
+        void set_transition_model  ( 
+            const matrix<double,states,states>& A
+        );
+        /*!
+            ensures
+                - #get_transition_model() == A
+        !*/
+
+        void set_process_noise     ( 
+            const matrix<double,states,states>& Q
+        );
+        /*!
+            ensures
+                - #get_process_noise() == Q
+        !*/
+
+        void set_measurement_noise ( 
+            const matrix<double,measurements,measurements>& R
+        );
+        /*!
+            ensures
+                - #get_measurement_noise() == R
+        !*/
+
+        void set_estimation_error_covariance ( 
+            const matrix<double,states,states>& P
+        ); 
+        /*!
+            ensures
+                - #get_current_estimation_error_covariance() == P
+                  (Note that you should only set this before you start filtering
+                  since the Kalman filter will maintain the value of P on its own.
+                  So only set this during initialization unless you are sure you
+                  understand what you are doing.)
+        !*/
 
         const matrix<double,measurements,states>& get_observation_model (
-        ) const { return H; }
+        ) const;
+        /*!
+            ensures
+                - Returns the matrix "H" which relates process states x to measurements z.
+                  The relation is linear, therefore, z = H*x.  That is, multiplying a
+                  state by H gives the measurement you expect to observe for that state.
+        !*/
 
         const matrix<double,states,states>& get_transition_model (
-        ) const { return A; }
+        ) const;
+        /*!
+            ensures
+                - Returns the matrix "A" which determines how process states change over time.
+                  The relation is linear, therefore, given a state vector x, the value you
+                  expect it to have at the next time step is A*x.
+        !*/
 
         const matrix<double,states,states>& get_process_noise (
-        ) const { return Q; }
+        ) const;
+        /*!
+            ensures
+                - returns the process noise covariance matrix.  You can think of this
+                  covariance matrix as a measure of how wrong the assumption of
+                  linear state transitions is. 
+        !*/
 
         const matrix<double,measurements,measurements>& get_measurement_noise (
-        ) const { return R; }
+        ) const;
+        /*!
+            ensures
+                - returns the measurement noise covariance matrix.  That is, when we
+                  measure a state x we only obtain H*x corrupted by Gaussian noise.
+                  The measurement noise is the covariance matrix of this Gaussian
+                  noise which corrupts our measurements.
+        !*/
 
         void update (
-        )
-        {
-            // propagate estimation error covariance forward
-            P = A*P*trans(A) + Q;
+        );
+        /*!
+            ensures
+                - propagates the current state estimate forward in time one
+                  time step.  In particular:
+                    - #get_current_state() == get_predicted_next_state()
+                    - #get_predicted_next_state() == get_transition_model()*get_current_state()
+                    - #get_current_estimation_error_covariance() == the propagated value of this covariance matrix
+        !*/
 
-            // propagate state forward
-            x = xb;
-            xb = A*x;
-        }
-
-        void update (const matrix<double,measurements,1>& z)
-        {
-            // propagate estimation error covariance forward
-            P = A*P*trans(A) + Q;
-
-            // compute Kalman gain matrix
-            const matrix<double,states,measurements> K = P*trans(H)*pinv(H*P*trans(H) + R);
-
-            if (got_first_meas)
-            {
-                const matrix<double,measurements,1> res = z - H*xb;
-                // correct the current state estimate
-                x = xb + K*res;
-            }
-            else
-            {
-                // Since we don't have a previous state estimate at the start of filtering,
-                // we will just set the current state to whatever is indicated by the measurement
-                x = pinv(H)*z; 
-                got_first_meas = true;
-            }
-
-            // propagate state forward in time
-            xb = A*x;
-
-            // update estimation error covariance since we got a measurement.
-            P = (identity_matrix<double,states>() - K*H)*P;
-        }
-
+        void update (
+            const matrix<double,measurements,1>& z
+        );
+        /*!
+            ensures
+                - propagates the current state estimate forward in time one time step.  
+                  Also applies a correction based on the given measurement z.  In particular:
+                    - #get_current_state(), #get_predicted_next_state(), and
+                      #get_current_estimation_error_covariance() are updated using the
+                      Kalman filter method based on the new measurement in z.
+        !*/
 
         const matrix<double,states,1>& get_current_state(
-        ) const
-        {
-            return x;
-        }
+        ) const;
+        /*!
+            ensures
+                - returns the current estimate of the state of the process.  This
+                  estimate is based on all the measurements supplied to the update()
+                  method.
+        !*/
 
         const matrix<double,states,1>& get_predicted_next_state(
-        ) const
-        {
-            return xb;
-        }
+        ) const;
+        /*!
+            ensures
+                - returns the next expected value of the process state.  
+                - Specifically, returns get_transition_model()*get_current_state()
+                  
+        !*/
 
         const matrix<double,states,states>& get_current_estimation_error_covariance(
-        ) const
-        {
-            return P;
-        }
-
-        friend inline void serialize(const kalman_filter& item, std::ostream& out)
-        {
-            int version = 1;
-            serialize(version, out);
-            serialize(item.got_first_meas, out);
-            serialize(item.x, out);
-            serialize(item.xb, out);
-            serialize(item.P, out);
-            serialize(item.H, out);
-            serialize(item.A, out);
-            serialize(item.Q, out);
-            serialize(item.R, out);
-        }
-
-        friend inline void deserialize(kalman_filter& item, std::istream& in)
-        {
-            int version = 0;
-            deserialize(version, in);
-            if (version != 1)
-                throw dlib::serialization_error("Unknown version number found while deserializing kalman_filter object.");
-
-            deserialize(item.got_first_meas, in);
-            deserialize(item.x, in);
-            deserialize(item.xb, in);
-            deserialize(item.P, in);
-            deserialize(item.H, in);
-            deserialize(item.A, in);
-            deserialize(item.Q, in);
-            deserialize(item.R, in);
-        }
-
-    private:
-
-        bool got_first_meas;
-        matrix<double,states,1> x, xb;
-        matrix<double,states,states> P;
-
-        matrix<double,measurements,states> H;
-        matrix<double,states,states> A;
-        matrix<double,states,states> Q;
-        matrix<double,measurements,measurements> R;
-
+        ) const;
+        /*!
+            ensures
+                - returns the current state error estimation covariance matrix.  
+                  This matrix captures our uncertainty about the value of get_current_state().
+        !*/
 
     };
 
