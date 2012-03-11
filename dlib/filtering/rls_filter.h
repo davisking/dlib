@@ -137,11 +137,14 @@ namespace dlib
             // Don't bother with the filter until we have seen two samples
             if (count >= 2)
             {
+                // predict next state
                 for (long i = 0; i < z.size(); ++i)
                     next(i) = filter(vector_to_matrix(data[i]));
             }
             else
             {
+                // Use current measurement as the next state prediction
+                // since we don't know any better at this point.
                 ++count;
                 next = matrix_cast<double>(z);
             }
