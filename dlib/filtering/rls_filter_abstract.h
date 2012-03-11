@@ -26,7 +26,7 @@ namespace dlib
                 determine how to best combine the contents of the history buffer to
                 predict each point.  Therefore, each time update() is called with
                 a point, recursive least squares updates the linear combination weights,
-                and then we insert the point into the history buffer.  After that, the 
+                and then it inserts the point into the history buffer.  After that, the 
                 next prediction is based on these updated weights and the current history 
                 buffer.
         !*/
@@ -38,8 +38,8 @@ namespace dlib
         /*!
             ensures
                 - #get_window_size() == 5
-                - #get_c() == 100
                 - #get_forget_factor() == 0.8
+                - #get_c() == 100
                 - #get_predicted_next_state().size() == 0
         !*/
 
@@ -84,11 +84,11 @@ namespace dlib
                       linearly combining the history buffer into a prediction of the next point.
                 - else
                     - Old calls to update(z) are eventually forgotten.  That is, the smaller
-                      the forget factor, the less the recursive least squares algorithm will 
-                      care about attempting to find linear combination weights which would have
-                      make good predictions on old points.  It will care more about fitting 
-                      recent points.  This is appropriate if the statistical properties of
-                      the time series we are modeling are not constant.
+                      the forget factor, the less recursive least squares will care about 
+                      attempting to find linear combination weights which would have make 
+                      good predictions on old points.  It will care more about fitting recent 
+                      points.  This is appropriate if the statistical properties of the time 
+                      series we are modeling are not constant.
         !*/
 
         unsigned long get_window_size (
@@ -104,7 +104,7 @@ namespace dlib
         /*!
             ensures
                 - Propagates the prediction forward in time.
-                - In particular, the value in #get_predicted_next_state() is inserted
+                - In particular, the value in get_predicted_next_state() is inserted
                   into the history buffer and then the next prediction is estimated 
                   based on this updated history buffer.
                 - #get_predicted_next_state() == the prediction for the next point
@@ -130,6 +130,7 @@ namespace dlib
                   these updated weights and history buffer.
                 - #get_predicted_next_state() == the prediction for the next point
                   in the time series.
+                - #get_predicted_next_state().size() == z.size()
         !*/
 
         const matrix<double,0,1>& get_predicted_next_state(
