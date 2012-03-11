@@ -43,6 +43,17 @@ namespace dlib
             double C = 100
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 < forget_factor && forget_factor <= 1 &&
+                        0 < C && size_ >= 2,
+                "\t rls_filter::rls_filter()"
+                << "\n\t invalid arguments were given to this function"
+                << "\n\t forget_factor: " << forget_factor 
+                << "\n\t C:     " << C 
+                << "\n\t size_: " << size_
+                << "\n\t this: " << this
+                );
+
             size = size_;
             count = 0;
             filter = rls(forget_factor, C);
@@ -89,6 +100,18 @@ namespace dlib
             const matrix_exp<EXP>& z
         )
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_col_vector(z) == true &&
+                        z.size() != 0 &&
+                        (get_predicted_next_state().size()==0 || z.size()==get_predicted_next_state().size()),
+                "\t void rls_filter::update(z)"
+                << "\n\t invalid arguments were given to this function"
+                << "\n\t is_col_vector(z): " << is_col_vector(z) 
+                << "\n\t z.size():         " << z.size()
+                << "\n\t get_predicted_next_state().size(): " << get_predicted_next_state().size()
+                << "\n\t this: " << this
+                );
+
             // initialize data if necessary 
             if (data.size() == 0)
             {
