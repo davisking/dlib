@@ -27,6 +27,8 @@
          <term file="algorithms.html" name="shrink_rect"/>
          <term file="algorithms.html" name="grow_rect"/>
          <term file="algorithms.html" name="dcenter"/>
+         <term file="algorithms.html" name="kalman_filter"/>
+         <term file="algorithms.html" name="rls_filter"/>
 
 
          <term file="dlib/optimization/optimization_abstract.h.html" name="central_differences"/>

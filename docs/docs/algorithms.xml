@@ -122,6 +122,12 @@
          <item>projection_hash</item> 
          <item>create_random_projection_hash</item> 
       </section>
+
+      <section>
+         <name>Filtering</name>
+         <item>kalman_filter</item> 
+         <item>rls_filter</item> 
+      </section>
     </top>  
    </menu>
 
@@ -220,6 +226,41 @@
             This function takes a block of memory and returns a 128bit hash.  The 
             hashing algorithm used is Austin Appleby's excellent 
             <a href="http://code.google.com/p/smhasher/">MurmurHash3</a>. 
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>kalman_filter</name>
+         <file>dlib/filtering.h</file>
+         <spec_file>dlib/filtering/kalman_filter_abstract.h</spec_file>
+         <description>
+                This object implements the Kalman filter, which is a tool for 
+                recursively estimating the state of a process given measurements
+                related to that process.  To use this tool you will have to 
+                be familiar with the workings of the Kalman filter.  An excellent
+                introduction can be found in the paper:
+                <blockquote>
+                    An Introduction to the Kalman Filter
+                    by Greg Welch and Gary Bishop
+                </blockquote>
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rls_filter</name>
+         <file>dlib/filtering.h</file>
+         <spec_file>dlib/filtering/rls_filter_abstract.h</spec_file>
+         <description>
+            This object is a tool for doing time series prediction using 
+            linear <a href="ml.html#rls">recursive least squares</a>.  In particular,
+            this object takes a sequence of points from the user and, at each
+            step, attempts to predict the value of the next point.
          </description>
          
       </component>
