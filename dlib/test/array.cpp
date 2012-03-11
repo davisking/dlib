@@ -35,7 +35,7 @@ namespace
     {        
         dlib::rand rnd;
 
-        DLIB_TEST(is_array<array>::value == true);
+        DLIB_TEST(dlib::is_array<array>::value == true);
 
         array a1, a2;
 
@@ -608,7 +608,7 @@ namespace
         DLIB_TEST(a.size() == 6);
         DLIB_TEST(a[5].whatever == 99);
 
-        DLIB_TEST(is_array<array<stuff> >::value == true);
+        DLIB_TEST(dlib::is_array<array<stuff> >::value == true);
     }
 
 
@@ -631,7 +631,7 @@ namespace
             print_spinner();
             array_expand_test<array<unsigned long> >();
 
-            DLIB_TEST(is_array<int>::value == false);
+            DLIB_TEST(dlib::is_array<int>::value == false);
         }
     } a;
 
