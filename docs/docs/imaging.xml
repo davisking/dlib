@@ -172,6 +172,7 @@
          <item>interpolate_quadratic</item> 
          <item>transform_image</item> 
          <item>rotate_image</item> 
+         <item>resize_image</item> 
          <item>flip_image_left_right</item> 
          <item>flip_image_up_down</item> 
       </section>
@@ -1228,6 +1229,17 @@
          <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
          <description>        
             This is a routine for rotating an image. 
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>resize_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This is a routine capable of resizing or stretching an image.
          </description>
       </component>
 
