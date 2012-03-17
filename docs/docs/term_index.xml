@@ -1074,6 +1074,7 @@
          <term file="imaging.html" name="transform_image"/>
          <term file="imaging.html" name="rotate_image"/>
          <term file="imaging.html" name="resize_image"/>
+         <term file="imaging.html" name="pyramid_up"/>
          <term file="imaging.html" name="flip_image_left_right"/>
          <term file="imaging.html" name="flip_image_up_down"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="black_background"/>

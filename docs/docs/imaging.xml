@@ -161,6 +161,7 @@
 
       <section>
          <name>Scaling and Rotating</name>
+         <item>pyramid_up</item> 
          <item>pyramid_down</item> 
          <item>pyramid_down_3_2</item> 
          <item>pyramid_down_4_3</item> 
@@ -1229,6 +1230,20 @@
          <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
          <description>        
             This is a routine for rotating an image. 
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>pyramid_up</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This routine upsamples an image.  In particular, it takes one of the
+            <a href="#pyramid_down">pyramid_down</a> objects as an argument and
+            performs an upsampling which is the inverse of the supplied pyramid_down
+            object.
          </description>
       </component>
 
