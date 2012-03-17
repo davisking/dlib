@@ -565,6 +565,104 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        class helper_pyramid_up 
+        {
+        public:
+            helper_pyramid_up(
+                double x_scale_,
+                double y_scale_,
+                const dlib::vector<double,2> offset_
+            ):
+                x_scale(x_scale_),
+                y_scale(y_scale_),
+                offset(offset_)
+            {}
+
+            dlib::vector<double,2> operator() (
+                const dlib::vector<double,2>& p
+            ) const
+            {
+                return dlib::vector<double,2>((p.x()-offset.x())*x_scale, 
+                                              (p.y()-offset.y())*y_scale);
+            }
+
+        private:
+            const double x_scale;
+            const double y_scale;
+            const dlib::vector<double,2> offset;
+        };
+    }
+
+    template <
+        typename image_type,
+        typename pyramid_type,
+        typename interpolation_type
+        >
+    void pyramid_up (
+        const image_type& in_img,
+        image_type& out_img,
+        const pyramid_type& pyr,
+        unsigned int levels,
+        const interpolation_type& interp
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void pyramid_up()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
+        if (in_img.size() == 0)
+        {
+            out_img.clear();
+            return;
+        }
+
+        if (levels == 0)
+        {
+            assign_image(out_img, in_img);
+            return;
+        }
+
+        rectangle rect = get_rect(in_img);
+        rectangle uprect = pyr.rect_up(rect,levels);
+        out_img.set_size(uprect.bottom()+1, uprect.right()+1);
+
+        const double x_scale = (rect.width() -1)/(double)(uprect.width() -1);
+        const double y_scale = (rect.height()-1)/(double)(uprect.height()-1);
+        transform_image(in_img, out_img, interp, 
+                        dlib::impl::helper_pyramid_up(x_scale,y_scale,  uprect.tl_corner()));
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type,
+        typename pyramid_type
+        >
+    void pyramid_up (
+        const image_type& in_img,
+        image_type& out_img,
+        const pyramid_type& pyr,
+        unsigned int levels = 1
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void pyramid_up()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
+        pyramid_up(in_img, out_img, pyr, levels, interpolate_quadratic());
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_INTERPOlATION__

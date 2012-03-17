@@ -411,6 +411,65 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type,
+        typename pyramid_type,
+        typename interpolation_type
+        >
+    void pyramid_up (
+        const image_type& in_img,
+        image_type& out_img,
+        const pyramid_type& pyr,
+        unsigned int levels,
+        const interpolation_type& interp
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pyramid_type == a type compatible with the image pyramid objects defined 
+              in dlib/image_transforms/image_pyramid_abstract.h
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              interpolate_quadratic, or a type with a compatible interface.
+            - is_same_object(in_img, out_img) == false
+        ensures
+            - This function inverts the downsampling transformation performed by pyr().
+              In particular, it attempts to make an image, out_img, which would result
+              in in_img when downsampled with pyr().  
+            - #out_img == An upsampled copy of in_img.  In particular, downsampling
+              #out_img levels times with pyr() should result in a final image which
+              looks like in_img.
+            - uses the supplied interpolation routine interp to perform the necessary
+              pixel interpolation.
+            - Note that downsampling an image with pyr() and then upsampling it with 
+              pyramid_up() will not necessarily result in a final image which is
+              the same size as the original.  This is because the exact size of the
+              original image cannot be determined based on the downsampled image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type,
+        typename pyramid_type
+        >
+    void pyramid_up (
+        const image_type& in_img,
+        image_type& out_img,
+        const pyramid_type& pyr,
+        unsigned int levels = 1
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pyramid_type == a type compatible with the image pyramid objects defined 
+              in dlib/image_transforms/image_pyramid_abstract.h
+            - is_same_object(in_img, out_img) == false
+        ensures
+            - performs: pyramid_up(in_img, out_img, pyr, levels, interpolate_quadratic());
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_INTERPOlATION_ABSTRACT_
