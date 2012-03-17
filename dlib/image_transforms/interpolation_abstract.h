@@ -319,6 +319,58 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type,
+        typename interpolation_type
+        >
+    void resize_image (
+        const image_type& in_img,
+        image_type& out_img,
+        const interpolation_type& interp
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              interpolate_quadratic, or a type with a compatible interface.
+            - is_same_object(in_img, out_img) == false
+        ensures
+            - #out_img == A copy of in_img which has been stretched so that it 
+              fits exactly into out_img.   
+            - The size of out_img is not modified.  I.e. 
+                - #out_img.nr() == out_img.nr()
+                - #out_img.nc() == out_img.nc()
+            - uses the supplied interpolation routine interp to perform the necessary
+              pixel interpolation.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+
+    template <
+        typename image_type
+        >
+    void resize_image (
+        const image_type& in_img,
+        image_type& out_img
+    );
+    /*!
+        requires
+            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type>::has_alpha == false
+            - is_same_object(in_img, out_img) == false
+        ensures
+            - #out_img == A copy of in_img which has been stretched so that it 
+              fits exactly into out_img.   
+            - The size of out_img is not modified.  I.e. 
+                - #out_img.nr() == out_img.nr()
+                - #out_img.nc() == out_img.nc()
+            - uses the interpolate_quadratic object to perform the necessary pixel 
+              interpolation.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type
         >
     void flip_image_left_right (

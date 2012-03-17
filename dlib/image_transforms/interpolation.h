@@ -433,7 +433,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-
     template <
         typename image_type
         >
@@ -451,6 +450,77 @@ namespace dlib
             );
 
         rotate_image(in_img, out_img, angle, interpolate_quadratic());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        class helper_resize_image 
+        {
+        public:
+            helper_resize_image(
+                double x_scale_,
+                double y_scale_
+            ):
+                x_scale(x_scale_),
+                y_scale(y_scale_)
+            {}
+
+            dlib::vector<double,2> operator() (
+                const dlib::vector<double,2>& p
+            ) const
+            {
+                return dlib::vector<double,2>(p.x()*x_scale, p.y()*y_scale);
+            }
+
+        private:
+            const double x_scale;
+            const double y_scale;
+        };
+    }
+
+    template <
+        typename image_type,
+        typename interpolation_type
+        >
+    void resize_image (
+        const image_type& in_img,
+        image_type& out_img,
+        const interpolation_type& interp
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void resize_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
+        const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
+        const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
+        transform_image(in_img, out_img, interp, 
+                        dlib::impl::helper_resize_image(x_scale,y_scale));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void resize_image (
+        const image_type& in_img,
+        image_type& out_img
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( is_same_object(in_img, out_img) == false ,
+            "\t void resize_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
+            );
+
+        resize_image(in_img, out_img, interpolate_quadratic());
     }
 
 // ----------------------------------------------------------------------------------------
