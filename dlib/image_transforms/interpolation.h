@@ -629,10 +629,15 @@ namespace dlib
 
         rectangle rect = get_rect(in_img);
         rectangle uprect = pyr.rect_up(rect,levels);
+        if (uprect.is_empty())
+        {
+            out_img.clear();
+            return;
+        }
         out_img.set_size(uprect.bottom()+1, uprect.right()+1);
 
-        const double x_scale = (rect.width() -1)/(double)(uprect.width() -1);
-        const double y_scale = (rect.height()-1)/(double)(uprect.height()-1);
+        const double x_scale = (rect.width() -1)/(double)std::max<long>(1,(uprect.width() -1));
+        const double y_scale = (rect.height()-1)/(double)std::max<long>(1,(uprect.height()-1));
         transform_image(in_img, out_img, interp, 
                         dlib::impl::helper_pyramid_up(x_scale,y_scale,  uprect.tl_corner()));
 
