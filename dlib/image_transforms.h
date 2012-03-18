@@ -13,7 +13,7 @@
 #include "image_transforms/integral_image.h"
 #include "image_transforms/image_pyramid.h"
 #include "image_transforms/label_connected_blobs.h"
-#include "image_transforms/randomly_color_image.h"
+#include "image_transforms/colormaps.h"
 #include "image_transforms/segment_image.h"
 #include "image_transforms/interpolation.h"
 
