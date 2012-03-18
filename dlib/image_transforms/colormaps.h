@@ -3,7 +3,7 @@
 #ifndef DLIB_RANDOMLY_COlOR_IMAGE_H__
 #define DLIB_RANDOMLY_COlOR_IMAGE_H__
 
-#include "randomly_color_image_abstract.h"
+#include "colormaps_abstract.h"
 #include "../hash.h"
 #include "../pixel.h"
 #include "../matrix.h"
@@ -61,6 +61,68 @@ namespace dlib
     {
         typedef op_randomly_color_image<image_type> op;
         return matrix_op<op>(op(img));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    struct op_heatmap : does_not_alias 
+    {
+        op_heatmap( 
+            const T& img_,
+            const double max_val_,
+            const double min_val_
+            ) : img(img_), max_val(max_val_), min_val(min_val_){}
+
+        const T& img;
+
+        const double max_val;
+        const double min_val;
+
+        const static long cost = 7;
+        const static long NR = 0;
+        const static long NC = 0;
+        typedef rgb_pixel type;
+        typedef const rgb_pixel const_ret_type;
+        typedef typename T::mem_manager_type mem_manager_type;
+        typedef row_major_layout layout_type;
+
+        const_ret_type apply (long r, long c ) const 
+        { 
+            // scale the gray value into the range [0, 1]
+            const double gray = put_in_range(0, 1, (get_pixel_intensity(img[r][c]) - min_val)/(max_val-min_val));
+            rgb_pixel pix(0,0,0);
+
+            pix.red = static_cast<unsigned char>(std::min(gray/0.4,1.0)*255 + 0.5);
+
+            if (gray > 0.4)
+            {
+                pix.green = static_cast<unsigned char>(std::min((gray-0.4)/0.4,1.0)*255 + 0.5);
+            }
+            if (gray > 0.8)
+            {
+                pix.blue = static_cast<unsigned char>(std::min((gray-0.8)/0.2,1.0)*255 + 0.5);
+            }
+
+            return pix;
+        }
+
+        long nr () const { return img.nr(); }
+        long nc () const { return img.nc(); }
+    }; 
+
+    template <
+        typename image_type
+        >
+    const matrix_op<op_heatmap<image_type> >  
+    heatmap (
+        const image_type& img,
+        double max_val,
+        double min_val = 0
+    )
+    {
+        typedef op_heatmap<image_type> op;
+        return matrix_op<op>(op(img,max_val,min_val));
     }
 
 // ----------------------------------------------------------------------------------------
