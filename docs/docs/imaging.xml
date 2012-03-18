@@ -585,7 +585,7 @@
       <component>
          <name>randomly_color_image</name>
          <file>dlib/image_transforms.h</file>
-         <spec_file link="true">dlib/image_transforms/randomly_color_image_abstract.h</spec_file>
+         <spec_file link="true">dlib/image_transforms/colormaps_abstract.h</spec_file>
          <description>
               Randomly generates a mapping from gray level pixel values
               to the RGB pixel space and then uses this mapping to create
