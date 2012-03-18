@@ -997,6 +997,7 @@
          <term link="dlib/image_transforms/thresholding_abstract.h.html" name="off_pixel"/>
     
 
+         <term file="imaging.html" name="heatmap"/>
          <term file="imaging.html" name="randomly_color_image"/>
          <term file="imaging.html" name="assign_image"/>
          <term file="imaging.html" name="assign_image_scaled"/>

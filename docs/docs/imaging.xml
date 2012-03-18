@@ -177,12 +177,17 @@
          <item>flip_image_left_right</item> 
          <item>flip_image_up_down</item> 
       </section>
+
+      <section>
+         <name>Colormaps</name>
+         <item>randomly_color_image</item>
+         <item>heatmap</item>
+      </section>
  
       <section>
          <name>Miscellaneous</name>
 
          <item>cv_image</item>
-         <item>randomly_color_image</item>
 
          <item>draw_line</item> 
          <item>fill_rect</item> 
@@ -581,6 +586,21 @@
             
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>heatmap</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/colormaps_abstract.h</spec_file>
+         <description>
+            Converts a grayscale image into a heatmap.  This is useful if you want
+            to display a grayscale image with more than 256 values.   
+         </description>
+         <examples>
+            <example>image_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
       
       <component>
          <name>randomly_color_image</name>
