@@ -63,12 +63,17 @@ int main(int argc, char** argv)
         // the window by holding CTRL and scrolling the mouse wheel)
         image_window my_window(edge_image);
 
+        // We can also easily display the edge_image as a heatmap like so.
+        image_window win_hot(heatmap(edge_image, 255));
+        win_hot.set_title("heatmap version of edge image");
+
         // also make a window to display the original image
         image_window my_window2(img);
 
-        // wait until the user closes both windows before we let the program 
+        // wait until the user closes the windows before we let the program 
         // terminate.
         my_window.wait_until_closed();
+        win_hot.wait_until_closed();
         my_window2.wait_until_closed();
     }
     catch (exception& e)
