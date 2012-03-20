@@ -165,11 +165,11 @@ int main()
         // we add detection templates which are capable of matching all the output boxes we want to learn.
         // For example, if object_locations contained a rectangle with a height to width ratio of 10 but
         // we only added square detection templates then it would be impossible to detect this non-square
-        // rectangle.  The setup_grid_detection_templates() routine will take care of this for us by looking
-        // at the contents of object_locations and automatically picking an appropriate set.  Also, the final 
-        // arguments indicate that we want our detection templates to have 4 enveloping rectangles laid out 
-        // in a 2x2 regular grid inside each sliding window.
-        setup_grid_detection_templates(scanner, object_locations, 2, 2);
+        // rectangle.  The setup_grid_detection_templates_verbose() routine will take care of this for us by 
+        // looking at the contents of object_locations and automatically picking an appropriate set.  Also, 
+        // the final arguments indicate that we want our detection templates to have 4 enveloping rectangles 
+        // laid out in a 2x2 regular grid inside each sliding window.
+        setup_grid_detection_templates_verbose(scanner, object_locations, 2, 2);
 
 
         // Now that we have defined the kind of sliding window classifier system we want and stored 
