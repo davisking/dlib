@@ -128,11 +128,20 @@ namespace dlib
 
         typedef std::list<std::pair<unsigned long, rectangle> > list_type;
 
+        unsigned long max_area = 0;
+
         // copy rects into sorted_rects and sort them in order of increasing area
         list_type sorted_rects;
         for (unsigned long i = 0; i < rects.size(); ++i)
+        {
+            max_area = std::max(rects[i].area(), max_area);
             sorted_rects.push_back(std::make_pair(rects[i].area(), rects[i]));
+        }
         sorted_rects.sort(dlib::impl::compare_first);
+
+        // Make sure this area value is comfortably larger than all the 
+        // rectangles' areas.
+        max_area = 3*max_area + 100;
 
         std::vector<rectangle> object_boxes;
 
@@ -142,8 +151,11 @@ namespace dlib
             sorted_rects.pop_front();
             object_boxes.push_back(centered_rect(point(0,0), cur.width(), cur.height()));
 
-            // remove all the rectangles which match cur
-            for (unsigned long itr = 0; itr < scanner.get_max_pyramid_levels(); ++itr)
+            // Scale cur up the image pyramid and remove any rectangles which match.
+            // But also stop when cur gets large enough to not match anything.
+            for (unsigned long itr = 0; 
+                 itr < scanner.get_max_pyramid_levels() && cur.area() < max_area; 
+                 ++itr)
             {
                 list_type::iterator i = sorted_rects.begin();
                 while (i != sorted_rects.end())
