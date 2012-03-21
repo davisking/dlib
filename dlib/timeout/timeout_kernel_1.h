@@ -10,6 +10,14 @@
 #include "../uintn.h"
 #include "../timer.h"
 
+#ifdef _MSC_VER
+// this is to disable the "'this' : used in base member initializer list"
+// warning you get from some of the GUI objects since all the objects
+// require that their parent class be passed into their constructor. 
+// In this case though it is totally safe so it is ok to disable this warning.
+#pragma warning(disable : 4355)
+#endif // _MSC_VER
+
 namespace dlib
 {
 
