@@ -218,6 +218,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
 
       <section>
          <name>Data IO</name>
+         <item>load_image_dataset_metadata</item> 
+         <item>save_image_dataset_metadata</item> 
          <item>load_libsvm_formatted_data</item> 
          <item>save_libsvm_formatted_data</item> 
          <item>sparse_to_dense</item>
@@ -1707,6 +1709,46 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>rank_features_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>load_image_dataset_metadata</name>
+         <file>dlib/data_io.h</file>
+         <spec_file link="true">dlib/data_io/image_dataset_metadata.h</spec_file>
+         <description>
+            dlib comes with a graphical tool for annotating images with
+            labeled rectangles.  The tool produces an XML file containing these
+            annotations.  Therefore, load_image_dataset_metadata() is a routine
+            for parsing these XML files.
+            <p>
+               The graphical annotation tool can be found in the tools/imglab
+               folder and compiled with the following commands.
+<code_box>
+cd tools/imglab
+mkdir build
+cmake ..
+make
+</code_box>
+            </p>
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>save_image_dataset_metadata</name>
+         <file>dlib/data_io.h</file>
+         <spec_file link="true">dlib/data_io/image_dataset_metadata.h</spec_file>
+         <description>
+            This routine is a tool for saving labeled image metadata to an 
+            XML file.  In particular, this routine saves the metadata into a
+            form which can be read by the <a href="#load_image_dataset_metadata">load_image_dataset_metadata</a>
+            routine.
+         </description>
                                  
       </component>
       

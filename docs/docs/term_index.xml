@@ -180,6 +180,12 @@
 
          <term file="dlib/svm/pegasos_abstract.h.html" name="replicate_settings"/>
          <term file="ml.html" name="mlp"/>
+         <term file="dlib/data_io/image_dataset_metadata.h.html" name="image"/>
+         <term file="dlib/data_io/image_dataset_metadata.h.html" name="box"/>
+         <term file="dlib/data_io/image_dataset_metadata.h.html" name="dataset"/>
+         <term link="ml.html#load_image_dataset_metadata" name="image_dataset_metadata"/>
+         <term file="ml.html" name="load_image_dataset_metadata"/>
+         <term file="ml.html" name="save_image_dataset_metadata"/>
          <term file="ml.html" name="load_libsvm_formatted_data"/>
          <term file="ml.html" name="save_libsvm_formatted_data"/>
          <term file="ml.html" name="sparse_to_dense"/>
