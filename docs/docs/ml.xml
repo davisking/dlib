@@ -1723,16 +1723,6 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             labeled rectangles.  The tool produces an XML file containing these
             annotations.  Therefore, load_image_dataset_metadata() is a routine
             for parsing these XML files.
-            <p>
-               The graphical annotation tool can be found in the tools/imglab
-               folder and compiled with the following commands.
-<code_box>
-cd tools/imglab
-mkdir build
-cmake ..
-make
-</code_box>
-            </p>
          </description>
                                  
       </component>
