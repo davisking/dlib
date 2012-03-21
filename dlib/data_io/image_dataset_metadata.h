@@ -13,8 +13,20 @@ namespace dlib
 {
     namespace image_dataset_metadata
     {
+
+    // ------------------------------------------------------------------------------------
+
         struct box
         {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents an annotated rectangular area of an image.  
+                    It is typically used to mark the location of an object such as a 
+                    person, car, etc.
+
+                    The main variable of interest is rect.  It gives the location of 
+                    the box.  All the other variables are optional.
+            !*/
             box(
             ) : 
                 head(-0xFFFF,-0xFFFF), 
@@ -33,11 +45,27 @@ namespace dlib
             bool occluded;
 
             bool has_head() const { return head != point(-0xFFFF,-0xFFFF); }
+            /*!
+                ensures
+                    - returns true if head metadata is present and false otherwise.
+            !*/
+
             bool has_label() const { return label.size() != 0; }
+            /*!
+                ensures
+                    - returns true if label metadata is present and false otherwise.
+            !*/
         };
+
+    // ------------------------------------------------------------------------------------
 
         struct image
         {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents an annotated image.   
+            !*/
+
             image() {}
             image(const std::string& f) : filename(f) {}
 
@@ -45,8 +73,16 @@ namespace dlib
             std::vector<box> boxes;
         };
 
+    // ------------------------------------------------------------------------------------
+
         struct dataset
         {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents a labeled set of images.  In particular, it
+                    contains the filename for each image as well as annotated boxes.
+            !*/
+
             std::vector<image> images;
             std::string comment;
             std::string name;
@@ -58,6 +94,15 @@ namespace dlib
             const dataset& meta,
             const std::string& filename
         );
+        /*!
+            ensures
+                - Writes the contents of the meta object to a file with the given
+                  filename.  The file will be in an XML format.
+            throws
+                - dlib::error 
+                  This exception is thrown if there is an error which prevents
+                  this function from succeeding.
+        !*/
 
     // ------------------------------------------------------------------------------------
 
@@ -65,6 +110,16 @@ namespace dlib
             dataset& meta,
             const std::string& filename
         );
+        /*!
+            ensures
+                - Attempts to interpret filename as a file containing XML formatted data
+                  as produced by the save_image_dataset_metadata() function.  Then
+                  meta is loaded with the contents of the file.
+            throws
+                - dlib::error 
+                  This exception is thrown if there is an error which prevents
+                  this function from succeeding.
+        !*/
 
     // ------------------------------------------------------------------------------------
 
