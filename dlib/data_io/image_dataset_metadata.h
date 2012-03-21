@@ -5,7 +5,7 @@
 
 #include <string>
 #include <vector>
-#include <dlib/geometry.h>
+#include "../geometry.h"
 
 // ----------------------------------------------------------------------------------------
 

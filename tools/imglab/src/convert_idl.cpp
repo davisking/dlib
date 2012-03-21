@@ -1,6 +1,6 @@
 
 #include "convert_idl.h"
-#include "image_dataset_metadata.h"
+#include "dlib/data_io.h"
 #include <iostream>
 #include <string>
 #include <dlib/dir_nav.h>

@@ -15,6 +15,7 @@
 #include "../md5/md5_kernel_1.cpp"
 #include "../tokenizer/tokenizer_kernel_1.cpp"
 #include "../unicode/unicode.cpp"
+#include "../data_io/image_dataset_metadata.cpp"
 
 #ifndef DLIB_ISO_CPP_ONLY
 // Code that depends on OS specific APIs

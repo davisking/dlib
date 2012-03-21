@@ -1,6 +1,6 @@
 
 #include "convert_pascal_xml.h"
-#include "image_dataset_metadata.h"
+#include "dlib/data_io.h"
 #include <iostream>
 #include <dlib/xml_parser.h>
 #include <string>

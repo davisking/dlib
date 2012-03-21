@@ -7,10 +7,10 @@
 
 #include <fstream>
 #include <sstream>
-#include <dlib/compress_stream.h>
-#include <dlib/base64.h>
-#include <dlib/xml_parser.h>
-#include <dlib/string.h>
+#include "../compress_stream.h"
+#include "../base64.h"
+#include "../xml_parser.h"
+#include "../string.h"
 
 // ----------------------------------------------------------------------------------------
 

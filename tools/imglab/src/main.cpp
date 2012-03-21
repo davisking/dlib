@@ -1,5 +1,5 @@
 
-#include "image_dataset_metadata.h"
+#include "dlib/data_io.h"
 #include "metadata_editor.h"
 #include "convert_pascal_xml.h"
 #include "convert_pascal_v1.h"
