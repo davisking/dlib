@@ -35,7 +35,7 @@
     A window will appear showing all the images.  You can use the up and down arrow 
     keys to cycle though the images and the mouse to label objects.  In particular, 
     holding the shift key, left clicking, and dragging the mouse will allow you to 
-    draw boxes around the objects you which to detect.  So next label all the objects 
+    draw boxes around the objects you wish to detect.  So next, label all the objects 
     with boxes.  Note that it is important to label all the objects since any object 
     not labeled is implicitly assumed to be not an object we should detect.
 
@@ -56,7 +56,7 @@
 
 
     There are also a number of other useful command line options in the current
-    example program which you can explore. 
+    example program which you can explore below. 
 */
 
 
