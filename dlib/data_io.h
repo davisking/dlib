@@ -6,6 +6,10 @@
 #include "data_io/libsvm_io.h"
 #include "data_io/image_dataset_metadata.h"
 
+#ifndef DLIB_ISO_CPP_ONLY
+#include "data_io/load_image_dataset.h"
+#endif
+
 #endif // DLIB_DATA_Io_HEADER
 
 
