@@ -58,6 +58,9 @@ Other:
    - Turned the array object into a single implementation object.  Now arrays 
      can be created using the normal array&lt;type&gt; obj; syntax.  Additionally, 
      all extensions were merged into the array object. 
+   - Added an example program which better documents how to create training
+     data for the object detection tools as well as how this data can be used.
+     See the train_object_detector.cpp example for details.
 
 </current>
 
