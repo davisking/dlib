@@ -46,11 +46,11 @@
     and observing that the boxes are present.
 
     Returning to the present example program, we can now issue the command 
-        ./object_detector_ex_2 -tv mydataset.xml
+        ./train_object_detector -tv mydataset.xml
     which will train an object detection model based on our labeled data.  The model 
     will be saved to the file object_detector.svm.  Once this has finished we can use 
     the object detector to locate objects in new images with a command like
-        ./object_detector_ex_2 some_image.png
+        ./train_object_detector some_image.png
     This command will display some_image.png in a window and any detected objects will
     be indicated by a red box.
 
@@ -126,7 +126,7 @@ int main(int argc, char** argv)
 
         if (parser.option("h"))
         {
-            cout << "Usage: object_detector_ex_2 [options] <image dataset file|image file>\n";
+            cout << "Usage: train_object_detector [options] <image dataset file|image file>\n";
             parser.print_options(cout); 
                                        
             cout << endl;
