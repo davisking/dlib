@@ -219,6 +219,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       <section>
          <name>Data IO</name>
          <item>load_image_dataset_metadata</item> 
+         <item>load_image_dataset</item> 
          <item>save_image_dataset_metadata</item> 
          <item>load_libsvm_formatted_data</item> 
          <item>save_libsvm_formatted_data</item> 
@@ -1715,6 +1716,25 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>load_image_dataset</name>
+         <file>dlib/data_io.h</file>
+         <spec_file link="true">dlib/data_io/load_image_dataset_abstract.h</spec_file>
+         <description>
+            This is a function which loads the list of images indicated by an
+            <a href="#load_image_dataset_metadata">image dataset metadata file</a>
+            as well as the box locations for each image.  It makes loading the
+            data necessary to train an <a href="imaging.html#object_detector">object_detector</a> 
+            a little more convenient.
+         </description>
+         <examples>
+            <example>train_object_detector.cpp.html</example>
+         </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>load_image_dataset_metadata</name>
          <file>dlib/data_io.h</file>
          <spec_file link="true">dlib/data_io/image_dataset_metadata.h</spec_file>
@@ -1722,7 +1742,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             dlib comes with a graphical tool for annotating images with
             labeled rectangles.  The tool produces an XML file containing these
             annotations.  Therefore, load_image_dataset_metadata() is a routine
-            for parsing these XML files.
+            for parsing these XML files.  Note also that this is the metadata
+            format used by the image labeling tool included with dlib in the
+            tools/imglab folder.
          </description>
                                  
       </component>
@@ -1737,7 +1759,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             This routine is a tool for saving labeled image metadata to an 
             XML file.  In particular, this routine saves the metadata into a
             form which can be read by the <a href="#load_image_dataset_metadata">load_image_dataset_metadata</a>
-            routine.
+            routine.  Note also that this is the metadata
+            format used by the image labeling tool included with dlib in the
+            tools/imglab folder.
          </description>
                                  
       </component>
@@ -2281,6 +2305,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>object_detector_ex.cpp.html</example>
             <example>object_detector_advanced_ex.cpp.html</example>
+            <example>train_object_detector.cpp.html</example>
          </examples>
                                  
       </component>
@@ -2299,6 +2324,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>object_detector_ex.cpp.html</example>
             <example>object_detector_advanced_ex.cpp.html</example>
+            <example>train_object_detector.cpp.html</example>
          </examples>
                                  
       </component>
@@ -2462,6 +2488,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>object_detector_ex.cpp.html</example>
             <example>object_detector_advanced_ex.cpp.html</example>
+            <example>train_object_detector.cpp.html</example>
          </examples>
                                  
       </component>

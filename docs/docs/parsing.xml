@@ -422,6 +422,7 @@
          
          <examples>
             <example>compress_stream_ex.cpp.html</example>
+            <example>train_object_detector.cpp.html</example>
          </examples>
 
          <implementations>

@@ -342,6 +342,7 @@
          </description>
          <examples>
             <example>object_detector_ex.cpp.html</example>
+            <example>train_object_detector.cpp.html</example>
          </examples>
                                  
       </component>
@@ -397,6 +398,7 @@
          </description>
          <examples>
             <example>object_detector_ex.cpp.html</example>
+            <example>train_object_detector.cpp.html</example>
          </examples>
                                  
       </component>
@@ -1520,6 +1522,7 @@
          <examples>
             <example>object_detector_ex.cpp.html</example>
             <example>object_detector_advanced_ex.cpp.html</example>
+            <example>train_object_detector.cpp.html</example>
          </examples>
                                  
       </component>
@@ -1626,9 +1629,6 @@
                to create each feature extraction region.  Therefore, the detection templates will extract
               features from a regular grid inside each object box.
          </description>
-         <examples>
-            <example>object_detector_ex.cpp.html</example>
-         </examples>
                                  
       </component>
             
@@ -1643,6 +1643,10 @@
             except that it also outputs information regarding the selected detection templates
             to standard out.
          </description>
+         <examples>
+            <example>object_detector_ex.cpp.html</example>
+            <example>train_object_detector.cpp.html</example>
+         </examples>
       </component>
             
    <!-- ************************************************************************* -->
@@ -1657,6 +1661,7 @@
          </description>
          <examples>
             <example>object_detector_ex.cpp.html</example>
+            <example>train_object_detector.cpp.html</example>
          </examples>
                                  
       </component>

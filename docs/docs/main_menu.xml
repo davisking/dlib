@@ -116,6 +116,10 @@
             <name>Examples</name>
             <sub>
                <item>
+                  <name>Train_Object_Detector</name>
+                  <link>train_object_detector.cpp.html</link>
+               </item>
+               <item>
                   <name>Assignment_Learning</name>
                   <link>assignment_learning_ex.cpp.html</link>
                </item>
