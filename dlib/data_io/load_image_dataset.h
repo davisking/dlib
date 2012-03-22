@@ -67,7 +67,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename image_type, typename MM>
+    template <
+        typename image_type, 
+        typename MM
+        >
     void load_image_dataset (
         array<image_type,MM>& images,
         std::vector<std::vector<rectangle> >& object_locations,
