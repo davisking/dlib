@@ -84,7 +84,7 @@ it by typing:
 sudo apt-get install libx11-dev
 </code_box>
 
-        <h2>Compiling on Windows using gcc</h2>
+        <h2>Compiling on Windows Using GCC</h2>
         <p>
             The commands for gcc on windows are the same as above but you may also have to link 
             (via the -l option) to the following libraries: gdi32, comctl32, user32, ws2_32, or imm32.
@@ -92,7 +92,7 @@ sudo apt-get install libx11-dev
             windows development than gcc.
         </p>
 
-        <h2>Compiling on Windows using Visual Studio</h2>
+        <h2>Compiling on Windows Using Visual Studio</h2>
         <p>
            All you need to do is create an empty console project. Then add dlib/all/source.cpp to it and add the
            folder containing the dlib folder to the #include search path.  Then you can compile any example program 
