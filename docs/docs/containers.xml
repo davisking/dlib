@@ -558,6 +558,14 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#clamp</link>
                      </item>
                      <item>
+                        <name>lowerbound</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#lowerbound</link>
+                     </item>
+                     <item>
+                        <name>upperbound</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#upperbound</link>
+                     </item>
+                     <item>
                         <name>linspace</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#linspace</link>
                      </item>
