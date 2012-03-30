@@ -147,7 +147,7 @@ namespace dlib
 
             // Check how big the duality gap is and stop when it goes below eps.  
             // The duality gap is the gap between the objective value of the function
-            // we are optimizing and the value of it's primal form.  This value is always 
+            // we are optimizing and the value of its primal form.  This value is always 
             // greater than or equal to the distance to the optimum solution so it is a 
             // good way to decide if we should stop.   See the book referenced above for 
             // more information.  In particular, see the part about the Wolfe Dual.
