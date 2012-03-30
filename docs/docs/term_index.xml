@@ -80,6 +80,7 @@
          <term file="optimization.html" name="solve_qp_using_smo"/>
          <term file="optimization.html" name="solve_qp2_using_smo"/>
          <term file="optimization.html" name="solve_qp3_using_smo"/>
+         <term file="optimization.html" name="solve_qp4_using_smo"/>
          <term file="optimization.html" name="oca"/>
          <term link="optimization.html#find_min_bobyqa" name="BOBYQA"/>
          <term file="optimization.html" name="find_max"/>

@@ -43,6 +43,7 @@
          <item>solve_qp_using_smo</item> 
          <item>solve_qp2_using_smo</item> 
          <item>solve_qp3_using_smo</item> 
+         <item>solve_qp4_using_smo</item> 
          <item>oca</item> 
          <item>solve_least_squares</item> 
          <item>solve_least_squares_lm</item> 
@@ -425,6 +426,28 @@ subject to the following constraint:
                   <li>Working Set Selection Using Second Order Information for Training Support Vector Machines by
                      Fan, Chen, and Lin.  In the Journal of Machine Learning Research 2005.</li>
                </ul>
+
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>solve_qp4_using_smo</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_solve_qp_using_smo_abstract.h</spec_file>
+         <description>
+             This function solves the following quadratic program:
+<pre>
+   Minimize: f(alpha,lambda) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b + 
+                                0.5*trans(lambda)*lambda - trans(lambda)*A*alpha
+   subject to the following constraints:
+      sum(alpha)  == C 
+      min(alpha)  >= 0 
+      min(lambda) >= 0
+   Where f is convex.  This means that Q should be positive-semidefinite.
+</pre>
 
          </description>
                                  
