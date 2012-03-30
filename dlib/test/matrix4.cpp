@@ -607,6 +607,31 @@ namespace
                 DLIB_TEST(equal(0.0/m , zeros_matrix<double>(3,4)));
             }
         }
+
+        {
+            matrix<int> m(2,3);
+            m = 1,2,3,
+                4,5,6;
+            matrix<int> M(2,3);
+            M = m;
+
+            DLIB_TEST(upperbound(m,6) == M);
+            DLIB_TEST(upperbound(m,60) == M);
+            DLIB_TEST(lowerbound(m,-2) == M);
+            DLIB_TEST(lowerbound(m,0) == M);
+
+            M = 2,2,3,
+                4,5,6;
+            DLIB_TEST(lowerbound(m,2) == M);
+
+            M = 0,0,0,
+                0,0,0;
+            DLIB_TEST(upperbound(m,0) == M);
+
+            M = 1,2,3,
+                3,3,3;
+            DLIB_TEST(upperbound(m,3) == M);
+        }
     }
 
 
