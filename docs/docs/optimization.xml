@@ -543,7 +543,8 @@ subject to the following constraint:
 <pre>
    Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
 
-   Where R(w) is a user-supplied convex function and C > 0
+   Where R(w) is a user-supplied convex function and C > 0.  Optionally,
+   this object can also add the non-negativity constraint that min(w) >= 0.
 </pre>
 <br/>
 <br/>
