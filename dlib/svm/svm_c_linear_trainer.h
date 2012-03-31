@@ -173,8 +173,11 @@ namespace dlib
         {
             using dlib::sparse_vector::dot;
             using dlib::dot;
+            // The reason for using w_size_m1 and not just w.size()-1 is because
+            // doing it this way avoids an inane warning from gcc that can occur in some cases.
+            const long w_size_m1 = w.size()-1;
             for (long i = 0; i < samples.size(); ++i)
-                dot_prods[i] = dot(colm(w,0,w.size()-1), samples(i)) - w(w.size()-1);
+                dot_prods[i] = dot(colm(w,0,w_size_m1), samples(i)) - w(w_size_m1);
 
             if (is_first_call)
             {
