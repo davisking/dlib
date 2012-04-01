@@ -118,6 +118,7 @@ namespace dlib
                     of another node in the graph.
             !*/
 
+        public:
             neighbor_iterator(
             ); 
             /*!
