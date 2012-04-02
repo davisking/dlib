@@ -19,64 +19,128 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    typename T::edge_type& edge(
+    typename enable_if<is_graph<T>,typename T::edge_type>::type& edge(
         T& g, 
-        unsigned long idx, 
-        unsigned long n
+        unsigned long idx_i, 
+        unsigned long idx_j
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(g.has_edge(idx,n) == true,
-            "\tT::edge_type& edge(g, i, j)"
-            << "\n\tyou have requested an invalid edge"
-            << "\n\ti: " << idx
-            << "\n\tj: " << n 
+        DLIB_ASSERT(g.has_edge(idx_i,idx_j) == true,
+            "\tT::edge_type& edge(g, idx_i, idx_j)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t idx_i: " << idx_i
+            << "\n\t idx_j: " << idx_j 
             );
 
-        for (unsigned long i = 0; i < g.node(idx).number_of_neighbors(); ++i)
+        for (unsigned long i = 0; i < g.node(idx_i).number_of_neighbors(); ++i)
         {
-            if (g.node(idx).neighbor(i).index() == n)
-                return g.node(idx).edge(i);
+            if (g.node(idx_i).neighbor(i).index() == idx_j)
+                return g.node(idx_i).edge(i);
         }
 
         // put this here just so compilers don't complain about a lack of
         // a return here
         DLIB_CASSERT(false,
-            "\tT::edge_type& edge(g, i, j)"
-            << "\n\tyou have requested an invalid edge"
-            << "\n\ti: " << idx
-            << "\n\tj: " << n 
+            "\tT::edge_type& edge(g, idx_i, idx_j)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t idx_i: " << idx_i
+            << "\n\t idx_j: " << idx_j 
             );
     }
 
     template <typename T>
-    const typename T::edge_type& edge(
+    const typename enable_if<is_graph<T>,typename T::edge_type>::type& edge(
         const T& g,  
-        unsigned long idx,
-        unsigned long n
+        unsigned long idx_i,
+        unsigned long idx_j
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(g.has_edge(idx,n) == true,
-            "\tT::edge_type& edge(g, i, j)"
-            << "\n\tyou have requested an invalid edge"
-            << "\n\ti: " << idx
-            << "\n\tj: " << n 
+        DLIB_ASSERT(g.has_edge(idx_i,idx_j) == true,
+            "\tT::edge_type& edge(g, idx_i, idx_j)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t idx_i: " << idx_i
+            << "\n\t idx_j: " << idx_j 
             );
 
-        for (unsigned long i = 0; i < g.node(idx).number_of_neighbors(); ++i)
+        for (unsigned long i = 0; i < g.node(idx_i).number_of_neighbors(); ++i)
         {
-            if (g.node(idx).neighbor(i).index() == n)
-                return g.node(idx).edge(i);
+            if (g.node(idx_i).neighbor(i).index() == idx_j)
+                return g.node(idx_i).edge(i);
         }
 
         // put this here just so compilers don't complain about a lack of
         // a return here
         DLIB_CASSERT(false,
-            "\tT::edge_type& edge(g, i, j)"
-            << "\n\tyou have requested an invalid edge"
-            << "\n\ti: " << idx
-            << "\n\tj: " << n 
+            "\tT::edge_type& edge(g, idx_i, idx_j)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t idx_i: " << idx_i
+            << "\n\t idx_j: " << idx_j 
+            );
+    }
+
+// ----------------------------------------------------------------------------------------
+    
+    template <typename T>
+    typename enable_if<is_directed_graph<T>,typename T::edge_type>::type& edge(
+        T& g, 
+        unsigned long parent_idx, 
+        unsigned long child_idx 
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(g.has_edge(parent_idx,child_idx) == true,
+            "\t T::edge_type& edge(g, parent_idx, child_idx)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t parent_idx: " << parent_idx
+            << "\n\t child_idx: " << child_idx 
+            );
+
+        for (unsigned long i = 0; i < g.node(parent_idx).number_of_children(); ++i)
+        {
+            if (g.node(parent_idx).child(i).index() == child_idx)
+                return g.node(parent_idx).child_edge(i);
+        }
+
+        // put this here just so compilers don't complain about a lack of
+        // a return here
+        DLIB_CASSERT(false,
+            "\t T::edge_type& edge(g, parent_idx, child_idx)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t parent_idx: " << parent_idx
+            << "\n\t child_idx: " << child_idx 
+            );
+    }
+
+    template <typename T>
+    const typename enable_if<is_directed_graph<T>,typename T::edge_type>::type& edge(
+        const T& g,  
+        unsigned long parent_idx, 
+        unsigned long child_idx 
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(g.has_edge(parent_idx,child_idx) == true,
+            "\t T::edge_type& edge(g, parent_idx, child_idx)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t parent_idx: " << parent_idx
+            << "\n\t child_idx: " << child_idx 
+            );
+
+        for (unsigned long i = 0; i < g.node(parent_idx).number_of_children(); ++i)
+        {
+            if (g.node(parent_idx).child(i).index() == child_idx)
+                return g.node(parent_idx).child_edge(i);
+        }
+
+        // put this here just so compilers don't complain about a lack of
+        // a return here
+        DLIB_ASSERT(false,
+            "\t T::edge_type& edge(g, parent_idx, child_idx)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t parent_idx: " << parent_idx
+            << "\n\t child_idx: " << child_idx 
             );
     }
 
