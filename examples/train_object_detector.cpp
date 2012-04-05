@@ -169,8 +169,8 @@ int main(int argc, char** argv)
 
 
             image_scanner_type scanner;
-            setup_hashed_features(scanner, images, hash_bits);
             setup_grid_detection_templates_verbose(scanner, object_locations, grid_size, grid_size);
+            setup_hashed_features(scanner, images, hash_bits);
 
             structural_object_detection_trainer<image_scanner_type> trainer(scanner);
             trainer.set_num_threads(threads);
