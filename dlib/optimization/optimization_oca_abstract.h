@@ -124,7 +124,8 @@ namespace dlib
                 For reference, OCA solves optimization problems with the following form:
                     Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
 
-                    Where R(w) is a user-supplied convex function and C > 0
+                    Where R(w) is a user-supplied convex function and C > 0.  Optionally,
+                    this object can also add the non-negativity constraint that min(w) >= 0.
 
 
                 For a detailed discussion you should consult the following papers
@@ -149,7 +150,8 @@ namespace dlib
             >
         typename matrix_type::type operator() (
             const oca_problem<matrix_type>& problem,
-            matrix_type& w
+            matrix_type& w,
+            bool require_nonnegative_w = false 
         ) const;
         /*!
             requires
@@ -160,6 +162,10 @@ namespace dlib
                 - The optimization algorithm runs until problem.optimization_status() 
                   indicates it is time to stop.
                 - returns the objective value at the solution #w
+                - if (require_nonnegative_w == true) then
+                    - Adds the constraint that every element of w be non-negative.  
+                      Therefore, if this argument is true then #w won't contain any
+                      negative values.
         !*/
 
         void set_subproblem_epsilon (

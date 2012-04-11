@@ -59,14 +59,11 @@ cd examples
 mkdir build
 cd build
 cmake ..
+cmake --build . --config Release
 </code_box>
-Then cmake will create whatever is needed to compile the examples on your computer.  If you are using Linux 
-or a Mac it will create a makefile and then you can compile everything by typing:
-<code_box>
-make
-</code_box>
-Or on windows, if you have Visual Studio installed, it will make a Visual Studio project which you can then open
-and compile by clicking the build button.
+Note that you also need to have a C++ compiler installed on your system.  There are free C++ compilers
+for most operating systems.  For example, Visual Studio Express is free on Windows and GCC is free and
+works well on Mac OS X and Linux systems.
 
         <h2>Compiling on Linux From Command Line</h2>
         From within the examples folder, you can compile any of the examples with a single command like so:
@@ -87,7 +84,7 @@ it by typing:
 sudo apt-get install libx11-dev
 </code_box>
 
-        <h2>Compiling on Windows using gcc</h2>
+        <h2>Compiling on Windows Using GCC</h2>
         <p>
             The commands for gcc on windows are the same as above but you may also have to link 
             (via the -l option) to the following libraries: gdi32, comctl32, user32, ws2_32, or imm32.
@@ -95,7 +92,7 @@ sudo apt-get install libx11-dev
             windows development than gcc.
         </p>
 
-        <h2>Compiling on Windows using Visual Studio</h2>
+        <h2>Compiling on Windows Using Visual Studio</h2>
         <p>
            All you need to do is create an empty console project. Then add dlib/all/source.cpp to it and add the
            folder containing the dlib folder to the #include search path.  Then you can compile any example program 

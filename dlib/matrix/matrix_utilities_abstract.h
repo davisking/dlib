@@ -1709,6 +1709,42 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp lowerbound (
+        const matrix_exp& m,
+        const matrix_exp::type& thresh 
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (m(r,c) >= thresh) then
+                        - R(r,c) == m(r,c)
+                    - else
+                        - R(r,c) == thresh
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp upperbound (
+        const matrix_exp& m,
+        const matrix_exp::type& thresh 
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                    - if (m(r,c) <= thresh) then
+                        - R(r,c) == m(r,c)
+                    - else
+                        - R(r,c) == thresh
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_UTILITIES_ABSTRACT_

@@ -74,6 +74,7 @@ set (tests
    metaprogramming.cpp
    multithreaded_object.cpp
    object_detector.cpp
+   oca.cpp
    one_vs_all_trainer.cpp
    one_vs_one_trainer.cpp
    optimization.cpp

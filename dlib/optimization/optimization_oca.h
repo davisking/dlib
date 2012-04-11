@@ -7,7 +7,7 @@
 
 #include "../matrix.h"
 #include "optimization_solve_qp_using_smo.h"
-#include <list>
+#include <vector>
 
 // ----------------------------------------------------------------------------------------
 
@@ -110,7 +110,8 @@ namespace dlib
             >
         typename matrix_type::type operator() (
             const oca_problem<matrix_type>& problem,
-            matrix_type& w
+            matrix_type& w,
+            bool require_nonnegative_w = false 
         ) const
         {
             // make sure requires clause is not broken
@@ -130,10 +131,10 @@ namespace dlib
 
             const scalar_type C = problem.get_c();
 
-            std::list<vect_type> planes;
+            matrix<scalar_type,0,0,mem_manager_type, layout_type> planes;
             std::vector<scalar_type> bs, miss_count;
 
-            vect_type temp, alpha;
+            vect_type new_plane, alpha;
 
             w.set_size(problem.get_num_dimensions(), 1);
             w = 0;
@@ -154,7 +155,7 @@ namespace dlib
                 // The flat lower bounding plane is always good to have if we know
                 // what it is.
                 bs.push_back(R_lower_bound);
-                planes.push_back(zeros_matrix<scalar_type>(w.size(),1));
+                planes = zeros_matrix(w);
                 alpha = uniform_matrix<scalar_type>(1,1, C);
                 miss_count.push_back(0);
 
@@ -169,9 +170,12 @@ namespace dlib
 
                 // add the next cutting plane
                 scalar_type cur_risk;
-                planes.resize(planes.size()+1);
-                problem.get_risk(w, cur_risk, planes.back());
-                bs.push_back(cur_risk - dot(w,planes.back()));
+                problem.get_risk(w, cur_risk, new_plane);
+                if (planes.size() != 0)
+                    planes = join_rows(planes, new_plane);
+                else 
+                    planes = new_plane;
+                bs.push_back(cur_risk - dot(w,new_plane));
                 miss_count.push_back(0);
 
                 // If alpha is empty then initialize it (we must always have sum(alpha) == C).  
@@ -187,24 +191,22 @@ namespace dlib
                 // report current status
                 const scalar_type risk_gap = cur_risk - (cp_obj-wnorm)/C;
                 if (counter > 0 && problem.optimization_status(cur_obj, cur_obj - cp_obj, 
-                                                               cur_risk, risk_gap, planes.size(), counter))
+                                                               cur_risk, risk_gap, planes.nc(), counter))
                 {
                     break;
                 }
 
                 // compute kernel matrix for all the planes
                 K.swap(Ktmp);
-                K.set_size(planes.size(), planes.size());
+                K.set_size(planes.nc(), planes.nc());
                 // copy over the old K matrix
                 set_subm(K, 0,0, Ktmp.nr(), Ktmp.nc()) = Ktmp;
 
                 // now add the new row and column to K
-                long rr = 0;
-                for (typename std::list<vect_type>::iterator r = planes.begin(); r != planes.end(); ++r)
+                for (long c = 0; c < planes.nc(); ++c)
                 {
-                    K(rr, Ktmp.nc()) = dot(*r, planes.back());
-                    K(Ktmp.nc(), rr) = K(rr,Ktmp.nc());
-                    ++rr;
+                    K(c, Ktmp.nc()) = dot(colm(planes,c), new_plane);
+                    K(Ktmp.nc(), c) = K(c,Ktmp.nc());
                 }
 
 
@@ -216,23 +218,22 @@ namespace dlib
                     eps = 1e-16;
                 // Note that we warm start this optimization by using the alpha from the last
                 // iteration as the starting point.
-                solve_qp_using_smo(K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
+                if (require_nonnegative_w)
+                    solve_qp4_using_smo(planes, K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
+                else
+                    solve_qp_using_smo(K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
 
                 // construct the w that minimized the subproblem.
-                w = 0;
-                rr = 0;
-                for (typename std::list<vect_type>::iterator i = planes.begin(); i != planes.end(); ++i)
+                w = -(planes*alpha);
+                if (require_nonnegative_w)
+                    w = lowerbound(w,0);
+
+                for (long i = 0; i < alpha.size(); ++i)
                 {
-                    if (alpha(rr) != 0)
-                    {
-                        w -= alpha(rr)*(*i);
-                        miss_count[rr] = 0;
-                    }
+                    if (alpha(i) != 0)
+                        miss_count[i] = 0;
                     else
-                    {
-                        miss_count[rr] += 1;
-                    }
-                    ++rr;
+                        miss_count[i] += 1;
                 }
 
                 // Compute the lower bound on the true objective given to us by the cutting 
@@ -245,13 +246,11 @@ namespace dlib
                 while (max(vector_to_matrix(miss_count)) >= inactive_thresh)
                 {
                     const long idx = index_of_max(vector_to_matrix(miss_count));
-                    typename std::list<vect_type>::iterator i0 = planes.begin();
-                    advance(i0, idx);
-                    planes.erase(i0);
                     bs.erase(bs.begin()+idx);
                     miss_count.erase(miss_count.begin()+idx);
                     K = removerc(K, idx, idx);
                     alpha = remove_row(alpha,idx);
+                    planes = remove_col(planes,idx);
                 }
 
                 ++counter;

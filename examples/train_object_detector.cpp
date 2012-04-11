@@ -2,7 +2,7 @@
 /*
 
     This is an example showing how you might use dlib to create a reasonably 
-    function command line tool for object detection.  This example assumes 
+    functional command line tool for object detection.  This example assumes 
     you are familiar with the contents of at least the following example 
     programs:
         - object_detector_ex.cpp
@@ -13,17 +13,15 @@
 
     This program is a command line tool for learning to detect objects in images.  
     Therefore, to create an object detector it requires a set of annotated training 
-    images.  To create this annotated data you will need to compile the imglab tool 
-    included with dlib.  To do this, go to the tools/imglab folder and type the 
-    following:
+    images.  To create this annotated data you will need to use the imglab tool 
+    included with dlib.  It is located in the tools/imglab folder and can be compiled
+    using the following commands.  
+        cd tools/imglab
         mkdir build
         cd build
         cmake ..
-        make
-    Note that you may need to install CMake (www.cmake.org) for this to work.  Also, 
-    if you are using visual studio then you should use the following command to 
-    compile instead of "make"
         cmake --build . --config Release
+    Note that you may need to install CMake (www.cmake.org) for this to work.  
 
     Next, lets assume you have a folder of images called /tmp/images.  These images 
     should contain examples of the objects you want to learn to detect.  You will 
@@ -35,17 +33,18 @@
     A window will appear showing all the images.  You can use the up and down arrow 
     keys to cycle though the images and the mouse to label objects.  In particular, 
     holding the shift key, left clicking, and dragging the mouse will allow you to 
-    draw boxes around the objects you which to detect.  So next label all the objects 
+    draw boxes around the objects you wish to detect.  So next, label all the objects 
     with boxes.  Note that it is important to label all the objects since any object 
     not labeled is implicitly assumed to be not an object we should detect.
 
-    Once you finish labeling objects go to the file menu, click save, and close the
-    program. This will save the object boxes back to mydataset.xml.  You can verify 
+    Once you finish labeling objects go to the file menu, click save, and then close 
+    the program. This will save the object boxes back to mydataset.xml.  You can verify 
     this by opening the tool again with
         ./imglab mydataset.xml
     and observing that the boxes are present.
 
-    Returning to the present example program, we can now issue the command 
+    Returning to the present example program, we can compile it using cmake just as we 
+    did with the imglab tool.  Once compiled, we can issue the command 
         ./train_object_detector -tv mydataset.xml
     which will train an object detection model based on our labeled data.  The model 
     will be saved to the file object_detector.svm.  Once this has finished we can use 
@@ -55,8 +54,8 @@
     be indicated by a red box.
 
 
-    There are also a number of other useful command line options in the current
-    example program which you can explore. 
+    There are a number of other useful command line options in the current example 
+    program which you can explore below. 
 */
 
 
@@ -170,8 +169,8 @@ int main(int argc, char** argv)
 
 
             image_scanner_type scanner;
-            setup_hashed_features(scanner, images, hash_bits);
             setup_grid_detection_templates_verbose(scanner, object_locations, grid_size, grid_size);
+            setup_hashed_features(scanner, images, hash_bits);
 
             structural_object_detection_trainer<image_scanner_type> trainer(scanner);
             trainer.set_num_threads(threads);

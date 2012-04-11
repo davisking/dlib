@@ -2875,6 +2875,80 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
+    struct op_lowerbound : basic_op_m<M>
+    {
+        typedef typename M::type type;
+
+        op_lowerbound( const M& m_, const type& thresh_) : 
+            basic_op_m<M>(m_), thresh(thresh_){}
+
+        const type& thresh;
+
+        typedef const typename M::type const_ret_type;
+        const static long cost = M::cost + 2;
+
+        const_ret_type apply ( long r, long c) const
+        { 
+            const type temp = this->m(r,c);
+            if (temp >= thresh)
+                return temp;
+            else
+                return thresh;
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_op<op_lowerbound<EXP> > lowerbound (
+        const matrix_exp<EXP>& m,
+        const typename EXP::type& thresh
+    )
+    {
+        typedef op_lowerbound<EXP> op;
+        return matrix_op<op>(op(m.ref(), thresh));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M>
+    struct op_upperbound : basic_op_m<M>
+    {
+        typedef typename M::type type;
+
+        op_upperbound( const M& m_, const type& thresh_) : 
+            basic_op_m<M>(m_), thresh(thresh_){}
+
+        const type& thresh;
+
+        typedef const typename M::type const_ret_type;
+        const static long cost = M::cost + 2;
+
+        const_ret_type apply ( long r, long c) const
+        { 
+            const type temp = this->m(r,c);
+            if (temp <= thresh)
+                return temp;
+            else
+                return thresh;
+        }
+    };
+
+    template <
+        typename EXP
+        >
+    const matrix_op<op_upperbound<EXP> > upperbound (
+        const matrix_exp<EXP>& m,
+        const typename EXP::type& thresh
+    )
+    {
+        typedef op_upperbound<EXP> op;
+        return matrix_op<op>(op(m.ref(), thresh));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M>
     struct op_reshape 
     {
         op_reshape(const M& m_, const long& rows_, const long& cols_) : m(m_),rows(rows_),cols(cols_) {}

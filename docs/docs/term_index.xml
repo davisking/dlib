@@ -80,6 +80,7 @@
          <term file="optimization.html" name="solve_qp_using_smo"/>
          <term file="optimization.html" name="solve_qp2_using_smo"/>
          <term file="optimization.html" name="solve_qp3_using_smo"/>
+         <term file="optimization.html" name="solve_qp4_using_smo"/>
          <term file="optimization.html" name="oca"/>
          <term link="optimization.html#find_min_bobyqa" name="BOBYQA"/>
          <term file="optimization.html" name="find_max"/>
@@ -490,6 +491,8 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pixel_to_vector"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="vector_to_pixel"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="clamp"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="lowerbound"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="upperbound"/>
 
 
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="scale_by"/>

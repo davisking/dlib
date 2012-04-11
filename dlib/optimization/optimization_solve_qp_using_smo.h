@@ -147,7 +147,7 @@ namespace dlib
 
             // Check how big the duality gap is and stop when it goes below eps.  
             // The duality gap is the gap between the objective value of the function
-            // we are optimizing and the value of it's primal form.  This value is always 
+            // we are optimizing and the value of its primal form.  This value is always 
             // greater than or equal to the distance to the optimum solution so it is a 
             // good way to decide if we should stop.   See the book referenced above for 
             // more information.  In particular, see the part about the Wolfe Dual.
@@ -205,6 +205,176 @@ namespace dlib
         cout << "   iter:        "<< iter+1 << endl;
         cout << "   eps:         "<< eps << endl;
         */
+
+        return iter+1;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP1,
+        typename EXP2,
+        typename EXP3,
+        typename T, long NR, long NC, typename MM, typename L
+        >
+    unsigned long solve_qp4_using_smo ( 
+        const matrix_exp<EXP1>& A,
+        const matrix_exp<EXP2>& Q,
+        const matrix_exp<EXP3>& b,
+        matrix<T,NR,NC,MM,L>& alpha,
+        T eps,
+        unsigned long max_iter
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(A.nc() == alpha.size() &&
+                     Q.nr() == Q.nc() &&
+                     is_col_vector(b) &&
+                     is_col_vector(alpha) &&
+                     b.size() == alpha.size() &&
+                     b.size() == Q.nr() &&
+                     alpha.size() > 0 &&
+                     min(alpha) >= 0 &&
+                     eps > 0 &&
+                     max_iter > 0,
+                     "\t void solve_qp4_using_smo()"
+                     << "\n\t Invalid arguments were given to this function"
+                     << "\n\t A.nc():               " << A.nc()
+                     << "\n\t Q.nr():               " << Q.nr()
+                     << "\n\t Q.nc():               " << Q.nc()
+                     << "\n\t is_col_vector(b):     " << is_col_vector(b)
+                     << "\n\t is_col_vector(alpha): " << is_col_vector(alpha)
+                     << "\n\t b.size():             " << b.size() 
+                     << "\n\t alpha.size():         " << alpha.size() 
+                     << "\n\t Q.nr():               " << Q.nr() 
+                     << "\n\t min(alpha):           " << min(alpha) 
+                     << "\n\t eps:                  " << eps 
+                     << "\n\t max_iter:             " << max_iter 
+        );
+
+        const T C = sum(alpha);
+
+        /*
+            For this optimization problem, it is the case that the optimal
+            value of lambda is given by a simple closed form expression if we
+            know the optimal alpha.  So what we will do is to just optimize 
+            alpha and every now and then we will update lambda with its optimal
+            value.  Therefore, we use essentially the same method as the
+            solve_qp_using_smo() routine.  
+        */
+
+        // compute optimal lambda for current alpha
+        matrix<T,NR,1,MM,L> lambda = A*alpha;
+        lambda = lowerbound(lambda, 0);
+
+        // Compute f'(alpha) (i.e. the gradient of f(alpha) with respect to alpha) for the current alpha.  
+        matrix<T,NR,NC,MM,L> df = Q*alpha - b - trans(A)*lambda;
+
+        const T tau = 1000*std::numeric_limits<T>::epsilon();
+
+        T big, little;
+        unsigned long iter = 0;
+        for (; iter < max_iter; ++iter)
+        {
+            // Find the two elements of df that satisfy the following:
+            //    - little_idx == index_of_min(df)
+            //    - big_idx   == the index of the largest element in df such that alpha(big_idx) > 0
+            // These two indices will tell us which two alpha values are most in violation of the KKT 
+            // optimality conditions.  
+            big = -std::numeric_limits<T>::max();
+            long big_idx = 0;
+            little = std::numeric_limits<T>::max();
+            long little_idx = 0;
+            for (long i = 0; i < df.nr(); ++i)
+            {
+                if (df(i) > big && alpha(i) > 0)
+                {
+                    big = df(i);
+                    big_idx = i;
+                }
+                if (df(i) < little)
+                {
+                    little = df(i);
+                    little_idx = i;
+                }
+            }
+
+            // Check how big the duality gap is and stop when it goes below eps.  
+            // The duality gap is the gap between the objective value of the function
+            // we are optimizing and the value of its primal form.  This value is always 
+            // greater than or equal to the distance to the optimum solution so it is a 
+            // good way to decide if we should stop.   
+            if (trans(alpha)*df - C*little < eps)
+            {
+                // compute optimal lambda and recheck the duality gap to make
+                // sure we have really converged.
+                lambda = A*alpha;
+                lambda = lowerbound(lambda, 0);
+                df = Q*alpha - b - trans(A)*lambda;
+
+                if (trans(alpha)*df - C*min(df) < eps)
+                    break;
+                else
+                    continue;
+            }
+
+
+            // Save these values, we will need them later.
+            const T old_alpha_big = alpha(big_idx);
+            const T old_alpha_little = alpha(little_idx);
+
+
+            // Now optimize the two variables we just picked. 
+            T quad_coef = Q(big_idx,big_idx) + Q(little_idx,little_idx) - 2*Q(big_idx, little_idx);
+            if (quad_coef <= tau)
+                quad_coef = tau;
+            const T delta = (big - little)/quad_coef;
+            alpha(big_idx) -= delta;
+            alpha(little_idx) += delta;
+
+            // Make sure alpha stays feasible.  That is, make sure the updated alpha doesn't
+            // violate the non-negativity constraint.  
+            if (alpha(big_idx) < 0)
+            {
+                // Since an alpha can't be negative we will just set it to 0 and shift all the
+                // weight to the other alpha.
+                alpha(big_idx) = 0;
+                alpha(little_idx) = old_alpha_big + old_alpha_little;
+            }
+
+
+            // Every 300 iterations
+            if ((iter%300) == 299)
+            {
+                // compute the optimal lambda for the current alpha
+                lambda = A*alpha;
+                lambda = lowerbound(lambda, 0);
+
+                // Perform this form of the update every so often because doing so can help
+                // avoid the buildup of numerical errors you get with the alternate update
+                // below.
+                df = Q*alpha - b - trans(A)*lambda;
+            }
+            else
+            {
+                // Now update the gradient. We will perform the equivalent of: df = Q*alpha - b;
+                const T delta_alpha_big   = alpha(big_idx) - old_alpha_big;
+                const T delta_alpha_little = alpha(little_idx) - old_alpha_little;
+
+                for(long k = 0; k < df.nr(); ++k)
+                    df(k) += Q(big_idx,k)*delta_alpha_big + Q(little_idx,k)*delta_alpha_little;;
+            }
+        }
+
+        /*
+        using namespace std;
+        cout << "SMO: " << endl;
+        cout << "   duality gap: "<< trans(alpha)*df - C*min(df) << endl;
+        cout << "   KKT gap:     "<< big-little << endl;
+        cout << "   iter:        "<< iter+1 << endl;
+        cout << "   eps:         "<< eps << endl;
+        */
+
 
         return iter+1;
     }
