@@ -987,7 +987,7 @@ string pretty_print_declaration (
 
 
         if (decl[i].first == tok_type::OTHER && decl[i].second == "<" && 
-            (decl[i-1].second != "operator" && (i>1 && decl[i-2].second != "operator" || decl[i-1].second != "<") ))
+            (decl[i-1].second != "operator" && ((i>1 && decl[i-2].second != "operator") || decl[i-1].second != "<") ))
             ++angle_count;
 
         if (decl[i-1].first == tok_type::KEYWORD && decl[i-1].second == "template" && 
@@ -999,7 +999,7 @@ string pretty_print_declaration (
         else if (decl[i].first == tok_type::OTHER && decl[i].second == ">")
         {
             // don't count angle brackets when they are part of an operator 
-            if (decl[i-1].second != "operator" && (i>1 && decl[i-2].second != "operator" || decl[i-1].second != ">"))
+            if (decl[i-1].second != "operator" && ((i>1 && decl[i-2].second != "operator") || decl[i-1].second != ">"))
                 --angle_count;
 
             if (angle_count == 0 && in_template)
@@ -1202,7 +1202,6 @@ string format_comment (
 
     // now remove the leading white space
     string temp2;
-    bool seen_newline = true;
     unsigned long counter = 0;
     for (unsigned long i = 0; i < temp.size(); ++i)
     {
