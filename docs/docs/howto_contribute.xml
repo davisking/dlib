@@ -39,7 +39,7 @@
 hg clone http://dclib.hg.sourceforge.net:8000/hgroot/dclib/dclib
 cd dclib
 [make changes to dlib source code]
-hg commit
+hg commit -u "Your Name &lt;your.email@host.com&gt;"
 hg bundle dlibchanges.hg
 </code_box>
 Then <a href="mailto:davis@dlib.net">email me</a> the dlibchanges.hg file and I'll review it and get back to you.
