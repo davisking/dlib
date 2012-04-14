@@ -111,6 +111,19 @@ namespace dlib
                 which will log various events taking place inside a bridge.
                 If you want to see these log messages then enable the logger
                 named "dlib.bridge".
+
+            
+            BRIDGE PROTOCOL DETAILS
+                The bridge object creates a single TCP connection between
+                two applications.  Whenever it sends an object from a pipe
+                over a TCP connection it sends a byte with the value 1 followed 
+                immediately by the serialized copy of the object from the pipe. 
+                The serialization is performed by calling the global serialize()
+                function.  
+
+                Additionally, a bridge object will periodically send bytes with
+                a value of 0 to ensure the TCP connection remains alive.  These
+                are just read and ignored.  
         !*/
 
     public:
