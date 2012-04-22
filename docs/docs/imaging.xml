@@ -188,6 +188,7 @@
          <name>Miscellaneous</name>
 
          <item>cv_image</item>
+         <item>toMat</item>
 
          <item>draw_line</item> 
          <item>fill_rect</item> 
@@ -573,15 +574,38 @@
          <file>dlib/opencv.h</file>
          <spec_file link="true">dlib/opencv/cv_image_abstract.h</spec_file>
          <description>
-            This object is meant to be used as a simple wrapper around the OpenCV
-            IplImage struct.  Using this class template you can turn an IplImage
-            object into something that looks like a normal dlib style image object.
+                This object is meant to be used as a simple wrapper around the OpenCV
+                IplImage struct or Mat object.  Using this class template you can turn
+                an OpenCV image into something that looks like a normal dlib style 
+                image object.
 
-            <p>
-            So you should be able to use cv_image objects with many of the image
-            processing functions in dlib as well as the GUI tools for displaying
-            images on the screen.
-            </p>
+               <p>
+                So you should be able to use cv_image objects with many of the image
+                processing functions in dlib as well as the GUI tools for displaying
+                images on the screen.
+               </p>
+
+               <p>
+                  Note that you can do the reverse conversion, from dlib to OpenCV,
+                  using the <a href="#toMat">toMat</a> routine.
+               </p>
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>toMat</name>
+         <file>dlib/opencv.h</file>
+         <spec_file link="true">dlib/opencv/to_open_cv_abstract.h</spec_file>
+         <description>
+            This routine converts a dlib style image into an instance of OpenCV's cv::Mat object.
+            This is done by setting up the Mat object to point to the same memory as the dlib image.
+               <p>
+                  Note that you can do the reverse conversion, from OpenCV to dlib,
+                  using the <a href="#cv_image">cv_image</a> object.
+               </p>
          </description>
                                  
       </component>

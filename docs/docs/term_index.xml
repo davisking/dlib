@@ -1050,6 +1050,7 @@
          <term file="imaging.html" name="rgb_pixel"/>
          <term file="imaging.html" name="bgr_pixel"/>
          <term file="imaging.html" name="cv_image"/>
+         <term file="imaging.html" name="toMat"/>
          <term link="imaging.html#cv_image" name="OpenCV Image"/>
          <term file="imaging.html" name="rgb_alpha_pixel"/>
          <term link="imaging.html#rgb_alpha_pixel" name="alpha"/>
