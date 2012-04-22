@@ -635,7 +635,8 @@
          <file>dlib/graph_utils.h</file>
          <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
          <description>        
-            This function takes a <a href="containers.html#graph">graph</a> object and a 
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> object and a 
             pair of indices.  It returns a reference to the edge object between the two nodes
             with the given indices. 
          </description>
