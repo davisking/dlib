@@ -4,6 +4,7 @@
 #define DLIB_OPEnCV_HEADER
 
 #include "opencv/cv_image.h"
+#include "opencv/to_open_cv.h"
 
 #endif // DLIB_OPEnCV_HEADER
 
