@@ -21,14 +21,14 @@ namespace dlib
         typedef typename image_type::type type;
         if (pixel_traits<type>::num == 1)
         {
-            return cv::Mat(img.nr(), img.nc(), cv::DataType<type>::type, &img[0][0], img.width_step());
+            return cv::Mat(img.nr(), img.nc(), cv::DataType<type>::type, (void*)&img[0][0], img.width_step());
         }
         else
         {
             int depth = sizeof(typename pixel_traits<type>::basic_pixel_type)*8;
             int channels = pixel_traits<type>::num;
-            int type CV_MAKETYPE(depth, channels);
-            return cv::Mat(img.nr(), img.nc(), type, &img[0][0], img.width_step());
+            int type = CV_MAKETYPE(depth, channels);
+            return cv::Mat(img.nr(), img.nc(), type, (void*)&img[0][0], img.width_step());
         }
     }
 }
