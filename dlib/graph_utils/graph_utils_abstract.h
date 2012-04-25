@@ -77,8 +77,8 @@ namespace dlib
             - T is an implementation of directed_graph/directed_graph_kernel_abstract.h 
             - g.has_edge(parent_idx,child_idx)
         ensures
-            - returns a reference to the edge data for the directed edge connecting parent
-              node g.node(parent_idx) to child node g.node(child_idx).
+            - returns a const reference to the edge data for the directed edge connecting 
+              parent node g.node(parent_idx) to child node g.node(child_idx).
     !*/
 
 // ----------------------------------------------------------------------------------------
