@@ -319,7 +319,7 @@ namespace
     {
         potts_model m(g);
 
-        const unsigned long num = (unsigned long)std::pow(2, m.number_of_nodes());
+        const unsigned long num = (unsigned long)std::pow(2.0, (double)m.number_of_nodes());
 
         double best_score = -std::numeric_limits<double>::infinity();
         for (unsigned long i = 0; i < num; ++i)
@@ -403,7 +403,7 @@ namespace
     )
     {
         typedef typename directed_graph::edge_type edge_weight_type;
-        const unsigned long num = (unsigned long)std::pow(2, g.number_of_nodes());
+        const unsigned long num = (unsigned long)std::pow(2.0, (double)g.number_of_nodes());
 
         std::vector<node_label> best_cut(g.number_of_nodes(),FREE_NODE);
 
