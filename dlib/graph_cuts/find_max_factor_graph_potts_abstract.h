@@ -208,6 +208,7 @@ namespace dlib
             - This function is a tool for exactly solving the MAP problem in a Potts
               model.  In particular, this means that this function finds the assignments 
               to all the labels in prob which maximizes potts_model_score(#prob).
+            - The optimal labels are stored in #prob.
             - Note that this routine is a little bit faster if all the values 
               returned by prob.factor_value() are negative.  So if you can arrange for that
               to be true without spending any extra CPU cycles then it might be a good idea 
