@@ -411,6 +411,37 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    bool graph_has_symmetric_edges (
+        const T& graph
+    )
+    {
+        for (unsigned long i = 0; i < graph.number_of_nodes(); ++i)
+        {
+            for (unsigned long j = 0; j < graph.node(i).number_of_children(); ++j)
+            {
+                const unsigned long jj = graph.node(i).child(j).index();
+                // make sure every edge from a parent to a child has an edge linking back
+                if (graph.has_edge(jj,i) == false)
+                    return false;
+            }
+
+            for (unsigned long j = 0; j < graph.node(i).number_of_parents(); ++j)
+            {
+                const unsigned long jj = graph.node(i).parent(j).index();
+                // make sure every edge from a child to a parent has an edge linking back
+                if (graph.has_edge(i,jj) == false)
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+// ----------------------------------------------------------------------------------------
     
     template <
         typename T

@@ -86,6 +86,26 @@ namespace dlib
     template <
         typename T
         >
+    bool graph_has_symmetric_edges (
+        const T& graph
+    );
+    /*!
+        requires
+            - T is an implementation of directed_graph/directed_graph_kernel_abstract.h 
+        ensures
+            - if (All nodes have either 0 edges between them or 2 edges between them.  
+              That is, if there is an edge pointing from node A to node B then there is
+              also an edge from B to A) then
+                - returns true
+            - else
+                - returns false
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
     bool graph_contains_directed_cycle (
         const T& graph
     );
