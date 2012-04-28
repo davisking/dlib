@@ -9,8 +9,16 @@
 
 namespace dlib
 {
+    /*!A node_label
+        The node_label type is the type used to label which part of a graph cut
+        a node is on.  It is used by all the graph cut tools.  The three possible
+        values of a node label are SOURCE_CUT, SINK_CUT, or FREE_NODE.
+    !*/
 
     typedef unsigned char node_label;
+    const node_label SOURCE_CUT = 0;
+    const node_label SINK_CUT = 1;
+    const node_label FREE_NODE = 2;
 
 // ----------------------------------------------------------------------------------------
 
@@ -327,12 +335,6 @@ namespace dlib
         !*/
 
     };
-
-// ----------------------------------------------------------------------------------------
-
-    const node_label SOURCE_CUT = 0;
-    const node_label SINK_CUT = 1;
-    const node_label FREE_NODE = 2;
 
 // ----------------------------------------------------------------------------------------
 
