@@ -343,6 +343,8 @@ namespace dlib
               solutions of the relaxed linear program but may take more iterations.  Note that
               the algorithm will never execute more than max_iter iterations regardless of
               the setting of eps.
+            - If the graph is tree-structured then this routine always gives the exact solution 
+              to the MAP problem.  However, for graphs with cycles, the solution may be approximate.
               
 
             - This function is an implementation of the NMPLP algorithm introduced in the 
