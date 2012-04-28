@@ -127,15 +127,15 @@ namespace dlib
 
         value_type factor_value (
             unsigned long idx, 
-            bool value
+            bool lab 
         ) const;
         /*!
             requires
                 - idx < number_of_nodes()
             ensures
                 - returns a value which indicates how "good" it is to assign the idx-node
-                  a label equal to value.  The larger the value, the more desirable
-                  the label contained by value. 
+                  a label equal to lab.  The larger the value, the more desirable
+                  the label contained by lab. 
         !*/
 
         value_type factor_value_disagreement (
