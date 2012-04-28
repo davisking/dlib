@@ -52,6 +52,8 @@
          <item>max_sum_submatrix</item> 
          <item>find_max_factor_graph_nmplp</item> 
          <item>find_max_factor_graph_viterbi</item> 
+         <item>find_max_factor_graph_potts</item> 
+         <item>min_cut</item> 
       </section>
 
       <section>
@@ -72,6 +74,8 @@
          <item>poly_min_extrap</item> 
          <item>lagrange_poly_min_extrap</item> 
          <item>line_search</item> 
+         <item>graph_cut_score</item> 
+         <item>potts_model_score</item> 
       </section>
 
     </top>  
@@ -528,6 +532,76 @@ subject to the following constraint:
             algorithm for finding the maximizing assignment.  In addition to basic first order Markov
             models, this function is also capable of finding the MAP assignment for higher order
             Markov models.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>potts_model_score</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/graph_cuts/find_max_factor_graph_potts_abstract.h</spec_file>
+         <description>
+              This routine computes the model score for a Potts problem and a
+              candidate labeling.  This score is the quantity maximised
+              by the <a href="#find_max_factor_graph_potts">find_max_factor_graph_potts</a>
+              routine.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>graph_cut_score</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/graph_cuts/min_cut_abstract.h</spec_file>
+         <description>
+            This routine computes the score for a candidate graph cut.  This is the 
+            quantity minimized by the <a href="#min_cut">min_cut</a> algorithm.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>min_cut</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/graph_cuts/min_cut_abstract.h</spec_file>
+         <description>
+                This is a function object which can be used to find the min cut
+                on a graph.
+                The implementation is based on the method described in the following
+                paper:
+                <blockquote>
+                    An Experimental Comparison of Min-Cut/Max-Flow Algorithms for
+                    Energy Minimization in Vision, by Yuri Boykov and Vladimir Kolmogorov, 
+                    in PAMI 2004.
+                </blockquote>
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_max_factor_graph_potts</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/graph_cuts/find_max_factor_graph_potts_abstract.h</spec_file>
+         <description>
+              This function is a tool for exactly solving the MAP problem in a Potts
+              model.  This type of model is useful when you have a problem which
+              can be modeled as a bunch of binary decisions on some variables,
+              but you have some kind of labeling consistency constraint.  This
+              means that there is some penalty for giving certain pairs of variables
+              different labels.  So in addition to trying to figure out how to best
+              label each variable on its own, you have to worry about making the
+              labels pairwise consistent in some sense.  The find_max_factor_graph_potts()
+              routine can be used to find the most probable/highest scoring
+              labeling for this type of model.
+              <p>The implementation of this routine is based on the <a href="#min_cut">min_cut</a> object.</p>
          </description>
                                  
       </component>

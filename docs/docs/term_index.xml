@@ -73,6 +73,16 @@
          <term file="optimization.html" name="find_max_trust_region"/>
          <term file="optimization.html" name="find_max_factor_graph_nmplp"/>
          <term file="optimization.html" name="find_max_factor_graph_viterbi"/>
+
+         <term file="optimization.html" name="find_max_factor_graph_potts"/>
+         <term file="optimization.html" name="min_cut"/>
+         <term file="optimization.html" name="graph_cut_score"/>
+         <term file="optimization.html" name="potts_model_score"/>
+         <term file="dlib/graph_cuts/min_cut_abstract.h.html" name="node_label"/>
+         <term link="dlib/graph_cuts/min_cut_abstract.h.html#node_label" name="SOURCE_CUT"/>
+         <term link="dlib/graph_cuts/min_cut_abstract.h.html#node_label" name="SINK_CUT"/>
+         <term link="dlib/graph_cuts/min_cut_abstract.h.html#node_label" name="FREE_NODE"/>
+
          <term file="optimization.html" name="solve_trust_region_subproblem"/>
          <term file="optimization.html" name="find_min_single_variable"/>
          <term file="optimization.html" name="find_min_using_approximate_derivatives"/>
@@ -170,7 +180,7 @@
          <term file="algorithms.html" name="randomly_subsample"/>
 
          <term file="ml.html" name="select_all_distinct_labels"/>
-         <term file="dlib/svm/multiclass_tools_abstract.h.html#find_missing_pairs" name="find_missing_pairs"/>
+         <term file="dlib/svm/multiclass_tools_abstract.h.html" name="find_missing_pairs"/>
 
          <term file="ml.html" name="svm_multiclass_linear_trainer"/>
          <term link="ml.html#svm_multiclass_linear_trainer" name="Multiclass SVM"/>
