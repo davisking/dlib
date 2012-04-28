@@ -507,6 +507,8 @@ subject to the following constraint:
    where X is a set of integer valued variables and f(X) can be written
    as the sum of functions which each involve only two variables from X.
 </pre>
+If the graph is tree-structured then this routine always gives the exact solution to the MAP problem.
+However, for graphs with cycles, the solution may be approximate.
 <br/>
 <br/>
             This function is an implementation of the NMPLP algorithm introduced in the 
