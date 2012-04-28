@@ -139,6 +139,7 @@
          <term file="algorithms.html" name="rand"/>
          <term link="algorithms.html#rand" name="Mersenne Twister"/>
          <term file="algorithms.html" name="graph_contains_undirected_cycle"/>
+         <term file="algorithms.html" name="graph_has_symmetric_edges"/>
          <term file="algorithms.html" name="graph_contains_directed_cycle"/>
          <term file="algorithms.html" name="copy_graph_structure"/>
 

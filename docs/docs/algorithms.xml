@@ -64,6 +64,7 @@
             <name>Graph Utilities</name>
             <sub>
                <item>graph_contains_directed_cycle</item> 
+               <item>graph_has_symmetric_edges</item> 
                <item>graph_contains_undirected_cycle</item> 
                <item>create_moral_graph</item> 
                <item>triangulate_graph_and_find_cliques</item> 
@@ -679,6 +680,20 @@
          <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
          <description>        
             This function checks a <a href="containers.html#directed_graph">directed_graph</a> for directed cycles.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_has_symmetric_edges</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function checks if a <a href="containers.html#directed_graph">directed_graph</a> 
+            has a pair of nodes with just one edge between them.  If so then it
+            does not have symmetric edges.
          </description>
                                  
       </component>
