@@ -45,6 +45,7 @@ set (tests
    find_max_factor_graph_viterbi.cpp
    geometry.cpp
    graph.cpp
+   graph_cuts.cpp
    hash.cpp
    hash_map.cpp
    hash_set.cpp

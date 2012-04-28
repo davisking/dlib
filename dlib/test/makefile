@@ -60,6 +60,7 @@ SRC += find_max_factor_graph_nmplp.cpp
 SRC += find_max_factor_graph_viterbi.cpp
 SRC += geometry.cpp
 SRC += graph.cpp
+SRC += graph_cuts.cpp
 SRC += hash.cpp
 SRC += hash_map.cpp
 SRC += hash_set.cpp
