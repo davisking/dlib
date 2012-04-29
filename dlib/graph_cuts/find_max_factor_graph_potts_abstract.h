@@ -172,6 +172,7 @@ namespace dlib
             - potts_problem == an object with an interface compatible with the potts_problem 
               object defined at the top of this file.
             - for all valid i and j:
+                - prob.factor_value_disagreement(i,j) >= 0
                 - prob.factor_value_disagreement(i,j) == prob.factor_value_disagreement(j,i)
         ensures
             - computes the model score for the given potts_problem.  We define this
@@ -206,6 +207,8 @@ namespace dlib
             - graph_type::edge_type is some signed type such as int or double
             - graph_type::type must be the same type as graph_type::edge_type 
             - graph_contains_length_one_cycle(g) == false
+            - for all valid i and j:
+                - edge(g,i,j) >= 0
         ensures
             - This function does the same thing as the version of potts_model_score()
               defined above, except that this version operates on a dlib::graph
@@ -264,6 +267,8 @@ namespace dlib
             - graph_type::edge_type is some signed type such as int or double
             - graph_type::type must be the same type as graph_type::edge_type 
             - graph_contains_length_one_cycle(g) == false
+            - for all valid i and j:
+                - edge(g,i,j) >= 0
         ensures
             - This routine simply converts g into a potts_problem and calls the
               version of find_max_factor_graph_potts() defined above on it.  Therefore,

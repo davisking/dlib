@@ -423,26 +423,51 @@ namespace dlib
         typename potts_model
         >
     typename potts_model::value_type potts_model_score (
-        const potts_model& g
+        const potts_model& prob
     )
     {
-        typename potts_model::value_type score = 0;
-        for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < prob.number_of_nodes(); ++i)
         {
-            const bool label = (g.get_label(i)!=0);
+            for (unsigned long jj = 0; jj < prob.number_of_neighbors(i); ++jj)
+            {
+                unsigned long j = prob.get_neighbor(i,jj);
+                DLIB_ASSERT(prob.factor_value_disagreement(i,j) >= 0,
+                    "\t value_type potts_model_score(prob)"
+                    << "\n\t Invalid inputs were given to this function." 
+                    << "\n\t i: " << i 
+                    << "\n\t j: " << j 
+                    << "\n\t prob.factor_value_disagreement(i,j): " << prob.factor_value_disagreement(i,j)
+                    );
+                DLIB_ASSERT(prob.factor_value_disagreement(i,j) == prob.factor_value_disagreement(j,i),
+                    "\t value_type potts_model_score(prob)"
+                    << "\n\t Invalid inputs were given to this function." 
+                    << "\n\t i: " << i 
+                    << "\n\t j: " << j 
+                    << "\n\t prob.factor_value_disagreement(i,j): " << prob.factor_value_disagreement(i,j)
+                    << "\n\t prob.factor_value_disagreement(j,i): " << prob.factor_value_disagreement(j,i)
+                    );
+            }
+        }
+#endif 
+
+        typename potts_model::value_type score = 0;
+        for (unsigned long i = 0; i < prob.number_of_nodes(); ++i)
+        {
+            const bool label = (prob.get_label(i)!=0);
             if (label)
-                score += g.factor_value(i);
+                score += prob.factor_value(i);
         }
 
-        for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
+        for (unsigned long i = 0; i < prob.number_of_nodes(); ++i)
         {
-            for (unsigned long n = 0; n < g.number_of_neighbors(i); ++n)
+            for (unsigned long n = 0; n < prob.number_of_neighbors(i); ++n)
             {
-                const unsigned long idx2 = g.get_neighbor(i,n);
-                const bool label_i = (g.get_label(i)!=0);
-                const bool label_idx2 = (g.get_label(idx2)!=0);
+                const unsigned long idx2 = prob.get_neighbor(i,n);
+                const bool label_i = (prob.get_label(i)!=0);
+                const bool label_idx2 = (prob.get_label(idx2)!=0);
                 if (label_i != label_idx2 && i < idx2)
-                    score -= g.factor_value_disagreement(i, idx2);
+                    score -= prob.factor_value_disagreement(i, idx2);
             }
         }
 
@@ -468,6 +493,23 @@ namespace dlib
 
         // The edges and node's have to use the same type to represent factor weights!
         COMPILE_TIME_ASSERT((is_same_type<edge_type, type>::value == true));
+
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
+        {
+            for (unsigned long jj = 0; jj < g.node(i).number_of_neighbors(); ++jj)
+            {
+                unsigned long j = g.node(i).neighbor(jj).index();
+                DLIB_ASSERT(edge(g,i,j) >= 0,
+                    "\t edge_type potts_model_score(g,labels)"
+                    << "\n\t Invalid inputs were given to this function." 
+                    << "\n\t i: " << i 
+                    << "\n\t j: " << j 
+                    << "\n\t edge(g,i,j): " << edge(g,i,j)
+                    );
+            }
+        }
+#endif 
 
         typename graph_type::edge_type score = 0;
         for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
@@ -498,12 +540,36 @@ namespace dlib
         typename potts_model
         >
     void find_max_factor_graph_potts (
-        potts_model& m
+        potts_model& prob
     )
     {
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < prob.number_of_nodes(); ++i)
+        {
+            for (unsigned long jj = 0; jj < prob.number_of_neighbors(i); ++jj)
+            {
+                unsigned long j = prob.get_neighbor(i,jj);
+                DLIB_ASSERT(prob.factor_value_disagreement(i,j) >= 0,
+                    "\t void find_max_factor_graph_potts(prob)"
+                    << "\n\t Invalid inputs were given to this function." 
+                    << "\n\t i: " << i 
+                    << "\n\t j: " << j 
+                    << "\n\t prob.factor_value_disagreement(i,j): " << prob.factor_value_disagreement(i,j)
+                    );
+                DLIB_ASSERT(prob.factor_value_disagreement(i,j) == prob.factor_value_disagreement(j,i),
+                    "\t void find_max_factor_graph_potts(prob)"
+                    << "\n\t Invalid inputs were given to this function." 
+                    << "\n\t i: " << i 
+                    << "\n\t j: " << j 
+                    << "\n\t prob.factor_value_disagreement(i,j): " << prob.factor_value_disagreement(i,j)
+                    << "\n\t prob.factor_value_disagreement(j,i): " << prob.factor_value_disagreement(j,i)
+                    );
+            }
+        }
+#endif 
         min_cut mc;
-        dlib::impl::potts_flow_graph<potts_model> pfg(m);
-        mc(pfg, m.number_of_nodes(), m.number_of_nodes()+1);
+        dlib::impl::potts_flow_graph<potts_model> pfg(prob);
+        mc(pfg, prob.number_of_nodes(), prob.number_of_nodes()+1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -525,6 +591,23 @@ namespace dlib
 
         // The edges and node's have to use the same type to represent factor weights!
         COMPILE_TIME_ASSERT((is_same_type<edge_type, type>::value == true));
+
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
+        {
+            for (unsigned long jj = 0; jj < g.node(i).number_of_neighbors(); ++jj)
+            {
+                unsigned long j = g.node(i).neighbor(jj).index();
+                DLIB_ASSERT(edge(g,i,j) >= 0,
+                    "\t void find_max_factor_graph_potts(g,labels)"
+                    << "\n\t Invalid inputs were given to this function." 
+                    << "\n\t i: " << i 
+                    << "\n\t j: " << j 
+                    << "\n\t edge(g,i,j): " << edge(g,i,j)
+                    );
+            }
+        }
+#endif 
 
         dlib::impl::general_potts_problem<graph_type> gg(g, labels);
         find_max_factor_graph_potts(gg);
