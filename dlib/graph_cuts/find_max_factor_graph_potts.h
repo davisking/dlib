@@ -6,6 +6,9 @@
 #include "find_max_factor_graph_potts_abstract.h"
 #include "../matrix.h"
 #include "min_cut.h"
+#include "general_potts_problem.h"
+#include "../algs.h"
+#include "../graph_utils.h"
 
 namespace dlib
 {
@@ -456,6 +459,31 @@ namespace dlib
         min_cut mc;
         dlib::impl::potts_flow_graph<potts_model> pfg(m);
         mc(pfg, m.number_of_nodes(), m.number_of_nodes()+1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename graph_type 
+        >
+    void find_max_factor_graph_potts (
+        const graph_type& g,
+        std::vector<node_label>& labels
+    )
+    {
+        DLIB_ASSERT(graph_contains_length_one_cycle(g) == false,
+                    "\t void find_max_factor_graph_potts(g,labels)"
+                    << "\n\t Invalid inputs were given to this function." 
+                    );
+        typedef typename graph_type::edge_type edge_type;
+        typedef typename graph_type::type type;
+
+        // The edges and node's have to use the same type to represent factor weights!
+        COMPILE_TIME_ASSERT((is_same_type<edge_type, type>::value == true));
+
+        dlib::impl::general_potts_problem<graph_type> gg(g, labels);
+        find_max_factor_graph_potts(gg);
+
     }
 
 // ----------------------------------------------------------------------------------------

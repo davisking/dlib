@@ -5,6 +5,7 @@
 
 #include "../matrix.h"
 #include "min_cut_abstract.h"
+#include "../graph_utils.h"
 
 namespace dlib
 {
@@ -209,6 +210,34 @@ namespace dlib
               model.  In particular, this means that this function finds the assignments 
               to all the labels in prob which maximizes potts_model_score(#prob).
             - The optimal labels are stored in #prob.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename graph_type 
+        >
+    void find_max_factor_graph_potts (
+        const graph_type& g,
+        std::vector<node_label>& labels
+    );
+    /*!
+        requires
+            - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
+            - graph_type::edge_type is some signed type such as int or double
+            - graph_type::type must be the same type as graph_type::edge_type 
+            - graph_contains_length_one_cycle(g) == false
+        ensures
+            - This routine simply converts g into a potts_problem and calls the
+              version of find_max_factor_graph_potts() defined above on it.  Therefore,
+              this routine is just a convenience wrapper that lets you use a dlib::graph
+              to represent a potts problem.
+            - #labels.size() == g.number_of_nodes() 
+            - for all valid i:  
+                - #labels[i] == the optimal label for g.node(i)
+            - The correspondence between g and a potts_problem is the following:
+                - the factor_value() for a node is stored in g.node(i).data.
+                - the factor_value_disagreement(i,j) is stored in edge(g,i,j).
     !*/
 
 // ----------------------------------------------------------------------------------------
