@@ -439,8 +439,53 @@ namespace dlib
             for (unsigned long n = 0; n < g.number_of_neighbors(i); ++n)
             {
                 const unsigned long idx2 = g.get_neighbor(i,n);
-                if (g.get_label(i) != g.get_label(idx2) && i < idx2)
+                const bool label_i = (g.get_label(i)!=0);
+                const bool label_idx2 = (g.get_label(idx2)!=0);
+                if (label_i != label_idx2 && i < idx2)
                     score -= g.factor_value_disagreement(i, idx2);
+            }
+        }
+
+        return score;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename graph_type 
+        >
+    typename graph_type::edge_type potts_model_score (
+        const graph_type& g,
+        const std::vector<node_label>& labels
+    )
+    {
+        DLIB_ASSERT(graph_contains_length_one_cycle(g) == false,
+                    "\t edge_type potts_model_score(g,labels)"
+                    << "\n\t Invalid inputs were given to this function." 
+                    );
+        typedef typename graph_type::edge_type edge_type;
+        typedef typename graph_type::type type;
+
+        // The edges and node's have to use the same type to represent factor weights!
+        COMPILE_TIME_ASSERT((is_same_type<edge_type, type>::value == true));
+
+        typename graph_type::edge_type score = 0;
+        for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
+        {
+            const bool label = (labels[i]!=0);
+            if (label)
+                score += g.node(i).data;
+        }
+
+        for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
+        {
+            for (unsigned long n = 0; n < g.node(i).number_of_neighbors(); ++n)
+            {
+                const unsigned long idx2 = g.node(i).neighbor(n).index();
+                const bool label_i = (labels[i]!=0);
+                const bool label_idx2 = (labels[idx2]!=0);
+                if (label_i != label_idx2 && i < idx2)
+                    score -= g.node(i).edge(n);
             }
         }
 

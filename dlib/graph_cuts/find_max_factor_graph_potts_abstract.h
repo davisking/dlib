@@ -194,6 +194,42 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename graph_type 
+        >
+    typename graph_type::edge_type potts_model_score (
+        const graph_type& g,
+        const std::vector<node_label>& labels
+    );
+    /*!
+        requires
+            - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
+            - graph_type::edge_type is some signed type such as int or double
+            - graph_type::type must be the same type as graph_type::edge_type 
+            - graph_contains_length_one_cycle(g) == false
+        ensures
+            - This function does the same thing as the version of potts_model_score()
+              defined above, except that this version operates on a dlib::graph
+              instead of a potts_problem object.
+            - computes the model score for the given graph and labeling.  We define this
+              precisely below:
+                - let L(i) == the boolean label of the ith variable in g.  Or in other 
+                  words, L(i) == (labels[i] != 0).
+                - let F == the sum of values of g.node(i).data for only i values
+                  where L(i) == true.
+                - Let D == the sum of values of edge(g,i,j) for only i and j 
+                  values which meet the following conditions:
+                    - i and j are neighbors in the graph defined by g, that is,
+                      it is valid to call edge(g,i,j).
+                    - L(i) != L(j)
+                    - i < j
+                      (i.e. We want to make sure to only count the edge between i and j once)
+
+                - Then this function returns F - D
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename potts_problem
         >
     void find_max_factor_graph_potts (
@@ -232,7 +268,8 @@ namespace dlib
             - This routine simply converts g into a potts_problem and calls the
               version of find_max_factor_graph_potts() defined above on it.  Therefore,
               this routine is just a convenience wrapper that lets you use a dlib::graph
-              to represent a potts problem.
+              to represent a potts problem.  This means that this function maximizes 
+              the value of potts_model_score(g, #labels).
             - #labels.size() == g.number_of_nodes() 
             - for all valid i:  
                 - #labels[i] == the optimal label for g.node(i)

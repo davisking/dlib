@@ -7,6 +7,7 @@
 #include <dlib/graph_cuts.h>
 #include <dlib/graph_utils.h>
 #include <dlib/directed_graph.h>
+#include <dlib/graph.h>
 #include <dlib/rand.h>
 
 #include "tester.h"
@@ -336,6 +337,125 @@ namespace
                 g = m;
             }
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename graph_type>
+    void brute_force_potts_model_on_graph (
+        const graph_type& g,
+        std::vector<node_label>& labels_
+    )
+    {
+        std::vector<node_label> labels;
+        labels.resize(g.number_of_nodes());
+
+        const unsigned long num = (unsigned long)std::pow(2.0, (double)g.number_of_nodes());
+
+        double best_score = -std::numeric_limits<double>::infinity();
+        for (unsigned long i = 0; i < num; ++i)
+        {
+            for (unsigned long j = 0; j < g.number_of_nodes(); ++j)
+            {
+                unsigned long T = (1)<<j;
+                T = (T&i);
+                if (T != 0)
+                    labels[j] = SINK_CUT;
+                else
+                    labels[j] = SOURCE_CUT;
+            }
+
+
+            double score = potts_model_score(g,labels);
+            if (score > best_score)
+            {
+                best_score = score;
+                labels_ = labels;
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename graph_type>
+    void make_random_undirected_graph(
+        dlib::rand& rnd,
+        graph_type& g
+    )
+    {
+        typedef typename graph_type::edge_type edge_weight_type;
+        g.clear();
+        const unsigned int num_nodes = rnd.get_random_32bit_number()%8;
+        g.set_number_of_nodes(num_nodes);
+
+        const unsigned int num_edges = static_cast<unsigned int>(num_nodes*(num_nodes-1)/2*rnd.get_random_double() + 0.5);
+
+        // add the right number of randomly selected edges
+        unsigned int count = 0;
+        while (count < num_edges)
+        {
+            unsigned long i = rnd.get_random_32bit_number()%g.number_of_nodes();
+            unsigned long j = rnd.get_random_32bit_number()%g.number_of_nodes();
+            if (i != j && g.has_edge(i, j) == false)
+            {
+                ++count;
+                g.add_edge(i, j);
+                edge(g, i, j) = static_cast<edge_weight_type>(rnd.get_random_double()*50);
+            }
+        }
+
+        for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
+        {
+            g.node(i).data = static_cast<edge_weight_type>(rnd.get_random_gaussian()*200);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_graph_potts_model(
+        dlib::rand& rnd
+    )
+    {
+        using namespace std;
+        double brute_force_score;
+        double graph_cut_score;
+
+        graph<double,double>::kernel_1a_c temp;
+        make_random_undirected_graph(rnd,temp);
+
+        {
+            std::vector<node_label> labels;
+
+            brute_force_potts_model_on_graph(temp, labels);
+
+            for (unsigned long i = 0; i < temp.number_of_nodes(); ++i)
+            {
+                dlog << LTRACE << "node " << i << ": "<< (int)labels[i];
+            }
+
+            brute_force_score = potts_model_score(temp, labels);
+            dlog << LTRACE << "brute force score: "<< brute_force_score;
+        }
+        dlog << LTRACE << "******************";
+
+        {
+            std::vector<node_label> labels;
+            find_max_factor_graph_potts(temp, labels);
+            DLIB_TEST(temp.number_of_nodes() == labels.size());
+
+            for (unsigned long i = 0; i < temp.number_of_nodes(); ++i)
+            {
+                dlog << LTRACE << "node " << i << ": "<< (int)labels[i];
+            }
+            graph_cut_score = potts_model_score(temp, labels);
+            dlog << LTRACE << "graph cut score: "<< graph_cut_score;
+        }
+
+        DLIB_TEST_MSG(graph_cut_score == brute_force_score, std::abs(graph_cut_score - brute_force_score));
+
+        dlog << LTRACE << "##################";
+        dlog << LTRACE << "##################";
+        dlog << LTRACE << "##################";
     }
 
 // ----------------------------------------------------------------------------------------
@@ -731,6 +851,13 @@ namespace
                 print_spinner();
                 dense_potts_problem p(6, rnd);
                 impl_test_potts_model(p);
+            }
+
+            for (int k = 0; k < 300; ++k)
+            {
+                dlog << LTRACE << "dense_potts_problem iter " << k;
+                print_spinner();
+                test_graph_potts_model(rnd);
             }
         }
     } a;
