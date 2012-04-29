@@ -178,9 +178,9 @@ namespace dlib
               precisely below:
                 - let L(i) == the boolean label of the ith variable in prob.  Or in other 
                   words, L(i) == (prob.get_label(i) != 0).
-                - let F == the sum of all values of prob.factor_value(i) for only i values
+                - let F == the sum of values of prob.factor_value(i) for only i values
                   where L(i) == true.
-                - Let D == the sum of all values of prob.factor_value_disagreement(i,j) 
+                - Let D == the sum of values of prob.factor_value_disagreement(i,j) 
                   for only i and j values which meet the following conditions:
                     - i and j are neighbors in the graph defined by prob, that is,
                       it is valid to call prob.factor_value_disagreement(i,j).
