@@ -134,6 +134,7 @@ namespace dlib
                     const unsigned long jj = g.node_id(j);
                     DLIB_ASSERT(g.get_flow(i,jj) >= 0,
                                 "\t void min_cut::operator()"
+                                << "\n\t Invalid inputs were given to this function." 
                                 << "\n\t i: "<< i 
                                 << "\n\t jj: "<< jj
                                 << "\n\t g.get_flow(i,jj): "<< g.get_flow(i,jj)
