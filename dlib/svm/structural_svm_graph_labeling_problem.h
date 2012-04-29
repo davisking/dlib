@@ -1,10 +1,10 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_STRUCTURAL_SVM_POtTS_PROBLEM_H__
-#define DLIB_STRUCTURAL_SVM_POtTS_PROBLEM_H__
+#ifndef DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_H__
+#define DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_H__
 
 
-#include "structural_svm_potts_problem_abstract.h"
+#include "structural_svm_graph_labeling_problem_abstract.h"
 #include "../graph_cuts.h"
 #include "../matrix.h"
 #include "../array.h"
@@ -23,7 +23,7 @@ namespace dlib
     template <
         typename graph_type
         >
-    bool is_potts_learning_problem (
+    bool is_graph_labeling_problem (
         const dlib::array<graph_type>& samples,
         const std::vector<std::vector<node_label> >& labels
     )
@@ -33,15 +33,15 @@ namespace dlib
             - graph_type::type and graph_type::edge_type are either dlib::matrix types
               capable of containing column vectors or some kind of sparse vector type.
         ensures
-            - Note that a potts learning problem is a task to learn a binary classifier which 
+            - Note that a graph labeling problem is a task to learn a binary classifier which 
               predicts the correct label for each node in the provided graphs.  Additionally, 
               we have information in the form of graph edges between nodes where edges are 
               present when we believe the linked nodes are likely to have the same label.  
-              Therefore, part of a potts learning problem is to learn to score each edge in 
+              Therefore, part of a graph labeling problem is to learn to score each edge in 
               terms of how strongly the edge should enforce labeling consistency between 
-              its two nodes.  Thus, to be a valid potts problem, samples should contain 
+              its two nodes.  Thus, to be a valid graph labeling problem, samples should contain 
               example graphs of connected nodes while labels should indicate the desired 
-              label of each node.  The precise requirements for a valid potts learning 
+              label of each node.  The precise requirements for a valid graph labeling 
               problem are listed below.
             - This function returns true if all of the following are true and false otherwise:
                 - is_learning_problem(samples, labels) == true
@@ -99,7 +99,7 @@ namespace dlib
     template <
         typename graph_type 
         >
-    class structural_svm_potts_problem : noncopyable,
+    class structural_svm_graph_labeling_problem : noncopyable,
         public structural_svm_problem_threaded<matrix<double,0,1>, 
                                             typename dlib::impl::fvect<graph_type>::type >
     {
@@ -111,7 +111,7 @@ namespace dlib
 
         typedef std::vector<node_label> label_type;
 
-        structural_svm_potts_problem(
+        structural_svm_graph_labeling_problem(
             const dlib::array<sample_type>& samples_,
             const std::vector<label_type>& labels_,
             unsigned long num_threads = 2
@@ -121,8 +121,8 @@ namespace dlib
             labels(labels_)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_potts_learning_problem(samples, labels) == true,
-                    "\t structural_svm_potts_problem::structural_svm_potts_problem()"
+            DLIB_ASSERT(is_graph_labeling_problem(samples, labels) == true,
+                    "\t structural_svm_graph_labeling_problem::structural_svm_graph_labeling_problem()"
                     << "\n\t invalid inputs were given to this function");
 
 
@@ -350,6 +350,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_STRUCTURAL_SVM_POtTS_PROBLEM_H__
+#endif // DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_H__
 
 
