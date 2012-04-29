@@ -151,9 +151,6 @@ namespace dlib
                     else
                         sink_flows(i,1) = temp;
 
-                    source_flows(i,1) = 0;
-                    sink_flows(i,0) = 0;
-
                     for (unsigned long j = 0; j < g.number_of_neighbors(i); ++j)
                     {
                         flows(i,j) = g.factor_value_disagreement(i, g.get_neighbor(i,j));
