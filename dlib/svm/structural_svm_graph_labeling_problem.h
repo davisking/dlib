@@ -293,7 +293,7 @@ namespace dlib
             const sample_type& samp = samples[idx];
 
             // setup the potts graph based on samples[idx] and current_solution.
-            graph<double,double>::kernel_1a_c g; // TODO, remove _c
+            graph<double,double>::kernel_1a g; 
             copy_graph_structure(samp, g);
             for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
             {
