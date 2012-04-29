@@ -20,30 +20,43 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename graph_type>
-    bool is_potts_problem (
+    template <
+        typename graph_type
+        >
+    bool is_potts_learning_problem (
         const dlib::array<graph_type>& samples,
         const std::vector<std::vector<node_label> >& labels
     )
     /*!
         requires
             - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
-            - graph_type::edge_type is either a dlib::matrix capable of containing
-              column vectors or is some kind of sparse vector type.
+            - graph_type::type and graph_type::edge_type are either dlib::matrix types
+              capable of containing column vectors or some kind of sparse vector type.
         ensures
-            - returns true if all of the following are true and false otherwise:
+            - Note that a potts learning problem is a task to learn a binary classifier which 
+              predicts the correct label for each node in the provided graphs.  Additionally, 
+              we have information in the form of graph edges between nodes where edges are 
+              present when we believe the linked nodes are likely to have the same label.  
+              Therefore, part of a potts learning problem is to learn to score each edge in 
+              terms of how strongly the edge should enforce labeling consistency between 
+              its two nodes.  Thus, to be a valid potts problem, samples should contain 
+              example graphs of connected nodes while labels should indicate the desired 
+              label of each node.  The precise requirements for a valid potts learning 
+              problem are listed below.
+            - This function returns true if all of the following are true and false otherwise:
                 - is_learning_problem(samples, labels) == true
                 - All the vectors stored on the edges of each graph in samples 
                   contain only values which are >= 0. 
                 - graph_type::type and graph_type::edge_type either both represent
                   dlib::matrix column vectors or are both sparse vectors.
                 - for all valid i:
+                    - graph_contains_length_one_cycle(samples[i]) == false 
                     - samples[i].number_of_nodes() == labels[i].size()
                       (i.e. Every graph node gets its own label)
                 - if (graph_type::edge_type is a dlib::matrix) then     
                     - All the nodes must contain vectors with the same number of dimensions.
                     - All the edges must contain vectors with the same number of dimensions.
-                      (However, edge vectors may differ in dimension from node vectors though.)
+                      (However, edge vectors may differ in dimension from node vectors.)
                     - All vectors have non-zero size.  That is, they have more than 0 dimensions.
     !*/
     {
@@ -108,7 +121,7 @@ namespace dlib
             labels(labels_)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_potts_problem(samples, labels) == true,
+            DLIB_ASSERT(is_potts_learning_problem(samples, labels) == true,
                     "\t structural_svm_potts_problem::structural_svm_potts_problem()"
                     << "\n\t invalid inputs were given to this function");
 
