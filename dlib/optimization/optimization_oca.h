@@ -111,7 +111,7 @@ namespace dlib
         typename matrix_type::type operator() (
             const oca_problem<matrix_type>& problem,
             matrix_type& w,
-            bool require_nonnegative_w = false 
+            unsigned long num_nonnegative = 0 
         ) const
         {
             // make sure requires clause is not broken
@@ -123,6 +123,9 @@ namespace dlib
                 << "\n\t problem.get_num_dimensions(): " << problem.get_num_dimensions() 
                 << "\n\t this: " << this
                 );
+
+            if (num_nonnegative > static_cast<unsigned long>(problem.get_num_dimensions()))
+                num_nonnegative = problem.get_num_dimensions();
 
             typedef typename matrix_type::type scalar_type;
             typedef typename matrix_type::layout_type layout_type;
@@ -218,15 +221,16 @@ namespace dlib
                     eps = 1e-16;
                 // Note that we warm start this optimization by using the alpha from the last
                 // iteration as the starting point.
-                if (require_nonnegative_w)
-                    solve_qp4_using_smo(planes, K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
+                if (num_nonnegative != 0)
+                    solve_qp4_using_smo(rowm(planes,range(0,num_nonnegative-1)), K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
                 else
                     solve_qp_using_smo(K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
 
                 // construct the w that minimized the subproblem.
                 w = -(planes*alpha);
-                if (require_nonnegative_w)
-                    w = lowerbound(w,0);
+                // threshold the first num_nonnegative w elements if necessary.
+                if (num_nonnegative != 0)
+                    set_rowm(w,range(0,num_nonnegative-1)) = lowerbound(rowm(w,range(0,num_nonnegative-1)),0);
 
                 for (long i = 0; i < alpha.size(); ++i)
                 {

@@ -60,8 +60,8 @@ namespace
             oca solver;
 
             // test the version without a non-negativity constraint on w.
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, false);
-            dlog << LINFO << w;
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 0);
+            dlog << LINFO << trans(w);
             true_w = -0.5, 0.5, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
             DLIB_TEST(max(abs(w-true_w)) < 1e-10);
@@ -69,9 +69,67 @@ namespace
             print_spinner();
 
             // test the version with a non-negativity constraint on w.
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, true);
-            dlog << LINFO << w;
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 9999);
+            dlog << LINFO << trans(w);
             true_w = 0, 1, 0;
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+            print_spinner();
+
+            // test the version with a non-negativity constraint on w.
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 2);
+            dlog << LINFO << trans(w);
+            true_w = 0, 1, 0;
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+            print_spinner();
+
+
+            // test the version with a non-negativity constraint on w.
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 1);
+            dlog << LINFO << trans(w);
+            true_w = 0, 1, 0;
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+            print_spinner();
+
+
+            // switching the labels should change which w weight goes negative.
+            y.clear();
+            y.push_back(-1);
+            y.push_back(+1);
+
+
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 0);
+            dlog << LINFO << trans(w);
+            true_w = 0.5, -0.5, 0;
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+            print_spinner();
+
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 1);
+            dlog << LINFO << trans(w);
+            true_w = 0.5, -0.5, 0;
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+            print_spinner();
+
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 2);
+            dlog << LINFO << trans(w);
+            true_w = 1, 0, 0;
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+            print_spinner();
+
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 5);
+            dlog << LINFO << trans(w);
+            true_w = 1, 0, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
             DLIB_TEST(max(abs(w-true_w)) < 1e-10);
         }

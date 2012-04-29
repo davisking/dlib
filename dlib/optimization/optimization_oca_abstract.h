@@ -151,7 +151,7 @@ namespace dlib
         typename matrix_type::type operator() (
             const oca_problem<matrix_type>& problem,
             matrix_type& w,
-            bool require_nonnegative_w = false 
+            unsigned long num_nonnegative = 0 
         ) const;
         /*!
             requires
@@ -162,10 +162,10 @@ namespace dlib
                 - The optimization algorithm runs until problem.optimization_status() 
                   indicates it is time to stop.
                 - returns the objective value at the solution #w
-                - if (require_nonnegative_w == true) then
-                    - Adds the constraint that every element of w be non-negative.  
-                      Therefore, if this argument is true then #w won't contain any
-                      negative values.
+                - if (num_nonnegative != 0) then
+                    - Adds the constraint that #w(i) >= 0 for all i < num_nonnegative.
+                      That is, the first num_nonnegative elements of #w will always be
+                      non-negative.
         !*/
 
         void set_subproblem_epsilon (
