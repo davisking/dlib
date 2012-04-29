@@ -17,6 +17,41 @@
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename graph_type>
+    bool is_potts_problem (
+        const dlib::array<graph_type>& samples,
+        const std::vector<std::vector<node_label> >& labels
+    )
+    /*!
+        requires
+            - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
+            - graph_type::edge_type is either a dlib::matrix capable of containing
+              column vectors or is some kind of sparse vector type.
+        ensures
+            - returns true if all of the following are true and false otherwise:
+                - is_learning_problem(samples, labels) == true
+                - All the vectors stored on the edges of each graph in samples 
+                  contain only values which are >= 0. 
+                - graph_type::type and graph_type::edge_type either both represent
+                  dlib::matrix column vectors or are both sparse vectors.
+                - for all valid i:
+                    - samples[i].number_of_nodes() == labels[i].size()
+                      (i.e. Every graph node gets its own label)
+                - if (graph_type::edge_type is a dlib::matrix) then     
+                    - All the nodes must contain vectors with the same number of dimensions.
+                    - All the edges must contain vectors with the same number of dimensions.
+                      (However, edge vectors may differ in dimension from node vectors though.)
+                    - All vectors have non-zero size.  That is, they have more than 0 dimensions.
+    !*/
+    {
+        return true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     namespace impl
     {
         template <
@@ -73,10 +108,9 @@ namespace dlib
             labels(labels_)
         {
             // make sure requires clause is not broken
-            // TODO
-            // requires, at least one edge in the dataset.  All edge vectors have same number
-            // of dims.  All node vectors have same number of dims.  none of the dims can be 0.
-            // all elements in a edge vector must be >= 0.
+            DLIB_ASSERT(is_potts_problem(samples, labels) == true,
+                    "\t structural_svm_potts_problem::structural_svm_potts_problem()"
+                    << "\n\t invalid inputs were given to this function");
 
 
             // Figure out how many dimensions are in a node vector.  Just pick
