@@ -29,7 +29,7 @@ namespace
         typedef double value_type;
     private:
 
-        matrix<value_type,0,2> factors1;
+        matrix<value_type,0,1> factors1;
         matrix<value_type> factors2;
         matrix<node_label,0,1> labels;
     public:
@@ -39,7 +39,7 @@ namespace
             dlib::rand& rnd
         )
         {
-            factors1 = -7*(randm(num_nodes, 2, rnd)-0.5);
+            factors1 = -7*(randm(num_nodes, 1, rnd)-0.5);
             factors2 = make_symmetric(randm(num_nodes, num_nodes, rnd) > 0.5);
             labels.set_size(num_nodes);
             labels = FREE_NODE;
@@ -92,14 +92,11 @@ namespace
         }
 
 
-        value_type factor_value (unsigned long idx, bool value) const
+        value_type factor_value (unsigned long idx) const
         {
             DLIB_TEST(idx < number_of_nodes());
 
-            if (value)
-                return factors1(idx,0);
-            else
-                return factors1(idx,1);
+            return factors1(idx);
         }
 
         value_type factor_value_disagreement (unsigned long idx1, unsigned long idx2) const
@@ -124,7 +121,7 @@ namespace
         const static unsigned long max_number_of_neighbors = 4;
     private:
 
-        matrix<value_type,0,2> factors1;
+        matrix<value_type,0,1> factors1;
         matrix<value_type> factors2;
         matrix<node_label,0,1> labels;
         long nr;
@@ -142,7 +139,7 @@ namespace
             rect = rectangle(0,0,nc-1,nr-1);
             inner_rect = shrink_rect(rect,1);
             const unsigned long num_nodes = nr*nc;
-            factors1 = -7*(randm(num_nodes, 2, rnd));
+            factors1 = -7*(randm(num_nodes, 1, rnd));
             factors2 = randm(num_nodes, 4, rnd) > 0.5;
 
             //factors1 = 0;
@@ -260,15 +257,12 @@ namespace
             return labels(idx);
         }
 
-        value_type factor_value (unsigned long idx, bool value) const
+        value_type factor_value (unsigned long idx) const
         {
             ++count;
             DLIB_TEST(idx < (unsigned long)number_of_nodes());
 
-            if (value)
-                return factors1(idx,0);
-            else
-                return factors1(idx,1);
+            return factors1(idx);
         }
 
         value_type factor_value_disagreement (unsigned long idx1, unsigned long idx2) const

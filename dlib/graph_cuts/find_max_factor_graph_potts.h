@@ -140,33 +140,21 @@ namespace dlib
                 sink_label = FREE_NODE;
 
                 // setup flows based on factor potentials
-                edge_type min_value = std::numeric_limits<edge_type>::max();
                 for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
                 {
-                    source_flows(i,0) = -g.factor_value(i, true);
-                    sink_flows(i,1) = -g.factor_value(i, false);
+                    const edge_type temp = g.factor_value(i);
+                    if (temp < 0)
+                        source_flows(i,0) = -temp;
+                    else
+                        sink_flows(i,1) = temp;
 
                     source_flows(i,1) = 0;
                     sink_flows(i,0) = 0;
-
-                    if (source_flows(i,0) < min_value)
-                        min_value = source_flows(i,0);
-                    if (sink_flows(i,1) < min_value)
-                        min_value = sink_flows(i,1);
 
                     for (unsigned long j = 0; j < g.number_of_neighbors(i); ++j)
                     {
                         flows(i,j) = g.factor_value_disagreement(i, g.get_neighbor(i,j));
                     }
-                }
-
-                // The flows can't be negative, so if they are then just adjust them
-                // so they are positive.  Note that doing this doesn't change the optimal
-                // labeling assignment.
-                if (min_value < 0)
-                {
-                    source_flows -= min_value;
-                    sink_flows -= min_value;
                 }
             }
 
@@ -439,7 +427,8 @@ namespace dlib
         for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
         {
             const bool label = (g.get_label(i)!=0);
-            score += g.factor_value(i, label);
+            if (label)
+                score += g.factor_value(i);
         }
 
         for (unsigned long i = 0; i < g.number_of_nodes(); ++i)

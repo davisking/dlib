@@ -126,16 +126,16 @@ namespace dlib
         typedef an_integer_or_real_type value_type;
 
         value_type factor_value (
-            unsigned long idx, 
-            bool lab 
+            unsigned long idx
         ) const;
         /*!
             requires
                 - idx < number_of_nodes()
             ensures
                 - returns a value which indicates how "good" it is to assign the idx-node
-                  a label equal to lab.  The larger the value, the more desirable
-                  the label contained by lab. 
+                  the label of true.  The larger the value, the more desirable it is to 
+                  give it this label.  Similarly, a negative value indicates that it is
+                  better to give the node a label of false.
         !*/
 
         value_type factor_value_disagreement (
@@ -177,7 +177,7 @@ namespace dlib
               precisely:
                 - let L(i) == the boolean label of the ith variable in prob.  Or in other 
                   words, L(i) == (prob.get_label(i) != 0).
-                - let F == the sum over valid i of prob.factor_value(i, L(i)).
+                - let F == the sum of all values of prob.factor_value(i) where whenever L(i) == true.
                 - Let D == the sum of all values of prob.factor_value_disagreement(i,j) 
                   whenever the following conditions are true about i and j:
                     - i and j are neighbors in the graph defined by prob, that is,
@@ -209,10 +209,6 @@ namespace dlib
               model.  In particular, this means that this function finds the assignments 
               to all the labels in prob which maximizes potts_model_score(#prob).
             - The optimal labels are stored in #prob.
-            - Note that this routine is a little bit faster if all the values 
-              returned by prob.factor_value() are negative.  So if you can arrange for that
-              to be true without spending any extra CPU cycles then it might be a good idea 
-              to do so.
     !*/
 
 // ----------------------------------------------------------------------------------------
