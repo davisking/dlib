@@ -158,13 +158,15 @@ namespace dlib
             }
         }
 
-        long get_num_nonnegative_dimensions (
+        long get_num_edge_weights (
         ) const
         /*!
             ensures
-                - returns the number of dimensions of the solution vector which
-                  are required to be non-negative.  This is equal to the number of
-                  dimensions for a feature vector on a graph edge.
+                - returns the dimensionality of the edge weight vector.  It is also
+                  important to know that when using the oca solver with this object,
+                  you must set it to generate non-negative weights for the edge weight
+                  part of the total weight vector.  You can do this by passing get_num_edge_weights()
+                  to the third argument to oca::operator().
         !*/
         { 
             return edge_dims;
