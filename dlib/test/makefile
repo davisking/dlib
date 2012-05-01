@@ -116,6 +116,7 @@ SRC += smart_pointers.cpp
 SRC += sockets2.cpp
 SRC += sockets.cpp
 SRC += sockstreambuf.cpp
+SRC += sparse_vector.cpp
 SRC += stack.cpp
 SRC += static_map.cpp
 SRC += static_set.cpp

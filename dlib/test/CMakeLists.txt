@@ -101,6 +101,7 @@ set (tests
    sockets2.cpp
    sockets.cpp
    sockstreambuf.cpp
+   sparse_vector.cpp
    stack.cpp
    static_map.cpp
    static_set.cpp
