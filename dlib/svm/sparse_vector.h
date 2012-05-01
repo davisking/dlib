@@ -216,16 +216,33 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        template <typename T>
-        typename T::value_type::second_type dot (
+
+        namespace impl
+        {
+            // This funny looking thing is here to let us use SFINAE to make the dot()
+            // function below only get selected from the overload resolution order if
+            // it's operating on two sparse vectors.
+            template <typename T, typename U>
+            struct dot_ret_type
+            {
+                typedef T type;
+            };
+        }
+
+        // This funny looking thing is here to let us use SFINAE to make the dot()
+        // function below only get selected from the overload resolution order if
+        // it's operating on two sparse vectors.
+        template <typename T, typename U>
+        typename dlib::sparse_vector::impl::dot_ret_type<typename T::value_type::second_type,typename U::value_type::second_type>::type 
+        dot (
             const T& a,
-            const T& b
+            const U& b
         )
         {
             typedef typename T::value_type::second_type scalar_type;
 
             typename T::const_iterator ai = a.begin();
-            typename T::const_iterator bi = b.begin();
+            typename U::const_iterator bi = b.begin();
 
             scalar_type sum = 0;
             while (ai != a.end() && bi != b.end())
