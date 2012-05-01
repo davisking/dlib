@@ -153,7 +153,7 @@ namespace dlib
         }
 
 
-        matrix<double, 1, 2, mem_manager_type> res;
+        matrix<double, 1, 2> res;
         res(0) = (double)num_pos_correct/(double)(num_pos); 
         res(1) = (double)num_neg_correct/(double)(num_neg); 
         return res;
