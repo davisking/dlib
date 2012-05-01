@@ -59,8 +59,14 @@ namespace dlib
         }
 
         matrix<double, 1, 2> res;
-        res(0) = (double)num_pos_correct/(double)(num_pos); 
-        res(1) = (double)num_neg_correct/(double)(num_neg); 
+        if (num_pos != 0)
+            res(0) = (double)num_pos_correct/(double)(num_pos); 
+        else
+            res(0) = 1;
+        if (num_neg != 0)
+            res(1) = (double)num_neg_correct/(double)(num_neg); 
+        else
+            res(1) = 1;
         return res;
     }
 
@@ -161,8 +167,14 @@ namespace dlib
 
 
         matrix<double, 1, 2> res;
-        res(0) = (double)num_pos_correct/(double)(num_pos); 
-        res(1) = (double)num_neg_correct/(double)(num_neg); 
+        if (num_pos != 0)
+            res(0) = (double)num_pos_correct/(double)(num_pos); 
+        else
+            res(0) = 1;
+        if (num_neg != 0)
+            res(1) = (double)num_neg_correct/(double)(num_neg); 
+        else
+            res(1) = 1;
         return res;
     }
 
