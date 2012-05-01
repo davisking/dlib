@@ -201,7 +201,7 @@ namespace dlib
                 // add an element into the stored data sequence
                 dh_temp.s = x - prev_x;
                 dh_temp.y = funct_derivative - prev_derivative;
-                double temp = dlib::dot(dh_temp.s, dh_temp.y);
+                double temp = dot(dh_temp.s, dh_temp.y);
                 // only accept this bit of data if temp isn't zero
                 if (std::abs(temp) > std::numeric_limits<double>::epsilon())
                 {

@@ -298,7 +298,7 @@ namespace dlib
 
 
         // figure out how many elements we need in our dense vectors.  
-        const unsigned long max_dim = sparse_vector::max_index_plus_one(samples);
+        const unsigned long max_dim = max_index_plus_one(samples);
 
 
         // now turn all the samples into dense samples

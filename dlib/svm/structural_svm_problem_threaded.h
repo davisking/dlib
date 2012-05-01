@@ -64,7 +64,7 @@ namespace dlib
 
                     auto_mutex lock(self.accum_mutex);
                     total_loss += loss;
-                    sparse_vector::add_to(subgradient, ftemp);
+                    add_to(subgradient, ftemp);
                 }
                 else
                 {
@@ -79,12 +79,12 @@ namespace dlib
                         scalar_type loss_temp;
                         self.separation_oracle_cached(i, w, loss_temp, ftemp);
                         loss += loss_temp;
-                        sparse_vector::add_to(faccum, ftemp);
+                        add_to(faccum, ftemp);
                     }
 
                     auto_mutex lock(self.accum_mutex);
                     total_loss += loss;
-                    sparse_vector::add_to(subgradient, faccum);
+                    add_to(subgradient, faccum);
                 }
             }
 

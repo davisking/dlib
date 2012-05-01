@@ -68,7 +68,7 @@ namespace dlib
         ) const 
         {
             // plus 1 for the bias term
-            return sparse_vector::max_index_plus_one(samples) + 1;
+            return max_index_plus_one(samples) + 1;
         }
 
         virtual bool optimization_status (
@@ -138,13 +138,13 @@ namespace dlib
                 {
                     if (labels(i) > 0)
                     {
-                        sparse_vector::subtract_from(subgradient, samples(i), Cpos);
+                        subtract_from(subgradient, samples(i), Cpos);
 
                         subgradient(subgradient.size()-1) += Cpos;
                     }
                     else
                     {
-                        sparse_vector::add_to(subgradient, samples(i), Cneg);
+                        add_to(subgradient, samples(i), Cneg);
 
                         subgradient(subgradient.size()-1) -= Cneg;
                     }
@@ -171,8 +171,6 @@ namespace dlib
                 - for all i: #dot_prods[i] == dot(colm(#w,0,w.size()-1), samples(i)) - #w(w.size()-1)
         !*/
         {
-            using dlib::sparse_vector::dot;
-            using dlib::dot;
             // The reason for using w_size_m1 and not just w.size()-1 is because
             // doing it this way avoids an inane warning from gcc that can occur in some cases.
             const long w_size_m1 = w.size()-1;
@@ -558,8 +556,8 @@ namespace dlib
             // sparse vector container so we need to use this special kind of copy to handle that case.
             // As an aside, the reason for using max_index_plus_one() and not just w.size()-1 is because
             // doing it this way avoids an inane warning from gcc that can occur in some cases.
-            const long out_size = sparse_vector::max_index_plus_one(x);
-            sparse_vector::assign(df.basis_vectors(0), matrix_cast<scalar_type>(colm(w, 0, out_size)));
+            const long out_size = max_index_plus_one(x);
+            assign(df.basis_vectors(0), matrix_cast<scalar_type>(colm(w, 0, out_size)));
             df.alpha.set_size(1);
             df.alpha(0) = 1;
 

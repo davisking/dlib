@@ -184,7 +184,7 @@ namespace dlib
                         {
                             cache[i].get_truth_joint_feature_vector_cached(ftemp);
 
-                            sparse_vector::subtract_from(psi_true, ftemp);
+                            subtract_from(psi_true, ftemp);
                         }
                     }
 
@@ -249,7 +249,7 @@ namespace dlib
 
                         auto_mutex lock(self.accum_mutex);
                         data.loss += loss;
-                        sparse_vector::add_to(data.subgradient, ftemp);
+                        add_to(data.subgradient, ftemp);
                     }
                     else
                     {
@@ -268,12 +268,12 @@ namespace dlib
                                                                    loss_temp,
                                                                    ftemp);
                             loss += loss_temp;
-                            sparse_vector::add_to(faccum, ftemp);
+                            add_to(faccum, ftemp);
                         }
 
                         auto_mutex lock(self.accum_mutex);
                         data.loss += loss;
-                        sparse_vector::add_to(data.subgradient, faccum);
+                        add_to(data.subgradient, faccum);
                     }
                 }
 

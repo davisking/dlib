@@ -415,7 +415,8 @@ namespace dlib
     template <
         typename vector_type 
         >
-    unsigned long max_index_plus_one (
+    typename enable_if<is_same_type<sample_pair, typename vector_type::value_type>,unsigned long>::type
+    max_index_plus_one (
         const vector_type& pairs
     )
     {

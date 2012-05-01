@@ -50,7 +50,7 @@ namespace dlib
             samples(samples_),
             labels(labels_),
             distinct_labels(select_all_distinct_labels(labels_)),
-            dims(sparse_vector::max_index_plus_one(samples_)+1) // +1 for the bias
+            dims(max_index_plus_one(samples_)+1) // +1 for the bias
         {}
 
         virtual long get_num_dimensions (
@@ -70,7 +70,7 @@ namespace dlib
             feature_vector_type& psi
         ) const 
         {
-            sparse_vector::assign(psi, samples[idx]);
+            assign(psi, samples[idx]);
             // Add a constant -1 to account for the bias term.
             psi.push_back(std::make_pair(dims-1,static_cast<scalar_type>(-1)));
 
@@ -94,8 +94,6 @@ namespace dlib
             // LOSS(idx,y) + F(x,y).  Note that y in this case is given by distinct_labels[i].
             for (unsigned long i = 0; i < distinct_labels.size(); ++i)
             {
-                using dlib::sparse_vector::dot;
-                using dlib::dot;
                 // Compute the F(x,y) part:
                 // perform: temp == dot(relevant part of current solution, samples[idx]) - current_bias
                 scalar_type temp = dot(rowm(current_solution, range(i*dims, (i+1)*dims-2)), samples[idx]) - current_solution((i+1)*dims-1);
@@ -112,7 +110,7 @@ namespace dlib
                 }
             }
 
-            sparse_vector::assign(psi, samples[idx]);
+            assign(psi, samples[idx]);
             // add a constant -1 to account for the bias term
             psi.push_back(std::make_pair(dims-1,static_cast<scalar_type>(-1)));
 
@@ -287,7 +285,7 @@ namespace dlib
 
             trained_function_type df;
 
-            const long dims = sparse_vector::max_index_plus_one(all_samples);
+            const long dims = max_index_plus_one(all_samples);
             df.labels  = select_all_distinct_labels(all_labels);
             df.weights = colm(reshape(weights, df.labels.size(), dims+1), range(0,dims-1));
             df.b       = colm(reshape(weights, df.labels.size(), dims+1), dims);

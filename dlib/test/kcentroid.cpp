@@ -42,7 +42,6 @@ namespace
             const sample_type& b
         ) const
         { 
-            using namespace sparse_vector;
             return dot(a,b);
         }
 
@@ -365,7 +364,6 @@ namespace
             - tests the kcentroid object with the given kernel
     !*/
     {
-        using namespace dlib::sparse_vector;
         // Here we declare that our samples will be 2 dimensional column vectors.  
         typedef typename kernel_type::sample_type sample_type;
 
@@ -439,7 +437,7 @@ namespace
         temp[3] = 4;
         temp[4] = 5;
         dlog << LDEBUG << "AAAA 3.4" ;
-        double junk = sparse_vector::distance(temp2,temp);
+        double junk = dlib::distance(temp2,temp);
         dlog << LDEBUG << "AAAA 3.5" ;
         DLIB_TEST(approx_equal(test(temp), junk) );
 
@@ -462,7 +460,7 @@ namespace
         temp[2] = 3;
         temp[3] = 4;
         temp[4] = 5;
-        DLIB_TEST(approx_equal(test(temp), sparse_vector::distance(temp2,temp)));
+        DLIB_TEST(approx_equal(test(temp), dlib::distance(temp2,temp)));
 
 
         // make test store the -1*point(0,1,0,3,-1)
@@ -483,7 +481,7 @@ namespace
         temp[2] = -3;
         temp[3] = 4;
         temp[4] = 5;
-        DLIB_TEST(approx_equal(test(temp), sparse_vector::distance(temp2,temp)));
+        DLIB_TEST(approx_equal(test(temp), dlib::distance(temp2,temp)));
 
 
 
@@ -500,8 +498,8 @@ namespace
         temp[2] = -3;
         temp[3] = 4;
         temp[4] = 5;
-        DLIB_TEST(approx_equal(test(temp), sparse_vector::distance(temp2,temp)));
-        DLIB_TEST(approx_equal(test.get_distance_function()(temp), sparse_vector::distance(temp2,temp)));
+        DLIB_TEST(approx_equal(test(temp), dlib::distance(temp2,temp)));
+        DLIB_TEST(approx_equal(test.get_distance_function()(temp), dlib::distance(temp2,temp)));
 
 
         dlog << LDEBUG << "AAAA 6" ;
@@ -522,8 +520,8 @@ namespace
         temp[2] = -3;
         temp[3] = 4;
         temp[4] = 5;
-        DLIB_TEST(approx_equal(test(temp), sparse_vector::distance(temp2,temp)));
-        DLIB_TEST(approx_equal(test.get_distance_function()(temp), sparse_vector::distance(temp2,temp)));
+        DLIB_TEST(approx_equal(test(temp), dlib::distance(temp2,temp)));
+        DLIB_TEST(approx_equal(test.get_distance_function()(temp), dlib::distance(temp2,temp)));
         DLIB_TEST(approx_equal(test(test), 0));
         DLIB_TEST(approx_equal(test.get_distance_function()(test.get_distance_function()), 0));
 
@@ -545,7 +543,6 @@ namespace
             - tests the kcentroid object with the given kernel
     !*/
     {
-        using namespace sparse_vector;
         // Here we declare that our samples will be 2 dimensional column vectors.  
         typedef typename kernel_type::sample_type sample_type;
 

@@ -50,18 +50,18 @@ namespace
 
             DLIB_TEST(samples.size() == 150);
             DLIB_TEST(labels.size() == 150);
-            DLIB_TEST(sparse_vector::max_index_plus_one(samples) == 5);
+            DLIB_TEST(max_index_plus_one(samples) == 5);
             fix_nonzero_indexing(samples);
-            DLIB_TEST(sparse_vector::max_index_plus_one(samples) == 4);
+            DLIB_TEST(max_index_plus_one(samples) == 4);
 
             load_libsvm_formatted_data("iris.scale2",samples, labels);
 
             DLIB_TEST(samples.size() == 150);
             DLIB_TEST(labels.size() == 150);
 
-            DLIB_TEST(sparse_vector::max_index_plus_one(samples) == 5);
+            DLIB_TEST(max_index_plus_one(samples) == 5);
             fix_nonzero_indexing(samples);
-            DLIB_TEST(sparse_vector::max_index_plus_one(samples) == 4);
+            DLIB_TEST(max_index_plus_one(samples) == 4);
 
             one_vs_one_trainer<any_trainer<sample_type,scalar_type>,scalar_type> trainer;
 
@@ -85,7 +85,7 @@ namespace
                 std::vector<dsample_type> dsamples = sparse_to_dense(samples);
                 DLIB_TEST(dsamples.size() == 150);
                 DLIB_TEST(dsamples[0].size() == 4);
-                DLIB_TEST(sparse_vector::max_index_plus_one(dsamples) == 4);
+                DLIB_TEST(max_index_plus_one(dsamples) == 4);
 
                 one_vs_one_trainer<any_trainer<dsample_type,scalar_type>,scalar_type> trainer;
 

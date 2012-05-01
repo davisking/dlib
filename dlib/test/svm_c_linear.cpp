@@ -135,30 +135,30 @@ namespace
 
 
         // Now test some of the sparse helper functions
-        DLIB_TEST(sparse_vector::max_index_plus_one(samples) == 2);
-        DLIB_TEST(sparse_vector::max_index_plus_one(samples[0]) == 2);
+        DLIB_TEST(max_index_plus_one(samples) == 2);
+        DLIB_TEST(max_index_plus_one(samples[0]) == 2);
 
         matrix<double,3,1> m;
         m = 1;
-        sparse_vector::add_to(m, samples[3]);
+        add_to(m, samples[3]);
         DLIB_TEST(m(0) == 1 + samples[3][0].second);
         DLIB_TEST(m(1) == 1 + samples[3][1].second);
         DLIB_TEST(m(2) == 1);
 
         m = 1;
-        sparse_vector::subtract_from(m, samples[3]);
+        subtract_from(m, samples[3]);
         DLIB_TEST(m(0) == 1 - samples[3][0].second);
         DLIB_TEST(m(1) == 1 - samples[3][1].second);
         DLIB_TEST(m(2) == 1);
 
         m = 1;
-        sparse_vector::add_to(m, samples[3], 2);
+        add_to(m, samples[3], 2);
         DLIB_TEST(m(0) == 1 + 2*samples[3][0].second);
         DLIB_TEST(m(1) == 1 + 2*samples[3][1].second);
         DLIB_TEST(m(2) == 1);
 
         m = 1;
-        sparse_vector::subtract_from(m, samples[3], 2);
+        subtract_from(m, samples[3], 2);
         DLIB_TEST(m(0) == 1 - 2*samples[3][0].second);
         DLIB_TEST(m(1) == 1 - 2*samples[3][1].second);
         DLIB_TEST(m(2) == 1);
@@ -227,7 +227,6 @@ namespace
                 sv[0] = 1;
                 sv[3] = 1;
 
-                using namespace sparse_vector;
 
                 DLIB_TEST(dot(sv,dv) == 5);
                 DLIB_TEST(dot(dv,sv) == 5);
@@ -249,7 +248,6 @@ namespace
                 sv[0] = 1;
                 sv[3] = 1;
 
-                using namespace sparse_vector;
 
                 assign(dv2, dv);
 

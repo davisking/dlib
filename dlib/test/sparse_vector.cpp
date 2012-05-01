@@ -14,7 +14,6 @@ namespace
     using namespace test;
     using namespace dlib;
     using namespace std;
-    using namespace dlib::sparse_vector;
     dlib::logger dlog("test.sparse_vector");
 
 

@@ -75,9 +75,6 @@ namespace dlib
                 unsigned long best_idx = 0;
 
 
-                using sparse_vector::dot;
-                using dlib::dot;
-
                 const scalar_type dot_true_psi = dot(true_psi, current_solution);
 
                 // figure out which element in the cache is the best (i.e. has the biggest risk)
@@ -338,7 +335,7 @@ namespace dlib
                 {
                     cache[i].get_truth_joint_feature_vector_cached(ftemp);
 
-                    sparse_vector::subtract_from(psi_true, ftemp);
+                    subtract_from(psi_true, ftemp);
                 }
             }
 
@@ -364,7 +361,7 @@ namespace dlib
                 scalar_type loss;
                 separation_oracle_cached(i, w, loss, ftemp);
                 total_loss += loss;
-                sparse_vector::add_to(subgradient, ftemp);
+                add_to(subgradient, ftemp);
             }
         }
 

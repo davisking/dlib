@@ -39,7 +39,7 @@ namespace dlib
             const sample_type& b
         ) const
         { 
-            const scalar_type d = sparse_vector::distance_squared(a,b);
+            const scalar_type d = distance_squared(a,b);
             return std::exp(-gamma*d);
         }
 
@@ -123,7 +123,7 @@ namespace dlib
             const sample_type& b
         ) const
         { 
-            return std::pow(gamma*(sparse_vector::dot(a,b)) + coef, degree);
+            return std::pow(gamma*(dot(a,b)) + coef, degree);
         }
 
         sparse_polynomial_kernel& operator= (
@@ -211,7 +211,7 @@ namespace dlib
             const sample_type& b
         ) const
         { 
-            return std::tanh(gamma*(sparse_vector::dot(a,b)) + coef);
+            return std::tanh(gamma*(dot(a,b)) + coef);
         }
 
         sparse_sigmoid_kernel& operator= (
@@ -284,7 +284,7 @@ namespace dlib
             const sample_type& b
         ) const
         { 
-            return sparse_vector::dot(a,b);
+            return dot(a,b);
         }
 
         bool operator== (

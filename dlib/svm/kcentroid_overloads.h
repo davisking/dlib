@@ -744,14 +744,14 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
 
-            return sparse_vector::distance(alpha,w , x.alpha,x.w);
+            return distance(alpha,w , x.alpha,x.w);
         }
 
         scalar_type inner_product (
             const sample_type& x
         ) const
         {
-            return alpha*sparse_vector::dot(w,x);
+            return alpha*dot(w,x);
         }
 
         scalar_type inner_product (
@@ -765,20 +765,20 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
 
-            return alpha*x.alpha*sparse_vector::dot(w,x.w);
+            return alpha*x.alpha*dot(w,x.w);
         }
 
         scalar_type squared_norm (
         ) const
         {
-            return alpha*alpha* sparse_vector::length_squared(w);
+            return alpha*alpha*length_squared(w);
         }
 
         scalar_type operator() (
             const sample_type& x
         ) const
         {
-            return sparse_vector::distance(static_cast<scalar_type>(1), x, alpha, w);
+            return distance(static_cast<scalar_type>(1), x, alpha, w);
         }
 
         scalar_type test_and_train (
@@ -1032,7 +1032,7 @@ namespace dlib
 
             if (samples_seen > 0)
             {
-                scalar_type temp1 = sparse_vector::distance_squared(alpha,w , x.alpha,x.w);
+                scalar_type temp1 = distance_squared(alpha,w , x.alpha,x.w);
                 scalar_type temp2 = alpha*w_extra - x.alpha*x.w_extra;
                 return std::sqrt(temp1 + temp2*temp2);
             }
@@ -1047,7 +1047,7 @@ namespace dlib
         ) const
         {
             if (samples_seen > 0)
-                return alpha*(sparse_vector::dot(w,x) + w_extra*x_extra);
+                return alpha*(dot(w,x) + w_extra*x_extra);
             else 
                 return 0;
         }
@@ -1064,7 +1064,7 @@ namespace dlib
                 );
 
             if (samples_seen > 0 && x.samples_seen > 0)
-                return alpha*x.alpha*(sparse_vector::dot(w,x.w) + w_extra*x.w_extra);
+                return alpha*x.alpha*(dot(w,x.w) + w_extra*x.w_extra);
             else
                 return 0;
         }
@@ -1073,7 +1073,7 @@ namespace dlib
         ) const
         {
             if (samples_seen > 0)
-                return alpha*alpha*(sparse_vector::length_squared(w) + w_extra*w_extra);
+                return alpha*alpha*(length_squared(w) + w_extra*w_extra);
             else
                 return 0;
         }
@@ -1084,13 +1084,13 @@ namespace dlib
         {
             if (samples_seen > 0)
             {
-                scalar_type temp1 = sparse_vector::distance_squared(1,x,alpha,w);
+                scalar_type temp1 = distance_squared(1,x,alpha,w);
                 scalar_type temp2 = x_extra - alpha*w_extra;
                 return std::sqrt(temp1 + temp2*temp2);
             }
             else
             {
-                return std::sqrt(sparse_vector::length_squared(x) + x_extra*x_extra);
+                return std::sqrt(length_squared(x) + x_extra*x_extra);
             }
         }
 
@@ -1229,7 +1229,7 @@ namespace dlib
                     temp_basis_vectors.set_size(1);
                     temp_alpha.set_size(1);
                     temp_basis_vectors(0) = sample_type(w.begin(), w.end());
-                    sparse_vector::scale_by(temp_basis_vectors(0), scale);
+                    dlib::scale_by(temp_basis_vectors(0), scale);
                     temp_alpha(0) = alpha/scale;
                 }
                 else
@@ -1239,7 +1239,7 @@ namespace dlib
                     temp_basis_vectors.set_size(2);
                     temp_alpha.set_size(2);
                     temp_basis_vectors(0) = sample_type(w.begin(), w.end());
-                    sparse_vector::scale_by(temp_basis_vectors(0), 2);
+                    dlib::scale_by(temp_basis_vectors(0), 2);
                     temp_alpha(0) = alpha;
                     temp_basis_vectors(1) = sample_type(w.begin(), w.end());
                     temp_alpha(1) = -alpha;

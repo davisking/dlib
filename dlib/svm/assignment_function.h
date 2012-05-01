@@ -105,9 +105,6 @@ namespace dlib
             result_type& assignment
         ) const
         {
-            using dlib::sparse_vector::dot;
-            using dlib::dot;
-
             assignment.clear();
 
             matrix<double> cost;

@@ -149,9 +149,6 @@ namespace dlib
             feature_vector_type& psi
         ) const
         {
-            using dlib::sparse_vector::dot;
-            using dlib::dot;
-
             matrix<double> cost;
             unsigned long size;
             if (force_assignment)

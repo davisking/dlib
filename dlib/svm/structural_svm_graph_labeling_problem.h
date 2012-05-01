@@ -59,9 +59,6 @@ namespace dlib
                     - All vectors have non-zero size.  That is, they have more than 0 dimensions.
     !*/
     {
-        using namespace dlib::sparse_vector;
-        using namespace dlib;
-
         if (!is_learning_problem(samples, labels))
             return false;
 
@@ -170,8 +167,6 @@ namespace dlib
             DLIB_ASSERT(is_graph_labeling_problem(samples, labels) == true,
                     "\t structural_svm_graph_labeling_problem::structural_svm_graph_labeling_problem()"
                     << "\n\t invalid inputs were given to this function");
-
-            using namespace dlib::sparse_vector;
 
 
             // figure out how many dimensions are in the node and edge vectors.
@@ -321,9 +316,6 @@ namespace dlib
             feature_vector_type& psi
         ) const
         {
-            using dlib::sparse_vector::dot;
-            using dlib::dot;
-
             const sample_type& samp = samples[idx];
 
             // setup the potts graph based on samples[idx] and current_solution.

@@ -57,8 +57,6 @@ namespace dlib
             result_type& labels 
         ) const
         {
-            using dlib::sparse_vector::dot;
-            using dlib::dot;
 
             labels.clear();
 
