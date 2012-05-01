@@ -488,11 +488,18 @@
             <term link="dlib/svm/sparse_vector_abstract.h.html#length_squared" name="for sparse vectors"/>
          </term>
 
-         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="min"/>
+         <term name="min">
+            <term link="dlib/matrix/matrix_utilities_abstract.h.html#min" name="for matrix objects"/>
+            <term link="dlib/svm/sparse_vector_abstract.h.html#min" name="for sparse vectors"/>
+         </term>
+         <term name="max">
+            <term link="dlib/matrix/matrix_utilities_abstract.h.html#max" name="for matrix objects"/>
+            <term link="dlib/svm/sparse_vector_abstract.h.html#max" name="for sparse vectors"/>
+         </term>
+
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="find_min_and_max"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="index_of_max"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="index_of_min"/>
-         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="max"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="sum"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="sum_rows"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="sum_cols"/>
