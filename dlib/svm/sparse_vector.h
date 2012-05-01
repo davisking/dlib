@@ -11,6 +11,7 @@
 #include <map>
 // This is included just so we can do some disable_if stuff on it in the max_index_plus_one routine().
 #include "../manifold_regularization/sample_pair.h"
+#include "../matrix.h"
 
 
 namespace dlib

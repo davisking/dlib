@@ -1,8 +1,8 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include <dlib/sparse_vector.h>
 #include "tester.h"
-#include <dlib/svm.h>
 #include <dlib/rand.h>
 #include <dlib/string.h>
 #include <vector>

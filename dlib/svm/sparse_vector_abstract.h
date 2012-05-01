@@ -6,6 +6,7 @@
 #include <cmath>
 #include "../algs.h"
 #include "../serialize.h"
+#include "../matrix.h"
 #include <map>
 #include <vector>
 
