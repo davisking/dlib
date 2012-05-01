@@ -43,6 +43,7 @@ namespace dlib
               example graphs of connected nodes while labels should indicate the desired 
               label of each node.  The precise requirements for a valid graph labeling 
               problem are listed below.
+            - There is at least one node with a label of 0 and one with a label != 0.
             - This function returns true if all of the following are true and false otherwise:
                 - is_learning_problem(samples, labels) == true
                 - All the vectors stored on the edges of each graph in samples 
