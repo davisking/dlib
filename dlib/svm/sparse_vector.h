@@ -7,6 +7,8 @@
 #include <cmath>
 #include <limits>
 #include "../algs.h"
+#include <vector>
+#include <map>
 
 
 namespace dlib
@@ -216,37 +218,67 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        namespace impl
+        {
+            template <typename T, typename U>
+            typename T::value_type::second_type dot (
+                const T& a,
+                const U& b
+            )
+            {
+                typedef typename T::value_type::second_type scalar_type;
+
+                typename T::const_iterator ai = a.begin();
+                typename U::const_iterator bi = b.begin();
+
+                scalar_type sum = 0;
+                while (ai != a.end() && bi != b.end())
+                {
+                    if (ai->first == bi->first)
+                    {
+                        sum += ai->second * bi->second;
+                        ++ai;
+                        ++bi;
+                    }
+                    else if (ai->first < bi->first)
+                    {
+                        ++ai;
+                    }
+                    else 
+                    {
+                        ++bi;
+                    }
+                }
+
+                return sum;
+            }
+        }
+
         template <typename T>
-        typename T::value_type::second_type dot (
+        inline typename T::value_type::second_type dot (
             const T& a,
             const T& b
         )
         {
-            typedef typename T::value_type::second_type scalar_type;
+            return dlib::sparse_vector::impl::dot(a,b);
+        }
 
-            typename T::const_iterator ai = a.begin();
-            typename T::const_iterator bi = b.begin();
+        template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+        inline T4 dot (
+            const std::vector<T1,T2>& a,
+            const std::map<T3,T4,T5,T6>& b
+        )
+        {
+            return dlib::sparse_vector::impl::dot(a,b);
+        }
 
-            scalar_type sum = 0;
-            while (ai != a.end() && bi != b.end())
-            {
-                if (ai->first == bi->first)
-                {
-                    sum += ai->second * bi->second;
-                    ++ai;
-                    ++bi;
-                }
-                else if (ai->first < bi->first)
-                {
-                    ++ai;
-                }
-                else 
-                {
-                    ++bi;
-                }
-            }
-
-            return sum;
+        template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+        inline T4 dot (
+            const std::map<T3,T4,T5,T6>& a,
+            const std::vector<T1,T2>& b
+        )
+        {
+            return dlib::sparse_vector::impl::dot(a,b);
         }
 
     // ------------------------------------------------------------------------------------

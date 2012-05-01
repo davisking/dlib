@@ -6,6 +6,8 @@
 #include <cmath>
 #include "../algs.h"
 #include "../serialize.h"
+#include <map>
+#include <vector>
 
 namespace dlib
 {
@@ -156,6 +158,30 @@ namespace dlib
         typename T::value_type::second_type dot (
             const T& a,
             const T& b
+        );
+        /*!
+            requires
+                - a and b are sparse vectors 
+            ensures
+                - returns the dot product between the vectors a and b
+        !*/
+
+        template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+        T4 dot (
+            const std::vector<T1,T2>& a,
+            const std::map<T3,T4,T5,T6>& b
+        );
+        /*!
+            requires
+                - a and b are sparse vectors 
+            ensures
+                - returns the dot product between the vectors a and b
+        !*/
+
+        template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+        T4 dot (
+            const std::map<T3,T4,T5,T6>& a,
+            const std::vector<T1,T2>& b
         );
         /*!
             requires
