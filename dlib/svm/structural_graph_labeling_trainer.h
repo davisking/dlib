@@ -147,12 +147,48 @@ namespace dlib
             matrix<double,0,1> w;
             solver(prob, w, prob.get_num_edge_weights());
 
-            vector_type edge_weights = rowm(w,range(0, prob.get_num_edge_weights()-1));
-            vector_type node_weights = rowm(w,range(prob.get_num_edge_weights(),w.size()-1));
+            vector_type edge_weights;
+            vector_type node_weights;
+            populate_weights(w, edge_weights, node_weights, prob.get_num_edge_weights());
             return graph_labeler<vector_type>(edge_weights, node_weights);
         }
 
     private:
+
+        template <typename T>
+        typename enable_if<is_matrix<T> >::type populate_weights (
+            const matrix<double,0,1>& w,
+            T& edge_weights,
+            T& node_weights,
+            long split_idx
+        ) const
+        {
+            edge_weights = rowm(w,range(0, split_idx-1));
+            node_weights = rowm(w,range(split_idx,w.size()-1));
+        }
+
+        template <typename T>
+        typename disable_if<is_matrix<T> >::type populate_weights (
+            const matrix<double,0,1>& w,
+            T& edge_weights,
+            T& node_weights,
+            long split_idx
+        ) const
+        {
+            edge_weights.clear();
+            node_weights.clear();
+            for (long i = 0; i < split_idx; ++i)
+            {
+                if (w(i) != 0)
+                    edge_weights.insert(edge_weights.end(), std::make_pair(i,w(i)));
+            }
+            for (long i = split_idx; i < w.size(); ++i)
+            {
+                if (w(i) != 0)
+                    node_weights.insert(node_weights.end(), std::make_pair(i-split_idx,w(i)));
+            }
+        }
+
 
         double C;
         oca solver;
