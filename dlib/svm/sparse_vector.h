@@ -566,6 +566,42 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        template <typename T>
+        typename T::value_type::second_type min (
+            const T& a
+        )
+        {
+            typedef typename T::value_type::second_type type;
+
+            type temp = 0;
+            for (typename T::const_iterator i = a.begin(); i != a.end(); ++i)
+            {
+                if (temp > i->second)
+                    temp = i->second;
+            }
+            return temp;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T>
+        typename T::value_type::second_type max (
+            const T& a
+        )
+        {
+            typedef typename T::value_type::second_type type;
+
+            type temp = 0;
+            for (typename T::const_iterator i = a.begin(); i != a.end(); ++i)
+            {
+                if (temp < i->second)
+                    temp = i->second;
+            }
+            return temp;
+        }
+
+    // ------------------------------------------------------------------------------------
+
     }
 
 // ----------------------------------------------------------------------------------------

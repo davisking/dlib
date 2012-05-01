@@ -308,6 +308,34 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        template <typename T>
+        typename T::value_type::second_type min (
+            const T& vect
+        );
+        /*!
+            requires
+                - T == an unsorted sparse vector
+            ensures
+                - returns the minimum value in the sparse vector vect.  Note that
+                  this value is always <= 0 since a sparse vector has an unlimited number
+                  of 0 elements.
+        !*/
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T>
+        typename T::value_type::second_type max (
+            const T& vect
+        );
+        /*!
+            requires
+                - T == an unsorted sparse vector
+            ensures
+                - returns the maximum value in the sparse vector vect.  Note that
+                  this value is always >= 0 since a sparse vector has an unlimited number
+                  of 0 elements.
+        !*/
+
     }
 
 // ----------------------------------------------------------------------------------------
