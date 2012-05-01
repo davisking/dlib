@@ -30,8 +30,8 @@ namespace dlib
     /*!
         requires
             - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
-            - graph_type::type and graph_type::edge_type are either dlib::matrix types
-              capable of containing column vectors or some kind of sparse vector type.
+            - graph_type::type and graph_type::edge_type are either both dlib::matrix types
+              capable of containing column vectors or both some kind of sparse vector type.
         ensures
             - Note that a graph labeling problem is a task to learn a binary classifier which 
               predicts the correct label for each node in the provided graphs.  Additionally, 
@@ -43,13 +43,10 @@ namespace dlib
               example graphs of connected nodes while labels should indicate the desired 
               label of each node.  The precise requirements for a valid graph labeling 
               problem are listed below.
-            - There is at least one node with a label of 0 and one with a label != 0.
             - This function returns true if all of the following are true and false otherwise:
                 - is_learning_problem(samples, labels) == true
                 - All the vectors stored on the edges of each graph in samples 
                   contain only values which are >= 0. 
-                - graph_type::type and graph_type::edge_type either both represent
-                  dlib::matrix column vectors or are both sparse vectors.
                 - for all valid i:
                     - graph_contains_length_one_cycle(samples[i]) == false 
                     - samples[i].number_of_nodes() == labels[i].size()
@@ -61,9 +58,56 @@ namespace dlib
                     - All vectors have non-zero size.  That is, they have more than 0 dimensions.
     !*/
     {
+        using namespace dlib::sparse_vector;
+        using namespace dlib;
+
+        if (!is_learning_problem(samples, labels))
+            return false;
+
+        const bool ismat = is_matrix<typename graph_type::type>::value;
+
+        // these are -1 until assigned with a value
+        long node_dims = -1;
+        long edge_dims = -1;
+
+        for (unsigned long i = 0; i < samples.size(); ++i)
+        {
+            if (samples[i].number_of_nodes() != labels[i].size())
+                return false;
+            if (graph_contains_length_one_cycle(samples[i]))
+                return false;
+
+            for (unsigned long j = 0; j < samples[i].number_of_nodes(); ++j)
+            {
+                if (samples[i].node(j).data.size() == 0)
+                    return false;
+
+                if (ismat && node_dims == -1)
+                    node_dims = samples[i].node(j).data.size();
+                // all nodes must have vectors of the same size. 
+                if (ismat && (long)samples[i].node(j).data.size() != node_dims)
+                    return false;
+
+                for (unsigned long n = 0; n < samples[i].node(j).number_of_neighbors(); ++n)
+                {
+                    if (ismat && samples[i].node(j).edge(n).size() == 0)
+                        return false;
+                    if (min(samples[i].node(j).edge(n)) < 0)
+                        return false;
+
+                    if (ismat && edge_dims == -1)
+                        edge_dims = samples[i].node(j).edge(n).size();
+                    // all edges must have vectors of the same size.
+                    if (ismat && (long)samples[i].node(j).edge(n).size() != edge_dims)
+                        return false;
+                }
+            }
+        }
+
         return true;
     }
 
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     namespace impl
