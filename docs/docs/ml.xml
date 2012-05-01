@@ -1031,7 +1031,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
 
       <component>
          <name>sparse vectors</name>
-         <file>dlib/svm.h</file>
+         <file>dlib/sparse_vector.h</file>
          <spec_file>dlib/svm/sparse_vector_abstract.h</spec_file>
          <description>
             In dlib, sparse vectors are represented using the container objects
