@@ -152,10 +152,10 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        template <typename T, typename U>
+        template <typename T>
         typename T::value_type::second_type dot (
             const T& a,
-            const U& b
+            const T& b
         );
         /*!
             requires
