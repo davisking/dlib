@@ -445,6 +445,66 @@ namespace
     }
 
 
+    void test_copy()
+    {
+        {
+            directed_graph<int,int>::kernel_1a_c a,b;
+
+            a.set_number_of_nodes(3);
+            a.node(0).data = 1;
+            a.node(1).data = 2;
+            a.node(2).data = 3;
+            a.add_edge(0,1);
+            a.add_edge(1,0);
+            a.add_edge(0,2);
+            edge(a,0,1) = 4;
+            edge(a,1,0) = 3;
+            edge(a,0,2) = 5;
+
+            a.add_edge(0,0);
+            edge(a,0,0) = 9;
+            copy_graph(a, b);
+
+            DLIB_TEST(b.number_of_nodes() == 3);
+            DLIB_TEST(b.node(0).data == 1);
+            DLIB_TEST(b.node(1).data == 2);
+            DLIB_TEST(b.node(2).data == 3);
+            DLIB_TEST(edge(b,0,1) == 4);
+            DLIB_TEST(edge(b,1,0) == 3);
+            DLIB_TEST(edge(b,0,2) == 5);
+            DLIB_TEST(edge(b,0,0) == 9);
+        }
+        {
+            directed_graph<int,int>::kernel_1a_c a,b;
+
+            a.set_number_of_nodes(4);
+            a.node(0).data = 1;
+            a.node(1).data = 2;
+            a.node(2).data = 3;
+            a.node(3).data = 8;
+            a.add_edge(0,1);
+            a.add_edge(0,2);
+            a.add_edge(2,3);
+            a.add_edge(3,2);
+            edge(a,0,1) = 4;
+            edge(a,0,2) = 5;
+            edge(a,2,3) = 6;
+            edge(a,3,2) = 3;
+
+            copy_graph(a, b);
+
+            DLIB_TEST(b.number_of_nodes() == 4);
+            DLIB_TEST(b.node(0).data == 1);
+            DLIB_TEST(b.node(1).data == 2);
+            DLIB_TEST(b.node(2).data == 3);
+            DLIB_TEST(b.node(3).data == 8);
+            DLIB_TEST(edge(b,0,1) == 4);
+            DLIB_TEST(edge(b,0,2) == 5);
+            DLIB_TEST(edge(b,2,3) == 6);
+            DLIB_TEST(edge(b,3,2) == 3);
+        }
+    }
+
 
 
     class directed_graph_tester : public tester
@@ -465,6 +525,8 @@ namespace
         void perform_test (
         )
         {
+            test_copy();
+
             dlog << LINFO << "testing kernel_1a_c";
             directed_graph_test<directed_graph<int,unsigned short>::kernel_1a_c>();
 

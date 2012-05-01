@@ -323,6 +323,59 @@ namespace
     }
 
 
+    void test_copy()
+    {
+        {
+            graph<int,int>::kernel_1a_c a,b;
+
+            a.set_number_of_nodes(3);
+            a.node(0).data = 1;
+            a.node(1).data = 2;
+            a.node(2).data = 3;
+            a.add_edge(0,1);
+            a.add_edge(0,2);
+            edge(a,0,1) = 4;
+            edge(a,0,2) = 5;
+
+            a.add_edge(0,0);
+            edge(a,0,0) = 9;
+            copy_graph(a, b);
+
+            DLIB_TEST(b.number_of_nodes() == 3);
+            DLIB_TEST(b.node(0).data == 1);
+            DLIB_TEST(b.node(1).data == 2);
+            DLIB_TEST(b.node(2).data == 3);
+            DLIB_TEST(edge(b,0,1) == 4);
+            DLIB_TEST(edge(b,0,2) == 5);
+            DLIB_TEST(edge(b,0,0) == 9);
+        }
+        {
+            graph<int,int>::kernel_1a_c a,b;
+
+            a.set_number_of_nodes(4);
+            a.node(0).data = 1;
+            a.node(1).data = 2;
+            a.node(2).data = 3;
+            a.node(3).data = 8;
+            a.add_edge(0,1);
+            a.add_edge(0,2);
+            a.add_edge(2,3);
+            edge(a,0,1) = 4;
+            edge(a,0,2) = 5;
+            edge(a,2,3) = 6;
+
+            copy_graph(a, b);
+
+            DLIB_TEST(b.number_of_nodes() == 4);
+            DLIB_TEST(b.node(0).data == 1);
+            DLIB_TEST(b.node(1).data == 2);
+            DLIB_TEST(b.node(2).data == 3);
+            DLIB_TEST(b.node(3).data == 8);
+            DLIB_TEST(edge(b,0,1) == 4);
+            DLIB_TEST(edge(b,0,2) == 5);
+            DLIB_TEST(edge(b,2,3) == 6);
+        }
+    }
 
 
 
@@ -349,6 +402,8 @@ namespace
 
             dlog << LINFO << "testing kernel_1a";
             graph_test<graph<int>::kernel_1a>();
+
+            test_copy();
         }
     } a;
 

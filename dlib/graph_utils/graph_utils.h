@@ -354,6 +354,67 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename graph_type1,
+        typename graph_type2
+        >
+    typename enable_if<is_graph<graph_type1> >::type copy_graph (
+        const graph_type1& src,
+        graph_type2& dest
+    )
+    {
+        COMPILE_TIME_ASSERT(is_graph<graph_type1>::value);
+        COMPILE_TIME_ASSERT(is_graph<graph_type2>::value);
+        if (graph_helpers::is_same_object(src,dest))
+            return;
+
+        copy_graph_structure(src,dest);
+
+        // copy all the node and edge content 
+        for (unsigned long i = 0; i < src.number_of_nodes(); ++i)
+        {
+            dest.node(i).data = src.node(i).data;
+
+            for (unsigned long j = 0; j < src.node(i).number_of_neighbors(); ++j)
+            {
+                const unsigned long nidx = src.node(i).neighbor(j).index();
+                if (nidx >= i)
+                {
+                    dest.node(i).edge(j) = src.node(i).edge(j);
+                }
+            }
+        }
+    }
+
+    template <
+        typename graph_type1,
+        typename graph_type2
+        >
+    typename enable_if<is_directed_graph<graph_type1> >::type copy_graph (
+        const graph_type1& src,
+        graph_type2& dest
+    )
+    {
+        COMPILE_TIME_ASSERT(is_directed_graph<graph_type1>::value);
+        COMPILE_TIME_ASSERT(is_directed_graph<graph_type2>::value);
+        if (graph_helpers::is_same_object(src,dest))
+            return;
+
+        copy_graph_structure(src,dest);
+
+        // copy all the node and edge content 
+        for (unsigned long i = 0; i < src.number_of_nodes(); ++i)
+        {
+            dest.node(i).data = src.node(i).data;
+            for (unsigned long j = 0; j < src.node(i).number_of_children(); ++j)
+            {
+                dest.node(i).child_edge(j) = src.node(i).child_edge(j);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T,
         typename S
         >

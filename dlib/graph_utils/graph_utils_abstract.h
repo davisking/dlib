@@ -186,6 +186,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename src_type,
+        typename dest_type 
+        >
+    void copy_graph (
+        const src_type& src,
+        dest_type& dest
+    );
+    /*!
+        requires
+            - src_type is an implementation of directed_graph/directed_graph_kernel_abstract.h or
+              src_type is an implementation of graph/graph_kernel_abstract.h
+            - dest_type is an implementation of directed_graph/directed_graph_kernel_abstract.h or
+              dest_type is an implementation of graph/graph_kernel_abstract.h
+            - src_type and dest_type are both the same kind of graph.  That is, they
+              are either both directed or both undirected.
+            - the node and edge data in the graphs are copyable via operator=().
+        ensures
+            - #dest is a complete duplicate of src.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename directed_graph_type,
         typename graph_type
         >
