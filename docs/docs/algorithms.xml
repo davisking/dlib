@@ -74,6 +74,7 @@
                <item>is_clique</item> 
                <item>is_maximal_clique</item> 
                <item>copy_graph_structure</item> 
+               <item>copy_graph</item> 
                <item>edge</item> 
                <item>is_join_tree</item> 
                <item>create_join_tree</item> 
@@ -836,6 +837,20 @@
             This function takes a <a href="containers.html#graph">graph</a> and a 
             <a href="containers.html#set">set</a> of node index values and checks 
             if the specified set of nodes is a clique in the graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>copy_graph</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> and
+            makes a copy of it.
          </description>
                                  
       </component>

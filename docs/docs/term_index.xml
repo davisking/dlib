@@ -152,6 +152,7 @@
          <term file="algorithms.html" name="graph_has_symmetric_edges"/>
          <term file="algorithms.html" name="graph_contains_directed_cycle"/>
          <term file="algorithms.html" name="copy_graph_structure"/>
+         <term file="algorithms.html" name="copy_graph"/>
 
          <term file="algorithms.html" name="create_moral_graph"/>
          <term file="algorithms.html" name="triangulate_graph_and_find_cliques"/>
