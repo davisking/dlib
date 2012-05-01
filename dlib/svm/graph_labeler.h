@@ -46,7 +46,7 @@ namespace dlib
         ) const { return node_weights; }
 
         template <typename graph_type>
-        void predict_assignments (
+        void operator() (
             const graph_type& samp,
             result_type& labels 
         ) const
@@ -83,7 +83,7 @@ namespace dlib
         ) const
         {
             result_type temp;
-            predict_assignments(sample, temp);
+            (*this)(sample, temp);
             return temp;
         }
 
