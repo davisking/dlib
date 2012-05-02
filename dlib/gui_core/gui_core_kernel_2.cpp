@@ -13,6 +13,7 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xlocale.h>
+#include <X11/XKBlib.h>
 #include <poll.h>
 #include <iostream>
 #include "../assert.h"
@@ -1263,7 +1264,7 @@ namespace dlib
             {
                 if ( codes[n] == 0 )
                     continue;
-                switch(XKeycodeToKeysym( disp, codes[n], 0 ))
+                switch(XkbKeycodeToKeysym( disp, codes[n], 0, 0 ))
                 {
                     case XK_Alt_L:
                         alt_mask = index_to_modmask(n / map->max_keypermod);
