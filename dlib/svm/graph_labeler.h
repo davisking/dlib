@@ -43,6 +43,13 @@ namespace dlib
             edge_weights(edge_weights_),
             node_weights(node_weights_)
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(min(edge_weights) >= 0,
+                    "\t graph_labeler::graph_labeler()"
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t min(edge_weights): " << min(edge_weights)
+                    << "\n\t this:              " << this
+                    );
         }
 
         const vector_type& get_edge_weights (
@@ -53,18 +60,73 @@ namespace dlib
 
         template <typename graph_type>
         void operator() (
-            const graph_type& samp,
+            const graph_type& sample,
             result_type& labels 
         ) const
         {
+            // make sure requires clause is not broken
+#ifdef ENABLE_ASSERTS
+            DLIB_ASSERT(get_edge_weights().size() != 0 &&
+                        get_node_weights().size() != 0 && 
+                        graph_contains_length_one_cycle(sample) == false,
+                        "\t void graph_labeler::operator()"
+                        << "\n\t Invalid inputs were given to this function."
+                        << "\n\t get_edge_weights().size(): " << get_edge_weights().size()
+                        << "\n\t get_node_weights().size(): " << get_node_weights().size()
+                        << "\n\t graph_contains_length_one_cycle(sample): " << graph_contains_length_one_cycle(sample)
+                        << "\n\t this:                      " << this
+                    );
+            for (unsigned long i = 0; i < sample.number_of_nodes(); ++i)
+            {
+                if (is_matrix<vector_type>::value &&
+                    is_matrix<typename graph_type::type>::value)
+                {
+                    // check that dot() is legal.
+                    DLIB_ASSERT(get_node_weights().size() == sample.node(i).data.size(),
+                                "\t void graph_labeler::operator()"
+                                << "\n\t The size of the node weight vector must match the one in the node."
+                                << "\n\t get_node_weights().size():  " << get_node_weights().size()
+                                << "\n\t sample.node(i).data.size(): " << sample.node(i).data.size()
+                                << "\n\t i: " << i 
+                                << "\n\t this:              " << this
+                            );
+                }
+
+                for (unsigned long n = 0; n < sample.node(i).number_of_neighbors(); ++n)
+                {
+                    if (is_matrix<vector_type>::value &&
+                        is_matrix<typename graph_type::edge_type>::value)
+                    {
+                        // check that dot() is legal.
+                        DLIB_ASSERT(get_edge_weights().size() == sample.node(i).edge(n).size(),
+                                    "\t void graph_labeler::operator()"
+                                    << "\n\t The size of the edge weight vector must match the one in graph's edge."
+                                    << "\n\t get_edge_weights().size():  " << get_edge_weights().size()
+                                    << "\n\t sample.node(i).edge(n).size(): " << sample.node(i).edge(n).size()
+                                    << "\n\t i: " << i 
+                                    << "\n\t this:              " << this
+                        );
+                    }
+
+                    DLIB_ASSERT(min(sample.node(i).edge(n)) >= 0,
+                                "\t void graph_labeler::operator()"
+                                << "\n\t Invalid inputs were given to this function."
+                                << "\n\t min(sample.node(i).edge(n)): " << min(sample.node(i).edge(n))
+                                << "\n\t i:    " << i 
+                                << "\n\t n:    " << n 
+                                << "\n\t this: " << this
+                    );
+                }
+            }
+#endif
 
             labels.clear();
 
             graph<double,double>::kernel_1a g; 
-            copy_graph_structure(samp, g);
+            copy_graph_structure(sample, g);
             for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
             {
-                g.node(i).data = dot(node_weights, samp.node(i).data);
+                g.node(i).data = dot(node_weights, sample.node(i).data);
 
                 for (unsigned long n = 0; n < g.node(i).number_of_neighbors(); ++n)
                 {
@@ -72,7 +134,7 @@ namespace dlib
                     // Don't compute an edge weight more than once. 
                     if (i < j)
                     {
-                        g.node(i).edge(n) = dot(edge_weights, samp.node(i).edge(n));
+                        g.node(i).edge(n) = dot(edge_weights, sample.node(i).edge(n));
                     }
                 }
 

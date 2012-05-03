@@ -99,6 +99,8 @@ namespace dlib
             requires
                 - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
                 - graph_contains_length_one_cycle(sample) == false
+                - #get_edge_weights().size() != 0
+                - #get_node_weights().size() != 0
                 - for all valid i and j:
                     - min(edge(sample,i,j)) >= 0
                     - it must be legal to call dot(edge(sample,i,j), get_edge_weights())
