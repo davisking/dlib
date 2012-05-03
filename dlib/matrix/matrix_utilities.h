@@ -577,9 +577,10 @@ namespace dlib
         COMPILE_TIME_ASSERT(EXP1::NR*EXP1::NC == 0 ||
                             EXP2::NR*EXP2::NC == 0);
 
-        DLIB_ASSERT(is_vector(m1) && is_vector(m2) && m1.size() == m2.size(), 
+        DLIB_ASSERT(is_vector(m1) && is_vector(m2) && m1.size() == m2.size() &&
+                    m1.size() > 0, 
             "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
-            << "\n\t You can only compute the dot product between vectors of equal length"
+            << "\n\t You can only compute the dot product between non-empty vectors of equal length."
             << "\n\t is_vector(m1): " << is_vector(m1) 
             << "\n\t is_vector(m2): " << is_vector(m2) 
             << "\n\t m1.size():     " << m1.size() 
