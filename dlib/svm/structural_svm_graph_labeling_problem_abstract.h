@@ -3,15 +3,12 @@
 #undef DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_ABSTRACT_H__
 #ifdef DLIB_STRUCTURAL_SVM_GRAPH_LAbELING_PROBLEM_ABSTRACT_H__
 
-
-#include "../graph_cuts.h"
-#include "../matrix.h"
-#include "../array.h"
+#include "../array/array_kernel_abstract.h"
+#include "../graph/graph_kernel_abstract.h"
+#include "../matrix/matrix_abstract.h"
+#include "sparse_vector_abstract.h"
+#include "structural_svm_problem_threaded_abstract.h"
 #include <vector>
-#include <iterator>
-#include "structural_svm_problem_threaded.h"
-#include "../graph.h"
-#include "sparse_vector.h"
 
 // ----------------------------------------------------------------------------------------
 
