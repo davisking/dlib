@@ -21,12 +21,7 @@ namespace dlib
         >
     class graph_labeler 
     {
-        /*!
-            REQUIREMENTS ON vector_type
-                - vector_type is a dlib::matrix or sparse vector.  It can be either 
-                  so long as it is capable of representing both edge and node weight
-                  vectors.
-        !*/
+
     public:
 
         typedef std::vector<node_label> label_type;
