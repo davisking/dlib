@@ -98,6 +98,9 @@ namespace dlib
         /*!
             requires
                 - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
+                - graph_type::type and graph_type::edge_type must be either matrix objects
+                  capable of representing column vectors or some kind of sparse vector
+                  type as defined in dlib/svm/sparse_vector_abstract.h.
                 - graph_contains_length_one_cycle(sample) == false
                 - #get_edge_weights().size() != 0
                 - #get_node_weights().size() != 0
