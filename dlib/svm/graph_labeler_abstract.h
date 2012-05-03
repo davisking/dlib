@@ -38,7 +38,7 @@ namespace dlib
                 labeling using the find_max_factor_graph_potts() routine.  Therefore, 
                 the graph_labeler is just an object which contains the necessary data 
                 to compute these score functions and then call find_max_factor_graph_potts().  
-                In particular, this object uses linear functions to represent these score 
+                Additionally, this object uses linear functions to represent these score 
                 functions.    
         !*/
 
@@ -52,6 +52,8 @@ namespace dlib
         /*!
             ensures
                 - this object is properly initialized
+                - #get_node_weights() == an initial value of type vector_type.
+                - #get_edge_weights() == an initial value of type vector_type.
         !*/
 
         graph_labeler(
@@ -66,17 +68,6 @@ namespace dlib
                 - #get_node_weights() == node_weights
         !*/
 
-        const vector_type& get_node_weights (
-        ) const; 
-        /*!
-            ensures
-                - Recall that the score function for a node is a linear function of
-                  the vector stored in that node in the graph.  This means there is some
-                  vector W which we dot product with the vector in the graph to compute
-                  the score.  Therefore, this function returns that W vector which defines 
-                  the node score function.
-        !*/
-
         const vector_type& get_edge_weights (
         ) const; 
         /*!
@@ -88,6 +79,17 @@ namespace dlib
                   the edge score function.
         !*/
 
+        const vector_type& get_node_weights (
+        ) const; 
+        /*!
+            ensures
+                - Recall that the score function for a node is a linear function of
+                  the vector stored in that node in the graph.  This means there is some
+                  vector W which we dot product with the vector in the graph to compute
+                  the score.  Therefore, this function returns that W vector which defines 
+                  the node score function.
+        !*/
+
         template <typename graph_type>
         void operator() (
             const graph_type& sample,
@@ -96,12 +98,11 @@ namespace dlib
         /*!
             requires
                 - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
-                - graph_type::edge_type and graph_type::type must be vector types.  Moreover,
-                  it must be valid to dot product one of these types with a vector_type
-                  using the dlib::dot() routine.
                 - graph_contains_length_one_cycle(sample) == false
                 - for all valid i and j:
                     - min(edge(sample,i,j)) >= 0
+                    - it must be legal to call dot(edge(sample,i,j), get_edge_weights())
+                    - it must be legal to call dot(sample.node(i).data, get_node_weights())
             ensures
                 - Computes a labeling for each node in the given graph and stores the result
                   in #labels.  
@@ -127,12 +128,11 @@ namespace dlib
         /*!
             requires
                 - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
-                - graph_type::edge_type and graph_type::type must be vector types.  Moreover,
-                  it must be valid to dot product one of these types with a vector_type
-                  using the dlib::dot() routine.
                 - graph_contains_length_one_cycle(sample) == false
                 - for all valid i and j:
                     - min(edge(sample,i,j)) >= 0
+                    - it must be legal to call dot(edge(sample,i,j), get_edge_weights())
+                    - it must be legal to call dot(sample.node(i).data, get_node_weights())
             ensures
                 - Performs (*this)(sample, labels); return labels;
                   (i.e. This is just another version of the above operator() routine
