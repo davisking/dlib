@@ -99,6 +99,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                <item>structural_svm_sequence_labeling_problem</item> 
                <item>structural_svm_object_detection_problem</item> 
                <item>structural_svm_assignment_problem</item> 
+               <item>structural_svm_graph_labeling_problem</item> 
             </sub>
          </item>
          <item nolink="true">
@@ -113,6 +114,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>structural_object_detection_trainer</item> 
          <item>structural_sequence_labeling_trainer</item> 
          <item>structural_assignment_trainer</item> 
+         <item>structural_graph_labeling_trainer</item> 
       </section>
       <section>
          <name>Unsupervised</name>
@@ -162,12 +164,14 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>cross_validate_regression_trainer</item> 
          <item>cross_validate_sequence_labeler</item> 
          <item>cross_validate_assignment_trainer</item> 
+         <item>cross_validate_graph_labeling_trainer</item> 
          <item>test_binary_decision_function</item> 
          <item>test_multiclass_decision_function</item> 
          <item>test_regression_function</item> 
          <item>test_object_detection_function</item> 
          <item>test_sequence_labeler</item>
          <item>test_assignment_function</item>
+         <item>test_graph_labeling_function</item>
       </section>
 
       <section>
@@ -214,6 +218,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>one_vs_all_decision_function</item>
          <item>sequence_labeler</item>
          <item>assignment_function</item>
+         <item>graph_labeler</item>
       </section>
 
       <section>
@@ -234,6 +239,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>randomize_samples</item> 
          <item>is_binary_classification_problem</item> 
          <item>is_sequence_labeling_problem</item> 
+         <item>is_graph_labeling_problem</item> 
          <item>is_assignment_problem</item> 
          <item>is_forced_assignment_problem</item> 
          <item>approximate_distance_function</item> 
@@ -1383,6 +1389,21 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>graph_labeler</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/svm/graph_labeler_abstract.h</spec_file>
+         <description>
+            This object is a tool for labeling each node in a <a href="containers.html#graph">graph</a> 
+            with a value of true or false, subject to a labeling consistency constraint between 
+            nodes that share an edge.  In particular, this object is useful for 
+            representing a graph labeling model learned via some machine learning 
+            method, such as the <a href="#structural_graph_labeling_trainer">structural_graph_labeling_trainer</a>.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>multiclass_linear_decision_function</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/function_abstract.h</spec_file>
@@ -1622,6 +1643,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <description>
             This function takes a set of training data for an assignment problem
             and reports back if it could possibly be a well formed assignment problem.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_graph_labeling_problem</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_graph_labeling_problem_abstract.h</spec_file>
+         <description>
+            This function takes a set of training data for a graph labeling problem
+            and reports back if it could possibly be a well formed problem.
          </description>
                                  
       </component>
@@ -2262,6 +2296,20 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>cross_validate_graph_labeling_trainer</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_graph_labeling_trainer_abstract.h</spec_file>
+         <description>
+            Performs k-fold cross validation on a user supplied graph labeling trainer object such
+            as the <a href="#structural_graph_labeling_trainer">structural_graph_labeling_trainer</a>
+            and returns the fraction of assignments predicted correctly.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>test_sequence_labeler</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/cross_validate_sequence_labeler_abstract.h</spec_file>
@@ -2288,6 +2336,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>assignment_learning_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>test_graph_labeling_function</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/svm/cross_validate_graph_labeling_trainer_abstract.h</spec_file>
+         <description>
+            Tests a <a href="#graph_labeler">graph_labeler</a> on a set of data 
+            and returns the fraction of labels predicted correctly.
+         </description>
                                  
       </component>
       
@@ -2472,6 +2533,21 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
       
       <component>
+         <name>structural_svm_graph_labeling_problem</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/svm/structural_svm_graph_labeling_problem_abstract.h</spec_file>
+         <description>
+                This object is a tool for learning the weight vectors needed to use
+                a <a href="#graph_labeler">graph_labeler</a> object.  
+                It learns the parameter vectors by 
+                formulating the problem as a <a href="#structural_svm_problem">structural SVM problem</a>.  
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>structural_object_detection_trainer</name>
          <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/structural_object_detection_trainer_abstract.h</spec_file>
@@ -2513,6 +2589,27 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <examples>
             <example>sequence_labeler_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>structural_graph_labeling_trainer</name>
+         <file>dlib/graph_cuts.h</file>
+         <spec_file link="true">dlib/svm/structural_graph_labeling_trainer_abstract.h</spec_file>
+         <description>
+                This object is a tool for learning to solve a graph labeling problem based
+                on a training dataset of example labeled <a href="containers.html#graph">graphs</a>. 
+                The training procedure produces a <a href="#graph_labeler">graph_labeler</a> object 
+                which can be used to predict the labelings of new graphs.
+
+               <p>
+                Note that this is just a convenience wrapper around the 
+                <a href="#structural_svm_graph_labeling_problem">structural_svm_graph_labeling_problem</a> 
+                to make it look similar to all the other trainers in dlib.  
+            </p>
+         </description>
                                  
       </component>
       
