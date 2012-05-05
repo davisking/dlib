@@ -636,6 +636,48 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename sample_type, typename alloc>
+    std::vector<matrix<typename sample_type::value_type::second_type,0,1> > sparse_to_dense (
+        const std::vector<sample_type, alloc>& samples
+    )
+    {
+        typedef typename sample_type::value_type pair_type;
+        typedef typename basic_type<typename pair_type::first_type>::type key_type;
+
+        // You must use unsigned integral key types in your sparse vectors
+        COMPILE_TIME_ASSERT(is_unsigned_type<key_type>::value);
+
+        typedef typename pair_type::second_type value_type;
+
+        std::vector< matrix<value_type,0,1> > result;
+
+        // do nothing if there aren't any samples
+        if (samples.size() == 0)
+            return result;
+
+
+        // figure out how many elements we need in our dense vectors.  
+        const unsigned long max_dim = max_index_plus_one(samples);
+
+
+        // now turn all the samples into dense samples
+        result.resize(samples.size());
+
+        for (unsigned long i = 0; i < samples.size(); ++i)
+        {
+            result[i].set_size(max_dim);
+            result[i] = 0;
+            for (typename sample_type::const_iterator j = samples[i].begin(); j != samples[i].end(); ++j)
+            {
+                result[i](j->first) = j->second;
+            }
+        }
+
+        return result;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_SPARSE_VECTOR

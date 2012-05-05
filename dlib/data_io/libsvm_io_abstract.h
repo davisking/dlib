@@ -101,36 +101,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename sample_type, 
-        typename alloc
-        >
-    std::vector<matrix<typename sample_type::value_type::second_type,0,1> > sparse_to_dense (
-        const std::vector<sample_type, alloc>& samples
-    );
-    /*!
-        requires
-            - sample_type must be an STL container
-            - sample_type::value_type == std::pair<T,U> where T is some kind of 
-              unsigned integral type
-        ensures
-            - converts from sparse sample vectors to dense (column matrix form)
-            - That is, this function returns a std::vector R such that:
-                - R contains column matrices    
-                - R.size() == samples.size()
-                - for all valid i: 
-                    - R[i] == the dense (i.e. dlib::matrix) version of the sparse sample
-                      given by samples[i]
-                    - for all valid j:
-                        - R[i](j) == the value of the element in samples[i] that has key
-                          value j.  That is, the key used for each element of a sparse
-                          vector directly determines where that element gets put into a
-                          dense vector.  Note that elements not explicitly in the sparse
-                          vector have a value of 0.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     template <typename sample_type, typename alloc>
     void fix_nonzero_indexing (
         std::vector<sample_type,alloc>& samples
