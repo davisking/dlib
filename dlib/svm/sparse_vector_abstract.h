@@ -371,7 +371,7 @@ namespace dlib
     );
     /*!
         requires
-            - vect must be an unsorted sparse vector or a dense column vector.
+            - vect must be a sparse vector or a dense column vector.
         ensures
             - converts the single sparse or dense vector vect to a dense (column matrix form)
               representation.  That is, this function returns a vector V such that:
@@ -389,11 +389,11 @@ namespace dlib
         >
     matrix<typename sample_type::value_type::second_type,0,1> sparse_to_dense (
         const sample_type& vect,
-        long num_dimensions 
+        unsigned long num_dimensions 
     );
     /*!
         requires
-            - vect must be an unsorted sparse vector or a dense column vector.
+            - vect must be a sparse vector or a dense column vector.
         ensures
             - converts the single sparse or dense vector vect to a dense (column matrix form)
               representation.  That is, this function returns a vector V such that:
@@ -415,7 +415,7 @@ namespace dlib
     );
     /*!
         requires
-            - all elements of samples must be unsorted sparse vectors or dense column vectors.
+            - all elements of samples must be sparse vectors or dense column vectors.
         ensures
             - converts from sparse sample vectors to dense (column matrix form)
             - That is, this function returns a std::vector R such that:
@@ -425,6 +425,47 @@ namespace dlib
                     - R[i] == sparse_to_dense(samples[i], max_index_plus_one(samples))
                       (i.e. the dense (i.e. dlib::matrix) version of the sparse sample
                       given by samples[i].)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename sample_type, 
+        typename alloc
+        >
+    std::vector<matrix<typename sample_type::value_type::second_type,0,1> > sparse_to_dense (
+        const std::vector<sample_type, alloc>& samples,
+        unsigned long num_dimensions 
+    );
+    /*!
+        requires
+            - all elements of samples must be sparse vectors or dense column vectors.
+        ensures
+            - converts from sparse sample vectors to dense (column matrix form)
+            - That is, this function returns a std::vector R such that:
+                - R contains column matrices    
+                - R.size() == samples.size()
+                - for all valid i: 
+                    - R[i] == sparse_to_dense(samples[i], num_dimensions)
+                      (i.e. the dense (i.e. dlib::matrix) version of the sparse sample
+                      given by samples[i].)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    T make_sparse_vector (
+        const T& v
+    );
+    /*!
+        requires
+            - v is an unsorted sparse vector
+        ensures
+            - returns a copy of v which is a sparse vector. 
+              (i.e. it will be properly sorted and not have any duplicate
+              key values).
     !*/
 
 // ----------------------------------------------------------------------------------------

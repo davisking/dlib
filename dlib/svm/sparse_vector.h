@@ -641,7 +641,7 @@ namespace dlib
         template <typename sparse_vector_type>
         inline matrix<typename sparse_vector_type::value_type::second_type,0,1> sparse_to_dense (
             const sparse_vector_type& vect,
-            long num_dimensions 
+            unsigned long num_dimensions 
         )
         {
             // You must use unsigned integral key types in your sparse vectors
@@ -674,7 +674,7 @@ namespace dlib
     template <typename idx_type, typename value_type, typename alloc>
     matrix<value_type,0,1> sparse_to_dense (
         const std::vector<std::pair<idx_type,value_type>,alloc>& vect,
-        long num_dimensions 
+        unsigned long num_dimensions 
     )
     {
         return impl::sparse_to_dense(vect,num_dimensions);
@@ -695,7 +695,7 @@ namespace dlib
     template <typename T1, typename T2, typename T3, typename T4>
     matrix<T2,0,1> sparse_to_dense (
         const std::map<T1,T2,T3,T4>& vect,
-        long num_dimensions 
+        unsigned long num_dimensions 
     )
     {
         return impl::sparse_to_dense(vect,num_dimensions);
@@ -720,23 +720,25 @@ namespace dlib
     
     template <typename EXP>
     matrix<typename EXP::type,0,1> sparse_to_dense(
-        const matrix<EXP>& item,
-        long num
+        const matrix_exp<EXP>& item,
+        unsigned long num
     ) 
     { 
-        if (item.size() == num)
+        typedef typename EXP::type type;
+        if (item.size() == (long)num)
             return item; 
-        else if (item.size() < num)
-            return join_cols(item, zeros_matrix(num-item.size(),1));
+        else if (item.size() < (long)num)
+            return join_cols(item, zeros_matrix<type>((long)num-item.size(),1));
         else
-            return rowm(item,0,num);
+            return colm(item,0,(long)num);
     }
     
 // ----------------------------------------------------------------------------------------
 
     template <typename sample_type, typename alloc>
     std::vector<matrix<typename sample_type::value_type::second_type,0,1> > sparse_to_dense (
-        const std::vector<sample_type, alloc>& samples
+        const std::vector<sample_type, alloc>& samples,
+        unsigned long num_dimensions
     )
     {
         typedef typename sample_type::value_type pair_type;
@@ -744,18 +746,47 @@ namespace dlib
 
         std::vector< matrix<value_type,0,1> > result;
 
-        // figure out how many elements we need in our dense vectors.  
-        const unsigned long max_dim = max_index_plus_one(samples);
-
         // now turn all the samples into dense samples
         result.resize(samples.size());
 
         for (unsigned long i = 0; i < samples.size(); ++i)
         {
-            result[i] = sparse_to_dense(samples[i],max_dim);
+            result[i] = sparse_to_dense(samples[i],num_dimensions);
         }
 
         return result;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename sample_type, typename alloc>
+    std::vector<matrix<typename sample_type::value_type::second_type,0,1> > sparse_to_dense (
+        const std::vector<sample_type, alloc>& samples
+    )
+    {
+        return sparse_to_dense(samples, max_index_plus_one(samples));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    T make_sparse_vector (
+        const T& v
+    )
+    {
+        // You must use unsigned integral key types in your sparse vectors
+        typedef typename T::value_type::first_type idx_type;
+        typedef typename T::value_type::second_type value_type;
+        COMPILE_TIME_ASSERT(is_unsigned_type<idx_type>::value);
+        std::map<idx_type,value_type> temp;
+        for (typename T::const_iterator i = v.begin(); i != v.end(); ++i)
+        {
+            temp[i->first] += i->second;
+        }
+
+        return T(temp.begin(), temp.end());
     }
 
 // ----------------------------------------------------------------------------------------
