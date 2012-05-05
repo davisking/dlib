@@ -46,6 +46,7 @@ set (tests
    geometry.cpp
    graph.cpp
    graph_cuts.cpp
+   graph_labeler.cpp
    hash.cpp
    hash_map.cpp
    hash_set.cpp
