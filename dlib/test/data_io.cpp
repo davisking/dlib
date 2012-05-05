@@ -4,6 +4,7 @@
 #include "tester.h"
 #include <dlib/svm.h>
 #include <dlib/data_io.h>
+#include <dlib/sparse_vector.h>
 #include "create_iris_datafile.h"
 #include <vector>
 #include <sstream>
@@ -103,6 +104,105 @@ namespace
         }
 
 
+        void test_sparse_to_dense()
+        {
+            {
+                std::map<unsigned long, double> temp;
+
+                matrix<double,0,1> m, m2;
+
+                m = sparse_to_dense(m);
+                DLIB_TEST(m.size() == 0);
+                m.set_size(2,1);
+                m = 1, 2;
+                m2 = sparse_to_dense(m);
+                DLIB_TEST(m == m2);
+                m2 = sparse_to_dense(m,1);
+                DLIB_TEST(m2.size() == 1);
+                DLIB_TEST(m2(0,0) == 1);
+                m2 = sparse_to_dense(m,0);
+                DLIB_TEST(m2.size() == 0);
+
+                temp[3] = 2;
+                temp[5] = 4;
+                m2 = sparse_to_dense(temp);
+                m.set_size(6);
+                m = 0,0,0,2,0,4;
+                DLIB_TEST(m2 == m);
+
+                m2 = sparse_to_dense(temp, 5);
+                m.set_size(5);
+                m = 0,0,0,2,0;
+                DLIB_TEST(m2 == m);
+
+                m2 = sparse_to_dense(temp, 7);
+                m.set_size(7);
+                m = 0,0,0,2,0,4,0;
+                DLIB_TEST(m2 == m);
+
+                std::vector<std::vector<std::pair<unsigned long,double> > > vects;
+
+                std::vector<std::pair<unsigned long,double> > v;
+                v.push_back(make_pair(5,2));
+                v.push_back(make_pair(3,1));
+                v.push_back(make_pair(5,2));
+                v.push_back(make_pair(3,1));
+                v = make_sparse_vector(v);
+                vects.push_back(v);
+                vects.push_back(v);
+                vects.push_back(v);
+                vects.push_back(v);
+                DLIB_TEST(max_index_plus_one(v) == 6);
+                m2 = sparse_to_dense(v);
+                m.set_size(6);
+                m = 0,0,0,2,0,4;
+                DLIB_TEST_MSG(m2 == m, m2 << "\n\n" << m );
+
+                m2 = sparse_to_dense(v,7);
+                m.set_size(7);
+                m = 0,0,0,2,0,4,0;
+                DLIB_TEST(m2 == m);
+
+                m2 = sparse_to_dense(v,5);
+                m.set_size(5);
+                m = 0,0,0,2,0;
+                DLIB_TEST(m2 == m);
+
+                v.clear();
+                m2 = sparse_to_dense(v);
+                DLIB_TEST(m2.size() == 0);
+
+
+                std::vector<matrix<double,0,1> > mvects = sparse_to_dense(vects);
+                DLIB_TEST(mvects.size() == 4);
+                m.set_size(6);
+                m = 0,0,0,2,0,4;
+                DLIB_TEST(mvects[0] == m);
+                DLIB_TEST(mvects[1] == m);
+                DLIB_TEST(mvects[2] == m);
+                DLIB_TEST(mvects[3] == m);
+
+
+                mvects = sparse_to_dense(vects, 7);
+                DLIB_TEST(mvects.size() == 4);
+                m.set_size(7);
+                m = 0,0,0,2,0,4,0;
+                DLIB_TEST(mvects[0] == m);
+                DLIB_TEST(mvects[1] == m);
+                DLIB_TEST(mvects[2] == m);
+                DLIB_TEST(mvects[3] == m);
+
+                mvects = sparse_to_dense(vects, 5);
+                DLIB_TEST(mvects.size() == 4);
+                m.set_size(5);
+                m = 0,0,0,2,0;
+                DLIB_TEST(mvects[0] == m);
+                DLIB_TEST(mvects[1] == m);
+                DLIB_TEST(mvects[2] == m);
+                DLIB_TEST(mvects[3] == m);
+
+            }
+        }
 
 
         void perform_test (
@@ -110,6 +210,8 @@ namespace
         {
             print_spinner();
             create_iris_datafile();
+
+            test_sparse_to_dense();
 
             run_test<std::map<unsigned int, double> >();
             run_test<std::map<unsigned int, float> >();
