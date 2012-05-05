@@ -1837,8 +1837,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       
       <component>
          <name>sparse_to_dense</name>
-         <file>dlib/data_io.h</file>
-         <spec_file link="true">dlib/data_io/libsvm_io_abstract.h</spec_file>
+         <file>dlib/sparse_vector.h</file>
+         <spec_file link="true">dlib/svm/sparse_vector_abstract.h</spec_file>
          <description>
             This is a simple function that takes a std::vector of 
             <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a> 
