@@ -39,7 +39,7 @@ namespace dlib
             node_weights(node_weights_)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(min(edge_weights) >= 0,
+            DLIB_ASSERT(edge_weights.size() == 0 || min(edge_weights) >= 0,
                     "\t graph_labeler::graph_labeler()"
                     << "\n\t Invalid inputs were given to this function."
                     << "\n\t min(edge_weights): " << min(edge_weights)
@@ -61,9 +61,7 @@ namespace dlib
         {
             // make sure requires clause is not broken
 #ifdef ENABLE_ASSERTS
-            DLIB_ASSERT(get_edge_weights().size() != 0 &&
-                        get_node_weights().size() != 0 && 
-                        graph_contains_length_one_cycle(sample) == false,
+            DLIB_ASSERT(graph_contains_length_one_cycle(sample) == false,
                         "\t void graph_labeler::operator()"
                         << "\n\t Invalid inputs were given to this function."
                         << "\n\t get_edge_weights().size(): " << get_edge_weights().size()
@@ -103,9 +101,9 @@ namespace dlib
                         );
                     }
 
-                    DLIB_ASSERT(min(sample.node(i).edge(n)) >= 0,
+                    DLIB_ASSERT(sample.node(i).edge(n).size() == 0 || min(sample.node(i).edge(n)) >= 0,
                                 "\t void graph_labeler::operator()"
-                                << "\n\t Invalid inputs were given to this function."
+                                << "\n\t No edge vectors are allowed to have negative elements."
                                 << "\n\t min(sample.node(i).edge(n)): " << min(sample.node(i).edge(n))
                                 << "\n\t i:    " << i 
                                 << "\n\t n:    " << n 

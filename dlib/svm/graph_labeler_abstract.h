@@ -102,8 +102,6 @@ namespace dlib
                   capable of representing column vectors or some kind of sparse vector
                   type as defined in dlib/svm/sparse_vector_abstract.h.
                 - graph_contains_length_one_cycle(sample) == false
-                - #get_edge_weights().size() != 0
-                - #get_node_weights().size() != 0
                 - for all valid i and j:
                     - min(edge(sample,i,j)) >= 0
                     - it must be legal to call dot(edge(sample,i,j), get_edge_weights())
