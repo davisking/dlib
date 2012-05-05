@@ -636,41 +636,123 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <typename sparse_vector_type>
+        inline matrix<typename sparse_vector_type::value_type::second_type,0,1> sparse_to_dense (
+            const sparse_vector_type& vect,
+            long num_dimensions 
+        )
+        {
+            // You must use unsigned integral key types in your sparse vectors
+            typedef typename sparse_vector_type::value_type::first_type idx_type;
+            typedef typename sparse_vector_type::value_type::second_type value_type;
+            COMPILE_TIME_ASSERT(is_unsigned_type<idx_type>::value);
+
+            matrix<value_type,0,1> result;
+
+            if (vect.size() == 0)
+                return result;
+
+            result.set_size(num_dimensions);
+            result = 0;
+
+            for (typename sparse_vector_type::const_iterator j = vect.begin(); j != vect.end(); ++j)
+            {
+                if (result.size() < (long)(j->first))
+                {
+                    result(j->first) += j->second;
+                }
+            }
+
+            return result;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename idx_type, typename value_type, typename alloc>
+    matrix<value_type,0,1> sparse_to_dense (
+        const std::vector<std::pair<idx_type,value_type>,alloc>& vect,
+        long num_dimensions 
+    )
+    {
+        return impl::sparse_to_dense(vect,num_dimensions);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename idx_type, typename value_type, typename alloc>
+    matrix<value_type,0,1> sparse_to_dense (
+        const std::vector<std::pair<idx_type,value_type>,alloc>& vect
+    )
+    {
+        return impl::sparse_to_dense(vect, max_index_plus_one(vect));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T1, typename T2, typename T3, typename T4>
+    matrix<T2,0,1> sparse_to_dense (
+        const std::map<T1,T2,T3,T4>& vect,
+        long num_dimensions 
+    )
+    {
+        return impl::sparse_to_dense(vect,num_dimensions);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T1, typename T2, typename T3, typename T4>
+    matrix<T2,0,1> sparse_to_dense (
+        const std::map<T1,T2,T3,T4>& vect
+    )
+    {
+        return impl::sparse_to_dense(vect, max_index_plus_one(vect));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    typename enable_if<is_matrix<T>,T&>::type sparse_to_dense(
+        T& item
+    ) { return item; }
+    
+    template <typename EXP>
+    matrix<typename EXP::type,0,1> sparse_to_dense(
+        const matrix<EXP>& item,
+        long num
+    ) 
+    { 
+        if (item.size() == num)
+            return item; 
+        else if (item.size() < num)
+            return join_cols(item, zeros_matrix(num-item.size(),1));
+        else
+            return rowm(item,0,num);
+    }
+    
+// ----------------------------------------------------------------------------------------
+
     template <typename sample_type, typename alloc>
     std::vector<matrix<typename sample_type::value_type::second_type,0,1> > sparse_to_dense (
         const std::vector<sample_type, alloc>& samples
     )
     {
         typedef typename sample_type::value_type pair_type;
-        typedef typename basic_type<typename pair_type::first_type>::type key_type;
-
-        // You must use unsigned integral key types in your sparse vectors
-        COMPILE_TIME_ASSERT(is_unsigned_type<key_type>::value);
-
         typedef typename pair_type::second_type value_type;
 
         std::vector< matrix<value_type,0,1> > result;
 
-        // do nothing if there aren't any samples
-        if (samples.size() == 0)
-            return result;
-
-
         // figure out how many elements we need in our dense vectors.  
         const unsigned long max_dim = max_index_plus_one(samples);
-
 
         // now turn all the samples into dense samples
         result.resize(samples.size());
 
         for (unsigned long i = 0; i < samples.size(); ++i)
         {
-            result[i].set_size(max_dim);
-            result[i] = 0;
-            for (typename sample_type::const_iterator j = samples[i].begin(); j != samples[i].end(); ++j)
-            {
-                result[i](j->first) = j->second;
-            }
+            result[i] = sparse_to_dense(samples[i],max_dim);
         }
 
         return result;
