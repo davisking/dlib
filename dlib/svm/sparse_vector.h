@@ -659,7 +659,7 @@ namespace dlib
 
             for (typename sparse_vector_type::const_iterator j = vect.begin(); j != vect.end(); ++j)
             {
-                if (result.size() < (long)(j->first))
+                if ((long)(j->first) < result.size())
                 {
                     result(j->first) += j->second;
                 }
