@@ -47,7 +47,7 @@ namespace dlib
 
             for (unsigned long j = 0; j < samples[i].number_of_nodes(); ++j)
             {
-                if (samples[i].node(j).data.size() == 0)
+                if (ismat && samples[i].node(j).data.size() == 0)
                     return false;
 
                 if (ismat && node_dims == -1)
