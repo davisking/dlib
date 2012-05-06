@@ -198,7 +198,7 @@ namespace dlib
 
                 // accumulate the node vectors
                 if (label_i == true)
-                    set_rowm(psi, range(edge_dims, psi.size()-1)) = rowm(psi, range(edge_dims, psi.size()-1)) + sample.node(i).data;
+                    set_rowm(psi, range(edge_dims, psi.size()-1)) += sample.node(i).data;
 
                 for (unsigned long n = 0; n < sample.node(i).number_of_neighbors(); ++n)
                 {
@@ -209,7 +209,7 @@ namespace dlib
                     // the labels disagree.
                     if (i < j && label_i != label_j)
                     {
-                        set_rowm(psi, range(0, edge_dims-1)) = rowm(psi, range(0, edge_dims-1)) - sample.node(i).edge(n);
+                        set_rowm(psi, range(0, edge_dims-1)) -= sample.node(i).edge(n);
                     }
                 }
             }
