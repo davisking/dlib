@@ -75,7 +75,7 @@ namespace dlib
                     is_matrix<typename graph_type::type>::value)
                 {
                     // check that dot() is legal.
-                    DLIB_ASSERT(get_node_weights().size() == sample.node(i).data.size(),
+                    DLIB_ASSERT((unsigned long)get_node_weights().size() == (unsigned long)sample.node(i).data.size(),
                                 "\t void graph_labeler::operator()"
                                 << "\n\t The size of the node weight vector must match the one in the node."
                                 << "\n\t get_node_weights().size():  " << get_node_weights().size()
@@ -91,7 +91,7 @@ namespace dlib
                         is_matrix<typename graph_type::edge_type>::value)
                     {
                         // check that dot() is legal.
-                        DLIB_ASSERT(get_edge_weights().size() == sample.node(i).edge(n).size(),
+                        DLIB_ASSERT((unsigned long)get_edge_weights().size() == (unsigned long)sample.node(i).edge(n).size(),
                                     "\t void graph_labeler::operator()"
                                     << "\n\t The size of the edge weight vector must match the one in graph's edge."
                                     << "\n\t get_edge_weights().size():  " << get_edge_weights().size()
