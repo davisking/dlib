@@ -364,6 +364,25 @@ namespace
                 test1<node_vector_type,edge_vector_type,vector_type>(samples, labels);
             }
             print_spinner();
+            // test with dense vectors and sparse vectors together 
+            {
+                typedef matrix<double,3,1> node_vector_type;
+                typedef matrix<double,2,1> edge_vector_type;
+                typedef std::map<unsigned long,double> vector_type;
+                typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
+
+                dlib::array<graph_type> samples;
+                std::vector<std::vector<node_label> > labels;
+
+                make_data<graph_type>(samples, labels);
+                make_data<graph_type>(samples, labels);
+                make_data<graph_type>(samples, labels);
+                make_data<graph_type>(samples, labels);
+
+
+                test1<node_vector_type,edge_vector_type,vector_type>(samples, labels);
+            }
+            print_spinner();
             // test with sparse vectors
             {
                 typedef std::vector<std::pair<unsigned long,double> > vector_type;
@@ -408,6 +427,25 @@ namespace
             // test with sparse vectors
             {
                 typedef std::vector<std::pair<unsigned long,double> > vector_type;
+                typedef std::map<unsigned long, double> edge_vector_type;
+                typedef std::map<unsigned long, double> node_vector_type;
+                typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
+
+                dlib::array<graph_type> samples;
+                std::vector<std::vector<node_label> > labels;
+
+                make_data2_sparse<graph_type>(samples, labels);
+                make_data2_sparse<graph_type>(samples, labels);
+                make_data2_sparse<graph_type>(samples, labels);
+                make_data2_sparse<graph_type>(samples, labels);
+
+
+                test1<node_vector_type,edge_vector_type,vector_type>(samples, labels);
+            }
+            print_spinner();
+            // test with sparse vectors and dense mix
+            {
+                typedef matrix<double,0,1> vector_type;
                 typedef std::map<unsigned long, double> edge_vector_type;
                 typedef std::map<unsigned long, double> node_vector_type;
                 typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
