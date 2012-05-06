@@ -120,6 +120,46 @@ namespace dlib
                   part of the total weight vector.  You can do this by passing get_num_edge_weights()
                   to the third argument to oca::operator().
         !*/
+
+        void set_loss_on_positive_class (
+            double loss
+        );
+        /*!
+            requires
+                - loss >= 0
+            ensures
+                - #get_loss_on_positive_class() == loss
+        !*/
+
+        void set_loss_on_negative_class (
+            double loss
+        );
+        /*!
+            requires
+                - loss >= 0
+            ensures
+                - #get_loss_on_negative_class() == loss
+        !*/
+
+        double get_loss_on_positive_class (
+        ) const;
+        /*!
+            ensures
+                - returns the loss incurred when a graph node which is supposed to have
+                  a label of true gets misclassified.  This value controls how much we care 
+                  about correctly classifying nodes which should be labeled as true.  Larger 
+                  loss values indicate that we care more strongly than smaller values.
+        !*/
+
+        double get_loss_on_negative_class (
+        ) const;
+        /*!
+            ensures
+                - returns the loss incurred when a graph node which is supposed to have
+                  a label of false gets misclassified.  This value controls how much we care 
+                  about correctly classifying nodes which should be labeled as false.  Larger 
+                  loss values indicate that we care more strongly than smaller values.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
