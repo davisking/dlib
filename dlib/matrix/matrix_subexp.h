@@ -583,6 +583,62 @@ namespace dlib
             return *this;
         }
 
+        template <typename EXP>
+        assignable_sub_matrix& operator+= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nr() == (long)rect.height() && exp.nc() == (long)rect.width(),
+                "\tassignable_matrix_expression set_subm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\trect.width() (target matrix):   " << rect.width()
+                << "\n\trect.height() (target matrix):  " << rect.height()
+                );
+
+            if (exp.destructively_aliases(m) == false)
+            {
+                matrix_assign(*this, subm(m,rect)+exp); 
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator+=(tmp(exp));
+            }
+
+            return *this;
+        }
+
+        template <typename EXP>
+        assignable_sub_matrix& operator-= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nr() == (long)rect.height() && exp.nc() == (long)rect.width(),
+                "\tassignable_matrix_expression set_subm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\trect.width() (target matrix):   " << rect.width()
+                << "\n\trect.height() (target matrix):  " << rect.height()
+                );
+
+            if (exp.destructively_aliases(m) == false)
+            {
+                matrix_assign(*this, subm(m,rect)-exp); 
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator-=(tmp(exp));
+            }
+
+            return *this;
+        }
+
         assignable_sub_matrix& operator= (
             const T& value
         )
@@ -592,6 +648,36 @@ namespace dlib
                 for (long c = rect.left(); c <= rect.right(); ++c)
                 {
                     m(r,c) = value;
+                }
+            }
+
+            return *this;
+        }
+
+        assignable_sub_matrix& operator+= (
+            const T& value
+        )
+        {
+            for (long r = rect.top(); r <= rect.bottom(); ++r)
+            {
+                for (long c = rect.left(); c <= rect.right(); ++c)
+                {
+                    m(r,c) += value;
+                }
+            }
+
+            return *this;
+        }
+
+        assignable_sub_matrix& operator-= (
+            const T& value
+        )
+        {
+            for (long r = rect.top(); r <= rect.bottom(); ++r)
+            {
+                for (long c = rect.left(); c <= rect.right(); ++c)
+                {
+                    m(r,c) -= value;
                 }
             }
 
@@ -705,6 +791,62 @@ namespace dlib
             return *this;
         }
 
+        template <typename EXP>
+        assignable_sub_range_matrix& operator+= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nr() == rows.size() && exp.nc() == cols.size(),
+                "\tassignable_matrix_expression set_subm(matrix& m, const matrix_exp rows, const matrix_exp cols)"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\trows.size() (target matrix):  " << rows.size()
+                << "\n\tcols.size() (target matrix):  " << cols.size()
+                );
+
+            if (exp.destructively_aliases(m) == false)
+            {
+                matrix_assign(*this, subm(m,rows,cols)+exp);
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator+=(tmp(exp));
+            }
+
+            return *this;
+        }
+
+        template <typename EXP>
+        assignable_sub_range_matrix& operator-= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nr() == rows.size() && exp.nc() == cols.size(),
+                "\tassignable_matrix_expression set_subm(matrix& m, const matrix_exp rows, const matrix_exp cols)"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\trows.size() (target matrix):  " << rows.size()
+                << "\n\tcols.size() (target matrix):  " << cols.size()
+                );
+
+            if (exp.destructively_aliases(m) == false)
+            {
+                matrix_assign(*this, subm(m,rows,cols)-exp);
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator-=(tmp(exp));
+            }
+
+            return *this;
+        }
+
         assignable_sub_range_matrix& operator= (
             const T& value
         )
@@ -714,6 +856,36 @@ namespace dlib
                 for (long c = 0; c < cols.size(); ++c)
                 {
                     m(rows(r),cols(c)) = value;
+                }
+            }
+
+            return *this;
+        }
+
+        assignable_sub_range_matrix& operator+= (
+            const T& value
+        )
+        {
+            for (long r = 0; r < rows.size(); ++r)
+            {
+                for (long c = 0; c < cols.size(); ++c)
+                {
+                    m(rows(r),cols(c)) += value;
+                }
+            }
+
+            return *this;
+        }
+
+        assignable_sub_range_matrix& operator-= (
+            const T& value
+        )
+        {
+            for (long r = 0; r < rows.size(); ++r)
+            {
+                for (long c = 0; c < cols.size(); ++c)
+                {
+                    m(rows(r),cols(c)) -= value;
                 }
             }
 
@@ -858,6 +1030,60 @@ namespace dlib
             return *this;
         }
 
+        template <typename EXP>
+        assignable_col_matrix& operator+= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nc() == 1 && exp.nr() == m.nr(),
+                "\tassignable_matrix_expression set_colm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\tm.nr() (target matrix):   " << m.nr()
+                );
+
+            if (exp.destructively_aliases(m) == false)
+            {
+                matrix_assign(*this, colm(m,col)+exp); 
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator+=(tmp(exp));
+            }
+
+            return *this;
+        }
+
+        template <typename EXP>
+        assignable_col_matrix& operator-= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nc() == 1 && exp.nr() == m.nr(),
+                "\tassignable_matrix_expression set_colm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\tm.nr() (target matrix):   " << m.nr()
+                );
+
+            if (exp.destructively_aliases(m) == false)
+            {
+                matrix_assign(*this, colm(m,col)-exp); 
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator-=(tmp(exp));
+            }
+
+            return *this;
+        }
+
         assignable_col_matrix& operator= (
             const T& value
         )
@@ -865,6 +1091,30 @@ namespace dlib
             for (long i = 0; i < m.nr(); ++i)
             {
                 m(i,col) = value;
+            }
+
+            return *this;
+        }
+
+        assignable_col_matrix& operator+= (
+            const T& value
+        )
+        {
+            for (long i = 0; i < m.nr(); ++i)
+            {
+                m(i,col) += value;
+            }
+
+            return *this;
+        }
+
+        assignable_col_matrix& operator-= (
+            const T& value
+        )
+        {
+            for (long i = 0; i < m.nr(); ++i)
+            {
+                m(i,col) -= value;
             }
 
             return *this;
@@ -958,6 +1208,60 @@ namespace dlib
             return *this;
         }
 
+        template <typename EXP>
+        assignable_row_matrix& operator+= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nr() == 1 && exp.nc() == m.nc(),
+                "\tassignable_matrix_expression set_rowm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\tm.nc() (target matrix):   " << m.nc()
+                );
+
+            if (exp.destructively_aliases(m) == false)
+            {
+                matrix_assign(*this, rowm(m,row)+exp); 
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator+=(tmp(exp));
+            }
+
+            return *this;
+        }
+
+        template <typename EXP>
+        assignable_row_matrix& operator-= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            DLIB_ASSERT( exp.nr() == 1 && exp.nc() == m.nc(),
+                "\tassignable_matrix_expression set_rowm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\tm.nc() (target matrix):   " << m.nc()
+                );
+
+            if (exp.destructively_aliases(m) == false)
+            {
+                matrix_assign(*this, rowm(m,row)-exp); 
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to m to 
+                // avoid aliasing issues during the copy
+                this->operator-=(tmp(exp));
+            }
+
+            return *this;
+        }
+
         assignable_row_matrix& operator= (
             const T& value
         )
@@ -965,6 +1269,30 @@ namespace dlib
             for (long i = 0; i < m.nc(); ++i)
             {
                 m(row,i) = value;
+            }
+
+            return *this;
+        }
+
+        assignable_row_matrix& operator+= (
+            const T& value
+        )
+        {
+            for (long i = 0; i < m.nc(); ++i)
+            {
+                m(row,i) += value;
+            }
+
+            return *this;
+        }
+
+        assignable_row_matrix& operator-= (
+            const T& value
+        )
+        {
+            for (long i = 0; i < m.nc(); ++i)
+            {
+                m(row,i) -= value;
             }
 
             return *this;

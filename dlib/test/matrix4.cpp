@@ -810,6 +810,106 @@ namespace
         DLIB_TEST(mean(a) == complex<double>(4, 5));
     }
 
+    void test_setsubs()
+    {
+        {
+            matrix<double> m(3,3);
+            m = 0;
+
+            set_colm(m,0) += 1;
+            set_rowm(m,0) += 1;
+            set_subm(m,1,1,2,2) += 5;
+
+            matrix<double> m2(3,3);
+            m2 = 2, 1, 1,
+                 1, 5, 5, 
+                 1, 5, 5;
+
+            DLIB_TEST(m == m2);
+
+            set_colm(m,0) -= 1;
+            set_rowm(m,0) -= 1;
+            set_subm(m,1,1,2,2) -= 5;
+
+            m2 = 0;
+            DLIB_TEST(m == m2);
+
+            matrix<double,1,3> r;
+            matrix<double,3,1> c;
+            matrix<double,2,2> b;
+            r = 1,2,3;
+
+            c = 2,
+                3,
+                4;
+
+            b = 2,3,
+                4,5;
+
+            set_colm(m,1) += c;
+            set_rowm(m,1) += r;
+            set_subm(m,1,1,2,2) += b;
+
+            m2 = 0, 2, 0,
+                 1, 7, 6,
+                 0, 8, 5;
+
+            DLIB_TEST(m2 == m);
+
+            set_colm(m,1) -= c;
+            set_rowm(m,1) -= r;
+            set_subm(m,1,1,2,2) -= b;
+
+            m2 = 0;
+            DLIB_TEST(m2 == m);
+
+
+            // check that the code path for destructive aliasing works right.
+            m = 2*identity_matrix<double>(3);
+            set_colm(m,1) += m*c;
+            m2 = 2, 4, 0,
+                 0, 8, 0,
+                 0, 8, 2;
+            DLIB_TEST(m == m2);
+
+            m = 2*identity_matrix<double>(3);
+            set_colm(m,1) -= m*c;
+            m2 = 2, -4, 0,
+                 0, -4, 0,
+                 0, -8, 2;
+            DLIB_TEST(m == m2);
+
+            m = 2*identity_matrix<double>(3);
+            set_rowm(m,1) += r*m;
+            m2 = 2, 0, 0,
+                 2, 6, 6,
+                 0, 0, 2;
+            DLIB_TEST(m == m2);
+
+            m = 2*identity_matrix<double>(3);
+            set_rowm(m,1) -= r*m;
+            m2 = 2, 0, 0,
+                -2, -2, -6,
+                 0, 0, 2;
+            DLIB_TEST(m == m2);
+
+            m = identity_matrix<double>(3);
+            const rectangle rect(0,0,1,1);
+            set_subm(m,rect) += subm(m,rect)*b;
+            m2 = 3, 3, 0,
+                 4, 6, 0,
+                 0, 0, 1;
+            DLIB_TEST(m == m2);
+
+            m = identity_matrix<double>(3);
+            set_subm(m,rect) -= subm(m,rect)*b;
+            m2 = -1, -3, 0,
+                 -4, -4, 0,
+                  0, 0, 1;
+            DLIB_TEST(m == m2);
+
+        }
+    }
 
     class matrix_tester : public tester
     {
@@ -823,6 +923,8 @@ namespace
         void perform_test (
         )
         {
+            test_setsubs();
+
             test_conv<0,0,0,0>();
             test_conv<1,2,3,4>();
 

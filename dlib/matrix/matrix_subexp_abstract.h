@@ -324,6 +324,10 @@ namespace dlib
                 - set_subm(m,row,col,nr,nc) = scalar_value;
               result in it being the case that:
                 - subm(m,row,col,nr,nc) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -346,6 +350,10 @@ namespace dlib
                 - set_subm(m,rect) = scalar_value;
               result in it being the case that:
                 - subm(m,rect) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -373,6 +381,10 @@ namespace dlib
                 - set_subm(m,rows,cols) = scalar_value;
               result in it being the case that:
                 - subm(m,rows,cols) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -394,6 +406,10 @@ namespace dlib
                 - set_rowm(m,row) = scalar_value;
               result in it being the case that:
                 - rowm(m,row) == uniform_matrix<matrix::type>(1,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -418,6 +434,10 @@ namespace dlib
                 - set_rowm(m,rows) = scalar_value;
               result in it being the case that:
                 - rowm(m,rows) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -439,6 +459,10 @@ namespace dlib
                 - set_colm(m,col) = scalar_value;
               result in it being the case that:
                 - colm(m,col) == uniform_matrix<matrix::type>(nr,1,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -463,6 +487,10 @@ namespace dlib
                 - set_colm(m,cols) = scalar_value;
               result in it being the case that:
                 - colm(m,cols) == uniform_matrix<matrix::type>(nr,nc,scalar_value).
+
+            - In addition to the normal assignment statements using the = symbol, you may
+              also use the usual += and -= versions of the assignment operator.  In these
+              cases, they have their usual effect.
     !*/
 
 // ----------------------------------------------------------------------------------------
