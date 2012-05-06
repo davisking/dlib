@@ -108,6 +108,8 @@ namespace dlib
                 - This object will use num_threads threads during the optimization 
                   procedure.  You should set this parameter equal to the number of 
                   available processing cores on your machine.
+                - #get_loss_on_positive_class() == 1.0
+                - #get_loss_on_negative_class() == 1.0
         !*/
 
         long get_num_edge_weights (
