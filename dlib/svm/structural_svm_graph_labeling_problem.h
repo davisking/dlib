@@ -199,7 +199,7 @@ namespace dlib
                     << "\n\t loss: " << loss 
                     << "\n\t this: " << this );
 
-            loss_pos = loss;
+            loss_neg = loss;
         }
 
         double get_loss_on_negative_class (
