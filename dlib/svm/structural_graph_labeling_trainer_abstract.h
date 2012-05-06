@@ -48,6 +48,8 @@ namespace dlib
                 - #get_epsilon() == 0.1
                 - #get_num_threads() == 2
                 - #get_max_cache_size() == 40
+                - #get_loss_on_positive_class() == 1.0
+                - #get_loss_on_negative_class() == 1.0
         !*/
 
         void set_num_threads (
@@ -157,6 +159,46 @@ namespace dlib
                   improving the generalization of the resulting graph_labeler.  Larger 
                   values encourage exact fitting while smaller values of C may encourage 
                   better generalization. 
+        !*/
+
+        void set_loss_on_positive_class (
+            double loss
+        );
+        /*!
+            requires
+                - loss >= 0
+            ensures
+                - #get_loss_on_positive_class() == loss
+        !*/
+
+        void set_loss_on_negative_class (
+            double loss
+        );
+        /*!
+            requires
+                - loss >= 0
+            ensures
+                - #get_loss_on_negative_class() == loss
+        !*/
+
+        double get_loss_on_positive_class (
+        ) const;
+        /*!
+            ensures
+                - returns the loss incurred when a graph node which is supposed to have
+                  a label of true gets misclassified.  This value controls how much we care 
+                  about correctly classifying nodes which should be labeled as true.  Larger 
+                  loss values indicate that we care more strongly than smaller values.
+        !*/
+
+        double get_loss_on_negative_class (
+        ) const;
+        /*!
+            ensures
+                - returns the loss incurred when a graph node which is supposed to have
+                  a label of false gets misclassified.  This value controls how much we care 
+                  about correctly classifying nodes which should be labeled as false.  Larger 
+                  loss values indicate that we care more strongly than smaller values.
         !*/
 
         template <
