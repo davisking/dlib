@@ -67,7 +67,7 @@ namespace dlib
                 - a is a sparse vector
                 - b is a sparse vector
             ensures
-                - returns exp(-gamma * sparse_vector::distance_squared(a,b))
+                - returns exp(-gamma * distance_squared(a,b))
         !*/
 
         sparse_radial_basis_kernel& operator= (
@@ -173,7 +173,7 @@ namespace dlib
                 - a is a sparse vector
                 - b is a sparse vector
             ensures
-                - returns tanh(gamma * sparse_vector::dot(a,b) + coef)
+                - returns tanh(gamma * dot(a,b) + coef)
         !*/
 
         sparse_sigmoid_kernel& operator= (
@@ -285,7 +285,7 @@ namespace dlib
                 - a is a sparse vector
                 - b is a sparse vector
             ensures
-                - returns pow(gamma * sparse_vector::dot(a,b) + coef, degree)
+                - returns pow(gamma * dot(a,b) + coef, degree)
         !*/
 
         sparse_polynomial_kernel& operator= (
@@ -362,7 +362,7 @@ namespace dlib
                 - a is a sparse vector
                 - b is a sparse vector
             ensures
-                - returns sparse_vector::dot(a,b) 
+                - returns dot(a,b) 
         !*/
 
         bool operator== (
