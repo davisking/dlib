@@ -29,6 +29,14 @@ namespace dlib
         const std::vector<std::vector<node_label> >& labels
     )
     {
+        typedef typename graph_type::type node_vector_type;
+        typedef typename graph_type::edge_type edge_vector_type;
+        // The graph must use all dense vectors or all sparse vectors.  It can't mix the two types together.
+        COMPILE_TIME_ASSERT( (is_matrix<node_vector_type>::value && is_matrix<edge_vector_type>::value) ||
+                            (!is_matrix<node_vector_type>::value && !is_matrix<edge_vector_type>::value));
+                            
+
+
         if (!is_learning_problem(samples, labels))
             return false;
 
