@@ -135,6 +135,7 @@ namespace dlib
             // make sure requires clause is not broken
             DLIB_ASSERT(is_graph_labeling_problem(samples, labels),
                 "\t void structural_graph_labeling_trainer::train()"
+                << "\n\t Invalid inputs were given to this function."
                 << "\n\t samples.size(): " << samples.size() 
                 << "\n\t labels.size():  " << labels.size() 
                 << "\n\t this: " << this

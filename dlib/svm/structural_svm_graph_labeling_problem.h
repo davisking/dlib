@@ -144,7 +144,10 @@ namespace dlib
             // make sure requires clause is not broken
             DLIB_ASSERT(is_graph_labeling_problem(samples, labels) == true,
                     "\t structural_svm_graph_labeling_problem::structural_svm_graph_labeling_problem()"
-                    << "\n\t invalid inputs were given to this function");
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t samples.size(): " << samples.size() 
+                    << "\n\t labels.size():  " << labels.size() 
+                    << "\n\t this: " << this );
 
 
             // figure out how many dimensions are in the node and edge vectors.
