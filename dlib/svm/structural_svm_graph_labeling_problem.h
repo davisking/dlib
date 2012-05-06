@@ -165,14 +165,6 @@ namespace dlib
 
         long get_num_edge_weights (
         ) const
-        /*!
-            ensures
-                - returns the dimensionality of the edge weight vector.  It is also
-                  important to know that when using the oca solver with this object,
-                  you must set it to generate non-negative weights for the edge weight
-                  part of the total weight vector.  You can do this by passing get_num_edge_weights()
-                  to the third argument to oca::operator().
-        !*/
         { 
             return edge_dims;
         }
