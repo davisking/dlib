@@ -1391,7 +1391,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       <component>
          <name>graph_labeler</name>
          <file>dlib/graph_cuts.h</file>
-         <spec_file link="true">dlib/svm/graph_labeler_abstract.h</spec_file>
+         <spec_file link="true">dlib/graph_cuts/graph_labeler_abstract.h</spec_file>
          <description>
             This object is a tool for labeling each node in a <a href="containers.html#graph">graph</a> 
             with a value of true or false, subject to a labeling consistency constraint between 
@@ -1651,7 +1651,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       
       <component>
          <name>is_graph_labeling_problem</name>
-         <file>dlib/graph_cuts.h</file>
+         <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/structural_svm_graph_labeling_problem_abstract.h</spec_file>
          <description>
             This function takes a set of training data for a graph labeling problem
@@ -2297,7 +2297,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       
       <component>
          <name>cross_validate_graph_labeling_trainer</name>
-         <file>dlib/graph_cuts.h</file>
+         <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/cross_validate_graph_labeling_trainer_abstract.h</spec_file>
          <description>
             Performs k-fold cross validation on a user supplied graph labeling trainer object such
@@ -2343,7 +2343,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       
       <component>
          <name>test_graph_labeling_function</name>
-         <file>dlib/graph_cuts.h</file>
+         <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/cross_validate_graph_labeling_trainer_abstract.h</spec_file>
          <description>
             Tests a <a href="#graph_labeler">graph_labeler</a> on a set of data 
@@ -2534,7 +2534,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       
       <component>
          <name>structural_svm_graph_labeling_problem</name>
-         <file>dlib/graph_cuts.h</file>
+         <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/structural_svm_graph_labeling_problem_abstract.h</spec_file>
          <description>
                 This object is a tool for learning the weight vectors needed to use
@@ -2596,7 +2596,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       
       <component>
          <name>structural_graph_labeling_trainer</name>
-         <file>dlib/graph_cuts.h</file>
+         <file>dlib/svm_threaded.h</file>
          <spec_file link="true">dlib/svm/structural_graph_labeling_trainer_abstract.h</spec_file>
          <description>
                 This object is a tool for learning to solve a graph labeling problem based
