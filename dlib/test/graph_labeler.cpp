@@ -4,7 +4,7 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
-#include <dlib/graph_cuts.h>
+#include <dlib/svm_threaded.h>
 #include <dlib/data_io.h>
 
 #include "tester.h"

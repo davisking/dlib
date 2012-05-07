@@ -6,7 +6,7 @@
 #include "../algs.h"
 #include "../optimization.h"
 #include "structural_svm_graph_labeling_problem_abstract.h"
-#include "graph_labeler_abstract.h"
+#include "../graph_cuts/graph_labeler_abstract.h"
 
 
 namespace dlib

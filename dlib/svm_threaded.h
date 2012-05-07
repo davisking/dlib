@@ -15,6 +15,10 @@
 #include "svm/structural_svm_assignment_problem.h"
 #include "svm/structural_assignment_trainer.h"
 
+#include "svm/structural_svm_graph_labeling_problem.h"
+#include "svm/structural_graph_labeling_trainer.h"
+#include "svm/cross_validate_graph_labeling_trainer.h"
+
 #endif // DLIB_SVm_THREADED_HEADER
 
 

@@ -3,7 +3,7 @@
 #undef DLIB_GRAPH_LaBELER_ABSTRACT_H__
 #ifdef DLIB_GRAPH_LaBELER_ABSTRACT_H__
 
-#include "../graph_cuts/find_max_factor_graph_potts_abstract.h"
+#include "find_max_factor_graph_potts_abstract.h"
 #include "../graph/graph_kernel_abstract.h"
 #include "../matrix/matrix_abstract.h"
 #include <vector>

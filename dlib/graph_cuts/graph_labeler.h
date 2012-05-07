@@ -7,8 +7,8 @@
 #include "../matrix.h"
 #include "../string.h"
 #include <vector>
-#include "../graph_cuts.h"
-#include "sparse_vector.h"
+#include "find_max_factor_graph_potts.h"
+#include "../svm/sparse_vector.h"
 #include "../graph.h"
 
 namespace dlib
