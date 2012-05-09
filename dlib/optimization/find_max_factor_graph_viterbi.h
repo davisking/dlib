@@ -18,7 +18,7 @@ namespace dlib
     {
         struct viterbi_data
         {
-            viterbi_data() :val(0), back_index(0) {}
+            viterbi_data() :val(-std::numeric_limits<double>::infinity()), back_index(0) {}
             double val;
             unsigned long back_index;
         };

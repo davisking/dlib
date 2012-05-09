@@ -187,8 +187,17 @@ namespace
             do_test<0,3,8>();
             do_test<4,3,1>();
             do_test<4,3,0>();
-            do_test<0,3,0>();
 
+            do_test<3,2,1>();
+            do_test<3,2,0>();
+            do_test<3,2,2>();
+            do_test<2,2,1>();
+            do_test_negative<3,2,1>();
+            do_test_negative<3,2,0>();
+            do_test_negative<3,2,2>();
+            do_test_negative<2,2,1>();
+
+            do_test<0,3,0>();
             do_test<1,2,8>();
             do_test<2,2,7>();
             do_test<3,2,8>();
