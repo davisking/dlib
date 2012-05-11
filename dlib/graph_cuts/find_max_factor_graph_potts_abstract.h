@@ -89,7 +89,7 @@ namespace dlib
                 - This function is basically the inverse of get_neighbor().
                 - returns a number IDX such that:
                     - get_neighbor(idx1,IDX) == idx2
-                    - IDX < number_of_neighbors(node_idx1)
+                    - IDX < number_of_neighbors(idx1)
         !*/
 
         void set_label (
