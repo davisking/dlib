@@ -21,7 +21,9 @@ namespace dlib
                 OCA solves optimization problems with the following form:
                     Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
 
-                    Where R(w) is a user-supplied convex function and C > 0
+                    Where R(w) is a user-supplied convex function and C > 0.  Optionally,
+                    there can also be non-negativity constraints on some or all of the 
+                    elements of w.
 
 
                 Note that the stopping condition must be provided by the user
@@ -125,7 +127,8 @@ namespace dlib
                     Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
 
                     Where R(w) is a user-supplied convex function and C > 0.  Optionally,
-                    this object can also add the non-negativity constraint that min(w) >= 0.
+                    this object can also add non-negativity constraints to some or all
+                    of the elements of w.
 
 
                 For a detailed discussion you should consult the following papers
