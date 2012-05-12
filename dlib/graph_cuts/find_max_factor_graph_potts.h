@@ -541,25 +541,52 @@ namespace dlib
     )
     {
 #ifdef ENABLE_ASSERTS
-        for (unsigned long i = 0; i < prob.number_of_nodes(); ++i)
+        for (unsigned long node_i = 0; node_i < prob.number_of_nodes(); ++node_i)
         {
-            for (unsigned long jj = 0; jj < prob.number_of_neighbors(i); ++jj)
+            for (unsigned long jj = 0; jj < prob.number_of_neighbors(node_i); ++jj)
             {
-                unsigned long j = prob.get_neighbor(i,jj);
-                DLIB_ASSERT(prob.factor_value_disagreement(i,j) >= 0,
+                unsigned long node_j = prob.get_neighbor(node_i,jj);
+                DLIB_ASSERT(prob.get_neighbor_idx(node_j,node_i) < prob.number_of_neighbors(node_j),
+                    "\t void find_max_factor_graph_potts(prob)"
+                    << "\n\t The supplied potts problem defines an invalid graph." 
+                    << "\n\t node_i: " << node_i 
+                    << "\n\t node_j: " << node_j 
+                    << "\n\t prob.get_neighbor_idx(node_j,node_i): " << prob.get_neighbor_idx(node_j,node_i)
+                    << "\n\t prob.number_of_neighbors(node_j):     " << prob.number_of_neighbors(node_j)
+                            );
+
+                DLIB_ASSERT(prob.get_neighbor_idx(node_i,prob.get_neighbor(node_i,jj)) == jj,
+                    "\t void find_max_factor_graph_potts(prob)"
+                    << "\n\t The get_neighbor_idx() and get_neighbor() functions must be inverses of each other." 
+                    << "\n\t node_i: " << node_i 
+                    << "\n\t jj:     " << jj
+                    << "\n\t prob.get_neighbor(node_i,jj): " << prob.get_neighbor(node_i,jj)
+                    << "\n\t prob.get_neighbor_idx(node_i,prob.get_neighbor(node_i,jj)): " << prob.get_neighbor_idx(node_i,node_j)
+                            );
+
+                DLIB_ASSERT(prob.get_neighbor(node_j,prob.get_neighbor_idx(node_j,node_i))==node_i,
+                    "\t void find_max_factor_graph_potts(prob)"
+                    << "\n\t The get_neighbor_idx() and get_neighbor() functions must be inverses of each other." 
+                    << "\n\t node_i: " << node_i 
+                    << "\n\t node_j: " << node_j 
+                    << "\n\t prob.get_neighbor_idx(node_j,node_i): " << prob.get_neighbor_idx(node_j,node_i)
+                    << "\n\t prob.get_neighbor(node_j,prob.get_neighbor_idx(node_j,node_i)): " << prob.get_neighbor(node_j,prob.get_neighbor_idx(node_j,node_i))
+                            );
+
+                DLIB_ASSERT(prob.factor_value_disagreement(node_i,node_j) >= 0,
                     "\t void find_max_factor_graph_potts(prob)"
                     << "\n\t Invalid inputs were given to this function." 
-                    << "\n\t i: " << i 
-                    << "\n\t j: " << j 
-                    << "\n\t prob.factor_value_disagreement(i,j): " << prob.factor_value_disagreement(i,j)
+                    << "\n\t node_i: " << node_i 
+                    << "\n\t node_j: " << node_j 
+                    << "\n\t prob.factor_value_disagreement(node_i,node_j): " << prob.factor_value_disagreement(node_i,node_j)
                     );
-                DLIB_ASSERT(prob.factor_value_disagreement(i,j) == prob.factor_value_disagreement(j,i),
+                DLIB_ASSERT(prob.factor_value_disagreement(node_i,node_j) == prob.factor_value_disagreement(node_j,node_i),
                     "\t void find_max_factor_graph_potts(prob)"
                     << "\n\t Invalid inputs were given to this function." 
-                    << "\n\t i: " << i 
-                    << "\n\t j: " << j 
-                    << "\n\t prob.factor_value_disagreement(i,j): " << prob.factor_value_disagreement(i,j)
-                    << "\n\t prob.factor_value_disagreement(j,i): " << prob.factor_value_disagreement(j,i)
+                    << "\n\t node_i: " << node_i 
+                    << "\n\t node_j: " << node_j 
+                    << "\n\t prob.factor_value_disagreement(node_i,node_j): " << prob.factor_value_disagreement(node_i,node_j)
+                    << "\n\t prob.factor_value_disagreement(node_j,node_i): " << prob.factor_value_disagreement(node_j,node_i)
                     );
             }
         }
