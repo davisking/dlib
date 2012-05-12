@@ -91,7 +91,7 @@ namespace dlib
                 - EXP::type == unsigned long
                   (i.e. y contains unsigned longs)
                 - position < x.size()
-                - y.size() == min(position, order) + 1
+                - y.size() == min(position, order()) + 1
                 - is_vector(y) == true
                 - max(y) < num_labels() 
             ensures
@@ -121,7 +121,7 @@ namespace dlib
                   (i.e. y contains unsigned longs)
                 - reject_labeling(x,y,position) == false
                 - position < x.size()
-                - y.size() == min(position, order) + 1
+                - y.size() == min(position, order()) + 1
                 - is_vector(y) == true
                 - max(y) < num_labels() 
                 - set_feature is a function object which allows expressions of the form:
