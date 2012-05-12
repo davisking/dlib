@@ -240,8 +240,8 @@ namespace dlib
 
             while (orphans.size() > 0)
             {
-                const unsigned long p = orphans.front();
-                orphans.pop_front();
+                const unsigned long p = orphans.back();
+                orphans.pop_back();
 
                 const unsigned char label_p = g.get_label(p);
 
@@ -560,7 +560,7 @@ namespace dlib
         mutable std::vector<unsigned long> parent;
 
         mutable std::deque<unsigned long> active;
-        mutable std::deque<unsigned long> orphans;
+        mutable std::vector<unsigned long> orphans;
     };
 
 // ----------------------------------------------------------------------------------------
