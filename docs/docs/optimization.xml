@@ -620,7 +620,8 @@ However, for graphs with cycles, the solution may be approximate.
    Minimize: f(w) == 0.5*dot(w,w) + C*R(w)
 
    Where R(w) is a user-supplied convex function and C > 0.  Optionally,
-   this object can also add the non-negativity constraint that min(w) >= 0.
+   this object can also add non-negativity constraints to some or all
+   of the elements of w.
 </pre>
 <br/>
 <br/>
