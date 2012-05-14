@@ -17,8 +17,8 @@ namespace dlib
 
     typedef unsigned char node_label;
     const node_label SOURCE_CUT = 0;
-    const node_label SINK_CUT = 1;
-    const node_label FREE_NODE = 2;
+    const node_label SINK_CUT = 254;
+    const node_label FREE_NODE = 255;
 
 // ----------------------------------------------------------------------------------------
 
