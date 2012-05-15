@@ -591,6 +591,7 @@ namespace dlib
             }
         }
 #endif 
+        COMPILE_TIME_ASSERT(is_signed_type<typename potts_model::value_type>::value);
         min_cut mc;
         dlib::impl::potts_flow_graph<potts_model> pfg(prob);
         mc(pfg, prob.number_of_nodes(), prob.number_of_nodes()+1);
@@ -615,6 +616,7 @@ namespace dlib
 
         // The edges and node's have to use the same type to represent factor weights!
         COMPILE_TIME_ASSERT((is_same_type<edge_type, type>::value == true));
+        COMPILE_TIME_ASSERT(is_signed_type<edge_type>::value);
 
 #ifdef ENABLE_ASSERTS
         for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
