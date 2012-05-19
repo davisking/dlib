@@ -133,9 +133,9 @@ namespace dlib
             requires
                 - idx < number_of_nodes()
             ensures
-                - returns a value which indicates how "good" it is to assign the idx-node
-                  the label of true.  The larger the value, the more desirable it is to 
-                  give it this label.  Similarly, a negative value indicates that it is
+                - returns a value which indicates how "good" it is to assign the idx-th
+                  node the label of true.  The larger the value, the more desirable it is 
+                  to give it this label.  Similarly, a negative value indicates that it is
                   better to give the node a label of false.
         !*/
 
