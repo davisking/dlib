@@ -352,6 +352,7 @@ namespace dlib
             verbose = false;
             eps = 0.001;
             max_iterations = 10000;
+            learn_nonnegative_weights = false;
         }
 
         explicit svm_c_linear_trainer (
@@ -371,6 +372,7 @@ namespace dlib
             verbose = false;
             eps = 0.001;
             max_iterations = 10000;
+            learn_nonnegative_weights = false;
         }
 
         void set_epsilon (
@@ -430,6 +432,16 @@ namespace dlib
         ) const
         {
             return kernel_type();
+        }
+
+        bool learns_nonnegative_weights (
+        ) const { return learn_nonnegative_weights; }
+       
+        void set_learns_nonnegative_weights (
+            bool value
+        )
+        {
+            learn_nonnegative_weights = value;
         }
 
         void set_c (
@@ -544,9 +556,16 @@ namespace dlib
             typedef matrix<scalar_type,0,1> w_type;
             w_type w;
 
+            unsigned long num_nonnegative = 0;
+            if (learn_nonnegative_weights)
+            {
+                num_nonnegative = max_index_plus_one(x);
+            }
+
             svm_objective = solver(
                 make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations), 
-                w);
+                w,
+                num_nonnegative);
 
             // put the solution into a decision function and then return it
             decision_function<kernel_type> df;
@@ -570,6 +589,7 @@ namespace dlib
         scalar_type eps;
         bool verbose;
         unsigned long max_iterations;
+        bool learn_nonnegative_weights;
     }; 
 
 // ----------------------------------------------------------------------------------------

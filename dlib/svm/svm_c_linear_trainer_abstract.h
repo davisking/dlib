@@ -52,6 +52,7 @@ namespace dlib
                 - #get_epsilon() == 0.001
                 - this object will not be verbose unless be_verbose() is called
                 - #get_max_iterations() == 10000
+                - #learns_nonnegative_weights() == false
         !*/
 
         explicit svm_c_linear_trainer (
@@ -69,6 +70,7 @@ namespace dlib
                 - #get_epsilon() == 0.001
                 - this object will not be verbose unless be_verbose() is called
                 - #get_max_iterations() == 10000
+                - #learns_nonnegative_weights() == false
         !*/
 
         void set_epsilon (
@@ -143,6 +145,27 @@ namespace dlib
                 - returns a copy of the kernel function in use by this object.  Since
                   the linear kernels don't have any parameters this function just
                   returns kernel_type()
+        !*/
+
+        bool learns_nonnegative_weights (
+        ) const;
+        /*!
+            ensures
+                - The output of training is a weight vector and a bias value.  These
+                  two things define the resulting decision function.  That is, the
+                  decision function simply takes the dot product between the learned
+                  weight vector and a test sample, then subtracts the bias value.  
+                  Therefore, if learns_nonnegative_weights() == true then the resulting
+                  learned weight vector will always have non-negative entries.  The
+                  bias value may still be negative though.
+        !*/
+       
+        void set_learns_nonnegative_weights (
+            bool value
+        );
+        /*!
+            ensures
+                - #learns_nonnegative_weights() == value
         !*/
 
         void set_c (
