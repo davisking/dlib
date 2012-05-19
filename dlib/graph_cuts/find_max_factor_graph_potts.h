@@ -9,6 +9,7 @@
 #include "general_potts_problem.h"
 #include "../algs.h"
 #include "../graph_utils.h"
+#include "../array2d.h"
 
 namespace dlib
 {
@@ -410,6 +411,139 @@ namespace dlib
             }
 
         };
+
+// ----------------------------------------------------------------------------------------
+
+        template <
+            typename label_image_type,
+            typename image_potts_model
+            >
+        class potts_grid_problem 
+        {
+            label_image_type& label_img;
+            long nc;
+            long num_nodes;
+            unsigned char* labels;
+            const image_potts_model& model;
+
+        public:
+            const static unsigned long max_number_of_neighbors = 4;
+
+            potts_grid_problem (
+                label_image_type& label_img_,
+                const image_potts_model& image_potts_model_
+            ) : 
+                label_img(label_img_),
+                model(image_potts_model_)
+            {
+                num_nodes = model.nr()*model.nc();
+                nc = model.nc();
+                labels = &label_img[0][0];
+            }
+
+            unsigned long number_of_nodes (
+            ) const { return num_nodes; }
+
+            unsigned long number_of_neighbors (
+                unsigned long 
+            ) const 
+            { 
+                return 4;
+            }
+
+            unsigned long get_neighbor_idx (
+                long node_id1,
+                long node_id2
+            ) const
+            {
+                long diff = node_id2-node_id1;
+                if (diff > nc)
+                    diff -= (long)number_of_nodes();
+                else if (diff < -nc)
+                    diff += (long)number_of_nodes();
+
+                if (diff == 1) 
+                    return 0;
+                else if (diff == -1)
+                    return 1;
+                else if (diff == nc)
+                    return 2;
+                else
+                    return 3;
+            }
+
+            unsigned long get_neighbor (
+                long node_id,
+                long idx
+            ) const
+            {
+                switch(idx)
+                {
+                    case 0: 
+                        {
+                            long temp = node_id+1;
+                            if (temp < (long)number_of_nodes())
+                                return temp;
+                            else
+                                return temp - (long)number_of_nodes();
+                        }
+                    case 1: 
+                        {
+                            long temp = node_id-1;
+                            if (node_id >= 1)
+                                return temp;
+                            else
+                                return temp + (long)number_of_nodes();
+                        }
+                    case 2: 
+                        {
+                            long temp = node_id+nc;
+                            if (temp < (long)number_of_nodes())
+                                return temp;
+                            else
+                                return temp - (long)number_of_nodes();
+                        }
+                    case 3: 
+                        {
+                            long temp = node_id-nc;
+                            if (node_id >= nc)
+                                return temp;
+                            else
+                                return temp + (long)number_of_nodes();
+                        }
+                }
+                return 0;
+            }
+
+            void set_label (
+                const unsigned long& idx,
+                node_label value
+            )
+            {
+                *(labels+idx) = value;
+            }
+
+            node_label get_label (
+                const unsigned long& idx
+            ) const
+            {
+                return *(labels+idx);
+            }
+
+            typedef typename image_potts_model::value_type value_type;
+
+            value_type factor_value (unsigned long idx) const
+            {
+                return model.factor_value(idx);
+            }
+
+            value_type factor_value_disagreement (unsigned long idx1, unsigned long idx2) const
+            {
+                return model.factor_value_disagreement(idx1,idx2);
+            }
+
+        };
+
     }
 
 // ----------------------------------------------------------------------------------------
@@ -534,6 +668,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename potts_grid_problem,
+        typename mem_manager
+        >
+    typename potts_grid_problem::value_type potts_model_score (
+        const potts_grid_problem& prob,
+        const array2d<node_label,mem_manager>& labels
+    )
+    {
+        DLIB_ASSERT(prob.nr() == labels.nr() && prob.nc() == labels.nc(),
+            "\t value_type potts_model_score(prob,labels)"
+            << "\n\t Invalid inputs were given to this function." 
+            << "\n\t prob.nr(): " << labels.nr()
+            << "\n\t prob.nc(): " << labels.nc()
+            );
+        typedef array2d<node_label,mem_manager> image_type;
+        // This const_cast is ok because the model object won't actually modify labels
+        dlib::impl::potts_grid_problem<image_type,potts_grid_problem> model(const_cast<image_type&>(labels),prob);
+        return potts_model_score(model);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename potts_model
         >
     void find_max_factor_graph_potts (
@@ -641,6 +798,23 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename potts_grid_problem,
+        typename mem_manager
+        >
+    void find_max_factor_graph_potts (
+        const potts_grid_problem& prob,
+        array2d<node_label,mem_manager>& labels
+    )
+    {
+        typedef array2d<node_label,mem_manager> image_type;
+        labels.set_size(prob.nr(), prob.nc());
+        dlib::impl::potts_grid_problem<image_type,potts_grid_problem> model(labels,prob);
+        find_max_factor_graph_potts(model);
+    }
+
+// ---------------------------------------------------------------------------------------- 
 
 }
 
