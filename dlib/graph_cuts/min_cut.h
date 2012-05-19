@@ -79,7 +79,7 @@ namespace dlib
         {
             // Intentionally left empty since all the member variables
             // don't logically contribute to the state of this object.
-            // This copy constructor is here to explicitly void the overhead
+            // This copy constructor is here to explicitly avoid the overhead
             // of copying these transient variables.  
         }
 
