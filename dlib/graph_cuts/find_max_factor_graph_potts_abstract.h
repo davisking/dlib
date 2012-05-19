@@ -162,7 +162,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct potts_grid_problem 
+    class potts_grid_problem 
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -180,6 +180,8 @@ namespace dlib
                 the border nodes on the other side of the graph.  That is, the graph
                 "wraps" around at the borders.  
         !*/
+
+    public:
 
         // This typedef should be for a type like int or double.  It
         // must also be capable of representing signed values.
