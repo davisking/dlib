@@ -429,7 +429,7 @@ namespace dlib
                     - #g.get_flow(i,j) == the residual flow capacity left after the max 
                       possible amount of flow is passing from the source node to the sink
                       node.  For example, this means that #g.get_flow(i,j) == 0 whenever 
-                      node i and j are in different cuts.  
+                      node i is in the SOURCE_CUT and j is in the SINK_CUT. 
                     - #g.get_flow(i,j) >= 0
         !*/
 

@@ -756,6 +756,20 @@ namespace
 
         print_graph(g1);
 
+        // make sure the flow residuals are 0 at the cut locations
+        for (unsigned long i = 0; i < g1.number_of_nodes(); ++i)
+        {
+            for (unsigned long j = 0; j < g1.node(i).number_of_children(); ++j)
+            {
+                if ((g1.node(i).data == SOURCE_CUT && g1.node(i).child(j).data != SOURCE_CUT) ||
+                    (g1.node(i).data != SINK_CUT && g1.node(i).child(j).data == SINK_CUT)
+                    )
+                {
+                    DLIB_TEST_MSG(g1.node(i).child_edge(j) == 0, g1.node(i).child_edge(j));
+                }
+            }
+        }
+
         // copy the edge weights from g2 back to g1 so we can compute cut scores
         copy_edge_weights(g1, g2);
 
