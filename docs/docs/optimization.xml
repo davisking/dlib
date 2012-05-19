@@ -593,7 +593,7 @@ However, for graphs with cycles, the solution may be approximate.
          <file>dlib/graph_cuts.h</file>
          <spec_file link="true">dlib/graph_cuts/find_max_factor_graph_potts_abstract.h</spec_file>
          <description>
-              This function is a tool for exactly solving the MAP problem in a Potts
+              This is a set of overloaded functions for exactly solving the MAP problem in a Potts
               model.  This type of model is useful when you have a problem which
               can be modeled as a bunch of binary decisions on some variables,
               but you have some kind of labeling consistency constraint.  This
