@@ -43,6 +43,12 @@ namespace
             typedef matrix<double,0,1> w_type;
             w_type w;
 
+            decision_function<linear_kernel<w_type> > df;
+            svm_c_linear_trainer<linear_kernel<w_type> > trainer;
+            trainer.set_c_class1(2);
+            trainer.set_c_class1(3);
+            trainer.set_learns_nonnegative_weights(true);
+            trainer.set_epsilon(1e-12);
 
             std::vector<w_type> x;
             w_type temp(2);
@@ -74,6 +80,13 @@ namespace
             true_w = 0, 1, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
             DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+            df = trainer.train(x,y);
+            w = join_cols(df.basis_vectors(0), uniform_matrix<double>(1,1,-df.b));
+            true_w = 0, 1, 0;
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
 
             print_spinner();
 
@@ -132,6 +145,52 @@ namespace
             true_w = 1, 0, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
             DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+            df = trainer.train(x,y);
+            w = join_cols(df.basis_vectors(0), uniform_matrix<double>(1,1,-df.b));
+            true_w = 1, 0, 0;
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+
+
+            x.clear();
+            y.clear();
+            temp = -2, 2;
+            x.push_back(temp);
+            temp = 0, -0;
+            x.push_back(temp);
+
+            y.push_back(+1);
+            y.push_back(-1);
+
+            trainer.set_c(10);
+            df = trainer.train(x,y);
+            w = join_cols(df.basis_vectors(0), uniform_matrix<double>(1,1,-df.b));
+            true_w = 0, 1, -1;
+            dlog << LINFO << "w: " << trans(w);
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
+
+            x.clear();
+            y.clear();
+            temp = -2, 2;
+            x.push_back(temp);
+            temp = 0, -0;
+            x.push_back(temp);
+
+            y.push_back(-1);
+            y.push_back(+1);
+
+            trainer.set_c(10);
+            df = trainer.train(x,y);
+            w = join_cols(df.basis_vectors(0), uniform_matrix<double>(1,1,-df.b));
+            true_w = 1, 0, 1;
+            dlog << LINFO << "w: " << trans(w);
+            dlog << LINFO << "error: "<< max(abs(w-true_w));
+            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+
         }
 
     } a;
