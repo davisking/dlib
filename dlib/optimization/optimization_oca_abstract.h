@@ -168,7 +168,9 @@ namespace dlib
                 - if (num_nonnegative != 0) then
                     - Adds the constraint that #w(i) >= 0 for all i < num_nonnegative.
                       That is, the first num_nonnegative elements of #w will always be
-                      non-negative.
+                      non-negative.  This includes the copies of w passed to get_risk()
+                      in the form of the current_solution vector as well as the final
+                      output of this function.
         !*/
 
         void set_subproblem_epsilon (
