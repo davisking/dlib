@@ -237,7 +237,7 @@ namespace dlib
         >
     void find_max_factor_graph_potts (
         potts_problem& prob 
-    )
+    );
     /*!
         requires
             - potts_problem == an object with an interface compatible with the potts_problem 
