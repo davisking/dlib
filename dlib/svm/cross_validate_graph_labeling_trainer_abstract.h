@@ -19,7 +19,7 @@ namespace dlib
     matrix<double,1,2> test_graph_labeling_function (
         const graph_labeler& labeler,
         const dlib::array<graph_type>& samples,
-        const std::vector<std::vector<node_label> >& labels
+        const std::vector<std::vector<bool> >& labels
     );
     /*!
         requires
@@ -48,7 +48,7 @@ namespace dlib
     matrix<double,1,2> cross_validate_graph_labeling_trainer (
         const trainer_type& trainer,
         const dlib::array<graph_type>& samples,
-        const std::vector<std::vector<node_label> >& labels,
+        const std::vector<std::vector<bool> >& labels,
         const long folds
     );
     /*!

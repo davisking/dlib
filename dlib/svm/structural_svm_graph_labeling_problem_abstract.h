@@ -22,7 +22,7 @@ namespace dlib
         >
     bool is_graph_labeling_problem (
         const dlib::array<graph_type>& samples,
-        const std::vector<std::vector<node_label> >& labels
+        const std::vector<std::vector<bool> >& labels
     );
     /*!
         requires
@@ -83,7 +83,7 @@ namespace dlib
         typedef matrix<double,0,1> matrix_type;
         typedef typename graph_type::type feature_vector_type;
         typedef graph_type sample_type;
-        typedef std::vector<node_label> label_type;
+        typedef std::vector<bool> label_type;
 
         structural_svm_graph_labeling_problem(
             const dlib::array<sample_type>& samples,

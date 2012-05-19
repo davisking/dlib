@@ -26,7 +26,7 @@ namespace dlib
         >
     bool is_graph_labeling_problem (
         const dlib::array<graph_type>& samples,
-        const std::vector<std::vector<node_label> >& labels
+        const std::vector<std::vector<bool> >& labels
     )
     {
         typedef typename graph_type::type node_vector_type;
@@ -130,7 +130,7 @@ namespace dlib
 
         typedef graph_type sample_type;
 
-        typedef std::vector<node_label> label_type;
+        typedef std::vector<bool> label_type;
 
         structural_svm_graph_labeling_problem(
             const dlib::array<sample_type>& samples_,
@@ -234,20 +234,17 @@ namespace dlib
             psi = 0;
             for (unsigned long i = 0; i < sample.number_of_nodes(); ++i)
             {
-                const bool label_i = (label[i]!=0);
-
                 // accumulate the node vectors
-                if (label_i == true)
+                if (label[i] == true)
                     set_rowm(psi, range(edge_dims, psi.size()-1)) += sample.node(i).data;
 
                 for (unsigned long n = 0; n < sample.node(i).number_of_neighbors(); ++n)
                 {
                     const unsigned long j = sample.node(i).neighbor(n).index();
-                    const bool label_j = (label[j]!=0);
 
                     // Don't double count edges.  Also only include the vector if
                     // the labels disagree.
-                    if (i < j && label_i != label_j)
+                    if (i < j && label[i] != label[j])
                     {
                         set_rowm(psi, range(0, edge_dims-1)) -= sample.node(i).edge(n);
                     }
@@ -290,20 +287,17 @@ namespace dlib
             psi.clear();
             for (unsigned long i = 0; i < sample.number_of_nodes(); ++i)
             {
-                const bool label_i = (label[i]!=0);
-
                 // accumulate the node vectors
-                if (label_i == true)
+                if (label[i] == true)
                     add_to_sparse_vect(psi, sample.node(i).data, edge_dims);
 
                 for (unsigned long n = 0; n < sample.node(i).number_of_neighbors(); ++n)
                 {
                     const unsigned long j = sample.node(i).neighbor(n).index();
-                    const bool label_j = (label[j]!=0);
 
                     // Don't double count edges.  Also only include the vector if
                     // the labels disagree.
-                    if (i < j && label_i != label_j)
+                    if (i < j && label[i] != label[j])
                     {
                         subtract_from_sparse_vect(psi, sample.node(i).edge(n));
                     }
@@ -338,8 +332,7 @@ namespace dlib
 
                 // Include a loss augmentation so that we will get the proper loss augmented
                 // max when we use find_max_factor_graph_potts() below.
-                const bool label_i = (labels[idx][i]!=0);
-                if (label_i)
+                if (labels[idx][i])
                     g.node(i).data -= loss_pos;
                 else
                     g.node(i).data += loss_neg;
@@ -361,12 +354,15 @@ namespace dlib
             find_max_factor_graph_potts(g, labeling);
 
 
+            std::vector<bool> bool_labeling;
+            bool_labeling.reserve(labeling.size());
             // figure out the loss
             loss = 0;
             for (unsigned long i = 0; i < labeling.size(); ++i)
             {
-                const bool true_label = (labels[idx][i]!= 0);
+                const bool true_label = labels[idx][i];
                 const bool pred_label = (labeling[i]!= 0);
+                bool_labeling.push_back(pred_label);
                 if (true_label != pred_label)
                 {
                     if (true_label == true)
@@ -377,7 +373,7 @@ namespace dlib
             }
 
             // compute psi
-            get_joint_feature_vector(samp, labeling, psi);
+            get_joint_feature_vector(samp, bool_labeling, psi);
         }
 
         const dlib::array<sample_type>& samples;

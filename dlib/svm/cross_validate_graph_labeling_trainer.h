@@ -20,7 +20,7 @@ namespace dlib
     matrix<double,1,2> test_graph_labeling_function (
         const graph_labeler& labeler,
         const dlib::array<graph_type>& samples,
-        const std::vector<std::vector<node_label> >& labels
+        const std::vector<std::vector<bool> >& labels
     )
     {
         DLIB_ASSERT(is_graph_labeling_problem(samples, labels) ,
@@ -31,7 +31,7 @@ namespace dlib
             << "\n\t is_learning_problem(samples,labels):       " << is_learning_problem(samples,labels)
             );
 
-        std::vector<node_label> temp;
+        std::vector<bool> temp;
         unsigned long num_pos_correct = 0;
         unsigned long num_pos = 0;
         unsigned long num_neg_correct = 0;
@@ -79,7 +79,7 @@ namespace dlib
     matrix<double,1,2> cross_validate_graph_labeling_trainer (
         const trainer_type& trainer,
         const dlib::array<graph_type>& samples,
-        const std::vector<std::vector<node_label> >& labels,
+        const std::vector<std::vector<bool> >& labels,
         const long folds
     )
     {
@@ -93,7 +93,7 @@ namespace dlib
             << "\n\t is_learning_problem(samples,labels):       " << is_learning_problem(samples,labels)
             );
 
-        typedef std::vector<node_label> label_type;
+        typedef std::vector<bool> label_type;
 
         const long num_in_test  = samples.size()/folds;
         const long num_in_train = samples.size() - num_in_test;
@@ -105,7 +105,7 @@ namespace dlib
 
         long next_test_idx = 0;
 
-        std::vector<node_label> temp;
+        std::vector<bool> temp;
         unsigned long num_pos_correct = 0;
         unsigned long num_pos = 0;
         unsigned long num_neg_correct = 0;

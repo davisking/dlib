@@ -44,7 +44,7 @@ namespace dlib
 
     public:
 
-        typedef std::vector<node_label> label_type;
+        typedef std::vector<bool> label_type;
         typedef label_type result_type;
 
         graph_labeler(
@@ -73,9 +73,9 @@ namespace dlib
         /*!
             ensures
                 - Recall that the score function for an edge is a linear function of
-                  the vector stored at that edge in the graph.  This means there is some
-                  vector E which we dot product with the vector in the graph to compute
-                  the score.  Therefore, this function returns that E vector which defines 
+                  the vector stored at that edge.  This means there is some vector, E,
+                  which we dot product with the vector in the graph to compute the 
+                  score.  Therefore, this function returns that E vector which defines 
                   the edge score function.
         !*/
 
@@ -84,16 +84,16 @@ namespace dlib
         /*!
             ensures
                 - Recall that the score function for a node is a linear function of
-                  the vector stored in that node in the graph.  This means there is some
-                  vector W which we dot product with the vector in the graph to compute
-                  the score.  Therefore, this function returns that W vector which defines 
-                  the node score function.
+                  the vector stored in that node.  This means there is some vector, W, 
+                  which we dot product with the vector in the graph to compute the score.  
+                  Therefore, this function returns that W vector which defines the node 
+                  score function.
         !*/
 
         template <typename graph_type>
         void operator() (
             const graph_type& sample,
-            result_type& labels 
+            std::vector<bool>& labels 
         ) const;
         /*!
             requires
@@ -111,10 +111,7 @@ namespace dlib
                   in #labels.  
                 - #labels.size() == sample.number_of_nodes()
                 - for all valid i:
-                    - if (sample.node(i) is predicted to have a label of true) then
-                        - #labels[i] != 0
-                    - else
-                        - #labels[i] == 0
+                    - #labels[i] == the label of the node sample.node(i).
                 - The labels are computed by creating a graph, G, with scalar values on each node 
                   and edge.  The scalar values are calculated according to the following:
                     - for all valid i:
@@ -125,7 +122,7 @@ namespace dlib
         !*/
 
         template <typename graph_type>
-        result_type operator() (
+        std::vector<bool> operator() (
             const graph_type& sample 
         ) const;
         /*!

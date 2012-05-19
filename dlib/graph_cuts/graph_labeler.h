@@ -24,7 +24,7 @@ namespace dlib
 
     public:
 
-        typedef std::vector<node_label> label_type;
+        typedef std::vector<bool> label_type;
         typedef label_type result_type;
 
         graph_labeler()
@@ -56,7 +56,7 @@ namespace dlib
         template <typename graph_type>
         void operator() (
             const graph_type& sample,
-            result_type& labels 
+            std::vector<bool>& labels 
         ) const
         {
             // make sure requires clause is not broken
@@ -113,7 +113,6 @@ namespace dlib
             }
 #endif
 
-            labels.clear();
 
             graph<double,double>::kernel_1a g; 
             copy_graph_structure(sample, g);
@@ -133,15 +132,24 @@ namespace dlib
 
             }
 
-            find_max_factor_graph_potts(g, labels);
+            labels.clear();
+            std::vector<node_label> temp;
+            find_max_factor_graph_potts(g, temp);
+            for (unsigned long i = 0; i < temp.size(); ++i)
+            {
+                if (temp[i] != 0)
+                    labels.push_back(true);
+                else
+                    labels.push_back(false);
+            }
         }
 
         template <typename graph_type>
-        result_type operator() (
+        std::vector<bool> operator() (
             const graph_type& sample 
         ) const
         {
-            result_type temp;
+            std::vector<bool> temp;
             (*this)(sample, temp);
             return temp;
         }

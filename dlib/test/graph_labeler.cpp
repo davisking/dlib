@@ -34,16 +34,16 @@ namespace
         //samples.clear();
         //labels.clear();
 
-        std::vector<node_label> label;
+        std::vector<bool> label;
         graph_type g;
 
     // ---------------------------
         g.set_number_of_nodes(4);
         label.resize(g.number_of_nodes());
-        g.node(0).data = 0, 0, 1; label[0] = 1;
-        g.node(1).data = 0, 0, 1; label[1] = 1;
-        g.node(2).data = 0, 1, 0; label[2] = 0;
-        g.node(3).data = 0, 1, 0; label[3] = 0;
+        g.node(0).data = 0, 0, 1; label[0] = true;
+        g.node(1).data = 0, 0, 1; label[1] = true;
+        g.node(2).data = 0, 1, 0; label[2] = false;
+        g.node(3).data = 0, 1, 0; label[3] = false;
 
         g.add_edge(0,1);
         g.add_edge(1,2);
@@ -61,10 +61,10 @@ namespace
         g.clear();
         g.set_number_of_nodes(4);
         label.resize(g.number_of_nodes());
-        g.node(0).data = 0, 0, 1; label[0] = 1;
-        g.node(1).data = 0, 0, 0; label[1] = 1;
-        g.node(2).data = 0, 1, 0; label[2] = 0;
-        g.node(3).data = 0, 0, 0; label[3] = 0;
+        g.node(0).data = 0, 0, 1; label[0] = true;
+        g.node(1).data = 0, 0, 0; label[1] = true;
+        g.node(2).data = 0, 1, 0; label[2] = false;
+        g.node(3).data = 0, 0, 0; label[3] = false;
 
         g.add_edge(0,1);
         g.add_edge(1,2);
@@ -82,10 +82,10 @@ namespace
         g.clear();
         g.set_number_of_nodes(4);
         label.resize(g.number_of_nodes());
-        g.node(0).data = 0, 1, 0; label[0] = 0;
-        g.node(1).data = 0, 1, 0; label[1] = 0;
-        g.node(2).data = 0, 1, 0; label[2] = 0;
-        g.node(3).data = 0, 0, 0; label[3] = 0;
+        g.node(0).data = 0, 1, 0; label[0] = false;
+        g.node(1).data = 0, 1, 0; label[1] = false;
+        g.node(2).data = 0, 1, 0; label[2] = false;
+        g.node(3).data = 0, 0, 0; label[3] = false;
 
         g.add_edge(0,1);
         g.add_edge(1,2);
@@ -117,17 +117,17 @@ namespace
         //samples.clear();
         //labels.clear();
 
-        std::vector<node_label> label;
+        std::vector<bool> label;
         graph_type g;
         typename graph_type::edge_type v;
 
     // ---------------------------
         g.set_number_of_nodes(4);
         label.resize(g.number_of_nodes());
-        g.node(0).data[2] = 1; label[0] = 1;
-        g.node(1).data[2] = 1; label[1] = 1;
-        g.node(2).data[1] = 1; label[2] = 0;
-        g.node(3).data[1] = 1; label[3] = 0;
+        g.node(0).data[2] = 1; label[0] = true;
+        g.node(1).data[2] = 1; label[1] = true;
+        g.node(2).data[1] = 1; label[2] = false;
+        g.node(3).data[1] = 1; label[3] = false;
 
         g.add_edge(0,1);
         g.add_edge(1,2);
@@ -147,11 +147,11 @@ namespace
         g.clear();
         g.set_number_of_nodes(5);
         label.resize(g.number_of_nodes());
-        g.node(0).data[2] = 1; label[0] = 1;
-        g.node(1).data[0] = 0; label[1] = 1;
-        g.node(2).data[1] = 1; label[2] = 0;
-        g.node(3).data[0] = 0; label[3] = 0;
-                               label[4] = 1;
+        g.node(0).data[2] = 1; label[0] = true;
+        g.node(1).data[0] = 0; label[1] = true;
+        g.node(2).data[1] = 1; label[2] = false;
+        g.node(3).data[0] = 0; label[3] = false;
+                               label[4] = true;
 
         g.add_edge(0,1);
         g.add_edge(1,4);
@@ -171,10 +171,10 @@ namespace
         g.clear();
         g.set_number_of_nodes(4);
         label.resize(g.number_of_nodes());
-        g.node(0).data[1] = 1; label[0] = 0;
-        g.node(1).data[1] = 1; label[1] = 0;
-        g.node(2).data[1] = 1; label[2] = 0;
-        g.node(3).data[1] = 0; label[3] = 0;
+        g.node(0).data[1] = 1; label[0] = false;
+        g.node(1).data[1] = 1; label[1] = false;
+        g.node(2).data[1] = 1; label[2] = false;
+        g.node(3).data[1] = 0; label[3] = false;
 
         g.add_edge(0,1);
         g.add_edge(1,2);
@@ -208,16 +208,16 @@ namespace
         //samples.clear();
         //labels.clear();
 
-        std::vector<node_label> label;
+        std::vector<bool> label;
         graph_type g;
 
     // ---------------------------
         g.set_number_of_nodes(4);
         label.resize(g.number_of_nodes());
-        g.node(0).data = 0, 0, 1; label[0] = 1;
-        g.node(1).data = 0, 0, 1; label[1] = 1;
-        g.node(2).data = 0, 1, 0; label[2] = 0;
-        g.node(3).data = 0, 1, 0; label[3] = 0;
+        g.node(0).data = 0, 0, 1; label[0] = true;
+        g.node(1).data = 0, 0, 1; label[1] = true;
+        g.node(2).data = 0, 1, 0; label[2] = false;
+        g.node(3).data = 0, 1, 0; label[3] = false;
 
         g.add_edge(0,1);
         g.add_edge(1,2);
@@ -249,17 +249,17 @@ namespace
         //samples.clear();
         //labels.clear();
 
-        std::vector<node_label> label;
+        std::vector<bool> label;
         graph_type g;
         typename graph_type::edge_type v;
 
     // ---------------------------
         g.set_number_of_nodes(4);
         label.resize(g.number_of_nodes());
-        g.node(0).data[2] = 1; label[0] = 1;
-        g.node(1).data[2] = 1; label[1] = 1;
-        g.node(2).data[1] = 1; label[2] = 0;
-        g.node(3).data[1] = 1; label[3] = 0;
+        g.node(0).data[2] = 1; label[0] = true;
+        g.node(1).data[2] = 1; label[1] = true;
+        g.node(2).data[1] = 1; label[2] = false;
+        g.node(3).data[1] = 1; label[3] = false;
 
         g.add_edge(0,1);
         g.add_edge(1,2);
@@ -289,7 +289,7 @@ namespace
         >
     void test1(
         const dlib::array<graph_type>& samples,
-        const std::vector<std::vector<node_label> >& labels
+        const std::vector<std::vector<bool> >& labels
     )
     {
         dlog << LINFO << "begin test1()";
@@ -307,7 +307,7 @@ namespace
         labeler = graph_labeler<vector_type>();
         deserialize(labeler, sin);
 
-        std::vector<node_label> temp;
+        std::vector<bool> temp;
         for (unsigned long k = 0; k < samples.size(); ++k)
         {
             temp = labeler(samples[k]);
@@ -353,7 +353,7 @@ namespace
                 typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
 
                 dlib::array<graph_type> samples;
-                std::vector<std::vector<node_label> > labels;
+                std::vector<std::vector<bool> > labels;
 
                 make_data<graph_type>(samples, labels);
                 make_data<graph_type>(samples, labels);
@@ -372,7 +372,7 @@ namespace
                 typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
 
                 dlib::array<graph_type> samples;
-                std::vector<std::vector<node_label> > labels;
+                std::vector<std::vector<bool> > labels;
 
                 make_data<graph_type>(samples, labels);
                 make_data<graph_type>(samples, labels);
@@ -391,7 +391,7 @@ namespace
                 typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
 
                 dlib::array<graph_type> samples;
-                std::vector<std::vector<node_label> > labels;
+                std::vector<std::vector<bool> > labels;
 
                 make_data_sparse<graph_type>(samples, labels);
                 make_data_sparse<graph_type>(samples, labels);
@@ -413,7 +413,7 @@ namespace
                 typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
 
                 dlib::array<graph_type> samples;
-                std::vector<std::vector<node_label> > labels;
+                std::vector<std::vector<bool> > labels;
 
                 make_data2<graph_type>(samples, labels);
                 make_data2<graph_type>(samples, labels);
@@ -432,7 +432,7 @@ namespace
                 typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
 
                 dlib::array<graph_type> samples;
-                std::vector<std::vector<node_label> > labels;
+                std::vector<std::vector<bool> > labels;
 
                 make_data2_sparse<graph_type>(samples, labels);
                 make_data2_sparse<graph_type>(samples, labels);
@@ -451,7 +451,7 @@ namespace
                 typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
 
                 dlib::array<graph_type> samples;
-                std::vector<std::vector<node_label> > labels;
+                std::vector<std::vector<bool> > labels;
 
                 make_data2_sparse<graph_type>(samples, labels);
                 make_data2_sparse<graph_type>(samples, labels);

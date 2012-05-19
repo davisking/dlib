@@ -21,7 +21,7 @@ namespace dlib
     class structural_graph_labeling_trainer
     {
     public:
-        typedef std::vector<node_label> label_type;
+        typedef std::vector<bool> label_type;
         typedef graph_labeler<vector_type> trained_function_type;
 
         structural_graph_labeling_trainer (
