@@ -149,6 +149,8 @@ namespace dlib
             orphans.clear();
 
             typedef typename flow_graph::edge_type edge_type;
+            COMPILE_TIME_ASSERT(is_signed_type<edge_type>::value);
+
             typedef typename flow_graph::out_edge_iterator out_edge_iterator;
             typedef typename flow_graph::in_edge_iterator in_edge_iterator;
 
