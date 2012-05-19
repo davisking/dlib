@@ -50,7 +50,7 @@ namespace dlib
                 To define the optimization problem precisely, we first introduce some notation:
                     - let PSI(x,y)    == the joint feature vector for input x and a label y.
                     - let F(x,y|w)    == dot(w,PSI(x,y)).  
-                    - let LOSS(idx,y) == the loss incurred for predicting that the ith-th training 
+                    - let LOSS(idx,y) == the loss incurred for predicting that the idx-th training 
                       sample has a label of y.  Note that LOSS() should always be >= 0 and should
                       become exactly 0 when y is the correct label for the idx-th sample.
                     - let x_i == the i-th training sample.
@@ -218,7 +218,7 @@ namespace dlib
                     - let X           == the idx-th training sample.
                     - let PSI(X,y)    == the joint feature vector for input X and an arbitrary label y.
                     - let F(X,y)      == dot(current_solution,PSI(X,y)).  
-                    - let LOSS(idx,y) == the loss incurred for predicting that the ith-th sample
+                    - let LOSS(idx,y) == the loss incurred for predicting that the idx-th sample
                       has a label of y.  Note that LOSS() should always be >= 0 and should
                       become exactly 0 when y is the correct label for the idx-th sample.
 
