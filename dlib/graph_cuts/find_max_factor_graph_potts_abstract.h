@@ -211,7 +211,7 @@ namespace dlib
                 - The grid is represented in row-major-order format.  Therefore, idx
                   identifies a node according to its position in the row-major-order 
                   representation of the grid graph.  Or in other words, idx corresponds
-                  to the following row and column location:
+                  to the following row and column location in the graph:
                     - row == idx/nc()
                     - col == idx%nc()
                 - returns a value which indicates how "good" it is to assign the idx-th 
@@ -231,6 +231,12 @@ namespace dlib
                 - idx1 != idx2
                 - the idx1-th node and idx2-th node are neighbors in the grid graph.  
             ensures
+                - The grid is represented in row-major-order format.  Therefore, idx1 and 
+                  idx2 identify nodes according to their positions in the row-major-order 
+                  representation of the grid graph.  For example, idx1 corresponds
+                  to the following row and column location in the graph:
+                    - row == idx1/nc()
+                    - col == idx1%nc()
                 - returns a number >= 0.  This is the penalty for giving node idx1 and idx2
                   different labels.  Larger values indicate a larger penalty.
                 - this function is symmetric.  That is, it is true that: 
