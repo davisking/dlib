@@ -2605,6 +2605,15 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 which can be used to predict the labelings of new graphs.
 
                <p>
+               To elaborate, a graph labeling problem is a task to learn a binary classifier which 
+               predicts the label of each node in a graph.  Additionally, we have information in 
+               the form of graph edges between nodes where edges are present when we believe the 
+               linked nodes are likely to have the same label.  Therefore, part of a graph labeling 
+               problem is to learn to score each edge in terms of how strongly the edge should enforce 
+               labeling consistency between its two nodes.  
+               </p>
+
+               <p>
                 Note that this is just a convenience wrapper around the 
                 <a href="#structural_svm_graph_labeling_problem">structural_svm_graph_labeling_problem</a> 
                 to make it look similar to all the other trainers in dlib.  
