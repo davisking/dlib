@@ -177,7 +177,7 @@ namespace dlib
         ensures
             - computes the model score for the given potts_problem.  We define this
               precisely below:
-                - let L(i) == the boolean label of the ith variable in prob.  Or in other 
+                - let L(i) == the boolean label of the i-th variable in prob.  Or in other 
                   words, L(i) == (prob.get_label(i) != 0).
                 - let F == the sum of values of prob.factor_value(i) for only i values
                   where L(i) == true.
@@ -215,7 +215,7 @@ namespace dlib
               instead of a potts_problem object.
             - computes the model score for the given graph and labeling.  We define this
               precisely below:
-                - let L(i) == the boolean label of the ith variable in g.  Or in other 
+                - let L(i) == the boolean label of the i-th variable in g.  Or in other 
                   words, L(i) == (labels[i] != 0).
                 - let F == the sum of values of g.node(i).data for only i values
                   where L(i) == true.
