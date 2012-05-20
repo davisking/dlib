@@ -254,10 +254,42 @@ namespace dlib
     );
     /*!
         requires
-            - a is an unsorted sparse vector
+            - a is an unsorted sparse vector or a dlib::matrix
         ensures
             - #a == a*value
               (i.e. multiplies every element of the vector a by value)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    T add (
+        const T& a,
+        const T& b
+    );
+    /*!
+        requires
+            - a is a sparse vector or dlib::matrix
+            - b is a sparse vector or dlib::matrix
+        ensures
+            - returns a vector or matrix which represents a+b.  If the inputs are
+              sparse vectors then the result is a sparse vector.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    T subtract (
+        const T& a,
+        const T& b
+    );
+    /*!
+        requires
+            - a is a sparse vector or dlib::matrix
+            - b is a sparse vector or dlib::matrix
+        ensures
+            - returns a vector or matrix which represents a-b.  If the inputs are
+              sparse vectors then the result is a sparse vector.
     !*/
 
 // ----------------------------------------------------------------------------------------

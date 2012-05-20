@@ -354,7 +354,7 @@ namespace dlib
 // ------------------------------------------------------------------------------------
 
     template <typename T, typename U>
-    void scale_by (
+    typename disable_if<is_matrix<T>,void>::type scale_by (
         T& a,
         const U& value
     )
@@ -365,8 +365,127 @@ namespace dlib
         }
     }
 
+    template <typename T, typename U>
+    typename enable_if<is_matrix<T>,void>::type scale_by (
+        T& a,
+        const U& value
+    )
+    {
+        a *= value;
+    }
+
 // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
+
+    template <typename T>
+    typename disable_if<is_matrix<T>,T>::type add (
+        const T& a,
+        const T& b
+    )
+    {
+        T temp;
+
+        typename T::const_iterator i = a.begin();
+        typename T::const_iterator j = b.begin();
+        while (i != a.end() && j != b.end())
+        {
+            if (i->first == j->first)
+            {
+                temp.insert(temp.end(), std::make_pair(i->first, i->second + j->second));
+                ++i;
+                ++j;
+            }
+            else if (i->first < j->first)
+            {
+                temp.insert(temp.end(), *i);
+                ++i;
+            }
+            else
+            {
+                temp.insert(temp.end(), *j);
+                ++j;
+            }
+        }
+
+        while (i != a.end())
+        {
+            temp.insert(temp.end(), *i);
+            ++i;
+        }
+        while (j != b.end())
+        {
+            temp.insert(temp.end(), *j);
+            ++j;
+        }
+
+        return temp;
+    }
+
+    template <typename T, typename U>
+    typename enable_if_c<is_matrix<T>::value && is_matrix<U>::value, matrix_add_exp<T,U> >::type add (
+        const T& a,
+        const U& b
+    )
+    {
+        return matrix_add_exp<T,U>(a.ref(),b.ref());
+    }
+
+// ------------------------------------------------------------------------------------
+
+    template <typename T>
+    typename disable_if<is_matrix<T>,T>::type subtract (
+        const T& a,
+        const T& b
+    )
+    {
+        T temp;
+
+        typename T::const_iterator i = a.begin();
+        typename T::const_iterator j = b.begin();
+        while (i != a.end() && j != b.end())
+        {
+            if (i->first == j->first)
+            {
+                temp.insert(temp.end(), std::make_pair(i->first, i->second - j->second));
+                ++i;
+                ++j;
+            }
+            else if (i->first < j->first)
+            {
+                temp.insert(temp.end(), *i);
+                ++i;
+            }
+            else
+            {
+                temp.insert(temp.end(), std::make_pair(j->first, -j->second));
+                ++j;
+            }
+        }
+
+        while (i != a.end())
+        {
+            temp.insert(temp.end(), *i);
+            ++i;
+        }
+        while (j != b.end())
+        {
+            temp.insert(temp.end(), std::make_pair(j->first, -j->second));
+            ++j;
+        }
+
+        return temp;
+    }
+
+    template <typename T, typename U>
+    typename enable_if_c<is_matrix<T>::value && is_matrix<U>::value, matrix_subtract_exp<T,U> >::type subtract (
+        const T& a,
+        const U& b
+    )
+    {
+        return matrix_subtract_exp<T,U>(a.ref(),b.ref());
+    }
+
+// ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
     namespace impl
     {

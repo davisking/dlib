@@ -55,6 +55,92 @@ namespace
             DLIB_TEST(max(v) == 0);
             DLIB_TEST(min(v) == -9);
 
+
+            {
+                matrix<double> a(2,2), b(2,2);
+                a = randm(2,2);
+                b = randm(2,2);
+
+                DLIB_TEST(equal(a-b, subtract(a,b)));
+                DLIB_TEST(equal(a+b, add(a,b)));
+                DLIB_TEST(equal(a-(b+b), subtract(a,b+b)));
+                DLIB_TEST(equal(a+b+b, add(a,b+b)));
+            }
+
+            {
+                std::map<unsigned long,double> a, b, c;
+                a[1] = 2;
+                a[3] = 5;
+
+                b[0] = 3;
+                b[1] = 1;
+
+                c = add(a,b);
+                DLIB_TEST(c.size() == 3);
+                DLIB_TEST(c[0] == 3);
+                DLIB_TEST(c[1] == 3);
+                DLIB_TEST(c[3] == 5);
+
+                c = subtract(a,b);
+                DLIB_TEST(c.size() == 3);
+                DLIB_TEST(c[0] == -3);
+                DLIB_TEST(c[1] == 1);
+                DLIB_TEST(c[3] == 5);
+
+                c = add(b,a);
+                DLIB_TEST(c.size() == 3);
+                DLIB_TEST(c[0] == 3);
+                DLIB_TEST(c[1] == 3);
+                DLIB_TEST(c[3] == 5);
+
+                c = subtract(b,a);
+                DLIB_TEST(c.size() == 3);
+                DLIB_TEST(c[0] == 3);
+                DLIB_TEST(c[1] == -1);
+                DLIB_TEST(c[3] == -5);
+
+                std::vector<std::pair<unsigned long,double> > aa, bb, cc;
+
+                aa.assign(a.begin(), a.end());
+                bb.assign(b.begin(), b.end());
+
+                cc = add(aa,bb); 
+                DLIB_TEST(cc.size() == 3);
+                DLIB_TEST(cc[0].first == 0);
+                DLIB_TEST(cc[1].first == 1);
+                DLIB_TEST(cc[2].first == 3);
+                DLIB_TEST(cc[0].second == 3);
+                DLIB_TEST(cc[1].second == 3);
+                DLIB_TEST(cc[2].second == 5);
+
+                cc = subtract(aa,bb); 
+                DLIB_TEST(cc.size() == 3);
+                DLIB_TEST(cc[0].first == 0);
+                DLIB_TEST(cc[1].first == 1);
+                DLIB_TEST(cc[2].first == 3);
+                DLIB_TEST(cc[0].second == -3);
+                DLIB_TEST(cc[1].second == 1);
+                DLIB_TEST(cc[2].second == 5);
+
+                cc = add(bb,aa); 
+                DLIB_TEST(cc.size() == 3);
+                DLIB_TEST(cc[0].first == 0);
+                DLIB_TEST(cc[1].first == 1);
+                DLIB_TEST(cc[2].first == 3);
+                DLIB_TEST(cc[0].second == 3);
+                DLIB_TEST(cc[1].second == 3);
+                DLIB_TEST(cc[2].second == 5);
+
+                cc = subtract(bb,aa); 
+                DLIB_TEST(cc.size() == 3);
+                DLIB_TEST(cc[0].first == 0);
+                DLIB_TEST(cc[1].first == 1);
+                DLIB_TEST(cc[2].first == 3);
+                DLIB_TEST(cc[0].second == 3);
+                DLIB_TEST(cc[1].second == -1);
+                DLIB_TEST(cc[2].second == -5);
+
+            }
         }
     };
 
