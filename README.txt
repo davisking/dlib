@@ -8,7 +8,7 @@ instructions at http://dlib.net/howto_contribute.html.
 
 
 COMPILING DLIB EXAMPLE PROGRAMS
-   go into the examples folder and type:
+   Go into the examples folder and type:
    mkdir build; cd build; cmake .. ; cmake --build .
 
    That will build all the examples.  Note that there is nothing to install
