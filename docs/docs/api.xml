@@ -1250,6 +1250,42 @@
             component.  I put it on this page just because I expect that people would
             look here when searching for the sort of functionality provided by this component. 
             </p>
+            
+
+            <center><h2>Primary widgets</h2></center>
+            <table>
+               <tr>
+                  <td><a href="dlib/gui_widgets/base_widgets_abstract.h.html#button"><img src="guipics/button.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#check_box"><img src="guipics/check_box.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#radio_button"><img src="guipics/radio_button.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#label"><img src="guipics/label.png"/></a></td>
+               </tr>
+               <tr>
+                  <td><a href="dlib/gui_widgets/base_widgets_abstract.h.html#scroll_bar"><img src="guipics/scroll_bar.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#text_field"><img src="guipics/text_field.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#text_box"><img src="guipics/text_box.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#text_grid"><img src="guipics/text_grid.png"/></a></td>
+               </tr>
+               <tr>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#list_box"><img src="guipics/list_box.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#menu_bar"><img src="guipics/menu_bar.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/base_widgets_abstract.h.html#popup_menu"><img src="guipics/popup_menu.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#tabbed_display"><img src="guipics/tabbed_display.png"/></a></td>
+               </tr>
+               <tr>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#named_rectangle"><img src="guipics/named_rectangle.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#image_window"><img src="guipics/image_window.jpg"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#directed_graph_drawer"><img src="guipics/directed_graph_drawer.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#mouse_tracker"><img src="guipics/mouse_tracker.png"/></a></td>
+               </tr>
+               <tr>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#message_box"><img src="guipics/message_box.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#open_existing_file_box"><img src="guipics/open_existing_file_box.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#open_file_box"><img src="guipics/open_file_box.png"/></a></td>
+                  <td><a href="dlib/gui_widgets/widgets_abstract.h.html#save_file_box"><img src="guipics/save_file_box.png"/></a></td>
+               </tr>
+            </table>
+
          </description>
          
          <examples>
