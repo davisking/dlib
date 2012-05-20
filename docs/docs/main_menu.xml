@@ -124,6 +124,10 @@
                   <link>assignment_learning_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Graph_Labeling</name>
+                  <link>graph_labeling_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Sequence_Labeling</name>
                   <link>sequence_labeler_ex.cpp.html</link>
                </item>

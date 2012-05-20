@@ -1399,6 +1399,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             representing a graph labeling model learned via some machine learning 
             method, such as the <a href="#structural_graph_labeling_trainer">structural_graph_labeling_trainer</a>.
          </description>
+         <examples>
+            <example>graph_labeling_ex.cpp.html</example>
+         </examples>
       </component>
       
    <!-- ************************************************************************* -->
@@ -2304,6 +2307,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             as the <a href="#structural_graph_labeling_trainer">structural_graph_labeling_trainer</a>
             and returns the fraction of assignments predicted correctly.
          </description>
+         <examples>
+            <example>graph_labeling_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
@@ -2619,6 +2625,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 to make it look similar to all the other trainers in dlib.  
             </p>
          </description>
+         <examples>
+            <example>graph_labeling_ex.cpp.html</example>
+         </examples>
                                  
       </component>
       
