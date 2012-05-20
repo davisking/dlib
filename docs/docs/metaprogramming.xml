@@ -275,7 +275,7 @@
          <spec_file link="true">dlib/algs.h</spec_file>
          <description>
             This is a template where is_signed_type&lt;T&gt;::value == true when T is
-            a signed integral type and false when it is an unsigned integral
+            a signed scalar type and false when it is an unsigned scalar
             type.
          </description>
          
@@ -289,7 +289,7 @@
          <spec_file link="true">dlib/algs.h</spec_file>
          <description>
             This is a template where is_unsigned_type&lt;T&gt;::value == true when T is
-            an unsigned integral type and false when it is a signed integral
+            an unsigned scalar type and false when it is a signed scalar
             type.
          </description>
          
