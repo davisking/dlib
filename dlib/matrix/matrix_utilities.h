@@ -652,7 +652,7 @@ namespace dlib
     }
 
     template < typename EXP1, typename EXP2 >
-    typename enable_if_c<(EXP1::NC == 1 && EXP1::NR == 1) || (EXP2::NC == 1 && EXP2::NR == 1), typename EXP1::type>::type 
+    typename enable_if_c<(EXP1::NC*EXP1::NR == 1) || (EXP2::NC*EXP2::NR == 1), typename EXP1::type>::type 
     dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
     { 
         DLIB_ASSERT(m1.size() == m2.size(), 
