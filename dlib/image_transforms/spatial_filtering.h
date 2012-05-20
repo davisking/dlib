@@ -632,13 +632,15 @@ namespace dlib
     )
     {
         DLIB_ASSERT(img.nr() == out.nr() &&
-                    img.nc() == out.nc(),
+                    img.nc() == out.nc() &&
+                    is_same_object(img,out) == false,
             "\t void sum_filter()"
             << "\n\t Invalid arguments given to this function."
             << "\n\t img.nr(): " << img.nr() 
             << "\n\t img.nc(): " << img.nc() 
             << "\n\t out.nr(): " << out.nr() 
             << "\n\t out.nc(): " << out.nc() 
+            << "\n\t is_same_object(img,out): " << is_same_object(img,out) 
         );
 
         typedef typename image_type1::type pixel_type;

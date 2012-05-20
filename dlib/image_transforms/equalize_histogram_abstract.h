@@ -34,6 +34,19 @@ namespace dlib
             - #out_img.nr() == in_img.nr()
     !*/
 
+    template <
+        typename image_type 
+        >
+    void equalize_histogram (
+        image_type& img
+    );
+    /*!
+        requires
+            - it is valid to call equalize_histogram(img,img)
+        ensures
+            - calls equalize_histogram(img,img);
+    !*/
+
 // ---------------------------------------------------------------------------------------
 
     template <

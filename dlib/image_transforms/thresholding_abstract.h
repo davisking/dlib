@@ -39,6 +39,20 @@ namespace dlib
             - #out_img.nr() == in_img.nr()
     !*/
 
+    template <
+        typename image_type
+        >
+    void threshold_image (
+        image_type& img,
+        typename pixel_traits<typename image_type::type>::basic_pixel_type thresh
+    );
+    /*!
+        requires
+            - it is valid to call threshold_image(img,img,thresh);
+        ensures
+            - calls threshold_image(img,img,thresh);
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -67,6 +81,19 @@ namespace dlib
               means found is used as the thresh value.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
+    !*/
+
+    template <
+        typename image_type
+        >
+    void auto_threshold_image (
+        image_type& img
+    );
+    /*!
+        requires
+            - it is valid to call auto_threshold_image(img,img);
+        ensures
+            - calls auto_threshold_image(img,img);
     !*/
 
 // ----------------------------------------------------------------------------------------

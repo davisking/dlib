@@ -116,6 +116,16 @@ namespace dlib
 
     }
 
+    template <
+        typename image_type 
+        >
+    void equalize_histogram (
+        image_type& img
+    )
+    {
+        equalize_histogram(img,img);
+    }
+
 // ---------------------------------------------------------------------------------------
 
 }

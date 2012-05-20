@@ -86,7 +86,7 @@ namespace dlib
         using namespace morphological_operations_helpers;
         COMPILE_TIME_ASSERT(M%2 == 1);
         COMPILE_TIME_ASSERT(N%2 == 1);
-        DLIB_ASSERT((void*)&in_img != (void*)&out_img ,
+        DLIB_ASSERT(is_same_object(in_img,out_img) == false,
             "\tvoid binary_dilation()"
             << "\n\tYou must give two different image objects"
             );
@@ -158,7 +158,7 @@ namespace dlib
         using namespace morphological_operations_helpers;
         COMPILE_TIME_ASSERT(M%2 == 1);
         COMPILE_TIME_ASSERT(N%2 == 1);
-        DLIB_ASSERT((void*)&in_img != (void*)&out_img ,
+        DLIB_ASSERT(is_same_object(in_img,out_img) == false,
             "\tvoid binary_erosion()"
             << "\n\tYou must give two different image objects"
             );
@@ -235,7 +235,7 @@ namespace dlib
         using namespace morphological_operations_helpers;
         COMPILE_TIME_ASSERT(M%2 == 1);
         COMPILE_TIME_ASSERT(N%2 == 1);
-        DLIB_ASSERT((void*)&in_img != (void*)&out_img ,
+        DLIB_ASSERT(is_same_object(in_img,out_img) == false,
             "\tvoid binary_open()"
             << "\n\tYou must give two different image objects"
             );
@@ -314,7 +314,7 @@ namespace dlib
         using namespace morphological_operations_helpers;
         COMPILE_TIME_ASSERT(M%2 == 1);
         COMPILE_TIME_ASSERT(N%2 == 1);
-        DLIB_ASSERT((void*)&in_img != (void*)&out_img ,
+        DLIB_ASSERT(is_same_object(in_img,out_img) == false,
             "\tvoid binary_close()"
             << "\n\tYou must give two different image objects"
             );
@@ -605,6 +605,16 @@ namespace dlib
                     assign_pixel(out_img[r][c], on_pixel);
             }
         }
+    }
+
+    template <
+        typename image_type
+        >
+    void binary_complement (
+        image_type& img
+    )
+    {
+        binary_complement(img,img);
     }
 
 // ----------------------------------------------------------------------------------------

@@ -29,7 +29,7 @@ namespace dlib
             - pixel_traits<typename in_image_type::type>::grayscale == true   
             - pixel_traits<typename in_image_type::type>::has_alpha == false
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
-            - &in_img != &out_img
+            - is_same_object(in_img,out_img) == false
             - M % 2 == 1  (i.e. M must be odd)
             - N % 2 == 1  (i.e. N must be odd)
             - all pixels in in_img are set to either on_pixel or off_pixel
@@ -63,7 +63,7 @@ namespace dlib
             - pixel_traits<typename in_image_type::type>::grayscale == true   
             - pixel_traits<typename in_image_type::type>::has_alpha == false
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
-            - &in_img != &out_img
+            - is_same_object(in_img,out_img) == false
             - M % 2 == 1  (i.e. M must be odd)
             - N % 2 == 1  (i.e. N must be odd)
             - all pixels in in_img are set to either on_pixel or off_pixel
@@ -98,7 +98,7 @@ namespace dlib
             - pixel_traits<typename in_image_type::type>::grayscale == true   
             - pixel_traits<typename in_image_type::type>::has_alpha == false
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
-            - &in_img != &out_img
+            - is_same_object(in_img,out_img) == false
             - M % 2 == 1  (i.e. M must be odd)
             - N % 2 == 1  (i.e. N must be odd)
             - all pixels in in_img are set to either on_pixel or off_pixel
@@ -134,7 +134,7 @@ namespace dlib
             - pixel_traits<typename in_image_type::type>::grayscale == true   
             - pixel_traits<typename in_image_type::type>::has_alpha == false
             - pixel_traits<typename out_image_type::type>::has_alpha == false 
-            - &in_img != &out_img
+            - is_same_object(in_img,out_img) == false
             - M % 2 == 1  (i.e. M must be odd)
             - N % 2 == 1  (i.e. N must be odd)
             - all pixels in in_img are set to either on_pixel or off_pixel
@@ -276,6 +276,19 @@ namespace dlib
               if it was off_pixel in in_img then it will be on_pixel in #out_img)
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
+    !*/
+
+    template <
+        typename image_type
+        >
+    void binary_complement (
+        image_type& img
+    );
+    /*!
+        requires
+            - it must be valid to call binary_complement(img,img);
+        ensures
+            - calls binary_complement(img,img);
     !*/
 
 // ----------------------------------------------------------------------------------------

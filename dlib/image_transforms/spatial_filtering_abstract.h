@@ -330,9 +330,11 @@ namespace dlib
               and it must contain a scalar type
             - image_type2 == an implementation of array2d/array2d_kernel_abstract.h
               and it must contain a scalar type
+            - is_same_object(img,out) == false
         ensures
             - for all valid r and c:
-                - let SUM(r,c) == sum of pixels inside the rectangle translate_rect(rect, point(c,r))
+                - let SUM(r,c) == sum of pixels from img which are inside the rectangle 
+                  translate_rect(rect, point(c,r)).
                 - #out[r][c] == out[r][c] + SUM(r,c)
     !*/
 
