@@ -909,6 +909,29 @@ namespace
             DLIB_TEST(m == m2);
 
         }
+
+        {
+            matrix<double,1,1> a, b;
+            a = 2;
+            b = 3;
+            DLIB_TEST(dot(a,b) == 6);
+        }
+        {
+            matrix<double,1,1> a;
+            matrix<double,0,1> b(1);
+            a = 2;
+            b = 3;
+            DLIB_TEST(dot(a,b) == 6);
+            DLIB_TEST(dot(b,a) == 6);
+        }
+        {
+            matrix<double,1,1> a;
+            matrix<double,1,0> b(1);
+            a = 2;
+            b = 3;
+            DLIB_TEST(dot(a,b) == 6);
+            DLIB_TEST(dot(b,a) == 6);
+        }
     }
 
     class matrix_tester : public tester
