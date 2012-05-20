@@ -512,7 +512,7 @@ namespace dlib
     /*!A is_unsigned_type 
 
         This is a template where is_unsigned_type<T>::value == true when T is an unsigned
-        integral type and false when T is a signed integral type.
+        scalar type and false when T is a signed scalar type.
     !*/
     template <
         typename T
@@ -521,13 +521,16 @@ namespace dlib
     {
         static const bool value = static_cast<T>((static_cast<T>(0)-static_cast<T>(1))) > 0;
     };
+    template <> struct is_unsigned_type<long double> { static const bool value = false; };
+    template <> struct is_unsigned_type<double>      { static const bool value = false; };
+    template <> struct is_unsigned_type<float>       { static const bool value = false; };
 
 // ----------------------------------------------------------------------------------------
 
     /*!A is_signed_type 
 
         This is a template where is_signed_type<T>::value == true when T is a signed
-        integral type and false when T is an unsigned integral type.
+        scalar type and false when T is an unsigned scalar type.
     !*/
     template <
         typename T
