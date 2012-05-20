@@ -19,7 +19,7 @@ files needed by the htmlhelp tool (the thing that makes chm help files).
 
 Also note that the first 80 or so lines of the stylesheet.xsl file contains
 stuff specific to the dlib project and thus should be changed or removed
-as appropriate for your specific project.
+as appropriate if you want to reuse it for a different project. 
 
 ======================== Installing the required tools ========================
 
@@ -47,10 +47,10 @@ There are four scripts in the docs folder.
 	     Note that this script puts its output in the docs/web and
 	     docs/chm/docs folders.  I use the chm folder for off-line 
 	     documentation while the web folder contains what goes onto 
-	     dclib.sourceforge.net.  Both sets of HTML are generated from
-	     the same XML files and are mostly the same.  You will see
-	     <chm></chm> and <web></web> tags inside the XML though in 
-	     cases where the two differ.
+	     dlib.net.  Both sets of HTML are generated from the same XML 
+	     files and are mostly the same.  You will see <chm></chm> and 
+	     <web></web> tags inside the XML though in cases where the two 
+	     differ.
 	
  - makerel:  Runs makedocs as well as creates tar and zip files of the project.  
 	     It also runs htmlhelp in wine to generate the chm help files.  
