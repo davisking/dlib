@@ -151,9 +151,9 @@ namespace dlib
 
     const std::wstring convert_mbstring_to_wstring(const std::string &src)
     {
-        std::vector<wchar_t> wstr(src.length()+1);
-        std::mbstowcs(&wstr.front(), src.c_str(), src.length()+1);
-        return std::wstring(&wstr.front());
+        std::vector<wchar_t> wstr(src.length()+5);
+        std::mbstowcs(&wstr[0], src.c_str(), src.length()+1);
+        return std::wstring(&wstr[0]);
     }
 
 // ----------------------------------------------------------------------------------------
