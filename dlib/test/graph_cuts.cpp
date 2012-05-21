@@ -838,7 +838,12 @@ namespace
 
         value_type factor_value(unsigned long idx) const
         {
-            return ((double)murmur_hash3(&idx, sizeof(idx), seed) - std::numeric_limits<uint32>::max()/2.0)/1000.0;
+            // Copy idx into a char buffer to avoid warnings about violation of strict aliasing 
+            // rules when murmur_hash3() gets inlined into this function.
+            char buf[sizeof(idx)];
+            memcpy(buf,&idx,sizeof(idx));
+            // now hash the buffer rather than idx.
+            return ((double)murmur_hash3(buf, sizeof(buf), seed) - std::numeric_limits<uint32>::max()/2.0)/1000.0;
         }
 
         value_type factor_value_disagreement(unsigned long idx1, unsigned long idx2) const
