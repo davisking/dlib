@@ -238,7 +238,7 @@ namespace dlib
         void* param
     )
     {
-        linker_kernel_1& p = *reinterpret_cast<linker_kernel_1*>(param);
+        linker_kernel_1& p = *static_cast<linker_kernel_1*>(param);
 
         p.cons_mutex.lock();
         // if the connections are gone for whatever reason then return

@@ -661,7 +661,7 @@ namespace dlib
         void* item
     )
     {
-        param& p = *reinterpret_cast<param*>(item);
+        param& p = *static_cast<param*>(item);
 
 
         p.server.on_connect(p.new_connection);

@@ -195,7 +195,7 @@ namespace dlib
                 - returns a non-const reference to the T object
         !*/
         { 
-            return *reinterpret_cast<T*>(mem.get()); 
+            return *static_cast<T*>(mem.get()); 
         }
 
         template <typename T> 
@@ -208,7 +208,7 @@ namespace dlib
                 - returns a const reference to the T object
         !*/
         { 
-            return *reinterpret_cast<const T*>(mem.get()); 
+            return *static_cast<const T*>(mem.get()); 
         }
 
         template <typename T>
@@ -518,7 +518,7 @@ namespace dlib
         { 
             validate_type<T>();
             construct<T>();  
-            return *reinterpret_cast<T*>(mem.get()); 
+            return *static_cast<T*>(mem.get()); 
         }
 
         template <typename T>

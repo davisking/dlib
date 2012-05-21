@@ -58,7 +58,7 @@ namespace
         )
         {
             add_running_thread();
-            pipe& p = *reinterpret_cast<pipe*>(param);
+            pipe& p = *static_cast<pipe*>(param);
             try
             {
 
@@ -95,7 +95,7 @@ namespace
         )
         {
             add_running_thread();
-            pipe& p = *reinterpret_cast<pipe*>(param);
+            pipe& p = *static_cast<pipe*>(param);
             try
             {
 
@@ -131,7 +131,7 @@ namespace
         )
         {
             add_running_thread();
-            pipe& p = *reinterpret_cast<pipe*>(param);
+            pipe& p = *static_cast<pipe*>(param);
             try
             {
 

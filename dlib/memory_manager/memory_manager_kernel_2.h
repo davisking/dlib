@@ -96,7 +96,7 @@ namespace dlib
                     chunk_node* temp = first_chunk;
                     first_chunk = first_chunk->next;
                     // delete the memory chunk 
-                    ::operator delete ( reinterpret_cast<void*>(temp->chunk));
+                    ::operator delete ( static_cast<void*>(temp->chunk));
                     // delete the chunk_node
                     delete temp;
                 }
@@ -135,7 +135,7 @@ namespace dlib
                 try
                 {
                     // construct this new T object with placement new.
-                    new (reinterpret_cast<void*>(temp))T();
+                    new (static_cast<void*>(temp))T();
                 }
                 catch (...)
                 {
@@ -149,7 +149,7 @@ namespace dlib
             {
                 // the linked list is empty so we need to allocate some more memory
                 node* block = 0;
-                block = reinterpret_cast<node*>(::operator new (sizeof(node)*chunk_size));
+                block = static_cast<node*>(::operator new (sizeof(node)*chunk_size));
 
                 // the first part of this block can be our new object
                 temp = reinterpret_cast<T*>(block);
@@ -157,12 +157,12 @@ namespace dlib
                 try
                 {
                     // construct this new T object with placement new.
-                    new (reinterpret_cast<void*>(temp))T();
+                    new (static_cast<void*>(temp))T();
                 }
                 catch (...)
                 {
                     // construction of the new object threw so delete the block of memory
-                    ::operator delete ( reinterpret_cast<void*>(block));
+                    ::operator delete ( static_cast<void*>(block));
                     throw;
                 }
 
@@ -172,7 +172,7 @@ namespace dlib
                 catch (...) 
                 { 
                     temp->~T();
-                    ::operator delete ( reinterpret_cast<void*>(block));
+                    ::operator delete ( static_cast<void*>(block));
                     throw;
                 }
 

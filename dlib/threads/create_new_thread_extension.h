@@ -20,7 +20,7 @@ namespace dlib
         void* obj
     )
     {
-        T* o = reinterpret_cast<T*>(obj);
+        T* o = static_cast<T*>(obj);
         (o->*funct)();
     }
 

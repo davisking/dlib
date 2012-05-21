@@ -305,7 +305,7 @@ namespace dlib
 
         static void error_box_helper(void* param)
         {
-            ebh_param& p = *reinterpret_cast<ebh_param*>(param);
+            ebh_param& p = *static_cast<ebh_param*>(param);
 #ifdef UNICODE
             MessageBox (NULL,  convert_mbstring_to_wstring(p.text).c_str(), 
                         convert_mbstring_to_wstring(p.title).c_str(), MB_OK|MB_ICONERROR|MB_SYSTEMMODAL 

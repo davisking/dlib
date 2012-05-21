@@ -88,9 +88,9 @@ namespace dlib
     )
     {
         DLIB_CASSERT(this->operator[](d) != 0 &&
-                (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&d_copy)) &&
-                (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&r)) &&
-                (reinterpret_cast<const void*>(&r) != reinterpret_cast<void*>(&d_copy)),
+                (static_cast<const void*>(&d) != static_cast<void*>(&d_copy)) &&
+                (static_cast<const void*>(&d) != static_cast<void*>(&r)) &&
+                (static_cast<const void*>(&r) != static_cast<void*>(&d_copy)),
             "\tvoid binary_search_tree::remove"
             << "\n\tthe element must be in the table for it to be removed"
             << "\n\tthis:       " << this
@@ -113,7 +113,7 @@ namespace dlib
         range& r
     )
     {
-        DLIB_CASSERT( reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&r),
+        DLIB_CASSERT( static_cast<const void*>(&d) != static_cast<void*>(&r),
             "\tvoid binary_search_tree::add"
             << "\n\tyou can't call add() and give the same object to both arguments."
             << "\n\tthis:       " << this
@@ -157,7 +157,7 @@ namespace dlib
     )
     {
         DLIB_CASSERT(this->size() != 0 && 
-            (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&r)),
+            (static_cast<const void*>(&d) != static_cast<void*>(&r)),
             "\tvoid hash_table::remove_any"
             << "\n\ttable must not be empty if something is going to be removed"
             << "\n\tthis: " << this

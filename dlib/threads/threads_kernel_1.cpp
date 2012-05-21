@@ -31,7 +31,7 @@ namespace dlib
             void* param
         )
         {
-            info* alloc_p = reinterpret_cast<info*>(param);
+            info* alloc_p = static_cast<info*>(param);
             info p = *alloc_p;
             delete alloc_p;
 

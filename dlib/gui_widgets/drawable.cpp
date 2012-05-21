@@ -80,7 +80,7 @@ namespace dlib
         int i
     )
     {
-        drawable* d = reinterpret_cast<drawable*>(p);
+        drawable* d = static_cast<drawable*>(p);
         if (widget_set.is_member(d))
         {
             d->on_user_event(i);

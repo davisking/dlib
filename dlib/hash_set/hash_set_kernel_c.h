@@ -91,7 +91,7 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( this->is_member(item) &&
-                (reinterpret_cast<const void*>(&item) != reinterpret_cast<void*>(&item_copy)),
+                (static_cast<const void*>(&item) != static_cast<void*>(&item_copy)),
             "\tvoid hash_set::remove"
             << "\n\titem should be in the hash_set if it's going to be removed"
             << "\n\tthis:       " << this

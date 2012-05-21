@@ -82,7 +82,7 @@ namespace dlib
             {
                 node* temp = next;
                 next = next->next;
-                ::operator delete ( reinterpret_cast<void*>(temp));
+                ::operator delete ( static_cast<void*>(temp));
             }
         }
 
@@ -119,7 +119,7 @@ namespace dlib
                 try
                 {
                     // construct this new T object with placement new.
-                    new (reinterpret_cast<void*>(temp))T();
+                    new (static_cast<void*>(temp))T();
                 }
                 catch (...)
                 {
@@ -133,16 +133,16 @@ namespace dlib
             }
             else
             {
-                temp = reinterpret_cast<T*>(::operator new(sizeof(node)));
+                temp = static_cast<T*>(::operator new(sizeof(node)));
                 try
                 {
                     // construct this new T object with placement new.
-                    new (reinterpret_cast<void*>(temp))T();
+                    new (static_cast<void*>(temp))T();
                 }
                 catch (...)
                 {
                     // construction of the new object threw so delete the block of memory
-                    ::operator delete ( reinterpret_cast<void*>(temp));
+                    ::operator delete ( static_cast<void*>(temp));
                     throw;
                 }
             }
@@ -160,7 +160,7 @@ namespace dlib
 
             if (pool_size >= max_pool_size)
             {
-                ::operator delete ( reinterpret_cast<void*>(item));
+                ::operator delete ( static_cast<void*>(item));
                 return;
             }
 

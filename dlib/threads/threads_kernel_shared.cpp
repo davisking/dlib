@@ -201,7 +201,7 @@ namespace dlib
         )
         {
             // get a reference to the calling threader object
-            threader& self = *reinterpret_cast<threader*>(object);
+            threader& self = *static_cast<threader*>(object);
 
 
             {

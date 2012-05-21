@@ -263,7 +263,7 @@ namespace dlib
         block_table.reset();
         while (block_table.move_next())
         {
-            delete reinterpret_cast<config_reader_kernel_1*>(block_table.element().value());
+            delete static_cast<config_reader_kernel_1*>(block_table.element().value());
         }
         block_table.clear();
         key_table.clear();
@@ -565,7 +565,7 @@ namespace dlib
             throw config_reader_access_error(name,"");
         }
 
-        return *reinterpret_cast<config_reader_kernel_1*>(block_table[name]);
+        return *static_cast<config_reader_kernel_1*>(block_table[name]);
     }
 
 // ----------------------------------------------------------------------------------------

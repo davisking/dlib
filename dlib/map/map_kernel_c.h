@@ -82,14 +82,14 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( (!this->is_in_domain(d)) &&
-                (reinterpret_cast<void*>(&d) != reinterpret_cast<void*>(&r)),
+                (static_cast<void*>(&d) != static_cast<void*>(&r)),
             "\tvoid map::add"
             << "\n\tdomain element being added must not already be in the map"
             << "\n\tand d and r must not be the same variable"
             << "\n\tis_in_domain(d): " << (this->is_in_domain(d) ? "true" : "false")
             << "\n\tthis: " << this
-            << "\n\t&d:   " << reinterpret_cast<void*>(&d)
-            << "\n\t&r:   " << reinterpret_cast<void*>(&r)
+            << "\n\t&d:   " << static_cast<void*>(&d)
+            << "\n\t&r:   " << static_cast<void*>(&r)
             );
 
         // call the real function
@@ -109,14 +109,14 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( (this->size() > 0)  &&
-                (reinterpret_cast<void*>(&d) != reinterpret_cast<void*>(&r)),
+                (static_cast<void*>(&d) != static_cast<void*>(&r)),
             "\tvoid map::remove_any"
             << "\n\tsize() must be greater than zero if something is going to be removed"
             << "\n\tand d and r must not be the same variable."
             << "\n\tsize(): " << this->size() 
             << "\n\tthis:   " << this
-            << "\n\t&d:     " << reinterpret_cast<void*>(&d)
-            << "\n\t&r:     " << reinterpret_cast<void*>(&r)
+            << "\n\t&d:     " << static_cast<void*>(&d)
+            << "\n\t&r:     " << static_cast<void*>(&r)
             );
 
         // call the real function
@@ -137,17 +137,17 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( (this->is_in_domain(d)) &&
-                (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&r)) &&
-                (reinterpret_cast<void*>(&r) != reinterpret_cast<void*>(&d_copy)) &&
-                (reinterpret_cast<const void*>(&d) != reinterpret_cast<void*>(&d_copy)),
+                (static_cast<const void*>(&d) != static_cast<void*>(&r)) &&
+                (static_cast<void*>(&r) != static_cast<void*>(&d_copy)) &&
+                (static_cast<const void*>(&d) != static_cast<void*>(&d_copy)),
             "\tvoid map::remove"
             << "\n\tcan't remove something that isn't in the map or if the paremeters actually"
             << "\n\tare the same variable.  Either way can't remove."
             << "\n\tis_in_domain(d): " << (this->is_in_domain(d) ? "true" : "false")
             << "\n\tthis:      " << this
-            << "\n\t&d:        " << reinterpret_cast<const void*>(&d)
-            << "\n\t&r:        " << reinterpret_cast<void*>(&r)
-            << "\n\t&d_copy:   " << reinterpret_cast<void*>(&d_copy)
+            << "\n\t&d:        " << static_cast<const void*>(&d)
+            << "\n\t&r:        " << static_cast<void*>(&r)
+            << "\n\t&d_copy:   " << static_cast<void*>(&d_copy)
             );
 
         // call the real function
@@ -169,7 +169,7 @@ namespace dlib
             "\tvoid map::destroy"
             << "\n\tcan't remove something that isn't in the map"
             << "\n\tthis:      " << this
-            << "\n\t&d:        " << reinterpret_cast<const void*>(&d)
+            << "\n\t&d:        " << static_cast<const void*>(&d)
             );
 
         // call the real function

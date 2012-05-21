@@ -37,7 +37,7 @@ namespace
     )
     {
         
-        listener& list = *reinterpret_cast<listener*>(param);
+        listener& list = *static_cast<listener*>(param);
         connection* con;
         list.accept(con);
 

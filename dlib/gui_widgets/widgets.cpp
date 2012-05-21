@@ -2695,7 +2695,7 @@ namespace dlib
             // The point of this extra event_handler stuff is to allow the user
             // to end the program from within the callback.  So we want to destroy the 
             // window *before* we call their callback.
-            box_win& w = *reinterpret_cast<box_win*>(param);
+            box_win& w = *static_cast<box_win*>(param);
             w.close_window();
             any_function<void()> event_handler(w.event_handler);
             delete &w;
