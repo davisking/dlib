@@ -7,9 +7,9 @@
     Suppose you have a bunch of objects and you need to label each of them as
     true or false.  Suppose further that knowing the labels of some of these
     objects tells you something about the likely label of the others.  This
-    is common in a number of domains.  For example, in image segmentation you
-    need to label each pixel, and knowing the labels of neighboring pixels
-    gives you information about the likely label since neighboring pixels
+    is common in a number of domains.  For example, in image segmentation 
+    problems you need to label each pixel, and knowing the labels of neighboring 
+    pixels gives you information about the likely label since neighboring pixels
     will often have the same label.
     
     We can generalize this problem by saying that we have a graph and our task
@@ -47,7 +47,7 @@ using namespace dlib;
 // to the matrix object.)
 typedef matrix<double,2,1> node_vector_type;
 typedef matrix<double,1,1> edge_vector_type;
-typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
+typedef graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
 
 // ----------------------------------------------------------------------------------------
 
@@ -76,9 +76,10 @@ void make_training_examples(
         edge vectors will contain a value of 1 when the nodes connected by the edge
         should share the same label and a value of 0 otherwise.  
         
-        We want to see that the machine learning method is able to figure out these
-        rules.  If it is successful it will create a graph_labeler which can predict
-        the correct labels for these and other similarly constructed graphs.
+        We want to see that the machine learning method is able to figure out how 
+        these features relate to the labels.  If it is successful it will create a 
+        graph_labeler which can predict the correct labels for these and other 
+        similarly constructed graphs.
 
         Finally, note that these tools require all values in the edge vectors to be >= 0.
         However, the node vectors may contain both positive and negative values. 
@@ -93,7 +94,7 @@ void make_training_examples(
     // ---------------------------
     g.set_number_of_nodes(4);
     label.resize(g.number_of_nodes());
-    // store the vector [0,1] into node 0.
+    // store the vector [0,1] into node 0.  Also label it as true.
     g.node(0).data = 0, 1; label[0] = true;
     // store the vector [0,0] into node 1.
     g.node(1).data = 0, 0; label[1] = true;  // Note that this node's vector doesn't tell us how to label it.
@@ -165,6 +166,7 @@ void make_training_examples(
 
 }
 
+// ----------------------------------------------------------------------------------------
 
 int main()
 {
@@ -174,10 +176,11 @@ int main()
     make_training_examples(samples, labels);
 
 
-    // Create a structural SVM trainer for graph labeling problems.
+    // Create a structural SVM trainer for graph labeling problems.  The vector_type
+    // needs to be set to a type capable of holding node or edge vectors.
     typedef matrix<double,0,1> vector_type;
     structural_graph_labeling_trainer<vector_type> trainer;
-    // This is the usual SVM-C parameter.  Larger values make the trainer try 
+    // This is the usual SVM C parameter.  Larger values make the trainer try 
     // harder to fit the training data but might result in overfitting.  You 
     // should set this value to whatever gives the best cross-validation results.
     trainer.set_c(10);
@@ -202,7 +205,7 @@ int main()
          (3 T)-----(2 T)------(4 T)
 
         I have annotated each node with either T or F to indicate the correct 
-        output.  
+        output (true or false).  
     */
     graph_type g;
     g.set_number_of_nodes(5);
