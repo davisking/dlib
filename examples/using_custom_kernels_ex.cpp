@@ -152,7 +152,7 @@ int main()
             samples.push_back(samp);
 
             // if this point is less than 13 from the origin
-            if (sqrt((double)r*r + c*c) <= 13)
+            if (sqrt(r*r + c*c) <= 13)
                 labels.push_back(+1);
             else
                 labels.push_back(-1);
