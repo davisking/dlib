@@ -12,12 +12,53 @@
 
 <current>
 New Stuff:
+   - Improvements to linear algebra tools:
+      - Added the lowerbound() and upperbound() routines for thresholding dense 
+        matrices.
+      - Refined the tools for working with sparse vectors.  In particular, 
+        the following functions were added: min(), max(), make_sparse_vector(),
+        add(), and subtract().  A number of existing routines were also updated
+        to work with both sparse and dense vectors so that templated code which 
+        works on both vector types is simpler to write.
+      - Added the += and -= operators to the set_subm(), set_rowm(), and set_colm()
+        tools for operating on submatrices.
+   - Optimization:
+      - Added a new quadratic program solver, solve_qp4_using_smo().  This new
+        solver is useful for solving quadratic programs corresponding to
+        non-negative constrained primal quadratic programs.
+      - Added an optional non-negativity constraint to the oca optimizer.
+      - Added the min_cut object.  It provides a method to find the minimum weight 
+        cut on a graph.  
+      - Added tools for finding maximum probability assignment in a Potts style 
+        Markov random field.  See the find_max_factor_graph_potts() routine for 
+        details.
+   - Machine Learning:
+      - Added structural SVM tools for learning the parameters of a Potts style
+        Markov random field.  See the structural_graph_labeling_trainer and
+        graph_labeler objects as well as their associated example program for 
+        details.
+      - Added the ability to learn only non-negative weights to the 
+        svm_c_linear_trainer.
+   - Improved Integration with OpenCV: 
+      - Updated the cv_image object so it works with cv::Mat as well as IplImage.
+      - Added the toMat() routine for converting from a dlib style image to an
+        OpenCV cv::Mat image.
 
 Non-Backwards Compatible Changes:
+   - Removed the dlib::sparse_vector namespace.  Everything from this namespace 
+     was moved into the normal dlib:: namespace so that code which works with 
+     both sparse and dense vectors is more cohesive.
 
 Bug fixes:
+   - Fixed a bug in find_max_factor_graph_viterbi() which sometimes occurred when 
+     the model order was larger than the number of variables.
+   - Fixed a bug which caused a compiler error if you tried to call dot() on two 
+     1x1 matrices which were statically dimensioned.
 
 Other:
+   - Improved existing documentation: added pictures of the gui widgets, 
+     added documentation of the dlib::bridge protocol, and other minor 
+     usability improvements.
 
 </current>
 

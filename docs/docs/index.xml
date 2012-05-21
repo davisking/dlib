@@ -118,9 +118,13 @@
                   <li>Box-constrained derivative-free optimization via the 
                       <a href="optimization.html#find_min_bobyqa">BOBYQA</a> algorithm</li> 
                   <li>An implementation of the <a href="optimization.html#oca">Optimized Cutting Plane Algorithm</a></li> 
-                  <li>Several <preserve_space><a href="optimization.html#solve_qp2_using_smo">quadratic</a> 
-                              <a href="optimization.html#solve_qp3_using_smo">program</a>
-                              <a href="optimization.html#solve_qp_using_smo">solvers</a></preserve_space> </li> 
+                  <li><preserve_space><a href="optimization.html#solve_qp_using_smo">Several</a> 
+                                      <a href="optimization.html#solve_qp2_using_smo">quadratic</a> 
+                                      <a href="optimization.html#solve_qp3_using_smo">program</a>
+                                      <a href="optimization.html#solve_qp4_using_smo">solvers</a></preserve_space> </li> 
+                  <li>Combinatorial optimization tools for solving 
+                     <a href="optimization.html#max_cost_assignment">optimal assignment</a> or 
+                     <a href="optimization.html#min_cut">min cut/max flow</a> problems.</li>
                   <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
                   <li>A <a href="algorithms.html#rand">random number</a> object</li>
                </ul>
@@ -141,6 +145,7 @@
                   <li>Structural SVM tools for <a href="ml.html#structural_sequence_labeling_trainer">sequence labeling</a> </li>  
                   <li>Structural SVM tools for solving <a href="ml.html#structural_assignment_trainer">assignment problems</a> </li>  
                   <li>Structural SVM tools for <a href="ml.html#structural_object_detection_trainer">object detection</a> in images </li>  
+                  <li>Structural SVM tools for <a href="ml.html#structural_graph_labeling_trainer">labeling nodes</a> in graphs </li>  
                   <li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li>
                   <li>An online <a href="ml.html#svm_pegasos">SVM classification</a> algorithm</li>
                   <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector</li> and
@@ -158,7 +163,8 @@
                   <li><a href="bayes.html#bayesian_network_gibbs_sampler">Gibbs sampler</a> markov chain monte 
                   carlo algorithm for approximate inference in a Bayesian network.</li>
                   <li>Routines for performing MAP inference in 
-                     <a href="optimization.html#find_max_factor_graph_viterbi">chain-structured</a> or 
+                     <a href="optimization.html#find_max_factor_graph_viterbi">chain-structured</a>,
+                     <a href="optimization.html#find_max_factor_graph_potts">Potts</a>, or 
                      <a href="optimization.html#find_max_factor_graph_nmplp">general</a> factor graphs.</li>
                </ul>
             </li>
