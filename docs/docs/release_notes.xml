@@ -29,9 +29,9 @@ New Stuff:
       - Added an optional non-negativity constraint to the oca optimizer.
       - Added the min_cut object.  It provides a method to find the minimum weight 
         cut on a graph.  
-      - Added tools for finding maximum probability assignment in a Potts style 
-        Markov random field.  See the find_max_factor_graph_potts() routine for 
-        details.
+      - Added tools for finding the maximum probability assignment in a Potts 
+        style Markov random field.  See the find_max_factor_graph_potts() routine 
+        for details.
    - Machine Learning:
       - Added structural SVM tools for learning the parameters of a Potts style
         Markov random field.  See the structural_graph_labeling_trainer and
