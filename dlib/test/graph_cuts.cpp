@@ -888,6 +888,129 @@ namespace
         }
     }
 
+    void test_inf()
+    {
+        graph<double,double>::kernel_1a_c g;
+        g.set_number_of_nodes(4);
+        g.add_edge(0,1);
+        g.add_edge(1,2);
+        g.add_edge(2,3);
+        g.add_edge(3,0);
+
+        g.node(0).data = std::numeric_limits<double>::infinity();
+        g.node(1).data = -std::numeric_limits<double>::infinity();
+        g.node(2).data = std::numeric_limits<double>::infinity();
+        g.node(3).data = -std::numeric_limits<double>::infinity();
+
+        edge(g,0,1) = 1;
+        edge(g,1,2) = 1;
+        edge(g,2,3) = 1;
+        edge(g,3,0) = 1;
+
+        std::vector<node_label> labels;
+        find_max_factor_graph_potts(g, labels);
+
+        DLIB_TEST(labels[0] != 0);
+        DLIB_TEST(labels[1] == 0);
+        DLIB_TEST(labels[2] != 0);
+        DLIB_TEST(labels[3] == 0);
+
+        // --------------------------
+
+        g.node(0).data = std::numeric_limits<double>::infinity();
+        g.node(1).data = 0;
+        g.node(2).data = 0;
+        g.node(3).data = -3;
+
+        edge(g,0,1) = 1;
+        edge(g,1,2) = 1;
+        edge(g,2,3) = 1;
+        edge(g,3,0) = 1;
+
+        find_max_factor_graph_potts(g, labels);
+
+        DLIB_TEST(labels[0] != 0);
+        DLIB_TEST(labels[1] != 0);
+        DLIB_TEST(labels[2] != 0);
+        DLIB_TEST(labels[3] == 0);
+
+        // --------------------------
+
+        g.node(0).data = std::numeric_limits<double>::infinity();
+        g.node(1).data = 0;
+        g.node(2).data = 0;
+        g.node(3).data = -0.1;
+
+        edge(g,0,1) = 1;
+        edge(g,1,2) = 1;
+        edge(g,2,3) = 1;
+        edge(g,3,0) = 1;
+
+        find_max_factor_graph_potts(g, labels);
+
+        DLIB_TEST(labels[0] != 0);
+        DLIB_TEST(labels[1] != 0);
+        DLIB_TEST(labels[2] != 0);
+        DLIB_TEST(labels[3] != 0);
+
+        // --------------------------
+
+        g.node(0).data = std::numeric_limits<double>::infinity();
+        g.node(1).data = 0;
+        g.node(2).data = 0;
+        g.node(3).data = -0.1;
+
+        edge(g,0,1) = 1;
+        edge(g,1,2) = 1;
+        edge(g,2,3) = 0;
+        edge(g,3,0) = 0;
+
+        find_max_factor_graph_potts(g, labels);
+
+        DLIB_TEST(labels[0] != 0);
+        DLIB_TEST(labels[1] != 0);
+        DLIB_TEST(labels[2] != 0);
+        DLIB_TEST(labels[3] == 0);
+
+        // --------------------------
+
+        g.node(0).data = -std::numeric_limits<double>::infinity();
+        g.node(1).data = 0;
+        g.node(2).data = 0;
+        g.node(3).data = 0.1;
+
+        edge(g,0,1) = 1;
+        edge(g,1,2) = 1;
+        edge(g,2,3) = 0;
+        edge(g,3,0) = 0;
+
+        find_max_factor_graph_potts(g, labels);
+
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(labels[1] == 0);
+        DLIB_TEST(labels[2] == 0);
+        DLIB_TEST(labels[3] != 0);
+
+        // --------------------------
+
+        g.node(0).data = -std::numeric_limits<double>::infinity();
+        g.node(1).data = std::numeric_limits<double>::infinity();
+        g.node(2).data = 0;
+        g.node(3).data = 0.1;
+
+        edge(g,0,1) = 1;
+        edge(g,1,2) = 1;
+        edge(g,2,3) = 0;
+        edge(g,3,0) = 0;
+
+        find_max_factor_graph_potts(g, labels);
+
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(labels[1] != 0);
+        DLIB_TEST(labels[2] != 0);
+        DLIB_TEST(labels[3] != 0);
+    }
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -907,6 +1030,8 @@ namespace
         void perform_test (
         )
         {
+            test_inf();
+
             for (int i = 0; i < 500; ++i)
             {
                 array2d<unsigned char> labels, brute_labels;
