@@ -138,6 +138,9 @@ namespace dlib
                   node the label of true.  The larger the value, the more desirable it is 
                   to give it this label.  Similarly, a negative value indicates that it is
                   better to give the node a label of false.
+                - It is valid for the returned value to be positive or negative infinity.  
+                  A value of positive infinity indicates that the idx-th node must be labeled
+                  true while negative infinity means it must be labeled false.
         !*/
 
         value_type factor_value_disagreement (
@@ -156,6 +159,7 @@ namespace dlib
                   different labels.  Larger values indicate a larger penalty.
                 - this function is symmetric.  That is, it is true that: 
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
+                - The return value should be a finite value.
         !*/
 
     };
@@ -218,6 +222,9 @@ namespace dlib
                   node the label of true.  The larger the value, the more desirable it is 
                   to give it this label.  Similarly, a negative value indicates that it is
                   better to give the node a label of false.
+                - It is valid for the returned value to be positive or negative infinity.  
+                  A value of positive infinity indicates that the idx-th node must be labeled
+                  true while negative infinity means it must be labeled false.
         !*/
 
         value_type factor_value_disagreement (
@@ -241,6 +248,7 @@ namespace dlib
                   different labels.  Larger values indicate a larger penalty.
                 - this function is symmetric.  That is, it is true that: 
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
+                - The return value should be a finite value.
         !*/
     };
 

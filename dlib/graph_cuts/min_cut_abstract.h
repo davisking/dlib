@@ -268,8 +268,9 @@ namespace dlib
                 - idx2 < number_of_nodes()
                 - idx1 and idx2 are neighbors in the graph
             ensures
-                - returns the residual flow capacity from the idx1-th
-                  node to the idx2-th node.
+                - returns the residual flow capacity from the idx1-th node to the idx2-th node.
+                - It is valid for this function to return a floating point value of infinity.
+                  This value means this edge has an unlimited capacity.
         !*/
 
         edge_type get_flow (
@@ -283,6 +284,8 @@ namespace dlib
                 - let IDX = node_id(it)
                 - it represents the directed edge from a node, call it H, to the node IDX. Therefore,
                   this function returns get_flow(H,IDX)
+                - It is valid for this function to return a floating point value of infinity.
+                  This value means this edge has an unlimited capacity.
         !*/
 
         edge_type get_flow (
@@ -296,6 +299,8 @@ namespace dlib
                 - let IDX = node_id(it)
                 - it represents the directed edge from node IDX to another node, call it H. Therefore,
                   this function returns get_flow(IDX,H)
+                - It is valid for this function to return a floating point value of infinity.
+                  This value means this edge has an unlimited capacity.
         !*/
 
         void adjust_flow (
@@ -398,7 +403,7 @@ namespace dlib
                 - sink_node < g.number_of_nodes()
                 - for all valid i and j:
                     - g.get_flow(i,j) >= 0
-                      (i.e. all the flow capacities/edge weights are positive)
+                      (i.e. all the flow capacities/edge weights are non-negative)
                 - g does not contain any self loops.  That is, no nodes are neighbors with
                   themselves.
             ensures
