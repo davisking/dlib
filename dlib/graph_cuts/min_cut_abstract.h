@@ -355,7 +355,7 @@ namespace dlib
               object defined at the top of this file, or, an implementation of 
               dlib/directed_graph/directed_graph_kernel_abstract.h.
         ensures
-            - returns the sum of the outgoing edges from nodes with a label of SOURCE_CUT 
+            - returns the sum of the outgoing flows from nodes with a label of SOURCE_CUT 
               to nodes with a label != SOURCE_CUT.  Note that for a directed_graph object,
               the labels are stored in the node's data field.
     !*/
