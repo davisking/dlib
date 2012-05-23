@@ -123,7 +123,7 @@
                                       <a href="optimization.html#solve_qp3_using_smo">program</a>
                                       <a href="optimization.html#solve_qp4_using_smo">solvers</a></preserve_space> </li> 
                   <li>Combinatorial optimization tools for solving 
-                     <a href="optimization.html#max_cost_assignment">optimal assignment</a> or 
+                     <a href="optimization.html#max_cost_assignment">optimal assignment</a> and
                      <a href="optimization.html#min_cut">min cut/max flow</a> problems.</li>
                   <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
                   <li>A <a href="algorithms.html#rand">random number</a> object</li>
