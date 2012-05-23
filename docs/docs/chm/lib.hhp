@@ -11,6 +11,26 @@ Title=dLib
 
 
 [FILES]
+docs/guipics/button.png
+docs/guipics/check_box.png
+docs/guipics/directed_graph_drawer.png
+docs/guipics/image_window.jpg
+docs/guipics/label.png
+docs/guipics/list_box.png
+docs/guipics/menu_bar.png
+docs/guipics/message_box.png
+docs/guipics/mouse_tracker.png
+docs/guipics/named_rectangle.png
+docs/guipics/open_existing_file_box.png
+docs/guipics/open_file_box.png
+docs/guipics/popup_menu.png
+docs/guipics/radio_button.png
+docs/guipics/save_file_box.png
+docs/guipics/scroll_bar.png
+docs/guipics/tabbed_display.png
+docs/guipics/text_box.png
+docs/guipics/text_field.png
+docs/guipics/text_grid.png
 docs/api.html
 docs/dlib/test/makefile
 docs/right.gif
@@ -26,6 +46,7 @@ docs/dir_nav_ex.cpp.html
 docs/gui_api_ex.cpp.html
 docs/index.html
 docs/intro.html
+docs/optimization.html
 docs/kernel_1a.html
 docs/kernel_1b.html
 docs/kernel_1c.html
