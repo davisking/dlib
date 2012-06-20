@@ -339,7 +339,7 @@ namespace dlib
         !*/
 
         void get_feature_vector (
-            const rectangle& rects,
+            const rectangle& rect,
             feature_vector_type& psi
         ) const;
         /*!
