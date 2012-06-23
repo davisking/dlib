@@ -669,7 +669,7 @@ namespace dlib
 
         const rectangle area = get_rect(img);
 
-        // save width to avoid computing them over and over
+        // Save width to avoid computing it over and over.
         const long width = rect.width();
 
 
