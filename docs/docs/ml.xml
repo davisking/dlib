@@ -12,7 +12,8 @@
          <p>
             This page documents all the machine learning algorithms present in
             the library.  In particular, there are algorithms for performing 
-            classification, regression, clustering, sequence labeling, anomaly detection, 
+            classification, regression, clustering, sequence labeling, assignment learning,
+            graph segmentation, object detection, anomaly detection, 
             and feature ranking, as well as algorithms for doing more 
             specialized computations.
          </p>
