@@ -64,8 +64,8 @@ namespace dlib
             max_num_dets = 0;
             for (unsigned long i = 0; i < truth_rects.size(); ++i)
             {
-                if (truth_rects.size() > max_num_dets)
-                    max_num_dets = truth_rects.size();
+                if (truth_rects[i].size() > max_num_dets)
+                    max_num_dets = truth_rects[i].size();
 
                 scanners[i].copy_configuration(scanner);
             }
