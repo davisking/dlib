@@ -12,6 +12,19 @@
 
 <current>
 New Stuff:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.47" date="Jun 15, 2012">
+New Stuff:
    - Improvements to linear algebra tools:
       - Added the lowerbound() and upperbound() routines for thresholding dense 
         matrices.
@@ -59,8 +72,7 @@ Other:
    - Improved existing documentation: added pictures of the gui widgets, 
      added documentation of the dlib::bridge protocol, and other minor 
      usability improvements.
-
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
