@@ -84,6 +84,7 @@
          <term file="optimization.html" name="min_cut"/>
          <term file="optimization.html" name="graph_cut_score"/>
          <term file="optimization.html" name="potts_model_score"/>
+         <term file="dlib/graph_cuts/find_max_factor_graph_potts_abstract.h.html" name="make_potts_grid_problem"/>
          <term file="dlib/graph_cuts/min_cut_abstract.h.html" name="node_label"/>
          <term link="dlib/graph_cuts/min_cut_abstract.h.html#node_label" name="SOURCE_CUT"/>
          <term link="dlib/graph_cuts/min_cut_abstract.h.html#node_label" name="SINK_CUT"/>
