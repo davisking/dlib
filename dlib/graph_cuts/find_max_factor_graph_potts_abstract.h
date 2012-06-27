@@ -442,6 +442,180 @@ namespace dlib
             - #labels.nc() == prob.nc()
     !*/
 
+// ---------------------------------------------------------------------------------------- 
+// ---------------------------------------------------------------------------------------- 
+
+    struct single_image_model 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines a slightly more convenient interface for creating
+                potts_grid_problems which operate on an image.  In this case, the goal 
+                is to assign a label to each coordinate of an image.  In particular, 
+                this object defines the interface used by the make_potts_grid_problem() 
+                routine defined below. 
+
+                In the comments below, we will refer to the image supplied to 
+                make_potts_grid_problem() as IMG.
+        !*/
+
+        // This typedef should be for a type like int or double.  It
+        // must also be capable of representing signed values.
+        typedef an_integer_or_real_type value_type;
+
+        template <typename pixel_type>
+        value_type factor_value (
+            const pixel_type& v
+        ) const;
+        /*!
+            requires
+                - v is a pixel value from IMG.
+            ensures
+                - returns a value which indicates how "good" it is to assign the location
+                  in IMG corresponding to v with the label of true.  The larger the value, 
+                  the more desirable it is to give it this label.  Similarly, a negative 
+                  value indicates that it is better to give the node a label of false.
+                - It is valid for the returned value to be positive or negative infinity.  
+                  A value of positive infinity indicates that the pixel must be labeled
+                  true while negative infinity means it must be labeled false.
+        !*/
+
+        template <typename pixel_type>
+        value_type factor_value_disagreement (
+            const pixel_type& v1,
+            const pixel_type& v2 
+        ) const;
+        /*!
+            requires
+                - v1 and v2 are pixel values from neighboring pixels in the IMG image.
+            ensures
+                - returns a number >= 0.  This is the penalty for giving neighboring pixels 
+                  with values v1 and v2 different labels.  Larger values indicate a larger 
+                  penalty.
+                - this function is symmetric.  That is, it is true that: 
+                  factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
+                - The return value should be a finite value.
+        !*/
+    };
+
+// ---------------------------------------------------------------------------------------- 
+
+    template <
+        typename single_image_model,
+        typename pixel_type,
+        typename mem_manager
+        >
+    potts_grid_problem make_potts_grid_problem (
+        const single_image_model& model,
+        const array2d<pixel_type,mem_manager>& img
+    );
+    /*!
+        requires
+            - single_image_model == an object with an interface compatible with the 
+              single_image_model object defined above.
+            - for all valid i and j:
+                - model.factor_value_disagreement(i,j) >= 0
+                - model.factor_value_disagreement(i,j) == model.factor_value_disagreement(j,i)
+        ensures
+            - returns a potts_grid_problem which can be solved using the 
+              find_max_factor_graph_potts(prob,array2d) routine defined above.  That is,
+              given an image to store the labels, the following statement would solve the 
+              potts problem defined by the given model and image:
+                find_max_factor_graph_potts(make_potts_grid_problem(model,img),labels);
+    !*/
+
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    struct pair_image_model 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines a slightly more convenient interface for creating
+                potts_grid_problems which operate on a pair of identically sized images.
+                In this case, the goal is to assign a label to each coordinate in one
+                of the image pairs.  In particular, this object defines the interface
+                used by the make_potts_grid_problem() routine defined below. 
+
+                In the comments below, we will refer to the two images supplied to 
+                make_potts_grid_problem() as IMG1 and IMG2.  The goal of the potts
+                problem will be to assign labels to each pixel in IMG1 (IMG2 is
+                not labeled, it is simply used as a place to keep auxiliary data).
+        !*/
+
+        // This typedef should be for a type like int or double.  It
+        // must also be capable of representing signed values.
+        typedef an_integer_or_real_type value_type;
+
+        template <typename pixel_type>
+        value_type factor_value (
+            const pixel_type& v1,
+            const pixel_type& v2 
+        ) const;
+        /*!
+            requires
+                - v1 and v2 are corresponding pixels from IMG1 and IMG2 respectively.
+                  That is, both pixel values have the same coordinates in the images.
+                  So for example, if v1 is the value of IMG1[4][5] then v2 is the value
+                  of IMG2[4][5].
+            ensures
+                - returns a value which indicates how "good" it is to assign the location
+                  in IMG1 corresponding to v1 with the label of true.  The larger the value, 
+                  the more desirable it is to give it this label.  Similarly, a negative 
+                  value indicates that it is better to give the node a label of false.
+                - It is valid for the returned value to be positive or negative infinity.  
+                  A value of positive infinity indicates that the pixel must be labeled
+                  true while negative infinity means it must be labeled false.
+        !*/
+
+        template <typename pixel_type>
+        value_type factor_value_disagreement (
+            const pixel_type& v1,
+            const pixel_type& v2 
+        ) const;
+        /*!
+            requires
+                - v1 and v2 are pixel values from neighboring pixels in the IMG1 image.
+            ensures
+                - returns a number >= 0.  This is the penalty for giving neighboring pixels 
+                  with values v1 and v2 different labels.  Larger values indicate a larger 
+                  penalty.
+                - this function is symmetric.  That is, it is true that: 
+                  factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
+                - The return value should be a finite value.
+        !*/
+    };
+
+// ---------------------------------------------------------------------------------------- 
+
+    template <
+        typename pair_image_model,
+        typename pixel_type,
+        typename mem_manager
+        >
+    potts_grid_problem make_potts_grid_problem (
+        const pair_image_model& model,
+        const array2d<pixel_type,mem_manager>& img1,
+        const array2d<pixel_type,mem_manager>& img2
+    );
+    /*!
+        requires
+            - get_rect(img1) == get_rect(img2)
+              (i.e. img1 and img2 have the same dimensions)
+            - pair_image_model == an object with an interface compatible with the 
+              pair_image_model object defined above.
+            - for all valid i and j:
+                - model.factor_value_disagreement(i,j) >= 0
+                - model.factor_value_disagreement(i,j) == model.factor_value_disagreement(j,i)
+        ensures
+            - returns a potts_grid_problem which can be solved using the 
+              find_max_factor_graph_potts(prob,array2d) routine defined above.  That is,
+              given an image to store the labels, the following statement would solve the 
+              potts problem defined by the given model and pair of images:
+                find_max_factor_graph_potts(make_potts_grid_problem(model,img1,img2),labels);
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
 }
