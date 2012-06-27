@@ -444,6 +444,10 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------- 
 // ---------------------------------------------------------------------------------------- 
+//    The following functions and interface definitions are convenience routines for use 
+//    with the potts grid problem version of find_max_factor_graph_potts() defined above.
+// ---------------------------------------------------------------------------------------- 
+// ---------------------------------------------------------------------------------------- 
 
     struct single_image_model 
     {
@@ -451,11 +455,11 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object defines a slightly more convenient interface for creating
                 potts_grid_problems which operate on an image.  In this case, the goal 
-                is to assign a label to each coordinate of an image.  In particular, 
+                is to assign a binary label to each pixel in an image.  In particular, 
                 this object defines the interface used by the make_potts_grid_problem() 
                 routine defined below. 
 
-                In the comments below, we will refer to the image supplied to 
+                In the following comments, we will refer to the image supplied to 
                 make_potts_grid_problem() as IMG.
         !*/
 
@@ -500,45 +504,17 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------- 
 
-    template <
-        typename single_image_model,
-        typename pixel_type,
-        typename mem_manager
-        >
-    potts_grid_problem make_potts_grid_problem (
-        const single_image_model& model,
-        const array2d<pixel_type,mem_manager>& img
-    );
-    /*!
-        requires
-            - single_image_model == an object with an interface compatible with the 
-              single_image_model object defined above.
-            - for all valid i and j:
-                - model.factor_value_disagreement(i,j) >= 0
-                - model.factor_value_disagreement(i,j) == model.factor_value_disagreement(j,i)
-        ensures
-            - returns a potts_grid_problem which can be solved using the 
-              find_max_factor_graph_potts(prob,array2d) routine defined above.  That is,
-              given an image to store the labels, the following statement would solve the 
-              potts problem defined by the given model and image:
-                find_max_factor_graph_potts(make_potts_grid_problem(model,img),labels);
-    !*/
-
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
     struct pair_image_model 
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object defines a slightly more convenient interface for creating
                 potts_grid_problems which operate on a pair of identically sized images.
-                In this case, the goal is to assign a label to each coordinate in one
-                of the image pairs.  In particular, this object defines the interface
+                In this case, the goal is to assign a label to each pixel in the first
+                image of the pair.  In particular, this object defines the interface
                 used by the make_potts_grid_problem() routine defined below. 
 
-                In the comments below, we will refer to the two images supplied to 
+                In the following comments, we will refer to the two images supplied to 
                 make_potts_grid_problem() as IMG1 and IMG2.  The goal of the potts
                 problem will be to assign labels to each pixel in IMG1 (IMG2 is
                 not labeled, it is simply used as a place to keep auxiliary data).
@@ -588,6 +564,32 @@ namespace dlib
     };
 
 // ---------------------------------------------------------------------------------------- 
+
+    template <
+        typename single_image_model,
+        typename pixel_type,
+        typename mem_manager
+        >
+    potts_grid_problem make_potts_grid_problem (
+        const single_image_model& model,
+        const array2d<pixel_type,mem_manager>& img
+    );
+    /*!
+        requires
+            - single_image_model == an object with an interface compatible with the 
+              single_image_model object defined above.
+            - for all valid i and j:
+                - model.factor_value_disagreement(i,j) >= 0
+                - model.factor_value_disagreement(i,j) == model.factor_value_disagreement(j,i)
+        ensures
+            - returns a potts_grid_problem which can be solved using the 
+              find_max_factor_graph_potts(prob,array2d) routine defined above.  That is,
+              given an image to store the labels, the following statement would solve the 
+              potts problem defined by the given model and image:
+                find_max_factor_graph_potts(make_potts_grid_problem(model,img),labels);
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
     template <
         typename pair_image_model,
