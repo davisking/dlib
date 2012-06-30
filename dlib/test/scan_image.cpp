@@ -442,6 +442,105 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type1, 
+        typename image_type2
+        >
+    void naive_max_filter (
+        const image_type1& img,
+        image_type2& out,
+        const rectangle& rect,
+        typename image_type1::type thresh
+        )
+    {
+        typedef typename image_type1::type pixel_type;
+
+        const rectangle area = get_rect(img);
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                const rectangle win = translate_rect(rect,point(c,r)).intersect(area);
+                if (!win.is_empty())
+                    out[r][c] += std::max(dlib::max(subm(array_to_matrix(img),win)), thresh);
+                else
+                    out[r][c] += thresh;
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_max_filter(long rows, long cols, long width, long height, dlib::rand& rnd)
+    {
+        array2d<int> img(rows, cols);
+        rectangle rect = centered_rect(0,0, width, height);
+
+        array2d<int> out(img.nr(),img.nc());
+        assign_all_pixels(out, 0);
+        array2d<int> out2(img.nr(),img.nc());
+        assign_all_pixels(out2, 0);
+
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                img[r][c] = rnd.get_random_32bit_number();
+            }
+        }
+
+        const int thresh = rnd.get_random_32bit_number();
+
+        naive_max_filter(img, out2, rect, thresh);
+        max_filter(img, out, rect.width(), rect.height(), thresh);
+
+        DLIB_TEST_MSG(array_to_matrix(out) == array_to_matrix(out2),
+                                "rows: "<< rows 
+                                << "\ncols: "<< rows 
+                                << "\nwidth: "<< width 
+                                << "\nheight: "<< height );
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_max_filter()
+    {
+        dlib::rand rnd;
+        for (int iter = 0; iter < 300; ++iter)
+        {
+            print_spinner();
+            test_max_filter(0,0,1,1,rnd);
+            test_max_filter(0,0,3,1,rnd);
+            test_max_filter(0,0,3,3,rnd);
+            test_max_filter(0,0,1,3,rnd);
+            test_max_filter(1,1,1,1,rnd);
+            test_max_filter(2,2,1,1,rnd);
+            test_max_filter(3,3,1,1,rnd);
+            test_max_filter(3,3,3,3,rnd);
+            test_max_filter(3,3,3,5,rnd);
+            test_max_filter(20,20,901,901,rnd);
+            test_max_filter(5,5,1,5,rnd);
+            test_max_filter(50,50,9,9,rnd);
+            test_max_filter(50,50,9,9,rnd);
+            test_max_filter(50,50,9,9,rnd);
+            test_max_filter(20,20,1,901,rnd);
+            test_max_filter(20,20,3,901,rnd);
+            test_max_filter(20,20,901,1,rnd);
+        }
+
+        for (int iter = 0; iter < 200; ++iter)
+        {
+            print_spinner();
+            test_max_filter((int)rnd.get_random_8bit_number()%100+1,
+                            (int)rnd.get_random_8bit_number()%100+1,
+                            (int)rnd.get_random_8bit_number()*2+1,
+                            (int)rnd.get_random_8bit_number()*2+1,
+                            rnd);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class scan_image_tester : public tester
     {
     public:
@@ -454,6 +553,8 @@ namespace
         void perform_test (
         )
         {
+            test_max_filter();
+
             run_test1();
             run_test2();
             run_test3<unsigned char>(1);

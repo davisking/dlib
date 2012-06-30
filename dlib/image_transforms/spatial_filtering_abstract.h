@@ -340,6 +340,45 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type1, 
+        typename image_type2
+        >
+    void max_filter (
+        image_type1& img,
+        image_type2& out,
+        const long width,
+        const long height,
+        const typename image_type1::type& thresh
+    );
+    /*!
+        requires
+            - out.nr() == img.nr() 
+            - out.nc() == img.nc()
+            - image_type1 == an implementation of array2d/array2d_kernel_abstract.h
+              and it must contain a scalar type
+            - image_type2 == an implementation of array2d/array2d_kernel_abstract.h
+              and it must contain a scalar type
+            - is_same_object(img,out) == false
+            - (width%2)==1 && (height%2)==1 
+              (i.e. width and height must be odd)
+            - width > 0 && height > 0
+        ensures
+            - for all valid r and c:
+                - let MAX(r,c) == maximum of pixels from img which are inside the rectangle 
+                  centered_rect(point(c,r), width, height)
+                - if (MAX(r,c) >= thresh)
+                    - #out[r][c] == out[r][c] + MAX(r,c)
+                - else
+                    - #out[r][c] == out[r][c] + thresh 
+            - Does not change the size of img.
+            - Uses img as scratch space.  Therefore, the pixel values in img will have
+              been modified by this function.  That is, max_filter() destroys the contents
+              of img. 
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SPATIAL_FILTERINg_ABSTRACT_
