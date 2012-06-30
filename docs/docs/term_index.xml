@@ -1094,6 +1094,7 @@
          <term file="imaging.html" name="gaussian_blur"/>
          <term file="imaging.html" name="spatially_filter_image"/>
          <term file="imaging.html" name="sum_filter"/>
+         <term file="imaging.html" name="max_filter"/>
          <term file="imaging.html" name="spatially_filter_image_separable"/>
          <term file="imaging.html" name="spatially_filter_image_separable_down"/>
          <term file="imaging.html" name="separable_3x3_filter_block_grayscale"/>

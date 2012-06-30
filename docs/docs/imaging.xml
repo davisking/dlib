@@ -156,6 +156,7 @@
          <item>separable_3x3_filter_block_grayscale</item> 
          <item>separable_3x3_filter_block_rgb</item> 
          <item>sum_filter</item> 
+         <item>max_filter</item> 
          <item>spatially_filter_image_separable_down</item> 
       </section>
 
@@ -1106,6 +1107,20 @@
             This global function performs spatial filtering on an image with a user
             supplied separable filter.  Additionally, it produces a downsampled
             output.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>max_filter</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/spatial_filtering_abstract.h</spec_file>
+         <description>        
+            This function slides a rectangle over an input image and outputs a new 
+            image which contains the maximum valued pixel found inside the rectangle at each
+            position in the input image.
          </description>
                                  
       </component>
