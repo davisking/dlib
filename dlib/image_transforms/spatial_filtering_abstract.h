@@ -321,7 +321,7 @@ namespace dlib
         const image_type1& img,
         image_type2& out,
         const rectangle& rect
-    )
+    );
     /*!
         requires
             - out.nr() == img.nr() 
