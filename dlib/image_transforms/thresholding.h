@@ -131,10 +131,10 @@ namespace dlib
             moved_a = false;
             moved_b = false;
 
-            long a_hits = 0;
-            long b_hits = 0;
-            long a_mass = 0;
-            long b_mass = 0;
+            int64 a_hits = 0;
+            int64 b_hits = 0;
+            int64 a_mass = 0;
+            int64 b_mass = 0;
 
             for (long i = 0; i < hist.size(); ++i)
             {
