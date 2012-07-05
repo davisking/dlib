@@ -1009,6 +1009,63 @@ namespace
         DLIB_TEST(labels[1] != 0);
         DLIB_TEST(labels[2] != 0);
         DLIB_TEST(labels[3] != 0);
+
+        // --------------------------
+
+        g.node(0).data = -10;
+        g.node(1).data = std::numeric_limits<double>::infinity();
+        g.node(2).data = 0;
+        g.node(3).data = 0.1;
+
+        edge(g,0,1) = std::numeric_limits<double>::infinity();
+        edge(g,1,2) = std::numeric_limits<double>::infinity();
+        edge(g,2,3) = std::numeric_limits<double>::infinity();
+        edge(g,3,0) = std::numeric_limits<double>::infinity();
+
+        find_max_factor_graph_potts(g, labels);
+
+        DLIB_TEST(labels[0] != 0);
+        DLIB_TEST(labels[1] != 0);
+        DLIB_TEST(labels[2] != 0);
+        DLIB_TEST(labels[3] != 0);
+
+        // --------------------------
+
+        g.node(0).data = 10;
+        g.node(1).data = -std::numeric_limits<double>::infinity();
+        g.node(2).data = 20.05;
+        g.node(3).data = -0.1;
+
+        edge(g,0,1) = std::numeric_limits<double>::infinity();
+        edge(g,1,2) = 10;
+        edge(g,2,3) = std::numeric_limits<double>::infinity();
+        edge(g,3,0) = 10;
+
+        find_max_factor_graph_potts(g, labels);
+
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(labels[1] == 0);
+        DLIB_TEST(labels[2] == 0);
+        DLIB_TEST(labels[3] == 0);
+
+        // --------------------------
+
+        g.node(0).data = 10;
+        g.node(1).data = -std::numeric_limits<double>::infinity();
+        g.node(2).data = 20.2;
+        g.node(3).data = -0.1;
+
+        edge(g,0,1) = std::numeric_limits<double>::infinity();
+        edge(g,1,2) = 10;
+        edge(g,2,3) = std::numeric_limits<double>::infinity();
+        edge(g,3,0) = 10;
+
+        find_max_factor_graph_potts(g, labels);
+
+        DLIB_TEST(labels[0] == 0);
+        DLIB_TEST(labels[1] == 0);
+        DLIB_TEST(labels[2] != 0);
+        DLIB_TEST(labels[3] != 0);
     }
 
 // ----------------------------------------------------------------------------------------

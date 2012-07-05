@@ -159,7 +159,9 @@ namespace dlib
                   different labels.  Larger values indicate a larger penalty.
                 - this function is symmetric.  That is, it is true that: 
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
-                - The return value should be a finite value.
+                - It is valid for the returned value to be positive infinity.  Returning
+                  infinity indicates that the idx1-th and idx2-th nodes must share the same 
+                  label.
         !*/
 
     };
@@ -248,7 +250,9 @@ namespace dlib
                   different labels.  Larger values indicate a larger penalty.
                 - this function is symmetric.  That is, it is true that: 
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
-                - The return value should be a finite value.
+                - It is valid for the returned value to be positive infinity.  Returning
+                  infinity indicates that the idx1-th and idx2-th nodes must share the same 
+                  label.
         !*/
     };
 
@@ -498,7 +502,9 @@ namespace dlib
                   penalty.
                 - this function is symmetric.  That is, it is true that: 
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
-                - The return value should be a finite value.
+                - It is valid for the returned value to be positive infinity.  Returning
+                  infinity indicates that the idx1-th and idx2-th nodes must share the same 
+                  label.
         !*/
     };
 
@@ -559,7 +565,9 @@ namespace dlib
                   penalty.
                 - this function is symmetric.  That is, it is true that: 
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
-                - The return value should be a finite value.
+                - It is valid for the returned value to be positive infinity.  Returning
+                  infinity indicates that the idx1-th and idx2-th nodes must share the same 
+                  label.
         !*/
     };
 
