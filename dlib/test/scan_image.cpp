@@ -449,7 +449,8 @@ namespace
     void naive_max_filter (
         const image_type1& img,
         image_type2& out,
-        const rectangle& rect,
+        const long width,
+        const long height,
         typename image_type1::type thresh
         )
     {
@@ -460,11 +461,8 @@ namespace
         {
             for (long c = 0; c < img.nc(); ++c)
             {
-                const rectangle win = translate_rect(rect,point(c,r)).intersect(area);
-                if (!win.is_empty())
-                    out[r][c] += std::max(dlib::max(subm(array_to_matrix(img),win)), thresh);
-                else
-                    out[r][c] += thresh;
+                const rectangle win = centered_rect(point(c,r),width,height).intersect(area);
+                out[r][c] += std::max(dlib::max(subm(array_to_matrix(img),win)), thresh);
             }
         }
     }
@@ -491,7 +489,7 @@ namespace
 
         const int thresh = rnd.get_random_32bit_number();
 
-        naive_max_filter(img, out2, rect, thresh);
+        naive_max_filter(img, out2, rect.width(), rect.height(), thresh);
         max_filter(img, out, rect.width(), rect.height(), thresh);
 
         DLIB_TEST_MSG(array_to_matrix(out) == array_to_matrix(out2),
@@ -517,11 +515,19 @@ namespace
             test_max_filter(2,2,1,1,rnd);
             test_max_filter(3,3,1,1,rnd);
             test_max_filter(3,3,3,3,rnd);
+            test_max_filter(3,3,2,2,rnd);
             test_max_filter(3,3,3,5,rnd);
+            test_max_filter(3,3,6,8,rnd);
             test_max_filter(20,20,901,901,rnd);
             test_max_filter(5,5,1,5,rnd);
             test_max_filter(50,50,9,9,rnd);
             test_max_filter(50,50,9,9,rnd);
+            test_max_filter(50,50,10,10,rnd);
+            test_max_filter(50,50,11,10,rnd);
+            test_max_filter(50,50,10,11,rnd);
+            test_max_filter(50,50,10,21,rnd);
+            test_max_filter(50,50,20,10,rnd);
+            test_max_filter(50,50,20,10,rnd);
             test_max_filter(50,50,9,9,rnd);
             test_max_filter(20,20,1,901,rnd);
             test_max_filter(20,20,3,901,rnd);
@@ -533,8 +539,8 @@ namespace
             print_spinner();
             test_max_filter((int)rnd.get_random_8bit_number()%100+1,
                             (int)rnd.get_random_8bit_number()%100+1,
-                            (int)rnd.get_random_8bit_number()*2+1,
-                            (int)rnd.get_random_8bit_number()*2+1,
+                            (int)rnd.get_random_8bit_number()%150+1,
+                            (int)rnd.get_random_8bit_number()%150+1,
                             rnd);
         }
     }

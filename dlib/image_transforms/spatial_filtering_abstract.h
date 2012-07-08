@@ -360,8 +360,6 @@ namespace dlib
             - image_type2 == an implementation of array2d/array2d_kernel_abstract.h
               and it must contain a scalar type
             - is_same_object(img,out) == false
-            - (width%2)==1 && (height%2)==1 
-              (i.e. width and height must be odd)
             - width > 0 && height > 0
         ensures
             - for all valid r and c:
