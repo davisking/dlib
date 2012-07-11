@@ -176,7 +176,7 @@ void run_example_2(
 struct my_example_object
 {
     /*
-        All objects passing though a dlib::bridge must be serializable.  This
+        All objects passing through a dlib::bridge must be serializable.  This
         means there must exist global functions called serialize() and deserialize()
         which can convert an object into a bit stream and then reverse the process.
 
@@ -221,7 +221,7 @@ void run_example_3(
     /*
         In this example we will just send ints and my_example_object objects
         over a TCP connection.  Since we are sending more than one type of
-        object though a pipe we will need to use the type_safe_union.
+        object through a pipe we will need to use the type_safe_union.
     */
 
     typedef type_safe_union<int, my_example_object> tsu_type;
