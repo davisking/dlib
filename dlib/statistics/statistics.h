@@ -926,29 +926,17 @@ namespace dlib
             temp_out.swap(item.temp_out);
         }
 
+        template <typename T>
         friend void deserialize (
-            vector_normalizer_pca& item, 
+            vector_normalizer_pca<T>& item, 
             std::istream& in
-        )   
-        {
-            deserialize(item.m, in);
-            deserialize(item.sd, in);
-            deserialize(item.pca, in);
-            if (item.pca.nc() != item.m.nr())
-                throw serialization_error("Error deserializing object of type vector_normalizer_pca\n"   
-                                          "It looks like a serialized vector_normalizer was accidentally deserialized into \n"
-                                          "a vector_normalizer_pca object.");
-        }
+        );
 
+        template <typename T>
         friend void serialize (
-            const vector_normalizer_pca& item, 
+            const vector_normalizer_pca<T>& item, 
             std::ostream& out 
-        )
-        {
-            serialize(item.m, out);
-            serialize(item.sd, out);
-            serialize(item.pca, out);
-        }
+        );
 
     private:
 
@@ -1021,6 +1009,38 @@ namespace dlib
         vector_normalizer_pca<matrix_type>& a, 
         vector_normalizer_pca<matrix_type>& b 
     ) { a.swap(b); }   
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename matrix_type
+        >
+    void deserialize (
+        vector_normalizer_pca<matrix_type>& item, 
+        std::istream& in
+    )   
+    {
+        deserialize(item.m, in);
+        deserialize(item.sd, in);
+        deserialize(item.pca, in);
+        if (item.pca.nc() != item.m.nr())
+            throw serialization_error("Error deserializing object of type vector_normalizer_pca\n"   
+                                        "It looks like a serialized vector_normalizer was accidentally deserialized into \n"
+                                        "a vector_normalizer_pca object.");
+    }
+
+    template <
+        typename matrix_type
+        >
+    void serialize (
+        const vector_normalizer_pca<matrix_type>& item, 
+        std::ostream& out 
+    )
+    {
+        serialize(item.m, out);
+        serialize(item.sd, out);
+        serialize(item.pca, out);
+    }
 
 // ----------------------------------------------------------------------------------------
 
