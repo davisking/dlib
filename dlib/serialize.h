@@ -1044,12 +1044,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 }
 
-// forward declare the Message object so we can reference it below.
+// forward declare the MessageLite object so we can reference it below.
 namespace google
 {
     namespace protobuf
     {
-        class Message;
+        class MessageLite;
     }
 }
 
@@ -1067,7 +1067,7 @@ namespace dlib
     };
 
     template <typename T>
-    struct is_protocol_buffer <T,typename enable_if<is_convertible<T*,::google::protobuf::Message*> >::type  >
+    struct is_protocol_buffer <T,typename enable_if<is_convertible<T*,::google::protobuf::MessageLite*> >::type  >
     {
         static const bool value = true;
     };
