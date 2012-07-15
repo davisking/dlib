@@ -979,6 +979,15 @@
             This is actually a set of overloaded functions which provide the ability to restore an object's state
             from an input stream.  Currently all dlib container classes, non pointer C++ intrinsics, std::string, 
             std::vector, std::map, std::complex, dlib::bigint, dlib::uint64, dlib::int64, C style arrays, and dlib::vector objects are serializable.  
+            <p>
+               You can also use serialize() and deserialize() to read/write Google protocol buffer objects.  However, 
+               note that dlib::serialize() writes additional delimiting bytes at the start of each protocol buffer message.  
+               We do this because Google protocol buffers are not 
+               <a href="https://developers.google.com/protocol-buffers/docs/techniques#streaming">self-delimiting</a>
+               on their own.  This means that you can't write more than one protocol buffer object to an output stream unless you include some kind
+               of delimiter between the messages.  So dlib takes care of this for you by encapsulating each protocol buffer message inside a serialized 
+               std::string object.  
+            </p>
          </description>
                                  
       </component>
@@ -993,6 +1002,15 @@
             This is actually a set of overloaded functions which provide the ability to save an object's state
             to an output stream.  Currently all dlib container classes, non pointer C++ intrinsics, std::string, 
             std::vector, std::map, std::complex, dlib::bigint, dlib::uint64, dlib::int64, C style arrays, and dlib::vector objects are serializable.   
+            <p>
+               You can also use serialize() and deserialize() to read/write Google protocol buffer objects.  However, 
+               note that dlib::serialize() writes additional delimiting bytes at the start of each protocol buffer message.  
+               We do this because Google protocol buffers are not 
+               <a href="https://developers.google.com/protocol-buffers/docs/techniques#streaming">self-delimiting</a>
+               on their own.  This means that you can't write more than one protocol buffer object to an output stream unless you include some kind
+               of delimiter between the messages.  So dlib takes care of this for you by encapsulating each protocol buffer message inside a serialized 
+               std::string object.  
+            </p>
          </description>
                                  
       </component>
