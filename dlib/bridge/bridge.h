@@ -400,6 +400,12 @@ namespace dlib
                             << con->get_foreign_ip() << ":" << con->get_foreign_port() 
                             << ".\nThe exception error message is: \n" << e.what();
                     }
+                    catch (std::exception& e)
+                    {
+                        dlog << LERROR << "std::exception thrown while deserializing message from " 
+                            << con->get_foreign_ip() << ":" << con->get_foreign_port() 
+                            << ".\nThe exception error message is: \n" << e.what();
+                    }
 
 
 
@@ -486,6 +492,12 @@ namespace dlib
                     catch (dlib::serialization_error& e)
                     {
                         dlog << LERROR << "dlib::serialization_error thrown while serializing message to " 
+                            << con->get_foreign_ip() << ":" << con->get_foreign_port() 
+                            << ".\nThe exception error message is: \n" << e.what();
+                    }
+                    catch (std::exception& e)
+                    {
+                        dlog << LERROR << "std::exception thrown while serializing message to " 
                             << con->get_foreign_ip() << ":" << con->get_foreign_port() 
                             << ".\nThe exception error message is: \n" << e.what();
                     }
