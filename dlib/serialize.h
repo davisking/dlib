@@ -32,6 +32,10 @@
             ensures
                 - #item == a deserialized copy of the serializable_type that was
                   in the input stream in.
+                - Reads all the bytes associated with the serialized serializable_type
+                  contained inside the input stream and no more.  This means you
+                  can serialize multiple objects to an output stream and then read
+                  them all back in, one after another, using deserialize().
                 - if (serializable_type implements the enumerable interface) then
                     - item.at_start() == true
             throws                    
