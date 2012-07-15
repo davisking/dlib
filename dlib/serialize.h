@@ -57,6 +57,7 @@
         - enumerable<T> where T is a serializable type
         - map_pair<D,R> where D and R are both serializable types.
         - C style arrays of serializable types
+        - Google protocol buffer objects.
 
     This file provides deserialization support to the following object types:
         - The C++ base types (NOT including pointer types)
@@ -69,6 +70,7 @@
         - dlib::uint64
         - dlib::int64
         - C style arrays of serializable types
+        - Google protocol buffer objects.
 
     Support for deserialization of objects which implement the enumerable or
     map_pair interfaces is the responsibility of those objects.  
@@ -1036,6 +1038,67 @@ namespace dlib
         catch (serialization_error& e)
         {
             throw serialization_error(e.info + "\n   while deserializing an object of type std::complex");
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+}
+
+// forward declare the Message object so we can reference it below.
+namespace google
+{
+    namespace protobuf
+    {
+        class Message;
+    }
+}
+
+namespace dlib
+{
+
+    /*!A is_protocol_buffer
+        This is a template that tells you if a type is a Google protocol buffer object.  
+    !*/
+
+    template <typename T, typename U = void > 
+    struct is_protocol_buffer 
+    {
+        static const bool value = false;
+    };
+
+    template <typename T>
+    struct is_protocol_buffer <T,typename enable_if<is_convertible<T*,::google::protobuf::Message*> >::type  >
+    {
+        static const bool value = true;
+    };
+
+    template <typename T>
+    typename enable_if<is_protocol_buffer<T> >::type serialize(const T& item, std::ostream& out)
+    {
+        // Note that Google protocol buffer messages are not self delimiting (see https://developers.google.com/protocol-buffers/docs/techniques)
+        // This means they don't record their length or where they end, so we have to package them into a string which
+        // does know its length before we can use it in normal serialization code.
+
+        std::string temp;
+        if (!item.SerializeToString(&temp))
+        {
+            throw dlib::serialization_error("Error while serializing a Google Protocol Buffer object.");
+        }
+        serialize(temp, out);
+    }
+
+    template <typename T>
+    typename enable_if<is_protocol_buffer<T> >::type deserialize(T& item, std::istream& in)
+    {
+        // Note that Google protocol buffer messages are not self delimiting (see https://developers.google.com/protocol-buffers/docs/techniques)
+        // This means they don't record their length or where they end, so we have to package them into a string which
+        // does know its length before we can use it in normal serialization code.
+
+        std::string temp;
+        deserialize(temp, in);
+        if (!item.ParseFromString(temp))
+        {
+            throw dlib::serialization_error("Error while deserializing a Google Protocol Buffer object.");
         }
     }
 
