@@ -984,10 +984,10 @@
                note that dlib::serialize() writes additional delimiting bytes at the start of each protocol buffer message.  
                We do this because Google protocol buffers are not 
                <a href="https://developers.google.com/protocol-buffers/docs/techniques#streaming">self-delimiting</a>
-               on their own.  This means that you can't write more than one protocol buffer object to an output stream unless you include some kind
-               of delimiter between the messages.  
-               So dlib takes care of this for you by prefixing each message with its length in bytes.  The number
-               of bytes is encoded using the same scheme that serialize(int,ostream) uses. 
+               on their own.  This means that you can't write more than one protocol buffer object to an output stream 
+               unless you include some kind of delimiter between the messages.  
+               So dlib takes care of this for you by prefixing each message with its length in bytes.  In particular,
+               the number of bytes is encoded as a 32bit little endian integer.  
             </p>
          </description>
                                  
@@ -1008,10 +1008,10 @@
                note that dlib::serialize() writes additional delimiting bytes at the start of each protocol buffer message.  
                We do this because Google protocol buffers are not 
                <a href="https://developers.google.com/protocol-buffers/docs/techniques#streaming">self-delimiting</a>
-               on their own.  This means that you can't write more than one protocol buffer object to an output stream unless you include some kind
-               of delimiter between the messages.  
-               So dlib takes care of this for you by prefixing each message with its length in bytes.  The number
-               of bytes is encoded using the same scheme that serialize(int,ostream) uses. 
+               on their own.  This means that you can't write more than one protocol buffer object to an output stream 
+               unless you include some kind of delimiter between the messages.  
+               So dlib takes care of this for you by prefixing each message with its length in bytes.  In particular,
+               the number of bytes is encoded as a 32bit little endian integer.  
             </p>
          </description>
                                  
