@@ -129,6 +129,8 @@
 #include "interfaces/map_pair.h"
 #include "enable_if.h"
 #include "unicode.h"
+#include "unicode.h"
+#include "byte_orderer.h"
 
 namespace dlib
 {
@@ -1079,28 +1081,53 @@ namespace dlib
     template <typename T>
     typename enable_if<is_protocol_buffer<T> >::type serialize(const T& item, std::ostream& out)
     {
-        // Note that Google protocol buffer messages are not self delimiting (see https://developers.google.com/protocol-buffers/docs/techniques)
-        // This means they don't record their length or where they end, so we have to package them into a string which
-        // does know its length before we can use it in normal serialization code.
+        // Note that Google protocol buffer messages are not self delimiting 
+        // (see https://developers.google.com/protocol-buffers/docs/techniques)
+        // This means they don't record their length or where they end, so we have 
+        // to record this information ourselves.  So we save the size as a little endian 32bit 
+        // integer prefixed onto the front of the message.
 
+        byte_orderer bo;
+
+        // serialize into temp string
         std::string temp;
         if (!item.SerializeToString(&temp))
-        {
             throw dlib::serialization_error("Error while serializing a Google Protocol Buffer object.");
-        }
-        serialize(temp, out);
+        if (temp.size() > std::numeric_limits<uint32>::max())
+            throw dlib::serialization_error("Error while serializing a Google Protocol Buffer object, message too large.");
+
+        // write temp to the output stream
+        uint32 size = temp.size();
+        bo.host_to_little(size);
+        out.write((char*)&size, sizeof(size));
+        out.write(temp.c_str(), temp.size());
     }
 
     template <typename T>
     typename enable_if<is_protocol_buffer<T> >::type deserialize(T& item, std::istream& in)
     {
-        // Note that Google protocol buffer messages are not self delimiting (see https://developers.google.com/protocol-buffers/docs/techniques)
-        // This means they don't record their length or where they end, so we have to package them into a string which
-        // does know its length before we can use it in normal serialization code.
+        // Note that Google protocol buffer messages are not self delimiting 
+        // (see https://developers.google.com/protocol-buffers/docs/techniques)
+        // This means they don't record their length or where they end, so we have 
+        // to record this information ourselves.  So we save the size as a little endian 32bit 
+        // integer prefixed onto the front of the message.
 
+        byte_orderer bo;
+
+        uint32 size = 0;
+        // read the size
+        in.read((char*)&size, sizeof(size));
+        bo.little_to_host(size);
+        if (!in || size == 0)
+            throw dlib::serialization_error("Error while deserializing a Google Protocol Buffer object.");
+
+        // read the bytes into temp
         std::string temp;
-        deserialize(temp, in);
-        if (!item.ParseFromString(temp))
+        temp.resize(size);
+        in.read(&temp[0], size);
+
+        // parse temp into item
+        if (!in || !item.ParseFromString(temp))
         {
             throw dlib::serialization_error("Error while deserializing a Google Protocol Buffer object.");
         }
