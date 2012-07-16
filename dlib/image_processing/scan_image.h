@@ -172,8 +172,7 @@ namespace dlib
             {
                 const typename image_array_type::type& img = images[movable_rects[i].first];
 
-                assign_all_pixels(tempimg, 0);
-                sum_filter(img, tempimg, movable_rects[i].second);
+                sum_filter_assign(img, tempimg, movable_rects[i].second);
 
                 const rectangle rect = get_rect(tempimg).intersect(translate_rect(window,position));
                 if (rect.is_empty() == false)
@@ -352,8 +351,7 @@ namespace dlib
         for (unsigned long i = 0; i < movable_rects.size(); ++i)
         {
             const rectangle rect = movable_rects[i].second;
-            assign_all_pixels(temp, 0);
-            sum_filter(images[movable_rects[i].first], temp, rect);
+            sum_filter_assign(images[movable_rects[i].first], temp, rect);
             max_filter(temp, accum, window.width(), window.height(), 0);  
         }
 
