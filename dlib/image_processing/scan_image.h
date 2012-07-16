@@ -22,20 +22,20 @@ namespace dlib
 
         inline rectangle bounding_box_of_rects (
             const std::vector<std::pair<unsigned int, rectangle> >& rects,
-            const point& origin
+            const point& position
         )
         /*!
             ensures
                 - returns the smallest rectangle that contains all the 
                   rectangles in rects.  That is, returns the rectangle that
-                  contains translate_rect(rects[i].second,origin) for all valid i.
+                  contains translate_rect(rects[i].second,position) for all valid i.
         !*/
         {
             rectangle rect;
 
             for (unsigned long i = 0; i < rects.size(); ++i)
             {
-                rect += translate_rect(rects[i].second,origin);
+                rect += translate_rect(rects[i].second,position);
             }
 
             return rect;
@@ -72,7 +72,7 @@ namespace dlib
     double sum_of_rects_in_images (
         const image_array_type& images,
         const std::vector<std::pair<unsigned int, rectangle> >& rects,
-        const point& origin
+        const point& position
     )
     {
         DLIB_ASSERT(all_images_same_size(images),
@@ -101,8 +101,84 @@ namespace dlib
         for (unsigned long i = 0; i < rects.size(); ++i)
         {
             const typename image_array_type::type& img = images[rects[i].first];
-            const rectangle rect = get_rect(img).intersect(translate_rect(rects[i].second,origin));
+            const rectangle rect = get_rect(img).intersect(translate_rect(rects[i].second,position));
             temp += sum(matrix_cast<ptype>(subm(array_to_matrix(img), rect)));
+        }
+
+        return static_cast<double>(temp);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_array_type
+        >
+    double sum_of_rects_in_images_movable_parts (
+        const image_array_type& images,
+        const rectangle& window,
+        const std::vector<std::pair<unsigned int, rectangle> >& fixed_rects,
+        const std::vector<std::pair<unsigned int, rectangle> >& movable_rects,
+        const point& position
+    )
+    {
+        DLIB_ASSERT(all_images_same_size(images) && center(window) == point(0,0),
+            "\t double sum_of_rects_in_images_movable_parts()"
+            << "\n\t Invalid arguments given to this function."
+            << "\n\t all_images_same_size(images): " << all_images_same_size(images)
+            << "\n\t center(window): " << center(window)
+        );
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < fixed_rects.size(); ++i)
+        {
+            DLIB_ASSERT(fixed_rects[i].first < images.size(),
+                "\t double sum_of_rects_in_images_movable_parts()"
+                << "\n\t fixed_rects["<<i<<"].first must refer to a valid image."
+                << "\n\t fixed_rects["<<i<<"].first: " << fixed_rects[i].first 
+                << "\n\t images.size(): " << images.size() 
+            );
+        }
+        for (unsigned long i = 0; i < movable_rects.size(); ++i)
+        {
+            DLIB_ASSERT(movable_rects[i].first < images.size(),
+                "\t double sum_of_rects_in_images_movable_parts()"
+                << "\n\t movable_rects["<<i<<"].first must refer to a valid image."
+                << "\n\t movable_rects["<<i<<"].first: " << movable_rects[i].first 
+                << "\n\t images.size(): " << images.size() 
+            );
+            DLIB_ASSERT(center(movable_rects[i].second) == point(0,0),
+                "\t double sum_of_rects_in_images_movable_parts()"
+                << "\n\t movable_rects["<<i<<"].second: " << movable_rects[i].second 
+            );
+        }
+#endif
+        typedef typename image_array_type::type::type pixel_type;
+        typedef typename promote<pixel_type>::type ptype;
+
+        ptype temp = 0;
+
+        // compute TOTAL_FIXED part
+        for (unsigned long i = 0; i < fixed_rects.size(); ++i)
+        {
+            const typename image_array_type::type& img = images[fixed_rects[i].first];
+            const rectangle rect = get_rect(img).intersect(translate_rect(fixed_rects[i].second,position));
+            temp += sum(matrix_cast<ptype>(subm(array_to_matrix(img), rect)));
+        }
+
+        if (images.size() > 0)
+        {
+            // compute TOTAL_MOVABLE part
+            array2d<ptype> tempimg(images[0].nr(), images[0].nc());
+            for (unsigned long i = 0; i < movable_rects.size(); ++i)
+            {
+                const typename image_array_type::type& img = images[movable_rects[i].first];
+
+                assign_all_pixels(tempimg, 0);
+                sum_filter(img, tempimg, movable_rects[i].second);
+
+                const rectangle rect = get_rect(tempimg).intersect(translate_rect(window,position));
+                if (rect.is_empty() == false)
+                    temp += std::max(0,max(matrix_cast<ptype>(subm(array_to_matrix(tempimg), rect))));
+            }
         }
 
         return static_cast<double>(temp);
@@ -177,6 +253,120 @@ namespace dlib
                         // procedure once we hit the max_dets limit. So this method will result
                         // in a random subsample of all the detections >= thresh being in dets
                         // at the end of scan_image().
+                        const unsigned long random_index = rnd.get_random_32bit_number()%count;
+                        if (random_index < dets.size())
+                        {
+                            dets[random_index] = std::make_pair(cur_sum, point(c,r));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_array_type
+        >
+    void scan_image_movable_parts (
+        std::vector<std::pair<double, point> >& dets,
+        const image_array_type& images,
+        const rectangle& window,
+        const std::vector<std::pair<unsigned int, rectangle> >& fixed_rects,
+        const std::vector<std::pair<unsigned int, rectangle> >& movable_rects,
+        const double thresh,
+        const unsigned long max_dets
+    )
+    {
+        DLIB_ASSERT(images.size() > 0 && all_images_same_size(images) && 
+                    center(window) == point(0,0) && window.area() > 0,
+            "\t void scan_image_movable_parts()"
+            << "\n\t Invalid arguments given to this function."
+            << "\n\t all_images_same_size(images): " << all_images_same_size(images)
+            << "\n\t center(window): " << center(window)
+            << "\n\t window.area():  " << window.area() 
+            << "\n\t images.size():  " << images.size() 
+        );
+#ifdef ENABLE_ASSERTS
+        for (unsigned long i = 0; i < fixed_rects.size(); ++i)
+        {
+            DLIB_ASSERT(fixed_rects[i].first < images.size(),
+                "\t void scan_image_movable_parts()"
+                << "\n\t Invalid arguments given to this function."
+                << "\n\t fixed_rects["<<i<<"].first must refer to a valid image."
+                << "\n\t fixed_rects["<<i<<"].first: " << fixed_rects[i].first 
+                << "\n\t images.size(): " << images.size() 
+            );
+        }
+        for (unsigned long i = 0; i < movable_rects.size(); ++i)
+        {
+            DLIB_ASSERT(movable_rects[i].first < images.size(),
+                "\t void scan_image_movable_parts()"
+                << "\n\t Invalid arguments given to this function."
+                << "\n\t movable_rects["<<i<<"].first must refer to a valid image."
+                << "\n\t movable_rects["<<i<<"].first: " << movable_rects[i].first 
+                << "\n\t images.size(): " << images.size() 
+            );
+            DLIB_ASSERT(center(movable_rects[i].second) == point(0,0) &&
+                        movable_rects[i].second.area() > 0,
+                "\t void scan_image_movable_parts()"
+                << "\n\t Invalid arguments given to this function."
+                << "\n\t movable_rects["<<i<<"].second: " << movable_rects[i].second 
+                << "\n\t movable_rects["<<i<<"].second.area(): " << movable_rects[i].second.area()
+            );
+        }
+#endif
+
+
+        dets.clear();
+        if (max_dets == 0)
+            return;
+        if (movable_rects.size() == 0 && fixed_rects.size() == 0)
+            return;
+
+
+        typedef typename image_array_type::type::type pixel_type;
+        typedef typename promote<pixel_type>::type ptype;
+
+        array2d<ptype> accum(images[0].nr(), images[0].nc());
+        assign_all_pixels(accum, 0);
+
+        for (unsigned long i = 0; i < fixed_rects.size(); ++i)
+            sum_filter(images[fixed_rects[i].first], accum, fixed_rects[i].second);
+
+        array2d<ptype> temp(accum.nr(), accum.nc());
+        for (unsigned long i = 0; i < movable_rects.size(); ++i)
+        {
+            const rectangle rect = movable_rects[i].second;
+            assign_all_pixels(temp, 0);
+            sum_filter(images[movable_rects[i].first], temp, rect);
+            max_filter(temp, accum, window.width(), window.height(), 0);  
+        }
+
+        // TODO, make this block its own function and reuse it in scan_image().
+        unsigned long count = 0;
+        dlib::rand rnd;
+        for (long r = 0; r < accum.nr(); ++r)
+        {
+            for (long c = 0; c < accum.nc(); ++c)
+            {
+                const ptype cur_sum = accum[r][c];
+                if (cur_sum >= thresh)
+                {
+                    ++count;
+
+                    if (dets.size() < max_dets)
+                    {
+                        dets.push_back(std::make_pair(cur_sum, point(c,r)));
+                    }
+                    else 
+                    {
+                        // The idea here is to cause us to randomly sample possible detection
+                        // locations throughout the image rather than just stopping the detection
+                        // procedure once we hit the max_dets limit. So this method will result
+                        // in a random subsample of all the detections >= thresh being in dets
+                        // at the end of scan_image_movable_parts().
                         const unsigned long random_index = rnd.get_random_32bit_number()%count;
                         if (random_index < dets.size())
                         {
