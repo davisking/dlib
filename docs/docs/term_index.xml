@@ -1094,6 +1094,7 @@
          <term file="imaging.html" name="gaussian_blur"/>
          <term file="imaging.html" name="spatially_filter_image"/>
          <term file="imaging.html" name="sum_filter"/>
+         <term file="imaging.html" name="sum_filter_assign"/>
          <term file="imaging.html" name="max_filter"/>
          <term file="imaging.html" name="spatially_filter_image_separable"/>
          <term file="imaging.html" name="spatially_filter_image_separable_down"/>
@@ -1141,6 +1142,10 @@
 
          <term file="imaging.html" name="test_box_overlap"/>
          <term file="imaging.html" name="object_detector"/>
+
+         <term file="imaging.html" name="scan_image_movable_parts"/>
+         <term file="imaging.html" name="find_points_above_thresh"/>
+
          <term file="imaging.html" name="scan_image"/>
          <term file="imaging.html" name="scan_image_pyramid"/>
          <term file="imaging.html" name="compute_box_dimensions"/>
@@ -1153,6 +1158,7 @@
          <term file="imaging.html" name="setup_hashed_features"/>
          <term file="dlib/image_processing/scan_image_abstract.h.html" name="all_images_same_size"/>
          <term file="dlib/image_processing/scan_image_abstract.h.html" name="sum_of_rects_in_images"/>
+         <term file="dlib/image_processing/scan_image_abstract.h.html" name="sum_of_rects_in_images_movable_parts"/>
          <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="find_tight_overlap_tester"/>
          <term file="dlib/image_processing/scan_image_pyramid_tools_abstract.h.html" name="image_hash_construction_failure"/>
 

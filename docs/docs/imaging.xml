@@ -81,6 +81,8 @@
          <name>Object Detection</name>
          <item>object_detector</item>
          <item>scan_image</item>
+         <item>scan_image_movable_parts</item>
+         <item>find_points_above_thresh</item>
          <item>scan_image_pyramid</item>
          <item>test_box_overlap</item>
          <item nolink="true">
@@ -156,6 +158,7 @@
          <item>separable_3x3_filter_block_grayscale</item> 
          <item>separable_3x3_filter_block_rgb</item> 
          <item>sum_filter</item> 
+         <item>sum_filter_assign</item> 
          <item>max_filter</item> 
          <item>spatially_filter_image_separable_down</item> 
       </section>
@@ -1132,6 +1135,19 @@
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/spatial_filtering_abstract.h</spec_file>
          <description>        
+            This function slides a rectangle over an input image and adds the sum
+            of pixel values in each rectangle location to another image.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>sum_filter_assign</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/spatial_filtering_abstract.h</spec_file>
+         <description>        
             This function slides a rectangle over an input image and outputs a new 
             image which contains the sum of pixels inside the rectangle at each
             position in the input image.
@@ -1506,6 +1522,38 @@
             over an image space and finding the locations where the sum of pixels in
             the rectangles exceeds a threshold.  It is useful for implementing
             certain kinds of sliding window classifiers.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>scan_image_movable_parts</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_abstract.h</spec_file>
+         <description>        
+            This global function is a tool for sliding a set of rectangles
+            over an image space and finding the locations where the sum of pixels in
+            the rectangles exceeds a threshold.  It is useful for implementing
+            certain kinds of sliding window classifiers.  The behavior of this
+            routine is similar to <a href="#scan_image">scan_image</a> except that
+            it can also handle movable parts in addition to rigidly placed parts
+            within the sliding window.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_points_above_thresh</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_abstract.h</spec_file>
+         <description>        
+            This routine finds all points in an image with a pixel value above a
+            threshold.  It also has the ability to produce an efficient random
+            subsample of such points if the number of them is very large.
          </description>
                                  
       </component>
