@@ -187,6 +187,57 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    void find_points_above_thresh (
+        std::vector<std::pair<double, point> >& dets,
+        const image_type& img,
+        const double thresh,
+        const unsigned long max_dets
+    )
+    {
+        typedef typename image_type::type ptype;
+
+        dets.clear();
+        if (max_dets == 0)
+            return;
+
+        unsigned long count = 0;
+        dlib::rand rnd;
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                const ptype val = img[r][c];
+                if (val >= thresh)
+                {
+                    ++count;
+
+                    if (dets.size() < max_dets)
+                    {
+                        dets.push_back(std::make_pair(val, point(c,r)));
+                    }
+                    else 
+                    {
+                        // The idea here is to cause us to randomly sample possible detection
+                        // locations throughout the image rather than just stopping the detection
+                        // procedure once we hit the max_dets limit. So this method will result
+                        // in a random subsample of all the detections >= thresh being in dets
+                        // at the end of scan_image().
+                        const unsigned long random_index = rnd.get_random_32bit_number()%count;
+                        if (random_index < dets.size())
+                        {
+                            dets[random_index] = std::make_pair(val, point(c,r));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_array_type
         >
     void scan_image (
@@ -217,9 +268,6 @@ namespace dlib
 #endif
 
 
-        dets.clear();
-        if (max_dets == 0)
-            return;
 
 
         typedef typename image_array_type::type::type pixel_type;
@@ -231,37 +279,7 @@ namespace dlib
         for (unsigned long i = 0; i < rects.size(); ++i)
             sum_filter(images[rects[i].first], accum, rects[i].second);
 
-        unsigned long count = 0;
-        dlib::rand rnd;
-        for (long r = 0; r < accum.nr(); ++r)
-        {
-            for (long c = 0; c < accum.nc(); ++c)
-            {
-                const ptype cur_sum = accum[r][c];
-                if (cur_sum >= thresh)
-                {
-                    ++count;
-
-                    if (dets.size() < max_dets)
-                    {
-                        dets.push_back(std::make_pair(cur_sum, point(c,r)));
-                    }
-                    else 
-                    {
-                        // The idea here is to cause us to randomly sample possible detection
-                        // locations throughout the image rather than just stopping the detection
-                        // procedure once we hit the max_dets limit. So this method will result
-                        // in a random subsample of all the detections >= thresh being in dets
-                        // at the end of scan_image().
-                        const unsigned long random_index = rnd.get_random_32bit_number()%count;
-                        if (random_index < dets.size())
-                        {
-                            dets[random_index] = std::make_pair(cur_sum, point(c,r));
-                        }
-                    }
-                }
-            }
-        }
+        find_points_above_thresh(dets, accum, thresh, max_dets);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -318,13 +336,8 @@ namespace dlib
         }
 #endif
 
-
-        dets.clear();
-        if (max_dets == 0)
-            return;
         if (movable_rects.size() == 0 && fixed_rects.size() == 0)
             return;
-
 
         typedef typename image_array_type::type::type pixel_type;
         typedef typename promote<pixel_type>::type ptype;
@@ -344,38 +357,7 @@ namespace dlib
             max_filter(temp, accum, window.width(), window.height(), 0);  
         }
 
-        // TODO, make this block its own function and reuse it in scan_image().
-        unsigned long count = 0;
-        dlib::rand rnd;
-        for (long r = 0; r < accum.nr(); ++r)
-        {
-            for (long c = 0; c < accum.nc(); ++c)
-            {
-                const ptype cur_sum = accum[r][c];
-                if (cur_sum >= thresh)
-                {
-                    ++count;
-
-                    if (dets.size() < max_dets)
-                    {
-                        dets.push_back(std::make_pair(cur_sum, point(c,r)));
-                    }
-                    else 
-                    {
-                        // The idea here is to cause us to randomly sample possible detection
-                        // locations throughout the image rather than just stopping the detection
-                        // procedure once we hit the max_dets limit. So this method will result
-                        // in a random subsample of all the detections >= thresh being in dets
-                        // at the end of scan_image_movable_parts().
-                        const unsigned long random_index = rnd.get_random_32bit_number()%count;
-                        if (random_index < dets.size())
-                        {
-                            dets[random_index] = std::make_pair(cur_sum, point(c,r));
-                        }
-                    }
-                }
-            }
-        }
+        find_points_above_thresh(dets, accum, thresh, max_dets);
     }
 
 // ----------------------------------------------------------------------------------------

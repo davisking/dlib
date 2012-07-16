@@ -99,6 +99,37 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    void find_points_above_thresh (
+        std::vector<std::pair<double, point> >& dets,
+        const image_type& img,
+        const double thresh,
+        const unsigned long max_dets
+    );
+    /*!
+        requires
+            - image_type == an implementation of array2d/array2d_kernel_abstract.h
+            - image_type::type == a scalar pixel type (e.g. int rather than rgb_pixel)
+        ensures
+            - #dets == a list of points from img which had pixel values >= thresh.  
+            - Specifically, we have:
+                - #dets.size() <= max_dets
+                  (note that dets is cleared before new detections are added by find_points_above_thresh())
+                - for all valid i:
+                    - #dets[i].first == img[#dets[i].second.y()][#dets[i].second.x()] 
+                      (i.e. the first field contains the value of the pixel at this detection location)
+                    - #dets[i].first >= thresh
+            - if (there are more than max_dets locations that pass the above threshold test) then
+                - #dets == a random subsample of all the locations which passed the threshold
+                  test.  
+            - else
+                - #dets == all the points which passed the threshold test.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_array_type
         >
     void scan_image (
