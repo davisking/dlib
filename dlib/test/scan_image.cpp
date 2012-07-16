@@ -547,6 +547,140 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void make_images (
+        dlib::rand& rnd,
+        array<array2d<unsigned char> >& images,
+        long num,
+        long nr,
+        long nc
+    )
+    {
+        images.resize(num);
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            images[i].set_size(nr,nc);
+        }
+
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            for (long r = 0; r < nr; ++r)
+            {
+                for (long c = 0; c < nc; ++c)
+                {
+                    images[i][r][c] = rnd.get_random_8bit_number();
+                }
+            }
+        }
+    }
+
+
+    template <
+        typename image_array_type
+        >
+    void brute_force_scan_image_movable_parts (
+        std::vector<std::pair<double, point> >& dets,
+        const image_array_type& images,
+        const rectangle& window,
+        const std::vector<std::pair<unsigned int, rectangle> >& fixed_rects,
+        const std::vector<std::pair<unsigned int, rectangle> >& movable_rects,
+        const double thresh,
+        const unsigned long 
+    )
+    {
+        dets.clear();
+        if (movable_rects.size() == 0 && fixed_rects.size() == 0)
+            return;
+
+        for (long r = 0; r < images[0].nr(); ++r)
+        {
+            for (long c = 0; c < images[0].nc(); ++c)
+            {
+                const point p(c,r);
+                double score = sum_of_rects_in_images_movable_parts(images,
+                                                                    window,
+                                                                    fixed_rects,
+                                                                    movable_rects,
+                                                                    p); 
+
+                if (score >= thresh)
+                {
+                    dets.push_back(make_pair(score,p));
+                }
+            }
+        }
+    }
+
+    void test_scan_images_movable_parts()
+    {
+        array<array2d<unsigned char> > images;
+        dlib::rand rnd;
+        for (int iter = 0; iter < 40; ++iter)
+        {
+            print_spinner();
+            const int num_images = rnd.get_random_32bit_number()%4+1;
+
+            make_images(rnd,images, num_images, 
+                        rnd.get_random_32bit_number()%50+1,
+                        rnd.get_random_32bit_number()%50+1
+                        );
+
+            std::vector<std::pair<double,point> > dets1, dets2;
+            std::vector<std::pair<unsigned int, rectangle> > fixed_rects, movable_rects;
+
+            double total_area = 0;
+            for (unsigned long i = 0; i < images.size(); ++i)
+            {
+                fixed_rects.push_back(make_pair(i, centered_rect(
+                            rnd.get_random_32bit_number()%10-5,
+                            rnd.get_random_32bit_number()%10-5,
+                            rnd.get_random_32bit_number()%10,
+                            rnd.get_random_32bit_number()%10
+                            )));
+
+                total_area += fixed_rects.back().second.area();
+
+                movable_rects.push_back(make_pair(i, centered_rect(
+                            0,
+                            0,
+                            rnd.get_random_32bit_number()%10+1,
+                            rnd.get_random_32bit_number()%10+1
+                            )));
+                total_area += movable_rects.back().second.area();
+            }
+
+            const rectangle window = centered_rect(0,0, 
+                                                rnd.get_random_32bit_number()%15+1,
+                                                rnd.get_random_32bit_number()%15+1);
+            dlog << LINFO << "window size: "<< window.width() << ", " << window.height();
+            const double thresh = total_area*130;
+            const unsigned long max_dets = get_rect(images[0]).area();
+
+            scan_image_movable_parts(dets1,images,window,fixed_rects,movable_rects,thresh, max_dets);
+            brute_force_scan_image_movable_parts(dets2,images,window,fixed_rects,movable_rects,thresh, max_dets);
+
+            dlog << LINFO << "max_possible dets: " << max_dets;
+            dlog << LINFO << "regular dets: " << dets1.size();
+            dlog << LINFO << "brute force:  " << dets2.size();
+            DLIB_TEST(dets1.size() == dets2.size());
+
+            array2d<double> check(images[0].nr(), images[0].nc());
+            assign_all_pixels(check, 1e-300);
+            for (unsigned long i = 0; i < dets1.size(); ++i)
+            {
+                const point p = dets1[i].second;
+                check[p.y()][p.x()] = dets1[i].first;
+            }
+            for (unsigned long i = 0; i < dets2.size(); ++i)
+            {
+                const point p = dets2[i].second;
+                DLIB_TEST(std::abs(check[p.y()][p.x()] - dets2[i].first) < 1e-10);
+            }
+            dlog << LINFO << "=======================\n";
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class scan_image_tester : public tester
     {
     public:
@@ -559,6 +693,7 @@ namespace
         void perform_test (
         )
         {
+            test_scan_images_movable_parts();
             test_max_filter();
 
             run_test1();
