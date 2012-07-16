@@ -621,7 +621,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
     template <
+        bool add_to,
         typename image_type1, 
         typename image_type2
         >
@@ -710,9 +713,39 @@ namespace dlib
                 // add in the new right side of the rect and subtract the old right side.
                 cur_sum = cur_sum + column_sum[c+width] - column_sum[c];
 
-                out[r][c] += static_cast<typename image_type2::type>(cur_sum);
+                if (add_to)
+                    out[r][c] += static_cast<typename image_type2::type>(cur_sum);
+                else
+                    out[r][c] = static_cast<typename image_type2::type>(cur_sum);
             }
         }
+    }
+    }
+
+    template <
+        typename image_type1, 
+        typename image_type2
+        >
+    void sum_filter (
+        const image_type1& img,
+        image_type2& out,
+        const rectangle& rect
+    )
+    {
+        impl::sum_filter<true>(img,out,rect);
+    }
+
+    template <
+        typename image_type1, 
+        typename image_type2
+        >
+    void sum_filter_assign (
+        const image_type1& img,
+        image_type2& out,
+        const rectangle& rect
+    )
+    {
+        impl::sum_filter<false>(img,out,rect);
     }
 
 // ----------------------------------------------------------------------------------------
