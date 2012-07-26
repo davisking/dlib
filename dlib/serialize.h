@@ -167,8 +167,8 @@ namespace dlib
         !*/
         {
             COMPILE_TIME_ASSERT(sizeof(T) <= 8);
-            unsigned char buf[8];
-            unsigned char size = 0;
+            unsigned char buf[9];
+            unsigned char size = sizeof(T);
             unsigned char neg;
             if (item < 0)
             {
@@ -180,25 +180,22 @@ namespace dlib
                 neg = 0;
             }
 
-            for (unsigned char i = 0; i < sizeof(T); ++i)
+            for (unsigned char i = 1; i <= sizeof(T); ++i)
             {
                 buf[i] = static_cast<unsigned char>(item&0xFF);                
                 item >>= 8;
-                if (item == 0) { size = i+1; break; }
+                if (item == 0) { size = i; break; }
             }
-            if (size == 0) 
-                size = sizeof(T);
-            size |= neg;
 
-            out.write(reinterpret_cast<char*>(&size),1);            
-            size &= 0x7F;  // strip off the neg flag 
-            out.write(reinterpret_cast<char*>(buf),size);
-
-            // check if there was an error
-            if (!out)
+            std::streambuf* sbuf = out.rdbuf();
+            buf[0] = size|neg;
+            if (sbuf->sputn(reinterpret_cast<char*>(buf),size+1) != size+1)
+            {
+                out.setstate(std::ios::eofbit | std::ios::badbit);
                 return true;
-            else 
-                return false;
+            }
+
+            return false;
         }
 
     // ------------------------------------------------------------------------------------
@@ -229,11 +226,20 @@ namespace dlib
             unsigned char size;
             bool is_negative;
 
+            std::streambuf* sbuf = in.rdbuf();
+
             item = 0;
-            in.read(reinterpret_cast<char*>(&size),1);
-            // check if an error occurred 
-            if (!in) 
+            int ch = sbuf->sbumpc();
+            if (ch != EOF)
+            {
+                size = static_cast<unsigned char>(ch);
+            }
+            else
+            {
+                in.setstate(std::ios::badbit);
                 return true;
+            }
+
             if (size&0x80)
                 is_negative = true;
             else
@@ -242,13 +248,16 @@ namespace dlib
             
             // check if the serialized object is too big
             if (size > sizeof(T))
+            {
                 return true;
+            }
 
-            in.read(reinterpret_cast<char*>(&buf),size);
-
-            // check if there was an error reading from in.
-            if (!in)
+            if (sbuf->sgetn(reinterpret_cast<char*>(&buf),size) != size)
+            {
+                in.setstate(std::ios::badbit);
                 return true;
+            }
+
 
             for (unsigned char i = size-1; true; --i)
             {
@@ -286,26 +295,25 @@ namespace dlib
         !*/
         {
             COMPILE_TIME_ASSERT(sizeof(T) <= 8);
-            unsigned char buf[8];
-            unsigned char size = 0;
+            unsigned char buf[9];
+            unsigned char size = sizeof(T);
 
-            for (unsigned char i = 0; i < sizeof(T); ++i)
+            for (unsigned char i = 1; i <= sizeof(T); ++i)
             {
                 buf[i] = static_cast<unsigned char>(item&0xFF);                
                 item >>= 8;
-                if (item == 0) { size = i+1; break; }
+                if (item == 0) { size = i; break; }
             }
-            if (size == 0) 
-                size = sizeof(T);
 
-            out.write(reinterpret_cast<char*>(&size),1);     
-            out.write(reinterpret_cast<char*>(buf),size);
-
-            // check if there was an error
-            if (!out)
+            std::streambuf* sbuf = out.rdbuf();
+            buf[0] = size;
+            if (sbuf->sputn(reinterpret_cast<char*>(buf),size+1) != size+1)
+            {
+                out.setstate(std::ios::eofbit | std::ios::badbit);
                 return true;
-            else 
-                return false;
+            }
+
+            return false;
         }
 
     // ------------------------------------------------------------------------------------
@@ -335,20 +343,33 @@ namespace dlib
             unsigned char size;
 
             item = 0;
-            in.read(reinterpret_cast<char*>(&size),1);
+
+            std::streambuf* sbuf = in.rdbuf();
+            int ch = sbuf->sbumpc();
+            if (ch != EOF)
+            {
+                size = static_cast<unsigned char>(ch);
+            }
+            else
+            {
+                in.setstate(std::ios::badbit);
+                return true;
+            }
+
+
             // mask out the 3 reserved bits
             size &= 0x8F;
+
             // check if an error occurred 
-            if (!in || size > sizeof(T)) 
+            if (size > sizeof(T)) 
                 return true;
            
 
-            in.read(reinterpret_cast<char*>(&buf),size);
-
-            // check if the serialized object is too big to fit into something of type T.
-            // or if there was an error reading from in.
-            if (!in)
+            if (sbuf->sgetn(reinterpret_cast<char*>(&buf),size) != size)
+            {
+                in.setstate(std::ios::badbit);
                 return true;
+            }
 
             for (unsigned char i = size-1; true; --i)
             {
@@ -371,11 +392,40 @@ namespace dlib
         inline void deserialize (T& item, std::istream& in) \
         { if (ser_helper::unpack_int(item,in)) throw serialization_error("Error deserializing object of type " + std::string(#T)); }   
 
+    template <typename T>
+    inline bool pack_byte (
+        const T& ch,
+        std::ostream& out
+    )
+    {
+        std::streambuf* sbuf = out.rdbuf();
+        return (sbuf->sputc((char)ch) == EOF);
+    }
+
+    template <typename T>
+    inline bool unpack_byte (
+        T& ch,
+        std::istream& in
+    )
+    {
+        std::streambuf* sbuf = in.rdbuf();
+        int temp = sbuf->sbumpc();
+        if (temp != EOF)
+        {
+            ch = static_cast<T>(temp);
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     #define USE_DEFAULT_BYTE_SERIALIZATION_FOR(T)  \
         inline void serialize (const T& item,std::ostream& out) \
-        { out.write(reinterpret_cast<const char*>(&item),1); if (!out) throw serialization_error("Error serializing object of type " + std::string(#T)); } \
+        { if (pack_byte(item,out)) throw serialization_error("Error serializing object of type " + std::string(#T)); } \
         inline void deserialize (T& item, std::istream& in) \
-        { in.read(reinterpret_cast<char*>(&item),1); if (!in) throw serialization_error("Error deserializing object of type " + std::string(#T)); }   
+        { if (unpack_byte(item,in)) throw serialization_error("Error deserializing object of type " + std::string(#T)); }   
 
 // ----------------------------------------------------------------------------------------
 
