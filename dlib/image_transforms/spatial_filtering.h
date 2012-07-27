@@ -874,7 +874,7 @@ namespace dlib
             {
                 while (!Q.empty() && img[r][c] >= Q.back().second)
                     Q.pop_back();
-                Q.push_back(make_pair(c,img[r][c]));
+                Q.push_back(std::make_pair(c,img[r][c]));
             }
 
             for (long c = (width-1)/2; c < img.nc(); ++c)
@@ -883,7 +883,7 @@ namespace dlib
                     Q.pop_back();
                 while (!Q.empty() && Q.front().first <= c-width)
                     Q.pop_front();
-                Q.push_back(make_pair(c,img[r][c]));
+                Q.push_back(std::make_pair(c,img[r][c]));
 
                 img[r][c-((width-1)/2)] = Q.front().second;
             }
@@ -905,7 +905,7 @@ namespace dlib
             {
                 while (!Q.empty() && img[rr][cc] >= Q.back().second)
                     Q.pop_back();
-                Q.push_back(make_pair(rr,img[rr][cc]));
+                Q.push_back(std::make_pair(rr,img[rr][cc]));
             }
 
             for (long rr = (height-1)/2; rr < img.nr(); ++rr)
@@ -914,7 +914,7 @@ namespace dlib
                     Q.pop_back();
                 while (!Q.empty() && Q.front().first <= rr-height)
                     Q.pop_front();
-                Q.push_back(make_pair(rr,img[rr][cc]));
+                Q.push_back(std::make_pair(rr,img[rr][cc]));
 
                 out[rr-((height-1)/2)][cc] += std::max(Q.front().second, thresh);
             }
