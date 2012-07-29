@@ -333,9 +333,9 @@ namespace dlib
                 // Include a loss augmentation so that we will get the proper loss augmented
                 // max when we use find_max_factor_graph_potts() below.
                 if (labels[idx][i])
-                    g.node(i).data -= loss_pos;
+                    g.node(i).data -= get_loss_for_sample(idx,i,!labels[idx][i]);
                 else
-                    g.node(i).data += loss_neg;
+                    g.node(i).data += get_loss_for_sample(idx,i,!labels[idx][i]);
 
                 for (unsigned long n = 0; n < g.node(i).number_of_neighbors(); ++n)
                 {
@@ -360,20 +360,42 @@ namespace dlib
             loss = 0;
             for (unsigned long i = 0; i < labeling.size(); ++i)
             {
-                const bool true_label = labels[idx][i];
-                const bool pred_label = (labeling[i]!= 0);
-                bool_labeling.push_back(pred_label);
-                if (true_label != pred_label)
-                {
-                    if (true_label == true)
-                        loss += loss_pos;
-                    else
-                        loss += loss_neg;
-                }
+                const bool predicted_label = (labeling[i]!= 0);
+                bool_labeling.push_back(predicted_label);
+                loss += get_loss_for_sample(idx, i, predicted_label);
             }
 
             // compute psi
             get_joint_feature_vector(samp, bool_labeling, psi);
+        }
+
+        double get_loss_for_sample (
+            long sample_idx,
+            long node_idx,
+            bool predicted_label
+        ) const
+        /*!
+            requires
+                - 0 <= sample_idx < labels.size()
+                - 0 <= node_idx < labels[sample_idx].size()
+            ensures
+                - returns the loss incurred for predicting that the node
+                  samples[sample_idx].node(node_idx) has a label of predicted_label.
+        !*/
+        {
+                const bool true_label = labels[sample_idx][node_idx];
+                if (true_label != predicted_label)
+                {
+                    if (true_label == true)
+                        return loss_pos;
+                    else
+                        return loss_neg;
+                }
+                else
+                {
+                    // no loss for making the correct prediction.
+                    return 0;
+                }
         }
 
         const dlib::array<sample_type>& samples;
