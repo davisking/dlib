@@ -145,7 +145,7 @@ namespace dlib
                     - #get_loss_on_positive_class() == 1.0
                     - #get_loss_on_negative_class() == 1.0
                     - #get_losses().size() == 0
-                    - the losses argument is effectively ignored if its size is zero.
+                    - The losses argument is effectively ignored if its size is zero.
                 - else
                     - #get_losses() == losses
                     - Each node in the training data has its own loss value defined by
