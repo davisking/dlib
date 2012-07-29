@@ -23,13 +23,15 @@ namespace dlib
         const std::vector<std::vector<bool> >& labels
     )
     {
-        DLIB_ASSERT(is_graph_labeling_problem(samples, labels) ,
+#ifdef ENABLE_ASSERTS
+        std::string reason_for_failure;
+        DLIB_ASSERT(is_graph_labeling_problem(samples, labels, reason_for_failure) ,
             "\t matrix test_graph_labeling_function()"
             << "\n\t invalid inputs were given to this function"
             << "\n\t samples.size(): " << samples.size() 
-            << "\n\t is_graph_labeling_problem(samples,labels): " << is_graph_labeling_problem(samples,labels)
-            << "\n\t is_learning_problem(samples,labels):       " << is_learning_problem(samples,labels)
+            << "\n\t reason_for_failure: " << reason_for_failure 
             );
+#endif
 
         std::vector<bool> temp;
         unsigned long num_pos_correct = 0;
@@ -83,15 +85,20 @@ namespace dlib
         const long folds
     )
     {
-        DLIB_ASSERT(is_graph_labeling_problem(samples, labels) &&
-                    1 < folds && folds <= static_cast<long>(samples.size()),
+#ifdef ENABLE_ASSERTS
+        std::string reason_for_failure;
+        DLIB_ASSERT(is_graph_labeling_problem(samples, labels, reason_for_failure),
             "\t matrix cross_validate_graph_labeling_trainer()"
             << "\n\t invalid inputs were given to this function"
             << "\n\t samples.size(): " << samples.size() 
-            << "\n\t folds:  " << folds 
-            << "\n\t is_graph_labeling_problem(samples,labels): " << is_graph_labeling_problem(samples,labels)
-            << "\n\t is_learning_problem(samples,labels):       " << is_learning_problem(samples,labels)
+            << "\n\t reason_for_failure: " << reason_for_failure 
             );
+        DLIB_ASSERT( 1 < folds && folds <= static_cast<long>(samples.size()),
+            "\t matrix cross_validate_graph_labeling_trainer()"
+            << "\n\t invalid inputs were given to this function"
+            << "\n\t folds:  " << folds 
+            );
+#endif
 
         typedef std::vector<bool> label_type;
 

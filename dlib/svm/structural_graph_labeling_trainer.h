@@ -171,17 +171,25 @@ namespace dlib
             const std::vector<std::vector<double> >& losses
         ) const
         {
-            DLIB_ASSERT(is_graph_labeling_problem(samples, labels) == true &&
-                        (losses.size() == 0 || sizes_match(labels, losses) == true) &&
+#ifdef ENABLE_ASSERTS
+            std::string reason_for_failure;
+            DLIB_ASSERT(is_graph_labeling_problem(samples, labels, reason_for_failure) == true ,
+                    "\t void structural_graph_labeling_trainer::train()"
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t reason_for_failure: " << reason_for_failure 
+                    << "\n\t samples.size(): " << samples.size() 
+                    << "\n\t labels.size():  " << labels.size() 
+                    << "\n\t this: " << this );
+            DLIB_ASSERT((losses.size() == 0 || sizes_match(labels, losses) == true) &&
                         all_values_are_nonnegative(losses) == true,
                     "\t void structural_graph_labeling_trainer::train()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t samples.size(): " << samples.size() 
                     << "\n\t labels.size():  " << labels.size() 
                     << "\n\t losses.size():  " << losses.size() 
                     << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses) 
                     << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses) 
                     << "\n\t this: " << this );
+#endif
 
 
             structural_svm_graph_labeling_problem<graph_type> prob(samples, labels, losses, num_threads);
