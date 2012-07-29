@@ -167,20 +167,23 @@ namespace dlib
             >
         const graph_labeler<vector_type> train (  
             const dlib::array<graph_type>& samples,
-            const std::vector<label_type>& labels
+            const std::vector<label_type>& labels,
+            const std::vector<std::vector<double> >& losses
         ) const
         {
-            // make sure requires clause is not broken
-            DLIB_ASSERT(is_graph_labeling_problem(samples, labels),
-                "\t void structural_graph_labeling_trainer::train()"
-                << "\n\t Invalid inputs were given to this function."
-                << "\n\t samples.size(): " << samples.size() 
-                << "\n\t labels.size():  " << labels.size() 
-                << "\n\t this: " << this
-                );
+            DLIB_ASSERT(is_graph_labeling_problem(samples, labels) == true &&
+                        (losses.size() == 0 || sizes_match(labels, losses) == true) &&
+                        all_values_are_nonnegative(losses) == true,
+                    "\t void structural_graph_labeling_trainer::train()"
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t samples.size(): " << samples.size() 
+                    << "\n\t labels.size():  " << labels.size() 
+                    << "\n\t losses.size():  " << losses.size() 
+                    << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses) 
+                    << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses) 
+                    << "\n\t this: " << this );
 
 
-            std::vector<std::vector<double> > losses;
             structural_svm_graph_labeling_problem<graph_type> prob(samples, labels, losses, num_threads);
 
             if (verbose)
@@ -189,8 +192,11 @@ namespace dlib
             prob.set_c(C);
             prob.set_epsilon(eps);
             prob.set_max_cache_size(max_cache_size);
-            prob.set_loss_on_positive_class(loss_pos);
-            prob.set_loss_on_negative_class(loss_neg);
+            if (prob.get_losses().size() == 0)
+            {
+                prob.set_loss_on_positive_class(loss_pos);
+                prob.set_loss_on_negative_class(loss_neg);
+            }
 
             matrix<double,0,1> w;
             solver(prob, w, prob.get_num_edge_weights());
@@ -199,6 +205,18 @@ namespace dlib
             vector_type node_weights;
             populate_weights(w, edge_weights, node_weights, prob.get_num_edge_weights());
             return graph_labeler<vector_type>(edge_weights, node_weights);
+        }
+
+        template <
+            typename graph_type
+            >
+        const graph_labeler<vector_type> train (  
+            const dlib::array<graph_type>& samples,
+            const std::vector<label_type>& labels
+        ) const
+        {
+            std::vector<std::vector<double> > losses;
+            return train(samples, labels, losses);
         }
 
     private:

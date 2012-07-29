@@ -212,14 +212,49 @@ namespace dlib
             requires
                 - is_graph_labeling_problem(samples,labels) == true
             ensures
-                - Uses the structural_svm_graph_labeling_problem to train a 
-                  graph_labeler on the given samples/labels training pairs.  
-                  The idea is to learn to predict a label given an input sample.
+                - Uses the structural_svm_graph_labeling_problem to train a graph_labeler
+                  on the given samples/labels training pairs.  The idea is to learn to
+                  predict a label given an input sample.
+                - The values of get_loss_on_positive_class() and get_loss_on_negative_class() 
+                  are used to determine how to value mistakes on each node during training.
                 - returns a function F with the following properties:
-                    - F(new_sample) == The predicted labels for the nodes in the
-                      graph new_sample.
+                    - F(new_sample) == The predicted labels for the nodes in the graph
+                      new_sample.
         !*/
 
+        template <
+            typename graph_type
+            >
+        const graph_labeler<vector_type> train (  
+            const dlib::array<graph_type>& samples,
+            const std::vector<label_type>& labels,
+            const std::vector<std::vector<double> >& losses
+        ) const;
+        /*!
+            requires
+                - is_graph_labeling_problem(samples,labels) == true
+                - if (losses.size() != 0) then
+                    - sizes_match(labels, losses) == true
+                    - all_values_are_nonnegative(losses) == true
+            ensures
+                - Uses the structural_svm_graph_labeling_problem to train a graph_labeler
+                  on the given samples/labels training pairs.  The idea is to learn to
+                  predict a label given an input sample.
+                - returns a function F with the following properties:
+                    - F(new_sample) == The predicted labels for the nodes in the graph
+                      new_sample.
+                - if (losses.size() == 0) then
+                    - The values of get_loss_on_positive_class() and get_loss_on_negative_class() 
+                      are used to determine how to value mistakes on each node during training.
+                    - The losses argument is effectively ignored if its size is zero.
+                - else
+                    - Each node in the training data has its own loss value defined by the
+                      corresponding entry of losses.  In particular, this means that the
+                      node with label labels[i][j] incurs a loss of losses[i][j] if it is
+                      incorrectly labeled.
+                    - The get_loss_on_positive_class() and get_loss_on_negative_class()
+                      parameters are ignored.  Only losses is used in this case.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
