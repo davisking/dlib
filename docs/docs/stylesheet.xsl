@@ -509,16 +509,18 @@ function BigToggle(node)
             <xsl:choose>
                <xsl:when test="spec_file/@link = 'true'">
                   <BR/>
-                  <b><font style='font-size:1.3em' color='#007700'>Specification: </font></b> <a href="{spec_file}.html#{name}"><xsl:value-of select="spec_file"/></a>
+                  <b><a href="{spec_file}.html#{name}">
+                     <font style='font-size:1.3em'>Detailed Documentation</font></a></b> 
                </xsl:when>
                <xsl:otherwise>
                   <BR/>
-                  <b><font style='font-size:1.3em' color='#007700'>Specification: </font></b> <a href="{spec_file}.html"><xsl:value-of select="spec_file"/></a>
+                  <b><a href="{spec_file}.html">
+                     <font style='font-size:1.3em'>Detailed Documentation</font></a></b>
                </xsl:otherwise>
             </xsl:choose>
          </xsl:if>
          <xsl:if test="file">
-            <BR/><B>File to include: </B> <a href="{file}.html"><xsl:value-of select="file"/></a>
+            <BR/><B>File to include: </B><xsl:value-of select="file"/>
          </xsl:if>
          <xsl:if test="body_file">
             <BR/>
@@ -552,10 +554,12 @@ function BigToggle(node)
                <BR/>
                <xsl:choose>
                   <xsl:when test="spec_file/@link = 'true'">
-                     <b><font style='font-size:1.3em' color='#007700'>Specification: </font></b> <a href="{spec_file}.html#{name}"><xsl:value-of select="spec_file"/></a>
+                     <b><a href="{spec_file}.html#{name}">
+                        <font style='font-size:1.3em'>Detailed Documentation</font></a></b>
                   </xsl:when>
                   <xsl:otherwise>
-                     <b><font style='font-size:1.3em' color='#007700'>Specification: </font></b> <a href="{spec_file}.html"><xsl:value-of select="spec_file"/></a>
+                     <b><a href="{spec_file}.html">
+                        <font style='font-size:1.3em'>Detailed Documentation</font></a></b>
                   </xsl:otherwise>
                </xsl:choose>
 
@@ -578,7 +582,7 @@ function BigToggle(node)
    </xsl:template>      
 
    <xsl:template match="examples">
-    <BR/><b>Code Examples: </b>
+    <BR/><b>Example Programs: </b>
       <xsl:for-each select="example">
          <xsl:choose>
             <xsl:when test="position() = last()">
