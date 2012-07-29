@@ -180,7 +180,8 @@ namespace dlib
                 );
 
 
-            structural_svm_graph_labeling_problem<graph_type> prob(samples, labels, num_threads);
+            std::vector<std::vector<double> > losses;
+            structural_svm_graph_labeling_problem<graph_type> prob(samples, labels, losses, num_threads);
 
             if (verbose)
                 prob.be_verbose();

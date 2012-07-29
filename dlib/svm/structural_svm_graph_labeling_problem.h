@@ -84,6 +84,46 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U
+        >
+    bool sizes_match (
+        const std::vector<std::vector<T> >& lhs,
+        const std::vector<std::vector<U> >& rhs
+    )
+    {
+        if (lhs.size() != rhs.size())
+            return false;
+
+        for (unsigned long i = 0; i < lhs.size(); ++i)
+        {
+            if (lhs[i].size() != rhs[i].size())
+                return false;
+        }
+
+        return true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline bool all_values_are_nonnegative (
+        const std::vector<std::vector<double> >& x
+    )
+    {
+        for (unsigned long i = 0; i < x.size(); ++i)
+        {
+            for (unsigned long j = 0; j < x[i].size(); ++j)
+            {
+                if (x[i][j] < 0)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     namespace impl
@@ -135,18 +175,25 @@ namespace dlib
         structural_svm_graph_labeling_problem(
             const dlib::array<sample_type>& samples_,
             const std::vector<label_type>& labels_,
+            const std::vector<std::vector<double> >& losses_,
             unsigned long num_threads = 2
         ) :
             structural_svm_problem_threaded<matrix_type,feature_vector_type>(num_threads),
             samples(samples_),
-            labels(labels_)
+            labels(labels_),
+            losses(losses_)
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_graph_labeling_problem(samples, labels) == true,
+            DLIB_ASSERT(is_graph_labeling_problem(samples, labels) == true &&
+                        (losses.size() == 0 || sizes_match(labels, losses) == true) &&
+                        all_values_are_nonnegative(losses) == true,
                     "\t structural_svm_graph_labeling_problem::structural_svm_graph_labeling_problem()"
                     << "\n\t Invalid inputs were given to this function."
                     << "\n\t samples.size(): " << samples.size() 
                     << "\n\t labels.size():  " << labels.size() 
+                    << "\n\t losses.size():  " << losses.size() 
+                    << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses) 
+                    << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses) 
                     << "\n\t this: " << this );
 
             loss_pos = 1.0;
@@ -168,6 +215,9 @@ namespace dlib
             }
         }
 
+        const std::vector<std::vector<double> >& get_losses (
+        ) const { return losses; }
+
         long get_num_edge_weights (
         ) const
         { 
@@ -179,8 +229,8 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss >= 0,
-                    "\t structural_svm_graph_labeling_problem::set_loss_on_positive_class()"
+            DLIB_ASSERT(loss >= 0 && get_losses().size() == 0,
+                    "\t void structural_svm_graph_labeling_problem::set_loss_on_positive_class()"
                     << "\n\t Invalid inputs were given to this function."
                     << "\n\t loss: " << loss 
                     << "\n\t this: " << this );
@@ -193,8 +243,8 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss >= 0,
-                    "\t structural_svm_graph_labeling_problem::set_loss_on_negative_class()"
+            DLIB_ASSERT(loss >= 0 && get_losses().size() == 0,
+                    "\t void structural_svm_graph_labeling_problem::set_loss_on_negative_class()"
                     << "\n\t Invalid inputs were given to this function."
                     << "\n\t loss: " << loss 
                     << "\n\t this: " << this );
@@ -203,10 +253,28 @@ namespace dlib
         }
 
         double get_loss_on_negative_class (
-        ) const { return loss_neg; }
+        ) const 
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(get_losses().size() == 0,
+                    "\t double structural_svm_graph_labeling_problem::get_loss_on_negative_class()"
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t this: " << this );
+
+            return loss_neg; 
+        }
 
         double get_loss_on_positive_class (
-        ) const { return loss_pos; }
+        ) const 
+        { 
+            // make sure requires clause is not broken
+            DLIB_ASSERT(get_losses().size() == 0,
+                    "\t double structural_svm_graph_labeling_problem::get_loss_on_positive_class()"
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t this: " << this );
+
+            return loss_pos; 
+        }
 
 
     private:
@@ -386,7 +454,9 @@ namespace dlib
                 const bool true_label = labels[sample_idx][node_idx];
                 if (true_label != predicted_label)
                 {
-                    if (true_label == true)
+                    if (losses.size() != 0)
+                        return losses[sample_idx][node_idx];
+                    else if (true_label == true)
                         return loss_pos;
                     else
                         return loss_neg;
@@ -400,6 +470,7 @@ namespace dlib
 
         const dlib::array<sample_type>& samples;
         const std::vector<label_type>& labels;
+        const std::vector<std::vector<double> >& losses;
 
         long node_dims;
         long edge_dims;

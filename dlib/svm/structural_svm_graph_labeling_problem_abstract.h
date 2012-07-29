@@ -56,6 +56,36 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U
+        >
+    bool sizes_match (
+        const std::vector<std::vector<T> >& lhs,
+        const std::vector<std::vector<U> >& rhs
+    );
+    /*!
+        ensures
+            - returns true if the sizes of lhs and rhs, as well as their constituent vectors
+              all match.  In particular, we return true if all of the following conditions are
+              met and false otherwise:
+                - lhs.size() == rhs.size()
+                - for all valid i:
+                    - lhs[i].size() == rhs[i].size()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    bool all_values_are_nonnegative (
+        const std::vector<std::vector<double> >& x
+    );
+    /*!
+        ensures
+            - returns true if all the double values contained in x are >= 0.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -87,11 +117,15 @@ namespace dlib
         structural_svm_graph_labeling_problem(
             const dlib::array<sample_type>& samples,
             const std::vector<label_type>& labels,
+            const std::vector<std::vector<double> >& losses,
             unsigned long num_threads 
         );
         /*!
             requires
                 - is_graph_labeling_problem(samples,labels) == true
+                - if (losses.size() != 0) then
+                    - sizes_match(labels, losses) == true
+                    - all_values_are_nonnegative(losses) == true
             ensures
                 - This object attempts to learn a mapping from the given samples to the 
                   given labels.  In particular, it attempts to learn to predict labels[i] 
@@ -107,8 +141,29 @@ namespace dlib
                 - This object will use num_threads threads during the optimization 
                   procedure.  You should set this parameter equal to the number of 
                   available processing cores on your machine.
-                - #get_loss_on_positive_class() == 1.0
-                - #get_loss_on_negative_class() == 1.0
+                - if (losses.size() == 0) then
+                    - #get_loss_on_positive_class() == 1.0
+                    - #get_loss_on_negative_class() == 1.0
+                    - #get_losses().size() == 0
+                    - the losses argument is effectively ignored if its size is zero.
+                - else
+                    - #get_losses() == losses
+                    - Each node in the training data has its own loss value defined by
+                      the corresponding entry of losses.  In particular, this means that 
+                      the node with label labels[i][j] incurs a loss of losses[i][j] if 
+                      it is incorrectly labeled.
+                    - The get_loss_on_positive_class() and get_loss_on_negative_class()
+                      parameters are ignored.  Only get_losses() is used in this case.
+        !*/
+
+        const std::vector<std::vector<double> >& get_losses (
+        ) const;
+        /*!
+            ensures
+                - returns the losses vector given to this object's constructor. 
+                  This vector defines the per sample loss values used.  If the vector
+                  is empty then the loss values defined by get_loss_on_positive_class() and
+                  get_loss_on_positive_class() are used instead.
         !*/
 
         long get_num_edge_weights (
@@ -128,6 +183,7 @@ namespace dlib
         /*!
             requires
                 - loss >= 0
+                - get_losses().size() == 0
             ensures
                 - #get_loss_on_positive_class() == loss
         !*/
@@ -138,6 +194,7 @@ namespace dlib
         /*!
             requires
                 - loss >= 0
+                - get_losses().size() == 0
             ensures
                 - #get_loss_on_negative_class() == loss
         !*/
@@ -145,6 +202,8 @@ namespace dlib
         double get_loss_on_positive_class (
         ) const;
         /*!
+            requires
+                - get_losses().size() == 0
             ensures
                 - returns the loss incurred when a graph node which is supposed to have
                   a label of true gets misclassified.  This value controls how much we care 
@@ -155,6 +214,8 @@ namespace dlib
         double get_loss_on_negative_class (
         ) const;
         /*!
+            requires
+                - get_losses().size() == 0
             ensures
                 - returns the loss incurred when a graph node which is supposed to have
                   a label of false gets misclassified.  This value controls how much we care 
