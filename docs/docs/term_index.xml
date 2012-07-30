@@ -50,6 +50,8 @@
          <term file="ml.html" name="is_forced_assignment_problem"/>
          <term file="ml.html" name="is_assignment_problem"/>
          <term file="ml.html" name="is_graph_labeling_problem"/>
+         <term file="dlib/svm/structural_svm_graph_labeling_problem_abstract.h.html" name="sizes_match"/>
+         <term file="dlib/svm/structural_svm_graph_labeling_problem_abstract.h.html" name="all_values_are_nonnegative"/>
          <term file="ml.html" name="assignment_function"/>
          <term file="ml.html" name="graph_labeler"/>
          <term file="ml.html" name="test_assignment_function"/>
