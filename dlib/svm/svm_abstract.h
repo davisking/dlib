@@ -346,6 +346,82 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U,
+        typename V
+        >
+    void randomize_samples (
+        T& samples,
+        U& labels,
+        V& auxiliary
+    );
+    /*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - U == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - V == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if (samples, labels, or auxiliary are matrix objects) then 
+                - is_vector(samples) == true 
+                - is_vector(labels) == true
+                - is_vector(auxiliary) == true
+            - samples.size() == labels.size() == auxiliary.size()
+            - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
+        ensures
+            - randomizes the order of the samples, labels, and auxiliary but preserves the
+              pairing between each sample, its label, and its auxiliary value.
+            - A default initialized random number generator is used to perform the
+              randomizing.  Note that this means that each call this this function does the
+              same thing.  That is, the random number generator always uses the same seed.
+            - for all valid i:
+                - let r == the random index samples(i) was moved to.  then:
+                    - #labels(r) == labels(i)
+                    - #auxiliary(r) == auxiliary(i)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename U,
+        typename V,
+        typename rand_type
+        >
+    void randomize_samples (
+        T& samples,
+        U& labels,
+        V& auxiliary,
+        rand_type& rnd
+    );
+    /*!
+        requires
+            - T == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - U == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - V == a matrix object or an object compatible with std::vector that contains 
+              a swappable type.
+            - if (samples, labels, or auxiliary are matrix objects) then 
+                - is_vector(samples) == true 
+                - is_vector(labels) == true
+                - is_vector(auxiliary) == true
+            - samples.size() == labels.size() == auxiliary.size()
+            - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
+        ensures
+            - randomizes the order of the samples, labels, and auxiliary but preserves the
+              pairing between each sample, its label, and its auxiliary value.
+            - the given rnd random number generator object is used to do the randomizing
+            - for all valid i:
+                - let r == the random index samples(i) was moved to.  then:
+                    - #labels(r) == labels(i)
+                    - #auxiliary(r) == auxiliary(i)
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }

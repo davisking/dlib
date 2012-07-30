@@ -8,6 +8,7 @@
 #include <ctime>
 #include <dlib/statistics.h>
 #include <dlib/rand.h>
+#include <dlib/svm.h>
 #include <algorithm>
 
 #include "tester.h"
@@ -238,6 +239,53 @@ namespace
 
         }
 
+        void test_randomize_samples()
+        {
+            std::vector<unsigned int> t(15),u(15),v(15);
+
+            for (unsigned long i = 0; i < t.size(); ++i)
+            {
+                t[i] = i;
+                u[i] = i+1;
+                v[i] = i+2;
+            }
+            randomize_samples(t,u,v);
+
+            DLIB_TEST(t.size() == 15);
+            DLIB_TEST(u.size() == 15);
+            DLIB_TEST(v.size() == 15);
+
+            for (unsigned long i = 0; i < t.size(); ++i)
+            {
+                const unsigned long val = t[i];
+                DLIB_TEST(u[i] == val+1);
+                DLIB_TEST(v[i] == val+2);
+            }
+        }
+        void test_randomize_samples2()
+        {
+            dlib::matrix<int,15,1> t(15),u(15),v(15);
+
+            for (long i = 0; i < t.size(); ++i)
+            {
+                t(i) = i;
+                u(i) = i+1;
+                v(i) = i+2;
+            }
+            randomize_samples(t,u,v);
+
+            DLIB_TEST(t.size() == 15);
+            DLIB_TEST(u.size() == 15);
+            DLIB_TEST(v.size() == 15);
+
+            for (long i = 0; i < t.size(); ++i)
+            {
+                const long val = t(i);
+                DLIB_TEST(u(i) == val+1);
+                DLIB_TEST(v(i) == val+2);
+            }
+        }
+
         void perform_test (
         )
         {
@@ -245,6 +293,8 @@ namespace
             test_random_subset_selector2();
             test_running_covariance();
             test_running_stats();
+            test_randomize_samples();
+            test_randomize_samples2();
         }
     } a;
 
