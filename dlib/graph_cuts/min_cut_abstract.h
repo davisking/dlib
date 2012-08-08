@@ -22,9 +22,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename directed_graph_type
-        >
     class flow_graph 
     {
         /*!
