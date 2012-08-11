@@ -24,7 +24,7 @@ namespace dlib
             const std::vector<point>& movable_parts_
         ) : rect(rect_), movable_parts(movable_parts) {}
 
-        full_object_detection(
+        explicit full_object_detection(
             const rectangle& rect_
         ) : rect(rect_) {}
 
