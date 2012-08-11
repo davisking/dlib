@@ -22,7 +22,7 @@ namespace dlib
         full_object_detection(
             const rectangle& rect_,
             const std::vector<point>& movable_parts_
-        ) : rect(rect_), movable_parts(movable_parts) {}
+        ) : rect(rect_), movable_parts(movable_parts_) {}
 
         explicit full_object_detection(
             const rectangle& rect_
