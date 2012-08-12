@@ -6,6 +6,7 @@
 #include "../matrix.h"
 #include "structural_svm_problem_threaded_abstract.h"
 #include <sstream>
+#include "../image_processing/full_object_detection_abstract.h"
 
 namespace dlib
 {
@@ -81,23 +82,25 @@ namespace dlib
             const image_scanner_type& scanner,
             const overlap_tester_type& overlap_tester,
             const image_array_type& images,
-            const std::vector<std::vector<rectangle> >& truth_rects,
+            const std::vector<std::vector<full_object_detection> >& truth_object_detections,
             unsigned long num_threads = 2
         );
         /*!
             requires
-                - is_learning_problem(images, truth_rects)
+                - is_learning_problem(images, truth_object_detections)
                 - scanner.get_num_detection_templates() > 0
                 - scanner.load(images[0]) must be a valid expression.
+                - for all valid i, j:
+                    - truth_object_detections[i][j].movable_rects.size() == scanner.get_num_movable_components_per_detection_template() 
             ensures
                 - This object attempts to learn a mapping from the given images to the 
-                  object locations given in truth_rects.  In particular, it attempts to 
-                  learn to predict truth_rects[i] based on images[i].
+                  object locations given in truth_object_detections.  In particular, it attempts to 
+                  learn to predict truth_object_detections[i] based on images[i].
                   Or in other words, this object can be used to learn a parameter vector, w, such that 
                   an object_detector declared as:
                     object_detector<image_scanner_type,overlap_tester_type> detector(scanner,overlap_tester,w)
                   results in a detector object which attempts to compute the following mapping:
-                    truth_rects[i] == detector(images[i])
+                    truth_object_detections[i].rect == detector(images[i])
                 - #get_match_eps() == 0.5
                 - This object will use num_threads threads during the optimization 
                   procedure.  You should set this parameter equal to the number of 

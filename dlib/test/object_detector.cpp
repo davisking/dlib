@@ -57,6 +57,7 @@ namespace
             detector(images[i], dets2);
 
             matrix<double,0,1> psi(detector.get_w().size());
+            matrix<double,0,1> psi2(detector.get_w().size());
             const double thresh = detector.get_w()(detector.get_w().size()-1);
 
             DLIB_TEST(dets.size() == dets2.size());
@@ -65,10 +66,19 @@ namespace
                 DLIB_TEST(dets[j] == dets2[j].second);
 
                 psi = 0;
-                detector.get_scanner().get_feature_vector(dets[j], psi);
+                const full_object_detection fdet = detector.get_scanner().get_feature_vector(dets[j], detector.get_w(), psi);
 
-                const double check_score = dot(psi,detector.get_w()) - thresh;
+                double check_score = dot(psi,detector.get_w()) - thresh;
                 DLIB_TEST(std::abs(check_score - dets2[j].first) < 1e-10);
+
+
+                // Make sure fdet works the way it is supposed to with get_feature_vector().
+                psi2 = 0;
+                detector.get_scanner().get_feature_vector(fdet, psi2);
+
+                check_score = dot(psi2,detector.get_w()) - thresh;
+                DLIB_TEST(std::abs(check_score - dets2[j].first) < 1e-10);
+                DLIB_TEST(max(abs(psi-psi2)) < 1e-10);
             }
 
         }

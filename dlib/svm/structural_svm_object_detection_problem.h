@@ -9,6 +9,7 @@
 #include <sstream>
 #include "../string.h"
 #include "../array.h"
+#include "../image_processing/full_object_detection.h"
 
 namespace dlib
 {
@@ -37,35 +38,51 @@ namespace dlib
             const image_scanner_type& scanner,
             const overlap_tester_type& overlap_tester,
             const image_array_type& images_,
-            const std::vector<std::vector<rectangle> >& truth_rects_,
+            const std::vector<std::vector<full_object_detection> >& truth_object_detections_,
             unsigned long num_threads = 2
         ) :
             structural_svm_problem_threaded<matrix<double,0,1> >(num_threads),
             boxes_overlap(overlap_tester),
             images(images_),
-            truth_rects(truth_rects_),
+            truth_object_detections(truth_object_detections_),
             match_eps(0.5),
             loss_per_false_alarm(1),
             loss_per_missed_target(1)
         {
+#ifdef ENABLE_ASSERTS
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_learning_problem(images_, truth_rects_) && 
+            DLIB_ASSERT(is_learning_problem(images_, truth_object_detections_) && 
                          scanner.get_num_detection_templates() > 0,
                 "\t structural_svm_object_detection_problem::structural_svm_object_detection_problem()"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t scanner.get_num_detection_templates(): " << scanner.get_num_detection_templates()
-                << "\n\t is_learning_problem(images_,truth_rects_): " << is_learning_problem(images_,truth_rects_)
+                << "\n\t is_learning_problem(images_,truth_object_detections_): " << is_learning_problem(images_,truth_object_detections_)
                 << "\n\t this: " << this
                 );
+            for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
+            {
+                for (unsigned long j = 0; j < truth_object_detections[i].size(); ++j)
+                {
+                    DLIB_ASSERT(truth_object_detections[i][j].movable_parts.size() == scanner.get_num_movable_components_per_detection_template(),
+                        "\t trained_function_type structural_object_detection_trainer::train()"
+                        << "\n\t invalid inputs were given to this function"
+                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].movable_parts.size():          " << 
+                            truth_object_detections[i][j].movable_parts.size()
+                        << "\n\t scanner.get_num_movable_components_per_detection_template(): " << 
+                            scanner.get_num_movable_components_per_detection_template()
+                    );
+                }
+            }
+#endif
 
             scanners.set_max_size(images.size());
             scanners.set_size(images.size());
 
             max_num_dets = 0;
-            for (unsigned long i = 0; i < truth_rects.size(); ++i)
+            for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
             {
-                if (truth_rects[i].size() > max_num_dets)
-                    max_num_dets = truth_rects[i].size();
+                if (truth_object_detections[i].size() > max_num_dets)
+                    max_num_dets = truth_object_detections[i].size();
 
                 scanners[i].copy_configuration(scanner);
             }
@@ -160,12 +177,12 @@ namespace dlib
             std::vector<rectangle> mapped_rects;
 
             psi = 0;
-            for (unsigned long i = 0; i < truth_rects[idx].size(); ++i)
+            for (unsigned long i = 0; i < truth_object_detections[idx].size(); ++i)
             {
-                mapped_rects.push_back(scanner.get_best_matching_rect(truth_rects[idx][i]));
-                scanner.get_feature_vector(truth_rects[idx][i], psi);
+                mapped_rects.push_back(scanner.get_best_matching_rect(truth_object_detections[idx][i].rect));
+                scanner.get_feature_vector(truth_object_detections[idx][i], psi);
             }
-            psi(scanner.get_num_dimensions()) = -1.0*truth_rects[idx].size();
+            psi(scanner.get_num_dimensions()) = -1.0*truth_object_detections[idx].size();
 
             // check if any of the boxes overlap.  If they do then it is impossible for
             // us to learn to correctly classify this sample
@@ -207,8 +224,8 @@ namespace dlib
             // truth rectangles.
             for (unsigned long i = 0; i < mapped_rects.size(); ++i)
             {
-                const double area = (truth_rects[idx][i].intersect(mapped_rects[i])).area();
-                const double total_area = (truth_rects[idx][i] + mapped_rects[i]).area();
+                const double area = (truth_object_detections[idx][i].rect.intersect(mapped_rects[i])).area();
+                const double total_area = (truth_object_detections[idx][i].rect + mapped_rects[i]).area();
                 if (area/total_area <= match_eps)
                 {
                     using namespace std;
@@ -231,9 +248,9 @@ namespace dlib
                     sout << "image index              "<< idx << endl;
                     sout << "match_eps:               "<< match_eps << endl;
                     sout << "best possible match:     "<< area/total_area << endl;
-                    sout << "truth rect:              "<< truth_rects[idx][i] << endl;
-                    sout << "truth rect width/height: "<< truth_rects[idx][i].width()/(double)truth_rects[idx][i].height() << endl;
-                    sout << "truth rect area:         "<< truth_rects[idx][i].area() << endl;
+                    sout << "truth rect:              "<< truth_object_detections[idx][i].rect << endl;
+                    sout << "truth rect width/height: "<< truth_object_detections[idx][i].rect.width()/(double)truth_object_detections[idx][i].rect.height() << endl;
+                    sout << "truth rect area:         "<< truth_object_detections[idx][i].rect.area() << endl;
                     sout << "nearest detection template rect:              "<< mapped_rects[i] << endl;
                     sout << "nearest detection template rect width/height: "<< mapped_rects[i].width()/(double)mapped_rects[i].height() << endl;
                     sout << "nearest detection template rect area:         "<< mapped_rects[i].area() << endl;
@@ -262,13 +279,13 @@ namespace dlib
             // The loss will measure the number of incorrect detections.  A detection is
             // incorrect if it doesn't hit a truth rectangle or if it is a duplicate detection
             // on a truth rectangle.
-            loss = truth_rects[idx].size()*loss_per_missed_target;
+            loss = truth_object_detections[idx].size()*loss_per_missed_target;
 
             // Measure the loss augmented score for the detections which hit a truth rect.
-            std::vector<double> truth_score_hits(truth_rects[idx].size(), 0);
+            std::vector<double> truth_score_hits(truth_object_detections[idx].size(), 0);
 
             // keep track of which truth boxes we have hit so far.
-            std::vector<bool> hit_truth_table(truth_rects[idx].size(), false);
+            std::vector<bool> hit_truth_table(truth_object_detections[idx].size(), false);
 
             std::vector<rectangle> final_dets;
             // The point of this loop is to fill out the truth_score_hits array. 
@@ -277,7 +294,7 @@ namespace dlib
                 if (overlaps_any_box(final_dets, dets[i].second))
                     continue;
 
-                const std::pair<double,unsigned int> truth = find_best_match(truth_rects[idx], dets[i].second);
+                const std::pair<double,unsigned int> truth = find_best_match(truth_object_detections[idx], dets[i].second);
 
                 final_dets.push_back(dets[i].second);
 
@@ -285,7 +302,7 @@ namespace dlib
                 // if hit truth rect
                 if (truth_match > match_eps)
                 {
-                    // if this is the first time we have seen a detect which hit truth_rects[truth.second]
+                    // if this is the first time we have seen a detect which hit truth_object_detections[truth.second]
                     const double score = dets[i].first - thresh;
                     if (hit_truth_table[truth.second] == false)
                     {
@@ -311,7 +328,7 @@ namespace dlib
                 if (overlaps_any_box(final_dets, dets[i].second))
                     continue;
 
-                const std::pair<double,unsigned int> truth = find_best_match(truth_rects[idx], dets[i].second);
+                const std::pair<double,unsigned int> truth = find_best_match(truth_object_detections[idx], dets[i].second);
 
                 const double truth_match = truth.first;
                 if (truth_match > match_eps)
@@ -342,27 +359,27 @@ namespace dlib
             psi.set_size(get_num_dimensions());
             psi = 0;
             for (unsigned long i = 0; i < final_dets.size(); ++i)
-                scanner.get_feature_vector(final_dets[i], psi);
+                scanner.get_feature_vector(final_dets[i], current_solution, psi);
 
             psi(scanner.get_num_dimensions()) = -1.0*final_dets.size();
         }
 
 
         bool overlaps_any_box (
-            const std::vector<rectangle>& truth_rects,
+            const std::vector<rectangle>& truth_object_detections,
             const dlib::rectangle& rect
         ) const
         {
-            for (unsigned long i = 0; i < truth_rects.size(); ++i)
+            for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
             {
-                if (boxes_overlap(truth_rects[i], rect))
+                if (boxes_overlap(truth_object_detections[i], rect))
                     return true;
             }
             return false;
         }
 
         std::pair<double,unsigned int> find_best_match(
-            const std::vector<rectangle>& boxes,
+            const std::vector<full_object_detection>& boxes,
             const rectangle rect
         ) const
         /*!
@@ -381,10 +398,10 @@ namespace dlib
             for (unsigned long i = 0; i < boxes.size(); ++i)
             {
 
-                const unsigned long area = rect.intersect(boxes[i]).area();
+                const unsigned long area = rect.intersect(boxes[i].rect).area();
                 if (area != 0)
                 {
-                    const double new_match = area / static_cast<double>((rect + boxes[i]).area());
+                    const double new_match = area / static_cast<double>((rect + boxes[i].rect).area());
                     if (new_match > match)
                     {
                         match = new_match;
@@ -411,7 +428,7 @@ namespace dlib
         mutable array<image_scanner_type> scanners;
 
         const image_array_type& images;
-        const std::vector<std::vector<rectangle> >& truth_rects;
+        const std::vector<std::vector<full_object_detection> >& truth_object_detections;
 
         unsigned long max_num_dets;
         double match_eps;

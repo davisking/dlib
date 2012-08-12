@@ -9,6 +9,7 @@
 #include "../image_processing.h"
 #include "../array2d.h"
 #include <vector>
+#include "full_object_detection.h"
 
 namespace dlib
 {
@@ -52,10 +53,22 @@ namespace dlib
 
         void add_detection_template (
             const rectangle& object_box,
-            const std::vector<rectangle>& feature_extraction_regions 
+            const std::vector<rectangle>& stationary_feature_extraction_regions,
+            const std::vector<rectangle>& movable_feature_extraction_regions
+        );
+
+        void add_detection_template (
+            const rectangle& object_box,
+            const std::vector<rectangle>& stationary_feature_extraction_regions
         );
 
         inline unsigned long get_num_detection_templates (
+        ) const;
+
+        inline unsigned long get_num_movable_components_per_detection_template (
+        ) const;
+
+        inline unsigned long get_num_stationary_components_per_detection_template (
         ) const;
 
         inline unsigned long get_num_components_per_detection_template (
@@ -96,7 +109,13 @@ namespace dlib
         ) const;
 
         void get_feature_vector (
+            const full_object_detection& obj,
+            feature_vector_type& psi
+        ) const;
+
+        full_object_detection get_feature_vector (
             const rectangle& rect,
+            const feature_vector_type& w,
             feature_vector_type& psi
         ) const;
 
@@ -129,6 +148,7 @@ namespace dlib
         {
             rectangle object_box; // always centered at (0,0)
             std::vector<rectangle> rects; // template with respect to (0,0)
+            std::vector<rectangle> movable_rects; 
         };
 
         friend void serialize(const detection_template& item, std::ostream& out)
@@ -394,25 +414,59 @@ namespace dlib
     void scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
     add_detection_template (
         const rectangle& object_box,
-        const std::vector<rectangle>& feature_extraction_regions 
+        const std::vector<rectangle>& stationary_feature_extraction_regions,
+        const std::vector<rectangle>& movable_feature_extraction_regions
     )
     {
+#ifdef ENABLE_ASSERTS
         // make sure requires clause is not broken
         DLIB_ASSERT((get_num_detection_templates() == 0 || 
-                        get_num_components_per_detection_template() == feature_extraction_regions.size()) &&
+                        (get_num_stationary_components_per_detection_template() == stationary_feature_extraction_regions.size() &&
+                        get_num_movable_components_per_detection_template() == movable_feature_extraction_regions.size())) &&
                         center(object_box) == point(0,0),
             "\t void scan_image_pyramid::add_detection_template()"
             << "\n\t The number of rects in this new detection template doesn't match "
             << "\n\t the number in previous detection templates."
-            << "\n\t get_num_components_per_detection_template(): " << get_num_components_per_detection_template()
-            << "\n\t feature_extraction_regions.size(): " << feature_extraction_regions.size()
+            << "\n\t get_num_stationary_components_per_detection_template(): " << get_num_stationary_components_per_detection_template()
+            << "\n\t stationary_feature_extraction_regions.size():           " << stationary_feature_extraction_regions.size()
+            << "\n\t get_num_movable_components_per_detection_template():    " << get_num_movable_components_per_detection_template()
+            << "\n\t movable_feature_extraction_regions.size():              " << movable_feature_extraction_regions.size()
             << "\n\t this: " << this
             );
 
+        for (unsigned long i = 0; i < movable_feature_extraction_regions.size(); ++i)
+        {
+            DLIB_ASSERT(center(movable_feature_extraction_regions[i]) == point(0,0),
+                        "Invalid inputs were given to this function."
+                        << "\n\t center(movable_feature_extraction_regions["<<i<<"]): " << center(movable_feature_extraction_regions[i]) 
+                        << "\n\t this: " << this
+            );
+        }
+#endif
+
         detection_template temp;
         temp.object_box = object_box;
-        temp.rects = feature_extraction_regions;
+        temp.rects = stationary_feature_extraction_regions;
+        temp.movable_rects = movable_feature_extraction_regions;
         det_templates.push_back(temp);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type,
+        typename Feature_extractor_type
+        >
+    void scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
+    add_detection_template (
+        const rectangle& object_box,
+        const std::vector<rectangle>& stationary_feature_extraction_regions
+    )
+    {
+        // an empty set of movable feature regions
+        const std::vector<rectangle> movable_feature_extraction_regions;
+        add_detection_template(object_box, stationary_feature_extraction_regions,
+                               movable_feature_extraction_regions);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -435,6 +489,48 @@ namespace dlib
         typename Feature_extractor_type
         >
     unsigned long scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
+    get_num_stationary_components_per_detection_template (
+    ) const
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(get_num_detection_templates() > 0 ,
+            "\t unsigned long scan_image_pyramid::get_num_stationary_components_per_detection_template()"
+            << "\n\t You need to give some detection templates before calling this function. "
+            << "\n\t get_num_detection_templates(): " << get_num_detection_templates()
+            << "\n\t this: " << this
+            );
+
+        return det_templates[0].rects.size();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type,
+        typename Feature_extractor_type
+        >
+    unsigned long scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
+    get_num_movable_components_per_detection_template (
+    ) const
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(get_num_detection_templates() > 0 ,
+            "\t unsigned long scan_image_pyramid::get_num_movable_components_per_detection_template()"
+            << "\n\t You need to give some detection templates before calling this function. "
+            << "\n\t get_num_detection_templates(): " << get_num_detection_templates()
+            << "\n\t this: " << this
+            );
+
+        return det_templates[0].movable_rects.size();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type,
+        typename Feature_extractor_type
+        >
+    unsigned long scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
     get_num_components_per_detection_template (
     ) const
     {
@@ -446,7 +542,8 @@ namespace dlib
             << "\n\t this: " << this
             );
 
-        return det_templates[0].rects.size();
+        return get_num_movable_components_per_detection_template() +
+               get_num_stationary_components_per_detection_template();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -697,24 +794,47 @@ namespace dlib
         typename Pyramid_type,
         typename Feature_extractor_type
         >
-    void scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
+    full_object_detection scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
     get_feature_vector (
         const rectangle& rect,
+        const feature_vector_type&,// w,
+        feature_vector_type& psi
+    ) const
+    {
+        // TODO
+        get_feature_vector(full_object_detection(rect), psi);
+        return full_object_detection(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename Pyramid_type,
+        typename Feature_extractor_type
+        >
+    void scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
+    get_feature_vector (
+        const full_object_detection& obj,
         feature_vector_type& psi
     ) const
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(get_num_detection_templates() > 0 &&
                     is_loaded_with_image() &&
-                    psi.size() >= get_num_dimensions(), 
+                    psi.size() >= get_num_dimensions() &&
+                    obj.movable_parts.size() == get_num_movable_components_per_detection_template(),
             "\t void scan_image_pyramid::get_feature_vector()"
             << "\n\t Invalid inputs were given to this function "
             << "\n\t get_num_detection_templates(): " << get_num_detection_templates()
             << "\n\t is_loaded_with_image(): " << is_loaded_with_image()
             << "\n\t psi.size():             " << psi.size()
             << "\n\t get_num_dimensions():   " << get_num_dimensions()
+            << "\n\t get_num_movable_components_per_detection_template(): " << get_num_movable_components_per_detection_template()
+            << "\n\t obj.movable_parts.size():                            " << obj.movable_parts.size()
             << "\n\t this: " << this
             );
+
+        const rectangle rect = obj.rect;
 
         pyramid_type pyr;
         rectangle mapped_rect;

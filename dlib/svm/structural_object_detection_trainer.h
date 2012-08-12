@@ -9,6 +9,7 @@
 #include "structural_svm_object_detection_problem.h"
 #include "../image_processing/object_detector.h"
 #include "../image_processing/box_overlap_testing.h"
+#include "../image_processing/full_object_detection.h"
 
 
 namespace dlib
@@ -52,6 +53,12 @@ namespace dlib
             scanner.copy_configuration(scanner_);
 
             auto_overlap_tester = is_same_type<overlap_tester_type,test_box_overlap>::value;
+        }
+
+        const image_scanner_type& get_scanner (
+        ) const
+        {
+            return scanner;
         }
 
         bool auto_set_overlap_tester (
@@ -239,29 +246,45 @@ namespace dlib
             >
         const trained_function_type train (
             const image_array_type& images,
-            const std::vector<std::vector<rectangle> >& truth_rects
+            const std::vector<std::vector<full_object_detection> >& truth_object_detections
         ) const
         {
+#ifdef ENABLE_ASSERTS
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_learning_problem(images,truth_rects) == true,
-                "\t trained_function_type structural_object_detection_trainer::train(x,y)"
+            DLIB_ASSERT(is_learning_problem(images,truth_object_detections) == true,
+                "\t trained_function_type structural_object_detection_trainer::train()"
                 << "\n\t invalid inputs were given to this function"
                 << "\n\t images.size():      " << images.size()
-                << "\n\t truth_rects.size(): " << truth_rects.size()
-                << "\n\t is_learning_problem(images,truth_rects): " << is_learning_problem(images,truth_rects)
+                << "\n\t truth_object_detections.size(): " << truth_object_detections.size()
+                << "\n\t is_learning_problem(images,truth_object_detections): " << is_learning_problem(images,truth_object_detections)
                 );
+            for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
+            {
+                for (unsigned long j = 0; j < truth_object_detections[i].size(); ++j)
+                {
+                    DLIB_ASSERT(truth_object_detections[i][j].movable_parts.size() == get_scanner().get_num_movable_components_per_detection_template(),
+                        "\t trained_function_type structural_object_detection_trainer::train()"
+                        << "\n\t invalid inputs were given to this function"
+                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].movable_parts.size():                " << 
+                            truth_object_detections[i][j].movable_parts.size()
+                        << "\n\t get_scanner().get_num_movable_components_per_detection_template(): " << 
+                            get_scanner().get_num_movable_components_per_detection_template()
+                    );
+                }
+            }
+#endif
 
             overlap_tester_type local_overlap_tester;
 
             if (auto_overlap_tester)
             {
-                std::vector<std::vector<rectangle> > mapped_rects(truth_rects.size());
-                for (unsigned long i = 0; i < truth_rects.size(); ++i)
+                std::vector<std::vector<rectangle> > mapped_rects(truth_object_detections.size());
+                for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
                 {
-                    mapped_rects[i].resize(truth_rects[i].size());
-                    for (unsigned long j = 0; j < truth_rects[i].size(); ++j)
+                    mapped_rects[i].resize(truth_object_detections[i].size());
+                    for (unsigned long j = 0; j < truth_object_detections[i].size(); ++j)
                     {
-                        mapped_rects[i][j] = scanner.get_best_matching_rect(truth_rects[i][j]);
+                        mapped_rects[i][j] = scanner.get_best_matching_rect(truth_object_detections[i][j].rect);
                     }
                 }
 
@@ -273,7 +296,7 @@ namespace dlib
             }
 
             structural_svm_object_detection_problem<image_scanner_type,overlap_tester_type,image_array_type > 
-                svm_prob(scanner, local_overlap_tester, images, truth_rects, num_threads);
+                svm_prob(scanner, local_overlap_tester, images, truth_object_detections, num_threads);
 
             if (verbose)
                 svm_prob.be_verbose();
@@ -293,6 +316,25 @@ namespace dlib
             return object_detector<image_scanner_type,overlap_tester_type>(scanner, local_overlap_tester, w);
         }
 
+        template <
+            typename image_array_type
+            >
+        const trained_function_type train (
+            const image_array_type& images,
+            const std::vector<std::vector<rectangle> >& truth_object_detections
+        ) const
+        {
+            std::vector<std::vector<full_object_detection> > truth_dets(truth_object_detections.size());
+            for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
+            {
+                for (unsigned long j = 0; j < truth_object_detections[i].size(); ++j)
+                {
+                    truth_dets[i].push_back(full_object_detection(truth_object_detections[i][j]));
+                }
+            }
+
+            return train(images, truth_dets);
+        }
 
     private:
 

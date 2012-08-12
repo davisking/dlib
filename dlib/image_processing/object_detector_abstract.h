@@ -157,8 +157,8 @@ namespace dlib
                       minus the threshold, therefore this is a value > 0.
                     - #dets[i].second == the bounding box for the i-th detection.
                 - #get_scanner() will have been loaded with img. Therefore, you can call
-                  #get_scanner().get_feature_vector() to obtain the feature vectors for
-                  the resulting object detection boxes.
+                  #get_scanner().get_feature_vector() to obtain the feature vectors or
+                  full_object_detections for the resulting object detection boxes.
                 - The detection threshold is adjusted by having adjust_threshold added
                   to it.  Therefore, an adjust_threshold value > 0 makes detecting
                   objects harder while a negative one makes it easier.
