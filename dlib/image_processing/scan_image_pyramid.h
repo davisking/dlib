@@ -155,11 +155,13 @@ namespace dlib
         {
             serialize(item.object_box, out);
             serialize(item.rects, out);
+            serialize(item.movable_rects, out);
         }
         friend void deserialize(detection_template& item, std::istream& in)
         {
             deserialize(item.object_box, in);
             deserialize(item.rects, in);
+            deserialize(item.movable_rects, in);
         }
 
         void get_mapped_rect_and_metadata (
@@ -224,6 +226,8 @@ namespace dlib
         std::ostream& out
     )
     {
+        int version = 2;
+        serialize(version, out);
         serialize(item.feats_config, out);
         serialize(item.feats, out);
         serialize(item.det_templates, out);
@@ -241,6 +245,11 @@ namespace dlib
         std::istream& in 
     )
     {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 2)
+            throw serialization_error("Unsupported version found when deserializing a scan_image_pyramid object.");
+
         deserialize(item.feats_config, in);
         deserialize(item.feats, in);
         deserialize(item.det_templates, in);
