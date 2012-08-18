@@ -54,6 +54,7 @@
         - std::wstring
         - std::vector
         - std::map
+        - std::set
         - std::pair
         - std::complex
         - dlib::uint64
@@ -69,6 +70,7 @@
         - std::wstring
         - std::vector
         - std::map
+        - std::set
         - std::pair
         - std::complex
         - dlib::uint64
@@ -123,6 +125,7 @@
 #include <vector>
 #include <complex>
 #include <map>
+#include <set>
 #include <limits>
 #include "uintn.h"
 #include "interfaces/enumerable.h"
@@ -565,6 +568,18 @@ namespace dlib
         std::istream& in
     );
 
+    template <typename domain, typename compare, typename alloc>
+    void serialize (
+        const std::set<domain, compare, alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename domain, typename compare, typename alloc>
+    void deserialize (
+        std::set<domain, compare, alloc>& item,
+        std::istream& in
+    );
+
     template <typename T, typename alloc>
     void serialize (
         const std::vector<T,alloc>& item,
@@ -742,6 +757,53 @@ namespace dlib
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std::map"); }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename domain, typename compare, typename alloc>
+    void serialize (
+        const std::set<domain, compare, alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            const unsigned long size = static_cast<unsigned long>(item.size());
+
+            serialize(size,out); 
+            typename std::set<domain,compare,alloc>::const_iterator i;
+            for (i = item.begin(); i != item.end(); ++i)
+            {
+                serialize(*i,out);
+            }
+
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::set"); }
+    }
+
+    template <typename domain, typename compare, typename alloc>
+    void deserialize (
+        std::set<domain, compare, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            item.clear();
+
+            unsigned long size;
+            deserialize(size,in); 
+            domain d;
+            for (unsigned long i = 0; i < size; ++i)
+            {
+                deserialize(d,in);
+                item.insert(d);
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::set"); }
     }
 
 // ----------------------------------------------------------------------------------------
