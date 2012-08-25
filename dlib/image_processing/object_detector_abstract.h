@@ -3,7 +3,6 @@
 #undef DLIB_OBJECT_DeTECTOR_ABSTRACT_H__
 #ifdef DLIB_OBJECT_DeTECTOR_ABSTRACT_H__
 
-#include "../matrix.h"
 #include "../geometry.h"
 #include <vector>
 #include "box_overlap_testing_abstract.h"
@@ -37,6 +36,8 @@ namespace dlib
                 non-max suppression on the output of the scan_image_pyramid object.  
         !*/
     public:
+        typedef typename image_scanner_type::feature_vector_type feature_vector_type;
+
         object_detector (
         );
         /*!
@@ -59,7 +60,7 @@ namespace dlib
         object_detector (
             const image_scanner_type& scanner, 
             const overlap_tester_type& overlap_tester,
-            const matrix<double,0,1>& w 
+            const feature_vector_type& w 
         );
         /*!
             requires
@@ -81,7 +82,7 @@ namespace dlib
                   I.e. the copy is done using copy_configuration())
         !*/
 
-        const matrix<double,0,1>& get_w (
+        const feature_vector_type& get_w (
         ) const;
         /*!
             ensures

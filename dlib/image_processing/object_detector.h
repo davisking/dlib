@@ -4,7 +4,6 @@
 #define DLIB_OBJECT_DeTECTOR_H__
 
 #include "object_detector_abstract.h"
-#include "../matrix.h"
 #include "../geometry.h"
 #include <vector>
 #include "box_overlap_testing.h"
@@ -21,6 +20,8 @@ namespace dlib
     class object_detector
     {
     public:
+        typedef typename image_scanner_type::feature_vector_type feature_vector_type;
+
         object_detector (
         );
 
@@ -31,11 +32,11 @@ namespace dlib
         object_detector (
             const image_scanner_type& scanner_, 
             const overlap_tester_type& overlap_tester_,
-            const matrix<double,0,1>& w_ 
+            const feature_vector_type& w_ 
         );
 
-        const matrix<double,0,1>& get_w (
-        ) const;
+        const feature_vector_type& get_w (
+        ) const { return w; }
 
         const overlap_tester_type& get_overlap_tester (
         ) const;
@@ -104,7 +105,7 @@ namespace dlib
         }
 
         overlap_tester_type boxes_overlap;
-        matrix<double,0,1> w;
+        feature_vector_type w;
         image_scanner_type scanner;
     };
 
@@ -178,7 +179,7 @@ namespace dlib
     object_detector (
         const image_scanner_type& scanner_, 
         const overlap_tester_type& overlap_tester,
-        const matrix<double,0,1>& w_ 
+        const feature_vector_type& w_ 
     ) :
         boxes_overlap(overlap_tester),
         w(w_)
@@ -286,19 +287,6 @@ namespace dlib
                 final_dets.push_back(dets[i]);
             }
         }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename image_scanner_type,
-        typename overlap_tester_type
-        >
-    const matrix<double,0,1>& object_detector<image_scanner_type,overlap_tester_type>::
-    get_w (
-    ) const
-    {
-        return w;
     }
 
 // ----------------------------------------------------------------------------------------
