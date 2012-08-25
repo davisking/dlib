@@ -397,6 +397,7 @@ namespace dlib
         ) const;
         /*!
             requires
+                - all_parts_in_rect(obj) == true
                 - obj.movable_parts.size() == get_num_movable_components_per_detection_template()
                 - is_loaded_with_image() == true
                 - get_num_detection_templates() > 0

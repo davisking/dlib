@@ -169,6 +169,7 @@ namespace dlib
             rectangle rect,
             rectangle& mapped_rect,
             detection_template& best_template,
+            rectangle& object_box,
             unsigned long& best_level
         ) const;
 
@@ -643,7 +644,8 @@ namespace dlib
         array<array2d<double> > saliency_images;
         saliency_images.set_max_size(get_num_components_per_detection_template());
         saliency_images.set_size(get_num_components_per_detection_template());
-        std::vector<std::pair<unsigned int,rectangle> > region_rects(get_num_components_per_detection_template()); 
+        std::vector<std::pair<unsigned int,rectangle> > stationary_region_rects(get_num_stationary_components_per_detection_template()); 
+        std::vector<std::pair<unsigned int,rectangle> > movable_region_rects(get_num_movable_components_per_detection_template()); 
         pyramid_type pyr;
         std::vector<std::pair<double, point> > point_dets;
 
@@ -676,10 +678,27 @@ namespace dlib
             for (unsigned long i = 0; i < det_templates.size(); ++i)
             {
                 const point offset = -feats[l].image_to_feat_space(point(0,0));
-                for (unsigned long j = 0; j < region_rects.size(); ++j)
-                    region_rects[j] = std::make_pair(j, translate_rect(feats[l].image_to_feat_space(det_templates[i].rects[j]),offset)); 
+                for (unsigned long j = 0; j < stationary_region_rects.size(); ++j)
+                {
+                    stationary_region_rects[j] = std::make_pair(j, translate_rect(feats[l].image_to_feat_space(det_templates[i].rects[j]),offset)); 
+                }
+                for (unsigned long j = 0; j < movable_region_rects.size(); ++j)
+                {
+                    // Scale the size of the movable rectangle but make sure its center
+                    // stays at point(0,0).
+                    const rectangle temp = feats[l].image_to_feat_space(det_templates[i].movable_rects[j]);
+                    movable_region_rects[j] = std::make_pair(j+stationary_region_rects.size(),
+                                                             centered_rect(point(0,0),temp.width(), temp.height())); 
+                }
 
-                scan_image(point_dets, saliency_images, region_rects, thresh, max_dets_per_template); 
+                // Scale the object box into the feature extraction image, but keeping it
+                // centered at point(0,0).
+                rectangle scaled_object_box = feats[l].image_to_feat_space(det_templates[i].object_box);
+                scaled_object_box = centered_rect(point(0,0),scaled_object_box.width(), scaled_object_box.height());
+
+                scan_image_movable_parts(point_dets, saliency_images, scaled_object_box,
+                                         stationary_region_rects, movable_region_rects,
+                                         thresh, max_dets_per_template); 
 
                 // convert all the point detections into rectangles at the original image scale and coordinate system
                 for (unsigned long j = 0; j < point_dets.size(); ++j)
@@ -717,10 +736,10 @@ namespace dlib
             << "\n\t this: " << this
             );
 
-        rectangle mapped_rect;
+        rectangle mapped_rect, object_box;
         detection_template best_template;
         unsigned long best_level;
-        get_mapped_rect_and_metadata(max_pyramid_levels, rect, mapped_rect, best_template, best_level);
+        get_mapped_rect_and_metadata(max_pyramid_levels, rect, mapped_rect, best_template, object_box, best_level);
         return mapped_rect;
     }
 
@@ -736,6 +755,7 @@ namespace dlib
         rectangle rect,
         rectangle& mapped_rect,
         detection_template& best_template,
+        rectangle& object_box,
         unsigned long& best_level
     ) const
     {
@@ -764,10 +784,10 @@ namespace dlib
                 // because the rect_up() routine takes place using integer arithmetic and
                 // could potentially give slightly different results with and without the
                 // translation.
-                rectangle mapped_rect = translate_rect(det_templates[t].object_box, origin);
-                mapped_rect = pyr.rect_up(mapped_rect, l);
+                rectangle temp2 = translate_rect(det_templates[t].object_box, origin);
+                temp2 = pyr.rect_up(temp2, l);
 
-                const double match_score = get_match_score(mapped_rect, rect);
+                const double match_score = get_match_score(temp2, rect);
                 if (match_score > best_match_score)
                 {
                     best_match_score = match_score;
@@ -790,6 +810,16 @@ namespace dlib
             temp = translate_rect(temp, origin);
             best_template.rects[k] = temp;
         }
+        for (unsigned long k = 0; k < best_template.movable_rects.size(); ++k)
+        {
+            rectangle temp = best_template.movable_rects[k];
+            temp = feats_config.image_to_feat_space(temp);
+            temp = centered_rect(point(0,0), temp.width(), temp.height());
+            best_template.movable_rects[k] = temp;
+        }
+
+        const rectangle scaled_object_box = feats_config.image_to_feat_space(best_template.object_box);
+        object_box = centered_rect(origin-offset, scaled_object_box.width(), scaled_object_box.height());
 
         // The input rectangle was mapped to one of the detection templates.  Reverse the process
         // to figure out what the mapped rectangle is in the original input space.
@@ -806,13 +836,104 @@ namespace dlib
     full_object_detection scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
     get_feature_vector (
         const rectangle& rect,
-        const feature_vector_type&,// w,
+        const feature_vector_type& w,
         feature_vector_type& psi
     ) const
     {
-        // TODO
-        get_feature_vector(full_object_detection(rect), psi);
-        return full_object_detection(rect);
+        full_object_detection obj(rect);
+        // fill in movable part positions.  
+
+        rectangle mapped_rect;
+        detection_template best_template;
+        unsigned long best_level;
+        rectangle object_box;
+        get_mapped_rect_and_metadata(feats.size(), rect, mapped_rect, best_template, object_box, best_level);
+
+        Pyramid_type pyr;
+
+        array2d<double> saliency_image, sum_img;
+
+        double total_temp_score = 0;
+        // convert into feature space.
+        object_box = object_box.intersect(get_rect(feats[best_level]));
+
+        for (unsigned long i = 0; i < get_num_movable_components_per_detection_template(); ++i)
+        {
+            // make the saliency_image for the ith movable part.
+
+            const rectangle part_rect = best_template.movable_rects[i];
+            const rectangle area = grow_rect(object_box, 
+                                             part_rect.width()/2, 
+                                             part_rect.height()/2).intersect(get_rect(feats[best_level]));
+
+            saliency_image.set_size(area.height(), area.width());
+            const unsigned long offset = feats_config.get_num_dimensions()*(i+get_num_stationary_components_per_detection_template());
+
+            // build saliency image for pyramid level best_level 
+            for (long r = area.top(); r <= area.bottom(); ++r)
+            {
+                for (long c = area.left(); c <= area.right(); ++c)
+                {
+                    const typename feature_extractor_type::descriptor_type& descriptor = feats[best_level](r,c);
+
+                    double sum = 0;
+                    for (unsigned long k = 0; k < descriptor.size(); ++k)
+                    {
+                        sum += w(descriptor[k].first + offset)*descriptor[k].second;
+                    }
+                    saliency_image[r-area.top()][c-area.left()] = sum;
+                }
+            }
+
+            sum_img.set_size(saliency_image.nr(), saliency_image.nc());
+            sum_filter_assign(saliency_image, sum_img, part_rect);
+            // Figure out where the maximizer is in sum_img.  Note that we
+            // only look in the part of sum_img that corresponds to a location inside
+            // object_box.
+            rectangle valid_area = get_rect(sum_img);
+            valid_area.left()   += object_box.left()   - area.left();
+            valid_area.top()    += object_box.top()    - area.top();
+            valid_area.right()  += object_box.right()  - area.right();
+            valid_area.bottom() += object_box.bottom() - area.bottom();
+            double max_val = 0;
+            point max_loc;
+            for (long r = valid_area.top(); r <= valid_area.bottom(); ++r)
+            {
+                for (long c = valid_area.left(); c <= valid_area.right(); ++c)
+                {
+                    if (sum_img[r][c] > max_val)
+                    {
+                        //if (object_box.contains(point(c,r) + area.tl_corner()))
+                        {
+                            max_loc = point(c,r);
+                            max_val = sum_img[r][c];
+                        }
+                    }
+                }
+            }
+
+            if (max_val <= 0)
+            {
+                max_loc = MOVABLE_PART_NOT_PRESENT;
+            }
+            else
+            {
+                total_temp_score += max_val;
+                // convert max_loc back into feature image space from our cropped image.
+                max_loc += area.tl_corner();
+
+                // now convert from feature space to image space.
+                max_loc = feats[best_level].feat_to_image_space(max_loc);
+                max_loc = pyr.point_up(max_loc, best_level);
+                max_loc = nearest_point(obj.rect, max_loc);
+            }
+
+            obj.movable_parts.push_back(max_loc);
+        }
+
+
+        get_feature_vector(obj, psi);
+        return obj;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -842,18 +963,49 @@ namespace dlib
             << "\n\t obj.movable_parts.size():                            " << obj.movable_parts.size()
             << "\n\t this: " << this
             );
+        DLIB_ASSERT(all_parts_in_rect(obj), 
+            "\t void scan_image_pyramid::get_feature_vector()"
+            << "\n\t Invalid inputs were given to this function "
+            << "\n\t obj.rect: " << obj.rect
+            << "\n\t this: " << this
+        );
+
 
         const rectangle rect = obj.rect;
 
-        pyramid_type pyr;
         rectangle mapped_rect;
         detection_template best_template;
         unsigned long best_level;
-        get_mapped_rect_and_metadata (feats.size(), rect, mapped_rect, best_template, best_level);
+        rectangle object_box;
+        get_mapped_rect_and_metadata (feats.size(), rect, mapped_rect, best_template, object_box, best_level);
 
-        for (unsigned long j = 0; j < best_template.rects.size(); ++j)
+        Pyramid_type pyr;
+
+        // put the movable rects at the places indicated by obj.
+        std::vector<rectangle> rects = best_template.rects;
+        for (unsigned long i = 0; i < obj.movable_parts.size(); ++i)
         {
-            const rectangle rect = best_template.rects[j].intersect(get_rect(feats[best_level]));
+            if (obj.movable_parts[i] != MOVABLE_PART_NOT_PRESENT)
+            {
+                // map from the original image to scaled feature space.
+                point loc = feats[best_level].image_to_feat_space(pyr.point_down(obj.movable_parts[i], best_level));
+                // Make sure the movable part always stays within the object_box.
+                // Otherwise it would be at a place that the detect() function can never
+                // look.  
+                loc = nearest_point(object_box, loc);
+                rects.push_back(translate_rect(best_template.movable_rects[i], loc));
+            }
+            else
+            {
+                // add an empty rectangle since this part wasn't observed.
+                rects.push_back(rectangle());
+            }
+        }
+
+        // pull features out of all the boxes in rects.
+        for (unsigned long j = 0; j < rects.size(); ++j)
+        {
+            const rectangle rect = rects[j].intersect(get_rect(feats[best_level]));
             const unsigned long template_region_id = j;
             const unsigned long offset = feats_config.get_num_dimensions()*template_region_id;
             for (long r = rect.top(); r <= rect.bottom(); ++r)
