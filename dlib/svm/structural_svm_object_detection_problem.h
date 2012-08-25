@@ -319,6 +319,9 @@ namespace dlib
             hit_truth_table.assign(hit_truth_table.size(), false);
 
             final_dets.clear();
+#ifdef ENABLE_ASSERTS
+            double total_score = 0;
+#endif
             // Now figure out which detections jointly maximize the loss and detection score sum.  We
             // need to take into account the fact that allowing a true detection in the output, while 
             // initially reducing the loss, may allow us to increase the loss later with many duplicate
@@ -339,11 +342,17 @@ namespace dlib
                         {
                             hit_truth_table[truth.second] = true;
                             final_dets.push_back(dets[i].second);
+#ifdef ENABLE_ASSERTS
+                            total_score += dets[i].first;
+#endif
                             loss -= loss_per_missed_target;
                         }
                         else
                         {
                             final_dets.push_back(dets[i].second);
+#ifdef ENABLE_ASSERTS
+                            total_score += dets[i].first;
+#endif
                             loss += loss_per_false_alarm;
                         }
                     }
@@ -352,6 +361,9 @@ namespace dlib
                 {
                     // didn't hit anything
                     final_dets.push_back(dets[i].second);
+#ifdef ENABLE_ASSERTS
+                    total_score += dets[i].first;
+#endif
                     loss += loss_per_false_alarm;
                 }
             }
@@ -360,6 +372,17 @@ namespace dlib
             psi = 0;
             for (unsigned long i = 0; i < final_dets.size(); ++i)
                 scanner.get_feature_vector(final_dets[i], current_solution, psi);
+
+#ifdef ENABLE_ASSERTS
+            const double psi_score = dot(psi, current_solution);
+            DLIB_ASSERT(std::abs(psi_score-total_score)*std::max(psi_score,total_score) < 1e-10,
+                        "\t The get_feature_vector() and detect() methods of image_scanner_type are not in sync." 
+                        << "\n\t The relative error is too large to be attributed to rounding error."
+                        << "\n\t relative error: " << std::abs(psi_score-total_score)*std::max(psi_score,total_score)
+                        << "\n\t psi_score:      " << psi_score
+                        << "\n\t total_score:    " << total_score
+            );
+#endif
 
             psi(scanner.get_num_dimensions()) = -1.0*final_dets.size();
         }
