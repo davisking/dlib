@@ -6,6 +6,7 @@
 #include <vector>
 #include "../matrix.h"
 #include "../geometry.h"
+#include "../image_processing/full_object_detection_abstract.h"
 
 namespace dlib
 {
@@ -19,7 +20,7 @@ namespace dlib
     const matrix<double,1,2> test_object_detection_function (
         object_detector_type& detector,
         const image_array_type& images,
-        const std::vector<std::vector<rectangle> >& truth_rects,
+        const std::vector<std::vector<full_object_detection> >& truth_rects,
         const double overlap_eps = 0.5
     );
     /*!
@@ -50,7 +51,56 @@ namespace dlib
                     T and R match if and only if: T.intersect(R).area()/(T+R).area() > overlap_eps
     !*/
 
+    template <
+        typename object_detector_type,
+        typename image_array_type
+        >
+    const matrix<double,1,2> test_object_detection_function (
+        object_detector_type& detector,
+        const image_array_type& images,
+        const std::vector<std::vector<rectangle> >& truth_rects,
+        const double overlap_eps = 0.5
+    );
+    /*!
+        requires
+            - all the requirements of the above test_object_detection_function() routine.
+        ensures
+            - converts all the rectangles in truth_rects into full_object_detection objects
+              via full_object_detection's rectangle constructor.  Then invokes
+              test_object_detection_function() on the full_object_detections and returns
+              the results.  
+    !*/
+
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename trainer_type,
+        typename image_array_type
+        >
+    const matrix<double,1,2> cross_validate_object_detection_trainer (
+        const trainer_type& trainer,
+        const image_array_type& images,
+        const std::vector<std::vector<full_object_detection> >& truth_rects,
+        const long folds,
+        const double overlap_eps = 0.5
+    );
+    /*!
+        requires
+            - is_learning_problem(images,truth_rects)
+            - 0 < overlap_eps <= 1
+            - 1 < folds <= images.size()
+            - trainer_type == some kind of object detection trainer (e.g structural_object_detection_trainer)
+            - image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
+              and it must contain objects which can be accepted by detector().
+            - it is legal to call trainer.train(images, truth_rects)
+        ensures
+            - Performs k-fold cross-validation by using the given trainer to solve an 
+              object detection problem for the given number of folds.  Each fold is tested 
+              using the output of the trainer and a matrix summarizing the results is 
+              returned.  The matrix contains the precision and recall of the trained 
+              detectors and is defined identically to the test_object_detection_function()
+              routine defined at the top of this file.
+    !*/
 
     template <
         typename trainer_type,
@@ -65,21 +115,13 @@ namespace dlib
     );
     /*!
         requires
-            - is_learning_problem(images,truth_rects)
-            - 0 < overlap_eps <= 1
-            - 1 < folds <= images.size()
-            - trainer_type == some kind of object detection trainer (e.g structural_object_detection_trainer)
-            - image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
-              and it must contain objects which can be accepted by detector().
+            - all the requirements of the above cross_validate_object_detection_trainer() routine.
         ensures
-            - Performs k-fold cross-validation by using the given trainer to solve an 
-              object detection problem for the given number of folds.  Each fold is tested 
-              using the output of the trainer and a matrix summarizing the results is 
-              returned.  The matrix contains the precision and recall of the trained 
-              detectors and is defined identically to the test_object_detection_function()
-              routine defined at the top of this file.
+            - converts all the rectangles in truth_rects into full_object_detection objects
+              via full_object_detection's rectangle constructor.  Then invokes
+              cross_validate_object_detection_trainer() on the full_object_detections and
+              returns the results.  
     !*/
-
 // ----------------------------------------------------------------------------------------
 
 }
