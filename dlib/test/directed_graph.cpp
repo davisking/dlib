@@ -44,7 +44,7 @@ namespace
 
         COMPILE_TIME_ASSERT(is_directed_graph<directed_graph>::value == true);
         directed_graph a, b;
-        set<unsigned long>::compare_1b_c s;
+        dlib::set<unsigned long>::compare_1b_c s;
 
         DLIB_TEST(graph_contains_directed_cycle(a) == false);
         DLIB_TEST(graph_contains_undirected_cycle(a) == false);
@@ -383,8 +383,8 @@ namespace
         graph<int>::kernel_1a_c g;
         create_moral_graph(a,g);
 
-        graph<set<unsigned long>::compare_1b_c, set<unsigned long>::compare_1a_c>::kernel_1a_c join_tree;
-        set<set<unsigned long>::compare_1b_c>::kernel_1b_c sos;
+        graph<dlib::set<unsigned long>::compare_1b_c, dlib::set<unsigned long>::compare_1a_c>::kernel_1a_c join_tree;
+        dlib::set<dlib::set<unsigned long>::compare_1b_c>::kernel_1b_c sos;
 
         create_join_tree(g, join_tree);
         DLIB_TEST(is_join_tree(g, join_tree));

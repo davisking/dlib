@@ -450,13 +450,13 @@ namespace
         )
         {
             dlog << LINFO << "testing compare_1a";
-            set_compare_test<set<int>::compare_1a>  ();
+            set_compare_test<dlib::set<int>::compare_1a>  ();
             dlog << LINFO << "testing compare_1a_c";
-            set_compare_test<set<int>::compare_1a_c>();
+            set_compare_test<dlib::set<int>::compare_1a_c>();
             dlog << LINFO << "testing compare_1b";
-            set_compare_test<set<int>::compare_1b>  ();
+            set_compare_test<dlib::set<int>::compare_1b>  ();
             dlog << LINFO << "testing compare_1b_c";
-            set_compare_test<set<int>::compare_1b_c>();
+            set_compare_test<dlib::set<int>::compare_1b_c>();
         }
     } a;
 

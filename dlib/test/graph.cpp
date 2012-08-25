@@ -45,7 +45,7 @@ namespace
         COMPILE_TIME_ASSERT(is_graph<graph>::value);
 
         graph a, b;
-        set<unsigned long>::compare_1b_c s;
+        dlib::set<unsigned long>::compare_1b_c s;
 
         DLIB_TEST(graph_contains_length_one_cycle(a) == false);
         DLIB_TEST(graph_contains_undirected_cycle(a) == false);
@@ -273,9 +273,9 @@ namespace
 
         DLIB_TEST(graph_is_connected(a));
 
-        set<set<unsigned long>::compare_1b_c>::kernel_1b_c sos;
+        dlib::set<dlib::set<unsigned long>::compare_1b_c>::kernel_1b_c sos;
 
-        dlib::graph<set<unsigned long>::compare_1b_c, set<unsigned long>::compare_1b_c>::kernel_1a_c join_tree;
+        dlib::graph<dlib::set<unsigned long>::compare_1b_c, dlib::set<unsigned long>::compare_1b_c>::kernel_1a_c join_tree;
         unsigned long temp;
         triangulate_graph_and_find_cliques(a,sos);
         DLIB_TEST(a.number_of_nodes() == 8);
