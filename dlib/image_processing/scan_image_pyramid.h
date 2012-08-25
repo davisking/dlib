@@ -113,10 +113,9 @@ namespace dlib
             feature_vector_type& psi
         ) const;
 
-        full_object_detection get_feature_vector (
+        full_object_detection get_full_object_detection (
             const rectangle& rect,
-            const feature_vector_type& w,
-            feature_vector_type& psi
+            const feature_vector_type& w
         ) const;
 
         const rectangle get_best_matching_rect (
@@ -834,10 +833,9 @@ namespace dlib
         typename Feature_extractor_type
         >
     full_object_detection scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
-    get_feature_vector (
+    get_full_object_detection (
         const rectangle& rect,
-        const feature_vector_type& w,
-        feature_vector_type& psi
+        const feature_vector_type& w
     ) const
     {
         full_object_detection obj(rect);
@@ -931,8 +929,6 @@ namespace dlib
             obj.movable_parts.push_back(max_loc);
         }
 
-
-        get_feature_vector(obj, psi);
         return obj;
     }
 

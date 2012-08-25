@@ -65,8 +65,9 @@ namespace
             {
                 DLIB_TEST(dets[j] == dets2[j].second);
 
+                const full_object_detection fdet = detector.get_scanner().get_full_object_detection(dets[j], detector.get_w());
                 psi = 0;
-                const full_object_detection fdet = detector.get_scanner().get_feature_vector(dets[j], detector.get_w(), psi);
+                detector.get_scanner().get_feature_vector(fdet, psi);
 
                 double check_score = dot(psi,detector.get_w()) - thresh;
                 DLIB_TEST(std::abs(check_score - dets2[j].first) < 1e-10);

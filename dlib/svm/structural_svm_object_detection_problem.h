@@ -371,7 +371,7 @@ namespace dlib
             psi.set_size(get_num_dimensions());
             psi = 0;
             for (unsigned long i = 0; i < final_dets.size(); ++i)
-                scanner.get_feature_vector(final_dets[i], current_solution, psi);
+                scanner.get_feature_vector(scanner.get_full_object_detection(final_dets[i], current_solution), psi);
 
 #ifdef ENABLE_ASSERTS
             const double psi_score = dot(psi, current_solution);

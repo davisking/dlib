@@ -130,8 +130,9 @@ namespace dlib
                   confidence detections come first.  E.g. element 0 is the best detection,
                   element 1 the next best, and so on.
                 - #get_scanner() will have been loaded with img. Therefore, you can call
-                  #get_scanner().get_feature_vector() to obtain the feature vectors for
-                  the resulting object detection boxes.
+                  #get_scanner().get_feature_vector() to obtain the feature vectors or
+                  #get_scanner().get_full_object_detection() to get the
+                  full_object_detections for the resulting object detection boxes.
         !*/
 
         template <
@@ -158,6 +159,7 @@ namespace dlib
                     - #dets[i].second == the bounding box for the i-th detection.
                 - #get_scanner() will have been loaded with img. Therefore, you can call
                   #get_scanner().get_feature_vector() to obtain the feature vectors or
+                  #get_scanner().get_full_object_detection() to get the
                   full_object_detections for the resulting object detection boxes.
                 - The detection threshold is adjusted by having adjust_threshold added
                   to it.  Therefore, an adjust_threshold value > 0 makes detecting

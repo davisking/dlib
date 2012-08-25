@@ -404,46 +404,38 @@ namespace dlib
                 - psi.size() >= get_num_dimensions()
                   (i.e. psi must have preallocated its memory before this function is called)
             ensures
-                - This function allows you to determine the feature vector used for a sliding window location.
-                  Note that this vector is added to psi.
-                - Since scan_image_pyramid is a sliding window classifier system, not all possible rectangles can 
-                  be output by detect().  So in the case where obj.rect could not arise from a call to detect(), this 
-                  function will map obj.rect to the nearest possible object box and then add the feature vector for 
-                  the mapped rectangle into #psi.
-                - get_best_matching_rect(obj.rect) == the rectangle obj.rect gets mapped to for feature extraction.
+                - This function allows you to determine the feature vector used for a
+                  sliding window location.  Note that this vector is added to psi.  Note
+                  also that you must use get_full_object_detection() to convert a rect from
+                  detect() into the needed full_object_detection.
+                - Since scan_image_pyramid is a sliding window classifier system, not all
+                  possible rectangles can be output by detect().  So in the case where
+                  obj.rect could not arise from a call to detect(), this function will map
+                  obj.rect to the nearest possible object box and then add the feature
+                  vector for the mapped rectangle into #psi.
+                - get_best_matching_rect(obj.rect) == the rectangle obj.rect gets mapped to
+                  for feature extraction.
         !*/
 
-        full_object_detection get_feature_vector (
+        full_object_detection get_full_object_detection (
             const rectangle& rect,
-            const feature_vector_type& w,
-            feature_vector_type& psi
+            const feature_vector_type& w
         ) const;
         /*!
             requires
                 - w.size() >= get_num_dimensions()
                 - is_loaded_with_image() == true
                 - get_num_detection_templates() > 0
-                - psi.size() >= get_num_dimensions()
-                  (i.e. psi must have preallocated its memory before this function is called)
             ensures
-                - This function allows you to determine the feature vector used for a sliding window location.
-                  Note that this vector is added to psi.
-                - if (rect was produced by a call to detect(), i.e. rect contains an element of dets) then
-                    - #psi == psi + the feature vector corresponding to the sliding window location indicated 
-                      by rect.
-                    - If w is the w vector given to detect(), then if we assigned 0 to psi before calling
-                      get_feature_vector() then we have:
-                        - dot(w,#psi) == the score produced by detect() for rect.
-                    - get_best_matching_rect(rect) == rect
-                - else
-                    - Since scan_image_pyramid is a sliding window classifier system, not all possible rectangles can 
-                      be output by detect().  So in the case where rect could not arise from a call to detect(), this 
-                      function will map rect to the nearest possible object box and then add the feature vector for 
-                      the mapped rectangle into #psi.
-                    - get_best_matching_rect(rect) == the rectangle rect gets mapped to for feature extraction.
-                - returns a full_object_detection OBJ such that calling get_feature_vector(OBJ,psi)
-                  and get_feature_vector(OBJ.rect,w,psi) on a psi of 0 would both result in the same psi vector being output.
-                  This means that:
+                - This function allows you to determine the full_object_detection
+                  corresponding to a sliding window location.  Note that the detect()
+                  routine doesn't return the locations of the movable parts in a detected
+                  object.  Therefore, if you are using any movable parts in your model you
+                  must use get_full_object_detection() to find out where the movable parts
+                  were detected.  To do this, you supply the w and detected rectangle.
+                  Then the corresponding fully populated full_object_detection will be
+                  returned.
+                - returns a full_object_detection, OBJ, such that: 
                     - OBJ.rect == rect
                     - OBJ.movable_parts.size() == get_num_movable_components_per_detection_template()
                     - OBJ.movable_parts == the locations of the movable parts inside this detection.
