@@ -70,6 +70,7 @@ namespace dlib
                             truth_object_detections[i][j].movable_parts.size()
                         << "\n\t scanner.get_num_movable_components_per_detection_template(): " << 
                             scanner.get_num_movable_components_per_detection_template()
+                        << "\n\t all_parts_in_rect(truth_object_detections["<<i<<"]["<<j<<"]): " << all_parts_in_rect(truth_object_detections[i][j])
                     );
                 }
             }

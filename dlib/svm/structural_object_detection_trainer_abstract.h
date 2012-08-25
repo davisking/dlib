@@ -296,6 +296,7 @@ namespace dlib
                   (also, image_array_type must be an implementation of dlib/array/array_kernel_abstract.h)
                 - for all valid i, j:
                     - truth_object_detections[i][j].movable_parts.size() == get_scanner().get_num_movable_components_per_detection_template() 
+                    - all_parts_in_rect(truth_object_detections[i][j]) == true
             ensures
                 - Uses the structural_svm_object_detection_problem to train an object_detector 
                   on the given images and truth_object_detections.  

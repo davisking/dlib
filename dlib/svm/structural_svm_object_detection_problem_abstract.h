@@ -92,6 +92,7 @@ namespace dlib
                 - scanner.load(images[0]) must be a valid expression.
                 - for all valid i, j:
                     - truth_object_detections[i][j].movable_rects.size() == scanner.get_num_movable_components_per_detection_template() 
+                    - all_parts_in_rect(truth_object_detections[i][j]) == true
             ensures
                 - This object attempts to learn a mapping from the given images to the 
                   object locations given in truth_object_detections.  In particular, it attempts to 
