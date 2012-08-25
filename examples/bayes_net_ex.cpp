@@ -168,7 +168,7 @@ int main()
 
         // First we need to create an undirected graph which contains set objects at each node and
         // edge.  This long declaration does the trick.
-        typedef set<unsigned long>::compare_1b_c set_type;
+        typedef dlib::set<unsigned long>::compare_1b_c set_type;
         typedef graph<set_type, set_type>::kernel_1a_c join_tree_type;
         join_tree_type join_tree;
 
