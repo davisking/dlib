@@ -127,6 +127,9 @@ namespace dlib
         std::ostream& out
     )
     {
+        int version = 1;
+        serialize(version, out);
+
         T scanner;
         scanner.copy_configuration(item.scanner);
         serialize(scanner, out);
@@ -142,6 +145,11 @@ namespace dlib
         std::istream& in 
     )
     {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version encountered while deserializing a dlib::object_detector object.");
+
         deserialize(item.scanner, in);
         deserialize(item.w, in);
         deserialize(item.boxes_overlap, in);

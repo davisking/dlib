@@ -152,12 +152,19 @@ namespace dlib
 
         friend void serialize(const detection_template& item, std::ostream& out)
         {
+            int version = 1;
+            serialize(version, out);
             serialize(item.object_box, out);
             serialize(item.rects, out);
             serialize(item.movable_rects, out);
         }
         friend void deserialize(detection_template& item, std::istream& in)
         {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version found while deserializing a dlib::scan_image_pyramid::detection_template object.");
+
             deserialize(item.object_box, in);
             deserialize(item.rects, in);
             deserialize(item.movable_rects, in);
