@@ -94,7 +94,7 @@ namespace dlib
             - returns true if all the parts in obj are contained within obj.get_rect().
               That is, returns true if and only if, for all valid i, the following is
               always true:
-                obj.get_rect().contains(obj.parts()[i]) == true || obj.parts()[i] == OBJECT_PART_NOT_PRESENT
+                obj.get_rect().contains(obj.part(i)) == true || obj.part(i) == OBJECT_PART_NOT_PRESENT
     !*/
 
 // ----------------------------------------------------------------------------------------
