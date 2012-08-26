@@ -592,6 +592,13 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 training algorithms, the number of support vectors grows approximately 
                 linearly with the size of the training set).  
             </p>
+            <p>
+              However, if you are considering using svm_pegasos, you should also try the 
+              <a href="#svm_c_linear_trainer">svm_c_linear_trainer</a> for linear
+              kernels or <a href="#svm_c_ekm_trainer">svm_c_ekm_trainer</a> for non-linear
+              kernels since these other trainers are, usually, faster and easier to use
+              than svm_pegasos.
+            </p>
          </description>
 
          <examples>
