@@ -48,6 +48,7 @@ namespace dlib
                     Beyond Bags of Features: Spatial Pyramid Matching for Recognizing 
                     Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
                     and Jean Ponce
+                It also includes the ability to represent movable part models.
 
                 
 
@@ -88,8 +89,11 @@ namespace dlib
                 score of the classifier.  Note further that each of the movable feature extraction
                 zones must pass a threshold test for it to be included.  That is, if the score that a
                 movable zone would contribute to the overall score for a sliding window location is not
-                positive then that zone is not included in the feature vector (i.e. its part of the
-                feature vector is set to zero.  This way the length of the feature vector stays constant).
+                positive then that zone is not included in the feature vector (i.e.  its part of the
+                feature vector is set to zero.  This way the length of the feature vector stays
+                constant).  This movable region construction allows us to represent objects with parts
+                that move around relative to the object box.  For example, a human has hands but they
+                aren't always in the same place relative to a person's bounding box.  
 
             THREAD SAFETY
                 Concurrent access to an instance of this object is not safe and should be protected

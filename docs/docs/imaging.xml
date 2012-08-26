@@ -1574,6 +1574,7 @@
                     Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
                     and Jean Ponce
                 </blockquote>
+                It also includes the ability to represent movable part models.
 
                <br/><br/>
                The following feature extractors can be used with the scan_image_pyramid object:

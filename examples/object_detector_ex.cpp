@@ -121,22 +121,22 @@ int main()
                       problem you are trying to solve.
 
                    2. A detection template.  This is a rectangle which defines the shape of a 
-                      sliding window (the object_box), as well as a set of rectangles which
-                      envelop it.  This set of enveloping rectangles defines the spatial
-                      structure of the overall feature extraction within a sliding window.  
-                      In particular, each location of a sliding window has a feature vector
+                      sliding window (i.e. the object_box), as well as a set of rectangular feature 
+                      extraction regions inside it.  This set of regions defines the spatial 
+                      structure of the overall feature extraction within a sliding window.  In 
+                      particular, each location of a sliding window has a feature vector 
                       associated with it.  This feature vector is defined as follows:
-                        - Let N denote the number of enveloping rectangles.
-                        - Let M denote the dimensionality of the vectors output by feature_extractor_type
+                        - Let N denote the number of feature extraction zones.
+                        - Let M denote the dimensionality of the vectors output by Feature_extractor_type
                           objects.
                         - Let F(i) == the M dimensional vector which is the sum of all vectors 
-                          given by our feature_extractor_type object inside the ith enveloping 
-                          rectangle.
+                          given by our Feature_extractor_type object inside the ith feature extraction
+                          zone.
                         - Then the feature vector for a sliding window is an M*N dimensional vector
                           [F(1) F(2) F(3) ... F(N)] (i.e. it is a concatenation of the N vectors).
                           This feature vector can be thought of as a collection of N "bags of features",
-                          each bag coming from a spatial location determined by one of the enveloping 
-                          rectangles. 
+                          each bag coming from a spatial location determined by one of the rectangular
+                          feature extraction zones.
                           
                    3. A weight vector and a threshold value.  The dot product between the weight
                       vector and the feature vector for a sliding window location gives the score 
@@ -145,11 +145,27 @@ int main()
                       parameters yourself.  They are automatically populated by the 
                       structural_object_detection_trainer.
 
-                Finally, the sliding window classifiers described above are applied to every level 
-                of an image pyramid.   So you need to tell scan_image_pyramid what kind of pyramid
-                you want to use.  In this case we are using pyramid_down which downsamples each
-                pyramid layer by half (dlib also contains other version of pyramid_down which result 
-                in finer grained pyramids).
+                The sliding window classifiers described above are applied to every level of an image
+                pyramid.   So you need to tell scan_image_pyramid what kind of pyramid you want to
+                use.  In this case we are using pyramid_down which downsamples each pyramid layer by
+                half (dlib also contains other version of pyramid_down which result in finer grained
+                pyramids).
+
+                Finally, some of the feature extraction zones are allowed to move freely within the
+                object box.  This means that when we are sliding the classifier over an image, some
+                feature extraction zones are stationary (i.e. always in the same place relative to
+                the object box) while others are allowed to move anywhere within the object box.  In
+                particular, the movable regions are placed at the locations that maximize the score
+                of the classifier.  Note further that each of the movable feature extraction zones
+                must pass a threshold test for it to be included.  That is, if the score that a
+                movable zone would contribute to the overall score for a sliding window location is
+                not positive then that zone is not included in the feature vector (i.e. its part of
+                the feature vector is set to zero.  This way the length of the feature vector stays
+                constant).  This movable region construction allows us to represent objects with
+                parts that move around relative to the object box.  For example, a human has hands
+                but they aren't always in the same place relative to a person's bounding box.
+                However, to keep this example program simple, we will only be using stationary
+                feature extraction regions.
         */
         typedef hashed_feature_image<hog_image<3,3,1,4,hog_signed_gradient,hog_full_interpolation> > feature_extractor_type;
         typedef scan_image_pyramid<pyramid_down, feature_extractor_type> image_scanner_type;
@@ -167,8 +183,8 @@ int main()
         // we only added square detection templates then it would be impossible to detect this non-square
         // rectangle.  The setup_grid_detection_templates_verbose() routine will take care of this for us by 
         // looking at the contents of object_locations and automatically picking an appropriate set.  Also, 
-        // the final arguments indicate that we want our detection templates to have 4 enveloping rectangles 
-        // laid out in a 2x2 regular grid inside each sliding window.
+        // the final arguments indicate that we want our detection templates to have 4 feature extraction 
+        // regions laid out in a 2x2 regular grid inside each sliding window.
         setup_grid_detection_templates_verbose(scanner, object_locations, 2, 2);
 
 
