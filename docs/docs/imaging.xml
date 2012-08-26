@@ -80,6 +80,7 @@
       <section>
          <name>Object Detection</name>
          <item>object_detector</item>
+         <item>full_object_detection</item>
          <item>scan_image</item>
          <item>scan_image_movable_parts</item>
          <item>find_points_above_thresh</item>
@@ -1585,6 +1586,19 @@
             <example>object_detector_ex.cpp.html</example>
             <example>object_detector_advanced_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>full_object_detection</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/full_object_detection_abstract.h</spec_file>
+         <description>        
+                This object represents the location of an object in an image along with the
+                positions of each of its constituent parts.
+         </description>
                                  
       </component>
             

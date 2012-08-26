@@ -1144,6 +1144,8 @@
 
          <term file="imaging.html" name="test_box_overlap"/>
          <term file="imaging.html" name="object_detector"/>
+         <term file="imaging.html" name="full_object_detection"/>
+         <term file="dlib/image_processing/full_object_detection_abstract.h.html" name="all_parts_in_rect"/>
 
          <term file="imaging.html" name="scan_image_movable_parts"/>
          <term file="imaging.html" name="find_points_above_thresh"/>
