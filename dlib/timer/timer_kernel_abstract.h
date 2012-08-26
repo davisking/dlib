@@ -123,9 +123,9 @@ namespace dlib
         /*!
             ensures
                 - does not block.
-                - returns the amount of time that *this will wait between the return of
-                  one call to the action_function() and the beginning of the next call
-                  to the action_function().
+                - returns the amount of time, in milliseconds, that *this will wait between
+                  the return of one call to the action_function() and the beginning of the
+                  next call to the action_function().
         !*/
 
         void set_delay_time (
