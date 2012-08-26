@@ -275,48 +275,61 @@ namespace
         // Now make some squares and draw them onto our black images. All the
         // squares will be 70 pixels wide and tall.
         const int shrink = 0;
-
         std::vector<full_object_detection> temp;
-        temp.push_back(full_object_detection(centered_rect(point(100,100), 70,71))); 
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tr_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).bl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).br_corner());
-        fill_rect(images[0],temp.back().rect,255); // Paint the square white
 
-        temp.push_back(full_object_detection(centered_rect(point(200,300), 70,71)));
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tr_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).bl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).br_corner());
-        fill_rect(images[0],temp.back().rect,255); // Paint the square white
+        rectangle rect = centered_rect(point(100,100), 70,71);
+        std::vector<point> movable_parts;
+        movable_parts.push_back(shrink_rect(rect,shrink).tl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
+        temp.push_back(full_object_detection(rect, movable_parts)); 
+        fill_rect(images[0],rect,255); // Paint the square white
 
-        object_locations.push_back(temp);
-
-        temp.clear();
-        temp.push_back(full_object_detection(centered_rect(point(140,200), 70,71)));
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tr_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).bl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).br_corner());
-        fill_rect(images[1],temp.back().rect,255); // Paint the square white
-
-        temp.push_back(full_object_detection(centered_rect(point(303,200), 70,71)));
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tr_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).bl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).br_corner());
-        fill_rect(images[1],temp.back().rect,255); // Paint the square white
+        rect = centered_rect(point(200,200), 70,71);
+        movable_parts.clear();
+        movable_parts.push_back(shrink_rect(rect,shrink).tl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
+        temp.push_back(full_object_detection(rect, movable_parts)); 
+        fill_rect(images[0],rect,255); // Paint the square white
 
         object_locations.push_back(temp);
-
+        // ------------------------------------
         temp.clear();
-        temp.push_back(full_object_detection(centered_rect(point(123,121), 70,71)));
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).tr_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).bl_corner());
-        temp.back().movable_parts.push_back(shrink_rect(temp.back().rect,shrink).br_corner());
-        fill_rect(images[2],temp.back().rect,255); // Paint the square white
+
+        rect = centered_rect(point(140,200), 70,71);
+        movable_parts.clear();
+        movable_parts.push_back(shrink_rect(rect,shrink).tl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
+        temp.push_back(full_object_detection(rect, movable_parts)); 
+        fill_rect(images[1],rect,255); // Paint the square white
+
+
+        rect = centered_rect(point(303,200), 70,71);
+        movable_parts.clear();
+        movable_parts.push_back(shrink_rect(rect,shrink).tl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
+        temp.push_back(full_object_detection(rect, movable_parts)); 
+        fill_rect(images[1],rect,255); // Paint the square white
+
+        object_locations.push_back(temp);
+        // ------------------------------------
+        temp.clear();
+
+        rect = centered_rect(point(123,121), 70,71);
+        movable_parts.clear();
+        movable_parts.push_back(shrink_rect(rect,shrink).tl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());
+        movable_parts.push_back(shrink_rect(rect,shrink).br_corner());
+        temp.push_back(full_object_detection(rect, movable_parts)); 
+        fill_rect(images[2],rect,255); // Paint the square white
 
         object_locations.push_back(temp);
 

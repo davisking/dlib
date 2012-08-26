@@ -63,11 +63,11 @@ namespace dlib
             {
                 for (unsigned long j = 0; j < truth_object_detections[i].size(); ++j)
                 {
-                    DLIB_ASSERT(truth_object_detections[i][j].movable_parts.size() == scanner.get_num_movable_components_per_detection_template(),
+                    DLIB_ASSERT(truth_object_detections[i][j].num_parts() == scanner.get_num_movable_components_per_detection_template(),
                         "\t trained_function_type structural_object_detection_trainer::train()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].movable_parts.size():          " << 
-                            truth_object_detections[i][j].movable_parts.size()
+                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].num_parts():          " << 
+                            truth_object_detections[i][j].num_parts()
                         << "\n\t scanner.get_num_movable_components_per_detection_template(): " << 
                             scanner.get_num_movable_components_per_detection_template()
                         << "\n\t all_parts_in_rect(truth_object_detections["<<i<<"]["<<j<<"]): " << all_parts_in_rect(truth_object_detections[i][j])
@@ -180,7 +180,7 @@ namespace dlib
             psi = 0;
             for (unsigned long i = 0; i < truth_object_detections[idx].size(); ++i)
             {
-                mapped_rects.push_back(scanner.get_best_matching_rect(truth_object_detections[idx][i].rect));
+                mapped_rects.push_back(scanner.get_best_matching_rect(truth_object_detections[idx][i].get_rect()));
                 scanner.get_feature_vector(truth_object_detections[idx][i], psi);
             }
             psi(scanner.get_num_dimensions()) = -1.0*truth_object_detections[idx].size();
@@ -225,8 +225,8 @@ namespace dlib
             // truth rectangles.
             for (unsigned long i = 0; i < mapped_rects.size(); ++i)
             {
-                const double area = (truth_object_detections[idx][i].rect.intersect(mapped_rects[i])).area();
-                const double total_area = (truth_object_detections[idx][i].rect + mapped_rects[i]).area();
+                const double area = (truth_object_detections[idx][i].get_rect().intersect(mapped_rects[i])).area();
+                const double total_area = (truth_object_detections[idx][i].get_rect() + mapped_rects[i]).area();
                 if (area/total_area <= match_eps)
                 {
                     using namespace std;
@@ -249,9 +249,9 @@ namespace dlib
                     sout << "image index              "<< idx << endl;
                     sout << "match_eps:               "<< match_eps << endl;
                     sout << "best possible match:     "<< area/total_area << endl;
-                    sout << "truth rect:              "<< truth_object_detections[idx][i].rect << endl;
-                    sout << "truth rect width/height: "<< truth_object_detections[idx][i].rect.width()/(double)truth_object_detections[idx][i].rect.height() << endl;
-                    sout << "truth rect area:         "<< truth_object_detections[idx][i].rect.area() << endl;
+                    sout << "truth rect:              "<< truth_object_detections[idx][i].get_rect() << endl;
+                    sout << "truth rect width/height: "<< truth_object_detections[idx][i].get_rect().width()/(double)truth_object_detections[idx][i].get_rect().height() << endl;
+                    sout << "truth rect area:         "<< truth_object_detections[idx][i].get_rect().area() << endl;
                     sout << "nearest detection template rect:              "<< mapped_rects[i] << endl;
                     sout << "nearest detection template rect width/height: "<< mapped_rects[i].width()/(double)mapped_rects[i].height() << endl;
                     sout << "nearest detection template rect area:         "<< mapped_rects[i].area() << endl;
@@ -422,10 +422,10 @@ namespace dlib
             for (unsigned long i = 0; i < boxes.size(); ++i)
             {
 
-                const unsigned long area = rect.intersect(boxes[i].rect).area();
+                const unsigned long area = rect.intersect(boxes[i].get_rect()).area();
                 if (area != 0)
                 {
-                    const double new_match = area / static_cast<double>((rect + boxes[i].rect).area());
+                    const double new_match = area / static_cast<double>((rect + boxes[i].get_rect()).area());
                     if (new_match > match)
                     {
                         match = new_match;

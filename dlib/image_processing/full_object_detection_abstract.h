@@ -1,4 +1,4 @@
-// Copyright (C) 2011  Davis E. King (davis@dlib.net)
+// Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_FULL_OBJECT_DeTECTION_ABSTRACT_H__
 #ifdef DLIB_FULL_OBJECT_DeTECTION_ABSTRACT_H__
@@ -11,25 +11,91 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const static point MOVABLE_PART_NOT_PRESENT(0x7FFFFFFF,
-                                                0x7FFFFFFF);
+    const static point OBJECT_PART_NOT_PRESENT(0x7FFFFFFF,
+                                               0x7FFFFFFF);
 
 // ----------------------------------------------------------------------------------------
 
-    struct full_object_detection
+    class full_object_detection
     {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the location of an object in an image along with the
+                positions of each of its constituent parts.
+        !*/
+
+    public:
+
         full_object_detection(
-            const rectangle& rect_,
-            const std::vector<point>& movable_parts_
-        ) : rect(rect_), movable_parts(movable_parts_) {}
+            const rectangle& rect,
+            const std::vector<point>& parts
+        );
+        /*!
+            ensures
+                - #get_rect() == rect
+                - #num_parts() == parts.size()
+                - for all valid i:
+                    - part(i) == parts[i]
+        !*/
+
+        full_object_detection(
+        );
+        /*!
+            ensures
+                - #get_rect().is_empty() == true
+                - #num_parts() == 0
+        !*/
 
         explicit full_object_detection(
-            const rectangle& rect_
-        ) : rect(rect_) {}
+            const rectangle& rect
+        );
+        /*!
+            ensures
+                - #get_rect() == rect
+                - #num_parts() == 0
+        !*/
 
-        rectangle rect;
-        std::vector<point> movable_parts;  // it should always be the case that rect.contains(movable_parts[i]) == true
+        const rectangle& get_rect(
+        ) const;
+        /*!
+            ensures
+                - returns the rectangle that indicates where this object is.  In general,
+                  this should be the bounding box for the object.
+        !*/
+
+        unsigned long num_parts(
+        ) const;
+        /*!
+            ensures
+                - returns the number of parts in this object.  
+        !*/
+
+        const point& part(
+            unsigned long idx
+        ) const; 
+        /*!
+            requires
+                - idx < num_parts()
+            ensures
+                - returns the location of the center of the idx-th part of this object.
+                  Note that it is valid for a part to be "not present".  This is indicated
+                  when the return value of part() is equal to OBJECT_PART_NOT_PRESENT. 
+                  This is useful for modeling object parts that are not always observed.
+        !*/
     };
+
+// ----------------------------------------------------------------------------------------
+
+    bool all_parts_in_rect (
+        const full_object_detection& obj
+    );
+    /*!
+        ensures
+            - returns true if all the parts in obj are contained within obj.get_rect().
+              That is, returns true if and only if, for all valid i, the following is
+              always true:
+                obj.get_rect().contains(obj.parts()[i]) == true || obj.parts()[i] == OBJECT_PART_NOT_PRESENT
+    !*/
 
 // ----------------------------------------------------------------------------------------
 

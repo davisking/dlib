@@ -398,7 +398,7 @@ namespace dlib
         /*!
             requires
                 - all_parts_in_rect(obj) == true
-                - obj.movable_parts.size() == get_num_movable_components_per_detection_template()
+                - obj.num_parts() == get_num_movable_components_per_detection_template()
                 - is_loaded_with_image() == true
                 - get_num_detection_templates() > 0
                 - psi.size() >= get_num_dimensions()
@@ -410,11 +410,11 @@ namespace dlib
                   detect() into the needed full_object_detection.
                 - Since scan_image_pyramid is a sliding window classifier system, not all
                   possible rectangles can be output by detect().  So in the case where
-                  obj.rect could not arise from a call to detect(), this function will map
-                  obj.rect to the nearest possible object box and then add the feature
-                  vector for the mapped rectangle into #psi.
-                - get_best_matching_rect(obj.rect) == the rectangle obj.rect gets mapped to
-                  for feature extraction.
+                  obj.get_rect() could not arise from a call to detect(), this function
+                  will map obj.get_rect() to the nearest possible object box and then add
+                  the feature vector for the mapped rectangle into #psi.
+                - get_best_matching_rect(obj.get_rect()) == the rectangle obj.get_rect()
+                  gets mapped to for feature extraction.
         !*/
 
         full_object_detection get_full_object_detection (
@@ -436,9 +436,10 @@ namespace dlib
                   Then the corresponding fully populated full_object_detection will be
                   returned.
                 - returns a full_object_detection, OBJ, such that: 
-                    - OBJ.rect == rect
-                    - OBJ.movable_parts.size() == get_num_movable_components_per_detection_template()
-                    - OBJ.movable_parts == the locations of the movable parts inside this detection.
+                    - OBJ.get_rect() == rect
+                    - OBJ.num_parts() == get_num_movable_components_per_detection_template()
+                    - OBJ.part(i) == the location of the i-th movable part inside this detection,
+                      or OBJECT_PART_NOT_PRESENT if the part was not found.
         !*/
 
     };

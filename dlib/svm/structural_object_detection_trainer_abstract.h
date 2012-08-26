@@ -295,7 +295,7 @@ namespace dlib
                 - it must be valid to pass images[0] into the image_scanner_type::load() method.
                   (also, image_array_type must be an implementation of dlib/array/array_kernel_abstract.h)
                 - for all valid i, j:
-                    - truth_object_detections[i][j].movable_parts.size() == get_scanner().get_num_movable_components_per_detection_template() 
+                    - truth_object_detections[i][j].num_parts() == get_scanner().get_num_movable_components_per_detection_template() 
                     - all_parts_in_rect(truth_object_detections[i][j]) == true
             ensures
                 - Uses the structural_svm_object_detection_problem to train an object_detector 

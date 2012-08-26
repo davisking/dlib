@@ -91,17 +91,20 @@ namespace dlib
                 - scanner.get_num_detection_templates() > 0
                 - scanner.load(images[0]) must be a valid expression.
                 - for all valid i, j:
-                    - truth_object_detections[i][j].movable_rects.size() == scanner.get_num_movable_components_per_detection_template() 
+                    - truth_object_detections[i][j].num_parts() == scanner.get_num_movable_components_per_detection_template() 
                     - all_parts_in_rect(truth_object_detections[i][j]) == true
             ensures
-                - This object attempts to learn a mapping from the given images to the 
-                  object locations given in truth_object_detections.  In particular, it attempts to 
-                  learn to predict truth_object_detections[i] based on images[i].
-                  Or in other words, this object can be used to learn a parameter vector, w, such that 
-                  an object_detector declared as:
+                - This object attempts to learn a mapping from the given images to the
+                  object locations given in truth_object_detections.  In particular, it
+                  attempts to learn to predict truth_object_detections[i] based on
+                  images[i].  Or in other words, this object can be used to learn a
+                  parameter vector, w, such that an object_detector declared as:
                     object_detector<image_scanner_type,overlap_tester_type> detector(scanner,overlap_tester,w)
-                  results in a detector object which attempts to compute the following mapping:
-                    truth_object_detections[i].rect == detector(images[i])
+                  results in a detector object which attempts to compute the locations of
+                  all the objects in truth_object_detections.  So if you called
+                  detector(images[i]) you would hopefully get a list of rectangles back
+                  that had truth_object_detections[i].size() elements and contained exactly
+                  the rectangles indicated by truth_object_detections[i].
                 - #get_match_eps() == 0.5
                 - This object will use num_threads threads during the optimization 
                   procedure.  You should set this parameter equal to the number of 

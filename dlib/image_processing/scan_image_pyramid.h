@@ -838,7 +838,6 @@ namespace dlib
         const feature_vector_type& w
     ) const
     {
-        full_object_detection obj(rect);
         // fill in movable part positions.  
 
         rectangle mapped_rect;
@@ -855,6 +854,8 @@ namespace dlib
         // convert into feature space.
         object_box = object_box.intersect(get_rect(feats[best_level]));
 
+        std::vector<point> movable_parts;
+        movable_parts.reserve(get_num_movable_components_per_detection_template());
         for (unsigned long i = 0; i < get_num_movable_components_per_detection_template(); ++i)
         {
             // make the saliency_image for the ith movable part.
@@ -912,7 +913,7 @@ namespace dlib
 
             if (max_val <= 0)
             {
-                max_loc = MOVABLE_PART_NOT_PRESENT;
+                max_loc = OBJECT_PART_NOT_PRESENT;
             }
             else
             {
@@ -923,13 +924,13 @@ namespace dlib
                 // now convert from feature space to image space.
                 max_loc = feats[best_level].feat_to_image_space(max_loc);
                 max_loc = pyr.point_up(max_loc, best_level);
-                max_loc = nearest_point(obj.rect, max_loc);
+                max_loc = nearest_point(rect, max_loc);
             }
 
-            obj.movable_parts.push_back(max_loc);
+            movable_parts.push_back(max_loc);
         }
 
-        return obj;
+        return full_object_detection(rect, movable_parts);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -948,7 +949,7 @@ namespace dlib
         DLIB_ASSERT(get_num_detection_templates() > 0 &&
                     is_loaded_with_image() &&
                     psi.size() >= get_num_dimensions() &&
-                    obj.movable_parts.size() == get_num_movable_components_per_detection_template(),
+                    obj.num_parts() == get_num_movable_components_per_detection_template(),
             "\t void scan_image_pyramid::get_feature_vector()"
             << "\n\t Invalid inputs were given to this function "
             << "\n\t get_num_detection_templates(): " << get_num_detection_templates()
@@ -956,35 +957,34 @@ namespace dlib
             << "\n\t psi.size():             " << psi.size()
             << "\n\t get_num_dimensions():   " << get_num_dimensions()
             << "\n\t get_num_movable_components_per_detection_template(): " << get_num_movable_components_per_detection_template()
-            << "\n\t obj.movable_parts.size():                            " << obj.movable_parts.size()
+            << "\n\t obj.num_parts():                            " << obj.num_parts()
             << "\n\t this: " << this
             );
         DLIB_ASSERT(all_parts_in_rect(obj), 
             "\t void scan_image_pyramid::get_feature_vector()"
             << "\n\t Invalid inputs were given to this function "
-            << "\n\t obj.rect: " << obj.rect
+            << "\n\t obj.get_rect(): " << obj.get_rect()
             << "\n\t this: " << this
         );
 
 
-        const rectangle rect = obj.rect;
 
         rectangle mapped_rect;
         detection_template best_template;
         unsigned long best_level;
         rectangle object_box;
-        get_mapped_rect_and_metadata (feats.size(), rect, mapped_rect, best_template, object_box, best_level);
+        get_mapped_rect_and_metadata (feats.size(), obj.get_rect(), mapped_rect, best_template, object_box, best_level);
 
         Pyramid_type pyr;
 
         // put the movable rects at the places indicated by obj.
         std::vector<rectangle> rects = best_template.rects;
-        for (unsigned long i = 0; i < obj.movable_parts.size(); ++i)
+        for (unsigned long i = 0; i < obj.num_parts(); ++i)
         {
-            if (obj.movable_parts[i] != MOVABLE_PART_NOT_PRESENT)
+            if (obj.part(i) != OBJECT_PART_NOT_PRESENT)
             {
                 // map from the original image to scaled feature space.
-                point loc = feats[best_level].image_to_feat_space(pyr.point_down(obj.movable_parts[i], best_level));
+                point loc = feats[best_level].image_to_feat_space(pyr.point_down(obj.part(i), best_level));
                 // Make sure the movable part always stays within the object_box.
                 // Otherwise it would be at a place that the detect() function can never
                 // look.  

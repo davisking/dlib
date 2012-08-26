@@ -262,12 +262,12 @@ namespace dlib
             {
                 for (unsigned long j = 0; j < truth_object_detections[i].size(); ++j)
                 {
-                    DLIB_ASSERT(truth_object_detections[i][j].movable_parts.size() == get_scanner().get_num_movable_components_per_detection_template() &&
+                    DLIB_ASSERT(truth_object_detections[i][j].num_parts() == get_scanner().get_num_movable_components_per_detection_template() &&
                                 all_parts_in_rect(truth_object_detections[i][j]) == true,
                         "\t trained_function_type structural_object_detection_trainer::train()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].movable_parts.size():                " << 
-                            truth_object_detections[i][j].movable_parts.size()
+                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].num_parts():                " << 
+                            truth_object_detections[i][j].num_parts()
                         << "\n\t get_scanner().get_num_movable_components_per_detection_template(): " << 
                             get_scanner().get_num_movable_components_per_detection_template()
                         << "\n\t all_parts_in_rect(truth_object_detections["<<i<<"]["<<j<<"]): " << all_parts_in_rect(truth_object_detections[i][j])
@@ -286,7 +286,7 @@ namespace dlib
                     mapped_rects[i].resize(truth_object_detections[i].size());
                     for (unsigned long j = 0; j < truth_object_detections[i].size(); ++j)
                     {
-                        mapped_rects[i][j] = scanner.get_best_matching_rect(truth_object_detections[i][j].rect);
+                        mapped_rects[i][j] = scanner.get_best_matching_rect(truth_object_detections[i][j].get_rect());
                     }
                 }
 
