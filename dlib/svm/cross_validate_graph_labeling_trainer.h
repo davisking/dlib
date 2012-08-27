@@ -44,10 +44,10 @@ namespace dlib
 #endif
 
         std::vector<bool> temp;
-        unsigned long num_pos_correct = 0;
-        unsigned long num_pos = 0;
-        unsigned long num_neg_correct = 0;
-        unsigned long num_neg = 0;
+        double num_pos_correct = 0;
+        double num_pos = 0;
+        double num_neg_correct = 0;
+        double num_neg = 0;
 
         for (unsigned long i = 0; i < samples.size(); ++i)
         {
@@ -76,11 +76,11 @@ namespace dlib
 
         matrix<double, 1, 2> res;
         if (num_pos != 0)
-            res(0) = (double)num_pos_correct/(double)(num_pos); 
+            res(0) = num_pos_correct/num_pos; 
         else
             res(0) = 1;
         if (num_neg != 0)
-            res(1) = (double)num_neg_correct/(double)(num_neg); 
+            res(1) = num_neg_correct/num_neg; 
         else
             res(1) = 1;
         return res;
@@ -152,10 +152,10 @@ namespace dlib
         long next_test_idx = 0;
 
         std::vector<bool> temp;
-        unsigned long num_pos_correct = 0;
-        unsigned long num_pos = 0;
-        unsigned long num_neg_correct = 0;
-        unsigned long num_neg = 0;
+        double num_pos_correct = 0;
+        double num_pos = 0;
+        double num_neg_correct = 0;
+        double num_neg = 0;
 
         graph_type gtemp;
 
@@ -224,11 +224,11 @@ namespace dlib
 
         matrix<double, 1, 2> res;
         if (num_pos != 0)
-            res(0) = (double)num_pos_correct/(double)(num_pos); 
+            res(0) = num_pos_correct/num_pos; 
         else
             res(0) = 1;
         if (num_neg != 0)
-            res(1) = (double)num_neg_correct/(double)(num_neg); 
+            res(1) = num_neg_correct/num_neg; 
         else
             res(1) = 1;
         return res;
