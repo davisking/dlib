@@ -239,6 +239,25 @@ namespace dlib
             return dpca_mat;
         }
 
+        const general_matrix dpca_matrix_of_size (
+            const long num_rows 
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 < num_rows && num_rows <= in_vector_size(),
+                "\t general_matrix discriminant_pca::dpca_matrix_of_size()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t num_rows:         " << num_rows 
+                << "\n\t in_vector_size(): " << in_vector_size() 
+                << "\n\t this:             " << this
+                );
+
+            general_matrix dpca_mat;
+            general_matrix eigenvalues;
+            dpca_matrix_of_size(dpca_mat, eigenvalues, num_rows);
+            return dpca_mat;
+        }
+
         void dpca_matrix (
             general_matrix& dpca_mat,
             general_matrix& eigenvalues,
@@ -254,53 +273,25 @@ namespace dlib
                 << "\n\t this:             " << this
                 );
 
-            general_matrix cov;
+            compute_dpca_matrix(dpca_mat, eigenvalues, eps, 0);
+        }
 
-            // now combine the three measures of variance into a single matrix by using the
-            // within_weight and between_weight weights.
-            cov = get_total_covariance_matrix();
-            if (within_count != 0)
-                cov -= within_weight*within_cov/within_count; 
-            if (between_count != 0)
-                cov += between_weight*between_cov/between_count; 
+        void dpca_matrix_of_size (
+            general_matrix& dpca_mat,
+            general_matrix& eigenvalues,
+            const long num_rows 
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(0 < num_rows && num_rows <= in_vector_size(),
+                "\t general_matrix discriminant_pca::dpca_matrix_of_size()"
+                << "\n\t Invalid inputs were given to this function"
+                << "\n\t num_rows:         " << num_rows 
+                << "\n\t in_vector_size(): " << in_vector_size() 
+                << "\n\t this:             " << this
+                );
 
-
-            eigenvalue_decomposition<general_matrix> eig(make_symmetric(cov));
-
-            eigenvalues = eig.get_real_eigenvalues();
-            dpca_mat = eig.get_pseudo_v();
-
-            // sort the eigenvalues and eigenvectors so that the biggest eigenvalues come first
-            rsort_columns(dpca_mat, eigenvalues);
-
-            // Some of the eigenvalues might be negative.  So first lets zero those out
-            // so they won't get considered.
-            eigenvalues = pointwise_multiply(eigenvalues > 0, eigenvalues);
-            // figure out how many eigenvectors we want in our dpca matrix
-            const double thresh = sum(eigenvalues)*eps;
-            long num_vectors = 0;
-            double total = 0;
-            for (long r = 0; r < eigenvalues.size() && total < thresh; ++r)
-            {
-                // Don't even think about looking at eigenvalues that are 0.  If we go this
-                // far then we have all we need.
-                if (eigenvalues(r) == 0)
-                    break;
-
-                ++num_vectors;
-                total += eigenvalues(r);
-            }
-            
-            if (num_vectors == 0)
-                throw discriminant_pca_error("While performing discriminant_pca, all eigenvalues were negative or 0");
-
-            // So now we know we want to use num_vectors of the first eigenvectors.  So
-            // pull those out and discard the rest.
-            dpca_mat = trans(colm(dpca_mat,range(0,num_vectors-1)));
-
-            // also clip off the eigenvalues we aren't using
-            eigenvalues = rowm(eigenvalues, range(0,num_vectors-1));
-
+            compute_dpca_matrix(dpca_mat, eigenvalues, 1, num_rows);
         }
 
         void swap (
@@ -418,6 +409,70 @@ namespace dlib
         }
 
     private:
+
+        void compute_dpca_matrix (
+            general_matrix& dpca_mat,
+            general_matrix& eigenvalues,
+            const double eps,
+            long num_rows 
+        ) const
+        {
+            general_matrix cov;
+
+            // now combine the three measures of variance into a single matrix by using the
+            // within_weight and between_weight weights.
+            cov = get_total_covariance_matrix();
+            if (within_count != 0)
+                cov -= within_weight*within_cov/within_count; 
+            if (between_count != 0)
+                cov += between_weight*between_cov/between_count; 
+
+
+            eigenvalue_decomposition<general_matrix> eig(make_symmetric(cov));
+
+            eigenvalues = eig.get_real_eigenvalues();
+            dpca_mat = eig.get_pseudo_v();
+
+            // sort the eigenvalues and eigenvectors so that the biggest eigenvalues come first
+            rsort_columns(dpca_mat, eigenvalues);
+
+            long num_vectors = 0;
+            if (num_rows == 0)
+            {
+                // Some of the eigenvalues might be negative.  So first lets zero those out
+                // so they won't get considered.
+                eigenvalues = pointwise_multiply(eigenvalues > 0, eigenvalues);
+                // figure out how many eigenvectors we want in our dpca matrix
+                const double thresh = sum(eigenvalues)*eps;
+                double total = 0;
+                for (long r = 0; r < eigenvalues.size() && total < thresh; ++r)
+                {
+                    // Don't even think about looking at eigenvalues that are 0.  If we go this
+                    // far then we have all we need.
+                    if (eigenvalues(r) == 0)
+                        break;
+
+                    ++num_vectors;
+                    total += eigenvalues(r);
+                }
+
+                if (num_vectors == 0)
+                    throw discriminant_pca_error("While performing discriminant_pca, all eigenvalues were negative or 0");
+            }
+            else
+            {
+                num_vectors = num_rows;
+            }
+
+
+            // So now we know we want to use num_vectors of the first eigenvectors.  So
+            // pull those out and discard the rest.
+            dpca_mat = trans(colm(dpca_mat,range(0,num_vectors-1)));
+
+            // also clip off the eigenvalues we aren't using
+            eigenvalues = rowm(eigenvalues, range(0,num_vectors-1));
+
+        }
 
         general_matrix get_total_covariance_matrix (
         ) const
