@@ -91,6 +91,7 @@ set (tests
    read_write_mutex.cpp
    reference_counter.cpp
    rls.cpp
+   sammon.cpp
    scan_image.cpp
    sequence.cpp
    sequence_labeler.cpp
