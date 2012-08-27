@@ -54,7 +54,7 @@ namespace dlib
                   num_dims dimensional space that preserves relative distances between the
                   input data points.
                 - This function returns a std::vector, OUT, such that:
-                    - OUT == a set of column vectors that represent the Sammon's projection of 
+                    - OUT == a set of column vectors that represent the Sammon projection of 
                       the input data vectors. 
                     - OUT.size() == data.size()
                     - for all valid i:
@@ -100,7 +100,7 @@ namespace dlib
                   or the change in error from one iteration to the next is less than err_delta.
                 - Upon completion, the output of Sammon's projection is stored into #result, in
                   particular, we will have:
-                    - #result == a set of column vectors that represent the Sammon's projection of 
+                    - #result == a set of column vectors that represent the Sammon projection of 
                       the input data vectors. 
                     - #result.size() == data.size()
                     - for all valid i:
