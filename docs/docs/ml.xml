@@ -127,6 +127,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>find_clusters_using_kmeans</item> 
          <item>vector_normalizer</item> 
          <item>vector_normalizer_pca</item> 
+         <item>sammon_projection</item> 
       </section>
       <section>
          <name>Semi-Supervised</name>
@@ -660,6 +661,23 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 This algorithm is basically a straightforward generalization of the classical PCA
                 technique to handle partially labeled data.  It is useful if you want to learn a linear
                 dimensionality reduction rule using a bunch of data that is partially labeled.  
+         </description>
+
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>sammon_projection</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/sammon_abstract.h</spec_file>
+         <description>
+                This is a function object that computes the Sammon projection of a set
+                of N points in a L-dimensional vector space onto a d-dimensional space
+                (d &lt; L), according to the paper:
+                <blockquote>
+                    A Nonlinear Mapping for Data Structure Analysis (1969) by J.W. Sammon
+                </blockquote>
          </description>
 
       </component>

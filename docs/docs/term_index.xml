@@ -301,6 +301,7 @@
          <term file="ml.html" name="vector_normalizer"/>
          <term file="ml.html" name="vector_normalizer_pca"/>
          <term file="ml.html" name="discriminant_pca"/>
+         <term file="ml.html" name="sammon_projection"/>
          <term file="dlib/statistics/dpca_abstract.h.html" name="discriminant_pca_error"/>
          <term file="ml.html" name="kkmeans"/>
          <term file="ml.html" name="find_clusters_using_kmeans"/>
