@@ -33,7 +33,7 @@ namespace dlib
         template <typename matrix_type>
         std::vector<matrix<double,0,1> > operator() (
             const std::vector<matrix_type>& data,       
-            long num_dims                      
+            const long num_dims                      
         );
         /*!
             requires
@@ -65,10 +65,10 @@ namespace dlib
         template <typename matrix_type>
         void operator() (
             const std::vector<matrix_type>& data,       
-            long num_dims,                     
+            const long num_dims,                     
             std::vector<matrix<double,0,1> >& result,   
             double &err,                                
-            unsigned long num_iters = 1000,             
+            const unsigned long num_iters = 1000,             
             const double err_delta = 1.0e-9            
         );
         /*!
