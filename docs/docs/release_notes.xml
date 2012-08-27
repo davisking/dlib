@@ -14,29 +14,37 @@
 New Features:
   - Added more overloads of find_max_factor_graph_potts() to make applying it 
     over a Markov random field of image pixels really simple.
-  - Added the max_filter() routine.
   - Added overloads of serialize()/deserialize() so that they can serialize
     Google protocol buffer objects.
-  - Added scan_image_movable_parts()
-  - added find_points_above_thresh()
-  - Added sum_filter_assign().
-  - Added a per node loss option to the structural_svm_graph_labeling_problem's
-    interface.
-  - Added the full_object_detection object.
-  - Implemented the movable part stuff. 
+  - Image Processing:
+      - Added find_points_above_thresh()
+      - Added max_filter() 
+      - Added scan_image_movable_parts()
+      - Added sum_filter_assign()
+      - Added the full_object_detection object.
+      - Added the ability to model objects with movable parts into the
+        scan_image_pyramid object.  This update also includes all the needed tools
+        to train movable part models using the structural_object_detection_trainer.
+  - Machine Learning:
+      - Added a per node loss option to the structural_svm_graph_labeling_problem's
+        interface.
+      - Added Emanuele Cesena's implementation of Sammon's nonlinear dimensionality
+        reduction method.
 
 Non-Backwards Compatible Changes:
-  - Updated scan_image_pyramid serialization to include the movable rectangle
-    info.  Note that this also changes the serialization format for object_detector
-    objects since they contain a scan_image_pyramid instance.
+  - To support movable part models, the serialization format of scan_image_pyramid
+    objects was modified.  This breaks backwards compatibility with the previous
+    format for scan_image_pyramid objects as well as object_detector instances
+    that use the scan_image_pyramid.
 
 Bug fixes:
-  - Made auto_threshold_image() always use 64bit integers for part of its counting
-    to make it robust to very large images.
+  - Fixed a bug in auto_threshold_image() that caused it to give bad outputs 
+    when used with very large images.
 
 Other:
-  - Updated find_max_factor_graph_potts() to correctly say you can use infinite weights
-    for the factor_value_disagreement() values since the code actually supports this.
+  - Updated find_max_factor_graph_potts() to correctly say you can use infinite
+    weights for the factor_value_disagreement() values since the code actually
+    supports this.
   - Made integer serialization about 3 times faster.
 
 </current>
