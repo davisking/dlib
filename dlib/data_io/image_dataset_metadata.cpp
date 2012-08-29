@@ -77,14 +77,19 @@ namespace dlib
                     if (b.occluded)
                         fout << " occluded='" << b.occluded << "'";
 
-                    if (b.has_label() || b.has_head())
+                    if (b.has_label() || b.parts.size() != 0)
                     {
                         fout << ">\n";
 
                         if (b.has_label())
                             fout << "      <label>" << b.label << "</label>\n";
-                        if (b.has_head())
-                            fout << "      <head x='"<< b.head.x() <<"' y='"<< b.head.y() <<"'/>\n";
+                        
+                        // save all the parts
+                        std::map<std::string,point>::const_iterator itr;
+                        for (itr = b.parts.begin(); itr != b.parts.end(); ++itr)
+                        {
+                            fout << "      <part name='"<< itr->first << "' x='"<< itr->second.x() <<"' y='"<< itr->second.y() <<"'/>\n";
+                        }
 
                         fout << "    </box>\n";
                     }
@@ -141,65 +146,89 @@ namespace dlib
             }
 
             virtual void start_element ( 
-                const unsigned long ,
+                const unsigned long line_number,
                 const std::string& name,
                 const dlib::attribute_list& atts
             )
             {
-                if (ts.size() == 0) 
+                try
                 {
-                    if (name != "dataset")
+                    if (ts.size() == 0) 
                     {
-                        std::ostringstream sout;
-                        sout << "Invalid XML document.  Root tag must be <dataset>.  Found <" << name << "> instead.";
-                        throw dlib::error(sout.str());
+                        if (name != "dataset")
+                        {
+                            std::ostringstream sout;
+                            sout << "Invalid XML document.  Root tag must be <dataset>.  Found <" << name << "> instead.";
+                            throw dlib::error(sout.str());
+                        }
+                        else
+                        {
+                            ts.push_back(name);
+                            return;
+                        }
                     }
-                    else
+
+
+                    if (name == "box")
                     {
-                        ts.push_back(name);
-                        return;
+                        if (atts.is_in_list("top")) temp_box.rect.top() = sa = atts["top"];
+                        else throw dlib::error("<box> missing required attribute 'top'");
+
+                        if (atts.is_in_list("left")) temp_box.rect.left() = sa = atts["left"];
+                        else throw dlib::error("<box> missing required attribute 'left'");
+
+                        if (atts.is_in_list("width")) temp_box.rect.right() = sa = atts["width"];
+                        else throw dlib::error("<box> missing required attribute 'width'");
+
+                        if (atts.is_in_list("height")) temp_box.rect.bottom() = sa = atts["height"];
+                        else throw dlib::error("<box> missing required attribute 'height'");
+
+                        if (atts.is_in_list("difficult")) temp_box.difficult = sa = atts["difficult"];
+                        if (atts.is_in_list("truncated")) temp_box.truncated = sa = atts["truncated"];
+                        if (atts.is_in_list("occluded"))  temp_box.occluded  = sa = atts["occluded"];
+
+                        temp_box.rect.bottom() += temp_box.rect.top()-1;
+                        temp_box.rect.right() += temp_box.rect.left()-1;
                     }
+                    else if (name == "part" && ts.back() == "box")
+                    {
+                        point temp;
+                        if (atts.is_in_list("x")) temp.x() = sa = atts["x"];
+                        else throw dlib::error("<part> missing required attribute 'x'");
+
+                        if (atts.is_in_list("y")) temp.y() = sa = atts["y"];
+                        else throw dlib::error("<part> missing required attribute 'y'");
+
+                        if (atts.is_in_list("name")) 
+                        {
+                            if (temp_box.parts.count(atts["name"])==0)
+                            {
+                                temp_box.parts[atts["name"]] = temp;
+                            }
+                            else
+                            {
+                                throw dlib::error("<part> with name '" + atts["name"] + "' is defined more than one time in a single box.");
+                            }
+                        }
+                        else 
+                        {
+                            throw dlib::error("<part> missing required attribute 'name'");
+                        }
+                    }
+                    else if (name == "image")
+                    {
+                        temp_image.boxes.clear();
+
+                        if (atts.is_in_list("file")) temp_image.filename = atts["file"];
+                        else throw dlib::error("<image> missing required attribute 'file'");
+                    }
+
+                    ts.push_back(name);
                 }
-
-
-                if (name == "box")
+                catch (error& e)
                 {
-                    if (atts.is_in_list("top")) temp_box.rect.top() = sa = atts["top"];
-                    else throw dlib::error("<box> missing required attribute 'top'");
-
-                    if (atts.is_in_list("left")) temp_box.rect.left() = sa = atts["left"];
-                    else throw dlib::error("<box> missing required attribute 'left'");
-
-                    if (atts.is_in_list("width")) temp_box.rect.right() = sa = atts["width"];
-                    else throw dlib::error("<box> missing required attribute 'width'");
-
-                    if (atts.is_in_list("height")) temp_box.rect.bottom() = sa = atts["height"];
-                    else throw dlib::error("<box> missing required attribute 'height'");
-
-                    if (atts.is_in_list("difficult")) temp_box.difficult = sa = atts["difficult"];
-                    if (atts.is_in_list("truncated")) temp_box.truncated = sa = atts["truncated"];
-                    if (atts.is_in_list("occluded"))  temp_box.occluded  = sa = atts["occluded"];
-
-                    temp_box.rect.bottom() += temp_box.rect.top()-1;
-                    temp_box.rect.right() += temp_box.rect.left()-1;
+                    throw dlib::error("Error on line " + cast_to_string(line_number) + ": " + e.what());
                 }
-                else if (name == "head" && ts.back() == "box")
-                {
-                    if (atts.is_in_list("x")) temp_box.head.x() = sa = atts["x"];
-                    else throw dlib::error("<head> missing required attribute 'x'");
-
-                    if (atts.is_in_list("y")) temp_box.head.y() = sa = atts["y"];
-                    else throw dlib::error("<head> missing required attribute 'y'");
-                }
-                else if (name == "image")
-                {
-                    temp_image.boxes.clear();
-
-                    if (atts.is_in_list("file")) temp_image.filename = atts["file"];
-                    else throw dlib::error("<image> missing required attribute 'file'");
-                }
-
-                ts.push_back(name);
             }
 
             virtual void end_element ( 

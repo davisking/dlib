@@ -29,7 +29,6 @@ namespace dlib
             !*/
             box(
             ) : 
-                head(-0xFFFF,-0xFFFF), 
                 difficult(false),
                 truncated(false),
                 occluded(false)
@@ -37,18 +36,13 @@ namespace dlib
 
             rectangle rect;
 
+            std::map<std::string,point> parts;
+
             // optional fields
             std::string label;
-            point head; // a value of (-0xFFFF,-0xFFFF) indicates the field not supplied
             bool difficult;
             bool truncated;
             bool occluded;
-
-            bool has_head() const { return head != point(-0xFFFF,-0xFFFF); }
-            /*!
-                ensures
-                    - returns true if head metadata is present and false otherwise.
-            !*/
 
             bool has_label() const { return label.size() != 0; }
             /*!
