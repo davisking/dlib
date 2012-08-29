@@ -83,8 +83,9 @@ namespace
 
                     if (words[0] == "Center" && words[1] == "point" && words.size() > 9)
                     {
-                        img.boxes[idx].head.x() = sa = words[8];
-                        img.boxes[idx].head.y() = sa = words[9];
+                        const long x = sa = words[8];
+                        const long y = sa = words[9];
+                        img.boxes[idx].parts["head"] = point(x,y);
                     }
                     else if (words[0] == "Bounding" && words[1] == "box" && words.size() > 13)
                     {
