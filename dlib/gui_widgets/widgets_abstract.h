@@ -10,6 +10,7 @@
 
 #include "../gui_core.h"
 #include <string>
+#include <map>
 #include "../interfaces/enumerable.h"
 #include "style_abstract.h"
 
@@ -2321,6 +2322,7 @@ namespace dlib
                 - get_overlay_rects().size() == 0
                 - get_default_overlay_rect_label() == ""
                 - get_default_overlay_rect_color() == rgb_alpha_pixel(255,0,0,255) (i.e. RED)
+                - This object does not have any user labelable parts defined.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents an image inside a scrollable region.  
@@ -2330,8 +2332,11 @@ namespace dlib
                 
                 If you hold the Ctrl key you can zoom in and out using the mouse wheel.
                 You can also add new overlay rectangles by holding shift, left clicking,
-                and dragging the mouse.  Finally, you can delete an overlay rectangle
-                by double clicking on it and hitting delete or backspace.
+                and dragging the mouse.  Additionally, you can delete an overlay rectangle
+                by double clicking on it and hitting delete or backspace.  Finally, you
+                can also add part labels (if they have been defined by calling add_labelable_part_name())
+                by selecting an overlay rectangle with the mouse and then right clicking
+                on the part.
                 
 
                 The image is drawn such that:
@@ -2383,11 +2388,16 @@ namespace dlib
                     image shown by this object.  Each rectangle is represented by 
                     a rectangle object as well as a color and text label.  The label
                     is drawn below the lower right corner of the rectangle.
+
+                    Moreover, the rectangle can have sub-parts. Each part is listed
+                    in the parts member variable.  This variable maps the name of the
+                    part to its position.
             !*/
 
             rectangle rect;
             rgb_alpha_pixel color;
             std::string label;
+            std::map<std::string,point> parts;
 
             overlay_rect(
             ); 
@@ -2420,7 +2430,22 @@ namespace dlib
                 ensures
                     - #rect == r
                     - performs assign_pixel(color, p)
-                    - #label = l
+                    - #label == l
+            !*/
+
+            template <typename pixel_type>
+            overlay_rect(
+                const rectangle& r, 
+                pixel_type p, 
+                const std::string& l, 
+                const std::map<std::string,point>& parts_
+            ); 
+            /*!
+                ensures
+                    - #rect == r
+                    - performs assign_pixel(color, p)
+                    - #label == l
+                    - #parts == parts_
             !*/
 
         };
@@ -2543,6 +2568,30 @@ namespace dlib
             ensures
                 - returns the color given to new overlay rectangles created by the user
                   (i.e. when the user holds shift and adds them with the mouse)
+        !*/
+
+        void add_labelable_part_name (
+            const std::string& name
+        );
+        /*!
+            ensures
+                - adds a user labelable part with the given name.  If the name has
+                  already been added then this function has no effect.  
+                - These parts can be added by the user by selecting an overlay box
+                  and then right clicking anywhere in it.  A popup menu will appear
+                  listing the parts.  The user can then click a part name and it will
+                  add it into the overlay_rect::parts variable and also show it on the
+                  screen.
+        !*/
+
+        void clear_labelable_part_names (
+        );
+        /*!
+            ensures
+                - removes all use labelable parts.  Calling this function undoes 
+                  all previous calls to add_labelable_part_name().  Therefore, the 
+                  user won't be able to label any parts after clear_labelable_part_names()
+                  is called.
         !*/
 
         rectangle get_image_display_rect (

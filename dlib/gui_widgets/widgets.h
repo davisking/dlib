@@ -26,6 +26,7 @@
 #include <cctype>
 #include <vector>
 #include "../any.h"
+#include <set>
 
 #ifdef _MSC_VER
 // This #pragma directive is also located in the algs.h file but for whatever
@@ -3218,6 +3219,17 @@ namespace dlib
                 - if (rect_is_selected) then
                     - selected_rect == the index in overlay_rects of the user selected
                       rectangle.
+                    - last_right_click_pos == the last place we saw the user right click
+                      the mouse.
+                    - parts_menu.is_enabled() == true
+                    - if (it is actually a part of this rect that is selected) then
+                        - selected_part_name == the name of the part in overlay_rects[selected_rect].parts
+                          that is selected.
+                    - else
+                        - selected_part_name.size() == 0
+                - else
+                    - parts_menu.is_enabled() == false
+                    - selected_part_name.size() == 0
         !*/
 
     public:
@@ -3256,6 +3268,26 @@ namespace dlib
             assign_image_scaled(img,new_img);
         }
 
+        virtual void set_pos (
+            long x,
+            long y
+        )
+        {
+            auto_mutex lock(m);
+            scrollable_region::set_pos(x,y);
+            parts_menu.set_rect(rect);
+        }
+
+        virtual void set_size (
+            long width,
+            long height 
+        )
+        {
+            auto_mutex lock(m);
+            scrollable_region::set_size(width,height);
+            parts_menu.set_rect(rect);
+        }
+
         struct overlay_rect
         {
             overlay_rect() { assign_pixel(color, 0);}
@@ -3268,9 +3300,14 @@ namespace dlib
             overlay_rect(const rectangle& r, pixel_type p, const std::string& l) 
                 : rect(r),label(l) { assign_pixel(color, p); }
 
+            template <typename pixel_type>
+            overlay_rect(const rectangle& r, pixel_type p, const std::string& l, const std::map<std::string,point>& parts_) 
+                : rect(r),label(l),parts(parts_) { assign_pixel(color, p); }
+
             rectangle rect;
             rgb_alpha_pixel color;
             std::string label;
+            std::map<std::string,point> parts;
         };
 
         struct overlay_line
@@ -3365,6 +3402,12 @@ namespace dlib
             orect_selected_event_handler = event_handler_;
         }
 
+        void add_labelable_part_name (
+            const std::string& name
+        );
+
+        void clear_labelable_part_names (
+        );
 
     private:
 
@@ -3407,6 +3450,18 @@ namespace dlib
             unsigned long state
         );
 
+        void on_part_add (
+            const std::string& part_name
+        );
+
+        rectangle get_rect_on_screen (
+            unsigned long idx
+        ) const;
+
+        rectangle get_rect_on_screen (
+            rectangle orect 
+        ) const;
+
         rgb_alpha_pixel invert_pixel (const rgb_alpha_pixel& p) const
         { return rgb_alpha_pixel(255-p.red, 255-p.green, 255-p.blue, p.alpha); }
 
@@ -3422,11 +3477,16 @@ namespace dlib
         point rect_anchor;
         rectangle rect_to_draw;
         bool rect_is_selected;
+        std::string selected_part_name;
         unsigned long selected_rect;
         rgb_alpha_pixel default_rect_color;
         std::string default_rect_label;
         any_function<void()> event_handler;
         any_function<void(const overlay_rect& orect)> orect_selected_event_handler;
+        popup_menu_region parts_menu;
+        point last_right_click_pos;
+        const int part_width;
+        std::set<std::string> part_names;
 
         // restricted functions
         image_display(image_display&);        // copy constructor
