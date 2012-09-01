@@ -100,6 +100,16 @@ metadata_editor::
 // ----------------------------------------------------------------------------------------
 
 void metadata_editor::
+add_labelable_part_name (
+    const std::string& name
+)
+{
+    display.add_labelable_part_name(name);
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
 file_save()
 {
     save_metadata_to_file(filename);
@@ -279,6 +289,7 @@ std::vector<dlib::image_display::overlay_rect> get_overlays (
     {
         temp[i].rect = data.boxes[i].rect;
         temp[i].label = data.boxes[i].label;
+        temp[i].parts = data.boxes[i].parts;
         assign_pixel(temp[i].color, rgb_pixel(255,0,0));
     }
     return temp;
@@ -376,6 +387,7 @@ on_overlay_rects_changed(
             box temp;
             temp.label = rects[i].label;
             temp.rect = rects[i].rect;
+            temp.parts = rects[i].parts;
             boxes.push_back(temp);
         }
     }
@@ -415,6 +427,12 @@ display_about(
                         "the mouse, and dragging it.  Hit tab to give input focus to the next "
                         "label text field and supply a label for a rectangle.  Double clicking "
                         "a rectangle selects it and the delete key removes it."
+                        ,0,0) << endl << endl;
+
+    sout << wrap_string("It is also possible to label object parts by selecting a rectangle and "
+                        "then right clicking.  A popup menu will appear and you can select a part label. "
+                        "Note that you must define the allowable part labels by giving --parts on the "
+                        "command line.  An example would be '--parts \"leye reye nose mouth\"'."
                         ,0,0) << endl << endl;
 
     sout << wrap_string("Finally, hold ctrl and scroll the mouse wheel to zoom while normal left click "

@@ -17,6 +17,10 @@ public:
 
     ~metadata_editor();
 
+    void add_labelable_part_name (
+        const std::string& name
+    );
+
 private:
 
     void file_save();

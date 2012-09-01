@@ -1,5 +1,6 @@
 
 #include "dlib/data_io.h"
+#include "dlib/string.h"
 #include "metadata_editor.h"
 #include "convert_pascal_xml.h"
 #include "convert_pascal_v1.h"
@@ -13,7 +14,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "0.3";
+const char* VERSION = "0.4";
 
 
 
@@ -125,20 +126,25 @@ int main(int argc, char** argv)
         parser.add_option("l","List all the labels in the given XML file.");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("v","Display version.");
+        parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
+                          "defined in a space separated list contained in <arg>.",1);
         parser.add_option("convert","Convert foreign image Annotations from <arg> format to the imglab format. "
                           "Supported formats: pascal-xml, pascal-v1, idl.",1);
 
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r","l","convert"};
+        const char* singles[] = {"h","c","r","l","convert","parts"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
         parser.check_incompatible_options("c", "l");
         parser.check_incompatible_options("c", "rename");
+        parser.check_incompatible_options("c", "parts");
         parser.check_incompatible_options("l", "rename");
+        parser.check_incompatible_options("l", "parts");
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "rename");
+        parser.check_incompatible_options("convert", "parts");
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
 
@@ -212,6 +218,14 @@ int main(int argc, char** argv)
         if (parser.number_of_arguments() == 1)
         {
             metadata_editor editor(parser[0]);
+            if (parser.option("parts"))
+            {
+                std::vector<string> parts = split(parser.option("parts").argument());
+                for (unsigned long i = 0; i < parts.size(); ++i)
+                {
+                    editor.add_labelable_part_name(parts[i]);
+                }
+            }
             editor.wait_until_closed();
         }
     }
