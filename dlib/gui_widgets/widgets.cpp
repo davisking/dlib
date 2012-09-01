@@ -5732,6 +5732,9 @@ namespace dlib
 
         overlay_rects[selected_rect].parts[part_name] = c1;
         parent.invalidate_rectangle(rect); 
+
+        if (event_handler.is_set())
+            event_handler();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -5927,10 +5930,15 @@ namespace dlib
             {
                 rectangle temp = get_rect_on_screen(centered_rect(itr->second,part_width,part_width));
 
-                if (rect_is_selected && selected_part_name.size() != 0 && selected_part_name == itr->first)
+                if (rect_is_selected && selected_rect == i && 
+                    selected_part_name.size() != 0 && selected_part_name == itr->first)
+                {
                     draw_circle(c, center(temp), temp.width()/2, invert_pixel(overlay_rects[i].color), area);
+                }
                 else
+                {
                     draw_circle(c, center(temp), temp.width()/2, overlay_rects[i].color, area);
+                }
 
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r((temp.br_corner() + temp.bl_corner())/2,  
