@@ -11,6 +11,7 @@
 #include <string>
 #include "../algs.h"
 #include "../logger.h"
+#include "../smart_pointers.h"
 
 
 namespace dlib
@@ -135,8 +136,16 @@ namespace dlib
             int get_max_connections (
             ) const;
 
+            void start_async (
+            );
 
         private:
+
+            void start_async_helper (
+            );
+
+            void open_listening_socket (
+            );
 
             virtual void on_connect (
                 connection& new_connection
@@ -169,8 +178,8 @@ namespace dlib
             set_of_connections cons;
             mutex listening_port_mutex;
             mutex listening_ip_mutex;
-            mutex running_mutex;
-            signaler running_signaler;
+            rmutex running_mutex;
+            rsignaler running_signaler;
             mutex shutting_down_mutex;
             mutex cons_mutex;
             int thread_count;
@@ -179,6 +188,8 @@ namespace dlib
             int max_connections;
             mutex max_connections_mutex;
             signaler thread_count_zero;
+            scoped_ptr<thread_function> async_start_thread;
+            scoped_ptr<listener> sock;
 
 
             // restricted functions
@@ -324,47 +335,103 @@ namespace dlib
         typename set_of_connections
         >
     void server_kernel_1<set_of_connections>::
-    start (
+    start_async_helper (
     )
     {
-  
-        listener* sock;
-        int status = create_listener(sock,listening_port,listening_ip);
-
-        // if there was an error then clear this object
-        if (status < 0)
+        try
         {
-            max_connections_mutex.lock();
-            listening_port_mutex.lock();
-            listening_ip_mutex.lock();
-            listening_ip = "";        
-            listening_port = 0;
-            max_connections = 0;
-            listening_port_mutex.unlock();
-            listening_ip_mutex.unlock();
-            max_connections_mutex.unlock();
+            start();
         }
-
-        
-
-        // throw an exception for the error
-        if (status == PORTINUSE)
+        catch (std::exception& e)
         {
-            throw dlib::socket_error(
-                EPORT_IN_USE,
-                "error occurred in server_kernel_1::start()\nport already in use"
+            sdlog << LERROR << e.what();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename set_of_connections
+        >
+    void server_kernel_1<set_of_connections>::
+    start_async (
+    )
+    {
+        auto_mutex lock(running_mutex);
+        if (running)
+            return;
+
+        // Any exceptions likely to be thrown by the server are going to be
+        // thrown when trying to bind the port.  So calling this here rather
+        // than in the thread we are about to make will cause start_async()
+        // to report errors back to the user in a very straight forward way.
+        open_listening_socket();
+
+        member_function_pointer<>::kernel_1a mfp;
+        mfp.set(*this,&server_kernel_1::start_async_helper);
+        async_start_thread.reset(new thread_function(mfp));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename set_of_connections
+        >
+    void server_kernel_1<set_of_connections>::
+    open_listening_socket (
+    )
+    {
+        if (!sock)
+        {
+            int status = create_listener(sock,listening_port,listening_ip);
+
+            // if there was an error then clear this object
+            if (status < 0)
+            {
+                max_connections_mutex.lock();
+                listening_port_mutex.lock();
+                listening_ip_mutex.lock();
+                listening_ip = "";        
+                listening_port = 0;
+                max_connections = 0;
+                listening_port_mutex.unlock();
+                listening_ip_mutex.unlock();
+                max_connections_mutex.unlock();
+            }
+
+
+
+            // throw an exception for the error
+            if (status == PORTINUSE)
+            {
+                throw dlib::socket_error(
+                    EPORT_IN_USE,
+                    "error occurred in server_kernel_1::start()\nport already in use"
                 );
-        }
-        else if (status == OTHER_ERROR)
-        {
-            throw dlib::socket_error(
-                "error occurred in server_kernel_1::start()\nunable to create listener"
+            }
+            else if (status == OTHER_ERROR)
+            {
+                throw dlib::socket_error(
+                    "error occurred in server_kernel_1::start()\nunable to create listener"
                 );            
+            }
         }
 
         running_mutex.lock();
         running = true;
         running_mutex.unlock();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename set_of_connections
+        >
+    void server_kernel_1<set_of_connections>::
+    start (
+    )
+    {
+        open_listening_socket();
 
         // determine the listening port
         bool port_assigned = false;
@@ -380,6 +447,7 @@ namespace dlib
         
 
 
+        int status = 0;
 
         connection* client;
         bool exit = false;
@@ -430,7 +498,7 @@ namespace dlib
             try{cons.add(client_temp);}
             catch(...)
             { 
-                delete sock;
+                sock.reset();;
                 delete client;
                 cons_mutex.unlock();
 
@@ -456,7 +524,7 @@ namespace dlib
                             );
             } catch (...) 
             {
-                delete sock;
+                sock.reset();
                 delete client;
                 running_mutex.lock();
                 running = false;
@@ -472,7 +540,7 @@ namespace dlib
             {
                 delete temp;
                 // close the listening socket
-                delete sock;
+                sock.reset();
 
                 // close the new connection and remove it from cons
                 cons_mutex.lock();
@@ -546,7 +614,7 @@ namespace dlib
 
 
         // close the socket
-        delete sock;
+        sock.reset();
 
         // signal that the listener has closed
         running_mutex.lock();

@@ -136,6 +136,33 @@ namespace dlib
                         will be unusable until clear() is called and succeeds
             !*/
 
+            void start_async (
+            );
+            /*!
+                ensures
+                    - starts listening on the port and ip specified by get_listening_ip()
+                      and #get_listening_port() for new connections.  
+                    - if (get_listening_port() == 0) then
+                        - a port to listen on will be automatically selected 
+                        - #get_listening_port() == the selected port being used
+                    - if (get_listening_ip() == "" ) then
+                        - all local IPs will be listened on
+                    - does NOT block.  That is, this function will return right away and
+                      the server will run on a background thread until clear() or this
+                      object's destructor is called (or until some kind of fatal error
+                      occurs).  
+                    - if an error occurs in the background thread while the server is
+                      running then it will shut itself down, set is_running() to false, and
+                      log the error to a dlib::logger object. 
+                    - calling start_async() on a running server has no effect.
+                throws
+                    - dlib::socket_error
+                        start_async() will throw this exception if there is some problem binding
+                        ports and/or starting the server. 
+                        If this happens then
+                            - The server will be cleared and returned to its initial value. 
+            !*/
+
             bool is_running ( 
             ) const;
             /*!
