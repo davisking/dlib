@@ -5658,6 +5658,25 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        class image_display_functor
+        {
+            const std::string str;
+            const member_function_pointer<const std::string&>::kernel_1a mfp;
+        public:
+            image_display_functor (
+                const std::string& str_,
+                const member_function_pointer<const std::string&>::kernel_1a& mfp_
+            ) : str(str_),
+                mfp(mfp_)
+            {}
+
+            void operator() (
+            ) const { mfp(str); }
+        };
+    }
+
     image_display::
     image_display(  
         drawable_window& w
@@ -5668,7 +5687,9 @@ namespace dlib
         drawing_rect(true),
         rect_is_selected(false),
         selected_rect(0),
-        default_rect_color(255,0,0,255)
+        default_rect_color(255,0,0,255),
+        parts_menu(w),
+        part_width(15) // width part circles are drawn on the screen
     { 
         enable_mouse_drag();
 
@@ -5677,7 +5698,40 @@ namespace dlib
         set_horizontal_mouse_wheel_scroll_increment(30);
         set_vertical_mouse_wheel_scroll_increment(30);
 
+        parts_menu.disable();
+
+
         enable_events(); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    on_part_add (
+        const std::string& part_name
+    )
+    {
+        if (!rect_is_selected)
+            return;
+
+        const rectangle valid_area = get_rect_on_screen(selected_rect);
+        const point loc = nearest_point(valid_area,last_right_click_pos);
+        
+        // Transform loc from gui window space into the space used by the overlay
+        // rectangles (i.e. relative to the raw image)
+        const point origin(total_rect().tl_corner());
+        point c1 = loc - origin;
+        if (zoom_in_scale != 1)
+        {
+            c1 = c1/(double)zoom_in_scale;
+        }
+        else if (zoom_out_scale != 1)
+        {
+            c1 = c1*(double)zoom_out_scale;
+        }
+
+        overlay_rects[selected_rect].parts[part_name] = c1;
+        parent.invalidate_rectangle(rect); 
     }
 
 // ----------------------------------------------------------------------------------------
@@ -5789,6 +5843,41 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    rectangle image_display::
+    get_rect_on_screen (
+        rectangle orect 
+    ) const
+    {
+        const point origin(total_rect().tl_corner());
+        orect.left()   = orect.left()*zoom_in_scale/zoom_out_scale;
+        orect.top()    = orect.top()*zoom_in_scale/zoom_out_scale;
+        if (zoom_in_scale != 1)
+        {
+            // make it so the box surrounds the pixels when we zoom in.
+            orect.right()  = (orect.right()+1)*zoom_in_scale/zoom_out_scale;
+            orect.bottom() = (orect.bottom()+1)*zoom_in_scale/zoom_out_scale;
+        }
+        else
+        {
+            orect.right()  = orect.right()*zoom_in_scale/zoom_out_scale;
+            orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
+        }
+
+        return translate_rect(orect, origin);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    rectangle image_display::
+    get_rect_on_screen (
+        unsigned long idx
+    ) const
+    {
+        return get_rect_on_screen(overlay_rects[idx].rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void image_display::
     draw (
         const canvas& c
@@ -5816,33 +5905,37 @@ namespace dlib
         // now draw all the overlay rectangles
         for (unsigned long i = 0; i < overlay_rects.size(); ++i)
         {
-            rectangle orect = overlay_rects[i].rect;
-            orect.left()   = orect.left()*zoom_in_scale/zoom_out_scale;
-            orect.top()    = orect.top()*zoom_in_scale/zoom_out_scale;
-            if (zoom_in_scale != 1)
-            {
-                // make it so the box surrounds the pixels when we zoom in.
-                orect.right()  = (orect.right()+1)*zoom_in_scale/zoom_out_scale;
-                orect.bottom() = (orect.bottom()+1)*zoom_in_scale/zoom_out_scale;
-            }
-            else
-            {
-                orect.right()  = orect.right()*zoom_in_scale/zoom_out_scale;
-                orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
-            }
+            const rectangle orect = get_rect_on_screen(i);
 
             if (rect_is_selected && selected_rect == i)
-                draw_rectangle(c, translate_rect(orect, origin), invert_pixel(overlay_rects[i].color), area);
+                draw_rectangle(c, orect, invert_pixel(overlay_rects[i].color), area);
             else
-                draw_rectangle(c, translate_rect(orect, origin), overlay_rects[i].color, area);
+                draw_rectangle(c, orect, overlay_rects[i].color, area);
 
             if (overlay_rects[i].label.size() != 0)
             {
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r(orect.br_corner(),  
                             orect.br_corner() + point(10000,10000));
-                r = translate_rect(r, origin);
                 mfont->draw_string(c, r, overlay_rects[i].label, overlay_rects[i].color, 0, 
+                                   std::string::npos, area);
+            }
+
+
+            std::map<std::string,point>::const_iterator itr;
+            for (itr = overlay_rects[i].parts.begin(); itr != overlay_rects[i].parts.end(); ++itr)
+            {
+                rectangle temp = get_rect_on_screen(centered_rect(itr->second,part_width,part_width));
+
+                if (rect_is_selected && selected_part_name.size() != 0 && selected_part_name == itr->first)
+                    draw_circle(c, center(temp), temp.width()/2, invert_pixel(overlay_rects[i].color), area);
+                else
+                    draw_circle(c, center(temp), temp.width()/2, overlay_rects[i].color, area);
+
+                // make a rectangle that is at the spot we want to draw our string
+                rectangle r((temp.br_corner() + temp.bl_corner())/2,  
+                            temp.br_corner() + point(10000,10000));
+                mfont->draw_string(c, r, itr->first, overlay_rects[i].color, 0, 
                                    std::string::npos, area);
             }
         }
@@ -5875,12 +5968,43 @@ namespace dlib
             (key == base_window::KEY_BACKSPACE || key == base_window::KEY_DELETE))
         {
             rect_is_selected = false;
-            overlay_rects.erase(overlay_rects.begin() + selected_rect);
+            parts_menu.disable();
+            if (selected_part_name.size() == 0)
+                overlay_rects.erase(overlay_rects.begin() + selected_rect);
+            else
+                overlay_rects[selected_rect].parts.erase(selected_part_name);
             parent.invalidate_rectangle(rect);
 
             if (event_handler.is_set())
                 event_handler();
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    add_labelable_part_name (
+        const std::string& name
+    )
+    {
+        auto_mutex lock(m);
+        if (part_names.insert(name).second)
+        {
+            member_function_pointer<const std::string&>::kernel_1a mfp;
+            mfp.set(*this,&image_display::on_part_add);
+            parts_menu.menu().add_menu_item(menu_item_text("Add " + name,impl::image_display_functor(name,mfp)));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    clear_labelable_part_names (
+    )
+    {
+        auto_mutex lock(m);
+        part_names.clear();
+        parts_menu.menu().clear();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -5899,6 +6023,13 @@ namespace dlib
         if (rect.contains(x,y) == false || hidden || !enabled)
             return;
 
+        if (btn == base_window::RIGHT && rect_is_selected)
+        {
+            last_right_click_pos = point(x,y);
+            parts_menu.set_rect(get_rect_on_screen(selected_rect));
+            return;
+        }
+
         if (!is_double_click && btn == base_window::LEFT && (state&base_window::SHIFT))
         {
             drawing_rect = true;
@@ -5907,13 +6038,17 @@ namespace dlib
             if (rect_is_selected)
             {
                 rect_is_selected = false;
+                parts_menu.disable();
                 parent.invalidate_rectangle(rect);
             }
         }
         else if (drawing_rect)
         {
             if (rect_is_selected)
+            {
                 rect_is_selected = false;
+                parts_menu.disable();
+            }
 
             drawing_rect = false;
             parent.invalidate_rectangle(rect);
@@ -5923,29 +6058,16 @@ namespace dlib
             const point origin(total_rect().tl_corner());
             const bool rect_was_selected = rect_is_selected;
             rect_is_selected = false;
+            parts_menu.disable();
 
             long best_dist = std::numeric_limits<long>::max();
             long best_idx = 0;
+            std::string best_part;
 
             // check if this click landed on any of the overlay rectangles
             for (unsigned long i = 0; i < overlay_rects.size(); ++i)
             {
-                rectangle orect = overlay_rects[i].rect;
-                orect.left()   = orect.left()*zoom_in_scale/zoom_out_scale;
-                orect.top()    = orect.top()*zoom_in_scale/zoom_out_scale;
-                if (zoom_in_scale != 1)
-                {
-                    // make it so the box surrounds the pixels when we zoom in.
-                    orect.right()  = (orect.right()+1)*zoom_in_scale/zoom_out_scale;
-                    orect.bottom() = (orect.bottom()+1)*zoom_in_scale/zoom_out_scale;
-                }
-                else
-                {
-                    orect.right()  = orect.right()*zoom_in_scale/zoom_out_scale;
-                    orect.bottom() = orect.bottom()*zoom_in_scale/zoom_out_scale;
-                }
-
-                orect = translate_rect(orect, origin);
+                const rectangle orect = get_rect_on_screen(i);
 
                 const long dist = distance_to_rect_edge(orect, point(x,y));
 
@@ -5953,6 +6075,23 @@ namespace dlib
                 {
                     best_dist = dist;
                     best_idx = i;
+                    best_part.clear();
+                }
+
+                std::map<std::string,point>::const_iterator itr;
+                for (itr = overlay_rects[i].parts.begin(); itr != overlay_rects[i].parts.end(); ++itr)
+                {
+                    rectangle temp = get_rect_on_screen(centered_rect(itr->second,part_width,part_width));
+                    point c = center(temp);
+
+                    // distance from edge of part circle
+                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()/2));
+                    if (dist < best_dist)
+                    {
+                        best_idx = i;
+                        best_dist = dist;
+                        best_part = itr->first;
+                    }
                 }
             }
 
@@ -5960,7 +6099,10 @@ namespace dlib
             if (best_dist < 13)
             {
                 rect_is_selected = true;
+                if (part_names.size() != 0)
+                    parts_menu.enable();
                 selected_rect = best_idx;
+                selected_part_name = best_part;
                 if (orect_selected_event_handler.is_set())
                     orect_selected_event_handler(overlay_rects[best_idx]);
             }
@@ -5971,6 +6113,7 @@ namespace dlib
         else if (rect_is_selected)
         {
             rect_is_selected = false;
+            parts_menu.disable();
             parent.invalidate_rectangle(rect);
         }
     }

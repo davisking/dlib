@@ -1843,7 +1843,7 @@ namespace dlib
                   (i.e. this is the number that determines how far in the user is allowed to zoom)
         !*/
 
-        void set_size (
+        virtual void set_size (
             unsigned long width,
             unsigned long height
         );
@@ -2039,7 +2039,7 @@ namespace dlib
                   style
         !*/
 
-        void set_size (
+        virtual void set_size (
             unsigned long width,
             unsigned long height
         );

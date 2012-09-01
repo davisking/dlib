@@ -2189,7 +2189,7 @@ namespace dlib
         virtual ~zoomable_region (
         )= 0;
 
-        void set_pos (
+        virtual void set_pos (
             long x,
             long y
         );
@@ -2231,7 +2231,7 @@ namespace dlib
         double max_zoom_scale (
         ) const;
 
-        void set_size (
+        virtual void set_size (
             unsigned long width,
             unsigned long height
         );
@@ -2436,7 +2436,7 @@ namespace dlib
             long order
         );
 
-        void set_size (
+        virtual void set_size (
             unsigned long width,
             unsigned long height
         );
@@ -2483,7 +2483,7 @@ namespace dlib
             long pos
         );
 
-        void set_pos (
+        virtual void set_pos (
             long x,
             long y
         );
