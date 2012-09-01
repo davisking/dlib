@@ -2661,7 +2661,7 @@ namespace dlib
                 - std::bad_alloc
         */
 
-        void set_overlay_rects_changed_handler (
+        void set_overlay_rect_selected_handler (
             const any_function<void(const overlay_rect& orect)>& event_handler
         );
         /*
