@@ -2487,6 +2487,61 @@ namespace dlib
 
         };
 
+        struct overlay_circle
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents a circle that is drawn on top of the
+                    image shown by this object.  Each circle is represented by 
+                    its center, radius, and color.  It can also have an optional
+                    text label which will appear below the circle.
+            !*/
+
+            point center;
+            int radius;
+            rgb_alpha_pixel color;
+            std::string label;
+
+            overlay_circle(
+            );
+            /*!
+                ensures
+                    - #center == point(0,0)
+                    - #radius == 0
+                    - #color == rgb_alpha_pixel(0,0,0,0)
+                    - #label.size() == 0
+            !*/
+
+            template <typename pixel_type>
+            overlay_circle(
+                const point& center_, 
+                const int radius_,
+                pixel_type p
+            ); 
+            /*!
+                ensures
+                    - performs assign_pixel(color, p)
+                    - #center == center_
+                    - #radius == radius_
+            !*/
+
+            template <typename pixel_type>
+            overlay_circle(
+                const point& center_, 
+                const int radius_,
+                pixel_type p,
+                const std::string& label_
+            ); 
+            /*!
+                ensures
+                    - performs assign_pixel(color, p)
+                    - #center == center_
+                    - #radius == radius_
+                    - #label == label_
+            !*/
+
+        };
+
         void add_overlay (
             const overlay_rect& overlay
         );
@@ -2506,6 +2561,15 @@ namespace dlib
         !*/
 
         void add_overlay (
+            const overlay_circle& overlay
+        );
+        /*!
+            ensures
+                - adds the given overlay circle into this object such
+                  that it will be displayed. 
+        !*/
+
+        void add_overlay (
             const std::vector<overlay_rect>& overlay
         );
         /*!
@@ -2520,6 +2584,15 @@ namespace dlib
         /*!
             ensures
                 - adds the given set of overlay lines into this object such
+                  that they will be displayed. 
+        !*/
+
+        void add_overlay (
+            const std::vector<overlay_circle>& overlay
+        );
+        /*!
+            ensures
+                - adds the given set of overlay circles into this object such
                   that they will be displayed. 
         !*/
 
@@ -2700,6 +2773,7 @@ namespace dlib
 
         typedef image_display::overlay_rect overlay_rect;
         typedef image_display::overlay_line overlay_line;
+        typedef image_display::overlay_circle overlay_circle;
 
         image_window(
         ); 
@@ -2791,6 +2865,15 @@ namespace dlib
                   that it will be displayed. 
         !*/
 
+        void add_overlay (
+            const overlay_circle& overlay
+        );
+        /*!
+            ensures
+                - adds the given overlay circle into this object such
+                  that it will be displayed. 
+        !*/
+
         template <typename pixel_type>
         void add_overlay(
             const point& p1,
@@ -2817,6 +2900,15 @@ namespace dlib
         /*!
             ensures
                 - adds the given set of overlay lines into this object such
+                  that they will be displayed. 
+        !*/
+
+        void add_overlay (
+            const std::vector<overlay_circle>& overlay
+        );
+        /*!
+            ensures
+                - adds the given set of overlay circles into this object such
                   that they will be displayed. 
         !*/
 

@@ -5804,6 +5804,22 @@ namespace dlib
 
     void image_display::
     add_overlay (
+        const overlay_circle& overlay
+    )
+    {
+        auto_mutex M(m);
+
+        // push this new overlay into our overlay vector
+        overlay_circles.push_back(overlay);
+
+        // make the parent window redraw us now that we changed the overlay
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    add_overlay (
         const std::vector<overlay_rect>& overlay
     )
     {
@@ -5835,12 +5851,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void image_display::
+    add_overlay (
+        const std::vector<overlay_circle>& overlay
+    )
+    {
+        auto_mutex M(m);
+
+        // push this new overlay into our overlay vector
+        overlay_circles.insert(overlay_circles.end(), overlay.begin(), overlay.end());
+
+        // make the parent window redraw us now that we changed the overlay
+        parent.invalidate_rectangle(rect);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
     clear_overlay (
     )
     {
         auto_mutex M(m);
         overlay_rects.clear();
         overlay_lines.clear();
+        overlay_circles.clear();
         parent.invalidate_rectangle(rect);
     }
 
@@ -5955,6 +5988,27 @@ namespace dlib
                       zoom_in_scale*overlay_lines[i].p1/zoom_out_scale + origin, 
                       zoom_in_scale*overlay_lines[i].p2/zoom_out_scale + origin, 
                       overlay_lines[i].color, area);
+        }
+
+        // now draw all the overlay circles 
+        for (unsigned long i = 0; i < overlay_circles.size(); ++i)
+        {
+            const point center = zoom_in_scale*overlay_circles[i].center/zoom_out_scale + origin;
+            const int radius = zoom_in_scale*overlay_circles[i].radius/zoom_out_scale;
+            draw_circle(c, 
+                      center, 
+                      radius, 
+                      overlay_circles[i].color, area);
+
+            if (overlay_circles[i].label.size() != 0)
+            {
+                const point temp = center + point(0,radius);
+
+                // make a rectangle that is at the spot we want to draw our string
+                rectangle r(temp,  temp + point(10000,10000));
+                mfont->draw_string(c, r, overlay_circles[i].label, overlay_circles[i].color, 0, 
+                                   std::string::npos, area);
+            }
         }
 
         if (drawing_rect)
@@ -6421,6 +6475,16 @@ namespace dlib
 
     void image_window::
     add_overlay (
+        const overlay_circle& overlay
+    ) 
+    { 
+        gui_img.add_overlay(overlay); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    add_overlay (
         const std::vector<overlay_rect>& overlay
     ) 
     { 
@@ -6432,6 +6496,16 @@ namespace dlib
     void image_window::
     add_overlay (
         const std::vector<overlay_line>& overlay
+    ) 
+    { 
+        gui_img.add_overlay(overlay); 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_window::
+    add_overlay (
+        const std::vector<overlay_circle>& overlay
     ) 
     { 
         gui_img.add_overlay(overlay); 

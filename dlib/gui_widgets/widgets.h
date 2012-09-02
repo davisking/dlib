@@ -27,6 +27,7 @@
 #include <vector>
 #include "../any.h"
 #include <set>
+#include "../image_processing/full_object_detection.h"
 
 #ifdef _MSC_VER
 // This #pragma directive is also located in the algs.h file but for whatever
@@ -3323,6 +3324,24 @@ namespace dlib
             rgb_alpha_pixel color;
         };
 
+        struct overlay_circle
+        {
+            overlay_circle():radius(0) { assign_pixel(color, 0);}
+
+            template <typename pixel_type>
+            overlay_circle(const point& center_, const int radius_, pixel_type p) 
+                : center(center_), radius(radius_) { assign_pixel(color, p); }
+
+            template <typename pixel_type>
+            overlay_circle(const point& center_, const int radius_, pixel_type p, const std::string& l) 
+                : center(center_), radius(radius_), label(l) { assign_pixel(color, p); }
+
+            point center;
+            int radius;
+            rgb_alpha_pixel color;
+            std::string label;
+        };
+
         void add_overlay (
             const overlay_rect& overlay
         );
@@ -3332,11 +3351,19 @@ namespace dlib
         );
 
         void add_overlay (
+            const overlay_circle& overlay
+        );
+
+        void add_overlay (
             const std::vector<overlay_rect>& overlay
         );
 
         void add_overlay (
             const std::vector<overlay_line>& overlay
+        );
+
+        void add_overlay (
+            const std::vector<overlay_circle>& overlay
         );
 
         void clear_overlay (
@@ -3470,6 +3497,7 @@ namespace dlib
 
         std::vector<overlay_rect> overlay_rects;
         std::vector<overlay_line> overlay_lines;
+        std::vector<overlay_circle> overlay_circles;
 
         long zoom_in_scale;
         long zoom_out_scale;
@@ -3501,6 +3529,7 @@ namespace dlib
 
         typedef image_display::overlay_rect overlay_rect;
         typedef image_display::overlay_line overlay_line;
+        typedef image_display::overlay_circle overlay_circle;
 
         image_window(
         ); 
@@ -3562,6 +3591,10 @@ namespace dlib
             const overlay_line& overlay
         );
 
+        void add_overlay (
+            const overlay_circle& overlay
+        );
+
         template <typename pixel_type>
         void add_overlay(const point& p1, const point& p2, pixel_type p) 
         { add_overlay(image_display::overlay_line(p1,p2,p)); }
@@ -3572,6 +3605,10 @@ namespace dlib
 
         void add_overlay (
             const std::vector<overlay_line>& overlay
+        );
+
+        void add_overlay (
+            const std::vector<overlay_circle>& overlay
         );
 
         void clear_overlay (
