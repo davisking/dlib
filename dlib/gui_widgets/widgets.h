@@ -3266,6 +3266,7 @@ namespace dlib
             }
 
             rect_is_selected = false;
+            parts_menu.disable();
             assign_image_scaled(img,new_img);
         }
 
