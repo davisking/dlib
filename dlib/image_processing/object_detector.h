@@ -74,6 +74,15 @@ namespace dlib
             double adjust_threshold = 0
         );
 
+        template <
+            typename image_type
+            >
+        void operator() (
+            const image_type& img,
+            std::vector<full_object_detection>& final_dets,
+            double adjust_threshold = 0
+        );
+
         template <typename T, typename U>
         friend void serialize (
             const object_detector<T,U>& item,
@@ -334,6 +343,35 @@ namespace dlib
         {
             final_dets.push_back(std::make_pair(temp_dets[i].first, 
                                                 scanner.get_full_object_detection(temp_dets[i].second, w)));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_scanner_type,
+        typename overlap_tester_type
+        >
+    template <
+        typename image_type
+        >
+    void object_detector<image_scanner_type,overlap_tester_type>::
+    operator() (
+        const image_type& img,
+        std::vector<full_object_detection>& final_dets,
+        double adjust_threshold
+    ) 
+    {
+        std::vector<std::pair<double, rectangle> > temp_dets;
+        (*this)(img,temp_dets,adjust_threshold);
+
+        final_dets.clear();
+        final_dets.reserve(temp_dets.size());
+
+        // convert all the rectangle detections into full_object_detections.
+        for (unsigned long i = 0; i < temp_dets.size(); ++i)
+        {
+            final_dets.push_back(scanner.get_full_object_detection(temp_dets[i].second, w));
         }
     }
 

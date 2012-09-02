@@ -188,6 +188,23 @@ namespace dlib
                   into full_object_detections.  Therefore, this version of operator() is
                   simply a convenience function for performing this set of operations.
         !*/
+
+        template <
+            typename image_type
+            >
+        void operator() (
+            const image_type& img,
+            std::vector<full_object_detection>& final_dets,
+            double adjust_threshold = 0
+        );
+        /*!
+            requires
+                - img == an object which can be accepted by image_scanner_type::load()
+            ensures
+                - This function is identical to the above operator() routine, except that
+                  it doesn't include a double valued score.  That is, it just outputs the
+                  full_object_detections.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
