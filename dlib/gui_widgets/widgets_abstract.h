@@ -13,6 +13,7 @@
 #include <map>
 #include "../interfaces/enumerable.h"
 #include "style_abstract.h"
+#include "../image_processing/full_object_detection_abstract.h"
 
 namespace dlib
 {
@@ -2854,6 +2855,51 @@ namespace dlib
             ensures
                 - adds the given set of rectangles into this object such
                   that they will be displayed with the color specific by p. 
+        !*/
+
+        void add_overlay(
+            const full_object_detection& object,
+            const std::vector<std::string>& part_names
+        );
+        /*!
+            ensures
+                - adds the given full_object_detection to the overlays
+                  and shows it on the screen.  This includes any of its
+                  parts that are not set equal to OBJECT_PART_NOT_PRESENT.
+                - for all valid i < part_names.size():
+                    - the part object.part(i) will be labeled with the string
+                      part_names[i].
+        !*/
+
+        void add_overlay(
+            const full_object_detection& object
+        );
+        /*!
+            ensures
+                - adds the given full_object_detection to the overlays
+                  and shows it on the screen.  This includes any of its
+                  parts that are not set equal to OBJECT_PART_NOT_PRESENT.
+        !*/
+
+        void add_overlay(
+            const std::vector<full_object_detection>& objects,
+            const std::vector<std::string>& part_names
+        ); 
+        /*!
+            ensures
+                - calling this function is equivalent to calling the following
+                  sequence of functions, for all valid i:
+                    - add_overlay(objects[i], part_names);
+        !*/
+
+        void add_overlay(
+            const std::vector<full_object_detection>& objects
+        );
+        /*!
+            ensures
+                - calling this function is equivalent to calling the following
+                  sequence of functions, for all valid i:
+                    - add_overlay(objects[i]);
         !*/
 
         void add_overlay (

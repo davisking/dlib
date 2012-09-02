@@ -3587,6 +3587,79 @@ namespace dlib
             add_overlay(temp);
         }
 
+        void add_overlay(
+            const full_object_detection& object,
+            const std::vector<std::string>& part_names
+        ) 
+        { 
+
+            add_overlay(overlay_rect(object.get_rect(), rgb_pixel(255,0,0)));
+
+            std::vector<overlay_circle> temp;
+            temp.reserve(object.num_parts());
+            for (unsigned long i = 0; i < object.num_parts(); ++i)
+            {
+                if (object.part(i) != OBJECT_PART_NOT_PRESENT)
+                {
+                    if (i < part_names.size())
+                        temp.push_back(overlay_circle(object.part(i), 7, rgb_pixel(0,255,0), part_names[i]));
+                    else
+                        temp.push_back(overlay_circle(object.part(i), 7, rgb_pixel(0,255,0)));
+                }
+            }
+
+            add_overlay(temp);
+        }
+
+        void add_overlay(
+            const full_object_detection& object
+        ) 
+        { 
+            std::vector<std::string> part_names;
+            add_overlay(object, part_names);
+        }
+
+        void add_overlay(
+            const std::vector<full_object_detection>& objects,
+            const std::vector<std::string>& part_names
+        ) 
+        { 
+            std::vector<overlay_rect> rtemp;
+            rtemp.reserve(objects.size());
+            for (unsigned long i = 0; i < objects.size(); ++i)
+            {
+                rtemp.push_back(overlay_rect(objects[i].get_rect(), rgb_pixel(255,0,0)));
+            }
+
+            add_overlay(rtemp);
+
+            std::vector<overlay_circle> temp;
+
+            for (unsigned long i = 0; i < objects.size(); ++i)
+            {
+                for (unsigned long j = 0; j < objects[i].num_parts(); ++j)
+                {
+                    if (objects[i].part(j) != OBJECT_PART_NOT_PRESENT)
+                    {
+                        if (j < part_names.size())
+                            temp.push_back(overlay_circle(objects[i].part(j), 7, rgb_pixel(0,255,0),part_names[j]));
+                        else
+                            temp.push_back(overlay_circle(objects[i].part(j), 7, rgb_pixel(0,255,0)));
+                    }
+                }
+            }
+
+            add_overlay(temp);
+        }
+
+        void add_overlay(
+            const std::vector<full_object_detection>& objects
+        ) 
+        { 
+            std::vector<std::string> part_names;
+            add_overlay(objects, part_names);
+        }
+
         void add_overlay (
             const overlay_line& overlay
         );
