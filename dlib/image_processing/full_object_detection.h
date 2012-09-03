@@ -6,6 +6,7 @@
 #include "../geometry.h"
 #include "full_object_detection_abstract.h"
 #include <vector>
+#include "../serialize.h"
 
 namespace dlib
 {
@@ -47,6 +48,31 @@ namespace dlib
                 << "\n\t this:        " << this
                 );
             return parts[idx]; 
+        }
+
+        friend void serialize (
+            const full_object_detection& item,
+            std::ostream& out
+        )
+        {
+            int version = 1;
+            serialize(version, out);
+            serialize(item.rect, out);
+            serialize(item.parts, out);
+        }
+
+        friend void deserialize (
+            full_object_detection& item,
+            std::istream& in
+        )
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 1)
+                throw serialization_error("Unexpected version encountered while deserializing dlib::full_object_detection.");
+
+            deserialize(item.rect, in);
+            deserialize(item.parts, in);
         }
 
     private:

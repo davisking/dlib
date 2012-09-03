@@ -5,6 +5,7 @@
 
 #include <vector>
 #include "../geometry.h"
+#include "../serialize.h"
 
 namespace dlib
 {
@@ -83,6 +84,24 @@ namespace dlib
                   This is useful for modeling object parts that are not always observed.
         !*/
     };
+
+// ----------------------------------------------------------------------------------------
+
+    void serialize (
+        const full_object_detection& item, 
+        std::ostream& out
+    );   
+    /*!
+        provides serialization support 
+    !*/
+
+    void deserialize (
+        full_object_detection& item, 
+        std::istream& in
+    );   
+    /*!
+        provides deserialization support 
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
