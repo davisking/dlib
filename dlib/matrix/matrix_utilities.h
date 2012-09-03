@@ -230,7 +230,24 @@ namespace dlib
     template <
         typename EXP
         >
-    const typename matrix_exp<EXP>::type length (
+    typename enable_if_c<std::numeric_limits<typename EXP::type>::is_integer, double>::type length (
+        const matrix_exp<EXP>& m
+    )
+    {
+        DLIB_ASSERT(is_vector(m) == true, 
+            "\ttype length(const matrix_exp& m)"
+            << "\n\tm must be a row or column vector"
+            << "\n\tm.nr():     " << m.nr() 
+            << "\n\tm.nc():     " << m.nc() 
+            );
+        
+        return std::sqrt(static_cast<double>(sum(squared(m))));
+    }
+    
+    template <
+        typename EXP
+        >
+    typename disable_if_c<std::numeric_limits<typename EXP::type>::is_integer, const typename EXP::type>::type length (
         const matrix_exp<EXP>& m
     )
     {
@@ -242,7 +259,7 @@ namespace dlib
             );
         return std::sqrt(sum(squared(m)));
     }
-
+ 
 // ----------------------------------------------------------------------------------------
 
     template <
