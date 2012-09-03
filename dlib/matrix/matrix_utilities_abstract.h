@@ -1065,6 +1065,10 @@ namespace dlib
         ensures
             - returns sqrt(sum(squared(m)))
               (i.e. returns the length of the vector m)
+            - if (m contains integer valued elements) then  
+                - The return type is a double that represents the length.  Therefore, the
+                  return value of length() is always represented using a floating point
+                  type. 
     !*/
 
 // ----------------------------------------------------------------------------------------
