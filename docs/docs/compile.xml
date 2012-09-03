@@ -103,13 +103,23 @@ sudo apt-get install libx11-dev
         <center><h1>Preprocessor Directives</h1></center>
 
          <p>
-            There are a few preprocessor directives you can supply during the build process to cause the
-            library to build in various optional ways.  Most people will probably not want
-            to mess with these at all and will just use the library in its default build.  But they are listed
-            here in the event that you need to use them.
+            There are a few preprocessor directives you can supply during the build process
+            to cause the library to build in various optional ways.  By default, the
+            library will always do something reasonable, but they are listed here in the
+            event that you need to use them.
          </p>
 
-         <anchor>DLIB_THREAD_POOL_TIMEOUT</anchor>
+
+         <anchor>ENABLE_ASSERTS</anchor>
+        <h3>#define ENABLE_ASSERTS</h3>
+        <p>
+           Defining this directive causes all the <a href="metaprogramming.html#DLIB_ASSERT">DLIB_ASSERT</a> macros to
+           be active.  If you are using visual studio or CMake then ENABLE_ASSERTS will be automatically enabled
+           for you when you compile in debug mode.  However, if you are using a different build system then you
+           might have to manually enable it if you want to turn the asserts on.
+        </p>
+
+         <anchor>DLIB_ISO_CPP_ONLY</anchor>
         <h3>#define DLIB_ISO_CPP_ONLY</h3>
         <p>
            This is a #define directive that you can set to cause the library to exclude all non ISO C++ code (The things in the <a href="api.html">API wrappers</a> section and any objects that depend on those wrappers).
