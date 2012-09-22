@@ -3,9 +3,10 @@
 # information about it at http://www.cmake.org
 #
 #
-# This cmake file tries to find an installed BLAS and LAPACK libraries.  
+# This cmake file tries to find installed BLAS and LAPACK libraries.  
 # It looks for an installed copy of the Intel MKL library first and then
-# attempts to find some other BLAS and LAPACK libraries.
+# attempts to find some other BLAS and LAPACK libraries if you don't have 
+# the Intel MKL.
 #
 #  blas_found        - True if BLAS is available
 #  lapack_found      - True if LAPACK is available
@@ -16,6 +17,7 @@
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 SET(blas_found 0)
+SET(lapack_found 0)
 
 
 if (UNIX)
@@ -109,6 +111,24 @@ if (UNIX)
       endif()
       mark_as_advanced( generic_blas)
    endif()
+
+
+
+
+   # Make sure we really found a CBLAS library.  That is, it needs to expose
+   # the proper cblas link symbols.  So here we test if one of them is present
+   # and assume everything is good if it is.
+   if (blas_found)
+      INCLUDE (CheckFunctionExists)
+      set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+      CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
+      if (NOT HAVE_CBLAS)
+         message(STATUS "BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
+         set(blas_found 0)
+         set(lapack_found 0)
+      endif()
+   endif()
+
 
    if (NOT blas_found)
       message(STATUS "***** No BLAS library found *****")
