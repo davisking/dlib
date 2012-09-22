@@ -80,8 +80,9 @@ if (UNIX)
    # try to find some other BLAS libraries if we didn't find the MKL
    
    if (NOT blas_found)
-      find_library(atlas_lib atlas)
-      find_library(cblas_lib cblas)
+      set(extra_paths /usr/lib/atlas-base/ /usr/lib/atlas/ )
+      find_library(atlas_lib atlas ${extra_paths})
+      find_library(cblas_lib cblas ${extra_paths})
       if (atlas_lib AND cblas_lib)
          set(blas_libraries ${atlas_lib} ${cblas_lib})
          set(blas_found 1)
