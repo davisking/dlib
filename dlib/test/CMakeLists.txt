@@ -136,6 +136,11 @@ ADD_EXECUTABLE(${target_name} main.cpp tester.cpp ${tests})
 # add the folder containing the dlib folder to the include path
 INCLUDE_DIRECTORIES(../..)
 
+# Turn on all warnings when using gcc.
+if (CMAKE_COMPILER_IS_GNUCXX)
+   add_definitions("-W -Wall")
+endif()
+
 # There is a CMakeLists.txt file in the dlib source folder that tells cmake
 # how to build the dlib library.  Tell cmake about that file.
 add_subdirectory(.. dlib_build)
