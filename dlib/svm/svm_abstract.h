@@ -317,7 +317,8 @@ namespace dlib
         requires
             - T == a matrix object or an object compatible with std::vector that contains 
               a swappable type.
-            - if samples is a matrix then is_vector(samples) == true 
+            - if (samples is a matrix) then 
+                - is_vector(samples) == true 
         ensures
             - randomizes the order of the elements inside samples 
             - A default initialized random number generator is used to perform the randomizing.
@@ -339,7 +340,9 @@ namespace dlib
         requires
             - T == a matrix object or an object compatible with std::vector that contains 
               a swappable type.
-            - if samples is a matrix then is_vector(samples) == true 
+            - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
+            - if (samples is a matrix) then 
+                - is_vector(samples) == true 
         ensures
             - randomizes the order of the elements inside samples 
             - the given rnd random number generator object is used to do the randomizing
@@ -370,7 +373,6 @@ namespace dlib
                 - is_vector(labels) == true
                 - is_vector(auxiliary) == true
             - samples.size() == labels.size() == auxiliary.size()
-            - rand_type == a type that implements the dlib/rand/rand_kernel_abstract.h interface
         ensures
             - randomizes the order of the samples, labels, and auxiliary but preserves the
               pairing between each sample, its label, and its auxiliary value.
