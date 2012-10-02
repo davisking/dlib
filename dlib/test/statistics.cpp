@@ -299,6 +299,7 @@ namespace
             }
 
             DLIB_TEST(std::abs(variance(vector_to_matrix(a)) - rs1.variance()) < 1e-13);
+            DLIB_TEST(std::abs(stddev(vector_to_matrix(a)) - rs1.stddev()) < 1e-13);
             DLIB_TEST(std::abs(mean(vector_to_matrix(a)) - rs1.mean()) < 1e-13);
 
             for (int i = 10; i < 20; ++i)

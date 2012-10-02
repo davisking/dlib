@@ -1543,6 +1543,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp::type stddev (
+        const matrix_exp& m
+    );
+    /*!
+        ensures
+            - returns std::sqrt(variance(m))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix covariance (
         const matrix_exp& m
     );

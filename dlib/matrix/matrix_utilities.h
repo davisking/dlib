@@ -1769,6 +1769,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP
+        >
+    const typename matrix_exp<EXP>::type stddev (
+        const matrix_exp<EXP>& m
+    )
+    {
+        return std::sqrt(variance(m));
+    }
+
+// ----------------------------------------------------------------------------------------
+
 // this is a workaround for a bug in visual studio 7.1
     template <typename EXP>
     struct visual_studio_sucks_cov_helper
