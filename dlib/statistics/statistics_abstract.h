@@ -208,7 +208,7 @@ namespace dlib
             requires
                 - current_n() > 1
             ensures
-                - returns the variance of all the values presented to this
+                - returns the unbiased sample variance of all the values presented to this
                   object so far.
         !*/
 
@@ -218,8 +218,8 @@ namespace dlib
             requires
                 - current_n() > 1
             ensures
-                - returns the standard deviation of all the values presented to this
-                  object so far.
+                - returns the unbiased sampled standard deviation of all the values
+                  presented to this object so far.
         !*/
 
         T max (
@@ -248,6 +248,19 @@ namespace dlib
                 - current_n() > 1
             ensures
                 - return (val-mean())/stddev();
+        !*/
+
+        running_stats operator+ (
+            const running_stats& rhs
+        ) const;
+        /*!
+            requires
+                - max_n() == rhs.max_n()
+            ensures
+                - returns a new running_stats object that represents the combination of all
+                  the values given to *this and rhs.  That is, this function returns a
+                  running_stats object, R, that is equivalent to what you would obtain if
+                  all calls to this->add() and rhs.add() had instead been done to R.
         !*/
     };
 
@@ -399,6 +412,18 @@ namespace dlib
             ensures
                 - returns the unbiased sample standard deviation of all y samples
                   presented to this object via add().
+        !*/
+
+        running_scalar_covariance operator+ (
+            const running_covariance& rhs
+        ) const;
+        /*!
+            ensures
+                - returns a new running_scalar_covariance object that represents the
+                  combination of all the values given to *this and rhs.  That is, this
+                  function returns a running_scalar_covariance object, R, that is
+                  equivalent to what you would obtain if all calls to this->add() and
+                  rhs.add() had instead been done to R.
         !*/
     };
 

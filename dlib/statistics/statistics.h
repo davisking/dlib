@@ -53,11 +53,8 @@ namespace dlib
             const T& val
         )
         {
-            const T div_n   = 1/(n+1);
-            const T n_div_n = n*div_n;
-
-            sum     = n_div_n*sum     + val*div_n;
-            sum_sqr = n_div_n*sum_sqr + val*div_n*val;
+            sum     += val;
+            sum_sqr += val*val;
 
             if (val < min_value)
                 min_value = val;
@@ -83,7 +80,10 @@ namespace dlib
         T mean (
         ) const
         {
-            return sum;
+            if (n != 0)
+                return sum/n;
+            else
+                return 0;
         }
 
         T max (
@@ -122,8 +122,8 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
 
-            T temp = n/(n-1);
-            temp = temp*(sum_sqr - sum*sum);
+            T temp = 1/(n-1);
+            temp = temp*(sum_sqr - sum*sum/n);
             // make sure the variance is never negative.  This might
             // happen due to numerical errors.
             if (temp >= 0)
@@ -156,6 +156,29 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
             return (val-mean())/std::sqrt(variance());
+        }
+
+        running_stats operator+ (
+            const running_stats& rhs
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(max_n() == rhs.max_n(),
+                "\trunning_stats running_stats::operator+(rhs)"
+                << "\n\t invalid inputs were given to this function"
+                << "\n\t max_n():     " << max_n() 
+                << "\n\t rhs.max_n(): " << rhs.max_n() 
+                << "\n\t this:        " << this
+                );
+
+            running_stats temp(*this);
+
+            temp.sum += rhs.sum;
+            temp.sum_sqr += rhs.sum_sqr;
+            temp.n += rhs.n;
+            temp.min_value = std::min(rhs.min_value, min_value);
+            temp.max_value = std::max(rhs.max_value, max_value);
+            return temp;
         }
 
         template <typename U>
@@ -371,6 +394,21 @@ namespace dlib
                 );
 
             return std::sqrt(variance_y());
+        }
+
+        running_scalar_covariance operator+ (
+            const running_scalar_covariance& rhs
+        ) const
+        {
+            running_scalar_covariance temp(rhs);
+
+            temp.sum_xy += sum_xy;
+            temp.sum_x  += sum_x;
+            temp.sum_y  += sum_y;
+            temp.sum_xx += sum_xx;
+            temp.sum_yy += sum_yy;
+            temp.n      += n;
+            return temp;
         }
 
     private:

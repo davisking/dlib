@@ -286,6 +286,59 @@ namespace
             }
         }
 
+        void another_test()
+        {
+            std::vector<double> a;
+
+            running_stats<double> rs1, rs2;
+
+            for (int i = 0; i < 10; ++i)
+            {
+                rs1.add(i);
+                a.push_back(i);
+            }
+
+            DLIB_TEST(std::abs(variance(vector_to_matrix(a)) - rs1.variance()) < 1e-13);
+            DLIB_TEST(std::abs(mean(vector_to_matrix(a)) - rs1.mean()) < 1e-13);
+
+            for (int i = 10; i < 20; ++i)
+            {
+                rs2.add(i);
+                a.push_back(i);
+            }
+
+            DLIB_TEST(std::abs(variance(vector_to_matrix(a)) - (rs1+rs2).variance()) < 1e-13);
+            DLIB_TEST(std::abs(mean(vector_to_matrix(a)) - (rs1+rs2).mean()) < 1e-13);
+            DLIB_TEST((rs1+rs2).current_n() == 20);
+
+            running_scalar_covariance<double> rc1, rc2, rc3;
+            dlib::rand rnd;
+            for (double i = 0; i < 10; ++i)
+            {
+                const double a = i + rnd.get_random_gaussian();
+                const double b = i + rnd.get_random_gaussian();
+                rc1.add(a,b);
+                rc3.add(a,b);
+            }
+            for (double i = 11; i < 20; ++i)
+            {
+                const double a = i + rnd.get_random_gaussian();
+                const double b = i + rnd.get_random_gaussian();
+                rc2.add(a,b);
+                rc3.add(a,b);
+            }
+
+            DLIB_TEST(std::abs((rc1+rc2).mean_x() - rc3.mean_x()) < 1e-13);
+            DLIB_TEST(std::abs((rc1+rc2).mean_y() - rc3.mean_y()) < 1e-13);
+            DLIB_TEST_MSG(std::abs((rc1+rc2).variance_x() - rc3.variance_x()) < 1e-13, std::abs((rc1+rc2).variance_x() - rc3.variance_x()));
+            DLIB_TEST(std::abs((rc1+rc2).variance_y() - rc3.variance_y()) < 1e-13);
+            DLIB_TEST(std::abs((rc1+rc2).covariance() - rc3.covariance()) < 1e-13);
+            DLIB_TEST((rc1+rc2).current_n() == rc3.current_n());
+
+            rs1.set_max_n(50);
+            DLIB_TEST(rs1.max_n() == 50);
+        }
+
         void perform_test (
         )
         {
@@ -295,6 +348,7 @@ namespace
             test_running_stats();
             test_randomize_samples();
             test_randomize_samples2();
+            another_test();
         }
     } a;
 
