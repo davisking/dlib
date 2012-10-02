@@ -332,6 +332,10 @@
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#variance</link>
                      </item>
                      <item>
+                        <name>stddev</name>
+                        <link>dlib/matrix/matrix_utilities_abstract.h.html#stddev</link>
+                     </item>
+                     <item>
                         <name>covariance</name>
                         <link>dlib/matrix/matrix_utilities_abstract.h.html#covariance</link>
                      </item>

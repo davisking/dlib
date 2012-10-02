@@ -516,6 +516,7 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="prod"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="mean"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="variance"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="stddev"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="covariance"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pixel_to_vector"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="vector_to_pixel"/>
