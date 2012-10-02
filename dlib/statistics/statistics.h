@@ -71,7 +71,7 @@ namespace dlib
         T max_n (
         ) const
         {
-            return max_n;
+            return maximum_n;
         }
 
         T current_n (
