@@ -23,6 +23,7 @@
 // include this first so that it can disable the older version
 // of the winsock API when compiled in windows.
 #include "../sockets/sockets_kernel_1.cpp"
+#include "../bsp/bsp.cpp"
 
 #include "../dir_nav/dir_nav_kernel_1.cpp"
 #include "../dir_nav/dir_nav_kernel_2.cpp"
@@ -56,7 +57,6 @@
 #endif
 
 #ifndef DLIB_NO_GUI_SUPPORT
-
 #include "../gui_widgets/fonts.cpp"
 #include "../gui_widgets/widgets.cpp"
 #include "../gui_widgets/drawable.cpp"
@@ -65,7 +65,6 @@
 #include "../gui_widgets/base_widgets.cpp"
 #include "../gui_core/gui_core_kernel_1.cpp"
 #include "../gui_core/gui_core_kernel_2.cpp"
-
 #endif // DLIB_NO_GUI_SUPPORT
 
 #endif // DLIB_ISO_CPP_ONLY
