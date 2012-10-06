@@ -246,6 +246,8 @@ namespace dlib
         const unsigned long _node_id;
         array<scoped_ptr<thread_function> > threads;
 
+    // -----------------------------------
+
         template <
             typename funct_type
             >
@@ -255,6 +257,44 @@ namespace dlib
         );
 
         template <
+            typename funct_type,
+            typename ARG1
+            >
+        friend void bsp_connect (
+            funct_type& funct,
+            ARG1 arg1,
+            const std::vector<std::pair<std::string,unsigned short> >& hosts
+        );
+
+        template <
+            typename funct_type,
+            typename ARG1,
+            typename ARG2
+            >
+        friend void bsp_connect (
+            funct_type& funct,
+            ARG1 arg1,
+            ARG2 arg2,
+            const std::vector<std::pair<std::string,unsigned short> >& hosts
+        );
+
+        template <
+            typename funct_type,
+            typename ARG1,
+            typename ARG2,
+            typename ARG3
+            >
+        friend void bsp_connect (
+            funct_type& funct,
+            ARG1 arg1,
+            ARG2 arg2,
+            ARG3 arg3,
+            const std::vector<std::pair<std::string,unsigned short> >& hosts
+        );
+
+    // -----------------------------------
+
+        template <
             typename funct_type
             >
         friend void bsp_listen (
@@ -262,8 +302,48 @@ namespace dlib
             unsigned short listening_port
         );
 
+        template <
+            typename funct_type,
+            typename ARG1
+            >
+        friend void bsp_listen (
+            funct_type& funct,
+            ARG1 arg1,
+            unsigned short listening_port
+        );
+
+        template <
+            typename funct_type,
+            typename ARG1,
+            typename ARG2
+            >
+        friend void bsp_listen (
+            funct_type& funct,
+            ARG1 arg1,
+            ARG2 arg2,
+            unsigned short listening_port
+        );
+
+        template <
+            typename funct_type,
+            typename ARG1,
+            typename ARG2,
+            typename ARG3
+            >
+        friend void bsp_listen (
+            funct_type& funct,
+            ARG1 arg1,
+            ARG2 arg2,
+            ARG3 arg3,
+            unsigned short listening_port
+        );
+
+    // -----------------------------------
+
     };
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -277,15 +357,83 @@ namespace dlib
         impl::map_id_to_con cons;
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
-
         send_out_connection_orders(cons, hosts);
-
         bsp obj(node_id, cons);
         funct(obj);
-
         obj.check_for_errors();
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1
+        >
+    void bsp_connect (
+        funct_type& funct,
+        ARG1 arg1,
+        const std::vector<std::pair<std::string,unsigned short> >& hosts
+    )
+    {
+        impl::map_id_to_con cons;
+        const unsigned long node_id = 0;
+        connect_all(cons, hosts, node_id);
+        send_out_connection_orders(cons, hosts);
+        bsp obj(node_id, cons);
+        funct(obj,arg1);
+        obj.check_for_errors();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2
+        >
+    void bsp_connect (
+        funct_type& funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        const std::vector<std::pair<std::string,unsigned short> >& hosts
+    )
+    {
+        impl::map_id_to_con cons;
+        const unsigned long node_id = 0;
+        connect_all(cons, hosts, node_id);
+        send_out_connection_orders(cons, hosts);
+        bsp obj(node_id, cons);
+        funct(obj,arg1,arg2);
+        obj.check_for_errors();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3
+        >
+    void bsp_connect (
+        funct_type& funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3,
+        const std::vector<std::pair<std::string,unsigned short> >& hosts
+    )
+    {
+        impl::map_id_to_con cons;
+        const unsigned long node_id = 0;
+        connect_all(cons, hosts, node_id);
+        send_out_connection_orders(cons, hosts);
+        bsp obj(node_id, cons);
+        funct(obj,arg1,arg2,arg3);
+        obj.check_for_errors();
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -299,13 +447,79 @@ namespace dlib
         impl::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
-
         bsp obj(node_id, cons);
         funct(obj);
-
         obj.check_for_errors();
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1
+        >
+    void bsp_listen (
+        funct_type& funct,
+        ARG1 arg1,
+        unsigned short listening_port
+    )
+    {
+        impl::map_id_to_con cons;
+        unsigned long node_id;
+        listen_and_connect_all(node_id, cons, listening_port);
+        bsp obj(node_id, cons);
+        funct(obj,arg1);
+        obj.check_for_errors();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2
+        >
+    void bsp_listen (
+        funct_type& funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        unsigned short listening_port
+    )
+    {
+        impl::map_id_to_con cons;
+        unsigned long node_id;
+        listen_and_connect_all(node_id, cons, listening_port);
+        bsp obj(node_id, cons);
+        funct(obj,arg1,arg2);
+        obj.check_for_errors();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3
+        >
+    void bsp_listen (
+        funct_type& funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3,
+        unsigned short listening_port
+    )
+    {
+        impl::map_id_to_con cons;
+        unsigned long node_id;
+        listen_and_connect_all(node_id, cons, listening_port);
+        bsp obj(node_id, cons);
+        funct(obj,arg1,arg2,arg3);
+        obj.check_for_errors();
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }
