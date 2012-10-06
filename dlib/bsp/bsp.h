@@ -108,8 +108,10 @@ namespace dlib
             serialize(item, sout);
             for (unsigned long i = 0; i < number_of_nodes(); ++i)
             {
+                // Don't send to yourself.
                 if (i == node_id())
                     continue;
+
                 send_data(sout.str(), i);
             }
         }
