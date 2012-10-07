@@ -12,6 +12,7 @@
 #include "../serialize.h"
 #include "../map.h"
 #include <deque>
+#include <vector>
 
 namespace dlib
 {
@@ -74,7 +75,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class bsp : noncopyable
+    class bsp_context : noncopyable
     {
 
     public:
@@ -84,14 +85,6 @@ namespace dlib
             const T& item,
             unsigned long target_node_id
         ) 
-        /*!
-            requires
-                - item is serializable 
-                - target_node_id < number_of_nodes()
-                - target_node_id != node_id()
-            ensures
-                - sends a copy of item to the node with the given id.
-        !*/
         {
             std::ostringstream sout;
             serialize(item, sout);
@@ -102,10 +95,6 @@ namespace dlib
         void broadcast (
             const T& item
         ) 
-        /*!
-            ensures
-                - sends a copy of item to all other processing nodes.
-        !*/
         {
             std::ostringstream sout;
             serialize(item, sout);
@@ -121,50 +110,22 @@ namespace dlib
 
         unsigned long node_id (
         ) const { return _node_id; }
-        /*!
-            ensures
-                - Returns the id of the current processing node.  That is, 
-                  returns a number N such that:
-                    - N < number_of_nodes()
-                    - N == the node id of the processing node that called
-                      node_id().
-        !*/
 
         unsigned long number_of_nodes (
         ) const { return _cons.size()+1; }
-        /*!
-            ensures
-                - returns the number of processing nodes participating in the
-                  BSP computation.
-        !*/
 
         void receive (
         )
-        /*!
-            ensures
-                - simply waits for all other nodes to become blocked
-                  on calls to receive() or to terminate (i.e. waits for
-                  other nodes to be in a state that can't send messages).
-        !*/
         {
             int junk;
             if (receive(junk))
-                throw dlib::socket_error("call to receive got an unexpected message");
+                throw dlib::socket_error("Call to bsp_context::receive() got an unexpected message.");
         }
 
         template <typename T>
         bool receive (
             T& item
         ) 
-        /*!
-            ensures
-                - if (this function returns true) then
-                    - #item == the next message which was sent to the calling processing
-                      node.
-                - else
-                    - There were no other messages to receive and all other processing
-                      nodes are blocked on calls to receive().
-        !*/
         {
             unsigned long sending_node_id;
             return receive(item, sending_node_id);
@@ -175,17 +136,6 @@ namespace dlib
             T& item,
             unsigned long& sending_node_id
         ) 
-        /*!
-            ensures
-                - if (this function returns true) then
-                    - #item == the next message which was sent to the calling processing
-                      node.
-                    - #sending_node_id == the node id of the node that sent this message.
-                    - #sending_node_id < number_of_nodes()
-                - else
-                    - There were no other messages to receive and all other processing
-                      nodes are blocked on calls to receive().
-        !*/
         {
             shared_ptr<std::string> temp;
             if (receive_data(temp, sending_node_id))
@@ -200,13 +150,13 @@ namespace dlib
             }
         }
 
-        ~bsp();
+        ~bsp_context();
 
     private:
 
-        bsp();
+        bsp_context();
 
-        bsp(
+        bsp_context(
             unsigned long node_id_,
             impl::map_id_to_con& cons_
         );
@@ -385,7 +335,7 @@ namespace dlib
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
         send_out_connection_orders(cons, hosts);
-        bsp obj(node_id, cons);
+        bsp_context obj(node_id, cons);
         funct(obj);
         obj.close_all_connections_gracefully();
     }
@@ -406,7 +356,7 @@ namespace dlib
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
         send_out_connection_orders(cons, hosts);
-        bsp obj(node_id, cons);
+        bsp_context obj(node_id, cons);
         funct(obj,arg1);
         obj.close_all_connections_gracefully();
     }
@@ -429,7 +379,7 @@ namespace dlib
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
         send_out_connection_orders(cons, hosts);
-        bsp obj(node_id, cons);
+        bsp_context obj(node_id, cons);
         funct(obj,arg1,arg2);
         obj.close_all_connections_gracefully();
     }
@@ -454,7 +404,7 @@ namespace dlib
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
         send_out_connection_orders(cons, hosts);
-        bsp obj(node_id, cons);
+        bsp_context obj(node_id, cons);
         funct(obj,arg1,arg2,arg3);
         obj.close_all_connections_gracefully();
     }
@@ -474,7 +424,7 @@ namespace dlib
         impl::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
-        bsp obj(node_id, cons);
+        bsp_context obj(node_id, cons);
         funct(obj);
         obj.close_all_connections_gracefully();
     }
@@ -494,7 +444,7 @@ namespace dlib
         impl::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
-        bsp obj(node_id, cons);
+        bsp_context obj(node_id, cons);
         funct(obj,arg1);
         obj.close_all_connections_gracefully();
     }
@@ -516,7 +466,7 @@ namespace dlib
         impl::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
-        bsp obj(node_id, cons);
+        bsp_context obj(node_id, cons);
         funct(obj,arg1,arg2);
         obj.close_all_connections_gracefully();
     }
@@ -540,7 +490,7 @@ namespace dlib
         impl::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
-        bsp obj(node_id, cons);
+        bsp_context obj(node_id, cons);
         funct(obj,arg1,arg2,arg3);
         obj.close_all_connections_gracefully();
     }

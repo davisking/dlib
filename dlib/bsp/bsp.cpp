@@ -201,11 +201,11 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//                          IMPLEMENTATION OF bsp OBJECT MEMBERS
+//                          IMPLEMENTATION OF bsp_context OBJECT MEMBERS
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    void bsp::
+    void bsp_context::
     close_all_connections_gracefully(
     )
     {
@@ -230,8 +230,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bsp::
-    ~bsp()
+    bsp_context::
+    ~bsp_context()
     {
         _cons.reset();
         while (_cons.move_next())
@@ -246,8 +246,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bsp::
-    bsp(
+    bsp_context::
+    bsp_context(
         unsigned long node_id_,
         impl::map_id_to_con& cons_
     ) :
@@ -260,7 +260,7 @@ namespace dlib
     {
         // spawn a bunch of read threads, one for each connection
         member_function_pointer<impl::bsp_con*, unsigned long>::kernel_1a_c mfp;
-        mfp.set(*this, &bsp::read_thread);
+        mfp.set(*this, &bsp_context::read_thread);
         _cons.reset();
         while (_cons.move_next())
         {
@@ -274,7 +274,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool bsp::
+    bool bsp_context::
     receive_data (
         shared_ptr<std::string>& item,
         unsigned long& sending_node_id
@@ -322,7 +322,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void bsp::
+    void bsp_context::
     send_to_master_node (
         char msg
     )
@@ -366,7 +366,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void bsp::
+    void bsp_context::
     notify_everyone_if_all_blocked(
     )
     {
@@ -413,7 +413,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void bsp::
+    void bsp_context::
     read_thread (
         impl::bsp_con* con,
         unsigned long sender_id
@@ -502,7 +502,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void bsp::
+    void bsp_context::
     check_for_errors()
     {
         auto_mutex lock(class_mutex);
@@ -512,7 +512,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void bsp::
+    void bsp_context::
     send_data(
         const std::string& item,
         unsigned long target_node_id
