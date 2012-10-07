@@ -9,11 +9,9 @@
    <body>
       <br/><br/>
       <p>
-      To use any of these objects all you need to do is #include the file indicated in the 
-      short section about the component you would like to use. Pick which implementation you 
-      would like and typedef it to something nice. Here is an example of creating a typedef for 
-      a linker using the first kernel implementation. <br/>
-      <tt>typedef dlib::linker::kernel_1a linker1;</tt> 
+         This page documents tools built on top of the dlib <a href="api.html#sockets">sockets API</a>.
+         Therefore, all these tools are focused on providing some kind of higher level networking
+         abstraction or service.
       </p>
 
    </body>
@@ -28,7 +26,13 @@
             <item>server</item> 
             <item>bridge</item> 
             <item>sockstreambuf</item> 
+         </section>
 
+         <section>
+            <name>BSP</name>
+            <item>bsp_connect</item> 
+            <item>bsp_listen</item> 
+            <item>bsp_context</item> 
          </section>
 
       </top>
@@ -89,6 +93,36 @@
          <examples>
             <example>bridge_ex.cpp.html</example>
          </examples>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bsp_connect</name>
+         <file>dlib/bsp.h</file>
+         <spec_file link="true">dlib/bsp/bsp_abstract.h</spec_file>
+         <description>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bsp_listen</name>
+         <file>dlib/bsp.h</file>
+         <spec_file link="true">dlib/bsp/bsp_abstract.h</spec_file>
+         <description>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>bsp_context</name>
+         <file>dlib/bsp.h</file>
+         <spec_file link="true">dlib/bsp/bsp_abstract.h</spec_file>
+         <description>
+         </description>
       </component>
       
    <!-- ************************************************************************* -->
