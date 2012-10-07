@@ -215,7 +215,9 @@ namespace dlib
         bool read_thread_terminated_improperly; // true if any of our connections goes down.
         unsigned long outstanding_messages;
         unsigned long num_waiting_nodes;
+        unsigned long num_terminated_nodes;
         rsignaler buf_not_empty; // used to signal when msg_buffer isn't empty
+        rsignaler terminated_signal; 
         std::deque<shared_ptr<std::string> > msg_buffer;
         std::deque<unsigned long> msg_sender_id;
 
