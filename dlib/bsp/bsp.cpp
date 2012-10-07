@@ -495,7 +495,8 @@ namespace dlib
             sout << "An exception was thrown while attempting to receive a message from processing node " << sender_id << ".\n";
             sout << "  Sending processing node address:   " << con->con->get_foreign_ip() << ":" << con->con->get_foreign_port() << std::endl;
             sout << "  Receiving processing node address: " << con->con->get_local_ip() << ":" << con->con->get_local_port() << std::endl;
-            sout << "  Error message in the exception: " << e.what() << std::endl;
+            sout << "  Receiving processing node id: "<< _node_id << std::endl;
+            sout << "  Error message in the exception:    " << e.what() << std::endl;
             auto_mutex lock(class_mutex);
             error_message = sout.str();
         }
@@ -505,6 +506,7 @@ namespace dlib
             sout << "An exception was thrown while attempting to receive a message from processing node " << sender_id << ".\n";
             sout << "  Sending processing node address:   " << con->con->get_foreign_ip() << ":" << con->con->get_foreign_port() << std::endl;
             sout << "  Receiving processing node address: " << con->con->get_local_ip() << ":" << con->con->get_local_port() << std::endl;
+            sout << "  Receiving processing node id:      "<< _node_id << std::endl;
             auto_mutex lock(class_mutex);
             error_message = sout.str();
         }
