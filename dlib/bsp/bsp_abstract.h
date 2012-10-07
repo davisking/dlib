@@ -161,6 +161,24 @@ namespace dlib
     );
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3,
+        typename ARG4
+        >
+    void bsp_connect (
+        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        funct_type& funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3,
+        ARG4 arg4
+    );
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -211,6 +229,24 @@ namespace dlib
         ARG1 arg1,
         ARG2 arg2,
         ARG3 arg3
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3,
+        typename ARG4
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type& funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3,
+        ARG4 arg4
     );
 
 // ----------------------------------------------------------------------------------------
