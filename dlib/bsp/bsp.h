@@ -27,14 +27,16 @@ namespace dlib
             ) : 
                 con(connect(dest.first,dest.second)),
                 buf(con),
-                stream(&buf)
+                stream(&buf),
+                terminated(false)
             {}
 
             bsp_con(
                scoped_ptr<connection>& conptr 
             ) : 
                 buf(conptr),
-                stream(&buf)
+                stream(&buf),
+                terminated(false)
             {
                 // make sure we own the connection
                 conptr.swap(con);
@@ -43,6 +45,7 @@ namespace dlib
             scoped_ptr<connection> con;
             sockstreambuf::kernel_2a buf;
             std::iostream stream;
+            bool terminated;
         };
 
         typedef dlib::map<unsigned long, scoped_ptr<bsp_con> >::kernel_1a_c map_id_to_con;
@@ -135,6 +138,20 @@ namespace dlib
                   BSP computation.
         !*/
 
+        void receive (
+        )
+        /*!
+            ensures
+                - simply waits for all other nodes to become blocked
+                  on calls to receive() or to terminate (i.e. waits for
+                  other nodes to be in a state that can't send messages).
+        !*/
+        {
+            int junk;
+            if (receive(junk))
+                throw dlib::socket_error("call to receive got an unexpected message");
+        }
+
         template <typename T>
         bool receive (
             T& item
@@ -194,6 +211,14 @@ namespace dlib
             impl::map_id_to_con& cons_
         );
 
+        void close_all_connections_gracefully();
+        /*!
+            ensures
+                - closes all the connections to other nodes and lets them know that
+                  we are terminating normally rather than as the result of some kind
+                  of error.
+        !*/
+
         bool receive_data (
             shared_ptr<std::string>& item,
             unsigned long& sending_node_id
@@ -237,7 +262,7 @@ namespace dlib
 
         rmutex class_mutex; // used to lock any class members touched from more than one thread. 
         std::string error_message;
-        bool read_thread_terminated; // true if any of our connections goes down.
+        bool read_thread_terminated_improperly; // true if any of our connections goes down.
         unsigned long outstanding_messages;
         unsigned long num_waiting_nodes;
         rsignaler buf_not_empty; // used to signal when msg_buffer isn't empty
@@ -362,7 +387,7 @@ namespace dlib
         send_out_connection_orders(cons, hosts);
         bsp obj(node_id, cons);
         funct(obj);
-        obj.check_for_errors();
+        obj.close_all_connections_gracefully();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -383,7 +408,7 @@ namespace dlib
         send_out_connection_orders(cons, hosts);
         bsp obj(node_id, cons);
         funct(obj,arg1);
-        obj.check_for_errors();
+        obj.close_all_connections_gracefully();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -406,7 +431,7 @@ namespace dlib
         send_out_connection_orders(cons, hosts);
         bsp obj(node_id, cons);
         funct(obj,arg1,arg2);
-        obj.check_for_errors();
+        obj.close_all_connections_gracefully();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -431,7 +456,7 @@ namespace dlib
         send_out_connection_orders(cons, hosts);
         bsp obj(node_id, cons);
         funct(obj,arg1,arg2,arg3);
-        obj.check_for_errors();
+        obj.close_all_connections_gracefully();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -451,7 +476,7 @@ namespace dlib
         listen_and_connect_all(node_id, cons, listening_port);
         bsp obj(node_id, cons);
         funct(obj);
-        obj.check_for_errors();
+        obj.close_all_connections_gracefully();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -471,7 +496,7 @@ namespace dlib
         listen_and_connect_all(node_id, cons, listening_port);
         bsp obj(node_id, cons);
         funct(obj,arg1);
-        obj.check_for_errors();
+        obj.close_all_connections_gracefully();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -493,7 +518,7 @@ namespace dlib
         listen_and_connect_all(node_id, cons, listening_port);
         bsp obj(node_id, cons);
         funct(obj,arg1,arg2);
-        obj.check_for_errors();
+        obj.close_all_connections_gracefully();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -517,7 +542,7 @@ namespace dlib
         listen_and_connect_all(node_id, cons, listening_port);
         bsp obj(node_id, cons);
         funct(obj,arg1,arg2,arg3);
-        obj.check_for_errors();
+        obj.close_all_connections_gracefully();
     }
 
 // ----------------------------------------------------------------------------------------

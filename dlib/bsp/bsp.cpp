@@ -123,6 +123,7 @@ namespace dlib
         const static char ALL_NODES_WAITING      = 3;
         const static char SENT_MESSAGE           = 4;
         const static char GOT_MESSAGE            = 5;
+        const static char NODE_TERMINATE         = 6;
 
     // ------------------------------------------------------------------------------------
 
@@ -204,6 +205,31 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    void bsp::
+    close_all_connections_gracefully(
+    )
+    {
+        if (_node_id == 0)
+        {
+            // Wait for all the other nodes to terminate before we do anything since
+            // we are the controller node.
+            receive();
+        }
+
+        _cons.reset();
+        while (_cons.move_next())
+        {
+            // tell the other end that we are intentionally dropping the connection
+            serialize(impl::NODE_TERMINATE,_cons.element().value()->stream);
+            _cons.element().value()->stream.flush();
+            _cons.element().value()->con->shutdown();
+        }
+
+        check_for_errors();
+    }
+
+// ----------------------------------------------------------------------------------------
+
     bsp::
     ~bsp()
     {
@@ -225,7 +251,7 @@ namespace dlib
         unsigned long node_id_,
         impl::map_id_to_con& cons_
     ) :
-        read_thread_terminated(false),
+        read_thread_terminated_improperly(false),
         outstanding_messages(0),
         num_waiting_nodes(0),
         buf_not_empty(class_mutex),
@@ -264,11 +290,11 @@ namespace dlib
             if (msg_buffer.size() == 0)
             {
                 send_to_master_node(WAITING_ON_RECEIVE);
-                while (msg_buffer.size() == 0 && !read_thread_terminated)
+                while (msg_buffer.size() == 0 && !read_thread_terminated_improperly)
                 {
                     buf_not_empty.wait();
                 }
-                if (read_thread_terminated)
+                if (read_thread_terminated_improperly)
                 {
                     throw dlib::socket_error("A connection between processing nodes has been lost.");
                 }
@@ -355,10 +381,15 @@ namespace dlib
             {
                 try
                 {
-                    serialize(ALL_NODES_WAITING, _cons.element().value()->stream);
-                    _cons.element().value()->stream.flush();
-                    if (!_cons.element().value()->stream)
-                        throw dlib::error("Error writing data to TCP connection");
+                    // Skip connections to nodes that have already terminated their
+                    // execution.
+                    if (_cons.element().value()->terminated == false)
+                    {
+                        serialize(ALL_NODES_WAITING, _cons.element().value()->stream);
+                        _cons.element().value()->stream.flush();
+                        if (!_cons.element().value()->stream)
+                            throw dlib::error("Error writing data to TCP connection");
+                    }
                 }
                 catch (std::exception& e)
                 {
@@ -438,6 +469,18 @@ namespace dlib
                         auto_mutex lock(class_mutex);
                         --outstanding_messages;
                     } break;
+
+                    case NODE_TERMINATE: {
+                        auto_mutex lock(class_mutex);
+                        if (_node_id == 0)
+                        {
+                            // a terminating node is basically the same as a node that waits forever.
+                            _cons[sender_id]->terminated = true;
+                            ++num_waiting_nodes; 
+                            notify_everyone_if_all_blocked();
+                        }
+                        return;
+                    } break;
                 }
             }
         }
@@ -453,7 +496,7 @@ namespace dlib
         }
 
         auto_mutex lock(class_mutex);
-        read_thread_terminated = true;
+        read_thread_terminated_improperly = true;
         buf_not_empty.signal();
     }
 
@@ -476,6 +519,9 @@ namespace dlib
     ) 
     {
         using namespace impl;
+        if (_cons[target_node_id]->terminated)
+            throw socket_error("Attempt to send a message to a node that has terminated.");
+
         serialize(MESSAGE_HEADER, _cons[target_node_id]->stream);
         serialize(item, _cons[target_node_id]->stream);
         _cons[target_node_id]->stream.flush();
