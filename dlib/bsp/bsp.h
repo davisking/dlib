@@ -117,8 +117,9 @@ namespace dlib
         void receive (
         )
         {
-            int junk;
-            if (receive(junk))
+            unsigned long id;
+            shared_ptr<std::string> temp;
+            if (receive_data(temp,id))
                 throw dlib::socket_error("Call to bsp_context::receive() got an unexpected message.");
         }
 

@@ -254,6 +254,7 @@ namespace dlib
         read_thread_terminated_improperly(false),
         outstanding_messages(0),
         num_waiting_nodes(0),
+        num_terminated_nodes(0),
         buf_not_empty(class_mutex),
         terminated_signal(class_mutex),
         _cons(cons_),
@@ -526,6 +527,15 @@ namespace dlib
         auto_mutex lock(class_mutex);
         if (error_message.size() != 0)
             throw dlib::socket_error(error_message);
+
+        if (outstanding_messages != 0)
+        {
+            std::ostringstream sout;
+            sout << "A BSP job was allowed to terminate before all sent messages have been received.\n";
+            sout << "There are at least " << outstanding_messages << " messages still in flight.   Make sure all sent messages\n";
+            sout << "have a corresponding call to receive().";
+            throw dlib::socket_error(sout.str());
+        }
     }
 
 // ----------------------------------------------------------------------------------------
