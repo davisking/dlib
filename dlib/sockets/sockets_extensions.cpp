@@ -36,7 +36,11 @@ namespace dlib
         }
 
         if(create_connection(con,port,ip))
-            throw socket_error("unable to connect to '" + host_or_ip + "'"); 
+        {
+            std::ostringstream sout;
+            sout << "unable to connect to '" << host_or_ip << ":" << port << "'";
+            throw socket_error(sout.str()); 
+        }
 
         return con;
     }
