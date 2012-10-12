@@ -19,7 +19,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl
+    namespace impl1
     {
         struct bsp_con
         {
@@ -71,6 +71,82 @@ namespace dlib
             map_id_to_con& cons,
             unsigned short port
         );
+
+        struct msg_data
+        {
+            shared_ptr<std::string> data;
+            unsigned long sender_id;
+            char msg_type;
+        };
+
+
+        class thread_safe_deque
+        {
+        public:
+            thread_safe_deque() : sig(class_mutex),disabled(false) {}
+
+            ~thread_safe_deque()
+            {
+                disable();
+            }
+
+            void disable()
+            {
+                auto_mutex lock(class_mutex);
+                disabled = true;
+                sig.broadcast();
+            }
+
+            unsigned long size() const { return data.size(); }
+
+            void push_front( const msg_data& item)
+            {
+                auto_mutex lock(class_mutex);
+                data.push_front(item);
+                sig.signal();
+            }
+
+            void push_and_consume( msg_data& item)
+            {
+                auto_mutex lock(class_mutex);
+                data.push_back(item);
+                // do this here so that we don't have to worry about different threads touching the shared_ptr.
+                item.data.reset(); 
+                sig.signal();
+            }
+
+            bool pop ( 
+                msg_data& item
+            )
+            /*!
+                ensures
+                    - if (this function returns true) then
+                        - #item == the next thing from the queue
+                    - else
+                        - this object is disabled
+            !*/
+            {
+                auto_mutex lock(class_mutex);
+                while (data.size() == 0 && !disabled)
+                    sig.wait();
+
+                if (disabled)
+                    return false;
+
+                item = data.front();
+                data.pop_front();
+
+                return true;
+            }
+
+        private:
+            std::deque<msg_data> data;
+            dlib::mutex class_mutex;
+            dlib::signaler sig;
+            bool disabled;
+        };
+
+
     }
 
 // ----------------------------------------------------------------------------------------
@@ -159,7 +235,7 @@ namespace dlib
 
         bsp_context(
             unsigned long node_id_,
-            impl::map_id_to_con& cons_
+            impl1::map_id_to_con& cons_
         );
 
         void close_all_connections_gracefully();
@@ -175,27 +251,15 @@ namespace dlib
             unsigned long& sending_node_id
         );
 
-        void send_to_master_node (
-            char msg
+
+        void send_byte (
+            char val,
+            unsigned long target_node_id
         );
 
-        void notify_everyone_if_all_blocked(
+        void broadcast_byte (
+            char val
         );
-        /*!
-            requires
-                - class_mutex is locked
-            ensures
-                - sends out notifications to all the nodes if we are all blocked on receive.  This
-                  will cause all receive calls to unblock and return false.
-        !*/
-
-        void read_thread (
-            impl::bsp_con* con,
-            unsigned long sender_id
-        );
-
-
-        void check_for_errors();
 
         void send_data(
             const std::string& item,
@@ -211,18 +275,14 @@ namespace dlib
 
 
 
-        rmutex class_mutex; // used to lock any class members touched from more than one thread. 
-        std::string error_message;
-        bool read_thread_terminated_improperly; // true if any of our connections goes down.
+
         unsigned long outstanding_messages;
         unsigned long num_waiting_nodes;
         unsigned long num_terminated_nodes;
-        rsignaler buf_not_empty; // used to signal when msg_buffer isn't empty
-        rsignaler terminated_signal; 
-        std::deque<shared_ptr<std::string> > msg_buffer;
-        std::deque<unsigned long> msg_sender_id;
 
-        impl::map_id_to_con& _cons;
+        impl1::thread_safe_deque msg_buffer;
+
+        impl1::map_id_to_con& _cons;
         const unsigned long _node_id;
         array<scoped_ptr<thread_function> > threads;
 
@@ -366,7 +426,7 @@ namespace dlib
         funct_type& funct
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
         send_out_connection_orders(cons, hosts);
@@ -387,7 +447,7 @@ namespace dlib
         ARG1 arg1
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
         send_out_connection_orders(cons, hosts);
@@ -410,7 +470,7 @@ namespace dlib
         ARG2 arg2
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
         send_out_connection_orders(cons, hosts);
@@ -435,7 +495,7 @@ namespace dlib
         ARG3 arg3
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
         send_out_connection_orders(cons, hosts);
@@ -462,7 +522,7 @@ namespace dlib
         ARG4 arg4
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         const unsigned long node_id = 0;
         connect_all(cons, hosts, node_id);
         send_out_connection_orders(cons, hosts);
@@ -483,7 +543,7 @@ namespace dlib
         funct_type& funct
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
         bsp_context obj(node_id, cons);
@@ -503,7 +563,7 @@ namespace dlib
         ARG1 arg1
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
         bsp_context obj(node_id, cons);
@@ -525,7 +585,7 @@ namespace dlib
         ARG2 arg2
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
         bsp_context obj(node_id, cons);
@@ -549,7 +609,7 @@ namespace dlib
         ARG3 arg3
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
         bsp_context obj(node_id, cons);
@@ -575,7 +635,7 @@ namespace dlib
         ARG4 arg4
     )
     {
-        impl::map_id_to_con cons;
+        impl1::map_id_to_con cons;
         unsigned long node_id;
         listen_and_connect_all(node_id, cons, listening_port);
         bsp_context obj(node_id, cons);

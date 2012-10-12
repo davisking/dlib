@@ -15,6 +15,11 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
+
+            THREAD SAFETY
+                This object is not thread-safe.  This means you must serialize all access
+                to it using an appropriate mutex or other synchronization mechanism if it
+                is to be accessed from multiple threads. 
         !*/
 
     public:
