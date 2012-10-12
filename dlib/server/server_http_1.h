@@ -71,6 +71,7 @@ namespace dlib
             std::string path;
             std::string request_type;
             std::string content_type;
+            std::string protocol;
             std::string body;
 
             key_value_map queries;
@@ -91,6 +92,7 @@ namespace dlib
             key_value_map  headers;
             unsigned short http_return;
             std::string    http_return_status;
+            std::ostream  *out;
         };
 
 
@@ -203,7 +205,29 @@ namespace dlib
                 sin >> word;
             }
         }
+      
+        bool read_with_limit(std::istream& in, const size_t max, char *buffer, int delim = '\n')
+        {
+          using namespace std;
 
+          in.get(buffer, max, delim);
+          buffer[max] = '\0';
+          
+          // Make sure the last char is the delim.
+          if (in.get() != delim) {
+            in.setstate(ios::badbit);
+            buffer[0] = '\0';
+            return false;
+          } else {
+            // Read the remaining delimiters
+            if (delim == ' ') {
+              while (in.peek() == ' ')
+                in.get();
+            }
+            return true;
+          }
+        }
+      
         void on_connect (
             std::istream& in,
             std::ostream& out,
@@ -215,11 +239,16 @@ namespace dlib
         )
         {
             bool my_fault = true;
+            const size_t max_buffer_length = 16 * 1024;
+            const size_t max_line_length = max_buffer_length - 1;
+            const size_t max_content_length = 1024 * 1024;
 
             using namespace std;
 
             try
             {
+                char buffer[max_buffer_length];
+              
                 incoming_things incoming;
                 outgoing_things outgoing;
 
@@ -228,10 +257,16 @@ namespace dlib
                 incoming.local_ip     = local_ip;
                 incoming.local_port   = local_port;
 
-                in >> incoming.request_type;
+                read_with_limit(in, 16, buffer, ' ');
+                incoming.request_type = buffer;
 
                 // get the path
-                in >> incoming.path;
+                read_with_limit(in, max_line_length, buffer, ' ');
+                incoming.path = buffer;
+              
+                // Get the HTTP/1.1 - Ignore for now...
+                read_with_limit(in, 16, buffer);
+                incoming.protocol = buffer;
 
                 key_value_map& incoming_headers = incoming.headers;
                 key_value_map& cookies          = incoming.cookies;
@@ -240,7 +275,8 @@ namespace dlib
                 unsigned long content_length = 0;
 
                 string line;
-                getline(in,line);
+                read_with_limit(in, max_line_length, buffer);
+                line = buffer;
                 string first_part_of_header;
                 string::size_type position_of_double_point;
                 // now loop over all the incoming_headers
@@ -320,12 +356,19 @@ namespace dlib
                             }
                         }
                     } // no ':' in it!
-                    getline(in,line);
+                    if (!read_with_limit(in, max_line_length, buffer))
+                      break;
+                    line = buffer;
                 } // while (line.size() > 2 )
 
                 // If there is data being posted back to us then load it into the incoming.body
                 // string.
-                if ( content_length > 0 )
+                if (content_length > max_content_length) 
+                {
+                    dlog << LERROR << "Request from: " << foreign_ip << " - body content length " << content_length << " exceeded max content length of " << max_content_length;
+                    in.setstate(ios::badbit);
+                } 
+                else if ( content_length > 0)
                 {
                     incoming.body.resize(content_length);
                     in.read(&incoming.body[0],content_length);
@@ -333,7 +376,8 @@ namespace dlib
 
                 // If there is data being posted back to us as a query string then
                 // pick out the queries using parse_url.
-                if (strings_equal_ignore_case(incoming.request_type, "POST") && 
+                if ((strings_equal_ignore_case(incoming.request_type, "POST") || 
+                     strings_equal_ignore_case(incoming.request_type, "PUT")) && 
                     strings_equal_ignore_case(left_substr(content_type,";"), "application/x-www-form-urlencoded"))
                 {
                     parse_url(incoming.body, incoming.queries);
@@ -353,12 +397,18 @@ namespace dlib
                 // Set some defaults
                 outgoing.http_return        = 200;
                 outgoing.http_return_status = "OK";
+                outgoing.out = &out;
 
                 // if there wasn't a problem with the input stream at some point
                 // then lets trigger this request callback.
                 std::string result;
                 if (in)
                     result = on_request(incoming, outgoing);
+                else {
+                  dlog << LERROR << "Request from: " << foreign_ip << " - Invalid request - Request Entity Too Large";
+                  outgoing.http_return = 413;
+                  outgoing.http_return_status = "Request Entity Too Large";
+                }
                 my_fault = true;
 
                 // only send this header if the user hasn't told us to send another kind
