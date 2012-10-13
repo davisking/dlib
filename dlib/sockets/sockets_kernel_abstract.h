@@ -108,7 +108,7 @@ namespace dlib
                 - if (ip == "") then 
                     - the new listener will be listening on all interfaces 
                 - if (port == 0) then 
-                    - the kernel will assign a free port to listen on 
+                    - the operating system will assign a free port to listen on 
 
 
             - returns 0 if create_listener was successful 
