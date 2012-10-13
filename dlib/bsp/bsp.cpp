@@ -67,7 +67,7 @@ namespace dlib
                     unsigned long id = hosts[i].node_id;
                     cons.add(id, con);
                 }
-                catch (std::exception& e)
+                catch (std::exception&)
                 {
                     std::ostringstream sout;
                     sout << "Could not connect to " << hosts[i].ip << ":" << hosts[i].port;
@@ -168,7 +168,7 @@ namespace dlib
             // make a thread that will connect to all the targets
             map_id_to_con cons2;
             std::string error_string;
-            thread_function thread(connect_all_hostinfo, ref(cons2), ref(targets), node_id, ref(error_string));
+            thread_function thread(connect_all_hostinfo, dlib::ref(cons2), dlib::ref(targets), node_id, dlib::ref(error_string));
             if (error_string.size() != 0)
                 throw socket_error(error_string);
 
