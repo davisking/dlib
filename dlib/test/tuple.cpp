@@ -75,6 +75,8 @@ namespace
 
         print_spinner();
 
+        using dlib::tuple;
+
         tuple<> a;
         tuple<int> b;
         tuple<int, float> c;

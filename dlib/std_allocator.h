@@ -33,7 +33,7 @@ namespace dlib
                 using whatever dlib memory manager you supply.   
 
                 Thus, using this allocator object you can use any of the dlib memory manager objects with
-                the contains in the STL or with any other object that requires a C++ allocator object.
+                the containers in the STL or with any other object that requires a C++ allocator object.
 
                 It is important to note that many STL implementations make the assumption that the memory
                 allocated by one allocator can be freed by another.  This effectively means that you should
@@ -118,6 +118,8 @@ namespace dlib
         {
             pool.swap(item.pool);
         }
+
+        std_allocator& operator= (const std_allocator&) { return *this;}
 
     private:
         typename M::template rebind<char>::other pool; 
