@@ -4,6 +4,12 @@
 #error "You aren't supposed to directly #include this file.  #include <dlib/any.h> instead."  
 #endif
 
+#ifdef _MSC_VER
+// When using visual studio 2012, disable the warning "warning C4180: qualifier applied to function type has no meaning; ignored"
+// that you get about some template expansions applying & to function types. 
+#pragma warning(disable : 4180)
+#endif
+
 #ifdef DLIB_ANY_FUNCTION_RETURN
 
 // This file contains the body of the any_function class.  We use the
