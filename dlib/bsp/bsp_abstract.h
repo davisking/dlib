@@ -120,7 +120,7 @@ namespace dlib
         >
     void bsp_connect (
         const std::vector<std::pair<std::string,unsigned short> >& hosts,
-        funct_type& funct
+        funct_type funct
     );
 
 // ----------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ namespace dlib
         >
     void bsp_connect (
         const std::vector<std::pair<std::string,unsigned short> >& hosts,
-        funct_type& funct,
+        funct_type funct,
         ARG1 arg1
     );
 
@@ -144,7 +144,7 @@ namespace dlib
         >
     void bsp_connect (
         const std::vector<std::pair<std::string,unsigned short> >& hosts,
-        funct_type& funct,
+        funct_type funct,
         ARG1 arg1,
         ARG2 arg2
     );
@@ -159,7 +159,7 @@ namespace dlib
         >
     void bsp_connect (
         const std::vector<std::pair<std::string,unsigned short> >& hosts,
-        funct_type& funct,
+        funct_type funct,
         ARG1 arg1,
         ARG2 arg2,
         ARG3 arg3
@@ -176,7 +176,7 @@ namespace dlib
         >
     void bsp_connect (
         const std::vector<std::pair<std::string,unsigned short> >& hosts,
-        funct_type& funct,
+        funct_type funct,
         ARG1 arg1,
         ARG2 arg2,
         ARG3 arg3,
@@ -191,7 +191,7 @@ namespace dlib
         >
     void bsp_listen (
         unsigned short listening_port,
-        funct_type& funct
+        funct_type funct
     );
 
 // ----------------------------------------------------------------------------------------
@@ -202,7 +202,7 @@ namespace dlib
         >
     void bsp_listen (
         unsigned short listening_port,
-        funct_type& funct,
+        funct_type funct,
         ARG1 arg1
     );
 
@@ -215,7 +215,7 @@ namespace dlib
         >
     void bsp_listen (
         unsigned short listening_port,
-        funct_type& funct,
+        funct_type funct,
         ARG1 arg1,
         ARG2 arg2
     );
@@ -230,7 +230,7 @@ namespace dlib
         >
     void bsp_listen (
         unsigned short listening_port,
-        funct_type& funct,
+        funct_type funct,
         ARG1 arg1,
         ARG2 arg2,
         ARG3 arg3
@@ -247,7 +247,7 @@ namespace dlib
         >
     void bsp_listen (
         unsigned short listening_port,
-        funct_type& funct,
+        funct_type funct,
         ARG1 arg1,
         ARG2 arg2,
         ARG3 arg3,
