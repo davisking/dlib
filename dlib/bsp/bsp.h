@@ -11,6 +11,7 @@
 #include "../string.h"
 #include "../serialize.h"
 #include "../map.h"
+#include "../ref.h"
 #include <deque>
 #include <vector>
 
@@ -21,6 +22,10 @@ namespace dlib
 
     namespace impl1
     {
+        inline void null_notify(
+            unsigned short
+        ) {}
+
         struct bsp_con
         {
             bsp_con(
@@ -66,11 +71,139 @@ namespace dlib
             const std::vector<std::pair<std::string,unsigned short> >& hosts
         );
 
+    // ------------------------------------------------------------------------------------
+
+        struct hostinfo
+        {
+            hostinfo() {}
+            hostinfo (
+                const std::string& ip_,
+                unsigned short port_,
+                unsigned long node_id_
+            ) : 
+                ip(ip_),
+                port(port_),
+                node_id(node_id_)
+            {
+            }
+
+            std::string ip;
+            unsigned short port;
+            unsigned long node_id;
+        };
+
+        inline void serialize (
+            const hostinfo& item,
+            std::ostream& out
+        )
+        {
+            dlib::serialize(item.ip, out);
+            dlib::serialize(item.port, out);
+            dlib::serialize(item.node_id, out);
+        }
+
+        inline void deserialize (
+            hostinfo& item,
+            std::istream& in
+        )
+        {
+            dlib::deserialize(item.ip, in);
+            dlib::deserialize(item.port, in);
+            dlib::deserialize(item.node_id, in);
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void connect_all_hostinfo (
+            map_id_to_con& cons,
+            const std::vector<hostinfo>& hosts,
+            unsigned long node_id,
+            std::string& error_string 
+        );
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename port_notify_function_type
+        >
         void listen_and_connect_all(
             unsigned long& node_id,
             map_id_to_con& cons,
-            unsigned short port
-        );
+            unsigned short port,
+            port_notify_function_type port_notify_function
+        )
+        {
+            cons.clear();
+            scoped_ptr<listener> list;
+            const int status = create_listener(list, port);
+            if (status == PORTINUSE)
+            {
+                throw socket_error("Unable to create listening port " + cast_to_string(port) +
+                                   ".  The port is already in use");
+            }
+            else if (status != 0)
+            {
+                throw socket_error("Unable to create listening port " + cast_to_string(port) );
+            }
+
+            port_notify_function(list->get_listening_port());
+
+            scoped_ptr<connection> con;
+            if (list->accept(con))
+            {
+                throw socket_error("Error occurred while accepting new connection");
+            }
+
+            scoped_ptr<bsp_con> temp(new bsp_con(con));
+
+            unsigned long remote_node_id;
+            dlib::deserialize(remote_node_id, temp->stream);
+            dlib::deserialize(node_id, temp->stream);
+            std::vector<hostinfo> targets; 
+            dlib::deserialize(targets, temp->stream);
+            unsigned long num_incoming_connections;
+            dlib::deserialize(num_incoming_connections, temp->stream);
+
+            cons.add(remote_node_id,temp);
+
+            // make a thread that will connect to all the targets
+            map_id_to_con cons2;
+            std::string error_string;
+            thread_function thread(connect_all_hostinfo, dlib::ref(cons2), dlib::ref(targets), node_id, dlib::ref(error_string));
+            if (error_string.size() != 0)
+                throw socket_error(error_string);
+
+            // accept any incoming connections
+            for (unsigned long i = 0; i < num_incoming_connections; ++i)
+            {
+                // If it takes more than 10 seconds for the other nodes to connect to us
+                // then something has gone horribly wrong and it almost certainly will
+                // never connect at all.  So just give up if that happens.
+                const unsigned long timeout_milliseconds = 10000;
+                if (list->accept(con, timeout_milliseconds))
+                {
+                    throw socket_error("Error occurred while accepting new connection");
+                }
+
+                temp.reset(new bsp_con(con));
+
+                dlib::deserialize(remote_node_id, temp->stream);
+                cons.add(remote_node_id,temp);
+            }
+
+
+            // put all the connections created by the thread into cons
+            thread.wait();
+            while (cons2.size() > 0)
+            {
+                unsigned long id;
+                scoped_ptr<bsp_con> temp;
+                cons2.remove_any(id,temp);
+                cons.add(id,temp);
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
 
         struct msg_data
         {
@@ -412,6 +545,78 @@ namespace dlib
 
     // -----------------------------------
 
+        template <
+            typename port_notify_function_type,
+            typename funct_type
+            >
+        friend void bsp_listen_dynamic_port (
+            unsigned short listening_port,
+            port_notify_function_type port_notify_function,
+            funct_type funct
+        );
+
+        template <
+            typename port_notify_function_type,
+            typename funct_type,
+            typename ARG1
+            >
+        friend void bsp_listen_dynamic_port (
+            unsigned short listening_port,
+            port_notify_function_type port_notify_function,
+            funct_type funct,
+            ARG1 arg1
+        );
+
+        template <
+            typename port_notify_function_type,
+            typename funct_type,
+            typename ARG1,
+            typename ARG2
+            >
+        friend void bsp_listen_dynamic_port (
+            unsigned short listening_port,
+            port_notify_function_type port_notify_function,
+            funct_type funct,
+            ARG1 arg1,
+            ARG2 arg2
+        );
+
+        template <
+            typename port_notify_function_type,
+            typename funct_type,
+            typename ARG1,
+            typename ARG2,
+            typename ARG3
+            >
+        friend void bsp_listen_dynamic_port (
+            unsigned short listening_port,
+            port_notify_function_type port_notify_function,
+            funct_type funct,
+            ARG1 arg1,
+            ARG2 arg2,
+            ARG3 arg3
+        );
+
+        template <
+            typename port_notify_function_type,
+            typename funct_type,
+            typename ARG1,
+            typename ARG2,
+            typename ARG3,
+            typename ARG4
+            >
+        friend void bsp_listen_dynamic_port (
+            unsigned short listening_port,
+            port_notify_function_type port_notify_function,
+            funct_type funct,
+            ARG1 arg1,
+            ARG2 arg2,
+            ARG3 arg3,
+            ARG4 arg4
+        );
+
+    // -----------------------------------
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -536,6 +741,127 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename port_notify_function_type,
+        typename funct_type
+        >
+    void bsp_listen_dynamic_port (
+        unsigned short listening_port,
+        port_notify_function_type port_notify_function,
+        funct_type funct
+    )
+    {
+        impl1::map_id_to_con cons;
+        unsigned long node_id;
+        listen_and_connect_all(node_id, cons, listening_port, port_notify_function);
+        bsp_context obj(node_id, cons);
+        funct(obj);
+        obj.close_all_connections_gracefully();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename port_notify_function_type,
+        typename funct_type,
+        typename ARG1
+        >
+    void bsp_listen_dynamic_port (
+        unsigned short listening_port,
+        port_notify_function_type port_notify_function,
+        funct_type funct,
+        ARG1 arg1
+    )
+    {
+        impl1::map_id_to_con cons;
+        unsigned long node_id;
+        listen_and_connect_all(node_id, cons, listening_port, port_notify_function);
+        bsp_context obj(node_id, cons);
+        funct(obj,arg1);
+        obj.close_all_connections_gracefully();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename port_notify_function_type,
+        typename funct_type,
+        typename ARG1,
+        typename ARG2
+        >
+    void bsp_listen_dynamic_port (
+        unsigned short listening_port,
+        port_notify_function_type port_notify_function,
+        funct_type funct,
+        ARG1 arg1,
+        ARG2 arg2
+    )
+    {
+        impl1::map_id_to_con cons;
+        unsigned long node_id;
+        listen_and_connect_all(node_id, cons, listening_port, port_notify_function);
+        bsp_context obj(node_id, cons);
+        funct(obj,arg1,arg2);
+        obj.close_all_connections_gracefully();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename port_notify_function_type,
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3
+        >
+    void bsp_listen_dynamic_port (
+        unsigned short listening_port,
+        port_notify_function_type port_notify_function,
+        funct_type funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3
+    )
+    {
+        impl1::map_id_to_con cons;
+        unsigned long node_id;
+        listen_and_connect_all(node_id, cons, listening_port, port_notify_function);
+        bsp_context obj(node_id, cons);
+        funct(obj,arg1,arg2,arg3);
+        obj.close_all_connections_gracefully();
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename port_notify_function_type,
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3,
+        typename ARG4
+        >
+    void bsp_listen_dynamic_port (
+        unsigned short listening_port,
+        port_notify_function_type port_notify_function,
+        funct_type funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3,
+        ARG4 arg4
+    )
+    {
+        impl1::map_id_to_con cons;
+        unsigned long node_id;
+        listen_and_connect_all(node_id, cons, listening_port, port_notify_function);
+        bsp_context obj(node_id, cons);
+        funct(obj,arg1,arg2,arg3,arg4);
+        obj.close_all_connections_gracefully();
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename funct_type
         >
     void bsp_listen (
@@ -543,12 +869,7 @@ namespace dlib
         funct_type funct
     )
     {
-        impl1::map_id_to_con cons;
-        unsigned long node_id;
-        listen_and_connect_all(node_id, cons, listening_port);
-        bsp_context obj(node_id, cons);
-        funct(obj);
-        obj.close_all_connections_gracefully();
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -563,12 +884,7 @@ namespace dlib
         ARG1 arg1
     )
     {
-        impl1::map_id_to_con cons;
-        unsigned long node_id;
-        listen_and_connect_all(node_id, cons, listening_port);
-        bsp_context obj(node_id, cons);
-        funct(obj,arg1);
-        obj.close_all_connections_gracefully();
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -585,12 +901,7 @@ namespace dlib
         ARG2 arg2
     )
     {
-        impl1::map_id_to_con cons;
-        unsigned long node_id;
-        listen_and_connect_all(node_id, cons, listening_port);
-        bsp_context obj(node_id, cons);
-        funct(obj,arg1,arg2);
-        obj.close_all_connections_gracefully();
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -609,12 +920,7 @@ namespace dlib
         ARG3 arg3
     )
     {
-        impl1::map_id_to_con cons;
-        unsigned long node_id;
-        listen_and_connect_all(node_id, cons, listening_port);
-        bsp_context obj(node_id, cons);
-        funct(obj,arg1,arg2,arg3);
-        obj.close_all_connections_gracefully();
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2, arg3);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -635,12 +941,7 @@ namespace dlib
         ARG4 arg4
     )
     {
-        impl1::map_id_to_con cons;
-        unsigned long node_id;
-        listen_and_connect_all(node_id, cons, listening_port);
-        bsp_context obj(node_id, cons);
-        funct(obj,arg1,arg2,arg3,arg4);
-        obj.close_all_connections_gracefully();
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2, arg3, arg4);
     }
 
 // ----------------------------------------------------------------------------------------

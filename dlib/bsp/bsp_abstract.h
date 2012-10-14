@@ -187,21 +187,25 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename port_notify_function_type,
         typename funct_type
         >
-    void bsp_listen (
+    void bsp_listen_dynamic_port (
         unsigned short listening_port,
+        port_notify_function_type port_notify_function,
         funct_type funct
     );
 
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename port_notify_function_type,
         typename funct_type,
         typename ARG1
         >
-    void bsp_listen (
+    void bsp_listen_dynamic_port (
         unsigned short listening_port,
+        port_notify_function_type port_notify_function,
         funct_type funct,
         ARG1 arg1
     );
@@ -209,12 +213,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename port_notify_function_type,
         typename funct_type,
         typename ARG1,
         typename ARG2
         >
-    void bsp_listen (
+    void bsp_listen_dynamic_port (
         unsigned short listening_port,
+        port_notify_function_type port_notify_function,
         funct_type funct,
         ARG1 arg1,
         ARG2 arg2
@@ -223,13 +229,15 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename port_notify_function_type,
         typename funct_type,
         typename ARG1,
         typename ARG2,
         typename ARG3
         >
-    void bsp_listen (
+    void bsp_listen_dynamic_port (
         unsigned short listening_port,
+        port_notify_function_type port_notify_function,
         funct_type funct,
         ARG1 arg1,
         ARG2 arg2,
@@ -239,14 +247,16 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename port_notify_function_type,
         typename funct_type,
         typename ARG1,
         typename ARG2,
         typename ARG3,
         typename ARG4
         >
-    void bsp_listen (
+    void bsp_listen_dynamic_port (
         unsigned short listening_port,
+        port_notify_function_type port_notify_function,
         funct_type funct,
         ARG1 arg1,
         ARG2 arg2,

@@ -2,7 +2,6 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include "bsp.h"
-#include "../ref.h"
 #include <stack>
 
 // ----------------------------------------------------------------------------------------
@@ -14,25 +13,6 @@ namespace dlib
     namespace impl1
     {
 
-        struct hostinfo
-        {
-            hostinfo() {}
-            hostinfo (
-                const std::string& ip_,
-                unsigned short port_,
-                unsigned long node_id_
-            ) : 
-                ip(ip_),
-                port(port_),
-                node_id(node_id_)
-            {
-            }
-
-            std::string ip;
-            unsigned short port;
-            unsigned long node_id;
-        };
-
         void connect_all (
             map_id_to_con& cons,
             const std::vector<std::pair<std::string,unsigned short> >& hosts,
@@ -43,7 +23,7 @@ namespace dlib
             for (unsigned long i = 0; i < hosts.size(); ++i)
             {
                 scoped_ptr<bsp_con> con(new bsp_con(hosts[i]));
-                serialize(node_id, con->stream); // tell the other end our node_id
+                dlib::serialize(node_id, con->stream); // tell the other end our node_id
                 unsigned long id = i+1;
                 cons.add(id, con);
             }
@@ -62,7 +42,7 @@ namespace dlib
                 try
                 {
                     scoped_ptr<bsp_con> con(new bsp_con(make_pair(hosts[i].ip,hosts[i].port)));
-                    serialize(node_id, con->stream); // tell the other end our node_id
+                    dlib::serialize(node_id, con->stream); // tell the other end our node_id
                     con->stream.flush();
                     unsigned long id = hosts[i].node_id;
                     cons.add(id, con);
@@ -77,26 +57,6 @@ namespace dlib
             }
         }
 
-
-        void serialize (
-            const hostinfo& item,
-            std::ostream& out
-        )
-        {
-            dlib::serialize(item.ip, out);
-            dlib::serialize(item.port, out);
-            dlib::serialize(item.node_id, out);
-        }
-
-        void deserialize (
-            hostinfo& item,
-            std::istream& in
-        )
-        {
-            dlib::deserialize(item.ip, in);
-            dlib::deserialize(item.port, in);
-            dlib::deserialize(item.node_id, in);
-        }
 
         void send_out_connection_orders (
             map_id_to_con& cons,
@@ -127,80 +87,6 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
-
-        void listen_and_connect_all(
-            unsigned long& node_id,
-            map_id_to_con& cons,
-            unsigned short port
-        )
-        {
-            cons.clear();
-            scoped_ptr<listener> list;
-            const int status = create_listener(list, port);
-            if (status == PORTINUSE)
-            {
-                throw socket_error("Unable to create listening port " + cast_to_string(port) +
-                                   ".  The port is already in use");
-            }
-            else if (status != 0)
-            {
-                throw socket_error("Unable to create listening port " + cast_to_string(port) );
-            }
-
-            scoped_ptr<connection> con;
-            if (list->accept(con))
-            {
-                throw socket_error("Error occurred while accepting new connection");
-            }
-
-            scoped_ptr<bsp_con> temp(new bsp_con(con));
-
-            unsigned long remote_node_id;
-            dlib::deserialize(remote_node_id, temp->stream);
-            dlib::deserialize(node_id, temp->stream);
-            std::vector<hostinfo> targets; 
-            dlib::deserialize(targets, temp->stream);
-            unsigned long num_incoming_connections;
-            dlib::deserialize(num_incoming_connections, temp->stream);
-
-            cons.add(remote_node_id,temp);
-
-            // make a thread that will connect to all the targets
-            map_id_to_con cons2;
-            std::string error_string;
-            thread_function thread(connect_all_hostinfo, dlib::ref(cons2), dlib::ref(targets), node_id, dlib::ref(error_string));
-            if (error_string.size() != 0)
-                throw socket_error(error_string);
-
-            // accept any incoming connections
-            for (unsigned long i = 0; i < num_incoming_connections; ++i)
-            {
-                // If it takes more than 10 seconds for the other nodes to connect to us
-                // then something has gone horribly wrong and it almost certainly will
-                // never connect at all.  So just give up if that happens.
-                const unsigned long timeout_milliseconds = 10000;
-                if (list->accept(con, timeout_milliseconds))
-                {
-                    throw socket_error("Error occurred while accepting new connection");
-                }
-
-                temp.reset(new bsp_con(con));
-
-                dlib::deserialize(remote_node_id, temp->stream);
-                cons.add(remote_node_id,temp);
-            }
-
-
-            // put all the connections created by the thread into cons
-            thread.wait();
-            while (cons2.size() > 0)
-            {
-                unsigned long id;
-                scoped_ptr<bsp_con> temp;
-                cons2.remove_any(id,temp);
-                cons.add(id,temp);
-            }
-        }
 
 
     }
