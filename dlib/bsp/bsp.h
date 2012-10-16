@@ -484,68 +484,6 @@ namespace dlib
     // -----------------------------------
 
         template <
-            typename funct_type
-            >
-        friend void bsp_listen (
-            unsigned short listening_port,
-            funct_type funct
-        );
-
-        template <
-            typename funct_type,
-            typename ARG1
-            >
-        friend void bsp_listen (
-            unsigned short listening_port,
-            funct_type funct,
-            ARG1 arg1
-        );
-
-        template <
-            typename funct_type,
-            typename ARG1,
-            typename ARG2
-            >
-        friend void bsp_listen (
-            unsigned short listening_port,
-            funct_type funct,
-            ARG1 arg1,
-            ARG2 arg2
-        );
-
-        template <
-            typename funct_type,
-            typename ARG1,
-            typename ARG2,
-            typename ARG3
-            >
-        friend void bsp_listen (
-            unsigned short listening_port,
-            funct_type funct,
-            ARG1 arg1,
-            ARG2 arg2,
-            ARG3 arg3
-        );
-
-        template <
-            typename funct_type,
-            typename ARG1,
-            typename ARG2,
-            typename ARG3,
-            typename ARG4
-            >
-        friend void bsp_listen (
-            unsigned short listening_port,
-            funct_type funct,
-            ARG1 arg1,
-            ARG2 arg2,
-            ARG3 arg3,
-            ARG4 arg4
-        );
-
-    // -----------------------------------
-
-        template <
             typename port_notify_function_type,
             typename funct_type
             >
@@ -741,6 +679,92 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename funct_type
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct
+    )
+    {
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct,
+        ARG1 arg1
+    )
+    {
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct,
+        ARG1 arg1,
+        ARG2 arg2
+    )
+    {
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3
+    )
+    {
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2, arg3);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3,
+        typename ARG4
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3,
+        ARG4 arg4
+    )
+    {
+        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2, arg3, arg4);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename port_notify_function_type,
         typename funct_type
         >
@@ -857,93 +881,6 @@ namespace dlib
         funct(obj,arg1,arg2,arg3,arg4);
         obj.close_all_connections_gracefully();
     }
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct_type
-        >
-    void bsp_listen (
-        unsigned short listening_port,
-        funct_type funct
-    )
-    {
-        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct_type,
-        typename ARG1
-        >
-    void bsp_listen (
-        unsigned short listening_port,
-        funct_type funct,
-        ARG1 arg1
-    )
-    {
-        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct_type,
-        typename ARG1,
-        typename ARG2
-        >
-    void bsp_listen (
-        unsigned short listening_port,
-        funct_type funct,
-        ARG1 arg1,
-        ARG2 arg2
-    )
-    {
-        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct_type,
-        typename ARG1,
-        typename ARG2,
-        typename ARG3
-        >
-    void bsp_listen (
-        unsigned short listening_port,
-        funct_type funct,
-        ARG1 arg1,
-        ARG2 arg2,
-        ARG3 arg3
-    )
-    {
-        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2, arg3);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct_type,
-        typename ARG1,
-        typename ARG2,
-        typename ARG3,
-        typename ARG4
-        >
-    void bsp_listen (
-        unsigned short listening_port,
-        funct_type funct,
-        ARG1 arg1,
-        ARG2 arg2,
-        ARG3 arg3,
-        ARG4 arg4
-    )
-    {
-        bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2, arg3, arg4);
-    }
-
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

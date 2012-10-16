@@ -187,6 +187,77 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename funct_type
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct,
+        ARG1 arg1
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct,
+        ARG1 arg1,
+        ARG2 arg2
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct_type,
+        typename ARG1,
+        typename ARG2,
+        typename ARG3,
+        typename ARG4
+        >
+    void bsp_listen (
+        unsigned short listening_port,
+        funct_type funct,
+        ARG1 arg1,
+        ARG2 arg2,
+        ARG3 arg3,
+        ARG4 arg4
+    );
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename port_notify_function_type,
         typename funct_type
         >
