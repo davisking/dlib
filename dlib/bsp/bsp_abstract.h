@@ -110,10 +110,14 @@ namespace dlib
                     - #item == the next message which was sent to the calling processing
                       node.
                 - else
-                    - There were no other messages to receive and all other processing
-                      nodes are blocked on calls to receive() or have terminated.  That is,
-                      receive() waits for all other nodes to be in a state which can't
-                      generate new messages before it returns false).
+                    - The following must have been true for this function to return false:
+                        - All other nodes were blocked on calls to receive() or terminated.
+                        - There were not any messages in flight between any nodes.  
+                        - That is, if all the nodes had continued to block on receive()
+                          then they all would have blocked forever.  Therefore, this
+                          function only returns once there are no more messages to process
+                          by any any node and there is no possibility of more being
+                          generated until control is returned to the callers of receive(). 
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
@@ -140,10 +144,14 @@ namespace dlib
                     - #sending_node_id == the node id of the node that sent this message.
                     - #sending_node_id < number_of_nodes()
                 - else
-                    - There were no other messages to receive and all other processing
-                      nodes are blocked on calls to receive() or have terminated.  That is,
-                      receive() waits for all other nodes to be in a state which can't
-                      generate new messages before it returns false).
+                    - The following must have been true for this function to return false:
+                        - All other nodes were blocked on calls to receive() or terminated.
+                        - There were not any messages in flight between any nodes.  
+                        - That is, if all the nodes had continued to block on receive()
+                          then they all would have blocked forever.  Therefore, this
+                          function only returns once there are no more messages to process
+                          by any any node and there is no possibility of more being
+                          generated until control is returned to the callers of receive(). 
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
@@ -159,9 +167,14 @@ namespace dlib
         );
         /*!
             ensures
-                - simply waits for all other nodes to become blocked on calls to receive()
-                  or to terminate (i.e. waits for other nodes to be in a state that can't
-                  send messages).
+                - Wait for the following to all be true. 
+                    - All other nodes are blocked on calls to receive() or have terminated.
+                    - There are not any messages in flight between any nodes.  
+                    - That is, if all the nodes had continued to block on receive() then
+                      they all would have blocked forever.  Therefore, this function only
+                      returns once there are no more messages to process by any any node
+                      and there is no possibility of more being generated until control is
+                      returned to the callers of receive(). 
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
