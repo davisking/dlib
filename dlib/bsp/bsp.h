@@ -302,6 +302,7 @@ namespace dlib
                 << "\n\t Invalid arguments were given to this function."
                 << "\n\t target_node_id:    " << target_node_id
                 << "\n\t number_of_nodes(): " << number_of_nodes()
+                << "\n\t node_id():         " << node_id()
                 << "\n\t this: " << this
                 );
 
