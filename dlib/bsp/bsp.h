@@ -296,7 +296,7 @@ namespace dlib
         ) 
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(target_node_id < number_of_nodes() &&
+            DLIB_CASSERT(target_node_id < number_of_nodes() &&
                         target_node_id != node_id(),
                 "\t void bsp_context::send()"
                 << "\n\t Invalid arguments were given to this function."
@@ -697,7 +697,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(listening_port != 0,
+        DLIB_CASSERT(listening_port != 0,
             "\t void bsp_listen()"
             << "\n\t Invalid arguments were given to this function."
             );
@@ -718,7 +718,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(listening_port != 0,
+        DLIB_CASSERT(listening_port != 0,
             "\t void bsp_listen()"
             << "\n\t Invalid arguments were given to this function."
             );
@@ -741,7 +741,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(listening_port != 0,
+        DLIB_CASSERT(listening_port != 0,
             "\t void bsp_listen()"
             << "\n\t Invalid arguments were given to this function."
             );
@@ -766,7 +766,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(listening_port != 0,
+        DLIB_CASSERT(listening_port != 0,
             "\t void bsp_listen()"
             << "\n\t Invalid arguments were given to this function."
             );
@@ -793,7 +793,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(listening_port != 0,
+        DLIB_CASSERT(listening_port != 0,
             "\t void bsp_listen()"
             << "\n\t Invalid arguments were given to this function."
             );
