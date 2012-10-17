@@ -1224,6 +1224,7 @@
          <term file="dlib/bridge/bridge_abstract.h.html" name="bridge_status"/>
          <term file="network.html" name="bsp_context"/>
          <term file="network.html" name="bsp_listen"/>
+         <term file="network.html" name="bsp_listen_dynamic_port"/>
          <term file="network.html" name="bsp_connect"/>
 
 
