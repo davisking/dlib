@@ -295,6 +295,16 @@ namespace dlib
             unsigned long target_node_id
         ) 
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(target_node_id < number_of_nodes() &&
+                        target_node_id != node_id(),
+                "\t void bsp_context::send()"
+                << "\n\t Invalid arguments were given to this function."
+                << "\n\t target_node_id:    " << target_node_id
+                << "\n\t number_of_nodes(): " << number_of_nodes()
+                << "\n\t this: " << this
+                );
+
             std::ostringstream sout;
             serialize(item, sout);
             send_data(sout.str(), target_node_id);
@@ -686,6 +696,12 @@ namespace dlib
         funct_type funct
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(listening_port != 0,
+            "\t void bsp_listen()"
+            << "\n\t Invalid arguments were given to this function."
+            );
+
         bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct);
     }
 
@@ -701,6 +717,12 @@ namespace dlib
         ARG1 arg1
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(listening_port != 0,
+            "\t void bsp_listen()"
+            << "\n\t Invalid arguments were given to this function."
+            );
+
         bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1);
     }
 
@@ -718,6 +740,12 @@ namespace dlib
         ARG2 arg2
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(listening_port != 0,
+            "\t void bsp_listen()"
+            << "\n\t Invalid arguments were given to this function."
+            );
+
         bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2);
     }
 
@@ -737,6 +765,12 @@ namespace dlib
         ARG3 arg3
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(listening_port != 0,
+            "\t void bsp_listen()"
+            << "\n\t Invalid arguments were given to this function."
+            );
+
         bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2, arg3);
     }
 
@@ -758,6 +792,12 @@ namespace dlib
         ARG4 arg4
     )
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(listening_port != 0,
+            "\t void bsp_listen()"
+            << "\n\t Invalid arguments were given to this function."
+            );
+
         bsp_listen_dynamic_port(listening_port, impl1::null_notify, funct, arg1, arg2, arg3, arg4);
     }
 
