@@ -375,7 +375,7 @@ namespace dlib
                 - funct(CONTEXT) must be a valid expression 
                   (i.e. funct must be a function or function object)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT) will be executed and it will
               then be able to participate in the BSP computation as one of the processing
               nodes.  
@@ -411,7 +411,7 @@ namespace dlib
                 - funct(CONTEXT,arg1) must be a valid expression 
                   (i.e. funct must be a function or function object)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1) will be executed and it will
               then be able to participate in the BSP computation as one of the processing
               nodes.  
@@ -449,7 +449,7 @@ namespace dlib
                 - funct(CONTEXT,arg1,arg2) must be a valid expression 
                   (i.e. funct must be a function or function object)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2) will be executed and
               it will then be able to participate in the BSP computation as one of the
               processing nodes.  
@@ -489,7 +489,7 @@ namespace dlib
                 - funct(CONTEXT,arg1,arg2,arg3) must be a valid expression 
                   (i.e. funct must be a function or function object)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2,arg3) will be
               executed and it will then be able to participate in the BSP computation as
               one of the processing nodes.  
@@ -531,7 +531,7 @@ namespace dlib
                 - funct(CONTEXT,arg1,arg2,arg3,arg4) must be a valid expression 
                   (i.e. funct must be a function or function object)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2,arg3,arg4) will be
               executed and it will then be able to participate in the BSP computation as
               one of the processing nodes.  
@@ -570,7 +570,7 @@ namespace dlib
               (i.e. port_notify_function() must be a function or function object taking an 
               unsigned short)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT) will be executed and it will
               then be able to participate in the BSP computation as one of the processing
               nodes.  
@@ -620,7 +620,7 @@ namespace dlib
               (i.e. port_notify_function() must be a function or function object taking an 
               unsigned short)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1) will be executed and it
               will then be able to participate in the BSP computation as one of the
               processing nodes.  
@@ -672,7 +672,7 @@ namespace dlib
               (i.e. port_notify_function() must be a function or function object taking an 
               unsigned short)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2) will be executed and
               it will then be able to participate in the BSP computation as one of the
               processing nodes.  
@@ -726,7 +726,7 @@ namespace dlib
               (i.e. port_notify_function() must be a function or function object taking an 
               unsigned short)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2,arg3) will be
               executed and it will then be able to participate in the BSP computation as
               one of the processing nodes.  
@@ -782,7 +782,7 @@ namespace dlib
               (i.e. port_notify_function() must be a function or function object taking an 
               unsigned short)
         ensures
-            - This function listens for a connection from a bsp_connect() routine.  Once
+            - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2,arg3,arg4) will be
               executed and it will then be able to participate in the BSP computation as
               one of the processing nodes.  
