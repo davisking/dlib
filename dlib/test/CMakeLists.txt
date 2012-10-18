@@ -9,7 +9,6 @@ cmake_minimum_required(VERSION 2.6)
 # into the regression test suite.
 set (tests
    example.cpp
-   example_args.cpp
    any.cpp
    any_function.cpp
    array2d.cpp
@@ -23,6 +22,7 @@ set (tests
    binary_search_tree_mm1.cpp
    binary_search_tree_mm2.cpp
    bridge.cpp
+   bsp.cpp
    byte_orderer.cpp
    cmd_line_parser.cpp
    cmd_line_parser_wchar_t.cpp
@@ -40,6 +40,7 @@ set (tests
    empirical_kernel_map.cpp
    entropy_coder.cpp
    entropy_encoder_model.cpp
+   example_args.cpp
    filtering.cpp
    find_max_factor_graph_nmplp.cpp
    find_max_factor_graph_viterbi.cpp

@@ -38,6 +38,7 @@ SRC += binary_search_tree_kernel_2a.cpp
 SRC += binary_search_tree_mm1.cpp
 SRC += binary_search_tree_mm2.cpp
 SRC += bridge.cpp
+SRC += bsp.cpp
 SRC += byte_orderer.cpp
 SRC += cmd_line_parser.cpp
 SRC += cmd_line_parser_wchar_t.cpp
