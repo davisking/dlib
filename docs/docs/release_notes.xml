@@ -12,6 +12,19 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+
+</current>
+
+<!-- *******************************************************************************  -->
+
+<old name="17.48" date="Oct 18, 2012">
+New Features:
   - Added more overloads of find_max_factor_graph_potts() to make applying it 
     over a Markov random field of image pixels really simple.
   - Added overloads of serialize()/deserialize() so that they can serialize
@@ -47,7 +60,7 @@ Other:
     supports this.
   - Made integer serialization about 3 times faster.
 
-</current>
+</old>
 
 <!-- *******************************************************************************  -->
 
