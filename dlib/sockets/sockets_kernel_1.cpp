@@ -268,6 +268,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    int connection::
+    disable_nagle()
+    {
+        int flag = 1;
+        int status = setsockopt( connection_socket, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(flag) );
+
+        if (ret == SOCKET_ERROR) 
+            return OTHER_ERROR;
+        else
+            return 0;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     long connection::
     write (
         const char* buf, 

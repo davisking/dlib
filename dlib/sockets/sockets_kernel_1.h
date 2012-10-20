@@ -141,6 +141,9 @@ namespace dlib
         // as the SOCKET win the windows API.
         typedef unsigned_type<void*>::type socket_descriptor_type;
 
+        int disable_nagle(
+        );
+
         socket_descriptor_type get_socket_descriptor (
         ) const;
 

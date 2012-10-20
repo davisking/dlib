@@ -362,6 +362,19 @@ namespace dlib
                 - returns OTHER_ERROR if there was an error 
         !*/
 
+        int disable_nagle(
+        );
+        /*!
+            ensures
+                - Sets the TCP_NODELAY socket option to disable Nagle's algorithm.
+                  This can sometimes reduce transmission latency, however, in almost
+                  all normal cases you don't want to mess with this as the default
+                  setting is usually appropriate.  
+
+                - returns 0 upon success
+                - returns OTHER_ERROR if there was an error 
+        !*/
+
         typedef platform_specific_type socket_descriptor_type;
         socket_descriptor_type get_socket_descriptor (
         ) const;

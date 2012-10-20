@@ -183,6 +183,9 @@ namespace dlib
             return temp;
         }
 
+        int disable_nagle(
+        );
+
         typedef int socket_descriptor_type;
 
         socket_descriptor_type get_socket_descriptor (

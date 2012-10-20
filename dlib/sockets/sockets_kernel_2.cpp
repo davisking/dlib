@@ -11,6 +11,7 @@
 #include "sockets_kernel_2.h"
 #include <fcntl.h>
 #include "../set.h"
+#include <netinet/tcp.h>
 
 
 
@@ -308,6 +309,20 @@ namespace dlib
         sdo(false),
         sdr(0)
     {}
+
+// ----------------------------------------------------------------------------------------
+
+    int connection::
+    disable_nagle()
+    {
+        int flag = 1;
+        if(setsockopt( connection_socket, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(flag) ))
+        {
+            return OTHER_ERROR;
+        }
+
+        return 0;
+    }
 
 // ----------------------------------------------------------------------------------------
 
