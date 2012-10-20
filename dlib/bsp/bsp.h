@@ -12,7 +12,7 @@
 #include "../serialize.h"
 #include "../map.h"
 #include "../ref.h"
-#include <deque>
+#include <queue>
 #include <vector>
 
 namespace dlib
@@ -210,15 +210,64 @@ namespace dlib
             shared_ptr<std::string> data;
             unsigned long sender_id;
             char msg_type;
+            dlib::uint64 epoch;
+
+            msg_data() : sender_id(0xFFFFFFFF), msg_type(-1), epoch(0) {}
         };
 
+    // ------------------------------------------------------------------------------------
 
-        class thread_safe_deque
+        class thread_safe_message_queue : noncopyable
         {
-        public:
-            thread_safe_deque() : sig(class_mutex),disabled(false) {}
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a simple message queue for msg_data objects.  Note that it
+                    has the special property that, while messages will generally leave
+                    the queue in the order they are inserted, any message with a smaller
+                    epoch value will always be popped out first.  But for all messages
+                    with equal epoch values the queue functions as a normal FIFO queue.
+            !*/
+        private:
+            struct msg_wrap
+            {
+                msg_wrap(
+                    const msg_data& data_,
+                    const dlib::uint64& sequence_number_
+                ) : data(data_), sequence_number(sequence_number_) {}
 
-            ~thread_safe_deque()
+                msg_wrap() : sequence_number(0){}
+
+                msg_data data;
+                dlib::uint64 sequence_number;
+
+                // Make it so that when msg_wrap objects are in a std::priority_queue,
+                // messages with a smaller epoch number always come first.  Then, within an
+                // epoch, messages are ordered by their sequence number (so smaller first
+                // there as well).
+                bool operator<(const msg_wrap& item) const
+                {
+                    if (data.epoch < item.data.epoch)
+                    {
+                        return false;
+                    }
+                    else if (data.epoch > item.data.epoch)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (sequence_number < item.sequence_number)
+                            return false;
+                        else
+                            return true;
+                    }
+                }
+            };
+
+        public:
+            thread_safe_message_queue() : sig(class_mutex),disabled(false),next_seq_num(1) {}
+
+            ~thread_safe_message_queue()
             {
                 disable();
             }
@@ -230,19 +279,16 @@ namespace dlib
                 sig.broadcast();
             }
 
-            unsigned long size() const { return data.size(); }
-
-            void push_front( const msg_data& item)
-            {
+            unsigned long size() const 
+            { 
                 auto_mutex lock(class_mutex);
-                data.push_front(item);
-                sig.signal();
+                return data.size(); 
             }
 
             void push_and_consume( msg_data& item)
             {
                 auto_mutex lock(class_mutex);
-                data.push_back(item);
+                data.push(msg_wrap(item, next_seq_num++));
                 // do this here so that we don't have to worry about different threads touching the shared_ptr.
                 item.data.reset(); 
                 sig.signal();
@@ -266,17 +312,43 @@ namespace dlib
                 if (disabled)
                     return false;
 
-                item = data.front();
-                data.pop_front();
+                item = data.top().data;
+                data.pop();
+
+                return true;
+            }
+
+            bool pop ( 
+                msg_data& item,
+                const dlib::uint64& max_epoch
+            )
+            /*!
+                ensures
+                    - if (this function returns true) then
+                        - #item == the next thing from the queue that has an epoch <= max_epoch
+                    - else
+                        - this object is disabled
+            !*/
+            {
+                auto_mutex lock(class_mutex);
+                while ((data.size() == 0 || data.top().data.epoch > max_epoch) && !disabled)
+                    sig.wait();
+
+                if (disabled)
+                    return false;
+
+                item = data.top().data;
+                data.pop();
 
                 return true;
             }
 
         private:
-            std::deque<msg_data> data;
+            std::priority_queue<msg_wrap> data;
             dlib::mutex class_mutex;
             dlib::signaler sig;
             bool disabled;
+            dlib::uint64 next_seq_num;
         };
 
 
@@ -396,9 +468,8 @@ namespace dlib
         );
 
 
-        void send_byte (
-            char val,
-            unsigned long target_node_id
+        void notify_control_node (
+            char val
         );
 
         void broadcast_byte (
@@ -423,8 +494,9 @@ namespace dlib
         unsigned long outstanding_messages;
         unsigned long num_waiting_nodes;
         unsigned long num_terminated_nodes;
+        dlib::uint64 current_epoch;
 
-        impl1::thread_safe_deque msg_buffer;
+        impl1::thread_safe_message_queue msg_buffer;
 
         impl1::map_id_to_con& _cons;
         const unsigned long _node_id;
