@@ -260,6 +260,98 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test4_job_driver(bsp_context& obj, int& result)
+    {
+
+        obj.broadcast(obj.node_id());
+
+        int accum = 0;
+        int temp = 0;
+        while(obj.receive(temp))
+            accum += temp;
+
+        // send to node 1 so it can sum everything
+        if (obj.node_id() != 1)
+            obj.send(accum, 1);
+
+        while(obj.receive(temp))
+            accum += temp;
+
+        // Now hop the accum values along the nodes until the value from node 1 gets to
+        // node 0.
+        obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
+        DLIB_TEST(obj.receive(accum));
+        obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
+        DLIB_TEST(obj.receive(accum));
+        obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
+        DLIB_TEST(obj.receive(accum));
+
+        // this whole block is a noop since it doesn't end up doing anything.
+        for (int k = 0; k < 40; ++k)
+        {
+            dlog << LINFO << "k: " << k;
+            for (int i = 0; i < 4; ++i)
+            {
+                obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
+                DLIB_TEST_MSG(obj.receive(accum), obj.node_id());
+
+                obj.receive();
+            }
+        }
+
+
+        dlog << LINFO << "TERMINATE";
+        if (obj.node_id() == 0)
+            result = accum;
+    }
+
+
+    void test4_job(bsp_context& obj)
+    {
+        int junk;
+        test4_job_driver(obj, junk);
+    }
+
+
+    void dotest4()
+    {
+        dlog << LINFO << "start dotest4()";
+        print_spinner();
+        bool error_occurred = false;
+        {
+            thread_function t1(callfunct(test4_job, 12345, error_occurred));
+            thread_function t2(callfunct(test4_job, 12346, error_occurred));
+            thread_function t3(callfunct(test4_job, 12347, error_occurred));
+
+            // wait a little bit for the threads to start up
+            dlib::sleep(200);
+
+            try
+            {
+                std::vector<std::pair<std::string,unsigned short> > hosts;
+                hosts.push_back(make_pair("127.0.0.1",12345));
+                hosts.push_back(make_pair("127.0.0.1",12346));
+                hosts.push_back(make_pair("127.0.0.1",12347));
+                int result = 0;
+                const int expected =  1+2+3 + 0+2+3 + 0+1+3 + 0+1+2;
+                bsp_connect(hosts, test4_job_driver, dlib::ref(result));
+
+                dlog << LINFO << "result: " << result;
+                dlog << LINFO << "should be: " << expected;
+                DLIB_TEST(result == expected);
+            }
+            catch (std::exception& e)
+            {
+                dlog << LERROR << "error during bsp_context: " << e.what();
+                DLIB_TEST(false);
+            }
+
+        }
+        DLIB_TEST(error_occurred == false);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class bsp_tester : public tester
     {
 
@@ -278,6 +370,7 @@ namespace
             dotest2<1>();
             dotest2<2>();
             dotest3();
+            dotest4();
         }
     } a;
 
