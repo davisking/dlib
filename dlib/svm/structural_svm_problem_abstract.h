@@ -69,7 +69,7 @@ namespace dlib
                 For an introduction to structured support vector machines you should consult 
                 the following paper: 
                     Predicting Structured Objects with Support Vector Machines by 
-                    By Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
+                    Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
 
                 For a more detailed discussion of the particular algorithm implemented by this
                 object see the following paper:  
