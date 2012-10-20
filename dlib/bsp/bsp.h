@@ -35,7 +35,9 @@ namespace dlib
                 buf(con),
                 stream(&buf),
                 terminated(false)
-            {}
+            {
+                con->disable_nagle();
+            }
 
             bsp_con(
                scoped_ptr<connection>& conptr 
@@ -46,6 +48,8 @@ namespace dlib
             {
                 // make sure we own the connection
                 conptr.swap(con);
+
+                con->disable_nagle();
             }
 
             scoped_ptr<connection> con;
