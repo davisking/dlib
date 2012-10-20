@@ -274,7 +274,7 @@ namespace dlib
         int flag = 1;
         int status = setsockopt( connection_socket, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(flag) );
 
-        if (ret == SOCKET_ERROR) 
+        if (status == SOCKET_ERROR) 
             return OTHER_ERROR;
         else
             return 0;
