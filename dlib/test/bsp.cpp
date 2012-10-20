@@ -4,6 +4,7 @@
 
 #include <dlib/bsp.h>
 #include <dlib/threads.h>
+#include <dlib/pipe.h>
 
 #include "tester.h"
 
@@ -50,6 +51,55 @@ namespace
     {
         return callfunct_helper<funct>(f,port,error_occurred);
 
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename funct>
+    struct callfunct_helper_pn
+    {
+        callfunct_helper_pn (
+            funct f_,
+            int port_,
+            bool& error_occurred_,
+            dlib::pipe<unsigned short>& port_pipe_
+        ) :f(f_), port(port_), error_occurred(error_occurred_), port_pipe(port_pipe_) {}
+
+        funct f;
+        int port;
+        bool& error_occurred;
+        dlib::pipe<unsigned short>& port_pipe;
+
+        struct helper
+        {
+            helper (
+                dlib::pipe<unsigned short>& port_pipe_
+            ) : port_pipe(port_pipe_) {}
+
+            dlib::pipe<unsigned short>& port_pipe;
+
+            void operator() (unsigned short p) { port_pipe.enqueue(p); }
+        };
+
+        void operator() (
+        ) const
+        {
+            try
+            {
+                bsp_listen_dynamic_port(port, helper(port_pipe), f);
+            }
+            catch (exception& e)
+            {
+                dlog << LERROR << "error calling bsp_listen_dynamic_port(): " << e.what();
+                error_occurred = true;
+            }
+        }
+    };
+
+    template <typename funct>
+    callfunct_helper_pn<funct> callfunct(funct f, int port, bool& error_occurred, dlib::pipe<unsigned short>& port_pipe)
+    {
+        return callfunct_helper_pn<funct>(f,port,error_occurred,port_pipe);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -227,19 +277,19 @@ namespace
         print_spinner();
         bool error_occurred = false;
         {
-            thread_function t1(callfunct(test3_job, 12345, error_occurred));
-            thread_function t2(callfunct(test3_job, 12346, error_occurred));
-            thread_function t3(callfunct(test3_job, 12347, error_occurred));
+            dlib::pipe<unsigned short> ports(5);
+            thread_function t1(callfunct(test3_job, 12345, error_occurred, ports));
+            thread_function t2(callfunct(test3_job, 0, error_occurred, ports));
+            thread_function t3(callfunct(test3_job, 12347, error_occurred, ports));
 
-            // wait a little bit for the threads to start up
-            dlib::sleep(200);
 
             try
             {
                 std::vector<std::pair<std::string,unsigned short> > hosts;
-                hosts.push_back(make_pair("127.0.0.1",12345));
-                hosts.push_back(make_pair("127.0.0.1",12346));
-                hosts.push_back(make_pair("127.0.0.1",12347));
+                unsigned short port;
+                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
                 int result = 0;
                 const int expected =  1+2+3 + 0+2+3 + 0+1+3 + 0+1+2;
                 bsp_connect(hosts, test3_job_driver, dlib::ref(result));
@@ -319,19 +369,19 @@ namespace
         print_spinner();
         bool error_occurred = false;
         {
-            thread_function t1(callfunct(test4_job, 12345, error_occurred));
-            thread_function t2(callfunct(test4_job, 12346, error_occurred));
-            thread_function t3(callfunct(test4_job, 12347, error_occurred));
+            dlib::pipe<unsigned short> ports(5);
+            thread_function t1(callfunct(test4_job, 0, error_occurred, ports));
+            thread_function t2(callfunct(test4_job, 0, error_occurred, ports));
+            thread_function t3(callfunct(test4_job, 0, error_occurred, ports));
 
-            // wait a little bit for the threads to start up
-            dlib::sleep(200);
 
             try
             {
                 std::vector<std::pair<std::string,unsigned short> > hosts;
-                hosts.push_back(make_pair("127.0.0.1",12345));
-                hosts.push_back(make_pair("127.0.0.1",12346));
-                hosts.push_back(make_pair("127.0.0.1",12347));
+                unsigned short port;
+                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
                 int result = 0;
                 const int expected =  1+2+3 + 0+2+3 + 0+1+3 + 0+1+2;
                 bsp_connect(hosts, test4_job_driver, dlib::ref(result));
