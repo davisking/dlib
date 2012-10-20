@@ -2465,7 +2465,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                 the following paper: 
                 <blockquote>
                     Predicting Structured Objects with Support Vector Machines by 
-                    By Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
+                    Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
                 </blockquote>
 
                 For a more detailed discussion of the particular algorithm implemented by this
