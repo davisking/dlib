@@ -402,6 +402,26 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test5_job(
+        bsp_context& ,
+        int& val
+    )
+    {
+        val = 25;
+    }
+
+    void dotest5()
+    {
+        dlog << LINFO << "start dotest5()";
+        print_spinner();
+        std::vector<network_address> hosts;
+        int val = 0;
+        bsp_connect(hosts, test5_job, dlib::ref(val));
+        DLIB_TEST(val == 25);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class bsp_tester : public tester
     {
 
@@ -423,6 +443,7 @@ namespace
                 dotest2<2>();
                 dotest3();
                 dotest4();
+                dotest5();
             }
         }
     } a;
