@@ -26,7 +26,7 @@ namespace dlib
     {
         std::istringstream sin(full_address);
         sin >> *this;
-        if (!sin)
+        if (!sin || sin.peek() != EOF)
             throw invalid_network_address("invalid network address: " + full_address);
     }
 
