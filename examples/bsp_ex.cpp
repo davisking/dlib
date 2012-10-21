@@ -32,7 +32,7 @@ double f ( double x)
 // ----------------------------------------------------------------------------------------
 
 void bsp_job_node_0 (
-    bsp_context& context,
+    bsp_context& bsp,
     double& min_value,
     double& optimal_x
 )
@@ -43,15 +43,15 @@ void bsp_job_node_0 (
     min_value = std::numeric_limits<double>::infinity();
     double interval_width = std::abs(right-left);
 
-    for (int i = 0; i < 10000; ++i)
+    for (int i = 0; i < 100; ++i)
     {
-        context.broadcast(left);
-        context.broadcast(right);
+        bsp.broadcast(left);
+        bsp.broadcast(right);
 
-        for (unsigned int k = 1; k < context.number_of_nodes(); ++k)
+        for (unsigned int k = 1; k < bsp.number_of_nodes(); ++k)
         {
             std::pair<double,double> val;
-            context.receive(val);
+            bsp.receive(val);
             if (val.second < min_value)
             {
                 min_value = val.second;
@@ -68,17 +68,17 @@ void bsp_job_node_0 (
 // ----------------------------------------------------------------------------------------
 
 void bsp_job_other_nodes (
-    bsp_context& context,
+    bsp_context& bsp,
     long grid_resolution
 )
 {
     double left, right;
-    while (context.try_receive(left))
+    while (bsp.try_receive(left))
     {
-        context.receive(right);
+        bsp.receive(right);
 
-        const double l = (context.node_id()-1)/(context.number_of_nodes()-1.0);
-        const double r = context.node_id()    /(context.number_of_nodes()-1.0);
+        const double l = (bsp.node_id()-1)/(bsp.number_of_nodes()-1.0);
+        const double r = bsp.node_id()    /(bsp.number_of_nodes()-1.0);
 
         const double width = right-left;
         const matrix<double> values_to_check = linspace(left+l*width, left+r*width, grid_resolution);
@@ -95,7 +95,7 @@ void bsp_job_other_nodes (
             }
         }
 
-        context.send(make_pair(best_x, best_val), 0);
+        bsp.send(make_pair(best_x, best_val), 0);
     }
 }
 
