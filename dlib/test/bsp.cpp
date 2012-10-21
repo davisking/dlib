@@ -158,10 +158,10 @@ namespace
             try
             {
                 int result;
-                std::vector<std::pair<std::string,unsigned short> > hosts;
-                hosts.push_back(make_pair("127.0.0.1",12345));
-                hosts.push_back(make_pair("127.0.0.1",12346));
-                hosts.push_back(make_pair("127.0.0.1",12347));
+                std::vector<network_address> hosts;
+                hosts.push_back(network_address("127.0.0.1",12345));
+                hosts.push_back(network_address("127.0.0.1",12346));
+                hosts.push_back(network_address("127.0.0.1",12347));
                 bsp_connect(hosts, sum_array_driver, dlib::ref(v), dlib::ref(result));
 
                 dlog << LINFO << "result: "<< result;
@@ -202,10 +202,10 @@ namespace
 
             try
             {
-                std::vector<std::pair<std::string,unsigned short> > hosts;
-                hosts.push_back(make_pair("127.0.0.1",12345));
-                hosts.push_back(make_pair("127.0.0.1",12346));
-                hosts.push_back(make_pair("127.0.0.1",12347));
+                std::vector<network_address> hosts;
+                hosts.push_back(network_address("127.0.0.1",12345));
+                hosts.push_back(network_address("127.0.0.1",12346));
+                hosts.push_back(network_address("127.0.0.1",12347));
                 bsp_connect(hosts, test2_job<id>);
             }
             catch (std::exception& e)
@@ -285,11 +285,11 @@ namespace
 
             try
             {
-                std::vector<std::pair<std::string,unsigned short> > hosts;
+                std::vector<network_address> hosts;
                 unsigned short port;
-                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
-                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
-                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(network_address("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(network_address("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(network_address("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
                 int result = 0;
                 const int expected =  1+2+3 + 0+2+3 + 0+1+3 + 0+1+2;
                 bsp_connect(hosts, test3_job_driver, dlib::ref(result));
@@ -377,11 +377,11 @@ namespace
 
             try
             {
-                std::vector<std::pair<std::string,unsigned short> > hosts;
+                std::vector<network_address> hosts;
                 unsigned short port;
-                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
-                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
-                ports.dequeue(port); hosts.push_back(make_pair("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(network_address("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(network_address("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
+                ports.dequeue(port); hosts.push_back(network_address("127.0.0.1",port)); dlog << LINFO << "PORT: " << port;
                 int result = 0;
                 const int expected =  1+2+3 + 0+2+3 + 0+1+3 + 0+1+2;
                 bsp_connect(hosts, test4_job_driver, dlib::ref(result));

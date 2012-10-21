@@ -29,9 +29,9 @@ namespace dlib
         struct bsp_con
         {
             bsp_con(
-                const std::pair<std::string,unsigned short>& dest
+                const network_address& dest
             ) : 
-                con(connect(dest.first,dest.second)),
+                con(connect(dest)),
                 buf(con),
                 stream(&buf),
                 terminated(false)
@@ -62,7 +62,7 @@ namespace dlib
 
         void connect_all (
             map_id_to_con& cons,
-            const std::vector<std::pair<std::string,unsigned short> >& hosts,
+            const std::vector<network_address>& hosts,
             unsigned long node_id
         );
         /*!
@@ -72,7 +72,7 @@ namespace dlib
 
         void send_out_connection_orders (
             map_id_to_con& cons,
-            const std::vector<std::pair<std::string,unsigned short> >& hosts
+            const std::vector<network_address>& hosts
         );
 
     // ------------------------------------------------------------------------------------
@@ -81,18 +81,15 @@ namespace dlib
         {
             hostinfo() {}
             hostinfo (
-                const std::string& ip_,
-                unsigned short port_,
+                const network_address& addr_,
                 unsigned long node_id_
             ) : 
-                ip(ip_),
-                port(port_),
+                addr(addr_),
                 node_id(node_id_)
             {
             }
 
-            std::string ip;
-            unsigned short port;
+            network_address addr;
             unsigned long node_id;
         };
 
@@ -101,8 +98,7 @@ namespace dlib
             std::ostream& out
         )
         {
-            dlib::serialize(item.ip, out);
-            dlib::serialize(item.port, out);
+            dlib::serialize(item.addr, out);
             dlib::serialize(item.node_id, out);
         }
 
@@ -111,8 +107,7 @@ namespace dlib
             std::istream& in
         )
         {
-            dlib::deserialize(item.ip, in);
-            dlib::deserialize(item.port, in);
+            dlib::deserialize(item.addr, in);
             dlib::deserialize(item.node_id, in);
         }
 
@@ -531,7 +526,7 @@ namespace dlib
             typename funct_type
             >
         friend void bsp_connect (
-            const std::vector<std::pair<std::string,unsigned short> >& hosts,
+            const std::vector<network_address>& hosts,
             funct_type funct
         );
 
@@ -540,7 +535,7 @@ namespace dlib
             typename ARG1
             >
         friend void bsp_connect (
-            const std::vector<std::pair<std::string,unsigned short> >& hosts,
+            const std::vector<network_address>& hosts,
             funct_type funct,
             ARG1 arg1
         );
@@ -551,7 +546,7 @@ namespace dlib
             typename ARG2
             >
         friend void bsp_connect (
-            const std::vector<std::pair<std::string,unsigned short> >& hosts,
+            const std::vector<network_address>& hosts,
             funct_type funct,
             ARG1 arg1,
             ARG2 arg2
@@ -564,7 +559,7 @@ namespace dlib
             typename ARG3
             >
         friend void bsp_connect (
-            const std::vector<std::pair<std::string,unsigned short> >& hosts,
+            const std::vector<network_address>& hosts,
             funct_type funct,
             ARG1 arg1,
             ARG2 arg2,
@@ -579,7 +574,7 @@ namespace dlib
             typename ARG4
             >
         friend void bsp_connect (
-            const std::vector<std::pair<std::string,unsigned short> >& hosts,
+            const std::vector<network_address>& hosts,
             funct_type funct,
             ARG1 arg1,
             ARG2 arg2,
@@ -671,7 +666,7 @@ namespace dlib
         typename funct_type
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct
     )
     {
@@ -691,7 +686,7 @@ namespace dlib
         typename ARG1
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct,
         ARG1 arg1
     )
@@ -713,7 +708,7 @@ namespace dlib
         typename ARG2
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct,
         ARG1 arg1,
         ARG2 arg2
@@ -737,7 +732,7 @@ namespace dlib
         typename ARG3
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct,
         ARG1 arg1,
         ARG2 arg2,
@@ -763,7 +758,7 @@ namespace dlib
         typename ARG4
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct,
         ARG1 arg1,
         ARG2 arg2,

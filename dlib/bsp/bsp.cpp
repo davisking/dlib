@@ -15,7 +15,7 @@ namespace dlib
 
         void connect_all (
             map_id_to_con& cons,
-            const std::vector<std::pair<std::string,unsigned short> >& hosts,
+            const std::vector<network_address>& hosts,
             unsigned long node_id
         )
         {
@@ -41,7 +41,7 @@ namespace dlib
             {
                 try
                 {
-                    scoped_ptr<bsp_con> con(new bsp_con(make_pair(hosts[i].ip,hosts[i].port)));
+                    scoped_ptr<bsp_con> con(new bsp_con(hosts[i].addr));
                     dlib::serialize(node_id, con->stream); // tell the other end our node_id
                     con->stream.flush();
                     unsigned long id = hosts[i].node_id;
@@ -50,7 +50,7 @@ namespace dlib
                 catch (std::exception&)
                 {
                     std::ostringstream sout;
-                    sout << "Could not connect to " << hosts[i].ip << ":" << hosts[i].port;
+                    sout << "Could not connect to " << hosts[i].addr;
                     error_string = sout.str();
                     break;
                 }
@@ -60,7 +60,7 @@ namespace dlib
 
         void send_out_connection_orders (
             map_id_to_con& cons,
-            const std::vector<std::pair<std::string,unsigned short> >& hosts
+            const std::vector<network_address>& hosts
         )
         {
             // tell everyone their node ids
@@ -74,7 +74,7 @@ namespace dlib
             std::vector<hostinfo> targets; 
             for (unsigned long i = 0; i < hosts.size(); ++i)
             {
-                hostinfo info(hosts[i].first, hosts[i].second, i+1);
+                hostinfo info(hosts[i], i+1);
 
                 dlib::serialize(targets, cons[info.node_id]->stream);
                 targets.push_back(info);

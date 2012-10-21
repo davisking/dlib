@@ -251,7 +251,7 @@ namespace dlib
         typename funct_type
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct
     );
     /*!
@@ -265,9 +265,9 @@ namespace dlib
               calling bsp_connect().  In particular, this node will execute funct(CONTEXT),
               which is expected to carry out this node's portion of the BSP computation.
             - The other processing nodes are executed on the hosts indicated by the input
-              argument.  In particular, this function interprets hosts as a list of IP
-              addresses and port numbers identifying machines running the bsp_listen() or
-              bsp_listen_dynamic_port() routines.  
+              argument.  In particular, this function interprets hosts as a list addresses
+              identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
+              routines.  
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
@@ -285,7 +285,7 @@ namespace dlib
         typename ARG1
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct,
         ARG1 arg1
     );
@@ -300,9 +300,9 @@ namespace dlib
               calling bsp_connect().  In particular, this node will execute funct(CONTEXT,arg1),
               which is expected to carry out this node's portion of the BSP computation.
             - The other processing nodes are executed on the hosts indicated by the input
-              argument.  In particular, this function interprets hosts as a list of IP
-              addresses and port numbers identifying machines running the bsp_listen() or
-              bsp_listen_dynamic_port() routines.  
+              argument.  In particular, this function interprets hosts as a list addresses
+              identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
+              routines.  
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
@@ -321,7 +321,7 @@ namespace dlib
         typename ARG2
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct,
         ARG1 arg1,
         ARG2 arg2
@@ -337,9 +337,9 @@ namespace dlib
               calling bsp_connect().  In particular, this node will execute funct(CONTEXT,arg1,arg2),
               which is expected to carry out this node's portion of the BSP computation.
             - The other processing nodes are executed on the hosts indicated by the input
-              argument.  In particular, this function interprets hosts as a list of IP
-              addresses and port numbers identifying machines running the bsp_listen() or
-              bsp_listen_dynamic_port() routines.  
+              argument.  In particular, this function interprets hosts as a list addresses
+              identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
+              routines.  
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
@@ -359,7 +359,7 @@ namespace dlib
         typename ARG3
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct,
         ARG1 arg1,
         ARG2 arg2,
@@ -376,9 +376,9 @@ namespace dlib
               calling bsp_connect().  In particular, this node will execute funct(CONTEXT,arg1,arg2,arg3),
               which is expected to carry out this node's portion of the BSP computation.
             - The other processing nodes are executed on the hosts indicated by the input
-              argument.  In particular, this function interprets hosts as a list of IP
-              addresses and port numbers identifying machines running the bsp_listen() or
-              bsp_listen_dynamic_port() routines.  
+              argument.  In particular, this function interprets hosts as a list addresses
+              identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
+              routines.  
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
@@ -399,7 +399,7 @@ namespace dlib
         typename ARG4
         >
     void bsp_connect (
-        const std::vector<std::pair<std::string,unsigned short> >& hosts,
+        const std::vector<network_address>& hosts,
         funct_type funct,
         ARG1 arg1,
         ARG2 arg2,
@@ -417,9 +417,9 @@ namespace dlib
               calling bsp_connect().  In particular, this node will execute funct(CONTEXT,arg1,arg2,arg3,arg4),
               which is expected to carry out this node's portion of the BSP computation.
             - The other processing nodes are executed on the hosts indicated by the input
-              argument.  In particular, this function interprets hosts as a list of IP
-              addresses and port numbers identifying machines running the bsp_listen() or
-              bsp_listen_dynamic_port() routines.  
+              argument.  In particular, this function interprets hosts as a list addresses
+              identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
+              routines.  
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
