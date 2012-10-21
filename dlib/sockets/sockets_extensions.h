@@ -14,9 +14,28 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class invalid_network_address : public dlib::error 
+    { 
+    public: 
+        invalid_network_address(const std::string& msg) : dlib::error(msg) {};
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct network_address
     {
         network_address() : port(0){}
+
+        network_address(
+            const std::string& full_address
+        );
+
+        network_address (
+            const char* full_address
+        )
+        {
+            *this = network_address(std::string(full_address));
+        }
 
         network_address(
             const std::string& host_address_,
@@ -65,13 +84,6 @@ namespace dlib
     connection* connect (
         const std::string& host_or_ip,
         unsigned short port,
-        unsigned long timeout
-    );
-
-// ----------------------------------------------------------------------------------------
-
-    connection* connect (
-        const network_address& addr,
         unsigned long timeout
     );
 

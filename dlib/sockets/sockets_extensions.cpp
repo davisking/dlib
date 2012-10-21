@@ -19,6 +19,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    network_address::
+    network_address(
+        const std::string& full_address
+    )
+    {
+        std::istringstream sin(full_address);
+        sin >> *this;
+        if (!sin)
+            throw invalid_network_address(full_address);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void serialize(
         const network_address& item,
         std::ostream& out
@@ -240,16 +253,6 @@ namespace dlib
         data->connect_ended = true;
         connect_signaler.broadcast();
         return data->con;
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    connection* connect (
-        const network_address& addr,
-        unsigned long timeout
-    )
-    {
-        return connect(addr.host_address, addr.port, timeout);
     }
 
 // ----------------------------------------------------------------------------------------

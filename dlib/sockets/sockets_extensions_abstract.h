@@ -13,6 +13,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class invalid_network_address : public dlib::error 
+    { 
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown by network_address's constructor if the
+                input is invalid.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct network_address
     {
         /*!
@@ -31,6 +42,33 @@ namespace dlib
             ensures
                 - host_address == ""
                 - #port == 0
+        !*/
+
+        network_address(
+            const std::string& full_address
+        );
+        /*!
+            ensures
+                - interprets full_address as a network address of the form:
+                    host_address:port
+                  and assigns each part into #host_address and #port.  For example,
+                  network_address("localhost:80") would result in a network_address
+                  object where host_address was "localhost" and port was 80.
+            throws
+                - invalid_network_address
+                    This exception is thrown if the full_address string can't be
+                    interpreted as a valid network address.
+        !*/
+
+        network_address (
+            const char* full_address
+        );
+        /*!
+            requires
+                - full_address == a valid pointer to a null terminated string
+            ensures
+                - Invoking this constructor is equivalent to performing 
+                  network_address(std::string(full_address))
         !*/
 
         network_address(
@@ -110,6 +148,8 @@ namespace dlib
             - std::bad_alloc
     !*/
 
+// ----------------------------------------------------------------------------------------
+
     connection* connect (
         const network_address& addr
     );
@@ -136,15 +176,6 @@ namespace dlib
                 creating the connection or if timeout milliseconds elapses before the
                 connect is successful.
             - std::bad_alloc
-    !*/
-
-    connection* connect (
-        const network_address& addr,
-        unsigned long timeout
-    );
-    /*!
-        ensures
-            - returns connect(addr.host_address, addr_port, timeout);
     !*/
 
 // ----------------------------------------------------------------------------------------
