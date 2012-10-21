@@ -7,9 +7,45 @@
 #include "../sockets.h"
 #include "sockets_extensions_abstract.h"
 #include "../smart_pointers.h"
+#include <iosfwd>
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    struct network_address
+    {
+        network_address() : port(0){}
+
+        network_address(
+            const std::string& host_address_,
+            const unsigned short port_
+        ) : host_address(host_address_), port(port_) {}
+            
+        std::string host_address;
+        unsigned short port;
+    };
+
+    void serialize(
+        const network_address& item,
+        std::ostream& out
+    );
+
+    void deserialize(
+        network_address& item,
+        std::istream& in 
+    );
+
+    std::ostream& operator<< (
+        std::ostream& out,
+        const network_address& item
+    );
+
+    std::istream& operator>> (
+        std::istream& in,
+        network_address& item
+    );
 
 // ----------------------------------------------------------------------------------------
 
@@ -21,8 +57,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     connection* connect (
+        const network_address& addr
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    connection* connect (
         const std::string& host_or_ip,
         unsigned short port,
+        unsigned long timeout
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    connection* connect (
+        const network_address& addr,
         unsigned long timeout
     );
 

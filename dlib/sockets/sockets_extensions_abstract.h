@@ -13,6 +13,88 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct network_address
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is simply a container for two things:
+                    - A host machine address which is either an IP address or DNS name
+                      for a machine.
+                    - A port number.
+            
+                Together, these things define a machine and port on that machine.
+        !*/
+
+        network_address(
+        );
+        /*!
+            ensures
+                - host_address == ""
+                - #port == 0
+        !*/
+
+        network_address(
+            const std::string& host_address_,
+            const unsigned short port_
+        );
+        /*!
+            ensures
+                - #host_address == host_address_
+                - #port == port_
+        !*/
+            
+
+        std::string host_address;
+        unsigned short port;
+    };
+
+    void serialize(
+        const network_address& item,
+        std::ostream& out
+    );
+    /*!
+        ensures
+            - provides serialization support
+    !*/
+
+    void deserialize(
+        network_address& item,
+        std::istream& in 
+    );
+    /*!
+        ensures
+            - provides deserialization support
+    !*/
+
+    std::ostream& operator<< (
+        std::ostream& out,
+        const network_address& item
+    );
+    /*!
+        ensures
+            - writes the given network_address to the output stream.  The format is the
+              host_address, then a colon, then the port number.  So for example:
+                cout << network_address("localhost", 80);
+              would print:
+                localhost:80
+            - returns #out 
+    !*/
+
+    std::istream& operator>> (
+        std::istream& in,
+        network_address& item
+    );
+    /*!
+        ensures
+            - reads a network_address from the given input stream.  The expected format is
+              the same as the one used to print them by the above operator<<() routine. 
+            - returns #in
+            - if (there is an error reading the network_address) then
+                - #in.good() == false
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     connection* connect (
         const std::string& host_or_ip,
         unsigned short port
@@ -23,9 +105,17 @@ namespace dlib
               given port
         throws
             - dlib::socket_error
-              This exception is thrown if there is some problem that prevents us from
-              creating the connection
+                This exception is thrown if there is some problem that prevents us from
+                creating the connection
             - std::bad_alloc
+    !*/
+
+    connection* connect (
+        const network_address& addr
+    );
+    /*!
+        ensures
+            - returns connect(addr.host_address, addr_port);
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -42,10 +132,19 @@ namespace dlib
             - blocks for at most timeout milliseconds
         throws
             - dlib::socket_error
-              This exception is thrown if there is some problem that prevents us from
-              creating the connection or if timeout milliseconds elapses before
-              the connect is successful.
+                This exception is thrown if there is some problem that prevents us from
+                creating the connection or if timeout milliseconds elapses before the
+                connect is successful.
             - std::bad_alloc
+    !*/
+
+    connection* connect (
+        const network_address& addr,
+        unsigned long timeout
+    );
+    /*!
+        ensures
+            - returns connect(addr.host_address, addr_port, timeout);
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -83,8 +182,8 @@ namespace dlib
               has finished.
         throws
             - std::bad_alloc or dlib::thread_error
-              If either of these exceptions are thrown con will still be closed via
-              "delete con;" 
+                If either of these exceptions are thrown con will still be closed via
+                "delete con;" 
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -108,8 +207,8 @@ namespace dlib
               has finished.
         throws
             - std::bad_alloc or dlib::thread_error
-              If either of these exceptions are thrown con will still be closed and
-              deleted (i.e. #con.get() == 0).
+                If either of these exceptions are thrown con will still be closed and
+                deleted (i.e. #con.get() == 0).
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -12,10 +12,76 @@
 #include "../algs.h"
 #include "../timeout.h"
 #include "../misc_api.h"
+#include "../serialize.h"
 
 namespace dlib
 {
 
+// ----------------------------------------------------------------------------------------
+
+    void serialize(
+        const network_address& item,
+        std::ostream& out
+    )
+    {
+        serialize(item.host_address, out);
+        serialize(item.port, out);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void deserialize(
+        network_address& item,
+        std::istream& in 
+    )
+    {
+        deserialize(item.host_address, in);
+        deserialize(item.port, in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    std::ostream& operator<< (
+        std::ostream& out,
+        const network_address& item
+    )
+    {
+        out << item.host_address << ":" << item.port;
+        return out;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    std::istream& operator>> (
+        std::istream& in,
+        network_address& item
+    )
+    {
+        std::string temp;
+        in >> temp;
+
+        std::string::size_type pos = temp.find_last_of(":");
+        if (pos == std::string::npos)
+        {
+            in.setstate(std::ios::badbit);
+            return in;
+        }
+
+        item.host_address = temp.substr(0, pos);
+        try
+        {
+            item.port = sa = temp.substr(pos+1);
+        } catch (std::exception& )
+        {
+            in.setstate(std::ios::badbit);
+            return in;
+        }
+
+
+        return in;
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     connection* connect (
@@ -43,6 +109,15 @@ namespace dlib
         }
 
         return con;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    connection* connect (
+        const network_address& addr
+    )
+    {
+        return connect(addr.host_address, addr.port);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -165,6 +240,16 @@ namespace dlib
         data->connect_ended = true;
         connect_signaler.broadcast();
         return data->con;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    connection* connect (
+        const network_address& addr,
+        unsigned long timeout
+    )
+    {
+        return connect(addr.host_address, addr.port, timeout);
     }
 
 // ----------------------------------------------------------------------------------------
