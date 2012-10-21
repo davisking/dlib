@@ -973,6 +973,7 @@
          <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="listener"/>
 
 
+         <term file="dlib/sockets/sockets_extensions_abstract.h.html" name="network_address"/>
          <term file="dlib/sockets/sockets_extensions_abstract.h.html" name="connect"/>
          <term file="dlib/sockets/sockets_extensions_abstract.h.html" name="is_ip_address"/>
          <term file="dlib/sockets/sockets_extensions_abstract.h.html" name="close_gracefully"/>

@@ -712,6 +712,10 @@
                   <name>extensions</name>
                   <sub>
                      <item>   
+                        <name>network_address</name>
+                        <link>dlib/sockets/sockets_extensions_abstract.h.html#network_address</link>
+                     </item>
+                     <item>   
                         <name>connect</name>
                         <link>dlib/sockets/sockets_extensions_abstract.h.html#connect</link>
                      </item>
