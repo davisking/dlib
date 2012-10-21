@@ -36,9 +36,12 @@ namespace dlib
 
 
             THREAD SAFETY
-                This object is not thread-safe.  This means you must serialize all access
-                to it using an appropriate mutex or other synchronization mechanism if it
-                is to be accessed from multiple threads. 
+                This object is not thread-safe.  In particular, you should only ever have
+                one thread that works with an instance of this object.  This means that,
+                for example, you should not spawn sub-threads from within a BSP processing
+                node and have them invoke methods on this object.  Instead, you should only
+                invoke this object's methods from within the BSP processing node's main
+                thread (i.e. the thread that executes the user supplied function funct()).
         !*/
 
     public:
