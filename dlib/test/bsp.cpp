@@ -159,9 +159,9 @@ namespace
             {
                 int result;
                 std::vector<network_address> hosts;
-                hosts.push_back(network_address("127.0.0.1",12345));
-                hosts.push_back(network_address("127.0.0.1",12346));
-                hosts.push_back(network_address("127.0.0.1",12347));
+                hosts.push_back("127.0.0.1:12345");
+                hosts.push_back("localhost:12346");
+                hosts.push_back("127.0.0.1:12347");
                 bsp_connect(hosts, sum_array_driver, dlib::ref(v), dlib::ref(result));
 
                 dlog << LINFO << "result: "<< result;
@@ -203,9 +203,9 @@ namespace
             try
             {
                 std::vector<network_address> hosts;
-                hosts.push_back(network_address("127.0.0.1",12345));
-                hosts.push_back(network_address("127.0.0.1",12346));
-                hosts.push_back(network_address("127.0.0.1",12347));
+                hosts.push_back("127.0.0.1:12345");
+                hosts.push_back("127.0.0.1:12346");
+                hosts.push_back("127.0.0.1:12347");
                 bsp_connect(hosts, test2_job<id>);
             }
             catch (std::exception& e)
