@@ -152,7 +152,7 @@
          <description>
                 This is a tool used to implement algorithms using the Bulk Synchronous
                 Parallel (BSP) computing model.   In particular, this object defines
-                the API used by a BSP job to communicate between processing nodes.
+                the API used for communication between BSP jobs. 
          </description>
          <examples>
             <example>bsp_ex.cpp.html</example>
