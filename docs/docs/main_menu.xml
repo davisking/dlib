@@ -120,6 +120,10 @@
                   <link>train_object_detector.cpp.html</link>
                </item>
                <item>
+                  <name>BSP</name>
+                  <link>bsp_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Assignment_Learning</name>
                   <link>assignment_learning_ex.cpp.html</link>
                </item>
