@@ -222,6 +222,13 @@ namespace dlib
         // now wait for all the other nodes to terminate
         while (num_terminated_nodes < _cons.size() )
         {
+            if (node_id() == 0 && num_waiting_nodes + num_terminated_nodes == _cons.size() && outstanding_messages == 0)
+            {
+                num_waiting_nodes = 0;
+                broadcast_byte(impl2::SEE_ALL_IN_WAITING_STATE);
+                ++current_epoch;
+            }
+
             if (!msg_buffer.pop(msg))
                 throw dlib::socket_error("Error reading from msg_buffer in dlib::bsp_context.");
 
@@ -250,14 +257,6 @@ namespace dlib
             else if (msg.msg_type == impl2::IN_WAITING_STATE)
             {
                 ++num_waiting_nodes;
-            }
-
-
-            if (node_id() == 0 && num_waiting_nodes + num_terminated_nodes == _cons.size() && outstanding_messages == 0)
-            {
-                num_waiting_nodes = 0;
-                broadcast_byte(impl2::SEE_ALL_IN_WAITING_STATE);
-                ++current_epoch;
             }
         }
 
