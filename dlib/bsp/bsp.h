@@ -420,16 +420,35 @@ namespace dlib
         }
 
         template <typename T>
-        bool receive (
+        void receive (
+            T& item
+        ) 
+        {
+            if(!try_receive(item))
+                throw dlib::socket_error("bsp_context::receive(): no messages to receive, all nodes currently blocked.");
+        }
+
+        template <typename T>
+        bool try_receive (
             T& item
         ) 
         {
             unsigned long sending_node_id;
-            return receive(item, sending_node_id);
+            return try_receive(item, sending_node_id);
         }
 
         template <typename T>
-        bool receive (
+        void receive (
+            T& item,
+            unsigned long& sending_node_id
+        ) 
+        {
+            if(!try_receive(item, sending_node_id))
+                throw dlib::socket_error("bsp_context::receive(): no messages to receive, all nodes currently blocked.");
+        }
+
+        template <typename T>
+        bool try_receive (
             T& item,
             unsigned long& sending_node_id
         ) 

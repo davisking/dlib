@@ -114,7 +114,7 @@ namespace
 
         result = 0;
         int val;
-        while(obj.receive(val))
+        while(obj.try_receive(val))
             result += val;
     }
 
@@ -227,24 +227,24 @@ namespace
 
         int accum = 0;
         int temp = 0;
-        while(obj.receive(temp))
+        while(obj.try_receive(temp))
             accum += temp;
 
         // send to node 1 so it can sum everything
         if (obj.node_id() != 1)
             obj.send(accum, 1);
 
-        while(obj.receive(temp))
+        while(obj.try_receive(temp))
             accum += temp;
 
         // Now hop the accum values along the nodes until the value from node 1 gets to
         // node 0.
         obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
-        DLIB_TEST(obj.receive(accum));
+        obj.receive(accum);
         obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
-        DLIB_TEST(obj.receive(accum));
+        obj.receive(accum);
         obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
-        DLIB_TEST(obj.receive(accum));
+        obj.receive(accum);
 
         // this whole block is a noop since it doesn't end up doing anything.
         for (int k = 0; k < 100; ++k)
@@ -253,7 +253,7 @@ namespace
             for (int i = 0; i < 4; ++i)
             {
                 obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
-                DLIB_TEST(obj.receive(accum));
+                obj.receive(accum);
             }
         }
 
@@ -317,24 +317,24 @@ namespace
 
         int accum = 0;
         int temp = 0;
-        while(obj.receive(temp))
+        while(obj.try_receive(temp))
             accum += temp;
 
         // send to node 1 so it can sum everything
         if (obj.node_id() != 1)
             obj.send(accum, 1);
 
-        while(obj.receive(temp))
+        while(obj.try_receive(temp))
             accum += temp;
 
         // Now hop the accum values along the nodes until the value from node 1 gets to
         // node 0.
         obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
-        DLIB_TEST(obj.receive(accum));
+        obj.receive(accum);
         obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
-        DLIB_TEST(obj.receive(accum));
+        obj.receive(accum);
         obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
-        DLIB_TEST(obj.receive(accum));
+        obj.receive(accum);
 
         // this whole block is a noop since it doesn't end up doing anything.
         for (int k = 0; k < 40; ++k)
@@ -343,7 +343,7 @@ namespace
             for (int i = 0; i < 4; ++i)
             {
                 obj.send(accum, (obj.node_id()+1)%obj.number_of_nodes());
-                DLIB_TEST_MSG(obj.receive(accum), obj.node_id());
+                obj.receive(accum);
 
                 obj.receive();
             }
@@ -415,12 +415,15 @@ namespace
         void perform_test (
         )
         {
-            dotest1();
-            dotest2<0>();
-            dotest2<1>();
-            dotest2<2>();
-            dotest3();
-            dotest4();
+            for (int i = 0; i < 3; ++i)
+            {
+                dotest1();
+                dotest2<0>();
+                dotest2<1>();
+                dotest2<2>();
+                dotest3();
+                dotest4();
+            }
         }
     } a;
 

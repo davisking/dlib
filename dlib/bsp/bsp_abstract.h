@@ -102,7 +102,7 @@ namespace dlib
         !*/
 
         template <typename T>
-        bool receive (
+        bool try_receive (
             T& item
         );
         /*!
@@ -114,13 +114,15 @@ namespace dlib
                       node.
                 - else
                     - The following must have been true for this function to return false:
-                        - All other nodes were blocked on calls to receive() or terminated.
+                        - All other nodes were blocked on calls to receive(),
+                          try_receive(), or have terminated.
                         - There were not any messages in flight between any nodes.  
-                        - That is, if all the nodes had continued to block on receive()
-                          then they all would have blocked forever.  Therefore, this
-                          function only returns once there are no more messages to process
-                          by any any node and there is no possibility of more being
-                          generated until control is returned to the callers of receive(). 
+                        - That is, if all the nodes had continued to block on receive
+                          methods then they all would have blocked forever.  Therefore,
+                          this function only returns false once there are no more messages
+                          to process by any node and there is no possibility of more being
+                          generated until control is returned to the callers of receive
+                          methods. 
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
@@ -129,11 +131,36 @@ namespace dlib
                   deserialize(T) routine:
                     This is thrown if there is a problem in deserialize().  This might
                     happen if the message sent doesn't match the type T expected by
+                    try_receive().
+        !*/
+
+        template <typename T>
+        void receive (
+            T& item
+        );
+        /*!
+            requires
+                - item is serializable
+            ensures
+                - #item == the next message which was sent to the calling processing
+                  node.
+                - This function is just a wrapper around try_receive() that throws an
+                  exception if a message is not received (i.e. if try_receive() returns
+                  false).
+            throws
+                - dlib::socket_error:
+                    This exception is thrown if some error occurs which prevents us from
+                    communicating with other processing nodes or if there was not a message
+                    to receive.
+                - dlib::serialization_error or any exception thrown by the global
+                  deserialize(T) routine:
+                    This is thrown if there is a problem in deserialize().  This might
+                    happen if the message sent doesn't match the type T expected by
                     receive().
         !*/
 
         template <typename T>
-        bool receive (
+        bool try_receive (
             T& item,
             unsigned long& sending_node_id
         ); 
@@ -148,17 +175,46 @@ namespace dlib
                     - #sending_node_id < number_of_nodes()
                 - else
                     - The following must have been true for this function to return false:
-                        - All other nodes were blocked on calls to receive() or terminated.
+                        - All other nodes were blocked on calls to receive(),
+                          try_receive(), or have terminated.
                         - There were not any messages in flight between any nodes.  
-                        - That is, if all the nodes had continued to block on receive()
-                          then they all would have blocked forever.  Therefore, this
-                          function only returns once there are no more messages to process
-                          by any any node and there is no possibility of more being
-                          generated until control is returned to the callers of receive(). 
+                        - That is, if all the nodes had continued to block on receive
+                          methods then they all would have blocked forever.  Therefore,
+                          this function only returns false once there are no more messages
+                          to process by any node and there is no possibility of more being
+                          generated until control is returned to the callers of receive
+                          methods. 
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
                     communicating with other processing nodes.
+                - dlib::serialization_error or any exception thrown by the global
+                  deserialize(T) routine:
+                    This is thrown if there is a problem in deserialize().  This might
+                    happen if the message sent doesn't match the type T expected by
+                    try_receive().
+        !*/
+
+        template <typename T>
+        void receive (
+            T& item,
+            unsigned long& sending_node_id
+        ); 
+        /*!
+            requires
+                - item is serializable
+            ensures
+                - #item == the next message which was sent to the calling processing node.
+                - #sending_node_id == the node id of the node that sent this message.
+                - #sending_node_id < number_of_nodes()
+                - This function is just a wrapper around try_receive() that throws an
+                  exception if a message is not received (i.e. if try_receive() returns
+                  false).
+            throws
+                - dlib::socket_error:
+                    This exception is thrown if some error occurs which prevents us from
+                    communicating with other processing nodes or if there was not a message
+                    to receive.
                 - dlib::serialization_error or any exception thrown by the global
                   deserialize(T) routine:
                     This is thrown if there is a problem in deserialize().  This might
@@ -175,8 +231,8 @@ namespace dlib
                     - There are not any messages in flight between any nodes.  
                     - That is, if all the nodes had continued to block on receive() then
                       they all would have blocked forever.  Therefore, this function only
-                      returns once there are no more messages to process by any any node
-                      and there is no possibility of more being generated until control is
+                      returns once there are no more messages to process by any node and
+                      there is no possibility of more being generated until control is
                       returned to the callers of receive(). 
             throws
                 - dlib::socket_error:
