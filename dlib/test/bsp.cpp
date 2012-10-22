@@ -481,7 +481,7 @@ namespace
             const double width = right-left;
             matrix<double> values_to_check = linspace(left +l*width, left + r*width, 100);
 
-            double best_x;
+            double best_x = 0;
             double best_val = std::numeric_limits<double>::infinity();
             for (long j = 0; j < values_to_check.size(); ++j)
             {
