@@ -289,10 +289,6 @@ int main()
         cout << "\nexception thrown!" << endl;
         cout << e.what() << endl;
     }
-    catch (...)
-    {
-        cout << "Some error occurred" << endl;
-    }
 }
 
 // ----------------------------------------------------------------------------------------

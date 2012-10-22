@@ -296,12 +296,6 @@ int main(int argc, char** argv)
         cout << "\nTry the -h option for more information." << endl;
         return EXIT_FAILURE;
     }
-    catch (...)
-    {
-        cout << "Some error occurred" << endl;
-        cout << "\nTry the -h option for more information." << endl;
-        return EXIT_FAILURE;
-    }
 
     return EXIT_SUCCESS;
 }

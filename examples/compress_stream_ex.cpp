@@ -237,10 +237,6 @@ int main(int argc, char** argv)
         // the default message.   
         cout << e.what() << endl;
     }
-    catch (...)
-    {
-        cout << "Some error occurred" << endl;
-    }
 }
 
 

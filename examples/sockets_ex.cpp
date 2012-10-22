@@ -61,9 +61,5 @@ int main()
     {
         cout << e.what() << endl;
     }
-    catch (...)
-    {
-        cout << "Some error occurred" << endl;
-    }
 }
 
