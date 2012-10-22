@@ -88,6 +88,8 @@
                   <li>A simple <a href="network.html#http">HTTP server</a> object you can use to embed a 
                   web server into your applications</li> 
                   <li>A message passing <a href="other.html#pipe">pipe</a> for inter-thread and <a href="network.html#bridge">inter-process</a> communication</li>
+                  <li>A tool used to implement algorithms using the 
+                     <a href="network.html#bsp_context">Bulk Synchronous Parallel (BSP)</a> computing model</li>
                </ul>
             </li>
 
