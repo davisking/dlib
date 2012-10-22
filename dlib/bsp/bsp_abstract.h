@@ -4,6 +4,7 @@
 #ifdef DLIB_BsP_ABSTRACT_H__
 
 #include "../noncopyable.h"
+#include "../sockets/sockets_extensions_abstract.h"
 #include <vector>
 
 namespace dlib
