@@ -453,6 +453,10 @@ namespace dlib
             {
                 std::istringstream sin(*temp);
                 deserialize(item, sin);
+                if (sin.peek() != EOF)
+                    throw serialization_error("deserialize() did not consume all bytes produced by serialize().  "
+                                              "This probably means you are calling a receive method with a different type "
+                                              "of object than the one which was sent.");
                 return true;
             }
             else
