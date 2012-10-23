@@ -24,7 +24,7 @@ using namespace dlib;
 
 // ----------------------------------------------------------------------------------------
 
-double f ( double x)
+double f (double x)
 {
     return std::pow(x-2.0, 2.0);
 }
@@ -83,7 +83,7 @@ void bsp_job_other_nodes (
         const double width = right-left;
         const matrix<double> values_to_check = linspace(left+l*width, left+r*width, grid_resolution);
 
-        double best_x;
+        double best_x = 0;
         double best_val = std::numeric_limits<double>::infinity();
         for (long j = 0; j < values_to_check.size(); ++j)
         {
