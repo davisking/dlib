@@ -27,6 +27,17 @@ namespace dlib
         !*/
     };
 
+    connect_to_ip_and_port connect_to (
+        const network_address& addr
+    );
+    /*!
+        requires
+            - addr.port != 0
+        ensures
+            - converts the given network_address object into a connect_to_ip_and_port
+              object.
+    !*/
+
     struct listen_on_port
     {
         listen_on_port(
