@@ -148,7 +148,8 @@ void run_example_2(
     // they are listed doesn't matter.
     bridge echo_bridge(listen_on_port(12345), receive(echo), transmit(echo));
 
-    bridge b1(connect_to_ip_and_port("127.0.0.1", 12345), transmit(out), receive(in));
+    // Note that you can also specify the ip and port as a string by using connect_to().
+    bridge b1(connect_to("127.0.0.1:12345"), transmit(out), receive(in));
 
 
     int value = 1;
@@ -230,7 +231,7 @@ void run_example_3(
 
     // Note that we don't have to start the listening bridge first.  If b2
     // fails to make a connection it will just keep trying until successful.
-    bridge b2(connect_to_ip_and_port("127.0.0.1", 12345), receive(in));
+    bridge b2(connect_to("127.0.0.1:12345"), receive(in));
     // We don't have to configure a bridge in it's constructor.  If it's 
     // more convenient we can do so by calling reconfigure() instead.
     bridge b1;
@@ -300,7 +301,8 @@ void run_example_4(
 
     // setup both bridges to have receive pipes capable of holding bridge_status messages.
     bridge b1(listen_on_port(12345), transmit(out), receive(b1_status));
-    bridge b2(connect_to_ip_and_port("127.0.0.1", 12345), receive(in));
+    // Note that we can also use a hostname with connect_to() instead of supplying an IP address.
+    bridge b2(connect_to("localhost:12345"), receive(in));
 
     tsu_type msg;
     bridge_status bs;
