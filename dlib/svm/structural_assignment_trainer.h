@@ -55,6 +55,16 @@ namespace dlib
             return num_threads;
         }
 
+        bool learns_nonnegative_weights (
+        ) const { return learn_nonnegative_weights; }
+       
+        void set_learns_nonnegative_weights (
+            bool value
+        )
+        {
+            learn_nonnegative_weights = value;
+        }
+
         void set_epsilon (
             double eps_
         )
@@ -183,7 +193,13 @@ namespace dlib
 
             matrix<double,0,1> weights; 
 
-            solver(prob, weights);
+            unsigned long num_nonnegative = 0;
+            if (learn_nonnegative_weights)
+            {
+                num_nonnegative = fe.num_features();
+            }
+
+            solver(prob, weights, num_nonnegative);
 
             return assignment_function<feature_extractor>(weights,fe,force_assignment);
 
@@ -192,6 +208,7 @@ namespace dlib
 
     private:
 
+        bool learn_nonnegative_weights;
         bool force_assignment;
         double C;
         oca solver;
@@ -208,6 +225,7 @@ namespace dlib
             eps = 0.1;
             num_threads = 2;
             max_cache_size = 40;
+            learn_nonnegative_weights = false;
         }
 
         feature_extractor fe;

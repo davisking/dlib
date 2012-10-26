@@ -52,6 +52,7 @@ namespace dlib
                 - #get_max_cache_size() == 40
                 - #get_feature_extractor() == a default initialized feature_extractor
                 - #forces_assignment() == false
+                - #learns_nonnegative_weights() == false
         !*/
 
         explicit structural_assignment_trainer (
@@ -66,6 +67,7 @@ namespace dlib
                 - #get_max_cache_size() == 40
                 - #get_feature_extractor() == fe 
                 - #forces_assignment() == false
+                - #learns_nonnegative_weights() == false
         !*/
 
         const feature_extractor& get_feature_extractor (
@@ -160,6 +162,23 @@ namespace dlib
         /*!
             ensures
                 - returns a copy of the optimizer used to solve the structural SVM problem.  
+        !*/
+
+        bool learns_nonnegative_weights (
+        ) const;
+        /*!
+            ensures
+                - The output of training is a weight vector that defines the behavior of an
+                  assignment_function object.  If learns_nonnegative_weights() == true then
+                  the resulting weight vector will always have non-negative entries.  
+        !*/
+       
+        void set_learns_nonnegative_weights (
+            bool value
+        );
+        /*!
+            ensures
+                - #learns_nonnegative_weights() == value
         !*/
 
         void set_c (
