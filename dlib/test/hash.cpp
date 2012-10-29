@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <dlib/hash.h>
+#include <dlib/rand.h>
 #include <dlib/matrix.h>
 #include <dlib/byte_orderer.h>
 
@@ -107,6 +108,28 @@ namespace
         DLIB_TEST(final == 0x6384BA69);
     }
 
+    void test_murmur_hash_128_4()
+    {
+        dlib::rand rnd;
+        for (int i = 0; i < 100; ++i)
+        {
+            uint32 buf[4] = { rnd.get_random_32bit_number(), 
+                rnd.get_random_32bit_number(),
+                rnd.get_random_32bit_number(),
+                rnd.get_random_32bit_number()
+            };
+
+            std::pair<uint64,uint64> temp1, temp2;
+
+            // Make sure the 4 integer version of murmur hash does the same thing 
+            // as the memory block version.
+            temp1 = murmur_hash3_128bit(buf, sizeof(buf), 0);
+            temp2 = murmur_hash3_128bit(buf[0], buf[1], buf[2], buf[3]);
+            DLIB_TEST( temp1.first == temp2.first);
+            DLIB_TEST( temp1.second == temp2.second);
+        }
+    }
+
     class test_hash : public tester
     {
     public:
@@ -183,6 +206,7 @@ namespace
             DLIB_TEST(dlib::hash(mat2,6) == 0xb8aa7714);
             DLIB_TEST(murmur_hash3(&str1[0], str1.size(), 1) == 0xb17cea93);
 
+            test_murmur_hash_128_4();
         }
     } a;
 

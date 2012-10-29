@@ -326,6 +326,53 @@ namespace dlib
         return std::make_pair(h1,h2);
     }
 
+// ----------------------------------------------------------------------------------------
+
+    inline std::pair<uint64,uint64> murmur_hash3_128bit ( 
+        const uint32& v1, 
+        const uint32& v2, 
+        const uint32& v3, 
+        const uint32& v4 
+    )
+    {
+        uint64 h1 = 0;
+        uint64 h2 = 0;
+
+        const uint64 c1 = DLIB_BIG_CONSTANT(0x87c37b91114253d5);
+        const uint64 c2 = DLIB_BIG_CONSTANT(0x4cf5ad432745937f);
+
+        //----------
+        // body
+
+        uint64 k1 = (static_cast<uint64>(v2)<<32)|v1; 
+        uint64 k2 = (static_cast<uint64>(v4)<<32)|v3; 
+
+        k1 *= c1; k1  = DLIB_ROTL64(k1,31); k1 *= c2;
+
+        h1 = DLIB_ROTL64(k1,27); h1 = h1*5+0x52dce729;
+
+        k2 *= c2; k2  = DLIB_ROTL64(k2,33); k2 *= c1; 
+
+        h2 = DLIB_ROTL64(k2,31); h2 += h1; h2 = h2*5+0x38495ab5;
+
+        //----------
+        // finalization
+
+        h1 ^= 16; h2 ^= 16;
+
+        h1 += h2;
+        h2 += h1;
+
+        h1 = murmur_fmix(h1);
+        h2 = murmur_fmix(h2);
+
+        h1 += h2;
+        h2 += h1;
+
+        return std::make_pair(h1,h2);
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 
