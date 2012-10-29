@@ -52,7 +52,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline std::pair<uint64,uint64> murmur_hash3_128bit ( 
+    std::pair<uint64,uint64> murmur_hash3_128bit ( 
         const uint32& v1, 
         const uint32& v2, 
         const uint32& v3, 
