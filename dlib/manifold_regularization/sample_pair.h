@@ -20,13 +20,13 @@ namespace dlib
             _index1(0),
             _index2(0)
         {
-            _distance = std::numeric_limits<float>::infinity();
+            _distance = std::numeric_limits<double>::infinity();
         }
 
         sample_pair (
             const unsigned long idx1,
             const unsigned long idx2,
-            const float dist
+            const double dist
         )
         {
             _distance = dist;
@@ -48,13 +48,13 @@ namespace dlib
         const unsigned long& index2 (
         ) const { return _index2; }
 
-        const float& distance (
+        const double& distance (
         ) const { return _distance; }
 
     private:
         unsigned long _index1;
         unsigned long _index2;
-        float _distance;
+        double _distance;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ namespace dlib
         try
         {
             unsigned long idx1, idx2;
-            float dist;
+            double dist;
 
             deserialize(idx1,in);
             deserialize(idx2,in);

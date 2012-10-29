@@ -24,7 +24,7 @@ namespace dlib
                 of representing a single edge in more than one way.  That is,
                 sample_pair(i,j) == sample_pair(j,i) for any value of i and j.
 
-                This object also contains a float which can be used for any purpose.
+                This object also contains a double which can be used for any purpose.
         !*/
 
     public:
@@ -34,13 +34,13 @@ namespace dlib
             ensures
                 - #index1() == 0
                 - #index2() == 0
-                - #distance() == std::numeric_limits<float>::infinity()
+                - #distance() == std::numeric_limits<double>::infinity()
         !*/
 
         sample_pair (
             const unsigned long idx1,
             const unsigned long idx2,
-            const float dist
+            const double dist
         );
         /*!
             ensures
@@ -63,7 +63,7 @@ namespace dlib
                 - returns the second index value stored in this object 
         !*/
 
-        const float& distance (
+        const double& distance (
         ) const;
         /*!
             ensures

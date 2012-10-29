@@ -45,7 +45,7 @@ namespace dlib
             - contains_duplicate_pairs(#out) == false
             - for all valid i:
                 - #out[i].distance() == dist_funct(samples[#out[i].index1()], samples[#out[i].index2()])
-                - #out[i].distance() < std::numeric_limits<float>::infinity()
+                - #out[i].distance() < std::numeric_limits<double>::infinity()
             - random_seed is used to seed the random number generator used by this 
               function.
     !*/
@@ -88,7 +88,7 @@ namespace dlib
             - contains_duplicate_pairs(#out) == false
             - for all valid i:
                 - #out[i].distance() == dist_funct(samples[#out[i].index1()], samples[#out[i].index2()])
-                - #out[i].distance() < std::numeric_limits<float>::infinity()
+                - #out[i].distance() < std::numeric_limits<double>::infinity()
             - random_seed is used to seed the random number generator used by this 
               function.
     !*/
@@ -118,7 +118,7 @@ namespace dlib
               be not connected at all.
             - for all valid i:
                 - #out[i].distance() == dist_funct(samples[#out[i].index1()], samples[#out[i].index2()])
-                - #out[i].distance() < std::numeric_limits<float>::infinity()
+                - #out[i].distance() < std::numeric_limits<double>::infinity()
             - contains_duplicate_pairs(#out) == false
     !*/
 
@@ -169,7 +169,7 @@ namespace dlib
         >
     void remove_long_edges (
         vector_type& pairs,
-        float distance_threshold
+        double distance_threshold
     );
     /*!
         requires
@@ -188,7 +188,7 @@ namespace dlib
         >
     void remove_short_edges (
         vector_type& pairs,
-        float distance_threshold
+        double distance_threshold
     );
     /*!
         requires

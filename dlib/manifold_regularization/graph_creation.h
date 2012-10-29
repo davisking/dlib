@@ -29,7 +29,7 @@ namespace dlib
                   that has the biggest distance 
         !*/
         {
-            float dist = begin->distance();
+            double dist = begin->distance();
             iterator worst = begin;
             for (; begin != end; ++begin)
             {
@@ -92,8 +92,8 @@ namespace dlib
             const unsigned long idx2 = rnd.get_random_32bit_number()%samples.size();
             if (idx1 != idx2)
             {
-                const float dist = dist_funct(samples[idx1], samples[idx2]);
-                if (dist < std::numeric_limits<float>::infinity())
+                const double dist = dist_funct(samples[idx1], samples[idx2]);
+                if (dist < std::numeric_limits<double>::infinity())
                 {
                     edges.push_back(sample_pair(idx1, idx2, dist));
                 }
@@ -140,7 +140,7 @@ namespace dlib
             helper(
                 unsigned long idx1,
                 unsigned long idx2,
-                float dist
+                double dist
             ) : 
                 index1(idx1),
                 index2(idx2),
@@ -149,7 +149,7 @@ namespace dlib
 
             unsigned long index1;
             unsigned long index2;
-            float distance;
+            double distance;
         };
 
         inline bool order_by_index (
@@ -221,8 +221,8 @@ namespace dlib
             const unsigned long idx2 = rnd.get_random_32bit_number()%samples.size();
             if (idx1 != idx2)
             {
-                const float dist = dist_funct(samples[idx1], samples[idx2]);
-                if (dist < std::numeric_limits<float>::infinity())
+                const double dist = dist_funct(samples[idx1], samples[idx2]);
+                if (dist < std::numeric_limits<double>::infinity())
                 {
                     edges.push_back(impl2::helper(idx1, idx2, dist));
                     edges.push_back(impl2::helper(idx2, idx1, dist));
@@ -320,10 +320,10 @@ namespace dlib
 
         // Initialize all the edges to an edge with an invalid index
         edges.resize(samples.size()*k, 
-                     sample_pair(samples.size(),samples.size(),std::numeric_limits<float>::infinity()));
+                     sample_pair(samples.size(),samples.size(),std::numeric_limits<double>::infinity()));
 
         // Hold the length for the longest edge for each node.  Initially they are all infinity.
-        std::vector<float> worst_dists(samples.size(), std::numeric_limits<float>::infinity());
+        std::vector<double> worst_dists(samples.size(), std::numeric_limits<double>::infinity());
 
         std::vector<sample_pair>::iterator begin_i, end_i, begin_j, end_j, itr;
         begin_i = edges.begin();
@@ -343,7 +343,7 @@ namespace dlib
                 begin_j += k;
                 end_j += k;
 
-                const float dist = dist_funct(samples[i], samples[j]);
+                const double dist = dist_funct(samples[i], samples[j]);
 
                 if (dist < worst_dists[i])
                 {
@@ -446,7 +446,7 @@ namespace dlib
         >
     void remove_long_edges (
         vector_type& pairs,
-        float distance_threshold
+        double distance_threshold
     )
     {
         vector_type temp;
@@ -470,7 +470,7 @@ namespace dlib
         >
     void remove_short_edges (
         vector_type& pairs,
-        float distance_threshold
+        double distance_threshold
     )
     {
         vector_type temp;
