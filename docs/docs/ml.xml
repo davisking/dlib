@@ -141,6 +141,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                <item>find_k_nearest_neighbors</item>
                <item>find_approximate_k_nearest_neighbors</item>
                <item>remove_short_edges</item>
+               <item>remove_duplicate_edges</item>
                <item>remove_long_edges</item>
                <item>remove_percent_longest_edges</item>
                <item>remove_percent_shortest_edges</item>
@@ -338,6 +339,18 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             a vector of <a href="#sample_pair">sample_pairs</a>.
          </description>
 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_duplicate_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing duplicate edges (i.e. edges that compare equal 
+            according to ==) from a vector of <a href="#sample_pair">sample_pairs</a>.
+         </description>
       </component>
 
    <!-- ************************************************************************* -->
