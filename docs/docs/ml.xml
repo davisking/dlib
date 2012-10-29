@@ -137,6 +137,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
             <name>manifold_regularization_tools</name>
             <sub>
                <item>sample_pair</item>
+               <item>ordered_sample_pair</item>
                <item>find_percent_shortest_edges_randomly</item>
                <item>find_k_nearest_neighbors</item>
                <item>find_approximate_k_nearest_neighbors</item>
@@ -336,7 +337,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
          <description>
             This is a simple function for removing edges with a small distance value from
-            a vector of <a href="#sample_pair">sample_pairs</a>.
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
          </description>
 
       </component>
@@ -349,7 +350,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
          <description>
             This is a simple function for removing duplicate edges (i.e. edges that compare equal 
-            according to ==) from a vector of <a href="#sample_pair">sample_pairs</a>.
+            according to ==) from 
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
          </description>
       </component>
 
@@ -361,7 +363,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
          <description>
             This is a simple function for removing edges with a small distance value from
-            a vector of <a href="#sample_pair">sample_pairs</a>.
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
          </description>
 
       </component>
@@ -374,7 +376,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
          <description>
             This is a simple function for removing edges with a large distance value from
-            a vector of <a href="#sample_pair">sample_pairs</a>.
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
          </description>
 
       </component>
@@ -387,7 +389,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
          <description>
             This is a simple function for removing edges with a large distance value from
-            a vector of <a href="#sample_pair">sample_pairs</a>.
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
          </description>
 
       </component>
@@ -425,20 +427,33 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
 
    <!-- ************************************************************************* -->
 
-      
       <component>
          <name>sample_pair</name>
          <file>dlib/manifold_regularization.h</file>
          <spec_file link="true">dlib/manifold_regularization/sample_pair_abstract.h</spec_file>
          <description>
             This object is intended to represent an edge in an undirected graph 
-                which has data samples at its vertices.  
+                which has data samples at its vertices.  Therefore, it is the undirected version
+                of <a href="#ordered_sample_pair">ordered_sample_pair</a>.
          </description>
 
          <examples>
             <example>linear_manifold_regularizer_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>ordered_sample_pair</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/ordered_sample_pair_abstract.h</spec_file>
+         <description>
+            This object is intended to represent an edge in a directed graph 
+                which has data samples at its vertices.  Therefore, it is the directed version
+                of <a href="#sample_pair">sample_pair</a>.
+         </description>
       </component>
 
    <!-- ************************************************************************* -->

@@ -219,8 +219,10 @@
          <term file="ml.html" name="empirical_kernel_map"/>
 
          <term file="ml.html" name="sample_pair"/>
+         <term file="ml.html" name="ordered_sample_pair"/>
          <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_index"/>
          <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_distance"/>
+         <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_distance_and_index"/>
          <term file="ml.html" name="find_percent_shortest_edges_randomly"/>
          <term file="ml.html" name="find_k_nearest_neighbors"/>
          <term file="ml.html" name="remove_short_edges"/>
