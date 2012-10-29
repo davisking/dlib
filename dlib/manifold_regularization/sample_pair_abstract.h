@@ -74,25 +74,46 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline bool order_by_index (
-        const sample_pair& a,
-        const sample_pair& b
+    template <typename T>
+    bool order_by_index (
+        const T& a,
+        const T& b
     ) { return a.index1() < b.index1() || (a.index1() == b.index1() && a.index2() < b.index2()); }
     /*!
+        requires
+            - T is a type with an interface compatible with sample_pair.
         ensures
             - provides a total ordering of sample_pair objects that will cause pairs that are 
               equal to be adjacent when sorted.  This function can be used with std::sort() to
               first sort sequences of sample_pair objects and then find duplicate edges.
     !*/
 
-    inline bool order_by_distance (
-        const sample_pair& a,
-        const sample_pair& b
+    template <typename T>
+    bool order_by_distance (
+        const T& a,
+        const T& b
     ) { return a.distance() < b.distance(); }
     /*!
+        requires
+            - T is a type with an interface compatible with sample_pair.
         ensures
             - provides a total ordering of sample_pair objects that causes pairs with 
               smallest distance to be the first in a sorted list.  This function can be
+              used with std::sort()
+    !*/
+
+    template <typename T>
+    bool order_by_distance_and_index (
+        const T& a,
+        const T& b
+    ) { return a.distance() < b.distance() || (a.distance() == b.distance() && order_by_index(a,b)); }
+    /*!
+        requires
+            - T is a type with an interface compatible with sample_pair.
+        ensures
+            - provides a total ordering of sample_pair objects that causes pairs with
+              smallest distance to be the first in a sorted list but also orders samples
+              with equal distances according to order_by_index().  This function can be
               used with std::sort()
     !*/
 

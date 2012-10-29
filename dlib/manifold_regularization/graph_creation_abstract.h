@@ -132,8 +132,9 @@ namespace dlib
     );
     /*!
         requires
-            - vector_type == a type with an interface compatible with std::vector and 
-              it must in turn contain objects with an interface compatible with dlib::sample_pair
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
         ensures
             - if (pairs contains any elements that are equal according to operator==) then
                 - returns true
@@ -151,8 +152,9 @@ namespace dlib
     );
     /*!
         requires
-            - vector_type == a type with an interface compatible with std::vector and 
-              it must in turn contain objects with an interface compatible with dlib::sample_pair
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
         ensures
             - if (pairs.size() == 0) then
                 - returns 0
@@ -173,8 +175,9 @@ namespace dlib
     );
     /*!
         requires
-            - vector_type == a type with an interface compatible with std::vector and 
-              it must in turn contain objects with an interface compatible with dlib::sample_pair
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
         ensures
             - Removes all elements of pairs that have a distance value greater than the
               given threshold.
@@ -192,8 +195,9 @@ namespace dlib
     );
     /*!
         requires
-            - vector_type == a type with an interface compatible with std::vector and 
-              it must in turn contain objects with an interface compatible with dlib::sample_pair
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
         ensures
             - Removes all elements of pairs that have a distance value less than the
               given threshold.
@@ -212,8 +216,9 @@ namespace dlib
     /*!
         requires
             - 0 <= percent < 1
-            - vector_type == a type with an interface compatible with std::vector and 
-              it must in turn contain objects with an interface compatible with dlib::sample_pair
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
         ensures
             - Removes the given upper percentage of the longest edges in pairs.  I.e.
               this function removes the long edges from pairs.
@@ -232,8 +237,9 @@ namespace dlib
     /*!
         requires
             - 0 <= percent < 1
-            - vector_type == a type with an interface compatible with std::vector and 
-              it must in turn contain objects with an interface compatible with dlib::sample_pair
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
         ensures
             - Removes the given upper percentage of the shortest edges in pairs.  I.e.
               this function removes the short edges from pairs.
@@ -250,8 +256,9 @@ namespace dlib
     );
     /*!
         requires
-            - vector_type == a type with an interface compatible with std::vector and 
-              it must in turn contain objects with an interface compatible with dlib::sample_pair
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
         ensures
             - Removes any duplicate edges from pairs.  That is, for all elements of pairs,
               A and B, such that A == B, only one of A or B will be in pairs after this

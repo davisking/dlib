@@ -10,6 +10,7 @@
 #include "../rand.h"
 #include <algorithm>
 #include "sample_pair.h"
+#include "ordered_sample_pair.h"
 
 namespace dlib
 {
@@ -23,10 +24,11 @@ namespace dlib
         vector_type& pairs
     )
     {
+        typedef typename vector_type::value_type T;
         if (pairs.size() > 0)
         {
             // sort pairs so that we can avoid duplicates in the loop below
-            std::sort(pairs.begin(), pairs.end(), &order_by_index);
+            std::sort(pairs.begin(), pairs.end(), &order_by_index<T>);
 
             // now put edges into temp while avoiding duplicates
             vector_type temp;
@@ -137,54 +139,11 @@ namespace dlib
             remove_duplicate_edges(edges);
 
             // now sort all the edges by distance and take the percent with the smallest distance
-            std::sort(edges.begin(), edges.end(), &order_by_distance);
+            std::sort(edges.begin(), edges.end(), &order_by_distance<sample_pair>);
 
             const unsigned long out_size = std::min<unsigned long>((unsigned long)(num*percent), edges.size());
             out.assign(edges.begin(), edges.begin() + out_size);
         }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    namespace impl2
-    {
-        struct helper
-        {
-            /*
-                This is like the sample_pair but lets the edges be directional
-            */
-
-            helper(
-                unsigned long idx1,
-                unsigned long idx2,
-                double dist
-            ) : 
-                index1(idx1),
-                index2(idx2),
-                distance(dist) 
-            {}
-
-            unsigned long index1;
-            unsigned long index2;
-            double distance;
-        };
-
-        inline bool order_by_index (
-            const helper& a,
-            const helper& b
-        )
-        {
-            return a.index1 < b.index1 || (a.index1 == b.index1 && a.index2 < b.index2);
-        }
-
-        inline bool total_order_by_distance (
-            const helper& a,
-            const helper& b
-        )
-        {
-            return a.distance < b.distance || (a.distance == b.distance && order_by_index(a,b));
-        }
-
     }
 
 // ----------------------------------------------------------------------------------------
@@ -223,7 +182,7 @@ namespace dlib
         // we add each edge twice in the following loop.  So multiply num by 2 to account for that.
         num *= 2;
 
-        std::vector<impl2::helper> edges;
+        std::vector<ordered_sample_pair> edges;
         edges.reserve(num);
         std::vector<sample_pair, alloc> temp;
         temp.reserve(num);
@@ -241,45 +200,45 @@ namespace dlib
                 const double dist = dist_funct(samples[idx1], samples[idx2]);
                 if (dist < std::numeric_limits<double>::infinity())
                 {
-                    edges.push_back(impl2::helper(idx1, idx2, dist));
-                    edges.push_back(impl2::helper(idx2, idx1, dist));
+                    edges.push_back(ordered_sample_pair(idx1, idx2, dist));
+                    edges.push_back(ordered_sample_pair(idx2, idx1, dist));
                 }
             }
         }
 
-        std::sort(edges.begin(), edges.end(), &impl2::order_by_index);
+        std::sort(edges.begin(), edges.end(), &order_by_index<ordered_sample_pair>);
 
-        std::vector<impl2::helper>::iterator beg, itr;
+        std::vector<ordered_sample_pair>::iterator beg, itr;
         // now copy edges into temp when they aren't duplicates and also only move in the k shortest for
         // each index.
         itr = edges.begin();
         while (itr != edges.end())
         {
-            // first find the bounding range for all the edges connected to node itr->index1
+            // first find the bounding range for all the edges connected to node itr->index1()
             beg = itr; 
-            while (itr != edges.end() && itr->index1 == beg->index1)
+            while (itr != edges.end() && itr->index1() == beg->index1())
                 ++itr;
 
             // If the node has more than k edges then sort them by distance so that
             // we will end up with the k best.
             if (static_cast<unsigned long>(itr - beg) > k)
             {
-                std::sort(beg, itr, &impl2::total_order_by_distance);
+                std::sort(beg, itr, &order_by_distance_and_index<ordered_sample_pair>);
             }
 
             // take the k best unique edges from the range [beg,itr)
-            temp.push_back(sample_pair(beg->index1, beg->index2, beg->distance));
-            unsigned long prev_index2 = beg->index2;
+            temp.push_back(sample_pair(beg->index1(), beg->index2(), beg->distance()));
+            unsigned long prev_index2 = beg->index2();
             ++beg;
             unsigned long count = 1;
             for (; beg != itr && count < k; ++beg)
             {
-                if (beg->index2 != prev_index2)
+                if (beg->index2() != prev_index2)
                 {
-                    temp.push_back(sample_pair(beg->index1, beg->index2, beg->distance));
+                    temp.push_back(sample_pair(beg->index1(), beg->index2(), beg->distance()));
                     ++count;
                 }
-                prev_index2 = beg->index2;
+                prev_index2 = beg->index2();
             }
         }
 
@@ -365,7 +324,7 @@ namespace dlib
         }
 
         // sort the edges so that duplicate edges will be adjacent
-        std::sort(edges.begin(), edges.end(), &order_by_index);
+        std::sort(edges.begin(), edges.end(), &order_by_index<sample_pair>);
 
         // if the first edge is valid 
         if (edges[0].index1() < samples.size())
@@ -399,8 +358,9 @@ namespace dlib
         const vector_type& pairs
     )
     {
+        typedef typename vector_type::value_type T;
         vector_type temp(pairs);
-        std::sort(temp.begin(), temp.end(), &order_by_index);
+        std::sort(temp.begin(), temp.end(), &order_by_index<T>);
 
         for (unsigned long i = 1; i < temp.size(); ++i)
         {
@@ -417,7 +377,9 @@ namespace dlib
     template <
         typename vector_type 
         >
-    typename enable_if<is_same_type<sample_pair, typename vector_type::value_type>,unsigned long>::type
+    typename enable_if_c<(is_same_type<sample_pair, typename vector_type::value_type>::value ||
+                          is_same_type<ordered_sample_pair, typename vector_type::value_type>::value),
+                          unsigned long>::type
     max_index_plus_one (
         const vector_type& pairs
     )
@@ -506,7 +468,8 @@ namespace dlib
             << "\n\t percent:        " << percent 
             );
 
-        std::sort(pairs.begin(), pairs.end(), &order_by_distance);
+        typedef typename vector_type::value_type T;
+        std::sort(pairs.begin(), pairs.end(), &order_by_distance<T>);
 
         const unsigned long num = static_cast<unsigned long>((1.0-percent)*pairs.size());
 
@@ -534,7 +497,8 @@ namespace dlib
             << "\n\t percent:        " << percent 
             );
 
-        std::sort(pairs.rbegin(), pairs.rend(), &order_by_distance);
+        typedef typename vector_type::value_type T;
+        std::sort(pairs.rbegin(), pairs.rend(), &order_by_distance<T>);
 
         const unsigned long num = static_cast<unsigned long>((1.0-percent)*pairs.size());
 

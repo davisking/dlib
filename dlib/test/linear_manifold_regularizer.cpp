@@ -195,7 +195,7 @@ namespace
             find_k_nearest_neighbors(samples, squared_euclidean_distance(), 1, edges);
             DLIB_TEST(edges.size() == 4);
 
-            std::sort(edges.begin(), edges.end(), &order_by_index);
+            std::sort(edges.begin(), edges.end(), &order_by_index<sample_pair>);
 
             DLIB_TEST(edges[0] == sample_pair(0,1,0));
             DLIB_TEST(edges[1] == sample_pair(0,2,0));
@@ -208,7 +208,7 @@ namespace
             find_k_nearest_neighbors(samples, squared_euclidean_distance(3.9, 4.1), 3, edges);
             DLIB_TEST(edges.size() == 4);
 
-            std::sort(edges.begin(), edges.end(), &order_by_index);
+            std::sort(edges.begin(), edges.end(), &order_by_index<sample_pair>);
 
             DLIB_TEST(edges[0] == sample_pair(1,2,0));
             DLIB_TEST(edges[1] == sample_pair(1,3,0));
@@ -235,7 +235,7 @@ namespace
             find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(), 1, 10000, seed, edges);
             DLIB_TEST(edges.size() == 4);
 
-            std::sort(edges.begin(), edges.end(), &order_by_index);
+            std::sort(edges.begin(), edges.end(), &order_by_index<sample_pair>);
 
             DLIB_TEST(edges[0] == sample_pair(0,1,0));
             DLIB_TEST(edges[1] == sample_pair(0,2,0));
@@ -248,7 +248,7 @@ namespace
             find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(3.9, 4.1), 3, 10000, seed, edges);
             DLIB_TEST(edges.size() == 4);
 
-            std::sort(edges.begin(), edges.end(), &order_by_index);
+            std::sort(edges.begin(), edges.end(), &order_by_index<sample_pair>);
 
             DLIB_TEST(edges[0] == sample_pair(1,2,0));
             DLIB_TEST(edges[1] == sample_pair(1,3,0));
@@ -274,7 +274,7 @@ namespace
             find_k_nearest_neighbors(samples, squared_euclidean_distance(), 2, edges);
             DLIB_TEST(edges.size() == 4);
 
-            std::sort(edges.begin(), edges.end(), &order_by_index);
+            std::sort(edges.begin(), edges.end(), &order_by_index<sample_pair>);
 
             DLIB_TEST(edges[0] == sample_pair(0,1,0));
             DLIB_TEST(edges[1] == sample_pair(0,2,0));
@@ -302,7 +302,7 @@ namespace
             find_approximate_k_nearest_neighbors(samples, squared_euclidean_distance(), 2, 10000, seed,  edges);
             DLIB_TEST(edges.size() == 4);
 
-            std::sort(edges.begin(), edges.end(), &order_by_index);
+            std::sort(edges.begin(), edges.end(), &order_by_index<sample_pair>);
 
             DLIB_TEST(edges[0] == sample_pair(0,1,0));
             DLIB_TEST(edges[1] == sample_pair(0,2,0));
