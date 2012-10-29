@@ -242,6 +242,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename vector_type
+        >
+    void remove_duplicate_edges (
+        vector_type& pairs
+    );
+    /*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and 
+              it must in turn contain objects with an interface compatible with dlib::sample_pair
+        ensures
+            - Removes any duplicate edges from pairs.  That is, for all elements of pairs,
+              A and B, such that A == B, only one of A or B will be in pairs after this
+              function terminates.
+            - #pairs.size() <= pairs.size()
+            - #pairs will be sorted according to order_by_index().
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_GRAPH_CrEATION_ABSTRACT_H__

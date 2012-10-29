@@ -16,6 +16,36 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename vector_type
+        >
+    void remove_duplicate_edges (
+        vector_type& pairs
+    )
+    {
+        if (pairs.size() > 0)
+        {
+            // sort pairs so that we can avoid duplicates in the loop below
+            std::sort(pairs.begin(), pairs.end(), &order_by_index);
+
+            // now put edges into temp while avoiding duplicates
+            vector_type temp;
+            temp.reserve(pairs.size());
+            temp.push_back(pairs[0]);
+            for (unsigned long i = 1; i < pairs.size(); ++i)
+            {
+                if (pairs[i] != pairs[i-1])
+                {
+                    temp.push_back(pairs[i]);
+                }
+            }
+
+            temp.swap(pairs);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     namespace impl
     {
         template <typename iterator>
@@ -104,23 +134,10 @@ namespace dlib
         // now put edges into out while avoiding duplicates
         if (edges.size() > 0)
         {
-            // sort the edges so that duplicate edges will be adjacent
-            std::sort(edges.begin(), edges.end(), &order_by_index);
-
-            out.reserve(edges.size());
-            out.push_back(edges[0]);
-            for (unsigned long i = 1; i < edges.size(); ++i)
-            {
-                if (edges[i] != edges[i-1])
-                {
-                    out.push_back(edges[i]);
-                }
-            }
-
+            remove_duplicate_edges(edges);
 
             // now sort all the edges by distance and take the percent with the smallest distance
-            std::sort(out.begin(), out.end(), &order_by_distance);
-            out.swap(edges);
+            std::sort(edges.begin(), edges.end(), &order_by_distance);
 
             const unsigned long out_size = std::min<unsigned long>((unsigned long)(num*percent), edges.size());
             out.assign(edges.begin(), edges.begin() + out_size);
@@ -267,23 +284,8 @@ namespace dlib
         }
 
 
-        // now sort temp so that we can avoid duplicates in the final loop below
-        std::sort(temp.begin(), temp.end(), &order_by_index);
-
-
-        // now put edges into out while avoiding duplicates
-        if (temp.size() > 0)
-        {
-            out.reserve(temp.size());
-            out.push_back(temp[0]);
-            for (unsigned long i = 1; i < temp.size(); ++i)
-            {
-                if (temp[i] != temp[i-1])
-                {
-                    out.push_back(temp[i]);
-                }
-            }
-        }
+        remove_duplicate_edges(temp);
+        temp.swap(out);
     }
 
 // ----------------------------------------------------------------------------------------
