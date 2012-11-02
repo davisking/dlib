@@ -3281,8 +3281,8 @@ namespace dlib
         }
 
         virtual void set_size (
-            long width,
-            long height 
+            unsigned long width,
+            unsigned long height 
         )
         {
             auto_mutex lock(m);
