@@ -39,6 +39,17 @@ namespace dlib
 
         sample_pair (
             const unsigned long idx1,
+            const unsigned long idx2
+        );
+        /*!
+            ensures
+                - #index1() == min(idx1,idx2)
+                - #index2() == max(idx1,idx2)
+                - #distance() == std::numeric_limits<double>::infinity()
+        !*/
+
+        sample_pair (
+            const unsigned long idx1,
             const unsigned long idx2,
             const double dist
         );

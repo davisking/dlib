@@ -25,6 +25,16 @@ namespace dlib
 
         ordered_sample_pair (
             const unsigned long idx1,
+            const unsigned long idx2
+        )
+        {
+            _distance = std::numeric_limits<double>::infinity();
+            _index1 = idx1;
+            _index2 = idx2;
+        }
+
+        ordered_sample_pair (
+            const unsigned long idx1,
             const unsigned long idx2,
             const double dist
         )

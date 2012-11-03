@@ -25,6 +25,24 @@ namespace dlib
 
         sample_pair (
             const unsigned long idx1,
+            const unsigned long idx2
+        )
+        {
+            _distance = std::numeric_limits<double>::infinity();
+            if (idx1 < idx2)
+            {
+                _index1 = idx1;
+                _index2 = idx2;
+            }
+            else
+            {
+                _index1 = idx2;
+                _index2 = idx1;
+            }
+        }
+
+        sample_pair (
+            const unsigned long idx1,
             const unsigned long idx2,
             const double dist
         )
