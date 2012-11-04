@@ -88,6 +88,13 @@ namespace dlib
                     - returns a pseudorandom number in the range 0 to 2^32-1 
             !*/
 
+            uint64 get_random_64bit_number (
+            );
+            /*!
+                ensures
+                    - returns a pseudorandom number in the range 0 to 2^64-1 
+            !*/
+
             float get_random_float (
             );
             /*!

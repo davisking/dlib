@@ -123,6 +123,14 @@ namespace dlib
                 return mt();
             }
 
+            inline uint64 get_random_64bit_number (
+            )
+            {
+                const uint64 a = get_random_32bit_number();
+                const uint64 b = get_random_32bit_number();
+                return (a<<32)|b;
+            }
+
             double get_random_double (
             )
             {
