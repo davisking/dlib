@@ -9,8 +9,7 @@
 #include "../algs.h"
 #include <vector>
 #include <map>
-// This is included just so we can do some disable_if stuff on it in the max_index_plus_one routine().
-#include "../manifold_regularization/sample_pair.h"
+#include "../manifold_regularization/graph_creation.h"
 #include "../matrix.h"
 
 
@@ -545,7 +544,8 @@ namespace dlib
 
     template <typename T>
     typename disable_if_c<is_pair<typename T::value_type>::value ||
-                          is_same_type<typename T::value_type,sample_pair>::value,unsigned long>::type 
+                          is_same_type<typename T::value_type,sample_pair>::value ||
+                          is_same_type<typename T::value_type,ordered_sample_pair>::value , unsigned long>::type 
     max_index_plus_one (
         const T& samples
     ) 
@@ -906,6 +906,73 @@ namespace dlib
         }
 
         return T(temp.begin(), temp.end());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP, typename T, long NR, long NC, typename MM, typename L>
+    void sparse_matrix_vector_multiply (
+        const std::vector<sample_pair>& edges,
+        const matrix_exp<EXP>& v,
+        matrix<T,NR,NC,MM,L>& result
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(max_index_plus_one(edges) <= (unsigned long)v.size() &&
+                    is_col_vector(v),
+                    "\t void sparse_matrix_vector_multiply()"
+                    << "\n\t Invalid inputs were given to this function"
+                    << "\n\t max_index_plus_one(edges): " << max_index_plus_one(edges)
+                    << "\n\t v.size():                  " << v.size() 
+                    << "\n\t is_col_vector(v):          " << is_col_vector(v) 
+        );
+
+        result.set_size(v.nr(),v.nc());
+        result = 0;
+
+        for (unsigned long k = 0; k < edges.size(); ++k)
+        {
+            const long i = edges[k].index1();
+            const long j = edges[k].index2();
+            const double d = edges[k].distance();
+
+            result(i) += v(j)*d;
+            if (i != j)
+                result(j) += v(i)*d;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP, typename T, long NR, long NC, typename MM, typename L>
+    void sparse_matrix_vector_multiply (
+        const std::vector<ordered_sample_pair>& edges,
+        const matrix_exp<EXP>& v,
+        matrix<T,NR,NC,MM,L>& result
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(max_index_plus_one(edges) <= (unsigned long)v.size() &&
+                    is_col_vector(v),
+                    "\t void sparse_matrix_vector_multiply()"
+                    << "\n\t Invalid inputs were given to this function"
+                    << "\n\t max_index_plus_one(edges): " << max_index_plus_one(edges)
+                    << "\n\t v.size():                  " << v.size() 
+                    << "\n\t is_col_vector(v):          " << is_col_vector(v) 
+        );
+
+
+        result.set_size(v.nr(),v.nc());
+        result = 0;
+
+        for (unsigned long k = 0; k < edges.size(); ++k)
+        {
+            const long i = edges[k].index1();
+            const long j = edges[k].index2();
+            const double d = edges[k].distance();
+
+            result(i) += v(j)*d;
+        }
     }
 
 // ----------------------------------------------------------------------------------------

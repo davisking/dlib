@@ -9,6 +9,8 @@
 #include "../matrix.h"
 #include <map>
 #include <vector>
+#include "../manifold_regularization/sample_pair_abstract.h"
+#include "../manifold_regularization/ordered_sample_pair_abstract.h"
 
 namespace dlib
 {
@@ -498,6 +500,70 @@ namespace dlib
             - returns a copy of v which is a sparse vector. 
               (i.e. it will be properly sorted and not have any duplicate
               key values).
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP, 
+        typename T, 
+        long NR, 
+        long NC, 
+        typename MM, 
+        typename L
+        >
+    void sparse_matrix_vector_multiply (
+        const std::vector<sample_pair>& edges,
+        const matrix_exp<EXP>& v,
+        matrix<T,NR,NC,MM,L>& result
+    );
+    /*!
+        requires
+            - is_col_vector(v) == true
+            - max_index_plus_one(edges) <= v.size()
+        ensures
+            - Interprets edges as representing a symmetric sparse matrix M.  The elements
+              of M are defined such that, for all valid i,j:
+                - M(i,j) == sum of edges[k].distance() for all k where edges[k]==sample_pair(i,j) 
+                - This means that any element of M that doesn't have any edges associated
+                  with it will have a value of 0.
+            - #result == M*v
+              (i.e. this function multiplies the vector v with the sparse matrix
+              represented by edges and stores the output into result)
+            - get_rect(#result) == get_rect(v)
+              (i.e. result will have the same dimensions as v)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP, 
+        typename T, 
+        long NR, 
+        long NC, 
+        typename MM, 
+        typename L
+        >
+    void sparse_matrix_vector_multiply (
+        const std::vector<ordered_sample_pair>& edges,
+        const matrix_exp<EXP>& v,
+        matrix<T,NR,NC,MM,L>& result
+    );
+    /*!
+        requires
+            - is_col_vector(v) == true
+            - max_index_plus_one(edges) <= v.size()
+        ensures
+            - Interprets edges as representing a square sparse matrix M.  The elements of M
+              are defined such that, for all valid i,j:
+                - M(i,j) == sum of edges[k].distance() for all k where edges[k]==ordered_sample_pair(i,j) 
+                - This means that any element of M that doesn't have any edges associated
+                  with it will have a value of 0.
+            - #result == M*v
+              (i.e. this function multiplies the vector v with the sparse matrix
+              represented by edges and stores the output into result)
+            - get_rect(#result) == get_rect(v)
+              (i.e. result will have the same dimensions as v)
     !*/
 
 // ----------------------------------------------------------------------------------------
