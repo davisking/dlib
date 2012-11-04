@@ -16,6 +16,57 @@ namespace
     using namespace std;
     dlib::logger dlog("test.sparse_vector");
 
+    void test_sparse_matrix_vector_multiplies()
+    {
+        dlib::rand rnd;
+
+        const long size = 30;
+
+        for (int iter = 0; iter < 10; ++iter)
+        {
+            print_spinner();
+
+            std::vector<sample_pair> edges;
+            std::vector<ordered_sample_pair> oedges;
+            matrix<double> M(size,size);
+            M = 0;
+            for (long i = 0; i < M.size()/3; ++i)
+            {
+                const long r = rnd.get_random_32bit_number()%M.nr();
+                const long c = rnd.get_random_32bit_number()%M.nc();
+                const double d = rnd.get_random_gaussian()*10;
+                M(r,c) += d;
+                oedges.push_back(ordered_sample_pair(r,c,d));
+            }
+
+            matrix<double> SM(size,size);
+            SM = 0;
+            for (long i = 0; i < SM.size()/3; ++i)
+            {
+                const long r = rnd.get_random_32bit_number()%SM.nr();
+                const long c = rnd.get_random_32bit_number()%SM.nc();
+                const double d = rnd.get_random_gaussian()*10;
+                SM(r,c) += d;
+                if (r != c)
+                    SM(c,r) += d;
+                edges.push_back(sample_pair(r,c,d));
+            }
+
+            const matrix<double> v = randm(size,1);
+
+            matrix<double> result;
+
+            sparse_matrix_vector_multiply(oedges, v, result);
+            DLIB_TEST_MSG(length(M*v - result) < 1e-12, length(M*v - result));
+
+            sparse_matrix_vector_multiply(edges, v, result);
+            DLIB_TEST_MSG(length(SM*v - result) < 1e-12, length(SM*v - result));
+
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 
     class sparse_vector_tester : public tester
     {
@@ -141,6 +192,9 @@ namespace
                 DLIB_TEST(cc[2].second == -5);
 
             }
+
+            test_sparse_matrix_vector_multiplies();
+
         }
     };
 
