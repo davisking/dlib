@@ -36,18 +36,15 @@ namespace dlib
             rand(
             ) 
             {
-                // prime the generator a bit
-                for (int i = 0; i < 10000; ++i)
-                    mt();
+                init();
+            }
 
-                max_val =  0xFFFFFF;
-                max_val *= 0x1000000;
-                max_val += 0xFFFFFF;
-                max_val += 0.01;
-
-
-                has_gaussian = false;
-                next_gaussian = 0;
+            rand (
+                const std::string& seed_value
+            )
+            {
+                init();
+                set_seed(seed_value);
             }
 
             virtual ~rand(
@@ -234,6 +231,23 @@ namespace dlib
             );
 
         private:
+
+            void init()
+            {
+                // prime the generator a bit
+                for (int i = 0; i < 10000; ++i)
+                    mt();
+
+                max_val =  0xFFFFFF;
+                max_val *= 0x1000000;
+                max_val += 0xFFFFFF;
+                max_val += 0.01;
+
+
+                has_gaussian = false;
+                next_gaussian = 0;
+            }
+
             mt19937 mt;
 
             std::string seed;

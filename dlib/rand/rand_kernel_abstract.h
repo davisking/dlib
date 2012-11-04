@@ -34,6 +34,19 @@ namespace dlib
                     - std::bad_alloc
             !*/
 
+            rand (
+                const std::string& seed_value
+            );
+            /*!
+                ensures 
+                    - #*this is properly initialized
+                    - #get_seed() == seed_value
+                    - This version of the constructor is equivalent to using
+                      the default constructor and then calling set_seed(seed_value)
+                throws
+                    - std::bad_alloc
+            !*/
+
             virtual ~rand(
             ); 
             /*!
