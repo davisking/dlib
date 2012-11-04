@@ -269,6 +269,87 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename vector_type
+        >
+    bool is_ordered_by_index (
+        const vector_type& edges
+    );
+    /*!
+        requires
+            - vector_type == a type with an interface compatible with std::vector and it
+              must in turn contain objects with an interface compatible with
+              dlib::sample_pair or dlib::ordered_sample_pair.
+        ensures
+            - returns true if and only if the contents of edges are in sorted order
+              according to order_by_index().  That is, we return true if calling
+              std::stable_sort(edges.begin(), edges.end(), &order_by_index<T>) would not
+              change the ordering of elements of edges.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename alloc1, 
+        typename alloc2
+        >
+    void find_neighbor_ranges (
+        const std::vector<ordered_sample_pair,alloc1>& edges,
+        std::vector<std::pair<unsigned long, unsigned long>,alloc2>& neighbors
+    );
+    /*!
+        requires
+            - is_ordered_by_index(edges) == true
+              (i.e. edges is sorted so that all the edges for a particular node are grouped
+              together)
+        ensures
+            - This function takes a graph, represented by its list of edges, and finds the
+              ranges that contain the edges for each node in the graph.  In particular,
+              #neighbors[i] will tell you which edges correspond to the ith node in the
+              graph.
+            - #neighbors.size() == max_index_plus_one(edges)
+              (i.e. neighbors will have an entry for each node in the graph defined by the
+              list of edges)
+            - for all valid i:
+                - all elements of edges such that their index1() value == i are in the
+                  range [neighbors[i].first, neighbors[i].second).  That is, for all k such
+                  that neighbors[i].first <= k < neighbors[i].second:
+                    - edges[k].index1() == i.
+                    - all edges outside this range have an index1() value != i
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename alloc1, 
+        typename alloc2
+        >
+    void convert_unordered_to_ordered (
+        const std::vector<sample_pair,alloc1>& edges,
+        std::vector<ordered_sample_pair,alloc2>& out_edges
+    );
+    /*!
+        ensures
+            - interprets edges a defining an undirected graph. 
+            - This function populates out_edges with a directed graph that represents the
+              same graph as the one in edges.  In particular, this means that for all valid
+              i we have the following:
+                - if (edges[i].index1() != edges[i].index2()) then
+                    - #out_edges contains two edges corresponding to edges[i].  They
+                      represent the two directions of this edge.  The distance value from
+                      edges[i] is also copied into the output edges.
+                - else
+                    - #out_edges contains one edge corresponding to edges[i] since this is
+                      a self edge.  The distance value from edges[i] is also copied into
+                      the output edge.
+            - max_index_plus_one(edges) == max_index_plus_one(#out_edges) 
+              (i.e. both graphs have the same number of nodes)
+            - In all but the most trivial cases, we will have is_ordered_by_index(#out_edges) == false
+            - contains_duplicate_pairs(#out_edges) == contains_duplicate_pairs(edges)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_GRAPH_CrEATION_ABSTRACT_H__

@@ -511,6 +511,81 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename vector_type
+        >
+    bool is_ordered_by_index (
+        const vector_type& edges
+    )
+    {
+        for (unsigned long i = 1; i < edges.size(); ++i)
+        {
+            if (order_by_index(edges[i], edges[i-1]))
+                return false;
+        }
+        return true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename alloc1, 
+        typename alloc2
+        >
+    void find_neighbor_ranges (
+        const std::vector<ordered_sample_pair,alloc1>& edges,
+        std::vector<std::pair<unsigned long, unsigned long>,alloc2>& neighbors
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_ordered_by_index(edges),
+                    "\t void find_neighbor_ranges()"
+                    << "\n\t Invalid inputs were given to this function"
+        );
+
+
+        // setup neighbors so that [neighbors[i].first, neighbors[i].second) is the range
+        // within edges that contains all node i's edges.
+        const unsigned long num_nodes = max_index_plus_one(edges);
+        neighbors.assign(num_nodes, std::make_pair(0,0));
+        unsigned long cur_node = 0;
+        unsigned long start_idx = 0;
+        for (unsigned long i = 0; i < edges.size(); ++i)
+        {
+            if (edges[i].index1() != cur_node)
+            {
+                neighbors[cur_node] = std::make_pair(start_idx, i);
+                start_idx = i;
+                cur_node = edges[i].index1();
+            }
+        }
+        if (neighbors.size() != 0)
+            neighbors[cur_node] = make_pair(start_idx, edges.size());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename alloc1, 
+        typename alloc2
+        >
+    void convert_unordered_to_ordered (
+        const std::vector<sample_pair,alloc1>& edges,
+        std::vector<ordered_sample_pair,alloc2>& out_edges
+    )
+    {
+        out_edges.clear();
+        out_edges.reserve(edges.size()*2);
+        for (unsigned long i = 0; i < edges.size(); ++i)
+        {
+            out_edges.push_back(ordered_sample_pair(edges[i].index1(), edges[i].index2(), edges[i].distance()));
+            if (edges[i].index1() != edges[i].index2())
+                out_edges.push_back(ordered_sample_pair(edges[i].index2(), edges[i].index1(), edges[i].distance()));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_GRAPH_CrEATION_H__
