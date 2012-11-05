@@ -13,7 +13,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long chinese_whispers (
+    inline unsigned long chinese_whispers (
         const std::vector<ordered_sample_pair>& edges,
         std::vector<unsigned long>& labels,
         const unsigned long num_iterations,
@@ -89,7 +89,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long chinese_whispers (
+    inline unsigned long chinese_whispers (
         const std::vector<sample_pair>& edges,
         std::vector<unsigned long>& labels,
         const unsigned long num_iterations,
@@ -105,7 +105,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long chinese_whispers (
+    inline unsigned long chinese_whispers (
         const std::vector<sample_pair>& edges,
         std::vector<unsigned long>& labels,
         const unsigned long num_iterations = 100
@@ -117,7 +117,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long chinese_whispers (
+    inline unsigned long chinese_whispers (
         const std::vector<ordered_sample_pair>& edges,
         std::vector<unsigned long>& labels,
         const unsigned long num_iterations = 100

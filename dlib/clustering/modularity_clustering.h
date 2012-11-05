@@ -16,7 +16,7 @@ namespace dlib
 
     namespace impl
     {
-        double newman_cluster_split (
+        inline double newman_cluster_split (
             dlib::rand& rnd,
             const std::vector<ordered_sample_pair>& edges,
             const matrix<double,0,1>& node_degrees, // k from the Newman paper
@@ -153,7 +153,7 @@ namespace dlib
 
     // -------------------------------------------------------------------------------------
 
-        unsigned long newman_cluster_helper (
+        inline unsigned long newman_cluster_helper (
             dlib::rand& rnd,
             const std::vector<ordered_sample_pair>& edges,
             const matrix<double,0,1>& node_degrees, // k from the Newman paper
@@ -295,7 +295,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long newman_cluster (
+    inline unsigned long newman_cluster (
         const std::vector<ordered_sample_pair>& edges,
         std::vector<unsigned long>& labels,
         const double eps = 1e-4,
@@ -337,7 +337,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long newman_cluster (
+    inline unsigned long newman_cluster (
         const std::vector<sample_pair>& edges,
         std::vector<unsigned long>& labels,
         const double eps = 1e-4,
@@ -355,7 +355,7 @@ namespace dlib
 
     namespace impl
     {
-        std::vector<unsigned long> remap_labels (
+        inline std::vector<unsigned long> remap_labels (
             const std::vector<unsigned long>& labels,
             unsigned long& num_labels
         )
@@ -398,7 +398,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    double modularity (
+    inline double modularity (
         const std::vector<sample_pair>& edges,
         const std::vector<unsigned long>& labels
     )
@@ -458,7 +458,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    double modularity (
+    inline double modularity (
         const std::vector<ordered_sample_pair>& edges,
         const std::vector<unsigned long>& labels
     )
