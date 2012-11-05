@@ -24,6 +24,7 @@ set (tests
    bridge.cpp
    bsp.cpp
    byte_orderer.cpp
+   clustering.cpp
    cmd_line_parser.cpp
    cmd_line_parser_wchar_t.cpp
    compress_stream.cpp

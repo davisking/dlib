@@ -40,6 +40,7 @@ SRC += binary_search_tree_mm2.cpp
 SRC += bridge.cpp
 SRC += bsp.cpp
 SRC += byte_orderer.cpp
+SRC += clustering.cpp
 SRC += cmd_line_parser.cpp
 SRC += cmd_line_parser_wchar_t.cpp
 SRC += compress_stream.cpp
