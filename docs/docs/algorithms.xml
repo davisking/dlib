@@ -223,7 +223,7 @@
       <component>
          <name>murmur_hash3_128bit</name>
          <file>dlib/hash.h</file>
-         <spec_file>dlib/general_hash/murmur_hash3_abstract.h</spec_file>
+         <spec_file link="true">dlib/general_hash/murmur_hash3_abstract.h</spec_file>
          <description>
             This function takes a block of memory and returns a 128bit hash.  The 
             hashing algorithm used is Austin Appleby's excellent 
