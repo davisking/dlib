@@ -550,11 +550,6 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
              In particular, this is a method for automatically clustering the nodes in a
              graph into groups.  The method is able to automatically determine the number
              of clusters.  
-             <p>
-                It should be noted that this method is generally not going to work as
-                well as <a href="#newman_cluster">Newman clustering</a>. However, Chinese 
-                Whispers is very fast.
-            </p>
          </description>
                                  
       </component>
