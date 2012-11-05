@@ -22,7 +22,7 @@
 #include <iostream>
 #include <vector>
 
-#include "dlib/svm.h"
+#include "dlib/clustering.h"
 #include "dlib/rand.h"
 
 using namespace std;
