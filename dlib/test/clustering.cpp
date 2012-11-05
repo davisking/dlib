@@ -50,7 +50,7 @@ namespace
             }
         }
 
-        for (int i = 0; i < groups*noise_level; ++i)
+        for (int k = 0; k < groups*noise_level; ++k)
         {
             const int i = rnd.get_random_32bit_number()%labels.size();
             const int j = rnd.get_random_32bit_number()%labels.size();
