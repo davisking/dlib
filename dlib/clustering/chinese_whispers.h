@@ -26,6 +26,9 @@ namespace dlib
                     << "\n\t Invalid inputs were given to this function"
         );
 
+        labels.clear();
+        if (edges.size() == 0)
+            return 0;
 
         std::vector<std::pair<unsigned long, unsigned long> > neighbors;
         find_neighbor_ranges(edges, neighbors);

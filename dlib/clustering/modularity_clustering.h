@@ -308,6 +308,10 @@ namespace dlib
                     << "\n\t Invalid inputs were given to this function"
         );
 
+        labels.clear();
+        if (edges.size() == 0)
+            return 0;
+
         const unsigned long num_nodes = max_index_plus_one(edges);
 
         // compute the node_degrees vector, edge_sum value, and diag(B).
