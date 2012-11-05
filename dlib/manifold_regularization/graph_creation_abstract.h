@@ -264,7 +264,7 @@ namespace dlib
               A and B, such that A == B, only one of A or B will be in pairs after this
               function terminates.
             - #pairs.size() <= pairs.size()
-            - #pairs will be sorted according to order_by_index().
+            - is_ordered_by_index(#pairs) == true
     !*/
 
 // ----------------------------------------------------------------------------------------
