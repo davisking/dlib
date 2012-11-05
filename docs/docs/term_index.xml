@@ -227,6 +227,9 @@
          <term file="ml.html" name="find_k_nearest_neighbors"/>
          <term file="ml.html" name="remove_short_edges"/>
          <term file="ml.html" name="remove_duplicate_edges"/>
+         <term file="ml.html" name="is_ordered_by_index"/>
+         <term file="ml.html" name="convert_unordered_to_ordered"/>
+         <term file="ml.html" name="find_neighbor_ranges"/>
          <term file="ml.html" name="remove_long_edges"/>
          <term file="ml.html" name="remove_percent_longest_edges"/>
          <term file="ml.html" name="remove_percent_shortest_edges"/>
@@ -236,6 +239,7 @@
             <term link="dlib/manifold_regularization/graph_creation_abstract.h.html#max_index_plus_one" name="for graphs"/>
             <term link="dlib/svm/sparse_vector_abstract.h.html#max_index_plus_one" name="for sparse vectors"/>
          </term>
+         <term file="dlib/svm/sparse_vector_abstract.h.html" name="sparse_matrix_vector_multiply"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="add_to"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="subtract_from"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="assign"/>
@@ -308,6 +312,9 @@
          <term file="dlib/statistics/dpca_abstract.h.html" name="discriminant_pca_error"/>
          <term file="ml.html" name="kkmeans"/>
          <term file="ml.html" name="find_clusters_using_kmeans"/>
+         <term file="ml.html" name="newman_cluster"/>
+         <term file="ml.html" name="chinese_whispers"/>
+         <term file="ml.html" name="modularity"/>
          <term file="ml.html" name="pick_initial_centers"/>
          <term file="ml.html" name="rank_features"/>
          <term file="ml.html" name="find_gamma_with_big_centroid_gap"/>

@@ -118,13 +118,19 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>structural_graph_labeling_trainer</item> 
       </section>
       <section>
-         <name>Unsupervised</name>
+         <name>Unsupervised Clustering</name>
+         <item>kkmeans</item>
+         <item>find_clusters_using_kmeans</item> 
+         <item>newman_cluster</item> 
+         <item>chinese_whispers</item> 
+         <item>modularity</item> 
+      </section>
+      <section>
+         <name>Unsupervised Miscellaneous</name>
          <item>kcentroid</item>
          <item>linearly_independent_subset_finder</item>
          <item>empirical_kernel_map</item>
-         <item>kkmeans</item>
          <item>svm_one_class_trainer</item> 
-         <item>find_clusters_using_kmeans</item> 
          <item>vector_normalizer</item> 
          <item>vector_normalizer_pca</item> 
          <item>sammon_projection</item> 
@@ -149,6 +155,9 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                <item>squared_euclidean_distance</item>
                <item>use_weights_of_one</item>
                <item>use_gaussian_weights</item>
+               <item>is_ordered_by_index</item>
+               <item>find_neighbor_ranges</item>
+               <item>convert_unordered_to_ordered</item>
             </sub>
          </item>
       </section>
@@ -345,6 +354,46 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
    <!-- ************************************************************************* -->
 
       <component>
+         <name>is_ordered_by_index</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This function checks if a vector of <a href="#sample_pair">sample_pair</a> or
+            <a href="#ordered_sample_pair">ordered_sample_pair</a> objects is in sorted
+            order according to their index values.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>convert_unordered_to_ordered</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This function takes a graph, defined by a vector of 
+            <a href="#sample_pair">sample_pair</a> objects and converts it into the equivalent
+            graph defined by a vector of <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_neighbor_ranges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This function takes a graph, defined by a vector of 
+            <a href="#ordered_sample_pair">ordered_sample_pair</a> objects, and finds the
+            ranges that contain the edges for each node in the graph.  The output therefore
+            lets you easily locate the neighbors of any node in the graph.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>remove_duplicate_edges</name>
          <file>dlib/manifold_regularization.h</file>
          <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
@@ -457,11 +506,64 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       </component>
 
    <!-- ************************************************************************* -->
-
       
       <component>
+         <name>modularity</name>
+         <file>dlib/clustering.h</file>
+         <spec_file link="true">dlib/clustering/modularity_clustering_abstract.h</spec_file>
+         <description>
+            This function computes the modularity of a particular graph clustering.  This
+            is a number that tells you how good the clustering is.  In particular, it 
+            is the measure optimized by the <a href="#newman_cluster">newman_cluster</a> 
+            routine.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>newman_cluster</name>
+         <file>dlib/clustering.h</file>
+         <spec_file link="true">dlib/clustering/modularity_clustering_abstract.h</spec_file>
+         <description>
+             This function performs the clustering algorithm described in the paper
+             <blockquote>Modularity and community structure in networks by M. E. J. Newman.</blockquote> 
+             In particular, this is a method for automatically clustering the nodes in a
+             graph into groups.  The method is able to automatically determine the number
+             of clusters and does not have any parameters.  In general, it is a very good
+             clustering technique.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>chinese_whispers</name>
+         <file>dlib/clustering.h</file>
+         <spec_file link="true">dlib/clustering/chinese_whispers_abstract.h</spec_file>
+         <description>
+             This function performs the clustering algorithm described in the paper
+             <blockquote>Chinese Whispers - an Efficient Graph Clustering Algorithm and its
+              Application to Natural Language Processing Problems by Chris Biemann.</blockquote> 
+             In particular, this is a method for automatically clustering the nodes in a
+             graph into groups.  The method is able to automatically determine the number
+             of clusters.  
+             <p>
+                It should be noted that this method is generally not going to work as
+                well as <a href="#newman_cluster">Newman clustering</a>. However, Chinese 
+                Whispers is very fast.
+            </p>
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>find_clusters_using_kmeans</name>
-         <file>dlib/svm.h</file>
+         <file>dlib/clustering.h</file>
          <spec_file link="true">dlib/svm/kkmeans_abstract.h</spec_file>
          <description>
             This is just a simple linear kmeans clustering implementation.
@@ -473,7 +575,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
 
       <component>
          <name>pick_initial_centers</name>
-         <file>dlib/svm.h</file>
+         <file>dlib/clustering.h</file>
          <spec_file link="true">dlib/svm/kkmeans_abstract.h</spec_file>
          <description>
             This is a function that you can use to seed data clustering algorithms
@@ -641,7 +743,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
       
       <component>
          <name>kkmeans</name>
-         <file>dlib/svm.h</file>
+         <file>dlib/clustering.h</file>
          <spec_file link="true">dlib/svm/kkmeans_abstract.h</spec_file>
          <description>
                 This is an implementation of a kernelized k-means clustering algorithm.  
