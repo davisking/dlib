@@ -141,9 +141,9 @@
          <term link="algorithms.html#disjoint_subsets" name="union-find"/>
          <term file="algorithms.html" name="rectangle"/>
          <term file="algorithms.html" name="border_enumerator"/>
-         <term file="algorithms.html" name="edge"/>
-         <term file="algorithms.html" name="is_join_tree"/>
-         <term file="algorithms.html" name="create_join_tree"/>
+         <term file="graph_tools.html" name="edge"/>
+         <term file="graph_tools.html" name="is_join_tree"/>
+         <term file="graph_tools.html" name="create_join_tree"/>
          <term file="algorithms.html" name="set_intersection_size"/>
          <term file="algorithms.html" name="set_intersection"/>
          <term file="algorithms.html" name="set_union"/>
@@ -157,19 +157,19 @@
          <term file="algorithms.html" name="qsort_array"/>
          <term file="algorithms.html" name="rand"/>
          <term link="algorithms.html#rand" name="Mersenne Twister"/>
-         <term file="algorithms.html" name="graph_contains_undirected_cycle"/>
-         <term file="algorithms.html" name="graph_has_symmetric_edges"/>
-         <term file="algorithms.html" name="graph_contains_directed_cycle"/>
-         <term file="algorithms.html" name="copy_graph_structure"/>
-         <term file="algorithms.html" name="copy_graph"/>
+         <term file="graph_tools.html" name="graph_contains_undirected_cycle"/>
+         <term file="graph_tools.html" name="graph_has_symmetric_edges"/>
+         <term file="graph_tools.html" name="graph_contains_directed_cycle"/>
+         <term file="graph_tools.html" name="copy_graph_structure"/>
+         <term file="graph_tools.html" name="copy_graph"/>
 
-         <term file="algorithms.html" name="create_moral_graph"/>
-         <term file="algorithms.html" name="triangulate_graph_and_find_cliques"/>
-         <term file="algorithms.html" name="graph_contains_length_one_cycle"/>
-         <term file="algorithms.html" name="find_connected_nodes"/>
-         <term file="algorithms.html" name="graph_is_connected"/>
-         <term file="algorithms.html" name="is_clique"/>
-         <term file="algorithms.html" name="is_maximal_clique"/>
+         <term file="graph_tools.html" name="create_moral_graph"/>
+         <term file="graph_tools.html" name="triangulate_graph_and_find_cliques"/>
+         <term file="graph_tools.html" name="graph_contains_length_one_cycle"/>
+         <term file="graph_tools.html" name="find_connected_nodes"/>
+         <term file="graph_tools.html" name="graph_is_connected"/>
+         <term file="graph_tools.html" name="is_clique"/>
+         <term file="graph_tools.html" name="is_maximal_clique"/>
          <term file="algorithms.html" name="square_root"/>
          <term file="algorithms.html" name="vector"/>
          <term file="algorithms.html" name="point"/>
@@ -218,22 +218,22 @@
          <term file="ml.html" name="svm_pegasos"/>
          <term file="ml.html" name="empirical_kernel_map"/>
 
-         <term file="ml.html" name="sample_pair"/>
-         <term file="ml.html" name="ordered_sample_pair"/>
+         <term file="graph_tools.html" name="sample_pair"/>
+         <term file="graph_tools.html" name="ordered_sample_pair"/>
          <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_index"/>
          <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_distance"/>
          <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_distance_and_index"/>
-         <term file="ml.html" name="find_percent_shortest_edges_randomly"/>
-         <term file="ml.html" name="find_k_nearest_neighbors"/>
-         <term file="ml.html" name="remove_short_edges"/>
-         <term file="ml.html" name="remove_duplicate_edges"/>
-         <term file="ml.html" name="is_ordered_by_index"/>
-         <term file="ml.html" name="convert_unordered_to_ordered"/>
-         <term file="ml.html" name="find_neighbor_ranges"/>
-         <term file="ml.html" name="remove_long_edges"/>
-         <term file="ml.html" name="remove_percent_longest_edges"/>
-         <term file="ml.html" name="remove_percent_shortest_edges"/>
-         <term file="ml.html" name="find_approximate_k_nearest_neighbors"/>
+         <term file="graph_tools.html" name="find_percent_shortest_edges_randomly"/>
+         <term file="graph_tools.html" name="find_k_nearest_neighbors"/>
+         <term file="graph_tools.html" name="remove_short_edges"/>
+         <term file="graph_tools.html" name="remove_duplicate_edges"/>
+         <term file="graph_tools.html" name="is_ordered_by_index"/>
+         <term file="graph_tools.html" name="convert_unordered_to_ordered"/>
+         <term file="graph_tools.html" name="find_neighbor_ranges"/>
+         <term file="graph_tools.html" name="remove_long_edges"/>
+         <term file="graph_tools.html" name="remove_percent_longest_edges"/>
+         <term file="graph_tools.html" name="remove_percent_shortest_edges"/>
+         <term file="graph_tools.html" name="find_approximate_k_nearest_neighbors"/>
          <term file="dlib/manifold_regularization/graph_creation_abstract.h.html" name="contains_duplicate_pairs"/>
          <term name="max_index_plus_one">
             <term link="dlib/manifold_regularization/graph_creation_abstract.h.html#max_index_plus_one" name="for graphs"/>
@@ -245,9 +245,9 @@
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="assign"/>
 
          <term file="ml.html" name="linear_manifold_regularizer"/>
-         <term file="ml.html" name="squared_euclidean_distance"/>
-         <term file="ml.html" name="use_weights_of_one"/>
-         <term file="ml.html" name="use_gaussian_weights"/>
+         <term file="graph_tools.html" name="squared_euclidean_distance"/>
+         <term file="graph_tools.html" name="use_weights_of_one"/>
+         <term file="graph_tools.html" name="use_gaussian_weights"/>
 
          <term file="dlib/svm/empirical_kernel_map_abstract.h.html" name="empirical_kernel_map_error"/>
          <term file="dlib/svm/empirical_kernel_map_abstract.h.html" name="convert_to_decision_function"/>

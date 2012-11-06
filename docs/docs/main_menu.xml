@@ -11,6 +11,11 @@
             <chm_sub>algorithms.xml</chm_sub>
          </item>
          <item>
+            <name>Graph Tools</name>
+            <link>graph_tools.html</link>
+            <chm_sub>graph_tools.xml</chm_sub>
+         </item>
+         <item>
             <name>Optimization</name>
             <link>optimization.html</link>
             <chm_sub>optimization.xml</chm_sub>

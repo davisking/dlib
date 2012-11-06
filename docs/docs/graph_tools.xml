@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
+
+<doc>
+   <title>Graph Tools</title>
+
+   <!-- ************************************************************************* -->
+
+   <body>
+      <br/><br/>
+
+         <p>
+            In dlib, there are two types of graph representations.  On the one
+            hand, there are graphs based on an object which encapsulates the whole
+            graph, such as the <a href="containers.html#graph">graph</a> and 
+            <a href="containers.html#directed_graph">directed_graph</a> objects.  On the
+            other hand, there are graphs which are represented as simple vectors
+            of edges.  In this case, we use vectors of <a href="#sample_pair">sample_pair</a>
+            or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects for undirected
+            and directed graphs respectively.
+         </p>
+
+
+   </body>
+
+   <!-- ************************************************************************* -->
+
+   <menu width="150">
+    <top>
+      <section>
+         <name>Graph Object Based Graphs</name>
+         <item>graph_contains_directed_cycle</item> 
+         <item>graph_has_symmetric_edges</item> 
+         <item>graph_contains_undirected_cycle</item> 
+         <item>create_moral_graph</item> 
+         <item>triangulate_graph_and_find_cliques</item> 
+         <item>graph_contains_length_one_cycle</item> 
+         <item>find_connected_nodes</item> 
+         <item>graph_is_connected</item> 
+         <item>is_clique</item> 
+         <item>is_maximal_clique</item> 
+         <item>copy_graph_structure</item> 
+         <item>copy_graph</item> 
+         <item>edge</item> 
+         <item>is_join_tree</item> 
+         <item>create_join_tree</item> 
+      </section>
+
+      <section>
+         <name>Edge List Based Graphs</name>
+         <item>sample_pair</item>
+         <item>ordered_sample_pair</item>
+         <item>find_percent_shortest_edges_randomly</item>
+         <item>find_k_nearest_neighbors</item>
+         <item>find_approximate_k_nearest_neighbors</item>
+         <item>remove_short_edges</item>
+         <item>remove_duplicate_edges</item>
+         <item>remove_long_edges</item>
+         <item>remove_percent_longest_edges</item>
+         <item>remove_percent_shortest_edges</item>
+         <item>squared_euclidean_distance</item>
+         <item>use_weights_of_one</item>
+         <item>use_gaussian_weights</item>
+         <item>is_ordered_by_index</item>
+         <item>find_neighbor_ranges</item>
+         <item>convert_unordered_to_ordered</item>
+      </section>
+    </top>  
+   </menu>
+
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+   <!-- ************************************************************************* -->
+
+   <components>
+   
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>sample_pair</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/sample_pair_abstract.h</spec_file>
+         <description>
+            This object is intended to represent an edge in an undirected graph 
+                which has data samples at its vertices.  Therefore, it is the undirected version
+                of <a href="#ordered_sample_pair">ordered_sample_pair</a>.
+         </description>
+
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>ordered_sample_pair</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/ordered_sample_pair_abstract.h</spec_file>
+         <description>
+            This object is intended to represent an edge in a directed graph 
+                which has data samples at its vertices.  Therefore, it is the directed version
+                of <a href="#sample_pair">sample_pair</a>.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_percent_shortest_edges_randomly</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
+            Instead of checking all possible edges it randomly samples a large number of them and
+            then returns the best ones.  
+         </description>
+
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_k_nearest_neighbors</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a function which finds all the k nearest neighbors of a set of points and outputs
+            the result as a vector of <a href="#sample_pair">sample_pair</a> objects.  It takes O(n^2) where
+            n is the number of data samples.  A faster approximate version is provided by 
+            <a href="#find_approximate_k_nearest_neighbors">find_approximate_k_nearest_neighbors</a>.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_approximate_k_nearest_neighbors</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
+            Instead of checking all possible edges it randomly samples a large number of them and then performs 
+            exact k-nearest-neighbors on that randomly selected subset.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_short_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing edges with a small distance value from
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_duplicate_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing duplicate edges (i.e. edges that compare equal 
+            according to ==) from 
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_long_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing edges with a large distance value from
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_percent_longest_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing edges with a large distance value from
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>remove_percent_shortest_edges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This is a simple function for removing edges with a small distance value from
+            a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>squared_euclidean_distance</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/function_objects_abstract.h</spec_file>
+         <description>
+                This is a simple function object that computes squared euclidean distance
+                between two <a href="containers.html#matrix">matrix</a> objects.
+         </description>
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>use_weights_of_one</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/function_objects_abstract.h</spec_file>
+         <description>
+                This is a simple function object that takes a single argument
+                and always returns 1 
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>use_gaussian_weights</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/function_objects_abstract.h</spec_file>
+         <description>
+                This is a simple function object that takes a single argument
+                which should be an object similar to <a href="#sample_pair">sample_pair</a>.  
+         </description>
+         <examples>
+            <example>linear_manifold_regularizer_ex.cpp.html</example>
+         </examples>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_ordered_by_index</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This function checks if a vector of <a href="#sample_pair">sample_pair</a> or
+            <a href="#ordered_sample_pair">ordered_sample_pair</a> objects is in sorted
+            order according to their index values.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_neighbor_ranges</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This function takes a graph, defined by a vector of 
+            <a href="#ordered_sample_pair">ordered_sample_pair</a> objects, and finds the
+            ranges that contain the edges for each node in the graph.  The output therefore
+            lets you easily locate the neighbors of any node in the graph.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>convert_unordered_to_ordered</name>
+         <file>dlib/manifold_regularization.h</file>
+         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <description>
+            This function takes a graph, defined by a vector of 
+            <a href="#sample_pair">sample_pair</a> objects and converts it into the equivalent
+            graph defined by a vector of <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>edge</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> object and a 
+            pair of indices.  It returns a reference to the edge object between the two nodes
+            with the given indices. 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_join_tree</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes two <a href="containers.html#graph">graph</a> objects and
+            checks if the second of the two graphs is a valid join tree (aka tree decomposition)
+            of the first graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>create_join_tree</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> object and
+            creates a join tree for that graph.  Or in other words, this function finds a 
+            tree decomposition of the given graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_contains_directed_cycle</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function checks a <a href="containers.html#directed_graph">directed_graph</a> for directed cycles.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_has_symmetric_edges</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function checks if a <a href="containers.html#directed_graph">directed_graph</a> 
+            has a pair of nodes with just one edge between them.  If so then it
+            does not have symmetric edges.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>triangulate_graph_and_find_cliques</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> and
+            turns it into a chordal graph.  It also returns a 
+            <a href="containers.html#set">set</a> that contains
+            all the cliques present in the chordal graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>create_moral_graph</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#directed_graph">directed_graph</a>
+            and returns the moralized version of the graph in the form of a 
+            <a href="containers.html#graph">graph</a> object.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_contains_length_one_cycle</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a>
+            or <a href="containers.html#directed_graph">directed_graph</a> object and
+            returns true if and only if the graph contains a node that has an edge that
+            links back to itself.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_connected_nodes</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a node from a <a href="containers.html#graph">graph</a>
+            or <a href="containers.html#directed_graph">directed_graph</a> object and a 
+            <a href="containers.html#set">set</a> of unsigned longs.  It finds all the
+            nodes in the given graph that are connected to the given node by an 
+            undirected path and returns them in the set (also note that the
+            original query node is also returned in this set).
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_is_connected</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> or
+            <a href="containers.html#directed_graph">directed_graph</a> object and
+            determines if the graph is connected.  That is, it returns true if and only if
+            there is an undirected path between any two nodes in the given graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_clique</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> and a 
+            <a href="containers.html#set">set</a> of node index values and checks 
+            if the specified set of nodes is a clique in the graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>copy_graph</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> and
+            makes a copy of it.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>copy_graph_structure</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> or 
+            <a href="containers.html#directed_graph">directed_graph</a> and copies  
+            its structure to another graph or directed_graph object.  The only 
+            restriction is that you can't copy the structure of a graph into a
+            directed_graph.  The three other possible combinations are allowed
+            however.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_maximal_clique</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function takes a <a href="containers.html#graph">graph</a> and a 
+            <a href="containers.html#set">set</a> of node index values and checks 
+            if the specified set of nodes is a maximal clique in the graph.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>graph_contains_undirected_cycle</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/graph_utils_abstract.h</spec_file>
+         <description>        
+            This function checks a <a href="containers.html#directed_graph">directed_graph</a> for undirected cycles.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      
+   <!-- ************************************************************************* -->
+      
+   </components>
+
+   <!-- ************************************************************************* -->
+
+
+</doc>
+
+
+
