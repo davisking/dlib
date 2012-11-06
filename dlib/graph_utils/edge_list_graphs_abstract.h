@@ -1,11 +1,12 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_GRAPH_CrEATION_ABSTRACT_H__
-#ifdef DLIB_GRAPH_CrEATION_ABSTRACT_H__
+#undef DLIB_EDGE_LIST_GrAPHS_ABSTRACT_H__
+#ifdef DLIB_EDGE_LIST_GrAPHS_ABSTRACT_H__
 
 #include <vector>
 #include "../string.h"
 #include "sample_pair_abstract.h"
+#include "ordered_sample_pair_abstract.h"
 
 namespace dlib
 {
@@ -352,5 +353,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_GRAPH_CrEATION_ABSTRACT_H__
+#endif // DLIB_EDGE_LIST_GrAPHS_ABSTRACT_H__
 

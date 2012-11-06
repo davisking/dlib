@@ -9,7 +9,7 @@
 #include "../algs.h"
 #include <vector>
 #include <map>
-#include "../manifold_regularization/graph_creation.h"
+#include "../graph_utils/edge_list_graphs.h"
 #include "../matrix.h"
 
 

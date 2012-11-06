@@ -4,6 +4,7 @@
 #define DLIB_GRAPH_UTILs_H_ 
 
 #include "graph_utils/graph_utils.h"
+#include "graph_utils/edge_list_graphs.h"
 
 #endif // DLIB_GRAPH_UTILs_H_ 
 

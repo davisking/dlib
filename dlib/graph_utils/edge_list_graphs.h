@@ -1,9 +1,9 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_GRAPH_CrEATION_H__
-#define DLIB_GRAPH_CrEATION_H__
+#ifndef DLIB_EDGE_LIST_GrAPHS_H__
+#define DLIB_EDGE_LIST_GrAPHS_H__
 
-#include "graph_creation_abstract.h"
+#include "edge_list_graphs_abstract.h"
 #include <limits>
 #include <vector>
 #include "../string.h"
@@ -588,6 +588,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_GRAPH_CrEATION_H__
+#endif // DLIB_EDGE_LIST_GrAPHS_H__
 
 

@@ -6,7 +6,7 @@
 #include "chinese_whispers_abstract.h"
 #include <vector>
 #include "../rand.h"
-#include "../manifold_regularization/graph_creation.h"
+#include "../graph_utils/edge_list_graphs.h"
 
 namespace dlib
 {

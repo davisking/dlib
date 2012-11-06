@@ -5,7 +5,7 @@
 
 #include "modularity_clustering_abstract.h"
 #include "../sparse_vector.h"
-#include "../manifold_regularization/graph_creation.h"
+#include "../graph_utils/edge_list_graphs.h"
 #include "../matrix.h"
 #include "../rand.h"
 

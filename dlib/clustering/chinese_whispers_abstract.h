@@ -5,8 +5,8 @@
 
 #include <vector>
 #include "../rand.h"
-#include "../manifold_regularization/ordered_sample_pair_abstract.h"
-#include "../manifold_regularization/sample_pair_abstract.h"
+#include "../graph_utils/ordered_sample_pair_abstract.h"
+#include "../graph_utils/sample_pair_abstract.h"
 
 namespace dlib
 {
