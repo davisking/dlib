@@ -118,7 +118,8 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>structural_graph_labeling_trainer</item> 
       </section>
       <section>
-         <name>Unsupervised Clustering</name>
+         <name>Unsupervised - Clustering</name>
+         <item>pick_initial_centers</item> 
          <item>kkmeans</item>
          <item>find_clusters_using_kmeans</item> 
          <item>newman_cluster</item> 
@@ -126,7 +127,7 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>modularity</item> 
       </section>
       <section>
-         <name>Unsupervised Miscellaneous</name>
+         <name>Unsupervised - Miscellaneous</name>
          <item>kcentroid</item>
          <item>linearly_independent_subset_finder</item>
          <item>empirical_kernel_map</item>
@@ -258,7 +259,6 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
          <item>approximate_distance_function</item> 
          <item>is_learning_problem</item> 
          <item>select_all_distinct_labels</item> 
-         <item>pick_initial_centers</item> 
          <item>find_gamma_with_big_centroid_gap</item> 
          <item>compute_mean_squared_distance</item> 
          <item>kernel_matrix</item> 
