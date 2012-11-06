@@ -220,9 +220,9 @@
 
          <term file="graph_tools.html" name="sample_pair"/>
          <term file="graph_tools.html" name="ordered_sample_pair"/>
-         <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_index"/>
-         <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_distance"/>
-         <term file="dlib/manifold_regularization/sample_pair_abstract.h.html" name="order_by_distance_and_index"/>
+         <term file="dlib/graph_utils/sample_pair_abstract.h.html" name="order_by_index"/>
+         <term file="dlib/graph_utils/sample_pair_abstract.h.html" name="order_by_distance"/>
+         <term file="dlib/graph_utils/sample_pair_abstract.h.html" name="order_by_distance_and_index"/>
          <term file="graph_tools.html" name="find_percent_shortest_edges_randomly"/>
          <term file="graph_tools.html" name="find_k_nearest_neighbors"/>
          <term file="graph_tools.html" name="remove_short_edges"/>
@@ -234,9 +234,9 @@
          <term file="graph_tools.html" name="remove_percent_longest_edges"/>
          <term file="graph_tools.html" name="remove_percent_shortest_edges"/>
          <term file="graph_tools.html" name="find_approximate_k_nearest_neighbors"/>
-         <term file="dlib/manifold_regularization/graph_creation_abstract.h.html" name="contains_duplicate_pairs"/>
+         <term file="dlib/graph_utils/edge_list_graphs_abstract.h.html" name="contains_duplicate_pairs"/>
          <term name="max_index_plus_one">
-            <term link="dlib/manifold_regularization/graph_creation_abstract.h.html#max_index_plus_one" name="for graphs"/>
+            <term link="dlib/graph_utils/edge_list_graphs_abstract.h.html#max_index_plus_one" name="for graphs"/>
             <term link="dlib/svm/sparse_vector_abstract.h.html#max_index_plus_one" name="for sparse vectors"/>
          </term>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="sparse_matrix_vector_multiply"/>

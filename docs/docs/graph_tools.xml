@@ -78,8 +78,8 @@
       
       <component>
          <name>sample_pair</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/sample_pair_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/sample_pair_abstract.h</spec_file>
          <description>
             This object is intended to represent an edge in an undirected graph 
                 which has data samples at its vertices.  Therefore, it is the undirected version
@@ -96,8 +96,8 @@
 
       <component>
          <name>ordered_sample_pair</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/ordered_sample_pair_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/ordered_sample_pair_abstract.h</spec_file>
          <description>
             This object is intended to represent an edge in a directed graph 
                 which has data samples at its vertices.  Therefore, it is the directed version
@@ -109,8 +109,8 @@
       
       <component>
          <name>find_percent_shortest_edges_randomly</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
             Instead of checking all possible edges it randomly samples a large number of them and
@@ -127,8 +127,8 @@
 
       <component>
          <name>find_k_nearest_neighbors</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This is a function which finds all the k nearest neighbors of a set of points and outputs
             the result as a vector of <a href="#sample_pair">sample_pair</a> objects.  It takes O(n^2) where
@@ -142,8 +142,8 @@
 
       <component>
          <name>find_approximate_k_nearest_neighbors</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This function is a simple approximate form of <a href="#find_k_nearest_neighbors">find_k_nearest_neighbors</a>.
             Instead of checking all possible edges it randomly samples a large number of them and then performs 
@@ -155,8 +155,8 @@
 
       <component>
          <name>remove_short_edges</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This is a simple function for removing edges with a small distance value from
             a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
@@ -168,8 +168,8 @@
 
       <component>
          <name>remove_duplicate_edges</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This is a simple function for removing duplicate edges (i.e. edges that compare equal 
             according to ==) from 
@@ -181,8 +181,8 @@
 
       <component>
          <name>remove_long_edges</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This is a simple function for removing edges with a large distance value from
             a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
@@ -194,8 +194,8 @@
 
       <component>
          <name>remove_percent_longest_edges</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This is a simple function for removing edges with a large distance value from
             a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
@@ -207,8 +207,8 @@
 
       <component>
          <name>remove_percent_shortest_edges</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This is a simple function for removing edges with a small distance value from
             a vector of <a href="#sample_pair">sample_pair</a> or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.
@@ -220,8 +220,8 @@
 
       <component>
          <name>squared_euclidean_distance</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/function_objects_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/function_objects_abstract.h</spec_file>
          <description>
                 This is a simple function object that computes squared euclidean distance
                 between two <a href="containers.html#matrix">matrix</a> objects.
@@ -236,8 +236,8 @@
       
       <component>
          <name>use_weights_of_one</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/function_objects_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/function_objects_abstract.h</spec_file>
          <description>
                 This is a simple function object that takes a single argument
                 and always returns 1 
@@ -249,8 +249,8 @@
       
       <component>
          <name>use_gaussian_weights</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/function_objects_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/function_objects_abstract.h</spec_file>
          <description>
                 This is a simple function object that takes a single argument
                 which should be an object similar to <a href="#sample_pair">sample_pair</a>.  
@@ -265,8 +265,8 @@
       
       <component>
          <name>is_ordered_by_index</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This function checks if a vector of <a href="#sample_pair">sample_pair</a> or
             <a href="#ordered_sample_pair">ordered_sample_pair</a> objects is in sorted
@@ -278,8 +278,8 @@
 
       <component>
          <name>find_neighbor_ranges</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This function takes a graph, defined by a vector of 
             <a href="#ordered_sample_pair">ordered_sample_pair</a> objects, and finds the
@@ -292,8 +292,8 @@
 
       <component>
          <name>convert_unordered_to_ordered</name>
-         <file>dlib/manifold_regularization.h</file>
-         <spec_file link="true">dlib/manifold_regularization/graph_creation_abstract.h</spec_file>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
          <description>
             This function takes a graph, defined by a vector of 
             <a href="#sample_pair">sample_pair</a> objects and converts it into the equivalent
