@@ -5,7 +5,7 @@
 
 #include "graph_utils/edge_list_graphs.h"
 #include "manifold_regularization/linear_manifold_regularizer.h"
-#include "manifold_regularization/function_objects.h"
+#include "graph_utils/function_objects.h"
 
 #endif // DLIB_MANIFOLD_REGULARIzATION_HEADER
 
