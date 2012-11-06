@@ -337,7 +337,7 @@ namespace dlib
         unsigned long get_max_parameter_id (
         ) const
         {
-            return  SQLITE_LIMIT_VARIABLE_NUMBER;
+            return sqlite3_limit(db.get(), SQLITE_LIMIT_VARIABLE_NUMBER, -1);
         }
 
         unsigned long get_parameter_id (
