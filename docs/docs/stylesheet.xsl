@@ -1060,7 +1060,7 @@ function BigToggle(node)
       <xsl:for-each select="logentry">
       <xsl:sort order="descending" data-type="number" select="./@revision"/>
       <u>Revision</u>: <xsl:value-of select="substring(@node,1,16)"/> <br/>
-      <u>Author</u>: <xsl:value-of select="author"/> &lt;<xsl:value-of select="author/@email"/>&gt; <br/>
+      <u>Author</u>: <a href="mailto:{author/@email}"><xsl:value-of select="author"/></a> <br/>
       <u>Date</u>: <xsl:call-template name="format-date"><xsl:with-param name="xsd-date" select="date"/></xsl:call-template> <br/>
             <xsl:apply-templates select="msg"/>
             <xsl:apply-templates select="paths"/>
