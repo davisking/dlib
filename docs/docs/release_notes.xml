@@ -16,6 +16,8 @@ New Features:
 Non-Backwards Compatible Changes:
 
 Bug fixes:
+  - Added a patch, contributed by Martin Müllenhaupt, to fix a minor bug in the
+    SQLite bindings.
 
 Other:
   - Added a new documentation page for the various graph tools in dlib.
