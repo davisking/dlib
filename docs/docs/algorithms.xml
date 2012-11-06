@@ -33,33 +33,6 @@
                <item>gate</item> 
             </sub>
          </item>
-         <item nolink="true">
-            <name>Geometry</name>
-            <sub>
-               <item>border_enumerator</item> 
-               <item>rectangle</item> 
-               <item>vector</item> 
-               <item>point</item> 
-               <item>rotate_point</item> 
-               <item>point_rotator</item> 
-               <item>point_transform</item> 
-               <item>point_transform_affine</item> 
-               <item>rotation_matrix</item> 
-               <item>get_rect</item> 
-               <item>centered_rect</item> 
-               <item>center</item> 
-               <item>dcenter</item> 
-               <item>shrink_rect</item> 
-               <item>grow_rect</item> 
-               <item>translate_rect</item> 
-               <item>resize_rect</item> 
-               <item>resize_rect_width</item> 
-               <item>resize_rect_height</item> 
-               <item>move_rect</item> 
-               <item>nearest_point</item> 
-               <item>distance_to_rect_edge</item> 
-            </sub>
-         </item>
          <item>hsort_array</item> 
          <item>isort_array</item> 
          <item>put_in_range</item> 
@@ -75,6 +48,8 @@
             </sub>
          </item>
       </section>
+
+
 
       <section>
          <name>Statistics</name>
@@ -110,6 +85,33 @@
          <item>kalman_filter</item> 
          <item>rls_filter</item> 
       </section>
+
+      <section>
+         <name>Geometry</name>
+         <item>border_enumerator</item> 
+         <item>rectangle</item> 
+         <item>vector</item> 
+         <item>point</item> 
+         <item>rotate_point</item> 
+         <item>point_rotator</item> 
+         <item>point_transform</item> 
+         <item>point_transform_affine</item> 
+         <item>rotation_matrix</item> 
+         <item>get_rect</item> 
+         <item>centered_rect</item> 
+         <item>center</item> 
+         <item>dcenter</item> 
+         <item>shrink_rect</item> 
+         <item>grow_rect</item> 
+         <item>translate_rect</item> 
+         <item>resize_rect</item> 
+         <item>resize_rect_width</item> 
+         <item>resize_rect_height</item> 
+         <item>move_rect</item> 
+         <item>nearest_point</item> 
+         <item>distance_to_rect_edge</item> 
+      </section>
+
     </top>  
    </menu>
 
