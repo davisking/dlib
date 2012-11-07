@@ -511,12 +511,17 @@ namespace dlib
         }
 
         unsigned long get_max_content_length (
-        ) const { return max_content_length; }
+        ) const 
+        { 
+            auto_mutex lock(http_class_mutex);
+            return max_content_length; 
+        }
 
         void set_max_content_length (
             unsigned long max_length
         )
         {
+            auto_mutex lock(http_class_mutex);
             max_content_length = max_length;
         }
 
@@ -560,6 +565,7 @@ namespace dlib
             }
         }
 
+        mutex http_class_mutex;
         unsigned long max_content_length;
         const static logger dlog;
     };
