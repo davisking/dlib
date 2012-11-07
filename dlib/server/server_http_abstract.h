@@ -193,7 +193,8 @@ namespace dlib
                 - outgoing.http_return and outgoing.http_return_status may be set to override the 
                   default HTTP return code of 200 OK
             throws
-                - does not throw any exceptions
+                - throws only exceptions derived from std::exception.  If an exception is thrown
+                  then the error string from the exception is returned to the web browser.
         !*/
 
     };
