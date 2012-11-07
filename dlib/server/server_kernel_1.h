@@ -46,7 +46,7 @@ namespace dlib
                 thread_count_mutex      == a mutex
                 thread_count_signaler   == a signaler associated with thread_count_mutex
                 thread_count_zero       == a signaler associated with thread_count_mutex
-                max_connections         == 0
+                max_connections         == 1000 
                 max_connections_mutex   == a mutex for max_connections
              
             CONVENTION
@@ -217,7 +217,7 @@ namespace dlib
         running_signaler(running_mutex),
         thread_count(0),
         thread_count_signaler(thread_count_mutex),
-        max_connections(0),
+        max_connections(1000),
         thread_count_zero(thread_count_mutex)
     {
     }
@@ -285,7 +285,7 @@ namespace dlib
         listening_ip_mutex.lock();
         listening_ip = "";        
         listening_port = 0;
-        max_connections = 0;
+        max_connections = 1000;
         listening_port_mutex.unlock();
         listening_ip_mutex.unlock();
         max_connections_mutex.unlock();
@@ -393,7 +393,7 @@ namespace dlib
                 listening_ip_mutex.lock();
                 listening_ip = "";        
                 listening_port = 0;
-                max_connections = 0;
+                max_connections = 1000;
                 listening_port_mutex.unlock();
                 listening_ip_mutex.unlock();
                 max_connections_mutex.unlock();

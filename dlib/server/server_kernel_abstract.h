@@ -21,7 +21,7 @@ namespace dlib
                 get_listening_ip()      == ""
                 get_listening_port()    == 0
                 is_running()            == false
-                get_max_connections()   == 0
+                get_max_connections()   == 1000
 
 
             CALLBACK FUNCTIONS
@@ -53,9 +53,10 @@ namespace dlib
                 Also note that when clear() is called all open connection objects 
                 will be shutdown().
 
-                A note about get_max_connections().  When the maximum number of 
-                connections has been reached accept() will simply not be called 
-                until the number of open connections drops below get_max_connections()
+                A note about get_max_connections(): when the maximum number of connections
+                has been reached accept() will simply not be called until the number of
+                open connections drops below get_max_connections().  This means connections
+                will just wait to be serviced, rather than being outright refused.
 
             THREAD SAFETY
                 All member functions are thread-safe.
@@ -179,7 +180,7 @@ namespace dlib
             /*!
                 ensures
                     - returns the maximum number of connections the server will accept 
-                      at a time 
+                      at a time.
                     - returns 0 if the server will accept any number of connections
                 throws
                     - std::bad_alloc
