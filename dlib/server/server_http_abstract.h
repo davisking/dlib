@@ -49,6 +49,31 @@ namespace dlib
 
     public:
 
+        server_http (
+        );
+        /*!
+            ensures
+                - #get_max_content_length() == 10*1024*1024
+        !*/
+
+        unsigned long get_max_content_length (
+        ) const;
+        /*!
+            ensures
+                - returns the max allowable content length, in bytes, of the post back to
+                  the web server.  If a client attempts to send more data than this then an
+                  error number 413 is returned back to the client and the request is not
+                  processed by the web server.
+        !*/
+
+        void set_max_content_length (
+            unsigned long max_length
+        );
+        /*!
+            ensures
+                - #get_max_content_length() == max_length
+        !*/
+
         template <typename Key, typename Value>
         class constmap : public std::map<Key, Value>
         {
@@ -95,6 +120,7 @@ namespace dlib
             std::string path;
             std::string request_type;
             std::string content_type;
+            std::string protocol;
             std::string body;
 
             key_value_map queries;
@@ -131,9 +157,11 @@ namespace dlib
                     - incoming.path == the path being requested by this request
                     - incoming.request_type == the type of request, GET or POST
                     - incoming.content_type == the content type associated with this request
+                    - incoming.protocol == The protocol being used by the web browser (e.g. HTTP/1.1) 
                     - incoming.body == a string that contains the data that was posted back to the
                       web server by the client (e.g. The string has the length specified by the
                       Content-Length header).
+                    - incoming.body.size() < get_max_content_length()
                     - incoming.queries == a map that contains all the key/value pairs in the query 
                       string of this request.  The key and value strings of the query string will
                       have been decoded back into their original form before being sent to this
