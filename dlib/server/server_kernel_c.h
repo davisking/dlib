@@ -6,6 +6,7 @@
 #include "server_kernel_abstract.h"
 #include "../algs.h"
 #include "../assert.h"
+#include "../sockets.h"
 #include <string>
 #include <sstream>
 
@@ -38,15 +39,6 @@ namespace dlib
             );
 
     private:
-        bool is_dotted_quad (
-            std::string ip
-        ) const;
-        /*!
-            ensures
-                returns true if ip is a valid dotted quad ip address else
-                returns false
-        !*/
-        
 
     };
 
@@ -133,7 +125,7 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( 
-            ( ( is_dotted_quad(ip) || ip == "" ) &&
+            ( ( is_ip_address(ip) || ip == "" ) &&
               this->is_running() == false ),
             "\tvoid server::set_listening_ip"
             << "\n\tip           == " << ip
@@ -143,46 +135,6 @@ namespace dlib
 
         // call the real function
         server_base::set_listening_ip(ip);
-    }
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-    // private member function definitions
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename server_base
-        >
-    bool server_kernel_c<server_base>::
-    is_dotted_quad (
-        std::string ip
-    ) const
-    {
-
-        int num;
-        char dot;
-        std::istringstream sin(ip);
-
-        for (int i = 0; i < 3; ++i)
-        {
-            sin >> num; if (!sin) return false;
-            if (num < 0 || num > 255)
-                return false;
-
-            sin >> dot; if (!sin) return false;
-            if (dot != '.')
-                return false;
-        }
-
-        sin >> num; if (!sin) return false;
-        if (num < 0 || num > 255)
-            return false;
-
-        if (sin.get() != EOF)
-            return false;
-
-        return true;        
     }
 
 // ----------------------------------------------------------------------------------------

@@ -225,7 +225,7 @@ namespace dlib
             );
             /*!
                 requires
-                    - ip is of the form #.#.#.# (dotted quad notation) or ip == "" 
+                    - is_ip_address(ip) == true or ip == ""
                     - is_running() == false
                 ensures
                     - #get_listening_ip() == ip                     
