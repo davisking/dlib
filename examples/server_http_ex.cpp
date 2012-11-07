@@ -41,6 +41,7 @@ class web_server : public server::http_1a_c
             sout << "<br>  path = "         << incoming.path << endl;
             sout << "<br>  request_type = " << incoming.request_type << endl;
             sout << "<br>  content_type = " << incoming.content_type << endl;
+            sout << "<br>  protocol = "     << incoming.protocol << endl;
             sout << "<br>  foreign_ip = "   << incoming.foreign_ip << endl;
             sout << "<br>  foreign_port = " << incoming.foreign_port << endl;
             sout << "<br>  local_ip = "     << incoming.local_ip << endl;
@@ -63,7 +64,7 @@ class web_server : public server::http_1a_c
 
 
             // Echo any cookies back to the client browser 
-            sout << "<h2>Cookies we sent to the server</h2>";
+            sout << "<h2>Cookies the web browser sent to the server</h2>";
             for ( key_value_map::const_iterator ci = incoming.cookies.begin(); ci != incoming.cookies.end(); ++ci )
             {
                 sout << "<br/>" << ci->first << " = " << ci->second << endl;
@@ -71,7 +72,7 @@ class web_server : public server::http_1a_c
 
             sout << "<br/><br/>";
 
-            sout << "<h2>HTTP Headers we sent to the server</h2>";
+            sout << "<h2>HTTP Headers the web browser sent to the server</h2>";
             // Echo out all the HTTP headers we received from the client web browser
             for ( key_value_map::const_iterator ci = incoming.headers.begin(); ci != incoming.headers.end(); ++ci )
             {
