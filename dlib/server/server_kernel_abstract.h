@@ -277,8 +277,8 @@ namespace dlib
 
 
             // restricted functions
-            server(server<T>&);        // copy constructor
-            server<T>& operator=(server<T>&);    // assignment operator
+            server(server&);        // copy constructor
+            server& operator=(server&);    // assignment operator
     };
 
 }
