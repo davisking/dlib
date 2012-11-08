@@ -5,11 +5,11 @@
 
 #include "server_kernel_abstract.h"
 
-// non-templatable dependencies
 #include "../threads.h"
 #include "../sockets.h"
 #include <string>
 #include "../algs.h"
+#include "../set.h"
 #include "../logger.h"
 #include "../smart_pointers.h"
 
@@ -17,19 +17,17 @@
 namespace dlib
 {
 
+    // These forward declarations are here so we can use them in the typedefs in the server
+    // class.  The reason for this is for backwards compatibility with previous versions of
+    // dlib.
+    class server_http;
+    class server_iostream;
 
-    template <
-        typename set_of_connections
-        >
-    class server_kernel_1
+    class server
     {
 
+
         /*!
-            REQUIREMENTS ON set_of_connections
-                implements set/set_kernel_abstract.h or hash_set/hash_set_kernel_abstract.h
-                and is a set/hash_set of dlib::connection*
-
-
             INITIAL VALUE
                 listening_port          == 0
                 listening_ip            == ""
@@ -80,19 +78,20 @@ namespace dlib
         !*/
         
 
+        typedef set<connection*>::kernel_1a set_of_connections;
 
         // this structure is used to pass parameters to new threads
         struct param
         {
             param (
-                server_kernel_1<set_of_connections>& server_,
+                server& server_,
                 connection& new_connection_
             ) :
-                server(server_),
+                the_server(server_),
                 new_connection(new_connection_)
             {}
 
-            server_kernel_1<set_of_connections>& server;
+            server& the_server;
             connection& new_connection;
         };
         
@@ -100,10 +99,18 @@ namespace dlib
 
         public:
 
-            server_kernel_1(
+            // These typedefs are here for backward compatibility with previous versions of dlib
+            typedef     server kernel_1a;
+            typedef     server kernel_1a_c;
+            typedef     server_iostream iostream_1a;
+            typedef     server_iostream iostream_1a_c;
+            typedef     server_http http_1a;
+            typedef     server_http http_1a_c;
+
+            server(
             );
 
-            virtual ~server_kernel_1(
+            virtual ~server(
             ); 
 
             void clear(
@@ -142,6 +149,9 @@ namespace dlib
         private:
 
             void start_async_helper (
+            );
+
+            void start_accepting_connections (
             );
 
             void open_listening_socket (
@@ -193,9 +203,9 @@ namespace dlib
 
 
             // restricted functions
-            server_kernel_1(server_kernel_1<set_of_connections>&);   
-            server_kernel_1<set_of_connections>& operator= (
-                server_kernel_1<set_of_connections>&
+            server(server&);   
+            server& operator= (
+                server&
                 );    
     };
 
@@ -205,11 +215,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    server_kernel_1<set_of_connections>::
-    server_kernel_1 (
+    server::
+    server (
     ) :
         listening_port(0),
         running(false),
@@ -224,11 +231,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    server_kernel_1<set_of_connections>::
-    ~server_kernel_1 (
+    server::
+    ~server (
     )
     {
         clear();
@@ -236,10 +240,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    int server_kernel_1<set_of_connections>::
+    int server::
     get_max_connections (
     ) const
     {
@@ -251,14 +252,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    void server_kernel_1<set_of_connections>::
+    void server::
     set_max_connections (
         int max
     ) 
     {
+        // make sure requires clause is not broken
+        DLIB_CASSERT( 
+            max >= 0 ,
+            "\tvoid server::set_max_connections"
+            << "\n\tmax == " << max
+            << "\n\tthis: " << this
+            );
+
         max_connections_mutex.lock();
         max_connections = max;
         max_connections_mutex.unlock();
@@ -266,10 +272,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    void server_kernel_1<set_of_connections>::
+    void server::
     clear (
     )
     {
@@ -331,16 +334,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    void server_kernel_1<set_of_connections>::
+    void server::
     start_async_helper (
     )
     {
         try
         {
-            start();
+            start_accepting_connections();
         }
         catch (std::exception& e)
         {
@@ -350,10 +350,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    void server_kernel_1<set_of_connections>::
+    void server::
     start_async (
     )
     {
@@ -368,16 +365,13 @@ namespace dlib
         open_listening_socket();
 
         member_function_pointer<>::kernel_1a mfp;
-        mfp.set(*this,&server_kernel_1::start_async_helper);
+        mfp.set(*this,&server::start_async_helper);
         async_start_thread.reset(new thread_function(mfp));
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    void server_kernel_1<set_of_connections>::
+    void server::
     open_listening_socket (
     )
     {
@@ -406,13 +400,13 @@ namespace dlib
             {
                 throw dlib::socket_error(
                     EPORT_IN_USE,
-                    "error occurred in server_kernel_1::start()\nport already in use"
+                    "error occurred in server::start()\nport already in use"
                 );
             }
             else if (status == OTHER_ERROR)
             {
                 throw dlib::socket_error(
-                    "error occurred in server_kernel_1::start()\nunable to create listener"
+                    "error occurred in server::start()\nunable to create listener"
                 );            
             }
         }
@@ -424,11 +418,26 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    void server_kernel_1<set_of_connections>::
+    void server::
     start (
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT( 
+              this->is_running() == false,
+            "\tvoid server::start"
+            << "\n\tis_running() == " << this->is_running() 
+            << "\n\tthis: " << this
+            );
+
+        start_accepting_connections();
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void server::
+    start_accepting_connections (
     )
     {
         open_listening_socket();
@@ -565,7 +574,7 @@ namespace dlib
                 // throw the exception
                 throw dlib::thread_error(
                     ECREATE_THREAD,
-                    "error occurred in server_kernel_1::start()\nunable to start thread"
+                    "error occurred in server::start()\nunable to start thread"
                     );    
             }
             // if we made the new thread then update thread_count
@@ -630,17 +639,14 @@ namespace dlib
 
             // throw the exception
             throw dlib::socket_error(
-             "error occurred in server_kernel_1::start()\nlistening socket returned error"
+             "error occurred in server::start()\nlistening socket returned error"
                 );            
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    bool server_kernel_1<set_of_connections>::
+    bool server::
     is_running (
     ) const
     {
@@ -652,10 +658,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    const std::string server_kernel_1<set_of_connections>::
+    const std::string server::
     get_listening_ip (
     ) const
     {
@@ -667,10 +670,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    int server_kernel_1<set_of_connections>::
+    int server::
     get_listening_port (
     ) const
     {
@@ -682,14 +682,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    void server_kernel_1<set_of_connections>::
+    void server::
     set_listening_port (
         int port
     )
     {
+        // make sure requires clause is not broken
+        DLIB_CASSERT( 
+            ( port >= 0 &&
+              this->is_running() == false ),
+            "\tvoid server::set_listening_port"
+            << "\n\tport         == " << port
+            << "\n\tis_running() == " << this->is_running() 
+            << "\n\tthis: " << this
+            );
+
         listening_port_mutex.lock();
         listening_port = port;
         listening_port_mutex.unlock();
@@ -697,14 +704,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename set_of_connections
-        >
-    void server_kernel_1<set_of_connections>::
+    void server::
     set_listening_ip (
         const std::string& ip
     )
     {
+        // make sure requires clause is not broken
+        DLIB_CASSERT( 
+            ( ( is_ip_address(ip) || ip == "" ) &&
+              this->is_running() == false ),
+            "\tvoid server::set_listening_ip"
+            << "\n\tip           == " << ip
+            << "\n\tis_running() == " << this->is_running() 
+            << "\n\tthis: " << this
+            );
+
         listening_ip_mutex.lock();
         listening_ip = ip;
         listening_ip_mutex.unlock();
@@ -716,15 +730,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename soc
-        >
-    const logger server_kernel_1<soc>::sdlog("dlib.server");
+    const logger server::sdlog("dlib.server");
 
-    template <
-        typename soc
-        >
-    void server_kernel_1<soc>::
+    void server::
     service_connection(
         void* item
     )
@@ -732,25 +740,25 @@ namespace dlib
         param& p = *static_cast<param*>(item);
 
 
-        p.server.on_connect(p.new_connection);
+        p.the_server.on_connect(p.new_connection);
 
 
         // remove this connection from cons and close it
-        p.server.cons_mutex.lock();
+        p.the_server.cons_mutex.lock();
         connection* temp;
-        if (p.server.cons.is_member(&p.new_connection))
-            p.server.cons.remove(&p.new_connection,temp);
+        if (p.the_server.cons.is_member(&p.new_connection))
+            p.the_server.cons.remove(&p.new_connection,temp);
         try{ close_gracefully(&p.new_connection); } 
         catch (...) { sdlog << LERROR << "close_gracefully() threw"; } 
-        p.server.cons_mutex.unlock();
+        p.the_server.cons_mutex.unlock();
 
         // decrement the thread count and signal if it is now zero
-        p.server.thread_count_mutex.lock();
-        --p.server.thread_count;
-        p.server.thread_count_signaler.broadcast();
-        if (p.server.thread_count == 0)
-            p.server.thread_count_zero.broadcast();
-        p.server.thread_count_mutex.unlock();
+        p.the_server.thread_count_mutex.lock();
+        --p.the_server.thread_count;
+        p.the_server.thread_count_signaler.broadcast();
+        if (p.the_server.thread_count == 0)
+            p.the_server.thread_count_zero.broadcast();
+        p.the_server.thread_count_mutex.unlock();
 
         delete &p;
 

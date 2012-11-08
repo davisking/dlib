@@ -11,6 +11,7 @@
 #include <string>
 #include "../logger.h"
 #include "../string.h"
+#include "server_iostream_1.h"
 
 #ifdef  __INTEL_COMPILER
 // ignore the bogus warning about hiding on_connect()
@@ -491,10 +492,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename server_base
-        >
-    class server_http_1 : public server_base 
+    class server_http : public server_iostream 
     {
 
         /*!
@@ -505,7 +503,7 @@ namespace dlib
 
     public:
 
-        server_http_1()
+        server_http()
         {
             max_content_length = 10*1024*1024; // 10MB
         }
@@ -570,10 +568,7 @@ namespace dlib
         const static logger dlog;
     };
 
-    template <
-        typename server_base
-        >
-    const logger server_http_1<server_base>::dlog("dlib.server");
+    const logger server_http::dlog("dlib.server");
 }
 
 #endif // DLIB_SERVER_HTTp_1_

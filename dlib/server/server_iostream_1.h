@@ -7,27 +7,18 @@
 #include "server_iostream_abstract.h"
 #include "../logger.h"
 #include "../uintn.h"
+#include "server_kernel_1.h"
+#include "../sockstreambuf.h"
+#include "../map.h"
 
 
 namespace dlib
 {
 
-    template <
-        typename server_base,
-        typename ssbuf,
-        typename id_map
-        >
-    class server_iostream_1 : public server_base 
+    class server_iostream : public server 
     {
 
         /*!
-            REQUIREMENTS ON ssbuf
-                - must be an implementation of dlib/sockstreambuf/sockstreambuf_kernel_abstract.h
-
-            REQUIREMENTS ON id_map
-                - must be an implementation of dlib/map/map_kernel_abstract.h and domain must
-                  be set to uint64 and range must be set to connection*
-
             INITIAL VALUE
                 - next_id == 0
                 - con_map.size() == 0
@@ -39,16 +30,19 @@ namespace dlib
                 - m == the mutex that protects the members of this object
         !*/
 
+        typedef sockstreambuf::kernel_2a ssbuf;
+        typedef map<uint64,connection*,memory_manager<char>::kernel_2a>::kernel_1b id_map;
+
     public:
-        server_iostream_1(
+        server_iostream(
         ) :
             next_id(0)
         {}
 
-        ~server_iostream_1(
+        ~server_iostream(
         )
         {
-            server_base::clear();
+            server::clear();
         }
 
     protected:
@@ -149,12 +143,7 @@ namespace dlib
 
     };
 
-    template <
-        typename server_base,
-        typename ssbuf,
-        typename id_map
-        >
-    const logger server_iostream_1<server_base,ssbuf,id_map>::dlog("dlib.server");
+    const logger server_iostream::dlog("dlib.server");
 
 }
 
