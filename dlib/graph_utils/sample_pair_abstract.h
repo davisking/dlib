@@ -95,8 +95,9 @@ namespace dlib
             - T is a type with an interface compatible with sample_pair.
         ensures
             - provides a total ordering of sample_pair objects that will cause pairs that are 
-              equal to be adjacent when sorted.  This function can be used with std::sort() to
-              first sort sequences of sample_pair objects and then find duplicate edges.
+              equal to be adjacent when sorted.  So for example, this function can be used
+              with std::sort() to first sort a sequence of sample_pair objects and then
+              find duplicate edges.
     !*/
 
     template <typename T>
@@ -110,7 +111,7 @@ namespace dlib
         ensures
             - provides a total ordering of sample_pair objects that causes pairs with 
               smallest distance to be the first in a sorted list.  This function can be
-              used with std::sort()
+              used with std::sort().
     !*/
 
     template <typename T>
@@ -125,7 +126,7 @@ namespace dlib
             - provides a total ordering of sample_pair objects that causes pairs with
               smallest distance to be the first in a sorted list but also orders samples
               with equal distances according to order_by_index().  This function can be
-              used with std::sort()
+              used with std::sort().
     !*/
 
 // ----------------------------------------------------------------------------------------
