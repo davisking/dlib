@@ -7,7 +7,7 @@
 #include "server_iostream_abstract.h"
 #include "../logger.h"
 #include "../uintn.h"
-#include "server_kernel_1.h"
+#include "server_kernel.h"
 #include "../sockstreambuf.h"
 #include "../map.h"
 

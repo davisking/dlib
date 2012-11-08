@@ -11,7 +11,7 @@
 #include <string>
 #include "../logger.h"
 #include "../string.h"
-#include "server_iostream_1.h"
+#include "server_iostream.h"
 
 #ifdef  __INTEL_COMPILER
 // ignore the bogus warning about hiding on_connect()
