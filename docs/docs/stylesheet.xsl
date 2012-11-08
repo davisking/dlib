@@ -1123,7 +1123,7 @@ function BigToggle(node)
    </xsl:template>
 
    <xsl:template match="msg">
-    <pre><xsl:value-of select="."/></pre>
+      <p style="margin:0.4em"><xsl:value-of select="."/></p>
    </xsl:template>
 
    
