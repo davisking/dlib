@@ -1225,7 +1225,9 @@
 
          <term file="network.html" name="linker"/>
          <term file="network.html" name="server"/>
-         <term link="network.html#http" name="HTTP server"/>
+         <term file="network.html" name="server_iostream"/>
+         <term file="network.html" name="server_http"/>
+         <term link="network.html#server_http" name="HTTP server"/>
          <term file="network.html" name="sockstreambuf"/>
          <term file="network.html" name="bridge"/>
          <term file="dlib/bridge/bridge_abstract.h.html" name="connect_to_ip_and_port"/>

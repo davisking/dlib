@@ -24,6 +24,8 @@
             <name>Objects</name>
             <item>linker</item> 
             <item>server</item> 
+            <item>server_iostream</item> 
+            <item>server_http</item> 
             <item>bridge</item> 
             <item>sockstreambuf</item> 
          </section>
@@ -161,7 +163,7 @@
       
    <!-- ************************************************************************* -->
       
-      <component checked="true">
+      <component>
          <name>server</name>
          <file>dlib/server.h</file>
          <spec_file>dlib/server/server_kernel_abstract.h</spec_file>
@@ -174,101 +176,37 @@
          <examples>
             <example>sockets_ex.cpp.html</example>
             <example>sockstreambuf_ex.cpp.html</example>
-            <example>server_http_ex.cpp.html</example>
          </examples>
          
-         <implementations>
-            <implementation>
-               <name>server_kernel_1</name>
-               <file>dlib/server/server_kernel_1.h</file>
-               <description> 
-                  This implementation is done using the objects defined in the 
-                  <a href="api.html#sockets">sockets</a> and <a href="api.html#threads">threads</a> packages.
-                  It also uses a <a href="containers.html#set">set</a> to keep track of the connections.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for server_kernel_1 that uses set_kernel_1a</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-                        
-        
-         <extensions>
-            <extension>
-               <name>iostream</name>
-               <spec_file>dlib/server/server_iostream_abstract.h</spec_file>
-               <description> 
-                This extension redefines the on_connect() function so that
-                instead of giving you a connection object you get an istream 
-                and ostream object.
-               </description> 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>server_iostream</name>
+         <file>dlib/server.h</file>
+         <spec_file>dlib/server/server_iostream_abstract.h</spec_file>
+         <description> 
+            This is an extension of the <a href="#server">server</a> object that redefines
+            the on_connect() function so that instead of giving you a connection object you
+            get an istream and ostream object.
+         </description> 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>server_http</name>
+         <file>dlib/server.h</file>
+         <spec_file link="true">dlib/server/server_http_abstract.h</spec_file>
+         <description> 
+            This is an extension of the <a href="#server">server</a> object which
+            turns it into a simple HTTP server.
+         </description> 
 
-               <implementations>
-                  <implementation>
-                     <name>server_iostream_1</name>
-                     <file>dlib/server/server_iostream_1.h</file>
-                     <description> 
-                        This is implemented in the obvious way using the <a href="#sockstreambuf">sockstreambuf</a> object.
-                     </description> 
-
-                     <typedefs>
-                        <typedef>
-                           <name>iostream_1a</name>
-                           <description>is a typedef for server_kernel_1a extended by server_iostream_1 that uses
-                              sockstreambuf_kernel_2a</description>
-                        </typedef>
-                     </typedefs>                
-                     
-                  </implementation> 
-
-
-               </implementations>
-   
-            </extension>
-
-            <extension>
-               <name>http</name>
-               <spec_file>dlib/server/server_http_abstract.h</spec_file>
-               <description> 
-                This extension turns the server object into a simple HTTP server.
-               </description> 
-
-               <examples>
-                  <example>server_http_ex.cpp.html</example>
-               </examples>
-
-               <implementations>
-                  <implementation>
-                     <name>server_http_1</name>
-                     <file>dlib/server/server_http_1.h</file>
-                     <description> 
-                        This is implemented in the obvious way.
-                     </description> 
-
-                     <typedefs>
-                        <typedef>
-                           <name>http_1a</name>
-                           <description>is a typedef for server_iostream_1a extended by server_http_1 </description>
-                        </typedef>
-                     </typedefs>                
-                     
-                  </implementation> 
-
-
-               </implementations>
-   
-            </extension>
-
-         </extensions>
-
-
-
+         <examples>
+            <example>server_http_ex.cpp.html</example>
+         </examples>
       </component>
       
    <!-- ************************************************************************* -->
