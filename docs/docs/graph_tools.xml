@@ -64,6 +64,11 @@
          <item>is_ordered_by_index</item>
          <item>find_neighbor_ranges</item>
          <item>convert_unordered_to_ordered</item>
+         <item>order_by_index</item>
+         <item>order_by_distance</item>
+         <item>order_by_distance_and_index</item>
+         <item>contains_duplicate_pairs</item>
+         <item>max_index_plus_one</item>
       </section>
     </top>  
    </menu>
@@ -76,6 +81,80 @@
    
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>order_by_index</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/sample_pair_abstract.h</spec_file>
+         <description>
+            This function provides a total ordering of <a href="#sample_pair">sample_pair</a> 
+            or <a href="#ordered_sample_pair">ordered_sample_pair</a>
+            objects that will cause pairs that represent the same edge to be adjacent 
+            when sorted.  So for example, this function can be used
+            with std::sort() to first sort a sequence of sample_pair objects and then
+            find duplicate edges.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>order_by_distance</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/sample_pair_abstract.h</spec_file>
+         <description>
+            This function provides a total ordering of <a href="#sample_pair">sample_pair</a> 
+            or <a href="#ordered_sample_pair">ordered_sample_pair</a> objects that causes
+            pairs with smallest distance to be the first in a sorted list.  This function
+            can be used with std::sort().
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>order_by_distance_and_index</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/sample_pair_abstract.h</spec_file>
+         <description>
+              This function provides a total ordering of <a href="#sample_pair">sample_pair</a> or 
+              <a href="#ordered_sample_pair">ordered_sample_pair</a> objects that causes pairs
+              with smallest distance to be the first in a sorted list but also orders
+              samples with equal distances according to order_by_index().  This function
+              can be used with std::sort().
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>contains_duplicate_pairs</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
+         <description>
+            This function checks if a std::vector of <a href="#sample_pair">sample_pair</a> or 
+              <a href="#ordered_sample_pair">ordered_sample_pair</a> objects
+              contains any edge more than once.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>max_index_plus_one</name>
+         <file>dlib/graph_utils.h</file>
+         <spec_file link="true">dlib/graph_utils/edge_list_graphs_abstract.h</spec_file>
+         <description>
+            This function finds the number that is one greater than the largest index
+            value in a std::vector of <a href="#sample_pair">sample_pair</a> or 
+            <a href="#ordered_sample_pair">ordered_sample_pair</a> objects.  Therefore,
+            it is useful for finding out how many nodes are in an edge list graph (assuming
+            the graph contains all node indices from 0 to the largest index indicated 
+            by an edge).
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
       <component>
          <name>sample_pair</name>
          <file>dlib/graph_utils.h</file>
