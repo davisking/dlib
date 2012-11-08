@@ -17,7 +17,7 @@
 using namespace dlib;
 using namespace std;
 
-class web_server : public server::http_1a_c
+class web_server : public server_http
 {
     const std::string on_request ( 
         const incoming_things& incoming,

@@ -21,9 +21,8 @@ using namespace std;
 
 
 
-class serv : public server::kernel_1a_c
+class serv : public server
 {
-
     void on_connect  (
         connection& con
     )
