@@ -200,7 +200,7 @@
          <file>dlib/server.h</file>
          <spec_file link="true">dlib/server/server_http_abstract.h</spec_file>
          <description> 
-            This is an extension of the <a href="#server">server</a> object which
+            This is an extension of the <a href="#server_iostream">server_iostream</a> object which
             turns it into a simple HTTP server.
          </description> 
 
