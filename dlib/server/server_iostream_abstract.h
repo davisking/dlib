@@ -12,17 +12,11 @@
 namespace dlib
 {
 
-    template <
-        typename server_base
-        >
-    class server_iostream : public server_base 
+    class server_iostream : public server 
     {
 
         /*!
-            REQUIREMENTS ON server_base 
-                is an implementation of server/server_kernel_abstract.h
-
-            WHAT THIS EXTENSION DOES FOR SERVER 
+            WHAT THIS EXTENSION DOES FOR server 
                 This extension redefines the on_connect() function so that
                 instead of giving you a connection object you get an istream 
                 and ostream object.

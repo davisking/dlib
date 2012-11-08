@@ -3,7 +3,6 @@
 #undef DLIB_SERVER_KERNEL_ABSTRACT_
 #ifdef DLIB_SERVER_KERNEL_ABSTRACT_
 
-// non-templatable dependencies
 #include "../threads/threads_kernel_abstract.h"
 #include "../sockets/sockets_kernel_abstract.h"
 #include <string>
@@ -11,8 +10,6 @@
 
 namespace dlib
 {
-
-
     class server
     {
 
@@ -244,8 +241,6 @@ namespace dlib
                 throws
                     - std::bad_alloc
             !*/
-       
-
     
         private:
 

@@ -3,29 +3,228 @@
 #undef DLIB_SERVER_HTTp_ABSTRACT_
 #ifdef DLIB_SERVER_HTTp_ABSTRACT_
 
-
 #include "server_iostream_abstract.h"
 #include <iostream>
-#include <sstream>
 #include <string>
+#include <map>
 
 namespace dlib
 {
 
+// -----------------------------------------------------------------------------------------
+
     template <
-        typename server_base
+        typename Key, 
+        typename Value
         >
-    class server_http : public server_base 
+    class constmap : public std::map<Key, Value>
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is simply an extension to the std::map that allows you 
+                to use the operator[] accessor with a constant map.  
+        !*/
+    public:
+
+        const Value& operator[](
+            const Key& k
+        ) const;
+        /*!
+            ensures
+                - if (this->find(k) != this->end()) then
+                    - This map contains the given key
+                    - return the value associated with the given key
+                - else
+                    - return a default initialized Value object
+        !*/
+
+        Value& operator[](
+            const Key& k
+        ) { return std::map<Key, Value>::operator [](k); }
+        /*!
+            ensures
+                - This function does the same thing as the normal std::map operator[]
+                  function.
+                - if (this->find(k) != this->end()) then
+                    - This map contains the given key
+                    - return the value associated with the given key
+                - else
+                    - Adds a new entry into the map that is associated with the
+                      given key.  The new entry will be default initialized and
+                      this function returns a reference to it.
+        !*/ 
+    };
+
+    typedef constmap<std::string, std::string> key_value_map;
+
+// -----------------------------------------------------------------------------------------
+
+    struct incoming_things 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object contains all the various bits of information that describe a
+                HTTP request that comes into a web server.
+
+                For a detailed discussion of the fields of this object, see the
+                server_http::on_request() method defined later in this file.
+        !*/
+
+        incoming_things (
+            const std::string& foreign_ip_,
+            const std::string& local_ip_,
+            unsigned short foreign_port_,
+            unsigned short local_port_
+        );
+        /*!
+            ensures
+                - #foreign_ip = foreign_ip_
+                - #foreign_port = foreign_port_
+                - #local_ip = local_ip_
+                - #local_port = local_port_
+        !*/
+            
+        std::string path;
+        std::string request_type;
+        std::string content_type;
+        std::string protocol;
+        std::string body;
+
+        key_value_map queries;
+        key_value_map cookies;
+        key_value_map headers;
+
+        std::string foreign_ip;
+        unsigned short foreign_port;
+        std::string local_ip;
+        unsigned short local_port;
+    };
+
+    struct outgoing_things 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object contains all the various bits of information that describe a
+                HTTP response from a web server.
+
+                For a detailed discussion of the fields of this object, see the
+                server_http::on_request() method defined later in this file.
+        !*/
+
+        outgoing_things(
+        );
+        /*!
+            ensures
+                - #http_return == 200
+                - #http_return_status == "OK"
+        !*/
+
+        key_value_map  cookies;
+        key_value_map  headers;
+        unsigned short http_return;
+        std::string    http_return_status;
+    };
+
+// -----------------------------------------------------------------------------------------
+
+    class http_parse_error : public error 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an exception thrown by the parse_http_request() routine if 
+                there is a problem.
+        !*/
+    };
+
+// -----------------------------------------------------------------------------------------
+
+    unsigned long parse_http_request ( 
+        std::istream& in,
+        incoming_things& incoming,
+        unsigned long max_content_length
+    );
+    /*!
+        ensures
+            - Attempts to read a HTTP GET, POST, or PUT request from the given input
+              stream.
+            - Reads all headers of the request and puts them into #incoming.  In particular,
+              this function populates the following fields:
+                - #incoming.path
+                - #incoming.request_type
+                - #incoming.content_type
+                - #incoming.protocol
+                - #incoming.queries
+                - #incoming.cookies
+                - #incoming.headers
+            - This function also populates the #incoming.body field if and only if the
+              Content-Type field is equal to "application/x-www-form-urlencoded".
+              Otherwise, the content is not read from the stream.
+        throws
+            - http_parse_error
+                This exception is thrown if the Content-Length coming from the web
+                browser is greater than max_content_length or if any other problem
+                is detected with the request.
+    !*/
+
+    void read_body (
+        std::istream& in,
+        incoming_things& incoming
+    );
+    /*!
+        requires
+            - parse_http_request(in,incoming,max_content_length) has already been called
+              and therefore populated the fields of incoming.
+        ensures
+            - if (incoming.body has already been populated with the content of an HTTP
+              request) then
+                - this function does nothing
+            - else
+                - reads the body of the HTTP request into #incoming.body.
+    !*/
+
+    void write_http_response (
+        std::ostream& out,
+        outgoing_things outgoing,
+        const std::string& result
+    );
+    /*!
+        ensures
+            - Writes an HTTP response, defined by the data in outgoing, to the given output
+              stream.
+            - The result variable is written out as the content of the response.
+    !*/
+
+    void write_http_response (
+        std::ostream& out,
+        const http_parse_error& e 
+    );
+    /*!
+        ensures
+            - Writes an HTTP error response based on the information in the exception 
+              object e.
+    !*/
+
+    void write_http_response (
+        std::ostream& out,
+        const std::exception& e 
+    );
+    /*!
+        ensures
+            - Writes an HTTP error response based on the information in the exception
+              object e.
+    !*/
+
+// -----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------
+
+    class server_http : public server_iostream 
     {
 
         /*!
-            REQUIREMENTS ON server_base 
-                is an implementation of server/server_iostream_abstract.h
-
-            WHAT THIS EXTENSION DOES FOR SERVER IOSTREAM
-                This extension turns the server object into a simple HTTP server.
-                It only handles HTTP GET and POST requests and each incoming request triggers the
-                on_request() callback.  
+            WHAT THIS EXTENSION DOES FOR server_iostream
+                This extension turns the server object into a simple HTTP server.  It only
+                handles HTTP GET, PUT and POST requests and each incoming request triggers
+                the on_request() callback.  
 
             COOKIE STRINGS
                 The strings returned in the cookies key_value_map should be of the following form:
@@ -73,73 +272,6 @@ namespace dlib
             ensures
                 - #get_max_content_length() == max_length
         !*/
-
-        template <typename Key, typename Value>
-        class constmap : public std::map<Key, Value>
-        {
-            /*!
-                WHAT THIS OBJECT REPRESENTS
-                    This is simply an extension to the std::map that allows you 
-                    to use the operator[] accessor with a constant map.  
-            !*/
-        public:
-
-            const Value& operator[](
-                const Key& k
-            ) const;
-            /*!
-                ensures
-                    - if (this->find(k) != this->end()) then
-                        - This map contains the given key
-                        - return the value associated with the given key
-                    - else
-                        - return a default initialized Value object
-            !*/
-
-            Value& operator[](
-                const Key& k
-            ) { return std::map<Key, Value>::operator [](k); }
-            /*!
-                ensures
-                    - This function does the same thing as the normal std::map operator[]
-                      function.
-                    - if (this->find(k) != this->end()) then
-                        - This map contains the given key
-                        - return the value associated with the given key
-                    - else
-                        - Adds a new entry into the map that is associated with the
-                          given key.  The new entry will be default initialized and
-                          this function returns a reference to it.
-            !*/ 
-        };
-
-        typedef constmap<std::string, std::string> key_value_map;
-
-        struct incoming_things 
-        {
-            std::string path;
-            std::string request_type;
-            std::string content_type;
-            std::string protocol;
-            std::string body;
-
-            key_value_map queries;
-            key_value_map cookies;
-            key_value_map headers;
-
-            std::string foreign_ip;
-            unsigned short foreign_port;
-            std::string local_ip;
-            unsigned short local_port;
-        };
-
-        struct outgoing_things 
-        {
-            key_value_map  cookies;
-            key_value_map  headers;
-            unsigned short http_return;
-            std::string    http_return_status;
-        };
 
     private:
 
@@ -197,6 +329,52 @@ namespace dlib
                   then the error string from the exception is returned to the web browser.
         !*/
 
+
+    // -----------------------------------------------------------------------
+    //                        Implementation Notes
+    // -----------------------------------------------------------------------
+
+        virtual void on_connect (
+            std::istream& in,
+            std::ostream& out,
+            const std::string& foreign_ip,
+            const std::string& local_ip,
+            unsigned short foreign_port,
+            unsigned short local_port,
+            uint64
+        )
+        /*!
+            on_connect() is the function defined by server_iostream which is overloaded by
+            server_http.  In particular, the server_http's implementation is shown below.
+            In it you can see how the server_http parses the incoming http request, gets a
+            response by calling on_request(), and sends it back using the helper routines
+            defined at the top of this file.
+
+            Therefore, if you want to modify the behavior of the HTTP server, for example,
+            to do some more complex data streaming requiring direct access to the
+            iostreams, then you can do so by defining your own on_connect() routine.  In
+            particular, the default implementation shown below  is a good starting point.
+        !*/
+        {
+            try
+            {
+                incoming_things incoming(foreign_ip, local_ip, foreign_port, local_port);
+                outgoing_things outgoing;
+
+                parse_http_request(in, incoming, get_max_content_length());
+                read_body(in, incoming);
+                const std::string& result = on_request(incoming, outgoing);
+                write_http_response(out, outgoing, result);
+            }
+            catch (http_parse_error& e)
+            {
+                write_http_response(out, e);
+            }
+            catch (std::exception& e)
+            {
+                write_http_response(out, e);
+            }
+        }
     };
 
 }

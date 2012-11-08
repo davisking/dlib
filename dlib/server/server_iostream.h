@@ -143,9 +143,12 @@ namespace dlib
 
     };
 
-    const logger server_iostream::dlog("dlib.server");
 
 }
+
+#ifdef NO_MAKEFILE
+#include "server_iostream.cpp"
+#endif
 
 #endif // DLIB_SERVER_IOSTREAm_1_
 
