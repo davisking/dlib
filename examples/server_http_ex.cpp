@@ -44,7 +44,7 @@ class web_server : public server_http
         sout << "<br>  foreign_port = " << incoming.foreign_port << endl;
         sout << "<br>  local_ip = "     << incoming.local_ip << endl;
         sout << "<br>  local_port = "   << incoming.local_port << endl;
-        sout << "<br>  body = \""         << incoming.body << "\"" << endl;
+        sout << "<br>  body = \""       << incoming.body << "\"" << endl;
 
 
         // If this request is the result of the user submitting the form then echo back
