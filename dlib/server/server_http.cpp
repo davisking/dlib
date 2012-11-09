@@ -337,7 +337,7 @@ namespace dlib
 
         // only send this header if the user hasn't told us to send another kind
         bool has_content_type = false, has_location = false;
-        for( typename key_value_map::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )
+        for(key_value_map::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )
         {
             if ( !has_content_type && strings_equal_ignore_case(ci->first , "content-type") )
             {
@@ -364,13 +364,13 @@ namespace dlib
         out << "HTTP/1.0 " << outgoing.http_return << " " << outgoing.http_return_status << "\r\n";
 
         // Set any new headers
-        for( typename key_value_map::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )
+        for(key_value_map::const_iterator ci = response_headers.begin(); ci != response_headers.end(); ++ci )
         {
             out << ci->first << ": " << ci->second << "\r\n";
         }
 
         // set any cookies 
-        for( typename key_value_map::const_iterator ci = new_cookies.begin(); ci != new_cookies.end(); ++ci )
+        for(key_value_map::const_iterator ci = new_cookies.begin(); ci != new_cookies.end(); ++ci )
         {
             out << "Set-Cookie: " << urlencode(ci->first) << '=' << urlencode(ci->second) << "\r\n";
         }
