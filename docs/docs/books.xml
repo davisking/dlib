@@ -273,6 +273,14 @@
                </ul><br/>
             </li>
 
+            <li> <i>Structured Prediction and Learning in Computer Vision</i> by Sebastian Nowozin and Christoph H. Lampert 2011
+               <ul> If you are looking for a book discussing the background material necessary
+                  for understanding things like the <a href="ml.html#structural_svm_problem">Structural SVM</a>
+                  tools in dlib then this is a good book.  It is also available online 
+                  in <a href="http://www.nowozin.net/sebastian/papers/nowozin2011structured-tutorial.pdf">PDF form</a>.
+               </ul><br/>
+            </li>
+
          </ul>
 
         <h2>Image Processing</h2>

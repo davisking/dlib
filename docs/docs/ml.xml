@@ -2350,10 +2350,18 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                     T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural SVMs, 
                     Machine Learning, 77(1):27-59, 2009.
                 </blockquote>
+                Note that this object is essentially a tool for solving the 1-Slack structural
+                SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced 
+                paper.
 
-                    Note that this object is essentially a tool for solving the 1-Slack structural
-                    SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced 
-                    paper.
+               <br/><br/>
+                Finally, for a very detailed introduction to this subject, you should consider the book:
+                <blockquote>
+                <i><a href="http://www.nowozin.net/sebastian/papers/nowozin2011structured-tutorial.pdf">Structured 
+                     Prediction and Learning in Computer Vision</a></i> by Sebastian Nowozin and 
+                     Christoph H. Lampert
+                </blockquote>
+
          </description>
                                  
       </component>
@@ -2524,7 +2532,12 @@ Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf"
                <p>
                 Note that this is just a convenience wrapper around the 
                 <a href="#structural_svm_graph_labeling_problem">structural_svm_graph_labeling_problem</a> 
-                to make it look similar to all the other trainers in dlib.  
+                to make it look similar to all the other trainers in dlib.   You might also
+                consider reading the book
+                <i><a href="http://www.nowozin.net/sebastian/papers/nowozin2011structured-tutorial.pdf">Structured 
+                Prediction and Learning in Computer Vision</a></i> by Sebastian 
+                Nowozin and Christoph H. Lampert since it contains a good introduction to machine learning
+                methods such as the algorithm implemented by the structural_graph_labeling_trainer.
             </p>
          </description>
          <examples>
