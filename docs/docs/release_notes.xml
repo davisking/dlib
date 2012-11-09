@@ -12,15 +12,48 @@
 
 <current>
 New Features:
+  - Added the ability to label parts of objects with the mouse to the image_display widget.
+  - Added the start_async() function to the server object.
+  - Added the ability to put overlay circles and full_object_detections into the image_window widget.
+  - Added a stddev() for matrix objects.
+  - Added operator+() for running_stats and running_scalar_covariance
+  - Added BSP tools
+  - Added connection::disable_nagle()
+  - Added the network_address object.
+  - Added connect_to() to the bridge interface 
+  - Added the ability to learn non-negative weight vectors to the structural_assignment_trainer object.
+  - Added an overload of murmur_hash3_128bit() that takes 4 integers instead of a block of memory.
+  - Added remove_duplicate_edges().
+  - Added ordered_sample_pair 
+  - Added rand::get_random_64bit_number().
+  - Added sparse_matrix_vector_multiply()
+  - Added is_ordered_by_index(), find_neighbor_ranges(), and convert_unordered_to_ordered()
+  - Added newman_cluster(), chinese_whispers(), and modularity() routines.
 
 Non-Backwards Compatible Changes:
+  - Changed the image_dataset_metadata XML reading tools to use a map of strings to
+    points to represent object parts. This change also removes the old head point 
+    from a box since this information can now be represented in the parts map.
+  - Broke backwards compatibility, the syntax for passing order_by_distance and
+    order_by_index to std::sort() is now slightly different since these functions are
+    now templates. This allows them to work on any kind of sample_pair or
+    ordered_sample_pair object.
 
 Bug fixes:
   - Added a patch, contributed by Martin Müllenhaupt, to fix a minor bug in the
     SQLite bindings.
+  - Fixed a typo which would prevent code that called running_stats::max_n() from compiling.
 
 Other:
   - Added a new documentation page for the various graph tools in dlib.
+  - Added support for Visual Studio 2012
+  - Switched the sample_pair object to use double to store its distance value instead of float.
+  - Added William Sobel's patch to the web server that improves its flexibility and security.
+  - Changed the server object so you don't have to use the server::kernel_1a syntax
+    anymore to declare it.  Now you just say server, server_iostream, or server_http
+    depending on which one you want.
+  - Set the default max number of connections a server will accept at a time to 1000
+    rather than the previous default of infinity.
 
 </current>
 
