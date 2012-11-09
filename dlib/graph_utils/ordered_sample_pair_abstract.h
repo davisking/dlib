@@ -30,7 +30,7 @@ namespace dlib
             ensures
                 - #index1() == 0
                 - #index2() == 0
-                - #distance() == std::numeric_limits<double>::infinity()
+                - #distance() == 1 
         !*/
 
         ordered_sample_pair (
@@ -41,7 +41,7 @@ namespace dlib
             ensures
                 - #index1() == idx1
                 - #index2() == idx2
-                - #distance() == std::numeric_limits<double>::infinity()
+                - #distance() == 1 
         !*/
 
         ordered_sample_pair (

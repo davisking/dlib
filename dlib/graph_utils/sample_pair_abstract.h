@@ -34,7 +34,7 @@ namespace dlib
             ensures
                 - #index1() == 0
                 - #index2() == 0
-                - #distance() == std::numeric_limits<double>::infinity()
+                - #distance() == 1 
         !*/
 
         sample_pair (
@@ -45,7 +45,7 @@ namespace dlib
             ensures
                 - #index1() == min(idx1,idx2)
                 - #index2() == max(idx1,idx2)
-                - #distance() == std::numeric_limits<double>::infinity()
+                - #distance() == 1 
         !*/
 
         sample_pair (

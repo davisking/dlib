@@ -20,7 +20,7 @@ namespace dlib
             _index1(0),
             _index2(0)
         {
-            _distance = std::numeric_limits<double>::infinity();
+            _distance = 1;
         }
 
         ordered_sample_pair (
@@ -28,7 +28,7 @@ namespace dlib
             const unsigned long idx2
         )
         {
-            _distance = std::numeric_limits<double>::infinity();
+            _distance = 1;
             _index1 = idx1;
             _index2 = idx2;
         }
