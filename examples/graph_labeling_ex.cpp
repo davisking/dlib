@@ -1,36 +1,39 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example illustrating the use of the graph_labeler and 
+    This is an example illustrating the use of the graph_labeler and
     structural_graph_labeling_trainer objects.
 
-    Suppose you have a bunch of objects and you need to label each of them as
-    true or false.  Suppose further that knowing the labels of some of these
-    objects tells you something about the likely label of the others.  This
-    is common in a number of domains.  For example, in image segmentation 
-    problems you need to label each pixel, and knowing the labels of neighboring 
-    pixels gives you information about the likely label since neighboring pixels
-    will often have the same label.
+    Suppose you have a bunch of objects and you need to label each of them as true or
+    false.  Suppose further that knowing the labels of some of these objects tells you
+    something about the likely label of the others.  This is common in a number of domains.
+    For example, in image segmentation problems you need to label each pixel, and knowing
+    the labels of neighboring pixels gives you information about the likely label since
+    neighboring pixels will often have the same label.
     
-    We can generalize this problem by saying that we have a graph and our task
-    is to label each node in the graph as true or false.  Additionally, the 
-    edges in the graph connect nodes which are likely to share the same label.
-    In this example program, each node will have a feature vector which contains
-    information which helps tell if the node should be labeled as true or false.
-    The edges also contain feature vectors which give information indicating how 
-    strong the edge's labeling consistency constraint should be.  This is useful 
-    since some nodes will have uninformative feature vectors and the only way to 
-    tell how they should be labeled is by looking at their neighbor's labels.
+    We can generalize this problem by saying that we have a graph and our task is to label
+    each node in the graph as true or false.  Additionally, the edges in the graph connect
+    nodes which are likely to share the same label.  In this example program, each node
+    will have a feature vector which contains information which helps tell if the node
+    should be labeled as true or false.  The edges also contain feature vectors which give
+    information indicating how strong the edge's labeling consistency constraint should be.
+    This is useful since some nodes will have uninformative feature vectors and the only
+    way to tell how they should be labeled is by looking at their neighbor's labels.
 
-    Therefore, this program will show you how to learn two things using machine
-    learning.  The first is a linear classifier which operates on each node and 
-    predicts if it should be labeled as true or false.  The second thing is a
-    linear function of the edge vectors.  This function outputs a penalty
-    for giving two nodes connected by an edge differing labels.  The graph_labeler
-    object puts these two things together and uses them to compute a labeling
-    which takes both into account.  In what follows, we will use a structural
-    SVM method to find the parameters of these linear functions which minimize
+    Therefore, this program will show you how to learn two things using machine learning.
+    The first is a linear classifier which operates on each node and predicts if it should
+    be labeled as true or false.  The second thing is a linear function of the edge
+    vectors.  This function outputs a penalty for giving two nodes connected by an edge
+    differing labels.  The graph_labeler object puts these two things together and uses
+    them to compute a labeling which takes both into account.  In what follows, we will use
+    a structural SVM method to find the parameters of these linear functions which minimize
     the number of mistakes made by a graph_labeler.
+
+
+    Finally, you might also consider reading the book Structured Prediction and Learning in
+    Computer Vision by Sebastian Nowozin and Christoph H. Lampert since it contains a good
+    introduction to machine learning methods such as the algorithm implemented by the
+    structural_graph_labeling_trainer.
 */
 
 #include "dlib/svm_threaded.h"
