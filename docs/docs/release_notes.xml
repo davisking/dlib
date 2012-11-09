@@ -38,6 +38,8 @@ Non-Backwards Compatible Changes:
     order_by_index to std::sort() is now slightly different since these functions are
     now templates. This allows them to work on any kind of sample_pair or
     ordered_sample_pair object.
+  - The default distance of a sample_pair that was default initialized is 1 now
+    instead of infinity.
 
 Bug fixes:
   - Added a patch, contributed by Martin Müllenhaupt, to fix a minor bug in the
