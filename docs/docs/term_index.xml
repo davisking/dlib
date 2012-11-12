@@ -84,6 +84,7 @@
 
          <term file="optimization.html" name="find_max_parse_cky"/>
          <term file="optimization.html" name="parse_tree_to_string"/>
+         <term file="optimization.html" name="find_trees_not_rooted_with_tag"/>
          <term link="optimization.html#parse_tree_to_string" name="parse_tree_to_string_tagged"/>
          <term file="dlib/optimization/find_max_parse_cky_abstract.h.html" name="parse_tree_to_string_error"/>
          <term file="dlib/optimization/find_max_parse_cky_abstract.h.html" name="constituent"/>
