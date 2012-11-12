@@ -53,6 +53,7 @@
          <item>find_max_factor_graph_nmplp</item> 
          <item>find_max_factor_graph_viterbi</item> 
          <item>find_max_factor_graph_potts</item> 
+         <item>find_max_parse_cky</item> 
          <item>min_cut</item> 
       </section>
 
@@ -76,6 +77,7 @@
          <item>line_search</item> 
          <item>graph_cut_score</item> 
          <item>potts_model_score</item> 
+         <item>parse_tree_to_string</item> 
       </section>
 
     </top>  
@@ -524,6 +526,33 @@ However, for graphs with cycles, the solution may be approximate.
 
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>find_max_parse_cky</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/find_max_parse_cky_abstract.h</spec_file>
+         <description>
+            This function implements the CKY parsing algorithm.  In particular, it
+            finds the maximum scoring binary parse tree that parses an input sequence of tokens.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>parse_tree_to_string</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/find_max_parse_cky_abstract.h</spec_file>
+         <description>
+            This is a pair of functions useful for converting a parse tree output by 
+            <a href="#find_max_parse_cky">find_max_parse_cky</a> into a bracketed string
+            suitable for displaying the parse tree.  
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
       <component>
          <name>find_max_factor_graph_viterbi</name>
          <file>dlib/optimization.h</file>
