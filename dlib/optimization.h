@@ -15,6 +15,7 @@
 #include "optimization/max_sum_submatrix.h"
 #include "optimization/find_max_factor_graph_nmplp.h"
 #include "optimization/find_max_factor_graph_viterbi.h"
+#include "optimization/find_max_parse_cky.h"
 
 #endif // DLIB_OPTIMIZATIOn_HEADER
 
