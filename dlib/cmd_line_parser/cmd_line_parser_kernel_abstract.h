@@ -7,6 +7,8 @@
 #include <string>
 #include "../interfaces/enumerable.h"
 #include "../interfaces/cmd_line_parser_option.h"
+#include <vector>
+#include <iostream>
 
 namespace dlib
 {
@@ -287,6 +289,320 @@ namespace dlib
                 - swaps *this and item
         !*/
 
+        void print_options (
+            std::basic_ostream<char_type>& out
+        ) const;
+        /*!
+            ensures
+                - prints all the command line options to out.
+                - #at_start() == true
+            throws                
+                - any exception.
+                    if an exception is thrown then #at_start() == true but otherwise  
+                    it will have no effect on the state of #*this.
+        !*/
+
+    // -------------------------------------------------------------
+    //                    Input Validation Tools
+    // -------------------------------------------------------------
+
+        class cmd_line_check_error : public dlib::error 
+        {
+            /*!
+                This is the exception thrown by the check_*() routines if they find a
+                command line error.  The interpretation of the member variables is defined
+                below in each check_*() routine.
+            !*/
+
+        public:
+            const string_type opt;
+            const string_type opt2;
+            const string_type arg; 
+            const std::vector<string_type> required_opts; 
+        };
+
+        template <
+            typename T
+            >
+        void check_option_arg_type (
+            const string_type& option_name
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - option_is_defined(option_name) == true
+                - T is not a pointer type
+            ensures
+                - all the arguments for the given option are convertible
+                  by string_cast<T>() to an object of type T.
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied. 
+                    The exception's members will be set as follows:
+                        - type == EINVALID_OPTION_ARG
+                        - opt == option_name
+                        - arg == the text of the offending argument
+        !*/
+
+        template <
+            typename T
+            >
+        void check_option_arg_range (
+            const string_type& option_name,
+            const T& first,
+            const T& last
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - option_is_defined(option_name) == true
+                - first <= last
+                - T is not a pointer type
+            ensures
+                - all the arguments for the given option are convertible
+                  by string_cast<T>() to an object of type T and the resulting value is
+                  in the range first to last inclusive.
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EINVALID_OPTION_ARG
+                        - opt == option_name
+                        - arg == the text of the offending argument
+        !*/
+
+        template <
+            typename T,
+            size_t length
+            >
+        void check_option_arg_range (
+            const string_type& option_name,
+            const T (&arg_set)[length]
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - option_is_defined(option_name) == true
+                - T is not a pointer type
+            ensures
+                - for each argument to the given option:
+                    - this argument is convertible by string_cast<T>() to an object of
+                      type T and the resulting value is equal to some element in the
+                      arg_set array.
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EINVALID_OPTION_ARG
+                        - opt == option_name
+                        - arg == the text of the offending argument
+        !*/
+
+        template <
+            size_t length
+            >
+        void check_option_arg_range (
+            const string_type& option_name,
+            const char_type* (&arg_set)[length]
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - option_is_defined(option_name) == true
+            ensures
+                - for each argument to the given option:
+                    - there is a string in the arg_set array that is equal to this argument.
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EINVALID_OPTION_ARG
+                        - opt == option_name
+                        - arg == the text of the offending argument
+        !*/
+
+        template <
+            size_t length
+            >
+        void check_one_time_options (
+            const char_type* (&option_set)[length]
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - for all valid i:
+                    - option_is_defined(option_set[i]) == true
+            ensures
+                - all the options in the option_set array occur at most once on the
+                  command line.
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EMULTIPLE_OCCURANCES 
+                        - opt == the option that occurred more than once on the command line. 
+        !*/
+
+        void check_incompatible_options (
+            const string_type& option_name1,
+            const string_type& option_name2
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - option_is_defined(option_name1) == true
+                - option_is_defined(option_name2) == true
+            ensures
+                - option(option_name1).count() == 0 || option(option_name2).count() == 0
+                  (i.e. at most, only one of the options is currently present)
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EINCOMPATIBLE_OPTIONS 
+                        - opt == option_name1 
+                        - opt2 == option_name2 
+        !*/
+
+        template <
+            size_t length
+            >
+        void check_incompatible_options (
+            const char_type* (&option_set)[length]
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - for all valid i:
+                    - option_is_defined(option_set[i]) == true
+            ensures
+                - At most only one of the options in the array option_set has a count()
+                  greater than 0.  (i.e. at most, only one of the options is currently present)
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EINCOMPATIBLE_OPTIONS 
+                        - opt == One of the incompatible options found.
+                        - opt2 == The next incompatible option found.
+        !*/
+
+        void check_sub_option (
+            const string_type& parent_option,
+            const string_type& sub_option
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - option_is_defined(parent_option) == true
+                - option_is_defined(sub_option) == true
+            ensures
+                - if (option(parent_option).count() == 0) then
+                    - option(sub_option).count() == 0
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EMISSING_REQUIRED_OPTION 
+                        - opt == sub_option. 
+                        - required_opts == a vector that contains only parent_option. 
+        !*/
+
+        template <
+            size_t length
+            >
+        void check_sub_options (
+            const char_type* (&parent_option_set)[length],
+            const string_type& sub_option
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - option_is_defined(sub_option) == true
+                - for all valid i:
+                    - option_is_defined(parent_option_set[i] == true
+            ensures
+                - if (option(sub_option).count() > 0) then
+                    - At least one of the options in the array parent_option_set has a count()
+                      greater than 0. (i.e. at least one of the options in parent_option_set
+                      is currently present)
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EMISSING_REQUIRED_OPTION 
+                        - opt == the first option from the sub_option that is present. 
+                        - required_opts == a vector containing everything from parent_option_set.
+        !*/
+
+        template <
+            size_t length
+            >
+        void check_sub_options (
+            const string_type& parent_option,
+            const char_type* (&sub_option_set)[length]
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - option_is_defined(parent_option) == true
+                - for all valid i:
+                    - option_is_defined(sub_option_set[i]) == true
+            ensures
+                - if (option(parent_option).count() == 0) then
+                    - for all valid i:
+                        - option(sub_option_set[i]).count() == 0
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EMISSING_REQUIRED_OPTION 
+                        - opt == the first option from the sub_option_set that is present.
+                        - required_opts == a vector that contains only parent_option. 
+        !*/
+
+        template <
+            size_t parent_length,
+            size_t sub_length
+            >
+        void check_sub_options (
+            const char_type* (&parent_option_set)[parent_length],
+            const char_type* (&sub_option_set)[sub_length]
+        ) const;
+        /*!
+            requires
+                - parsed_line() == true
+                - for all valid i:
+                    - option_is_defined(parent_option_set[i] == true
+                - for all valid j:
+                    - option_is_defined(sub_option_set[j]) == true
+            ensures
+                - for all valid j:
+                    - if (option(sub_option_set[j]).count() > 0) then
+                        - At least one of the options in the array parent_option_set has a count()
+                          greater than 0. (i.e. at least one of the options in parent_option_set
+                          is currently present)
+            throws
+                - std::bad_alloc
+                - cmd_line_check_error
+                    This exception is thrown if the ensures clause could not be satisfied.
+                    The exception's members will be set as follows:
+                        - type == EMISSING_REQUIRED_OPTION 
+                        - opt == the first option from the sub_option_set that is present. 
+                        - required_opts == a vector containing everything from parent_option_set.
+        !*/
+
+
     private:
 
         // restricted functions
@@ -294,7 +610,13 @@ namespace dlib
         cmd_line_parser& operator=(cmd_line_parser&);    // assignment operator
 
     };   
+
+// -----------------------------------------------------------------------------------------
+
+    typedef cmd_line_parser<char>    command_line_parser;
+    typedef cmd_line_parser<wchar_t> wcommand_line_parser;
    
+// -----------------------------------------------------------------------------------------
 
     template <
         typename charT
@@ -307,6 +629,7 @@ namespace dlib
         provides a global swap function
     !*/
 
+// -----------------------------------------------------------------------------------------
 
 }
 

@@ -19,13 +19,19 @@
 namespace dlib
 {
 
+// ----------------------------------------------------------------------------------------
 
     template <
         typename charT
         >
-    class cmd_line_parser
+    class impl_cmd_line_parser
     {
-        cmd_line_parser() {}
+        /*!
+            This class is basically just a big templated typedef for building 
+            a complete command line parser type out of all the parts it needs.
+        !*/
+
+        impl_cmd_line_parser() {}
 
         typedef typename sequence<std::basic_string<charT> >::kernel_2a sequence_2a;
         typedef typename sequence<std::basic_string<charT>*>::kernel_2a psequence_2a;
@@ -33,36 +39,34 @@ namespace dlib
 
     public:
         
-        //----------- kernels ---------------
-
-        // kernel_1a        
-        typedef     cmd_line_parser_kernel_1<charT,map_1a_string,sequence_2a,psequence_2a>
-                    kernel_1a;
-        typedef     cmd_line_parser_kernel_c<kernel_1a>
-                    kernel_1a_c;
-          
-
-
-        //----------- extensions ---------------
-        
-        // print_1 extend kernel_1a
-        typedef     cmd_line_parser_print_1<kernel_1a>
-                    print_1a;
-        typedef     cmd_line_parser_print_1<kernel_1a_c>
-                    print_1a_c;
-
-        // check_1 extend print_1a
-        typedef     cmd_line_parser_check_1<print_1a>
-                    check_1a;
-        typedef     cmd_line_parser_check_c<cmd_line_parser_check_1<print_1a_c> >
-                    check_1a_c;
-
+        typedef cmd_line_parser_kernel_1<charT,map_1a_string,sequence_2a,psequence_2a> kernel_1a;
+        typedef cmd_line_parser_kernel_c<kernel_1a> kernel_1a_c;
+        typedef cmd_line_parser_print_1<kernel_1a_c> print_1a_c;
+        typedef cmd_line_parser_check_c<cmd_line_parser_check_1<print_1a_c> > check_1a_c;
     };
 
 // ----------------------------------------------------------------------------------------
 
-    typedef cmd_line_parser<char>::check_1a_c command_line_parser;
-    typedef cmd_line_parser<wchar_t>::check_1a_c wcommand_line_parser;
+    template <
+        typename charT
+        >
+    class cmd_line_parser : public impl_cmd_line_parser<charT>::check_1a_c
+    {
+    public:
+
+        // These typedefs are here for backwards compatibility with previous versions of dlib.
+        typedef cmd_line_parser kernel_1a;
+        typedef cmd_line_parser kernel_1a_c;
+        typedef cmd_line_parser print_1a;
+        typedef cmd_line_parser print_1a_c;
+        typedef cmd_line_parser check_1a;
+        typedef cmd_line_parser check_1a_c;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    typedef cmd_line_parser<char> command_line_parser;
+    typedef cmd_line_parser<wchar_t> wcommand_line_parser;
 
 // ----------------------------------------------------------------------------------------
 

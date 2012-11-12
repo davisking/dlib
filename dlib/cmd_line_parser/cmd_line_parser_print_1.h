@@ -3,7 +3,7 @@
 #ifndef DLIB_CMD_LINE_PARSER_PRINt_1_
 #define DLIB_CMD_LINE_PARSER_PRINt_1_
 
-#include "cmd_line_parser_print_abstract.h"
+#include "cmd_line_parser_kernel_abstract.h"
 #include "../algs.h"
 #include "../string.h"
 #include <iostream>

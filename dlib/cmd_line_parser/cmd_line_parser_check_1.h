@@ -3,7 +3,7 @@
 #ifndef DLIB_CMD_LINE_PARSER_CHECk_1_
 #define DLIB_CMD_LINE_PARSER_CHECk_1_ 
 
-#include "cmd_line_parser_check_abstract.h"
+#include "cmd_line_parser_kernel_abstract.h"
 #include <sstream>
 #include <string>
 #include "../string.h"
