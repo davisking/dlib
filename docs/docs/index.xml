@@ -126,7 +126,8 @@
                                       <a href="optimization.html#solve_qp4_using_smo">solvers</a></preserve_space> </li> 
                   <li>Combinatorial optimization tools for solving 
                      <a href="optimization.html#max_cost_assignment">optimal assignment</a> and
-                     <a href="optimization.html#min_cut">min cut/max flow</a> problems.</li>
+                     <a href="optimization.html#min_cut">min cut/max flow</a> problems as well as
+                     the <a href="optimization.html#find_max_parse_cky">CKY algorithm</a> for finding the most probable parse tree</li>
                   <li>A <a href="algorithms.html#bigint">big integer</a> object</li>
                   <li>A <a href="algorithms.html#rand">random number</a> object</li>
                </ul>
@@ -150,9 +151,9 @@
                   <li>Structural SVM tools for <a href="ml.html#structural_graph_labeling_trainer">labeling nodes</a> in graphs </li>  
                   <li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li>
                   <li>An online <a href="ml.html#svm_pegasos">SVM classification</a> algorithm</li>
-                  <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector</li> and
-                     offline support vector <a href="ml.html#svm_one_class_trainer">one-class classification</a>
-                     <li>Clustering algorithms: <a href="ml.html#find_clusters_using_kmeans">linear</a> 
+                  <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector and
+                     offline support vector <a href="ml.html#svm_one_class_trainer">one-class classification</a></li>
+                  <li>Clustering algorithms: <a href="ml.html#find_clusters_using_kmeans">linear</a> 
                         or <a href="ml.html#kkmeans">kernel k-means</a>, 
                         <a href="ml.html#chinese_whispers">Chinese Whispers</a>, and 
                         <a href="ml.html#newman_cluster">Newman clustering</a>.  </li>
