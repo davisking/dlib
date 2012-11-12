@@ -24,6 +24,9 @@ namespace dlib
         T right_tag;
     };
 
+    /*!A END_OF_TREE is used to indicate that parse_tree_element::left or
+         parse_tree_element::right doesn't point to another subtree.
+    !*/
     const unsigned long END_OF_TREE = 0xFFFFFFFF;
 
     template <typename T>
