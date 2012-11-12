@@ -238,7 +238,7 @@ namespace dlib
         template <bool print_tag, typename T, typename U >
         void print_parse_tree_helper (
             const std::vector<parse_tree_element<T> >& tree,
-            const std::vector<U>& items,
+            const std::vector<U>& words,
             unsigned long i,
             std::ostream& out
         )
@@ -254,19 +254,19 @@ namespace dlib
             if (tree[i].left < tree.size())
             {
                 left_recurse = true;
-                print_parse_tree_helper<print_tag>(tree, items, tree[i].left, out);
+                print_parse_tree_helper<print_tag>(tree, words, tree[i].left, out);
             }
             else
             {
-                if (tree[i].c.begin < items.size())
+                if (tree[i].c.begin < words.size())
                 {
-                    out << items[tree[i].c.begin] << " ";
+                    out << words[tree[i].c.begin] << " ";
                 }
                 else
                 {
                     std::ostringstream sout;
                     sout << "Parse tree refers to element " << tree[i].c.begin 
-                         << " of sequence which is only of size " << items.size() << ".";
+                         << " of sequence which is only of size " << words.size() << ".";
                     throw parse_tree_to_string_error(sout.str());
                 }
             }
@@ -276,19 +276,19 @@ namespace dlib
                 if (left_recurse == true)
                     out << " ";
 
-                print_parse_tree_helper<print_tag>(tree, items, tree[i].right, out);
+                print_parse_tree_helper<print_tag>(tree, words, tree[i].right, out);
             }
             else
             {
-                if (tree[i].c.k < items.size())
+                if (tree[i].c.k < words.size())
                 {
-                    out << items[tree[i].c.k];
+                    out << words[tree[i].c.k];
                 }
                 else
                 {
                     std::ostringstream sout;
                     sout << "Parse tree refers to element " << tree[i].c.k 
-                         << " of sequence which is only of size " << items.size() << ".";
+                         << " of sequence which is only of size " << words.size() << ".";
                     throw parse_tree_to_string_error(sout.str());
                 }
             }
@@ -303,14 +303,14 @@ namespace dlib
     template <typename T, typename U>
     std::string parse_tree_to_string (
         const std::vector<parse_tree_element<T> >& tree,
-        const std::vector<U>& items
+        const std::vector<U>& words
     )
     {
         if (tree.size() == 0)
             return "";
 
         std::ostringstream sout;
-        impl::print_parse_tree_helper<false>(tree, items, 0, sout);
+        impl::print_parse_tree_helper<false>(tree, words, 0, sout);
         return sout.str();
     }
 
@@ -319,14 +319,14 @@ namespace dlib
     template <typename T, typename U>
     std::string parse_tree_to_string_tagged (
         const std::vector<parse_tree_element<T> >& tree,
-        const std::vector<U>& items
+        const std::vector<U>& words
     )
     {
         if (tree.size() == 0)
             return "";
 
         std::ostringstream sout;
-        impl::print_parse_tree_helper<true>(tree, items, 0, sout);
+        impl::print_parse_tree_helper<true>(tree, words, 0, sout);
         return sout.str();
     }
 

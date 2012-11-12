@@ -136,7 +136,7 @@ namespace dlib
     template <typename T, typename U>
     std::string parse_tree_to_string (
         const std::vector<parse_tree_element<T> >& tree,
-        const std::vector<U>& items
+        const std::vector<U>& words
     );
     /*!
         ensures
@@ -148,7 +148,7 @@ namespace dlib
     template <typename T, typename U>
     std::string parse_tree_to_string_tagged (
         const std::vector<parse_tree_element<T> >& tree,
-        const std::vector<U>& items
+        const std::vector<U>& words
     );
     /*!
         ensures
