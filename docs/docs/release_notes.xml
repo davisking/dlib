@@ -29,6 +29,7 @@ New Features:
   - Added sparse_matrix_vector_multiply()
   - Added is_ordered_by_index(), find_neighbor_ranges(), and convert_unordered_to_ordered()
   - Added newman_cluster(), chinese_whispers(), and modularity() routines.
+  - Added find_max_parse_cky()
 
 Non-Backwards Compatible Changes:
   - Changed the image_dataset_metadata XML reading tools to use a map of strings to
