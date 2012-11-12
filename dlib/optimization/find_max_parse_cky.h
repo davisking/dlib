@@ -131,10 +131,13 @@ namespace dlib
     void find_max_parse_cky (
         const std::vector<T>& sequence,
         const production_rule_function& production_rules,
-        std::vector<std::vector<parse_tree_element<T> > >& parse_trees
+        std::vector<parse_tree_element<T> >& parse_tree
     )
     {
-        parse_trees.clear();
+        parse_tree.clear();
+        if (sequence.size() == 0)
+            return;
+
         array2d<std::map<T,double> > table(sequence.size(), sequence.size());
         array2d<std::map<T,parse_tree_element<T> > > back(sequence.size(), sequence.size());
         typedef typename std::map<T,double>::iterator itr;
@@ -185,31 +188,23 @@ namespace dlib
 
 
         // now use back pointers to build the parse trees
-        for (long r = 0; r < back.nr(); ++r)
+        const long r = 0;
+        const long c = back.nc()-1;
+        if (back[r][c].size() != 0)
         {
-            for (long c = back.nc()-1; c > r; --c)
+
+            // find the max scoring element in back[r][c]
+            itr_b max_i = back[r][c].begin();
+            itr_b i = max_i;
+            ++i;
+            for (; i != back[r][c].end(); ++i)
             {
-                if (back[r][c].size() != 0)
-                {
-
-                    // find the max scoring element in back[r][c]
-                    itr_b max_i = back[r][c].begin();
-                    itr_b i = max_i;
-                    ++i;
-                    for (; i != back[r][c].end(); ++i)
-                    {
-                        if (i->second.score > max_i->second.score)
-                            max_i = i;
-                    }
-
-                    parse_trees.resize(parse_trees.size()+1);
-                    parse_trees.back().reserve(c);
-                    impl::fill_parse_tree(parse_trees.back(), max_i->second.tag, back, r, c);
-
-                    r = c;
-                    break;
-                }
+                if (i->second.score > max_i->second.score)
+                    max_i = i;
             }
+
+            parse_tree.reserve(c);
+            impl::fill_parse_tree(parse_tree, max_i->second.tag, back, r, c);
         }
     }
 
@@ -303,14 +298,15 @@ namespace dlib
     template <typename T, typename U>
     std::string parse_tree_to_string (
         const std::vector<parse_tree_element<T> >& tree,
-        const std::vector<U>& words
+        const std::vector<U>& words,
+        const unsigned long root_idx = 0
     )
     {
-        if (tree.size() == 0)
+        if (root_idx >= tree.size())
             return "";
 
         std::ostringstream sout;
-        impl::print_parse_tree_helper<false>(tree, words, 0, sout);
+        impl::print_parse_tree_helper<false>(tree, words, root_idx, sout);
         return sout.str();
     }
 
@@ -319,15 +315,54 @@ namespace dlib
     template <typename T, typename U>
     std::string parse_tree_to_string_tagged (
         const std::vector<parse_tree_element<T> >& tree,
-        const std::vector<U>& words
+        const std::vector<U>& words,
+        const unsigned long root_idx = 0
     )
     {
-        if (tree.size() == 0)
+        if (root_idx >= tree.size())
             return "";
 
         std::ostringstream sout;
-        impl::print_parse_tree_helper<true>(tree, words, 0, sout);
+        impl::print_parse_tree_helper<true>(tree, words, root_idx, sout);
         return sout.str();
+    }
+
+// -----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T>
+        void helper_find_trees_without_tag (
+            const std::vector<parse_tree_element<T> >& tree,
+            const T& tag,
+            std::vector<unsigned long>& tree_roots,
+            unsigned long idx
+        )
+        {
+            if (idx < tree.size())
+            {
+                if (tree[idx].tag != tag)
+                {
+                    tree_roots.push_back(idx);
+                }
+                else
+                {
+                    helper_find_trees_without_tag(tree, tag, tree_roots, tree[idx].left);
+                    helper_find_trees_without_tag(tree, tag, tree_roots, tree[idx].right);
+                }
+            }
+        }
+    }
+
+    template <typename T>
+    void find_trees_not_rooted_with_tag (
+        const std::vector<parse_tree_element<T> >& tree,
+        const T& tag,
+        std::vector<unsigned long>& tree_roots 
+    )
+    {
+        tree_roots.clear();
+        impl::helper_find_trees_without_tag(tree, tag, tree_roots, 0);
     }
 
 // -----------------------------------------------------------------------------------------

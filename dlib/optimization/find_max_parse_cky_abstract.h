@@ -175,31 +175,30 @@ namespace dlib
     void find_max_parse_cky (
         const std::vector<T>& words,
         const production_rule_function& production_rules,
-        std::vector<std::vector<parse_tree_element<T> > >& parse_trees
+        std::vector<parse_tree_element<T> >& parse_tree
     );
     /*!
         requires
             - production_rule_function == a function or function object with the same
               interface as example_production_rule_function defined above.
+            - It must be possible to store T objects in a std::map.
         ensures
-            - Uses the CKY algorithm to find the most probable/highest scoring parse tree
-              of the given vector of words.  The output is stored in #parse_trees.
-            - This function outputs a set of non-overlapping parse trees.  Each parse tree
-              always spans the largest number of words possible, regardless of any other
-              considerations (except that the parse trees cannot have overlapping word
-              spans).  For example, this function will never select a smaller parse tree,
-              even if it would have a better score, if it can possibly build a larger tree.
-              Therefore, this function will only output multiple parse trees if it is
-              impossible to form words into a single parse tree.
+            - Uses the CKY algorithm to find the most probable/highest scoring binary parse
+              tree of the given vector of words.  
+            - if (#parse_tree.size() == 0) then
+                - There is no parse tree, using the given production_rules, that can cover
+                  the given word sequence.
+            - else
+                - #parse_tree == the highest scoring parse tree that covers all the
+                  elements of words.
+                - #parse_tree[0] == the root node of the parse tree.
+                - #parse_tree[0].score == the score of the parse tree.  This is the sum of
+                  the scores of all production rules used to construct the tree.
+                - #parse_tree[0].begin == 0
+                - #parse_tree[0].end == words.size()
             - This function uses production_rules() to find out what the allowed production
               rules are.  That is, production_rules() defines all properties of the grammar
               used by find_max_parse_cky(). 
-            - for all valid i:
-                - #parse_trees[i].size() != 0
-                - #parse_trees[i] == the root of the i'th parse tree.
-                - #parse_trees[i].score == the score of the i'th parse tree. 
-                - The i'th parse tree spans all the elements of words in the range
-                  [#parse_trees[i].c.begin, #parse_trees[i].c.end).
     !*/
 
 // -----------------------------------------------------------------------------------------
@@ -222,7 +221,8 @@ namespace dlib
         >
     std::string parse_tree_to_string (
         const std::vector<parse_tree_element<T> >& tree,
-        const std::vector<U>& words
+        const std::vector<U>& words,
+        const unsigned long root_idx = 0
     );
     /*!
         requires
@@ -240,6 +240,8 @@ namespace dlib
                    the dog  ran
 
               Then the output would be the string "[[the dog] ran]"
+            - Only the sub-tree rooted at tree[root_idx] will be output.  If root_idx >= 
+              tree.size() then the empty string is returned.
         throws
             - parse_tree_to_string_error
                 This exception is thrown if an invalid tree is detected.  This might happen
@@ -255,7 +257,8 @@ namespace dlib
         >
     std::string parse_tree_to_string_tagged (
         const std::vector<parse_tree_element<T> >& tree,
-        const std::vector<U>& words
+        const std::vector<U>& words,
+        const unsigned long root_idx = 0
     );
     /*!
         requires
@@ -277,11 +280,47 @@ namespace dlib
                    the dog  ran
 
               Then the output would be the string "[S [NP the dog] ran]"
+            - Only the sub-tree rooted at tree[root_idx] will be output.  If root_idx >=
+              tree.size() then the empty string is returned.
         throws
             - parse_tree_to_string_error
                 This exception is thrown if an invalid tree is detected.  This might happen
                 if the tree refers to elements of words that don't exist because words is
                 shorted than it is supposed to be.
+    !*/
+
+// -----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    void find_trees_not_rooted_with_tag (
+        const std::vector<parse_tree_element<T> >& tree,
+        const T& tag,
+        std::vector<unsigned long>& tree_roots 
+    );
+    /*!
+        requires
+            - objects of type T must be comparable using operator==
+        ensures
+            - Finds all the largest non-overlapping trees in tree that are not rooted with
+              the given tag.  
+            - find_trees_not_rooted_with_tag() is useful when you want to cut a parse tree
+              into a bunch of sub-trees and you know that the top level of the tree is all
+              composed of the same kind of tag.  So if you want to just "slice off" the top
+              of the tree where this tag lives then this function is useful for doing that.
+            - #tree_roots.size() == the number of sub-trees found.
+            - for all valid i:
+                - tree[#tree_roots[i]].tag != tag
+            - To make the operation of this function clearer, here are a few examples of
+              what it will do:
+                - if (tree[0].tag != tag) then 
+                    - #tree_roots.size() == 0
+                    - #tree_roots[0] == 0
+                - else if (tree[0].tag == tag but its immediate children's tags are not equal to tag) then 
+                    - #tree_roots.size() == 2
+                    - #tree_roots[0] == tree[0].left
+                    - #tree_roots[1] == tree[0].right
     !*/
 
 // -----------------------------------------------------------------------------------------
