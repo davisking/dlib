@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include "../serialize.h" 
 #include "../array2d.h"
 
 namespace dlib
@@ -22,7 +23,37 @@ namespace dlib
         T right_tag;
     };
 
+    template <typename T>
+    void serialize(
+        const constituent<T>& item,
+        std::ostream& out
+    )
+    {
+        serialize(item.begin, out);
+        serialize(item.end, out);
+        serialize(item.k, out);
+        serialize(item.left_tag, out);
+        serialize(item.right_tag, out);
+    }
+
+    template <typename T>
+    void deserialize(
+        constituent<T>& item,
+        std::istream& in 
+    )
+    {
+        deserialize(item.begin, in);
+        deserialize(item.end, in);
+        deserialize(item.k, in);
+        deserialize(item.left_tag, in);
+        deserialize(item.right_tag, in);
+    }
+
+// -----------------------------------------------------------------------------------------
+
     const unsigned long END_OF_TREE = 0xFFFFFFFF;
+
+// -----------------------------------------------------------------------------------------
 
     template <typename T>
     struct parse_tree_element
@@ -35,6 +66,33 @@ namespace dlib
         double score; 
     };
 
+    template <typename T>
+    void serialize (
+        const parse_tree_element<T>& item,
+        std::ostream& out
+    )
+    {
+        serialize(item.c, out);
+        serialize(item.tag, out);
+        serialize(item.left, out);
+        serialize(item.right, out);
+        serialize(item.score, out);
+    }
+
+    template <typename T>
+    void deserialize (
+        parse_tree_element<T>& item,
+        std::istream& in 
+    )
+    {
+        deserialize(item.c, in);
+        deserialize(item.tag, in);
+        deserialize(item.left, in);
+        deserialize(item.right, in);
+        deserialize(item.score, in);
+    }
+
+// -----------------------------------------------------------------------------------------
 
     namespace impl
     {

@@ -24,10 +24,32 @@ namespace dlib
         T right_tag;
     };
 
+    template <typename T>
+    void serialize(
+        const constituent<T>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support
+    !*/
+
+    template <typename T>
+    void deserialize(
+        constituent<T>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support 
+    !*/
+
+// -----------------------------------------------------------------------------------------
+
     /*!A END_OF_TREE is used to indicate that parse_tree_element::left or
          parse_tree_element::right doesn't point to another subtree.
     !*/
     const unsigned long END_OF_TREE = 0xFFFFFFFF;
+
+// -----------------------------------------------------------------------------------------
 
     template <typename T>
     struct parse_tree_element
@@ -45,6 +67,24 @@ namespace dlib
 
         double score; // score for this tree
     };
+
+    template <typename T>
+    void serialize (
+        const parse_tree_element<T>& item,
+        std::ostream& out
+    );
+    /*!
+        provides serialization support
+    !*/
+
+    template <typename T>
+    void deserialize (
+        parse_tree_element<T>& item,
+        std::istream& in 
+    );
+    /*!
+        provides deserialization support 
+    !*/
 
 // -----------------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------------
