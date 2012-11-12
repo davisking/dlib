@@ -58,6 +58,14 @@ namespace dlib
                     check_1a_c;
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    typedef cmd_line_parser<char>::check_1a_c command_line_parser;
+    typedef cmd_line_parser<wchar_t>::check_1a_c wcommand_line_parser;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_CMD_LINE_PARSEr_
