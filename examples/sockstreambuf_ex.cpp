@@ -77,7 +77,6 @@ int main()
 
         // set up the server object we have made
         our_server.set_listening_port(1234);
-        our_server.set_max_connections(1000);
         // Tell the server to begin accepting connections.
         our_server.start_async();
 
