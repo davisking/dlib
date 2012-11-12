@@ -15,14 +15,6 @@
 #include <vector>
 
 
-// Here I'm just making a typedef of the config reader we will be using.  If you
-// look at the documentation you will see that there are two possible config_reader
-// types we could use here.  The other one is a thread-safe version for use in an
-// application that needs to access a global config reader from multiple threads.  
-// But we aren't doing that here so I'm using the normal kind.
-typedef dlib::config_reader cr_type;
-
-
 using namespace std;
 using namespace dlib;
 
@@ -64,7 +56,7 @@ user2 {
 // ----------------------------------------------------------------------------------------
 
 void print_config_reader_contents (
-    const cr_type& cr,
+    const config_reader& cr,
     int depth = 0
 );
 /*
@@ -78,7 +70,7 @@ int main()
 {
     try
     {
-        cr_type cr("config.txt");
+        config_reader cr("config.txt");
 
         // Use our recursive function to print everything in the config file.
         print_config_reader_contents(cr);
@@ -121,7 +113,7 @@ int main()
 // ----------------------------------------------------------------------------------------
 
 void print_config_reader_contents (
-    const cr_type& cr,
+    const config_reader& cr,
     int depth 
 )
 {
