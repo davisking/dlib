@@ -36,13 +36,6 @@ typedef dlib::compress_stream::kernel_1da cs1;
 typedef dlib::compress_stream::kernel_1ea cs2;
 typedef dlib::compress_stream::kernel_1ec cs3;
 
-// Here I am making another typedef, this time for the version of
-// cmd_line_parser I want to use.  This version gives me a
-// command line parser object that has all the available extensions
-// for command line parsers applied to it.  So I will be able to use
-// its command line validation utilities as well as option printing.
-typedef dlib::cmd_line_parser<char>::check_1a_c clp;
-
 
 using namespace std;
 using namespace dlib;
@@ -52,7 +45,7 @@ int main(int argc, char** argv)
 {  
     try
     {
-        clp parser;
+        command_line_parser parser;
 
         // first I will define the command line options I want.  
         // Add a -c option and tell the parser what the option is for.

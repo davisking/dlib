@@ -77,15 +77,13 @@
 using namespace std;
 using namespace dlib;
 
-typedef dlib::cmd_line_parser<char>::check_1a_c clp_type;
-
 // ----------------------------------------------------------------------------------------
 
 int main(int argc, char** argv)
 {  
     try
     {
-        clp_type parser;
+        command_line_parser parser;
         parser.add_option("h","Display this help message.");
         parser.add_option("v","Be verbose.");
         parser.add_option("t","Train an object detector and save the detector to disk.");

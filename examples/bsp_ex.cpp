@@ -17,8 +17,6 @@
 
 #include <iostream>
 
-typedef dlib::cmd_line_parser<char>::check_1a_c clp_parser;
-
 using namespace std;
 using namespace dlib;
 
@@ -105,7 +103,7 @@ int main(int argc, char** argv)
 {
     try
     {
-        clp_parser parser;
+        command_line_parser parser;
         parser.add_option("h","Display this help message.");
         parser.add_option("l","Run as a listening BSP node.",1);
 
