@@ -63,6 +63,14 @@ namespace dlib
         typedef cmd_line_parser check_1a_c;
     };
 
+    template <
+        typename charT 
+        >
+    inline void swap (
+        cmd_line_parser<charT>& a, 
+        cmd_line_parser<charT>& b 
+    ) { a.swap(b); } 
+
 // ----------------------------------------------------------------------------------------
 
     typedef cmd_line_parser<char> command_line_parser;
