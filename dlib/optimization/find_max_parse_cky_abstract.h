@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "../algs.h" 
+#include "../serialize.h" 
 
 namespace dlib
 {
