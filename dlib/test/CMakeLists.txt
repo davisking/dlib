@@ -84,6 +84,7 @@ set (tests
    optimization.cpp
    optimization_test_functions.cpp
    opt_qp_solver.cpp
+   parse.cpp
    pipe.cpp
    pixel.cpp
    probabilistic.cpp

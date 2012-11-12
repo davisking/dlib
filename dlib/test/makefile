@@ -95,6 +95,7 @@ SRC += multithreaded_object.cpp
 SRC += object_detector.cpp
 SRC += oca.cpp
 SRC += one_vs_all_trainer.cpp
+SRC += parse.cpp
 SRC += one_vs_one_trainer.cpp
 SRC += optimization.cpp
 SRC += optimization_test_functions.cpp
