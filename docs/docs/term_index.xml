@@ -1257,6 +1257,8 @@
          <term link="parsing.html#utf8_uifstream" name="basic_utf8_ifstream"/>
          <term file="parsing.html" name="base64"/>
          <term file="parsing.html" name="cmd_line_parser"/>
+         <term link="parsing.html#cmd_line_parser" name="command_line_parser"/>
+         <term link="parsing.html#cmd_line_parser" name="wcommand_line_parser"/>
          <term file="parsing.html" name="get_option"/>
          <term link="dlib/cmd_line_parser/get_option_abstract.h.html#option_parse_error" name="option_parse_error"/>
          <term file="dlib/interfaces/cmd_line_parser_option.h.html" name="cmd_line_parser_option"/>

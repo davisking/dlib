@@ -418,6 +418,11 @@
             This object allows you to easily parse a command line.      Note that the
             documentation for the <a href="dlib/interfaces/cmd_line_parser_option.h.html">cmd_line_parser_option</a>
             (the object returned by the parser's .option() function) is in a separate file.
+            <p>
+               Note also that there are also standard typedefs for the ASCII and wide character versions of the
+               cmd_line_parser template.  These are the <tt>command_line_parser</tt> and <tt>wcommand_line_parser</tt>
+               types respectively.
+            </p>
          </description>
          
          <examples>
@@ -425,70 +430,7 @@
             <example>train_object_detector.cpp.html</example>
          </examples>
 
-         <implementations>
-            <implementation>
-               <name>cmd_line_parser_kernel_1</name>
-               <file>dlib/cmd_line_parser/cmd_line_parser_kernel_1.h</file>
-               <description> 
-                  This implementation uses the <a href="containers.html#map">map</a> and <a href="containers.html#sequence">sequence</a> 
-                  containers to keep track of the command line options and arguments.  For further details see the above link.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for cmd_line_parser_kernel_1 that uses map_kernel_1a and sequence_kernel_2a</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-                     
-
          <extensions>
-            <extension>
-               <name>cmd_line_parser_check</name>
-               <spec_file>dlib/cmd_line_parser/cmd_line_parser_check_abstract.h</spec_file>
-               <description>
-                This gives a cmd_line_parser object the ability to easily perform various
-                kinds of validation on the command line input.
-               </description>
-               <implementations>
-                  <implementation>
-                     <name>cmd_line_parser_check_1</name>
-                     <file>dlib/cmd_line_parser/cmd_line_parser_check_1.h</file>
-                     <description>This implementation is done in the obvious way.  See the source for details</description>
-                     <typedefs>
-                        <typedef>
-                           <name>check_1a</name>
-                           <description>is a typedef for cmd_line_parser_print_1 extended by cmd_line_parser_check_1</description>
-                        </typedef>
-                     </typedefs>
-                  </implementation>
-               </implementations>
-            </extension>
-
-            <extension>
-               <name>cmd_line_parser_print</name>
-               <spec_file>dlib/cmd_line_parser/cmd_line_parser_print_abstract.h</spec_file>
-               <description>This extension gives a cmd_line_parser object the ability to print its command line options 
-               in a nice format.</description>
-               <implementations>
-                  <implementation>
-                     <name>cmd_line_parser_print_1</name>
-                     <file>dlib/cmd_line_parser/cmd_line_parser_print_1.h</file>
-                     <description>This implementation is done by enumerating the options of the parser and printing them.</description>
-                     <typedefs>
-                        <typedef>
-                           <name>print_1a</name>
-                           <description>is a typedef for cmd_line_parser_kernel_1 extended by cmd_line_parser_print_1</description>
-                        </typedef>
-                     </typedefs>
-                  </implementation>
-               </implementations>
-            </extension>
-
             <extension>
                <name>get_option</name>
                <spec_file>dlib/cmd_line_parser/get_option_abstract.h</spec_file>
