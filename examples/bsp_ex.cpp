@@ -88,7 +88,8 @@ int main(int argc, char** argv)
         {
             // Get the argument to -l
             const unsigned short listening_port = get_option(parser, "l", 0);
-            cout << "Listening in port " << listening_port << endl;
+            cout << "Listening on port " << listening_port << endl;
+
             const long grid_resolution = 100;
 
             // bsp_listen() starts a listening BSP job.  This means that it will wait until
@@ -130,7 +131,7 @@ int main(int argc, char** argv)
             // and we will see the results here in main() after bsp_connect() terminates.
             bsp_connect(hosts, bsp_job_node_0, dlib::ref(min_value), dlib::ref(optimal_x));
 
-            // bsp_connect() and bsp_listen() block until all the BSP nodes have terminate.
+            // bsp_connect() and bsp_listen() block until all the BSP nodes have terminated.
             // Therefore, we won't get to this part of the code until the BSP processing
             // has finished.  But once we do we can print the results like so:
             cout << "optimal_x: "<< optimal_x << endl;
@@ -163,7 +164,7 @@ void bsp_job_node_0 (bsp_context& bsp, double& min_value, double& optimal_x)
     // you want.  However, in this example we use this node as a kind of controller for the
     // other nodes.  In particular, since we are doing a nested grid search, this node's
     // job will be to collect results from other nodes and then decide which part of the
-    // number line subsequence iterations should focus on.  
+    // number line subsequent iterations should focus on.  
     // 
     // Also, each BSP node has a node ID number.  You can determine it by calling
     // bsp.node_id().  However, the node spawned by a call to bsp_connect() always has a
@@ -175,7 +176,7 @@ void bsp_job_node_0 (bsp_context& bsp, double& min_value, double& optimal_x)
     // Now lets get down to work.  Recall that we are trying to find the x value that
     // minimizes the f(x) defined above.  The grid search will start out by considering the
     // range [-1e100, 1e100] on the number line.  It will progressively narrow this window
-    // until it has located the minimizer of f(x) to within 1e-15 of it's true value.
+    // until it has located the minimizer of f(x) to within 1e-15 of its true value.
     double left = -1e100;
     double right = 1e100;
 
@@ -236,7 +237,7 @@ void bsp_job_other_nodes (bsp_context& bsp, long grid_resolution)
     // only returns false if waiting for a message would result in all the BSP nodes
     // waiting forever.  
     // 
-    // Therefore, try_receive() functions both as a message receiving tool as well as an
+    // Therefore, try_receive() serves both as a message receiving tool as well as an
     // implicit form of barrier synchronization.  In this case, we use it to know when to
     // terminate.  That is, we know it is the time to terminate if all the messages between
     // nodes have been received and all nodes are inactive due to either termination or
