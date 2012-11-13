@@ -419,7 +419,7 @@
             documentation for the <a href="dlib/interfaces/cmd_line_parser_option.h.html">cmd_line_parser_option</a>
             (the object returned by the parser's .option() function) is in a separate file.
             <p>
-               Note also that there are also standard typedefs for the ASCII and wide character versions of the
+               Note also that there are standard typedefs for the ASCII and wide character versions of the
                cmd_line_parser template.  These are the <tt>command_line_parser</tt> and <tt>wcommand_line_parser</tt>
                types respectively.
             </p>
