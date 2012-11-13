@@ -35,6 +35,13 @@ namespace dlib
                 calls to bsp_listen() and one call to bsp_connect().  The call to
                 bsp_connect() then initiates the computation on all nodes.
 
+                Finally, note that there is no explicit barrier synchronization function
+                you call at the end of step 3.  Instead, you can simply call a method such
+                as try_receive() until it returns false.  That is, the bsp_context's
+                receive methods incorporate a barrier synchronization that happens once all
+                the BSP nodes are blocked on receive calls and there are no more messages
+                in flight. 
+
 
             THREAD SAFETY
                 This object is not thread-safe.  In particular, you should only ever have
@@ -124,6 +131,10 @@ namespace dlib
                           to process by any node and there is no possibility of more being
                           generated until control is returned to the callers of receive
                           methods. 
+                    - When one BSP node's receive method returns because of the above
+                      conditions then all of them will also return.  That is, it is NOT the
+                      case that just a subset of BSP nodes unblock.  Moreover, they all
+                      unblock at the same time.  
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
@@ -185,6 +196,10 @@ namespace dlib
                           to process by any node and there is no possibility of more being
                           generated until control is returned to the callers of receive
                           methods. 
+                    - When one BSP node's receive method returns because of the above
+                      conditions then all of them will also return.  That is, it is NOT the
+                      case that just a subset of BSP nodes unblock.  Moreover, they all
+                      unblock at the same time.  
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
@@ -227,14 +242,19 @@ namespace dlib
         );
         /*!
             ensures
-                - Wait for the following to all be true. 
-                    - All other nodes are blocked on calls to receive() or have terminated.
+                - Waits for the following to all be true:
+                    - All other nodes were blocked on calls to receive(), try_receive(), or
+                      have terminated.
                     - There are not any messages in flight between any nodes.  
-                    - That is, if all the nodes had continued to block on receive() then
-                      they all would have blocked forever.  Therefore, this function only
-                      returns once there are no more messages to process by any node and
-                      there is no possibility of more being generated until control is
-                      returned to the callers of receive(). 
+                    - That is, if all the nodes had continued to block on receive methods
+                      then they all would have blocked forever.  Therefore, this function
+                      only returns once there are no more messages to process by any node
+                      and there is no possibility of more being generated until control is
+                      returned to the callers of receive methods. 
+                - When one BSP node's receive method returns because of the above
+                  conditions then all of them will also return.  That is, it is NOT the
+                  case that just a subset of BSP nodes unblock.  Moreover, they all unblock
+                  at the same time.  
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
