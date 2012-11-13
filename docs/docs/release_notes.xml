@@ -8,74 +8,72 @@
 
 <release_notes>
 
-<!-- *******************************************************************************  -->
+<!-- **************************************************************************************  -->
 
 <current>
 New Features:
    - Machine Learning
-      - Added the ability to learn non-negative weight vectors to the 
+      - Added the ability to learn non-negative weight vectors to the
         structural_assignment_trainer object.
-      - Added two new graph clustering algorithms: Chinese Whispers and
-        Newman's modularity clustering.
-      - Added a number of new graph manipulation tools:
-        sparse_matrix_vector_multiply(), is_ordered_by_index(),
-        find_neighbor_ranges(), convert_unordered_to_ordered(),
+      - Added two new graph clustering algorithms: Chinese Whispers and Newman's modularity
+        clustering.
+      - Added a number of new graph manipulation tools: sparse_matrix_vector_multiply(),
+        is_ordered_by_index(), find_neighbor_ranges(), convert_unordered_to_ordered(),
         remove_duplicate_edges(), and the ordered_sample_pair object.
    - Networking
-      - Added a set of tools for creating applications using the Bulk Synchronous
-        Parallel computing model.  See the new bsp_ex.cpp example program for an
-        introduction.
-      - Added a routine that lets a user disable Nagle's algorithm on a TCP 
-        connection.
+      - Added a set of tools for creating applications using the Bulk Synchronous Parallel
+        computing model.  See the new bsp_ex.cpp example program for an introduction.
+      - Added a routine that lets a user disable Nagle's algorithm on a TCP connection.
       - Added an asynchronous start routine to the server object.  This is the new
         start_async() method.
       - Added the network_address object.
       - Added connect_to() to the bridge interface.
-   - Added find_max_parse_cky(), a method implementing the well known CKY algorithm
-     for parsing probabilistic context free grammars.
+   - Added find_max_parse_cky(), a method implementing the well known CKY algorithm for
+     parsing probabilistic context free grammars.
    - Added the ability to label parts of objects with the mouse to the image_display
      widget.
    - Added the ability to put overlay circles and full_object_detections into the
      image_window widget.
    - Added a stddev() for matrix objects.
    - Added operator+() for running_stats and running_scalar_covariance.
-   - Added an overload of murmur_hash3_128bit() that takes 4 integers instead of a
-     block of memory.
+   - Added an overload of murmur_hash3_128bit() that takes 4 integers instead of a block of
+     memory.
    - Added rand::get_random_64bit_number().
 
 Non-Backwards Compatible Changes:
-   - Changed the image_dataset_metadata XML reading tools to use a map of strings to
-     points to represent object parts. This change removes the old head point from a
-     box since this information can now be represented in the parts map.
-   - The syntax for passing order_by_distance and order_by_index to std::sort() is
-     now slightly different since these functions are now templates.  However, this
-     change allows them to work on any kind of sample_pair or ordered_sample_pair
-     object.
+   - Changed the image_dataset_metadata XML reading tools to use a map of strings to points
+     to represent object parts. This change removes the old head point from a box since
+     this information can now be represented in the parts map.
+   - The syntax for passing order_by_distance and order_by_index to std::sort() is now
+     slightly different since these functions are now templates.  However, this change
+     allows them to work on any kind of sample_pair or ordered_sample_pair object.
    - The default distance value of a sample_pair is now initialized to 1 instead of
      infinity.
 
 Bug fixes:
-   - Added a patch, contributed by Martin Müllenhaupt, to fix a minor bug in the
-     SQLite bindings.
+   - Added a patch, contributed by Martin Müllenhaupt, to fix a minor bug in the SQLite
+     bindings.
    - Fixed a typo which would prevent code that called running_stats::max_n() from
      compiling.
 
 Other:
    - Added a new documentation page for the various graph tools in dlib.
    - Added support for Visual Studio 2012.
-   - Switched the sample_pair object to use double to store its distance value
-     instead of float.
+   - Switched the sample_pair object to use double to store its distance value instead of
+     float.
    - Added William Sobel's patch to the web server that improves its flexibility and
      security.
-   - Changed the server object so you don't have to use the server::kernel_1a syntax
-     to declare it anymore.  Now you just say server, server_iostream, or
-     server_http depending on which one you want.
-   - Set the default max number of connections a server will accept at a time to
-     1000 rather than the previous default of infinity.
+   - Changed the server object so you don't have to use the server::kernel_1a syntax to
+     declare it anymore.  Now you just say server, server_iostream, or server_http
+     depending on which one you want.
+   - Changed the cmd_line_parser so you don't have to use the ::kernel_1a syntax anymore.
+     Now it is declared like a normal single implementation object.
+   - Set the default max number of connections a server will accept at a time to 1000
+     rather than the previous default of infinity.
 
 </current>
 
-<!-- *******************************************************************************  -->
+<!-- **************************************************************************************  -->
 
 <old name="17.48" date="Oct 18, 2012">
 New Features:
