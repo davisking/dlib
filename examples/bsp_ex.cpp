@@ -16,7 +16,7 @@
     current computer):  
 
         1. Open three command windows and navigate each to the folder containing the 
-           compiled bsp_ex.cpp program.  Lets call these window 1, window 2, and window 3.
+           compiled bsp_ex.cpp program.  Let's call these window 1, window 2, and window 3.
 
         2. In window 1 execute this command:
              ./bsp_ex -l12345
@@ -173,7 +173,7 @@ void bsp_job_node_0 (bsp_context& bsp, double& min_value, double& optimal_x)
     // is the interface that allows BSP jobs to communicate with each other. 
 
 
-    // Now lets get down to work.  Recall that we are trying to find the x value that
+    // Now let's get down to work.  Recall that we are trying to find the x value that
     // minimizes the f(x) defined above.  The grid search will start out by considering the
     // range [-1e100, 1e100] on the number line.  It will progressively narrow this window
     // until it has located the minimizer of f(x) to within 1e-15 of its true value.
