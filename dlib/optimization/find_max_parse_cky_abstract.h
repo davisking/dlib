@@ -292,6 +292,63 @@ namespace dlib
 // -----------------------------------------------------------------------------------------
 
     template <
+        typename T, 
+        typename U
+        >
+    std::string parse_trees_to_string (
+        const std::vector<parse_tree_element<T> >& tree,
+        const std::vector<U>& words,
+        const unsigned long root_idx = 0
+    );
+    /*!
+        requires
+            - It must be possible to print U objects to an ostream using operator<<
+              (typically, U would be something like std::string)
+        ensures
+            - This function behaves just like parse_tree_to_string() except that it will
+              not print the brackets (i.e. []) for the top most parts of the tree which
+              have tags equal to tree[root_idx].tag.  It will however print all the words.
+              Therefore, this function only includes brackets on the subtrees which begin
+              with a tag other than tree[root_idx].tag.
+        throws
+            - parse_tree_to_string_error
+                This exception is thrown if an invalid tree is detected.  This might happen
+                if the tree refers to elements of words that don't exist because words is
+                shorted than it is supposed to be.
+    !*/
+
+// -----------------------------------------------------------------------------------------
+
+    template <
+        typename T, 
+        typename U
+        >
+    std::string parse_trees_to_string_tagged (
+        const std::vector<parse_tree_element<T> >& tree,
+        const std::vector<U>& words,
+        const unsigned long root_idx = 0
+    );
+    /*!
+        requires
+            - It must be possible to print T objects to an ostream using operator<<
+            - It must be possible to print U objects to an ostream using operator<<
+              (typically, U would be something like std::string)
+        ensures
+            - This function behaves just like parse_tree_to_string_tagged() except that it
+              will not print the brackets (i.e. []) for the top most parts of the tree
+              which have tags equal to tree[root_idx].tag.  It will however print all the
+              words.  Therefore, this function only includes brackets on the subtrees which
+              begin with a tag other than tree[root_idx].tag.
+        throws
+            - parse_tree_to_string_error
+                This exception is thrown if an invalid tree is detected.  This might happen
+                if the tree refers to elements of words that don't exist because words is
+                shorted than it is supposed to be.
+    !*/
+
+// -----------------------------------------------------------------------------------------
+
+    template <
         typename T
         >
     void find_trees_not_rooted_with_tag (

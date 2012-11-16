@@ -28,6 +28,7 @@ namespace
     const unsigned long S   = 5;
     const unsigned long B   = 6;
     const unsigned long G   = 7;
+    const unsigned long A   = 8;
 
     typedef unsigned long tags;
 
@@ -43,6 +44,7 @@ namespace
 
         if (c.left_tag == NP && c.right_tag == VP)      possible_ids.push_back(make_pair(S,log(0.80)));
         else if (c.left_tag == DET && c.right_tag == N) possible_ids.push_back(make_pair(NP,log(0.30)));
+        else if (c.left_tag == VP && c.right_tag == A) possible_ids.push_back(make_pair(VP,log(0.30)));
         else if (c.left_tag == V && c.right_tag == NP)
         {
             possible_ids.push_back(make_pair(VP,log(0.20)));
@@ -70,12 +72,14 @@ namespace
             sequence.push_back(V);
             sequence.push_back(DET);
             sequence.push_back(N);
+            sequence.push_back(A);
 
             words.push_back("The");
             words.push_back("flight");
             words.push_back("includes");
             words.push_back("a");
             words.push_back("meal");
+            words.push_back("AWORD");
         }
 
         std::vector<parse_tree_element<tags> > parse_tree;
@@ -91,9 +95,9 @@ namespace
         for (unsigned long i = 0; i < roots.size(); ++i)
         {
             dlog << LINFO << parse_tree_to_string(parse_tree, words, roots[i]);
-            DLIB_TEST(parse_tree_to_string(parse_tree, words, roots[i]) == "[[The flight] [includes [a meal]]]");
+            DLIB_TEST(parse_tree_to_string(parse_tree, words, roots[i]) == "[[The flight] [[includes [a meal]] AWORD]]");
             dlog << LINFO << parse_tree_to_string_tagged(parse_tree, words, roots[i]);
-            DLIB_TEST(parse_tree_to_string_tagged(parse_tree, words, roots[i]) == "[5 [3 The flight] [4 includes [3 a meal]]]");
+            DLIB_TEST(parse_tree_to_string_tagged(parse_tree, words, roots[i]) == "[5 [3 The flight] [4 [4 includes [3 a meal]] AWORD]]");
         }
 
 
@@ -124,6 +128,13 @@ namespace
         DLIB_TEST(parse_tree_to_string(parse_tree, words) == str1);
         dlog << LINFO << parse_tree_to_string_tagged(parse_tree, words);
         DLIB_TEST(parse_tree_to_string_tagged(parse_tree, words) == str2);
+
+        const std::string str3 = "[[The flight] [includes [a meal]]] [[The flight] [includes [a meal]]]";
+        const std::string str4 = "[5 [3 The flight] [4 includes [3 a meal]]] [5 [3 The flight] [4 includes [3 a meal]]]";
+        dlog << LINFO << parse_trees_to_string(parse_tree, words);
+        DLIB_TEST(parse_trees_to_string(parse_tree, words) == str3);
+        dlog << LINFO << parse_trees_to_string_tagged(parse_tree, words);
+        DLIB_TEST(parse_trees_to_string_tagged(parse_tree, words) == str4);
 
         sequence.clear();
         find_max_parse_cky(sequence, user_defined_ruleset<true>, parse_tree);

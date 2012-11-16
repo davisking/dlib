@@ -232,26 +232,30 @@ namespace dlib
             std::ostream& 
         ) {  }
 
-        template <bool print_tag, typename T, typename U >
+        template <bool print_tag, bool skip_tag, typename T, typename U >
         void print_parse_tree_helper (
             const std::vector<parse_tree_element<T> >& tree,
             const std::vector<U>& words,
             unsigned long i,
+            const T& tag_to_skip,
             std::ostream& out
         )
         {
-            out << "[";
+            if (!skip_tag || tree[i].tag != tag_to_skip)
+                out << "[";
+
             bool left_recurse = false;
 
             // Only print if we are supposed to.  Doing it this funny way avoids compiler
             // errors in parse_tree_to_string() for the case where tag isn't
             // printable.
-            conditional_print<print_tag>(tree[i].tag, out);
+            if (!skip_tag || tree[i].tag != tag_to_skip)
+                conditional_print<print_tag>(tree[i].tag, out);
 
             if (tree[i].left < tree.size())
             {
                 left_recurse = true;
-                print_parse_tree_helper<print_tag>(tree, words, tree[i].left, out);
+                print_parse_tree_helper<print_tag,skip_tag>(tree, words, tree[i].left, tag_to_skip, out);
             }
             else
             {
@@ -268,12 +272,12 @@ namespace dlib
                 }
             }
 
+            if (left_recurse == true)
+                out << " ";
+
             if (tree[i].right < tree.size())
             {
-                if (left_recurse == true)
-                    out << " ";
-
-                print_parse_tree_helper<print_tag>(tree, words, tree[i].right, out);
+                print_parse_tree_helper<print_tag,skip_tag>(tree, words, tree[i].right, tag_to_skip, out);
             }
             else
             {
@@ -291,7 +295,8 @@ namespace dlib
             }
 
 
-            out << "]";
+            if (!skip_tag || tree[i].tag != tag_to_skip)
+                out << "]";
         }
     }
 
@@ -308,7 +313,7 @@ namespace dlib
             return "";
 
         std::ostringstream sout;
-        impl::print_parse_tree_helper<false>(tree, words, root_idx, sout);
+        impl::print_parse_tree_helper<false,false>(tree, words, root_idx, tree[root_idx].tag, sout);
         return sout.str();
     }
 
@@ -325,7 +330,41 @@ namespace dlib
             return "";
 
         std::ostringstream sout;
-        impl::print_parse_tree_helper<true>(tree, words, root_idx, sout);
+        impl::print_parse_tree_helper<true,false>(tree, words, root_idx, tree[root_idx].tag, sout);
+        return sout.str();
+    }
+
+// -----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    std::string parse_trees_to_string (
+        const std::vector<parse_tree_element<T> >& tree,
+        const std::vector<U>& words,
+        const unsigned long root_idx = 0
+    )
+    {
+        if (root_idx >= tree.size())
+            return "";
+
+        std::ostringstream sout;
+        impl::print_parse_tree_helper<false,true>(tree, words, root_idx, tree[root_idx].tag, sout);
+        return sout.str();
+    }
+
+// -----------------------------------------------------------------------------------------
+
+    template <typename T, typename U>
+    std::string parse_trees_to_string_tagged (
+        const std::vector<parse_tree_element<T> >& tree,
+        const std::vector<U>& words,
+        const unsigned long root_idx = 0
+    )
+    {
+        if (root_idx >= tree.size())
+            return "";
+
+        std::ostringstream sout;
+        impl::print_parse_tree_helper<true,true>(tree, words, root_idx, tree[root_idx].tag, sout);
         return sout.str();
     }
 
