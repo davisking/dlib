@@ -545,7 +545,7 @@ However, for graphs with cycles, the solution may be approximate.
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/find_max_parse_cky_abstract.h</spec_file>
          <description>
-            This is a pair of functions useful for converting a parse tree output by 
+            This is a set of functions useful for converting a parse tree output by 
             <a href="#find_max_parse_cky">find_max_parse_cky</a> into a bracketed string
             suitable for displaying the parse tree.  
          </description>
