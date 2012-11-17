@@ -15,7 +15,7 @@
 namespace dlib
 {
 
-    typedef dlib::shared_ptr< dlib::timeout::kernel_1a > timeout_ptr;
+    typedef dlib::shared_ptr<dlib::timeout> timeout_ptr;
 
 
 #ifdef _MSC_VER
@@ -564,7 +564,7 @@ namespace dlib
             // Implement a timeout
             timeout_ptr t;
             if ( timeout > 0 )
-                t.reset( new dlib::timeout::kernel_1a(*conn, &dlib::connection::shutdown, timeout) );
+                t.reset( new dlib::timeout(*conn, &dlib::connection::shutdown, timeout) );
 
             // Write our request
             conn->write(request_build.c_str(), static_cast<long>(request_build.size()));
@@ -577,7 +577,7 @@ namespace dlib
             bool read_headers(true);
 
             if ( timeout > 0 )
-                t.reset( new dlib::timeout::kernel_1a(*conn, &dlib::connection::shutdown, timeout) );
+                t.reset( new dlib::timeout(*conn, &dlib::connection::shutdown, timeout) );
 
             while ( (bytes_read = conn->read(buf, 512)) > 0 )
             {
@@ -694,7 +694,7 @@ namespace dlib
                 }
 
                 if ( timeout > 0 )
-                    t.reset( new dlib::timeout::kernel_1a(*conn, &dlib::connection::shutdown, timeout) );
+                    t.reset( new dlib::timeout(*conn, &dlib::connection::shutdown, timeout) );
             } // while still data to read
 
             t.reset();

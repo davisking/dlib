@@ -316,7 +316,7 @@ namespace dlib
 
         try
         {
-            timeout::kernel_1a t(*con,&connection::shutdown,timeout);
+            dlib::timeout t(*con,&connection::shutdown,timeout);
 
             char junk[100];
             // wait for the other end to close their side

@@ -78,7 +78,7 @@ namespace dlib
             {
                 if (buf)
                 {
-                    timeout::kernel_1a t(*con,&connection::shutdown,timeout);
+                    dlib::timeout t(*con,&connection::shutdown,timeout);
 
                     // This will flush the sockstreambuf and also destroy it.
                     buf.reset();
@@ -110,7 +110,7 @@ namespace dlib
         {
             if (con)
             {
-                con_timeout.reset(new timeout::kernel_1a(*this,&iosockstream::terminate_connection,timeout,con));
+                con_timeout.reset(new dlib::timeout(*this,&iosockstream::terminate_connection,timeout,con));
             }
         }
 
@@ -123,7 +123,7 @@ namespace dlib
             thecon->shutdown();
         }
 
-        scoped_ptr<timeout::kernel_1a> con_timeout;
+        scoped_ptr<timeout> con_timeout;
         shared_ptr_thread_safe<connection> con;
         scoped_ptr<sockstreambuf> buf;
 
