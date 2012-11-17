@@ -289,6 +289,14 @@
                   <link>sockstreambuf_ex.cpp.html</link>
                </item>
                <item>
+                  <name>IO Streams Server</name>
+                  <link>server_iostream_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>IO Socket Streams</name>
+                  <link>iosockstream_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Logger</name>
                   <link>logger_ex.cpp.html</link>
                </item>
@@ -315,10 +323,6 @@
                <item>
                   <name>Sockets</name>
                   <link>sockets_ex.cpp.html</link>
-               </item>
-               <item>
-                  <name>Sockets_2</name>
-                  <link>sockets_ex_2.cpp.html</link>
                </item>
                <item>
                   <name>Queue</name>

@@ -28,6 +28,7 @@
             <item>server_http</item> 
             <item>bridge</item> 
             <item>sockstreambuf</item> 
+            <item>iosockstream</item> 
          </section>
 
          <section>
@@ -175,7 +176,6 @@
 
          <examples>
             <example>sockets_ex.cpp.html</example>
-            <example>sockstreambuf_ex.cpp.html</example>
          </examples>
          
       </component>
@@ -191,6 +191,9 @@
             the on_connect() function so that instead of giving you a connection object you
             get an istream and ostream object.
          </description> 
+         <examples>
+            <example>server_iostream_ex.cpp.html</example>
+         </examples>
       </component>
       
    <!-- ************************************************************************* -->
@@ -212,6 +215,23 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>iosockstream</name>
+         <file>dlib/iosockstream.h</file>
+         <spec_file>dlib/iosockstream/iosockstream_abstract.h</spec_file>
+         <description>
+            This is an iostream object that reads/writes from a TCP network connection.
+         </description>
+         
+         <examples>
+            <example>iosockstream_ex.cpp.html</example>
+         </examples>
+
+      </component>
+            
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>sockstreambuf</name>
          <file>dlib/sockstreambuf.h</file>
          <spec_file>dlib/sockstreambuf/sockstreambuf_abstract.h</spec_file>
@@ -221,7 +241,6 @@
          
          <examples>
             <example>sockstreambuf_ex.cpp.html</example>
-            <example>sockets_ex_2.cpp.html</example>
          </examples>
 
       </component>
