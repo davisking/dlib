@@ -20,7 +20,7 @@ namespace dlib
                 connection* con = a connection from somewhere;
                 {
                     // setup a timer that will call con->shutdown() in 10 seconds
-                    timeout::kernel_1a t(*con,&connection::shutdown,10000); 
+                    timeout t(*con,&connection::shutdown,10000); 
                     // Now call read on the connection.  If this call to read() takes
                     // more than 10 seconds then the t timeout will trigger and shutdown
                     // the connection.  If read completes in less than 10 seconds then

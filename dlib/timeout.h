@@ -3,26 +3,7 @@
 #ifndef DLIB_TIMEOUt_
 #define DLIB_TIMEOUt_
 
-#include "timeout/timeout_kernel_1.h"
-
-namespace dlib
-{
-
-    class timeout
-    {
-        timeout() {}
-
-
-    public:
-        
-        //----------- kernels ---------------
-
-        // kernel_1a
-        typedef     timeout_kernel_1
-                    kernel_1a;
-
-    };
-}
+#include "timeout/timeout.h"
 
 #endif // DLIB_TIMEOUt_
 

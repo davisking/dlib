@@ -6,7 +6,7 @@
 #include "../threads.h"
 #include "../algs.h"
 #include "../misc_api.h"
-#include "timeout_kernel_abstract.h"
+#include "timeout_abstract.h"
 #include "../uintn.h"
 #include "../timer.h"
 
@@ -23,7 +23,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class timeout_kernel_1 
+    class timeout 
     {
         /*!
             INITIAL VALUE
@@ -62,15 +62,18 @@ namespace dlib
 
     public:
 
+        // This typedef is here for backwards compatibility with previous versions of dlib.
+        typedef timeout kernel_1a;
+
         template <
             typename T
             >
-        timeout_kernel_1 (  
+        timeout (  
             T& object,
             void (T::*callback_function)(),
             unsigned long ms_to_timeout
         ): 
-            t(*this,&timeout_kernel_1::trigger_timeout)
+            t(*this,&timeout::trigger_timeout)
         {
             zero<T,void>* B = new zero<T,void>;
             b = B;
@@ -84,13 +87,13 @@ namespace dlib
             typename T,
             typename U
             >
-        timeout_kernel_1 (  
+        timeout (  
             T& object,
             void (T::*callback_function)(U callback_function_argument),
             unsigned long ms_to_timeout,
             U callback_function_argument
         ): 
-            t(*this,&timeout_kernel_1::trigger_timeout)
+            t(*this,&timeout::trigger_timeout)
         {
             one<T,void,U>* B = new one<T,void,U>;
             b = B;
@@ -104,12 +107,12 @@ namespace dlib
         template <
             typename T
             >
-        timeout_kernel_1 (  
+        timeout (  
             T& object,
             int (T::*callback_function)(),
             unsigned long ms_to_timeout
         ): 
-            t(*this,&timeout_kernel_1::trigger_timeout)
+            t(*this,&timeout::trigger_timeout)
         {
             zero<T,int>* B = new zero<T,int>;
             b = B;
@@ -123,13 +126,13 @@ namespace dlib
             typename T,
             typename U
             >
-        timeout_kernel_1 (  
+        timeout (  
             T& object,
             int (T::*callback_function)(U callback_function_argument),
             unsigned long ms_to_timeout,
             U callback_function_argument
         ): 
-            t(*this,&timeout_kernel_1::trigger_timeout)
+            t(*this,&timeout::trigger_timeout)
         {
             one<T,int,U>* B = new one<T,int,U>;
             b = B;
@@ -140,7 +143,7 @@ namespace dlib
             t.start();
         }
 
-        virtual ~timeout_kernel_1 (
+        virtual ~timeout (
         )
         {
             t.stop_and_wait();
@@ -155,12 +158,12 @@ namespace dlib
             t.stop();
         }
 
-        dlib::timer<timeout_kernel_1>::kernel_2a t;
+        dlib::timer<timeout>::kernel_2a t;
         bind* b;
 
         // restricted functions
-        timeout_kernel_1(const timeout_kernel_1&);        // copy constructor
-        timeout_kernel_1& operator=(const timeout_kernel_1&);    // assignment operator
+        timeout(const timeout&);        // copy constructor
+        timeout& operator=(const timeout&);    // assignment operator
 
     };    
 
