@@ -304,6 +304,9 @@ namespace dlib
         unsigned long timeout 
     )
     {
+        if (!con)
+            return;
+
         if(con->shutdown_outgoing())
         {
             // there was an error so just close it now and return

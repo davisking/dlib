@@ -200,17 +200,19 @@ namespace dlib
     );
     /*!
         requires
-            - con == a valid pointer to a connection object
+            - con == a valid pointer to a connection object or 0
         ensures
-            - performs a graceful close of the given connection and if it takes longer than
-              timeout milliseconds to complete then forces the connection closed. 
-                - Specifically, a graceful close means that the outgoing part of con is
-                  closed (a FIN is sent) and then we wait for the other end to to close their 
-                  end of the connection.  This way any data still on its way to the other
-                  end of the connection will be received properly.
-            - this function will block until the graceful close is completed or we timeout.
-            - calls "delete con;".  Thus con is no longer a valid pointer after this function
-              has finished.
+            - This function does nothing if con == 0, otherwise it performs the following:
+                - performs a graceful close of the given connection and if it takes longer
+                  than timeout milliseconds to complete then forces the connection closed. 
+                    - Specifically, a graceful close means that the outgoing part of con is
+                      closed (a FIN is sent) and then we wait for the other end to to close
+                      their end of the connection.  This way any data still on its way to
+                      the other end of the connection will be received properly.
+                - This function will block until the graceful close is completed or we
+                  timeout.
+                - calls "delete con;".  Thus con is no longer a valid pointer after this
+                  function has finished.
         throws
             - std::bad_alloc or dlib::thread_error
                 If either of these exceptions are thrown con will still be closed via
@@ -225,17 +227,20 @@ namespace dlib
     );
     /*!
         requires
-            - con == a valid pointer to a connection object
+            - con == a valid pointer to a connection object or con.get() == 0
         ensures
-            - performs a graceful close of the given connection and if it takes longer than
-              timeout milliseconds to complete then forces the connection closed. 
-                - Specifically, a graceful close means that the outgoing part of con is
-                  closed (a FIN is sent) and then we wait for the other end to to close their 
-                  end of the connection.  This way any data still on its way to the other
-                  end of the connection will be received properly.
-            - this function will block until the graceful close is completed or we timeout.
-            - #con.get() == 0.  Thus con is no longer a valid pointer after this function
-              has finished.
+            - This function does nothing if con.get() == 0, otherwise it performs the
+              following:
+                - performs a graceful close of the given connection and if it takes longer
+                  than timeout milliseconds to complete then forces the connection closed. 
+                    - Specifically, a graceful close means that the outgoing part of con is
+                      closed (a FIN is sent) and then we wait for the other end to to close
+                      their end of the connection.  This way any data still on its way to
+                      the other end of the connection will be received properly.
+                - This function will block until the graceful close is completed or we
+                  timeout.
+                - #con.get() == 0.  Thus con is no longer a valid pointer after this
+                  function has finished.
         throws
             - std::bad_alloc or dlib::thread_error
                 If either of these exceptions are thrown con will still be closed and
