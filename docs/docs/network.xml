@@ -216,7 +216,7 @@
          <file>dlib/sockstreambuf.h</file>
          <spec_file>dlib/sockstreambuf/sockstreambuf_kernel_abstract.h</spec_file>
          <description>
-            This object represents a stream buffer for connection objects.
+            This object represents a stream buffer for connection objects.  
          </description>
          
          <examples>
@@ -224,42 +224,6 @@
             <example>sockets_ex_2.cpp.html</example>
          </examples>
 
-         <implementations>
-            <implementation>
-               <name>sockstreambuf_kernel_1</name>
-               <file>dlib/sockstreambuf/sockstreambuf_kernel_1.h</file>
-               <description> 
-                  This implementation is done in the obvious way without any sort of buffering. 
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for sockstreambuf_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-            <implementation>
-               <name>sockstreambuf_kernel_2</name>
-               <file>dlib/sockstreambuf/sockstreambuf_kernel_2.h</file>
-               <description> 
-                  This implementation is done in the obvious way but <i>with</i> buffering.  Thus, it is
-                  considerably faster than the unbuffered version of this object.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_2a</name>
-                     <description>is a typedef for sockstreambuf_kernel_2</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-                        
       </component>
             
       
