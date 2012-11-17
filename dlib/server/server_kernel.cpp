@@ -21,7 +21,8 @@ namespace dlib
         thread_count(0),
         thread_count_signaler(thread_count_mutex),
         max_connections(1000),
-        thread_count_zero(thread_count_mutex)
+        thread_count_zero(thread_count_mutex),
+        graceful_close_timeout(500)
     {
     }
 
@@ -35,6 +36,28 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    unsigned long server::
+    get_graceful_close_timeout (
+    ) const
+    {
+        auto_mutex lock(max_connections_mutex);
+        return graceful_close_timeout;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void server::
+    set_graceful_close_timeout (
+        unsigned long timeout
+    ) 
+    {
+        auto_mutex lock(max_connections_mutex);
+        graceful_close_timeout = timeout;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 
     int server::
     get_max_connections (
@@ -85,6 +108,7 @@ namespace dlib
         listening_ip = "";        
         listening_port = 0;
         max_connections = 1000;
+        graceful_close_timeout = 500;
         listening_port_mutex.unlock();
         listening_ip_mutex.unlock();
         max_connections_mutex.unlock();
@@ -185,6 +209,7 @@ namespace dlib
                 listening_ip = "";        
                 listening_port = 0;
                 max_connections = 1000;
+                graceful_close_timeout = 500;
                 listening_port_mutex.unlock();
                 listening_ip_mutex.unlock();
                 max_connections_mutex.unlock();
@@ -304,7 +329,7 @@ namespace dlib
             try{cons.add(client_temp);}
             catch(...)
             { 
-                sock.reset();;
+                sock.reset();
                 delete client;
                 cons_mutex.unlock();
 
@@ -326,7 +351,8 @@ namespace dlib
             try{
             temp = new param (
                             *this,
-                            *client
+                            *client,
+                            get_graceful_close_timeout() 
                             );
             } catch (...) 
             {
@@ -545,9 +571,10 @@ namespace dlib
         connection* temp;
         if (p.the_server.cons.is_member(&p.new_connection))
             p.the_server.cons.remove(&p.new_connection,temp);
-        try{ close_gracefully(&p.new_connection); } 
-        catch (...) { sdlog << LERROR << "close_gracefully() threw"; } 
         p.the_server.cons_mutex.unlock();
+
+        try{ close_gracefully(&p.new_connection, p.graceful_close_timeout); } 
+        catch (...) { sdlog << LERROR << "close_gracefully() threw"; } 
 
         // decrement the thread count and signal if it is now zero
         p.the_server.thread_count_mutex.lock();

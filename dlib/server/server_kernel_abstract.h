@@ -15,10 +15,11 @@ namespace dlib
 
         /*!
             INITIAL VALUE
-                get_listening_ip()      == ""
-                get_listening_port()    == 0
-                is_running()            == false
-                get_max_connections()   == 1000
+                get_listening_ip()           == ""
+                get_listening_port()         == 0
+                is_running()                 == false
+                get_max_connections()        == 1000
+                get_graceful_close_timeout() == 500 
 
 
             CALLBACK FUNCTIONS
@@ -242,6 +243,28 @@ namespace dlib
                     - std::bad_alloc
             !*/
     
+            void set_graceful_close_timeout (
+                unsigned long timeout
+            );
+            /*!
+                ensures
+                    - #get_graceful_close_timeout() == timeout
+            !*/
+
+            unsigned long get_graceful_close_timeout (
+            ) const;
+            /*!
+                ensures
+                    - When on_connect() terminates, it will close the connection using
+                      close_gracefully().  This is done so that any data still in the
+                      operating system's output buffers gets a chance to be properly
+                      transmitted to the remote host.  Part of this involves waiting for
+                      the remote host to close their end of the connection.  Therefore,
+                      get_graceful_close_timeout() returns the timeout, in milliseconds,
+                      that we wait for the remote host to close their end of the
+                      connection.  This is the timeout value given to close_gracefully().
+            !*/
+
         private:
 
             virtual void on_connect (

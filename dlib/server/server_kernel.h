@@ -45,7 +45,8 @@ namespace dlib
                 thread_count_signaler   == a signaler associated with thread_count_mutex
                 thread_count_zero       == a signaler associated with thread_count_mutex
                 max_connections         == 1000 
-                max_connections_mutex   == a mutex for max_connections
+                max_connections_mutex   == a mutex for max_connections and graceful_close_timeout
+                graceful_close_timeout  == 500 
              
             CONVENTION
                 listening_port          == get_listening_port()
@@ -85,14 +86,17 @@ namespace dlib
         {
             param (
                 server& server_,
-                connection& new_connection_
+                connection& new_connection_,
+                unsigned long graceful_close_timeout_
             ) :
                 the_server(server_),
-                new_connection(new_connection_)
+                new_connection(new_connection_),
+                graceful_close_timeout(graceful_close_timeout_)
             {}
 
             server& the_server;
             connection& new_connection;
+            unsigned long graceful_close_timeout; 
         };
         
 
@@ -145,6 +149,13 @@ namespace dlib
 
             void start_async (
             );
+
+            void set_graceful_close_timeout (
+                unsigned long timeout
+            );
+
+            unsigned long get_graceful_close_timeout (
+            ) const;
 
         private:
 
@@ -200,6 +211,7 @@ namespace dlib
             signaler thread_count_zero;
             scoped_ptr<thread_function> async_start_thread;
             scoped_ptr<listener> sock;
+            unsigned long graceful_close_timeout;
 
 
             // restricted functions
