@@ -55,6 +55,7 @@ set (tests
    hash_table.cpp
    hog_image.cpp
    image.cpp
+   iosockstream.cpp
    is_same_object.cpp
    kcentroid.cpp
    kernel_matrix.cpp
