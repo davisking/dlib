@@ -30,7 +30,6 @@ namespace dlib
                 - m == the mutex that protects the members of this object
         !*/
 
-        typedef sockstreambuf::kernel_2a ssbuf;
         typedef map<uint64,connection*,memory_manager<char>::kernel_2a>::kernel_1b id_map;
 
     public:
@@ -78,7 +77,7 @@ namespace dlib
             uint64 this_con_id;
             try
             {
-                ssbuf buf(&con);
+                sockstreambuf buf(&con);
                 std::istream in(&buf);
                 std::ostream out(&buf);
                 in.tie(&out);
