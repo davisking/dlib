@@ -1,5 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
+#ifndef DLIB_BSP_CPp__
+#define DLIB_BSP_CPp__
 
 #include "bsp.h"
 #include <stack>
@@ -490,4 +492,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 }
+
+#endif // DLIB_BSP_CPp__
 
