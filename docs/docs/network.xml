@@ -214,7 +214,7 @@
       <component>
          <name>sockstreambuf</name>
          <file>dlib/sockstreambuf.h</file>
-         <spec_file>dlib/sockstreambuf/sockstreambuf_kernel_abstract.h</spec_file>
+         <spec_file>dlib/sockstreambuf/sockstreambuf_abstract.h</spec_file>
          <description>
             This object represents a stream buffer for connection objects.  
          </description>
