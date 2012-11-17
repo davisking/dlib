@@ -126,7 +126,7 @@ namespace dlib
                     }
                 }
 
-                dlog << LERROR << "We ran out of memory in server_iostream::on_connect()";
+                _dLog << LERROR << "We ran out of memory in server_iostream::on_connect()";
                 // if this is an escaped exception from on_connect then let it fly! 
                 // Seriously though, this way it is obvious to the user that something bad happened
                 // since they probably won't have the dlib logger enabled.
@@ -137,7 +137,7 @@ namespace dlib
 
         uint64 next_id;
         id_map con_map;
-        const static logger dlog;
+        const static logger _dLog;
         mutex m;
         
 

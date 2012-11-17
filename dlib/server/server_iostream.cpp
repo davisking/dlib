@@ -7,7 +7,7 @@
 
 namespace dlib
 {
-    const logger server_iostream::dlog("dlib.server_iostream");
+    const logger server_iostream::_dLog("dlib.server_iostream");
 }
 
 #endif // DLIB_SERVER_IOSTREAM_CPp_
