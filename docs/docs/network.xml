@@ -236,7 +236,9 @@
          <file>dlib/sockstreambuf.h</file>
          <spec_file>dlib/sockstreambuf/sockstreambuf_abstract.h</spec_file>
          <description>
-            This object represents a stream buffer for connection objects.  
+            This object represents a stream buffer for connection objects.   If you
+            are considering using this object then you should also take a look at
+            the <a href="#iosockstream">iosockstream</a>.
          </description>
          
          <examples>
