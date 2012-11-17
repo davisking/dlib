@@ -38,7 +38,7 @@ namespace
         {
             try
             {
-                dlog << LINFO << "serving connection";
+                dlog << LINFO << "serv1: serving connection";
 
                 std::string temp;
                 in >> temp;
@@ -62,6 +62,89 @@ namespace
 
     };
 
+    class serv2 : public server_iostream
+    {
+        virtual void on_connect (
+            std::istream& ,
+            std::ostream& out,
+            const std::string& ,
+            const std::string& ,
+            unsigned short ,
+            unsigned short ,
+            uint64 
+        )
+        {
+            try
+            {
+                dlog << LINFO << "serv2: serving connection";
+
+                out << "one two three four five";
+            }
+            catch (error& e)
+            {
+                error_string = e.what();
+            }
+
+        }
+
+
+    public:
+        std::string error_string;
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    void test1()
+    {
+        serv theserv;
+        theserv.set_listening_port(12345);
+        theserv.start_async();
+
+        for (int i = 0; i < 1001; ++i)
+        {
+            print_spinner();
+            iosockstream stream("localhost:12345");
+
+            stream << "word another ";
+            std::string temp;
+            stream >> temp;
+            DLIB_TEST(temp == "yay");
+            stream >> temp;
+            DLIB_TEST(temp == "words");
+            stream << "yep ";
+        }
+
+        // Just to make sure the server finishes processing the last connection before
+        // we kill it and accidentally trigger a DLIB_TEST().
+        dlib::sleep(500);
+
+        if (theserv.error_string.size() != 0)
+            throw error(theserv.error_string);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test2()
+    {
+        serv2 theserv;
+        theserv.set_listening_port(12345);
+        theserv.start_async();
+
+        for (int i = 0; i < 1001; ++i)
+        {
+            print_spinner();
+            iosockstream stream("localhost:12345");
+
+            std::string temp;
+            stream >> temp; DLIB_TEST(temp == "one");
+            stream >> temp; DLIB_TEST(temp == "two");
+            stream >> temp; DLIB_TEST(temp == "three");
+            stream >> temp; DLIB_TEST(temp == "four");
+            stream >> temp; DLIB_TEST(temp == "five");
+        }
+    }
+
 // ----------------------------------------------------------------------------------------
 
     class test_iosockstream : public tester
@@ -76,30 +159,8 @@ namespace
         void perform_test (
         )
         {
-            serv theserv;
-            theserv.set_listening_port(12345);
-            theserv.start_async();
-
-            for (int i = 0; i < 1001; ++i)
-            {
-                print_spinner();
-                iosockstream stream("localhost:12345");
-
-                stream << "word another ";
-                std::string temp;
-                stream >> temp;
-                DLIB_TEST(temp == "yay");
-                stream >> temp;
-                DLIB_TEST(temp == "words");
-                stream << "yep ";
-            }
-
-            // Just to make sure the server finishes processing the last connection before
-            // we kill it and accidentally trigger a DLIB_TEST().
-            dlib::sleep(500);
-
-            if (theserv.error_string.size() != 0)
-                throw error(theserv.error_string);
+            test1();
+            test2();
         }
     } a;
 
