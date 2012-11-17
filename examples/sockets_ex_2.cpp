@@ -34,7 +34,7 @@ int main()
 
         {
             // Create a stream buffer for our connection
-            sockstreambuf::kernel_2a buf(con);
+            sockstreambuf buf(con);
             // Now stick that stream buffer into an iostream object
             iostream stream(&buf);
             // This command causes the iostream to flush its output buffers

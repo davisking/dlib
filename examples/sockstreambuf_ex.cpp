@@ -39,10 +39,8 @@ class serv : public server
         connection& con
     )
     {
-        // create a sockstreambuf that reads/writes on our connection.  I'm using the
-        // kernel_2a version here because it is generally the faster of the two versions in the
-        // library.
-        sockstreambuf::kernel_2a buf(&con);
+        // create a sockstreambuf that reads/writes on our connection.  
+        sockstreambuf buf(&con);
 
         // Now we make an iostream object that reads/writes to our streambuffer.  A lot of people
         // don't seem to know that the C++ iostreams are as powerful as they are.  So what I'm doing
