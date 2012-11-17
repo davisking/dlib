@@ -1,85 +1,85 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example illustrating the use of the sockets,
-    server and sockstreambuf components from the dlib C++ Library.
+    This is an example illustrating the use of the sockets and sockstreambuf
+    components from the dlib C++ Library.  Note that there is also an
+    iosockstream object in dlib that is often simpler to use, see
+    iosockstream_ex.cpp for an example of its use.
 
-    This is a simple echo server.  It listens on port 1234 for incoming
-    connections and just echos back any text it receives but in upper case.  
-    So basically it is the same as the other sockets example except it 
-    uses stream buffers.
-
-    To test it out you can just open a command prompt and type:
-    telnet localhost 1234
-
-    Then you can type away.
+    This program simply connects to www.google.com at port 80 and requests the
+    main Google web page.  It then prints what it gets back from Google to the
+    screen.
 
 
-    Also note that a good reference on the standard C++ iostream library can be 
-    found at http://www.cplusplus.com/ref/iostream/
+    For those of you curious about HTTP check out the excellent introduction at
+    http://www.jmarshall.com/easy/http/
 */
 
-
-
-
 #include "dlib/sockets.h"
-#include "dlib/server.h"
 #include "dlib/sockstreambuf.h"
 #include <iostream>
 
-using namespace dlib;
 using namespace std;
-
-
-
-class serv : public server
-{
-
-    void on_connect  (
-        connection& con
-    )
-    {
-        // create a sockstreambuf that reads/writes on our connection.  
-        sockstreambuf buf(&con);
-
-        // Now we make an iostream object that reads/writes to our streambuffer.  A lot of people
-        // don't seem to know that the C++ iostreams are as powerful as they are.  So what I'm doing
-        // here isn't anything special and is totally portable.  You will be able to use this stream
-        // object just as you would any iostream from the standard library.
-        iostream stream(&buf);
-
-        // This command causes our stream to flush its output buffers whenever you ask it for more 
-        // data.  
-        stream.tie(&stream);
-
-        char ch;
-        // Loop until we hit the end of the stream.  This happens when the connection terminates.
-        while (stream.peek() != EOF)
-        {
-            // get the next character from the client
-            ch = stream.get();
-
-            // now echo it back to them
-            stream << (char)toupper(ch);
-        }
-    }
-
-};
-
+using namespace dlib;
 
 int main()
 {
     try
     {
-        serv our_server;
+        // Connect to Google's web server which listens on port 80.  If this
+        // fails it will throw a dlib::socket_error exception.  Note that we
+        // are using a smart pointer here to contain the connection pointer
+        // returned from connect.  Doing this ensures that the connection
+        // is deleted even if someone throws an exception somewhere in your code.
+        scoped_ptr<connection> con(connect("www.google.com",80));
 
-        // set up the server object we have made
-        our_server.set_listening_port(1234);
-        // Tell the server to begin accepting connections.
-        our_server.start_async();
 
-        cout << "Press enter to end this program" << endl;
-        cin.get();
+        {
+            // Create a stream buffer for our connection
+            sockstreambuf buf(con);
+            // Now stick that stream buffer into an iostream object
+            iostream stream(&buf);
+            // This command causes the iostream to flush its output buffers
+            // whenever someone makes a read request. 
+            stream.tie(&stream);
+
+            // Now we make the HTTP GET request for the main Google page.
+            stream << "GET / HTTP/1.0\r\n\r\n";
+
+            // Here we print each character we get back one at a time. 
+            int ch = stream.get();
+            while (ch != EOF)
+            {
+                cout << (char)ch;
+                ch = stream.get();
+            }
+
+            // At the end of this scope buf will be destructed and flush 
+            // anything it still contains to the connection.  Thus putting
+            // this } here makes it safe to destroy the connection later on.
+            // If we just destroyed the connection before buf was destructed
+            // then buf might try to flush its data to a closed connection
+            // which would be an error.
+        }
+
+        // Here we call close_gracefully().  It takes a connection and performs
+        // a proper TCP shutdown by sending a FIN packet to the other end of the 
+        // connection and waiting half a second for the other end to close the 
+        // connection as well.  If half a second goes by without the other end 
+        // responding then the connection is forcefully shutdown and deleted.  
+        // 
+        // You usually want to perform a graceful shutdown of your TCP connections 
+        // because there might be some data you tried to send that is still buffered 
+        // in the operating system's output buffers.  If you just killed the 
+        // connection it might not be sent to the other side (although maybe 
+        // you don't care, and in the case of this example it doesn't really matter.  
+        // But I'm only putting this here for the purpose of illustration :-).  
+        // In any case, this function is provided to allow you to perform a graceful 
+        // close if you so choose.  
+        // 
+        // Also note that the timeout can be changed by suppling an optional argument 
+        // to this function.
+        close_gracefully(con);
     }
     catch (exception& e)
     {
