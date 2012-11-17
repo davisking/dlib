@@ -1,8 +1,9 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SOCKSTREAMBUF_KERNEL_1_CPp_
-#define DLIB_SOCKSTREAMBUF_KERNEL_1_CPp_
-#include "sockstreambuf_kernel_1.h"
+#ifndef DLIB_SOCKSTrEAMBUF_UNBUFFERED_CPp_
+#define DLIB_SOCKSTrEAMBUF_UNBUFFERED_CPp_
+
+#include "sockstreambuf_unbuffered.h"
 
 
 namespace dlib
@@ -12,7 +13,7 @@ namespace dlib
     // output functions
 // ---------------------------------------------------------------------------------------- 
 
-    sockstreambuf_kernel_1::int_type sockstreambuf_kernel_1::
+    sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
     overflow (
         int_type c
     )
@@ -31,7 +32,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------- 
 
-    std::streamsize sockstreambuf_kernel_1::
+    std::streamsize sockstreambuf_unbuffered::
     xsputn (
         const char* s,
         std::streamsize num
@@ -49,7 +50,7 @@ namespace dlib
     // input functions
 // ---------------------------------------------------------------------------------------- 
 
-    sockstreambuf_kernel_1::int_type sockstreambuf_kernel_1::
+    sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
     underflow( 
     )
     {
@@ -76,7 +77,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------- 
 
-    sockstreambuf_kernel_1::int_type sockstreambuf_kernel_1::
+    sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
     uflow( 
     )
     {   
@@ -106,7 +107,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------- 
 
-    sockstreambuf_kernel_1::int_type sockstreambuf_kernel_1::
+    sockstreambuf_unbuffered::int_type sockstreambuf_unbuffered::
     pbackfail(
         int_type c
     )
@@ -126,7 +127,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------- 
 
-    std::streamsize sockstreambuf_kernel_1::
+    std::streamsize sockstreambuf_unbuffered::
     xsgetn (
         char_type* s, 
         std::streamsize n
@@ -163,5 +164,5 @@ namespace dlib
 // ---------------------------------------------------------------------------------------- 
 
 }
-#endif // DLIB_SOCKSTREAMBUF_KERNEL_1_CPp_
+#endif // DLIB_SOCKSTrEAMBUF_UNBUFFERED_CPp_
 

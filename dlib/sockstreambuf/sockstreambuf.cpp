@@ -1,8 +1,9 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SOCKSTREAMBUF_KERNEL_2_CPp_
-#define DLIB_SOCKSTREAMBUF_KERNEL_2_CPp_
-#include "sockstreambuf_kernel_2.h"
+#ifndef DLIB_SOCKStREAMBUF_CPp_
+#define DLIB_SOCKStREAMBUF_CPp_
+
+#include "sockstreambuf.h"
 #include "../assert.h"
 
 #include <cstring>
@@ -14,7 +15,7 @@ namespace dlib
     // output functions
 // ---------------------------------------------------------------------------------------- 
 
-    sockstreambuf_kernel_2::int_type sockstreambuf_kernel_2::
+    sockstreambuf::int_type sockstreambuf::
     overflow (
         int_type c
     )
@@ -34,7 +35,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------- 
 
-    std::streamsize sockstreambuf_kernel_2::
+    std::streamsize sockstreambuf::
     xsputn (
         const char* s,
         std::streamsize num
@@ -90,7 +91,7 @@ namespace dlib
     // input functions
 // ---------------------------------------------------------------------------------------- 
 
-    sockstreambuf_kernel_2::int_type sockstreambuf_kernel_2::
+    sockstreambuf::int_type sockstreambuf::
     underflow( 
     )
     {
@@ -125,7 +126,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------- 
 
-    std::streamsize sockstreambuf_kernel_2::
+    std::streamsize sockstreambuf::
     xsgetn (
         char_type* s, 
         std::streamsize n
@@ -163,5 +164,5 @@ namespace dlib
 // ---------------------------------------------------------------------------------------- 
 
 }
-#endif // DLIB_SOCKSTREAMBUF_KERNEL_2_CPp_
+#endif // DLIB_SOCKStREAMBUF_CPp_
 

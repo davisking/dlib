@@ -1,19 +1,20 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SOCKSTREAMBUF_KERNEl_2_
-#define DLIB_SOCKSTREAMBUF_KERNEl_2_
+#ifndef DLIB_SOCKStREAMBUF_H__
+#define DLIB_SOCKStREAMBUF_H__
 
 #include <iosfwd>
 #include <streambuf>
 #include "../sockets.h"
-#include "sockstreambuf_kernel_abstract.h"
+#include "sockstreambuf_abstract.h"
+#include "sockstreambuf_unbuffered.h"
 
 namespace dlib
 {
 
 // ---------------------------------------------------------------------------------------- 
 
-    class sockstreambuf_kernel_2 : public std::streambuf
+    class sockstreambuf : public std::streambuf
     {
         /*!
             INITIAL VALUE
@@ -28,7 +29,13 @@ namespace dlib
         !*/
 
     public:
-        sockstreambuf_kernel_2 (
+
+        // These typedefs are here for backwards compatibility with previous versions of
+        // dlib.
+        typedef sockstreambuf_unbuffered kernel_1a;
+        typedef sockstreambuf kernel_2a;
+
+        sockstreambuf (
             connection* con_
         ) :
             con(*con_),
@@ -38,7 +45,7 @@ namespace dlib
             init();
         }
 
-        sockstreambuf_kernel_2 (
+        sockstreambuf (
             const scoped_ptr<connection>& con_
         ) :
             con(*con_),
@@ -48,7 +55,7 @@ namespace dlib
             init();
         }
 
-        virtual ~sockstreambuf_kernel_2 (
+        virtual ~sockstreambuf (
         )
         {
             sync();
@@ -141,8 +148,8 @@ namespace dlib
 }
 
 #ifdef NO_MAKEFILE
-#include "sockstreambuf_kernel_2.cpp"
+#include "sockstreambuf.cpp"
 #endif
 
-#endif // DLIB_SOCKSTREAMBUF_KERNEl_2_
+#endif // DLIB_SOCKStREAMBUF_H__
 

@@ -1,21 +1,26 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SOCKSTREAMBUF_KERNEl_1_
-#define DLIB_SOCKSTREAMBUF_KERNEl_1_
+#ifndef DLIB_SOCKSTrEAMBUF_UNBUFFERED_H__
+#define DLIB_SOCKSTrEAMBUF_UNBUFFERED_H__
 
 #include <iosfwd>
 #include <streambuf>
 #include "../sockets.h"
-#include "sockstreambuf_kernel_abstract.h"
+#include "sockstreambuf_abstract.h"
 
 namespace dlib
 {
 
 // ---------------------------------------------------------------------------------------- 
 
-    class sockstreambuf_kernel_1 : public std::streambuf
+    class sockstreambuf_unbuffered : public std::streambuf
     {
         /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the interface defined in sockstreambuf_abstract.h
+                except that it doesn't do any kind of buffering at all.  It just writes
+                data directly to a connection.
+
             INITIAL VALUE
                 con == a connection
                 lastread_next == false
@@ -36,7 +41,9 @@ namespace dlib
         !*/
 
     public:
-        sockstreambuf_kernel_1 (
+
+
+        sockstreambuf_unbuffered (
             connection* con_
         ) :
             con(*con_),
@@ -44,7 +51,7 @@ namespace dlib
             lastread_next(false)
         {}
 
-        sockstreambuf_kernel_1 (
+        sockstreambuf_unbuffered (
             const scoped_ptr<connection>& con_
         ) :
             con(*con_),
@@ -99,8 +106,8 @@ namespace dlib
 }
 
 #ifdef NO_MAKEFILE
-#include "sockstreambuf_kernel_1.cpp"
+#include "sockstreambuf_unbuffered.cpp"
 #endif
 
-#endif // DLIB_SOCKSTREAMBUF_KERNEl_1_
+#endif // DLIB_SOCKSTrEAMBUF_UNBUFFERED_H__
 

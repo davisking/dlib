@@ -1,7 +1,7 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_SOCKSTREAMBUF_KERNEl_ABSTRACT_
-#ifdef DLIB_SOCKSTREAMBUF_KERNEl_ABSTRACT_
+#undef DLIB_SOCKSTREAMBUF_ABSTRACT_
+#ifdef DLIB_SOCKSTREAMBUF_ABSTRACT_
 
 #include <iosfwd>
 #include <streambuf>
@@ -94,5 +94,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_SOCKSTREAMBUF_KERNEl_ABSTRACT_
+#endif // DLIB_SOCKSTREAMBUF_ABSTRACT_
 
