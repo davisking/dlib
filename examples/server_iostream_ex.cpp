@@ -56,7 +56,7 @@ class serv : public server_iostream
             char ch = in.get();
 
             // now echo it back to them
-            out << toupper(ch);
+            out << (char)toupper(ch);
         }
     }
 

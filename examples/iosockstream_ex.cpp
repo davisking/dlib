@@ -35,7 +35,7 @@ int main()
         // Here we print each character we get back one at a time. 
         while (stream.peek() != EOF)
         {
-            ch = (char)stream.get();
+            cout << (char)stream.get();
         }
     }
     catch (exception& e)
