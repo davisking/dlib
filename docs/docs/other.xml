@@ -811,54 +811,23 @@
       <component>
          <name>timer</name>
          <file>dlib/timer.h</file>
-         <spec_file>dlib/timer/timer_kernel_abstract.h</spec_file>
+         <spec_file>dlib/timer/timer_abstract.h</spec_file>
          <description>
                 This object represents a timer that will call a given member function 
                 repeatedly at regular intervals.
+                <p>
+                  The implementation of this object has a single master thread
+                  that does all the waiting.  This master thread creates and
+                  dispatches threads to specific timer objects when they need
+                  to run their action functions.  When a timer object isn't
+                  executing its action function then it doesn't have any thread
+                  allocated to it at all.  So it is fairly efficient.
+                </p>
          </description>
     
          <examples>
             <example>timer_ex.cpp.html</example>
          </examples>
-         
-         <implementations>
-            <implementation>
-               <name>timer_kernel_1</name>
-               <file>dlib/timer/timer_kernel_1.h</file>
-               <description> 
-                  This is implemented in the obvious way.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for timer_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-            <implementation>
-               <name>timer_kernel_2</name>
-               <file>dlib/timer/timer_kernel_2.h</file>
-               <description> 
-                  This implementation has a single master thread that does all the waiting.
-                  This master thread creates and dispatches threads to specific timer objects
-                  when they need to run their action functions.  When a timer object isn't executing 
-                  its action function then it doesn't have any thread allocated to it at all.  So
-                  it is much more efficient than timer_kernel_1.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_2a</name>
-                     <description>is a typedef for timer_kernel_2</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
                         
       </component>
             
