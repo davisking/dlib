@@ -1278,6 +1278,7 @@
          <term file="parsing.html" name="tokenizer"/>
          <term file="parsing.html" name="wrap_string"/>
          <term file="parsing.html" name="xml_parser"/>
+         <term link="parsing.html#xml_parser" name="parse_xml"/>
          <term file="parsing.html" name="cast_to_string"/>
          <term file="parsing.html" name="pad_int_with_zeros"/>
          <term file="parsing.html" name="toupper"/>
