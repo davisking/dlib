@@ -1278,6 +1278,9 @@
          <term file="parsing.html" name="tokenizer"/>
          <term file="parsing.html" name="wrap_string"/>
          <term file="parsing.html" name="xml_parser"/>
+         <term file="dlib/xml_parser/xml_parser_kernel_interfaces.h.html" name="document_handler"/>
+         <term file="dlib/xml_parser/xml_parser_kernel_interfaces.h.html" name="error_handler"/>
+         <term file="dlib/xml_parser/xml_parser_kernel_interfaces.h.html" name="attribute_list"/>
          <term link="parsing.html#xml_parser" name="parse_xml"/>
          <term file="parsing.html" name="cast_to_string"/>
          <term file="parsing.html" name="pad_int_with_zeros"/>
