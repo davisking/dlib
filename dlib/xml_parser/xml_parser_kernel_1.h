@@ -6,7 +6,9 @@
 
 #include "xml_parser_kernel_abstract.h"
 
+#include <sstream>
 #include <string>
+#include <fstream>
 #include <iostream>
 #include "xml_parser_kernel_interfaces.h"
 #include "../algs.h"
@@ -1356,6 +1358,159 @@ namespace dlib
 
     }
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class xml_parse_error : public error
+    {
+    public:
+        xml_parse_error(
+            const std::string& a
+        ): error(a) {}
+    };
+
+    namespace impl
+    {
+        class default_xml_error_handler : public error_handler
+        {
+            std::string filename;
+
+        public:
+
+            default_xml_error_handler (
+            ) {}
+
+            default_xml_error_handler (
+                const std::string& filename_
+            ) :filename(filename_) {}
+
+            virtual void error (
+                const unsigned long 
+            )
+            {
+                // just ignore non-fatal errors
+            }
+
+            virtual void fatal_error (
+                const unsigned long line_number
+            )
+            {
+                std::ostringstream sout;
+                if (filename.size() != 0)
+                    sout << "There is a fatal error on line " << line_number << " in the XML file '"<<filename<<"'.";
+                else
+                    sout << "There is a fatal error on line " << line_number << " in the XML being processed.";
+
+                throw xml_parse_error(sout.str());
+            }
+        };
+    }
+
+    inline void parse_xml (
+        std::istream& in,
+        document_handler& dh,
+        error_handler& eh
+    )
+    {
+        xml_parser parser;
+        parser.add_document_handler(dh);
+        parser.add_error_handler(eh);
+        parser.parse(in);
+    }
+
+    inline void parse_xml (
+        std::istream& in,
+        error_handler& eh,
+        document_handler& dh
+    )
+    {
+        xml_parser parser;
+        parser.add_document_handler(dh);
+        parser.add_error_handler(eh);
+        parser.parse(in);
+    }
+
+    inline void parse_xml (
+        std::istream& in,
+        error_handler& eh
+    )
+    {
+        xml_parser parser;
+        parser.add_error_handler(eh);
+        parser.parse(in);
+    }
+
+    inline void parse_xml (
+        std::istream& in,
+        document_handler& dh
+    )
+    {
+        xml_parser parser;
+        parser.add_document_handler(dh);
+        impl::default_xml_error_handler eh;
+        parser.add_error_handler(eh);
+        parser.parse(in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void parse_xml (
+        const std::string& filename,
+        document_handler& dh,
+        error_handler& eh
+    )
+    {
+        std::ifstream in(filename.c_str());
+        if (!in)
+            throw xml_parse_error("Unable to open file '" + filename + "'.");
+        xml_parser parser;
+        parser.add_document_handler(dh);
+        parser.add_error_handler(eh);
+        parser.parse(in);
+    }
+
+    inline void parse_xml (
+        const std::string& filename,
+        error_handler& eh,
+        document_handler& dh
+    )
+    {
+        std::ifstream in(filename.c_str());
+        if (!in)
+            throw xml_parse_error("Unable to open file '" + filename + "'.");
+        xml_parser parser;
+        parser.add_document_handler(dh);
+        parser.add_error_handler(eh);
+        parser.parse(in);
+    }
+
+    inline void parse_xml (
+        const std::string& filename,
+        error_handler& eh
+    )
+    {
+        std::ifstream in(filename.c_str());
+        if (!in)
+            throw xml_parse_error("Unable to open file '" + filename + "'.");
+        xml_parser parser;
+        parser.add_error_handler(eh);
+        parser.parse(in);
+    }
+
+    inline void parse_xml (
+        const std::string& filename,
+        document_handler& dh
+    )
+    {
+        std::ifstream in(filename.c_str());
+        if (!in)
+            throw xml_parse_error("Unable to open file '" + filename + "'.");
+        xml_parser parser;
+        parser.add_document_handler(dh);
+        impl::default_xml_error_handler eh(filename);
+        parser.add_error_handler(eh);
+        parser.parse(in);
+    }
 
 // ----------------------------------------------------------------------------------------
 

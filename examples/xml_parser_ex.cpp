@@ -91,57 +91,23 @@ public:
 
 // ----------------------------------------------------------------------------------------
 
-class xml_error_handler : public error_handler
-{
-    /*
-        This class handles error events that occur during parsing.  
-
-        Just like the document_handler class above it just prints the events to the screen.
-    */
-
-public:
-    virtual void error (
-        const unsigned long line_number
-    )
-    {
-        cout << "There is a non-fatal error on line " << line_number << " in the file we are parsing." << endl;
-    }
-
-    virtual void fatal_error (
-        const unsigned long line_number
-    )
-    {
-        cout << "There is a fatal error on line " << line_number << " so parsing will now halt" << endl;
-    }
-};
-
-// ----------------------------------------------------------------------------------------
-
 int main(int argc, char** argv)
 {
-    // Check if the user entered an argument to this application.  
-    if (argc != 2)
+    try
     {
-        cout << "Please enter an xml file to parse on the command line" << endl;
-        return 1;
-    }
+        // Check if the user entered an argument to this application.  
+        if (argc != 2)
+        {
+            cout << "Please enter an xml file to parse on the command line" << endl;
+            return 1;
+        }
 
-    // Try to open the file given on the command line
-    ifstream fin(argv[1]);
-    if (!fin)
+        doc_handler dh;
+        parse_xml(argv[1], dh);
+    }
+    catch (std::exception& e)
     {
-        cout << "unable to open file: " << argv[1] << endl;
-        return 1;
+        cout << e.what() << endl;
     }
-
-    // now make the xml parser and our document and error handlers
-    xml_parser parser;
-    doc_handler dh;
-    xml_error_handler eh;
-
-    // now associate the handlers with the parser and tell it to parse
-    parser.add_document_handler(dh);
-    parser.add_error_handler(eh);
-    parser.parse(fin);
 }
 

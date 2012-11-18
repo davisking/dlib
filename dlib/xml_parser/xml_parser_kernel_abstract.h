@@ -149,6 +149,128 @@ namespace dlib
         provides a global swap function
     !*/
 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class xml_parse_error : public error
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception object thrown by the parse_xml() routines defined
+                below.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    void parse_xml (
+        std::istream& in,
+        document_handler& dh,
+        error_handler& eh
+    );
+    /*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input stream using the
+              supplied document_handler and error_handler.
+    !*/
+
+    void parse_xml (
+        std::istream& in,
+        error_handler& eh,
+        document_handler& dh
+    )
+    /*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input stream using the
+              supplied document_handler and error_handler.
+    !*/
+
+    void parse_xml (
+        std::istream& in,
+        error_handler& eh
+    );
+    /*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input stream using the
+              supplied error_handler.
+    !*/
+
+    void parse_xml (
+        std::istream& in,
+        document_handler& dh
+    );
+    /*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input stream using the
+              supplied document_handler.
+            - Uses a default error handler that will throw an xml_parse_error exception
+              if a fatal parsing error is encountered.
+        throws
+            - xml_parse_error
+                Thrown if a fatal parsing error is encountered.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void parse_xml (
+        const std::string& filename,
+        document_handler& dh,
+        error_handler& eh
+    );
+    /*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input file using the
+              supplied error_handler and document_handler.
+        throws
+            - xml_parse_error
+                Thrown if there is a problem opening the input file.
+    !*/
+
+    void parse_xml (
+        const std::string& filename,
+        error_handler& eh,
+        document_handler& dh
+    );
+    /*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input file using the
+              supplied error_handler and document_handler.
+        throws
+            - xml_parse_error
+                Thrown if there is a problem opening the input file.
+    !*/
+
+    void parse_xml (
+        const std::string& filename,
+        error_handler& eh
+    );
+    /*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input file using the
+              supplied error_handler.
+        throws
+            - xml_parse_error
+                Thrown if there is a problem opening the input file.
+    !*/
+
+    void parse_xml (
+        const std::string& filename,
+        document_handler& dh
+    );
+    /*!
+        ensures
+            - makes an xml_parser and tells it to parse the given input file using the
+              supplied document_handler.
+            - Uses a default error handler that will throw an xml_parse_error exception
+              if a fatal parsing error is encountered.
+        throws
+            - xml_parse_error
+                Thrown if a fatal parsing error is encountered or if there is a problem
+                opening the input file.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_XML_PARSER_KERNEl_ABSTRACT_
