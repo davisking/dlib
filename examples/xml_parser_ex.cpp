@@ -103,6 +103,8 @@ int main(int argc, char** argv)
         }
 
         doc_handler dh;
+        // Now run the parser and tell it to call our doc_handler for each of the parsing
+        // events.
         parse_xml(argv[1], dh);
     }
     catch (std::exception& e)
