@@ -135,7 +135,7 @@ int main(int argc, char** argv)
     }
 
     // now make the xml parser and our document and error handlers
-    xml_parser::kernel_1a_c parser;
+    xml_parser parser;
     doc_handler dh;
     xml_error_handler eh;
 
