@@ -141,6 +141,7 @@ SRC += tokenizer.cpp
 SRC += trust_region.cpp
 SRC += tuple.cpp
 SRC += type_safe_union.cpp
+SRC += vectorstream.cpp
 
 
 ####################################################

@@ -124,6 +124,7 @@ set (tests
    timer.cpp
    tokenizer.cpp
    trust_region.cpp
+   vectorstream.cpp
    tuple.cpp
    type_safe_union.cpp
    )
