@@ -70,8 +70,12 @@ namespace dlib
             typedef linker kernel_1a;
             typedef linker kernel_1a_c;
 
-
             linker(
+            );
+
+            linker (
+                connection& a,
+                connection& b
             );
 
             virtual ~linker(

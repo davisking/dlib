@@ -36,12 +36,26 @@ namespace dlib
 
         public:
 
-
             linker(
             );
             /*!
                 ensures 
                     - #*this is properly initialized
+                throws
+                    - std::bad_alloc
+                    - dlib::thread_error
+            !*/
+
+            linker (
+                connection& a,
+                connection& b
+            );
+            /*!
+                ensures 
+                    - #*this is properly initialized
+                    - immediately invokes link(a,b); 
+                      (i.e. using this constructor is the same as creating a linker with
+                      the default constructor and then immediately invoking link() on it)
                 throws
                     - std::bad_alloc
                     - dlib::thread_error

@@ -27,6 +27,22 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     linker::
+    linker (
+        connection& a,
+        connection& b
+    ) :
+        running(false),
+        running_signaler(running_mutex),
+        A(0),
+        B(0),
+        service_connection_running_signaler(service_connection_running_mutex)
+    {
+        link(a,b);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    linker::
     ~linker (
     )
     {
