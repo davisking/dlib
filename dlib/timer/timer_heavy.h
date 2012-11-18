@@ -17,6 +17,18 @@ namespace dlib
     class timer_heavy
     {
         /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the timer_abstract.h interface.  It is very
+                simple and uses only one thread which is always alive in a timer_heavy.
+                The reason this object exists is for historical reasons.  Originally, the
+                dlib::timer was a multi-implementation component and the timer_heavy was
+                its first implementation.  It was superseded later by the more efficient
+                dlib::timer.  However, timer_heavy is still around so that
+                dlib::timer::kernel_1a has something to refer to.  This way, old client
+                code which somehow depends on the same thread always calling a timer action
+                function isn't going to be disrupted.
+
+
             INITIAL VALUE
                 - running   == false
                 - delay     == 1000
