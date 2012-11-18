@@ -10,8 +10,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    timer_kernel_2_global_clock::
-    timer_kernel_2_global_clock(
+    timer_global_clock::
+    timer_global_clock(
     ): 
         s(m),
         shutdown(false),
@@ -21,8 +21,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    timer_kernel_2_global_clock::
-    ~timer_kernel_2_global_clock()
+    timer_global_clock::
+    ~timer_global_clock()
     {
         m.lock();
         shutdown = true;
@@ -33,9 +33,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void timer_kernel_2_global_clock::
+    void timer_global_clock::
     add (
-        timer_kernel_2_base* r
+        timer_base* r
     )
     {
         if (r->in_global_clock == false)
@@ -56,7 +56,7 @@ namespace dlib
                 // next event in tm
                 s.signal();
             }
-            timer_kernel_2_base* rtemp = r;
+            timer_base* rtemp = r;
             uint64 ttemp = t;
             tm.add(ttemp,rtemp);
             r->next_time_to_run = t;
@@ -66,9 +66,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void timer_kernel_2_global_clock::
+    void timer_global_clock::
     remove (
-        timer_kernel_2_base* r
+        timer_base* r
     )
     {
         if (r->in_global_clock)
@@ -79,7 +79,7 @@ namespace dlib
                 if (tm.element().value() == r)
                 {
                     uint64 t;
-                    timer_kernel_2_base* rtemp;
+                    timer_base* rtemp;
                     tm.remove_current_element(t,rtemp);
                     r->in_global_clock = false;
                     break;
@@ -90,9 +90,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void timer_kernel_2_global_clock::
+    void timer_global_clock::
     adjust_delay (
-        timer_kernel_2_base* r,
+        timer_base* r,
         unsigned long new_delay
     )
     {
@@ -117,7 +117,7 @@ namespace dlib
             r->running = false;
             r->delay = new_delay;
 
-            timer_kernel_2_base* rtemp = r;
+            timer_base* rtemp = r;
             uint64 ttemp = t;
             tm.add(ttemp,rtemp);
             r->next_time_to_run = t;
@@ -135,7 +135,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void timer_kernel_2_global_clock::
+    void timer_global_clock::
     thread()
     {
         auto_mutex M(m);
@@ -155,8 +155,8 @@ namespace dlib
                 if (t <= cur_time + 999)
                 {
                     // remove this event from the tm map
-                    timer_kernel_2_base* r = tm.element().value();
-                    timer_kernel_2_base* rtemp;
+                    timer_base* r = tm.element().value();
+                    timer_base* rtemp;
                     tm.remove_current_element(t,rtemp);
                     r->in_global_clock = false;
 
@@ -181,24 +181,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    shared_ptr_thread_safe<timer_kernel_2_global_clock> get_global_clock()
+    shared_ptr_thread_safe<timer_global_clock> get_global_clock()
     {
-        static shared_ptr_thread_safe<timer_kernel_2_global_clock> d(new timer_kernel_2_global_clock);
+        static shared_ptr_thread_safe<timer_global_clock> d(new timer_global_clock);
         return d;
     }
 
 // ----------------------------------------------------------------------------------------
 
     // do this just to make sure get_global_clock() gets called at program startup
-    class timer_kernel_2_global_clock_helper
+    class timer_global_clock_helper
     {
     public:
-        timer_kernel_2_global_clock_helper()
+        timer_global_clock_helper()
         {
             get_global_clock();
         }
     };
-    static timer_kernel_2_global_clock_helper call_get_global_clock;
+    static timer_global_clock_helper call_get_global_clock;
 
 // ----------------------------------------------------------------------------------------
 

@@ -14,7 +14,7 @@ namespace dlib
     template <
         typename T
         >
-    class timer_kernel_1
+    class timer_heavy
     {
         /*!
             INITIAL VALUE
@@ -46,12 +46,12 @@ namespace dlib
 
         typedef void (T::*af_type)();
 
-        timer_kernel_1(  
+        timer_heavy(  
             T& ao_,
             af_type af_
         );
 
-        virtual ~timer_kernel_1(
+        virtual ~timer_heavy(
         );
 
         void clear(
@@ -110,8 +110,8 @@ namespace dlib
         uint64 next_time_to_run;
 
         // restricted functions
-        timer_kernel_1(const timer_kernel_1<T>&);        // copy constructor
-        timer_kernel_1<T>& operator=(const timer_kernel_1<T>&);    // assignment operator
+        timer_heavy(const timer_heavy<T>&);        // copy constructor
+        timer_heavy<T>& operator=(const timer_heavy<T>&);    // assignment operator
 
     };    
 
@@ -124,8 +124,8 @@ namespace dlib
     template <
         typename T
         >
-    timer_kernel_1<T>::
-    timer_kernel_1(  
+    timer_heavy<T>::
+    timer_heavy(  
         T& ao_,
         af_type af_
     ) : 
@@ -143,8 +143,8 @@ namespace dlib
     template <
         typename T
         >
-    timer_kernel_1<T>::
-    ~timer_kernel_1(
+    timer_heavy<T>::
+    ~timer_heavy(
     )
     {
         stop_and_wait();
@@ -155,7 +155,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_1<T>::
+    void timer_heavy<T>::
     clear(
     )
     {
@@ -171,7 +171,7 @@ namespace dlib
     template <
         typename T
         >
-    typename timer_kernel_1<T>::af_type timer_kernel_1<T>::
+    typename timer_heavy<T>::af_type timer_heavy<T>::
     action_function (
     ) const
     {
@@ -183,7 +183,7 @@ namespace dlib
     template <
         typename T
         >
-    const T& timer_kernel_1<T>::
+    const T& timer_heavy<T>::
     action_object (
     ) const
     {
@@ -195,7 +195,7 @@ namespace dlib
     template <
         typename T
         >
-    T& timer_kernel_1<T>::
+    T& timer_heavy<T>::
     action_object (
     )
     {
@@ -207,7 +207,7 @@ namespace dlib
     template <
         typename T
         >
-    bool timer_kernel_1<T>::
+    bool timer_heavy<T>::
     is_running (
     ) const
     {
@@ -220,7 +220,7 @@ namespace dlib
     template <
         typename T
         >
-    unsigned long timer_kernel_1<T>::
+    unsigned long timer_heavy<T>::
     delay_time (
     ) const
     {
@@ -233,7 +233,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_1<T>::
+    void timer_heavy<T>::
     set_delay_time (
         unsigned long milliseconds
     )
@@ -257,7 +257,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_1<T>::
+    void timer_heavy<T>::
     start (            
     )
     {
@@ -274,10 +274,10 @@ namespace dlib
             running = true;
 
             // start the thread
-            if (create_new_thread<timer_kernel_1,&timer_kernel_1::thread>(*this) == false)
+            if (create_new_thread<timer_heavy,&timer_heavy::thread>(*this) == false)
             {
                 running = false;
-                throw dlib::thread_error("error creating new thread in timer_kernel_1::start");
+                throw dlib::thread_error("error creating new thread in timer_heavy::start");
             }
         }
     }
@@ -287,7 +287,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_1<T>::
+    void timer_heavy<T>::
     stop (
     )
     {
@@ -302,7 +302,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_1<T>::
+    void timer_heavy<T>::
     thread (
     )
     {
@@ -354,7 +354,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_1<T>::
+    void timer_heavy<T>::
     stop_and_wait (
     )
     {

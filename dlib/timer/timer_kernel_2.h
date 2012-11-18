@@ -10,15 +10,16 @@
 #include "../uintn.h"
 #include "../binary_search_tree.h"
 #include "../smart_pointers_thread_safe.h"
+#include "timer_kernel_1.h"
 
 namespace dlib
 {
 
-    struct timer_kernel_2_base : public threaded_object
+    struct timer_base : public threaded_object
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object contains the base members of the timer_kernel_2 object.
+                This object contains the base members of the timer object.
                 It exists so that we can access them from outside any templated functions.
         !*/
 
@@ -32,11 +33,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class timer_kernel_2_global_clock : private threaded_object
+    class timer_global_clock : private threaded_object
     {
         /*!
             This object sets up a timer that triggers the action function
-            for timer_kernel_2 objects that are tracked inside this object. 
+            for timer objects that are tracked inside this object. 
             INITIAL VALUE
                 - shutdown == false
                 - running == false
@@ -47,15 +48,15 @@ namespace dlib
                 - else (running) then
                     - thread() is running
 
-                - tm[time] == pointer to a timer_kernel_2_base object 
+                - tm[time] == pointer to a timer_base object 
         !*/
-        typedef binary_search_tree<uint64,timer_kernel_2_base*,memory_manager<char>::kernel_2b>::kernel_2a_c time_map;
+        typedef binary_search_tree<uint64,timer_base*,memory_manager<char>::kernel_2b>::kernel_2a_c time_map;
     public:
 
-        ~timer_kernel_2_global_clock();
+        ~timer_global_clock();
 
         void add (
-            timer_kernel_2_base* r
+            timer_base* r
         );
         /*!
             requires
@@ -69,7 +70,7 @@ namespace dlib
         !*/
 
         void remove (
-            timer_kernel_2_base* r
+            timer_base* r
         );
         /*!
             requires
@@ -81,7 +82,7 @@ namespace dlib
         !*/
 
         void adjust_delay (
-            timer_kernel_2_base* r,
+            timer_base* r,
             unsigned long new_delay
         );
         /*!
@@ -95,10 +96,10 @@ namespace dlib
 
         mutex m;
 
-        friend shared_ptr_thread_safe<timer_kernel_2_global_clock> get_global_clock();
+        friend shared_ptr_thread_safe<timer_global_clock> get_global_clock();
 
     private:
-        timer_kernel_2_global_clock();
+        timer_global_clock();
 
         time_map tm;  
         signaler s;
@@ -112,10 +113,10 @@ namespace dlib
                 - spawns timer tasks as is appropriate
         !*/
     };
-    shared_ptr_thread_safe<timer_kernel_2_global_clock> get_global_clock();
+    shared_ptr_thread_safe<timer_global_clock> get_global_clock();
     /*!
         ensures
-            - returns the global instance of the timer_kernel_2_global_clock object
+            - returns the global instance of the timer_global_clock object
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -123,7 +124,7 @@ namespace dlib
     template <
         typename T
         >
-    class timer_kernel_2 : private timer_kernel_2_base 
+    class timer : private timer_base 
     {
         /*!
             INITIAL VALUE
@@ -150,14 +151,19 @@ namespace dlib
 
     public:
 
+        // These typedefs are here for backwards compatibility with previous versions of
+        // dlib.
+        typedef timer_heavy<T> kernel_1a;
+        typedef timer kernel_2a;
+
         typedef void (T::*af_type)();
 
-        timer_kernel_2(  
+        timer(  
             T& ao_,
             af_type af_
         );
 
-        virtual ~timer_kernel_2(
+        virtual ~timer(
         );
 
         void clear(
@@ -203,11 +209,11 @@ namespace dlib
         // data members
         T& ao;
         const af_type af;
-        shared_ptr_thread_safe<timer_kernel_2_global_clock> gc;
+        shared_ptr_thread_safe<timer_global_clock> gc;
 
         // restricted functions
-        timer_kernel_2(const timer_kernel_2&);        // copy constructor
-        timer_kernel_2& operator=(const timer_kernel_2&);    // assignment operator
+        timer(const timer&);        // copy constructor
+        timer& operator=(const timer&);    // assignment operator
 
     };    
 
@@ -220,8 +226,8 @@ namespace dlib
     template <
         typename T
         >
-    timer_kernel_2<T>::
-    timer_kernel_2(  
+    timer<T>::
+    timer(  
         T& ao_,
         af_type af_
     ) : 
@@ -240,8 +246,8 @@ namespace dlib
     template <
         typename T
         >
-    timer_kernel_2<T>::
-    ~timer_kernel_2(
+    timer<T>::
+    ~timer(
     )
     {
         clear();
@@ -253,7 +259,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_2<T>::
+    void timer<T>::
     clear(
     )
     {
@@ -269,7 +275,7 @@ namespace dlib
     template <
         typename T
         >
-    typename timer_kernel_2<T>::af_type timer_kernel_2<T>::
+    typename timer<T>::af_type timer<T>::
     action_function (
     ) const
     {
@@ -281,7 +287,7 @@ namespace dlib
     template <
         typename T
         >
-    const T& timer_kernel_2<T>::
+    const T& timer<T>::
     action_object (
     ) const
     {
@@ -293,7 +299,7 @@ namespace dlib
     template <
         typename T
         >
-    T& timer_kernel_2<T>::
+    T& timer<T>::
     action_object (
     )
     {
@@ -305,7 +311,7 @@ namespace dlib
     template <
         typename T
         >
-    bool timer_kernel_2<T>::
+    bool timer<T>::
     is_running (
     ) const
     {
@@ -318,7 +324,7 @@ namespace dlib
     template <
         typename T
         >
-    unsigned long timer_kernel_2<T>::
+    unsigned long timer<T>::
     delay_time (
     ) const
     {
@@ -331,7 +337,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_2<T>::
+    void timer<T>::
     set_delay_time (
         unsigned long milliseconds
     )
@@ -345,7 +351,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_2<T>::
+    void timer<T>::
     start (            
     )
     {
@@ -362,7 +368,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_2<T>::
+    void timer<T>::
     stop (
     )
     {
@@ -377,7 +383,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_2<T>::
+    void timer<T>::
     thread (
     )
     {
@@ -396,7 +402,7 @@ namespace dlib
     template <
         typename T
         >
-    void timer_kernel_2<T>::
+    void timer<T>::
     stop_and_wait (
     )
     {
