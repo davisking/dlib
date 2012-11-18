@@ -6,7 +6,7 @@
 #include "../threads.h"
 #include "../algs.h"
 #include "../misc_api.h"
-#include "timer_kernel_abstract.h"
+#include "timer_abstract.h"
 
 namespace dlib
 {

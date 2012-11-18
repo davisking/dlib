@@ -1,16 +1,16 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_TIMER_KERNEl_2_
-#define DLIB_TIMER_KERNEl_2_
+#ifndef DLIB_TIMEr_H__
+#define DLIB_TIMEr_H__
 
 #include "../threads.h"
 #include "../algs.h"
 #include "../misc_api.h"
-#include "timer_kernel_abstract.h"
+#include "timer_abstract.h"
 #include "../uintn.h"
 #include "../binary_search_tree.h"
 #include "../smart_pointers_thread_safe.h"
-#include "timer_kernel_1.h"
+#include "timer_heavy.h"
 
 namespace dlib
 {
@@ -418,9 +418,9 @@ namespace dlib
 }
 
 #ifdef NO_MAKEFILE
-#include "timer_kernel_2.cpp"
+#include "timer.cpp"
 #endif
 
-#endif // DLIB_TIMER_KERNEl_2_
+#endif // DLIB_TIMEr_H__
 
 

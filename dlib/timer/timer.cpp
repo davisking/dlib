@@ -1,9 +1,9 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_TIMER_KERNEl_2_CPP
-#define DLIB_TIMER_KERNEl_2_CPP
+#ifndef DLIB_TIMER_cPP__
+#define DLIB_TIMER_cPP__
 
-#include "timer_kernel_2.h"
+#include "timer.h"
 
 namespace dlib
 {
@@ -204,5 +204,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_TIMER_KERNEl_2_CPP
+#endif // DLIB_TIMER_cPP__
 
