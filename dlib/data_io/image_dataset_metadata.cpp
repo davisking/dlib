@@ -313,7 +313,7 @@ namespace dlib
             if (!fin)
                 throw dlib::error("ERROR: unable to open " + filename + " for reading.");
 
-            xml_parser::kernel_1a parser;
+            xml_parser parser;
             parser.add_document_handler(dh);
             parser.add_error_handler(eh);
             parser.parse(fin);
