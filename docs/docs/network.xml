@@ -52,7 +52,7 @@
       
    <!-- ************************************************************************* -->
       
-      <component checked="true">
+      <component>
          <name>linker</name>
          <file>dlib/linker.h</file>
          <spec_file>dlib/linker/linker_kernel_abstract.h</spec_file>
@@ -61,26 +61,6 @@
             them talk to each other.  ie. any incoming data from one connection is
             passed unaltered to the other and vice versa.         
          </description>
-         
-         <implementations>
-            <implementation>
-               <name>linker_kernel_1</name>
-               <file>dlib/linker/linker_kernel_1.h</file>
-               <description> 
-                  This implementation is done just using the objects defined in the 
-                  <a href="api.html#sockets">sockets</a> and <a href="api.html#threads">threads</a> packages.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for linker_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
                         
       </component>
       
