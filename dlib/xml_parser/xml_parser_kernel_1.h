@@ -3,46 +3,30 @@
 #ifndef DLIB_XML_PARSER_KERNEl_1_
 #define DLIB_XML_PARSER_KERNEl_1_
 
+
+#include "xml_parser_kernel_abstract.h"
+
 #include <string>
 #include <iostream>
 #include "xml_parser_kernel_interfaces.h"
-#include "xml_parser_kernel_abstract.h"
 #include "../algs.h"
 #include <cstdio>
+#include "../map.h"
+#include "../stack.h"
+#include "../sequence.h"
+#include "../memory_manager.h"
 
 namespace dlib
 {
 
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    class xml_parser_kernel_1
+    class xml_parser
     {
+        typedef dlib::map<std::string,std::string,memory_manager<char>::kernel_2a>::kernel_1b map;
+        typedef dlib::stack<std::string,memory_manager<char>::kernel_2a>::kernel_1a stack;
+        typedef sequence<document_handler*>::kernel_2a seq_dh;
+        typedef sequence<error_handler*>::kernel_2a seq_eh;
 
          /*!                
-            REQUIREMENTS ON map
-                is an implementation of map/map_kernel_abstract.h or
-                is an implementation of hash_map/hash_map_kernel_abstract.h and
-                is instantiated to map items of type std::string to std::string
-
-            REQUIREMENTS ON stack
-                is an implementation of stack/stack_kernel_abstract.h and
-                is instantiated with std::string
-
-            REQUIREMENTS ON seq_dh
-                is an implementation of sequence/sequence_kernel_abstract.h and
-                is instantiated with document_handler*
-
-            REQUIREMENTS ON seq_eh
-                is an implementation of sequence/sequence_kernel_abstract.h and
-                is instantiated with error_handler*
-
-
-
-
             INITIAL VALUE
                 dh_list.size() == 0
                 eh_list.size() == 0
@@ -53,42 +37,45 @@ namespace dlib
                 eh_list == a sequence of pointers to all the error_handlers that
                            have been added to the xml_parser
 
-                use of template parameters:
-                    map is used to implement the attribute_list interface
-                    stack is used just inside the parse function
-                    seq_dh is used to make the dh_list member variable
-                    seq_eh is used to make the eh_list member variable
+                map is used to implement the attribute_list interface
+                stack is used just inside the parse function
+                seq_dh is used to make the dh_list member variable
+                seq_eh is used to make the eh_list member variable
         !*/
 
 
        
         public:
 
+            // These typedefs are here for backwards compatibily with previous versions of
+            // dlib.
+            typedef xml_parser kernel_1a;
+            typedef xml_parser kernel_1a_c;
 
-            xml_parser_kernel_1(
+            xml_parser(
+            ) {}
+
+            virtual ~xml_parser(
+            ){}
+
+            inline void clear(
             );
 
-            virtual ~xml_parser_kernel_1(
-            ); 
-
-            void clear(
-            );
-
-            void parse (
+            inline void parse (
                 std::istream& in
             );
   
-            void add_document_handler (
+            inline void add_document_handler (
                 document_handler& item
             );
 
-            void add_error_handler (
+            inline void add_error_handler (
                 error_handler& item
             );
 
 
-            void swap (
-                xml_parser_kernel_1<map,stack,seq_dh,seq_eh>& item
+            inline void swap (
+                xml_parser& item
             );
    
 
@@ -173,7 +160,7 @@ namespace dlib
 
 
             // private member functions
-            void get_next_token(
+            inline void get_next_token(
                 std::istream& in,
                 std::string& token_text,
                 int& token_kind,
@@ -188,7 +175,7 @@ namespace dlib
                     only for chars tokens
             !*/
 
-            int parse_element (
+            inline int parse_element (
                 const std::string& token,
                 std::string& name,
                 attrib_list& atts
@@ -204,7 +191,7 @@ namespace dlib
                     returns -1 if it failed to parse token
             !*/
 
-            int parse_pi (
+            inline int parse_pi (
                 const std::string& token,
                 std::string& target,
                 std::string& data
@@ -220,7 +207,7 @@ namespace dlib
                     returns -1 if it failed to parse token
             !*/
 
-            int parse_element_end (
+            inline int parse_element_end (
                 const std::string& token,
                 std::string& name
             );
@@ -260,22 +247,16 @@ namespace dlib
             // -----------------------------------
 
             // restricted functions: assignment and copy construction
-            xml_parser_kernel_1(xml_parser_kernel_1<map,stack,seq_dh,seq_eh>&);   
-            xml_parser_kernel_1<map,stack,seq_dh,seq_eh>& operator= (
-                        xml_parser_kernel_1<map,stack,seq_dh,seq_eh>&
+            xml_parser(xml_parser&);   
+            xml_parser& operator= (
+                        xml_parser&
                         );  
 
     };
 
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
     inline void swap (
-        xml_parser_kernel_1<map,stack,seq_dh,seq_eh>& a, 
-        xml_parser_kernel_1<map,stack,seq_dh,seq_eh>& b 
+        xml_parser& a, 
+        xml_parser& b 
     ) { a.swap(b); }   
 
 
@@ -285,41 +266,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
  
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
-    xml_parser_kernel_1(
-    )
-    {
-    }
-
-// ----------------------------------------------------------------------------------------
-    
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
-    ~xml_parser_kernel_1(
-    )
-    {
-    }
-
-// ----------------------------------------------------------------------------------------
-    
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    void xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    void xml_parser::
     clear(
     )
     {
@@ -330,17 +277,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
         
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    void xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    void xml_parser::
     parse (
         std::istream& in
     )
     {
+        DLIB_CASSERT ( in.fail() == false ,
+            "\tvoid xml_parser::parse"
+            << "\n\tthe input stream must not be in the fail state"
+            << "\n\tthis: " << this
+            );
+
 
         // save which exceptions in will throw and make it so it won't throw any
         // for the life of this function
@@ -633,13 +580,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
         
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    void xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    void xml_parser::
     add_document_handler (
         document_handler& item
     )
@@ -650,13 +591,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
         
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    void xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    void xml_parser::
     add_error_handler (
         error_handler& item
     )
@@ -667,15 +602,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
         
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    void xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    void xml_parser::
     swap (
-        xml_parser_kernel_1<map,stack,seq_dh,seq_eh>& item
+        xml_parser& item
     )
     {
         dh_list.swap(item.dh_list);
@@ -688,13 +617,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
         
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    void xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    void xml_parser::
     get_next_token(
         std::istream& in,
         std::string& token_text,
@@ -1114,13 +1037,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
         
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    int xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    int xml_parser::
     parse_element (
         const std::string& token,
         std::string& name,
@@ -1277,13 +1194,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
         
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    int xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    int xml_parser::
     parse_pi (
         const std::string& token,
         std::string& target,
@@ -1325,13 +1236,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
         
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    int xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    int xml_parser::
     parse_element_end (
         const std::string& token,
         std::string& name
@@ -1354,13 +1259,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
         
-    template <
-        typename map,
-        typename stack,
-        typename seq_dh,
-        typename seq_eh
-        >
-    int xml_parser_kernel_1<map,stack,seq_dh,seq_eh>::
+    int xml_parser::
     change_entity (
         std::istream& in
     )
