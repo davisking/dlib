@@ -34,6 +34,7 @@
          <item>timer</item> 
          <item>timeout</item> 
          <item>member_function_pointer</item>
+         <item>vectorstream</item>
          <item>bound_function_pointer</item>
          <item>error</item>
          <item>console_progress_indicator</item>
@@ -364,6 +365,30 @@
       
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>vectorstream</name>
+         <file>dlib/vectorstream.h</file>
+         <spec_file>dlib/vectorstream/vectorstream_abstract.h</spec_file>
+         <description>
+                This is an iostream object that reads and writes from an in-memory buffer.
+                It functions very much the same way as the std::stringstream object.
+                However, while the std::stringstream holds its buffer internally and it can
+                only be accessed by copying it out, the vectorstream uses an external
+                std::vector&lt;char&gt; as its buffer.  That is, it holds a reference to an
+                external vector and does not contain any internal buffers of its own.  
+
+               <p>
+                This object is useful as a slightly more efficient alternative to the
+                std::stringstream since you can avoid the overhead of copying buffer
+                contents to and from the stream.  This is particularly useful when used as
+                a source or target for <a href="#serialize">serialization</a> routines.
+               </p>
+         </description>
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
       <component>
          <name>member_function_pointer</name>
          <file>dlib/member_function_pointer.h</file>

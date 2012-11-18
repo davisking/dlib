@@ -1224,6 +1224,7 @@
          <term link="other.html#dlib_testing_suite" name="testing"/>
          <term link="other.html#dlib_testing_suite" name="unit testing"/>
          <term file="other.html" name="logger"/>
+         <term file="other.html" name="vectorstream"/>
          <term file="other.html" name="member_function_pointer"/>
          <term file="other.html" name="make_mfp"/>
          <term file="other.html" name="bound_function_pointer"/>
