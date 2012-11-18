@@ -14,12 +14,12 @@ namespace dlib
     template <
         typename T
         >
-    mfpk1<> make_mfp (
+    member_function_pointer<> make_mfp (
         T& object,
         void (T::*cb)()
     )
     {
-        mfpk1<> temp;
+        member_function_pointer<> temp;
         temp.set(object, cb);
         return temp;
     }
@@ -27,12 +27,12 @@ namespace dlib
     template <
         typename T
         >
-    mfpk1<> make_mfp (
+    member_function_pointer<> make_mfp (
         const T& object,
         void (T::*cb)()const
     )
     {
-        mfpk1<> temp;
+        member_function_pointer<> temp;
         temp.set(object, cb);
         return temp;
     }
@@ -43,12 +43,12 @@ namespace dlib
         typename T,
         typename A1
         >
-    mfpk1<A1> make_mfp (
+    member_function_pointer<A1> make_mfp (
         T& object,
         void (T::*cb)(A1)
     )
     {
-        mfpk1<A1> temp;
+        member_function_pointer<A1> temp;
         temp.set(object, cb);
         return temp;
     }
@@ -57,12 +57,12 @@ namespace dlib
         typename T,
         typename A1
         >
-    mfpk1<A1> make_mfp (
+    member_function_pointer<A1> make_mfp (
         const T& object,
         void (T::*cb)(A1)const
     )
     {
-        mfpk1<A1> temp;
+        member_function_pointer<A1> temp;
         temp.set(object, cb);
         return temp;
     }
@@ -74,12 +74,12 @@ namespace dlib
         typename A1,
         typename A2
         >
-    mfpk1<A1,A2> make_mfp (
+    member_function_pointer<A1,A2> make_mfp (
         T& object,
         void (T::*cb)(A1,A2)
     )
     {
-        mfpk1<A1,A2> temp;
+        member_function_pointer<A1,A2> temp;
         temp.set(object, cb);
         return temp;
     }
@@ -89,12 +89,12 @@ namespace dlib
         typename A1,
         typename A2
         >
-    mfpk1<A1,A2> make_mfp (
+    member_function_pointer<A1,A2> make_mfp (
         const T& object,
         void (T::*cb)(A1,A2)const
     )
     {
-        mfpk1<A1,A2> temp;
+        member_function_pointer<A1,A2> temp;
         temp.set(object, cb);
         return temp;
     }
@@ -107,12 +107,12 @@ namespace dlib
         typename A2,
         typename A3
         >
-    mfpk1<A1,A2,A3> make_mfp (
+    member_function_pointer<A1,A2,A3> make_mfp (
         T& object,
         void (T::*cb)(A1,A2,A3)
     )
     {
-        mfpk1<A1,A2,A3> temp;
+        member_function_pointer<A1,A2,A3> temp;
         temp.set(object, cb);
         return temp;
     }
@@ -123,12 +123,12 @@ namespace dlib
         typename A2,
         typename A3
         >
-    mfpk1<A1,A2,A3> make_mfp (
+    member_function_pointer<A1,A2,A3> make_mfp (
         const T& object,
         void (T::*cb)(A1,A2,A3)const
     )
     {
-        mfpk1<A1,A2,A3> temp;
+        member_function_pointer<A1,A2,A3> temp;
         temp.set(object, cb);
         return temp;
     }
@@ -142,12 +142,12 @@ namespace dlib
         typename A3,
         typename A4
         >
-    mfpk1<A1,A2,A3,A4> make_mfp (
+    member_function_pointer<A1,A2,A3,A4> make_mfp (
         T& object,
         void (T::*cb)(A1,A2,A3,A4)
     )
     {
-        mfpk1<A1,A2,A3,A4> temp;
+        member_function_pointer<A1,A2,A3,A4> temp;
         temp.set(object, cb);
         return temp;
     }
@@ -159,12 +159,12 @@ namespace dlib
         typename A3,
         typename A4
         >
-    mfpk1<A1,A2,A3,A4> make_mfp (
+    member_function_pointer<A1,A2,A3,A4> make_mfp (
         const T& object,
         void (T::*cb)(A1,A2,A3,A4)const
     )
     {
-        mfpk1<A1,A2,A3,A4> temp;
+        member_function_pointer<A1,A2,A3,A4> temp;
         temp.set(object, cb);
         return temp;
     }

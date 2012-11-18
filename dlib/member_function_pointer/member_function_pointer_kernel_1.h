@@ -19,7 +19,20 @@ namespace dlib
         typename PARAM3 = void,
         typename PARAM4 = void
         >
-    class mfpk1;
+    class member_function_pointer;
+
+// ----------------------------------------------------------------------------------------
+
+#define DLIB_MFP_SC DLIB_ASSERT(cb != 0,                                \
+                   "\tvoid member_function_pointer::set"                \
+                   << "\n\tthe member function pointer can't be null"   \
+                   << "\n\tthis: " << this   );
+
+
+#define DLIB_MFP_OC DLIB_ASSERT(this->is_set() == true ,                            \
+                   "\tvoid member_function_pointer::operator()"                     \
+                   << "\n\tYou must call set() before you can use this function"    \
+                   << "\n\tthis: " << this);
 
 // ----------------------------------------------------------------------------------------
 
@@ -188,7 +201,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <>
-    class mfpk1<void,void,void,void> : public mfp_kernel_1_base_class<0>
+    class member_function_pointer<void,void,void,void> : public mfp_kernel_1_base_class<0>
     {
         class mp_base : public mp_base_base {
         public:
@@ -222,16 +235,22 @@ namespace dlib
         typedef void param3_type;
         typedef void param4_type;
 
-        void operator() () const { static_cast<const mp_base*>(mp_memory.get())->call(); }
+        // These two typedefs are here for backwards compatibility with previous versions
+        // of dlib.
+        typedef member_function_pointer kernel_1a;
+        typedef member_function_pointer kernel_1a_c;
+
+
+        void operator() () const { DLIB_MFP_OC; static_cast<const mp_base*>(mp_memory.get())->call(); }
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
     };    
 
@@ -240,7 +259,7 @@ namespace dlib
     template <
         typename PARAM1
         >
-    class mfpk1<PARAM1,void,void,void> : public mfp_kernel_1_base_class<1>
+    class member_function_pointer<PARAM1,void,void,void> : public mfp_kernel_1_base_class<1>
     {
         class mp_base : public mp_base_base {
         public:
@@ -274,16 +293,22 @@ namespace dlib
         typedef void param3_type;
         typedef void param4_type;
 
-        void operator() (PARAM1 p1) const { static_cast<const mp_base*>(mp_memory.get())->call(p1); }
+        // These two typedefs are here for backwards compatibility with previous versions
+        // of dlib.
+        typedef member_function_pointer kernel_1a;
+        typedef member_function_pointer kernel_1a_c;
+
+
+        void operator() (PARAM1 p1) const { DLIB_MFP_OC;  static_cast<const mp_base*>(mp_memory.get())->call(p1); }
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
     };    
 
@@ -293,7 +318,7 @@ namespace dlib
         typename PARAM1,
         typename PARAM2
         >
-    class mfpk1<PARAM1,PARAM2,void,void> : public mfp_kernel_1_base_class<2>
+    class member_function_pointer<PARAM1,PARAM2,void,void> : public mfp_kernel_1_base_class<2>
     {
         class mp_base : public mp_base_base {
         public:
@@ -327,16 +352,21 @@ namespace dlib
         typedef void param3_type;
         typedef void param4_type;
 
-        void operator() (PARAM1 p1, PARAM2 p2) const { static_cast<const mp_base*>(mp_memory.get())->call(p1,p2); }
+        // These two typedefs are here for backwards compatibility with previous versions
+        // of dlib.
+        typedef member_function_pointer kernel_1a;
+        typedef member_function_pointer kernel_1a_c;
+
+        void operator() (PARAM1 p1, PARAM2 p2) const { DLIB_MFP_OC;  static_cast<const mp_base*>(mp_memory.get())->call(p1,p2); }
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
     };    
 
@@ -347,7 +377,7 @@ namespace dlib
         typename PARAM2,
         typename PARAM3
         >
-    class mfpk1<PARAM1,PARAM2,PARAM3,void> : public mfp_kernel_1_base_class<3>
+    class member_function_pointer<PARAM1,PARAM2,PARAM3,void> : public mfp_kernel_1_base_class<3>
     {
         class mp_base : public mp_base_base {
         public:
@@ -381,16 +411,21 @@ namespace dlib
         typedef PARAM3 param3_type;
         typedef void param4_type;
 
-        void operator() (PARAM1 p1, PARAM2 p2, PARAM3 p3) const { static_cast<const mp_base*>(mp_memory.get())->call(p1,p2,p3); }
+        // These two typedefs are here for backwards compatibility with previous versions
+        // of dlib.
+        typedef member_function_pointer kernel_1a;
+        typedef member_function_pointer kernel_1a_c;
+
+        void operator() (PARAM1 p1, PARAM2 p2, PARAM3 p3) const { DLIB_MFP_OC;  static_cast<const mp_base*>(mp_memory.get())->call(p1,p2,p3); }
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
     };    
 
@@ -402,7 +437,7 @@ namespace dlib
         typename PARAM3,
         typename PARAM4
         >
-    class mfpk1 : public mfp_kernel_1_base_class<4>
+    class member_function_pointer : public mfp_kernel_1_base_class<4>
     {
         class mp_base : public mp_base_base {
         public:
@@ -436,17 +471,22 @@ namespace dlib
         typedef PARAM3 param3_type;
         typedef PARAM4 param4_type;
 
+        // These two typedefs are here for backwards compatibility with previous versions
+        // of dlib.
+        typedef member_function_pointer kernel_1a;
+        typedef member_function_pointer kernel_1a_c;
+
         void operator() (PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4) const 
-        { static_cast<const mp_base*>(mp_memory.get())->call(p1,p2,p3,p4); }
+        { DLIB_MFP_OC;  static_cast<const mp_base*>(mp_memory.get())->call(p1,p2,p3,p4); }
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
         template <typename T> typename disable_if<is_const_type<T>,void>::type 
         set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
         template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
-        { destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
+        { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
     };    
 

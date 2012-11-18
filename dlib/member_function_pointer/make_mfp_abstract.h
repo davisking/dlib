@@ -13,7 +13,7 @@ namespace dlib
     template <
         typename T
         >
-    member_function_pointer<>::kernel_1a make_mfp (
+    member_function_pointer<> make_mfp (
         T& object,
         void (T::*cb)()
     );
@@ -29,7 +29,7 @@ namespace dlib
     template <
         typename T
         >
-    member_function_pointer<>::kernel_1a make_mfp (
+    member_function_pointer<> make_mfp (
         const T& object,
         void (T::*cb)()const
     );
@@ -48,7 +48,7 @@ namespace dlib
         typename T,
         typename A1
         >
-    typename member_function_pointer<A1>::kernel_1a make_mfp (
+    member_function_pointer<A1> make_mfp (
         T& object,
         void (T::*cb)(A1 a1)
     );
@@ -65,7 +65,7 @@ namespace dlib
         typename T,
         typename A1
         >
-    typename member_function_pointer<A1>::kernel_1a make_mfp (
+    member_function_pointer<A1> make_mfp (
         const T& object,
         void (T::*cb)(A1 a1)const
     );
@@ -85,7 +85,7 @@ namespace dlib
         typename A1,
         typename A2
         >
-    typename member_function_pointer<A1,A2>::kernel_1a make_mfp (
+    member_function_pointer<A1,A2> make_mfp (
         T& object,
         void (T::*cb)(A1 a1, A2 a2)
     );
@@ -103,7 +103,7 @@ namespace dlib
         typename A1,
         typename A2
         >
-    typename member_function_pointer<A1,A2>::kernel_1a make_mfp (
+    member_function_pointer<A1,A2> make_mfp (
         const T& object,
         void (T::*cb)(A1 a1, A2 a2)const
     );
@@ -124,7 +124,7 @@ namespace dlib
         typename A2,
         typename A3
         >
-    typename member_function_pointer<A1,A2,A3>::kernel_1a make_mfp (
+    member_function_pointer<A1,A2,A3> make_mfp (
         T& object,
         void (T::*cb)(A1 a1, A2 a2, A3 a3)
     );
@@ -143,7 +143,7 @@ namespace dlib
         typename A2,
         typename A3
         >
-    typename member_function_pointer<A1,A2,A3>::kernel_1a make_mfp (
+    member_function_pointer<A1,A2,A3> make_mfp (
         const T& object,
         void (T::*cb)(A1 a1, A2 a2, A3 a3)const
     );
@@ -165,7 +165,7 @@ namespace dlib
         typename A3,
         typename A4
         >
-    typename member_function_pointer<A1,A2,A3,A4>::kernel_1a make_mfp (
+    member_function_pointer<A1,A2,A3,A4> make_mfp (
         T& object,
         void (T::*cb)(A1 a1, A2 a2, A3 a3, A4 a4)
     );
@@ -185,7 +185,7 @@ namespace dlib
         typename A3,
         typename A4
         >
-    typename member_function_pointer<A1,A2,A3,A4>::kernel_1a make_mfp (
+    member_function_pointer<A1,A2,A3,A4> make_mfp (
         const T& object,
         void (T::*cb)(A1 a1, A2 a2, A3 a3, A4 a4)const
     );
