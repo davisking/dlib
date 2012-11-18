@@ -214,7 +214,7 @@ namespace dlib
         service_connection_error_mutex.unlock();
 
 
-        // if we are ending becaues of an error
+        // if we are ending because of an error
         if (error)
         {
 
