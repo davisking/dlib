@@ -29,6 +29,12 @@ namespace dlib
                 buffer(buffer_) 
             {}
 
+
+            void seekg(size_type pos)
+            {
+                read_pos = pos;
+            }
+
             // ------------------------ OUTPUT FUNCTIONS ------------------------
 
             int_type overflow ( int_type c)
@@ -85,14 +91,14 @@ namespace dlib
                 std::streamsize n
             )
             { 
-                const size_type num = std::min<size_type>(n, buffer.size()-read_pos);
-                if (num > 0)
+                if (read_pos < buffer.size())
                 {
+                    const size_type num = std::min<size_type>(n, buffer.size()-read_pos);
                     std::memcpy(s, &buffer[read_pos], num);
                     read_pos += num;
+                    return num;
                 }
-
-                return num;
+                return 0;
             }
 
         };
@@ -105,6 +111,14 @@ namespace dlib
             std::iostream(&buf),
             buf(buffer)
         {}
+
+        std::istream& seekg (
+            std::streampos pos
+        )
+        {
+            buf.seekg(pos);
+            return *this;
+        }
 
     private:
         vector_streambuf buf;

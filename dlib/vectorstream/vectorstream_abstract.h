@@ -43,6 +43,17 @@ namespace dlib
                   immediately show up in the buffer.
         !*/
 
+        std::istream& seekg (
+            std::streampos pos
+        );
+        /*!
+            ensures
+                - The next read from this object will read from the position buffer[pos],
+                  where buffer is the std::vector given to this object's constructor.  Note
+                  that if pos >= buffer.size() then the next read will simply return EOF.
+                - returns *this
+        !*/
+
     };
 }
 
