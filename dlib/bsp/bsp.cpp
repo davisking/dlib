@@ -149,7 +149,7 @@ namespace dlib
 
                     if (msg.msg_type == MESSAGE_HEADER)
                     {
-                        msg.data.reset(new std::string);
+                        msg.data.reset(new std::vector<char>);
                         deserialize(msg.epoch, con->stream);
                         deserialize(*msg.data, con->stream);
                     }
@@ -162,34 +162,32 @@ namespace dlib
             }
             catch (std::exception& e)
             {
-                std::ostringstream sout;
+                impl1::msg_data msg;
+                msg.data.reset(new std::vector<char>);
+                vectorstream sout(*msg.data);
                 sout << "An exception was thrown while attempting to receive a message from processing node " << sender_id << ".\n";
                 sout << "  Sending processing node address:   " << con->con->get_foreign_ip() << ":" << con->con->get_foreign_port() << std::endl;
                 sout << "  Receiving processing node address: " << con->con->get_local_ip() << ":" << con->con->get_local_port() << std::endl;
                 sout << "  Receiving processing node id:      " << node_id << std::endl;
                 sout << "  Error message in the exception:    " << e.what() << std::endl;
 
-                impl1::msg_data msg;
                 msg.sender_id = sender_id;
                 msg.msg_type = READ_ERROR;
-                msg.data.reset(new std::string);
-                *msg.data = sout.str();
 
                 msg_buffer.push_and_consume(msg);
             }
             catch (...)
             {
-                std::ostringstream sout;
+                impl1::msg_data msg;
+                msg.data.reset(new std::vector<char>);
+                vectorstream sout(*msg.data);
                 sout << "An exception was thrown while attempting to receive a message from processing node " << sender_id << ".\n";
                 sout << "  Sending processing node address:   " << con->con->get_foreign_ip() << ":" << con->con->get_foreign_port() << std::endl;
                 sout << "  Receiving processing node address: " << con->con->get_local_ip() << ":" << con->con->get_local_port() << std::endl;
                 sout << "  Receiving processing node id:      " << node_id << std::endl;
 
-                impl1::msg_data msg;
                 msg.sender_id = sender_id;
                 msg.msg_type = READ_ERROR;
-                msg.data.reset(new std::string);
-                *msg.data = sout.str();
 
                 msg_buffer.push_and_consume(msg);
             }
@@ -241,7 +239,7 @@ namespace dlib
             }
             else if (msg.msg_type == impl2::READ_ERROR)
             {
-                throw dlib::socket_error(*msg.data);
+                throw dlib::socket_error(msg.data_to_string());
             }
             else if (msg.msg_type == impl2::MESSAGE_HEADER)
             {
@@ -332,7 +330,7 @@ namespace dlib
 
     bool bsp_context::
     receive_data (
-        shared_ptr<std::string>& item,
+        shared_ptr<std::vector<char> >& item,
         unsigned long& sending_node_id
     ) 
     {
@@ -406,7 +404,7 @@ namespace dlib
                 } break;
 
                 case impl2::READ_ERROR: {
-                    throw dlib::socket_error(*data.data);
+                    throw dlib::socket_error(data.data_to_string());
                 } break;
 
                 default: {
@@ -473,7 +471,7 @@ namespace dlib
 
     void bsp_context::
     send_data(
-        const std::string& item,
+        const std::vector<char>& item,
         unsigned long target_node_id
     ) 
     {

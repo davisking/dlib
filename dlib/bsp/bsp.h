@@ -12,6 +12,7 @@
 #include "../serialize.h"
 #include "../map.h"
 #include "../ref.h"
+#include "../vectorstream.h"
 #include <queue>
 #include <vector>
 
@@ -206,12 +207,20 @@ namespace dlib
 
         struct msg_data
         {
-            shared_ptr<std::string> data;
+            shared_ptr<std::vector<char> > data;
             unsigned long sender_id;
             char msg_type;
             dlib::uint64 epoch;
 
             msg_data() : sender_id(0xFFFFFFFF), msg_type(-1), epoch(0) {}
+
+            std::string data_to_string() const
+            {
+                if (data && data->size() != 0)
+                    return std::string(&(*data)[0], data->size());
+                else
+                    return "";
+            }
         };
 
     // ------------------------------------------------------------------------------------
@@ -377,9 +386,10 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            std::ostringstream sout;
+            std::vector<char> buf;
+            vectorstream sout(buf);
             serialize(item, sout);
-            send_data(sout.str(), target_node_id);
+            send_data(buf, target_node_id);
         }
 
         template <typename T>
@@ -387,7 +397,8 @@ namespace dlib
             const T& item
         ) 
         {
-            std::ostringstream sout;
+            std::vector<char> buf;
+            vectorstream sout(buf);
             serialize(item, sout);
             for (unsigned long i = 0; i < number_of_nodes(); ++i)
             {
@@ -395,7 +406,7 @@ namespace dlib
                 if (i == node_id())
                     continue;
 
-                send_data(sout.str(), i);
+                send_data(buf, i);
             }
         }
 
@@ -409,7 +420,7 @@ namespace dlib
         )
         {
             unsigned long id;
-            shared_ptr<std::string> temp;
+            shared_ptr<std::vector<char> > temp;
             if (receive_data(temp,id))
                 throw dlib::socket_error("Call to bsp_context::receive() got an unexpected message.");
         }
@@ -448,10 +459,10 @@ namespace dlib
             unsigned long& sending_node_id
         ) 
         {
-            shared_ptr<std::string> temp;
+            shared_ptr<std::vector<char> > temp;
             if (receive_data(temp, sending_node_id))
             {
-                std::istringstream sin(*temp);
+                vectorstream sin(*temp);
                 deserialize(item, sin);
                 if (sin.peek() != EOF)
                     throw serialization_error("deserialize() did not consume all bytes produced by serialize().  "
@@ -485,7 +496,7 @@ namespace dlib
         !*/
 
         bool receive_data (
-            shared_ptr<std::string>& item,
+            shared_ptr<std::vector<char> >& item,
             unsigned long& sending_node_id
         );
 
@@ -499,7 +510,7 @@ namespace dlib
         );
 
         void send_data(
-            const std::string& item,
+            const std::vector<char>& item,
             unsigned long target_node_id
         );
         /*!
