@@ -445,9 +445,9 @@ namespace dlib
             long arg1;
             long arg2;
 
-            member_function_pointer<>::kernel_1a mfp0;
-            member_function_pointer<long>::kernel_1a mfp1;
-            member_function_pointer<long,long>::kernel_1a mfp2;
+            member_function_pointer<> mfp0;
+            member_function_pointer<long> mfp1;
+            member_function_pointer<long,long> mfp2;
             bfp_type bfp;
 
             shared_ptr<function_object_copy> function_copy;

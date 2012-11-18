@@ -184,9 +184,7 @@ namespace dlib
         // to report errors back to the user in a very straight forward way.
         open_listening_socket();
 
-        member_function_pointer<>::kernel_1a mfp;
-        mfp.set(*this,&server::start_async_helper);
-        async_start_thread.reset(new thread_function(mfp));
+        async_start_thread.reset(new thread_function(make_mfp(*this,&server::start_async_helper)));
     }
 
 // ----------------------------------------------------------------------------------------

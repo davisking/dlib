@@ -127,7 +127,7 @@ namespace dlib
             reg.m.lock();
             const thread_id_type id = get_thread_id();
             thread_id_type id_copy;
-            member_function_pointer<>::kernel_1a mfp;
+            member_function_pointer<> mfp;
 
             // Remove all the member function pointers for this thread from the tree 
             // and call them.

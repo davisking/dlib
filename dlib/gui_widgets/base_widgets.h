@@ -2058,7 +2058,7 @@ namespace dlib
         {
             auto_mutex M(wm);
 
-            member_function_pointer<>::kernel_1a temp;
+            member_function_pointer<> temp;
             temp.set(object,event_handler);
 
             // if this handler isn't already registered then add it
@@ -2144,7 +2144,7 @@ namespace dlib
         array<popup_menu*> submenus;
         unsigned long selected_item;
         bool submenu_open;
-        array<member_function_pointer<>::kernel_1a> hide_handlers;
+        array<member_function_pointer<> > hide_handlers;
 
         // restricted functions
         popup_menu(popup_menu&);        // copy constructor

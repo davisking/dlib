@@ -203,7 +203,7 @@ namespace dlib
     public:
 
         typedef member_function_pointer<const std::string&, const log_level&, 
-                                        const uint64, const char*>::kernel_1a_c hook_mfp;
+                                        const uint64, const char*> hook_mfp;
 
         logger (  
             const char* name_

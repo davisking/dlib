@@ -5663,11 +5663,11 @@ namespace dlib
         class image_display_functor
         {
             const std::string str;
-            const member_function_pointer<const std::string&>::kernel_1a mfp;
+            const member_function_pointer<const std::string&> mfp;
         public:
             image_display_functor (
                 const std::string& str_,
-                const member_function_pointer<const std::string&>::kernel_1a& mfp_
+                const member_function_pointer<const std::string&>& mfp_
             ) : str(str_),
                 mfp(mfp_)
             {}
@@ -6052,7 +6052,7 @@ namespace dlib
         auto_mutex lock(m);
         if (part_names.insert(name).second)
         {
-            member_function_pointer<const std::string&>::kernel_1a mfp;
+            member_function_pointer<const std::string&> mfp;
             mfp.set(*this,&image_display::on_part_add);
             parts_menu.menu().add_menu_item(menu_item_text("Add " + name,impl::image_display_functor(name,mfp)));
         }

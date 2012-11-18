@@ -92,7 +92,7 @@ namespace dlib
                 void (T::*handler)()
             )
             {
-                member_function_pointer<>::kernel_1a mfp, junk_mfp;
+                member_function_pointer<> mfp, junk_mfp;
                 mfp.set(obj,handler);
 
                 thread_id_type junk_id;
@@ -119,7 +119,7 @@ namespace dlib
             )
             {
                 thread_id_type id = get_thread_id();
-                member_function_pointer<>::kernel_1a mfp;
+                member_function_pointer<> mfp;
                 mfp.set(obj,handler);
 
                 auto_mutex M(reg.m);
@@ -162,7 +162,7 @@ namespace dlib
                 mutex m;
                 binary_search_tree<
                     thread_id_type,
-                    member_function_pointer<>::kernel_1a,
+                    member_function_pointer<>,
                     memory_manager<char>::kernel_2a
                     >::kernel_2a_c reg;
             };

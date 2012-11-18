@@ -126,7 +126,7 @@ namespace dlib
         void thread_helper(
         );
 
-        typedef member_function_pointer<>::kernel_1a_c mfp;
+        typedef member_function_pointer<> mfp;
 
         rmutex m_;
         rsignaler s;

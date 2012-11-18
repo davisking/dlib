@@ -42,7 +42,7 @@ namespace dlib
             typename strip<T4>::type* arg4;
 
 
-            typename member_function_pointer<T1,T2,T3,T4>::kernel_1a_c mfp;
+            member_function_pointer<T1,T2,T3,T4> mfp;
         };
 
     // ----------------
