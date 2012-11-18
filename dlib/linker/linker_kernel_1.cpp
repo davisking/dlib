@@ -154,6 +154,10 @@ namespace dlib
                 error = true;
                 break;
             }
+            else if (status == SHUTDOWN)
+            {
+                b.shutdown();
+            }
 
             if (status <= 0)
             {
@@ -278,6 +282,10 @@ namespace dlib
                 error = true;
                 break;
             }
+            else if (status == SHUTDOWN)
+            {
+                a.shutdown();
+            }
 
 
             if (status <= 0)
@@ -315,7 +323,7 @@ namespace dlib
         {
             p.service_connection_error_mutex.lock();
             p.service_connection_error = true;
-            p.service_connection_error_mutex.lock();
+            p.service_connection_error_mutex.unlock();
         }
 
         // signal that this function is ending
