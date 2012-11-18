@@ -345,35 +345,19 @@
       
    <!-- ************************************************************************* -->
       
-      <component checked="true">
+      <component>
          <name>bound_function_pointer</name>
          <file>dlib/bound_function_pointer.h</file>
          <spec_file>dlib/bound_function_pointer/bound_function_pointer_kernel_abstract.h</spec_file>
          <description>
             This object represents a function with all its arguments bound to specific objects. 
+
+            <p>
+               This implementation is done using type erasure and placement new.  This
+               means that it never allocates memory on the heap and instead stores everything
+               on the stack.
+            </p>
          </description>
-         
-         <implementations>
-            <implementation>
-               <name>bound_function_pointer_kernel_1</name>
-               <file>dlib/bound_function_pointer/bound_function_pointer_kernel_1.h</file>
-               <description> 
-                  This implementation is done using type erasure and placement new.  This
-                  means that it never allocates memory on the heap and instead stores everything
-                  on the stack.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for bound_function_pointer_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-                           
                         
       </component>
       
