@@ -591,7 +591,7 @@
             
    <!-- ************************************************************************* -->
       
-      <component checked="true">
+      <component>
          <name>xml_parser</name>
          <file>dlib/xml_parser.h</file>
          <spec_file>dlib/xml_parser/xml_parser_kernel_abstract.h</spec_file>
@@ -614,29 +614,6 @@
          <examples>
             <example>xml_parser_ex.cpp.html</example>
          </examples>
-         
-         <implementations>
-            <implementation>
-               <name>xml_parser_kernel_1</name>
-               <file>dlib/xml_parser/xml_parser_kernel_1.h</file>
-               <description> 
-                  This implementation is done using a <a href="containers.html#stack">stack</a> (as opposed to recursive descent) to parse
-                  xml documents.  It also uses a <a href="containers.html#map">map</a> to implement the attribute_list interface and 
-                  internally uses the <a href="containers.html#sequence">sequence</a> object to keep track of all registered document and error
-                  handlers.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for xml_parser_kernel_1 that uses map_kernel_1a, stack_kernel_1a, and sequence_kernel_2a</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-                        
       </component>
             
       
