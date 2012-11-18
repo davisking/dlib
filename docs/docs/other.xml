@@ -380,7 +380,7 @@
       
    <!-- ************************************************************************* -->
       
-      <component checked="true">
+      <component>
          <name>member_function_pointer</name>
          <file>dlib/member_function_pointer.h</file>
          <spec_file>dlib/member_function_pointer/member_function_pointer_kernel_abstract.h</spec_file>
@@ -388,34 +388,17 @@
             This object represents a member function pointer.  It is useful because
             instances of this object can be created without needing to know the type
             of object whose member function we will be calling.
+            <p>
+                  The implementation of this object is done using type erasure and placement new.  This
+                  means that it never allocates memory on the heap and instead stores everything
+                  on the stack.
+            </p>
          </description>
          
          <examples>
             <example>member_function_pointer_ex.cpp.html</example>
          </examples>
 
-         <implementations>
-            <implementation>
-               <name>member_function_pointer_kernel_1</name>
-               <file>dlib/member_function_pointer/member_function_pointer_kernel_1.h</file>
-               <description> 
-                  This implementation is done using type erasure and placement new.  This
-                  means that it never allocates memory on the heap and instead stores everything
-                  on the stack.
-               </description> 
-    
-               <typedefs>
-                  <typedef>
-                     <name>kernel_1a</name>
-                     <description>is a typedef for member_function_pointer_kernel_1</description>
-                  </typedef>
-               </typedefs>                
-               
-            </implementation> 
-                     
-         </implementations>
-                           
-                        
       </component>
       
       
