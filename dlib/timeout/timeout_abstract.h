@@ -12,28 +12,62 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object provides a simple way to implement a timeout.  An example will make
-                its use clear.  Suppose we want to read from a socket but we want to terminate the
-                connection if the read takes longer than 10 seconds.  This could be accomplished
-                as follows:
+                This object provides a simple way to implement a timeout.  An example will
+                make its use clear.  Suppose we want to read from a socket but we want to
+                terminate the connection if the read takes longer than 10 seconds.  This
+                could be accomplished as follows:
 
                 connection* con = a connection from somewhere;
                 {
                     // setup a timer that will call con->shutdown() in 10 seconds
                     timeout t(*con,&connection::shutdown,10000); 
-                    // Now call read on the connection.  If this call to read() takes
-                    // more than 10 seconds then the t timeout will trigger and shutdown
-                    // the connection.  If read completes in less than 10 seconds then
-                    // the t object will be destructed on the next line due to the } 
-                    // and then the timeout won't trigger.
+                    // Now call read on the connection.  If this call to read() takes more
+                    // than 10 seconds then the t timeout will trigger and shutdown the
+                    // connection.  If read completes in less than 10 seconds then the t
+                    // object will be destructed on the next line due to the } and then the
+                    // timeout won't trigger.
                     con->read(buf,100);
                 }
+
+                
+                Alternatively, if you have a compiler capable of using C++11 lambda
+                functions, you can use a syntax like this:
+                {
+                    timeout t([con](){ con->shutdown(); }, 10000);
+                    con->read(buf,100);
+                }
+
+                More generally, you can use this with things other than sockets.  For
+                example, the following statement will print "Hello world!" after 1000ms:
+                    timeout t([](){ cout << "Hello world!" << endl; },  1000);
+
+
 
             THREAD SAFETY
                 All methods of this class are thread safe. 
         !*/
 
     public:
+
+        template <
+            typename T
+            >
+        timeout (
+            T callback_function,
+            unsigned long ms_to_timeout
+        );
+        /*!
+            requires
+                - callback_function does not throw
+            ensures                
+                - does not block.
+                - #*this is properly initialized
+                - if (this object isn't destructed in ms_to_timeout milliseconds) then
+                    - callback_function() will be called in ms_to_timeout milliseconds.
+            throws
+                - std::bad_alloc
+                - dlib::thread_error
+        !*/
 
         template <
             typename T

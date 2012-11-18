@@ -40,6 +40,15 @@ namespace dlib
             virtual ~bind() {}
         };
 
+        template <typename T>
+        class functor : public bind
+        {
+        public:
+            functor(const T& f) : function(f) {}
+            T function;
+            void go() { function(); }
+        };
+
         template <typename T, typename R>
         class zero : public bind
         {
@@ -64,6 +73,20 @@ namespace dlib
 
         // This typedef is here for backwards compatibility with previous versions of dlib.
         typedef timeout kernel_1a;
+
+        template <
+            typename T
+            >
+        timeout (
+            T callback_function,
+            unsigned long ms_to_timeout
+        ) :
+            t(*this,&timeout::trigger_timeout)
+        {
+            b = new functor<T>(callback_function);
+            t.set_delay_time(ms_to_timeout);
+            t.start();
+        }
 
         template <
             typename T
