@@ -221,27 +221,34 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class bound_function_pointer_kernel_1
+    class bound_function_pointer
     {
         typedef bfp1_helpers::bound_function_helper_T<bfp1_helpers::bound_function_helper<void,int> > bf_null_type;
 
     public:
-        bound_function_pointer_kernel_1 (
+
+        // These typedefs are here for backwards compatibility with previous versions of
+        // dlib.
+        typedef bound_function_pointer kernel_1a;
+        typedef bound_function_pointer kernel_1a_c;
+
+
+        bound_function_pointer (
         ) { bf_null_type().safe_clone(bf_memory); }
 
-        bound_function_pointer_kernel_1 ( 
-            const bound_function_pointer_kernel_1& item
+        bound_function_pointer ( 
+            const bound_function_pointer& item
         ) { item.bf()->clone(bf_memory.get()); }
 
-        ~bound_function_pointer_kernel_1()
+        ~bound_function_pointer()
         { destroy_bf_memory(); }
 
-        bound_function_pointer_kernel_1& operator= (
-            const bound_function_pointer_kernel_1& item
-        ) { bound_function_pointer_kernel_1(item).swap(*this); return *this; }
+        bound_function_pointer& operator= (
+            const bound_function_pointer& item
+        ) { bound_function_pointer(item).swap(*this); return *this; }
 
         void clear (
-        ) { bound_function_pointer_kernel_1().swap(*this); }
+        ) { bound_function_pointer().swap(*this); }
 
         bool is_set (
         ) const
@@ -250,11 +257,11 @@ namespace dlib
         }
 
         void swap (
-            bound_function_pointer_kernel_1& item
+            bound_function_pointer& item
         )
         {
             // make a temp copy of item
-            bound_function_pointer_kernel_1 temp(item);
+            bound_function_pointer temp(item);
 
             // destory the stuff in item
             item.destroy_bf_memory();
@@ -270,6 +277,13 @@ namespace dlib
         void operator() (
         ) const
         {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(is_set() == true ,
+                "\tvoid bound_function_pointer::operator()"
+                << "\n\tYou must call set() before you can use this function"
+                << "\n\tthis: " << this
+            );
+
             bf()->call();
         }
 
@@ -748,8 +762,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void swap (
-        bound_function_pointer_kernel_1& a,
-        bound_function_pointer_kernel_1& b
+        bound_function_pointer& a,
+        bound_function_pointer& b
     ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
