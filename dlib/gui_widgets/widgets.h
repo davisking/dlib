@@ -653,7 +653,7 @@ namespace dlib
 
         scoped_ptr<text_field_style> style;
 
-        timer<text_field>::kernel_2a t;
+        timer<text_field> t;
 
         popup_menu_region right_click_menu;
 
@@ -1049,7 +1049,7 @@ namespace dlib
 
         scoped_ptr<text_box_style> style;
 
-        timer<text_box>::kernel_2a t;
+        timer<text_box> t;
 
         popup_menu_region right_click_menu;
 
@@ -3188,7 +3188,7 @@ namespace dlib
         long cursor_pos;
         bool show_cursor;
         bool recent_cursor_move;
-        timer<text_grid>::kernel_2a cursor_timer;
+        timer<text_grid> cursor_timer;
         rgb_pixel border_color_;
         any_function<void(unsigned long, unsigned long)> text_modified_handler;
     };

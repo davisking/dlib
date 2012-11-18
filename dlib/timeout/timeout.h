@@ -181,7 +181,7 @@ namespace dlib
             t.stop();
         }
 
-        dlib::timer<timeout>::kernel_2a t;
+        dlib::timer<timeout> t;
         bind* b;
 
         // restricted functions

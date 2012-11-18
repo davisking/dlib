@@ -59,7 +59,7 @@ namespace
     )
     /*!
         requires
-            - timer_t is an implementation of timer/timer_kernel_abstract.h is instantiated 
+            - timer_t is an implementation of dlib/timer/timer_abstract.h is instantiated 
               timer_test_helper
         ensures
             - runs tests on timer_t for compliance with the specs 
@@ -94,7 +94,7 @@ namespace
     )
     /*!
         requires
-            - timer_t is an implementation of timer/timer_kernel_abstract.h is instantiated 
+            - timer_t is an implementation of dlib/timer/timer_abstract.h is instantiated 
               timer_test_helper
         ensures
             - runs tests on timer_t for compliance with the specs 
@@ -315,15 +315,15 @@ namespace
         void perform_test (
         )
         {
-            dlog << LINFO << "testing kernel_1a with test_timer";
-            timer_test<timer<timer_test_helper>::kernel_1a>  ();
-            dlog << LINFO << "testing kernel_1a with test_timer2";
-            timer_test2<timer<timer_test_helper>::kernel_1a>  ();
+            dlog << LINFO << "testing timer_heavy with test_timer";
+            timer_test<timer_heavy<timer_test_helper> >  ();
+            dlog << LINFO << "testing timer_heavy with test_timer2";
+            timer_test2<timer_heavy<timer_test_helper> >  ();
 
-            dlog << LINFO << "testing kernel_2a with test_timer";
-            timer_test<timer<timer_test_helper>::kernel_2a>  ();
-            dlog << LINFO << "testing kernel_2a with test_timer2";
-            timer_test2<timer<timer_test_helper>::kernel_2a>  ();
+            dlog << LINFO << "testing timer with test_timer";
+            timer_test<timer<timer_test_helper> >  ();
+            dlog << LINFO << "testing timer with test_timer2";
+            timer_test2<timer<timer_test_helper> >  ();
         }
     } a;
 

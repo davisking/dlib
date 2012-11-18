@@ -690,7 +690,7 @@ namespace dlib
 
             long x, y;
             tooltip_window win;
-            timer<tooltip>::kernel_2a tt_timer;
+            timer<tooltip> tt_timer;
 
         };
         friend struct data;
@@ -1410,10 +1410,10 @@ namespace dlib
         long max_pos; 
         long js;
 
-        timer<scroll_bar>::kernel_2a b1_timer;
-        timer<scroll_bar>::kernel_2a b2_timer;
-        timer<scroll_bar>::kernel_2a top_filler_timer;
-        timer<scroll_bar>::kernel_2a bottom_filler_timer;
+        timer<scroll_bar> b1_timer;
+        timer<scroll_bar> b2_timer;
+        timer<scroll_bar> top_filler_timer;
+        timer<scroll_bar> bottom_filler_timer;
         long delayed_pos;
         scoped_ptr<scroll_bar_style> style;
 

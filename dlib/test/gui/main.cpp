@@ -124,7 +124,7 @@ private:
     {
         draggable::on_window_resized();
     }
-    timer<color_box>::kernel_1a t;
+    timer<color_box> t;
 };
 
 
