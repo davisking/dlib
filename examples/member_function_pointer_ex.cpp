@@ -39,10 +39,10 @@ public:
 int main()
 {
     // create a pointer that can point to member functions that take no arguments
-    member_function_pointer<>::kernel_1a_c mfp1;
+    member_function_pointer<> mfp1;
 
     // create a pointer that can point to member functions that take a single int argument
-    member_function_pointer<int>::kernel_1a_c mfp2;
+    member_function_pointer<int> mfp2;
 
     example_object obj;
 
