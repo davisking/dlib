@@ -3,7 +3,6 @@
 #undef DLIB_LINKER_KERNEl_ABSTRACT_
 #ifdef DLIB_LINKER_KERNEl_ABSTRACT_
 
-// non-templateable dependencies
 #include "../threads/threads_kernel_abstract.h"
 #include "../sockets/sockets_kernel_abstract.h"
 

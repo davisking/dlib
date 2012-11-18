@@ -13,8 +13,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     
-    linker_kernel_1::
-    linker_kernel_1 (
+    linker::
+    linker (
     ) :
         running(false),
         running_signaler(running_mutex),
@@ -26,8 +26,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    linker_kernel_1::
-    ~linker_kernel_1 (
+    linker::
+    ~linker (
     )
     {
         clear();
@@ -35,7 +35,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void linker_kernel_1::
+    void linker::
     clear (
     )
     {
@@ -67,7 +67,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool linker_kernel_1::
+    bool linker::
     is_running (
     ) const
     {
@@ -79,12 +79,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void linker_kernel_1::
+    void linker::
     link (
         connection& a,
         connection& b
     )
     {
+        // make sure requires clause is not broken
+        DLIB_CASSERT( 
+            this->is_running() == false ,
+            "\tvoid linker::link"
+            << "\n\tis_running() == " << this->is_running() 
+            << "\n\tthis: " << this
+            );
+
         running_mutex.lock();
         running = true;
         running_mutex.unlock();
@@ -127,7 +135,7 @@ namespace dlib
 
             throw dlib::thread_error (
                 ECREATE_THREAD,
-                "failed to make new thread in linker_kernel_1::link()"
+                "failed to make new thread in linker::link()"
                 );
         }
 
@@ -219,7 +227,7 @@ namespace dlib
             // throw the exception for this error
             throw dlib::socket_error (
                 ECONNECTION,
-                "a connection returned an error in linker_kernel_1::link()"
+                "a connection returned an error in linker::link()"
                 );
          
         }
@@ -233,12 +241,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void linker_kernel_1::
+    void linker::
     service_connection (
         void* param
     )
     {
-        linker_kernel_1& p = *static_cast<linker_kernel_1*>(param);
+        linker& p = *static_cast<linker*>(param);
 
         p.cons_mutex.lock();
         // if the connections are gone for whatever reason then return

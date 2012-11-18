@@ -12,7 +12,7 @@
 namespace dlib
 {
 
-    class linker_kernel_1 
+    class linker 
     {
 
         /*!
@@ -21,7 +21,7 @@ namespace dlib
                 A                   == 0
                 B                   == 0
                 running_mutex       == a mutex 
-                running_signaler    == a signaler assocaited with running_mutex
+                running_signaler    == a signaler associated with running_mutex
                 cons_mutex          == a mutex
                 service_connection_running          == false
                 service_connection_running_mutex    == a mutex
@@ -65,11 +65,16 @@ namespace dlib
 
         public:
 
+            // These two typedefs are here for backwards compatibility with previous
+            // versions of dlib.
+            typedef linker kernel_1a;
+            typedef linker kernel_1a_c;
 
-            linker_kernel_1(
+
+            linker(
             );
 
-            virtual ~linker_kernel_1(
+            virtual ~linker(
             ); 
 
             void clear(
@@ -91,7 +96,7 @@ namespace dlib
             );
             /*!
                 requires
-                    param == pointer to a linker_kernel_1 object
+                    param == pointer to a linker object
                 ensures
                     waits for data from b and forwards it to a and
                     if (b closes normally or is shutdown()) service_connection ends and
@@ -116,8 +121,8 @@ namespace dlib
             mutex service_connection_error_mutex;
 
             // restricted functions
-            linker_kernel_1(linker_kernel_1&);        // copy constructor
-            linker_kernel_1& operator=(linker_kernel_1&);    // assignment operator
+            linker(linker&);        // copy constructor
+            linker& operator=(linker&);    // assignment operator
     };
 
 
