@@ -83,8 +83,8 @@
                <ul>
                   <li>The library provides a portable and simple <a href="api.html#sockets">TCP sockets API</a></li>
                   <li>An object to help you make TCP based <a href="network.html#server">servers</a></li>
-                  <li>A <a href="network.html#sockstreambuf">streambuf</a> object that enables TCP sockets 
-                  to interoperate with the C++ iostreams library </li>
+                  <li><a href="network.html#iosockstream">iostream</a> and <a href="network.html#sockstreambuf">streambuf</a> 
+                  objects that enables TCP sockets to interoperate with the C++ iostreams library </li>
                   <li>A simple <a href="network.html#server_http">HTTP server</a> object you can use to embed a 
                   web server into your applications</li> 
                   <li>A message passing <a href="other.html#pipe">pipe</a> for inter-thread and <a href="network.html#bridge">inter-process</a> communication</li>
