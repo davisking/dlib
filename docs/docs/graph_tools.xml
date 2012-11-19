@@ -303,7 +303,7 @@
          <spec_file link="true">dlib/graph_utils/function_objects_abstract.h</spec_file>
          <description>
                 This is a simple function object that computes squared euclidean distance
-                between two <a href="containers.html#matrix">matrix</a> objects.
+                between two <a href="linear_algebra.html#matrix">matrix</a> objects.
          </description>
          <examples>
             <example>linear_manifold_regularizer_ex.cpp.html</example>

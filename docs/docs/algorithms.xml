@@ -86,32 +86,6 @@
          <item>rls_filter</item> 
       </section>
 
-      <section>
-         <name>Geometry</name>
-         <item>border_enumerator</item> 
-         <item>rectangle</item> 
-         <item>vector</item> 
-         <item>point</item> 
-         <item>rotate_point</item> 
-         <item>point_rotator</item> 
-         <item>point_transform</item> 
-         <item>point_transform_affine</item> 
-         <item>rotation_matrix</item> 
-         <item>get_rect</item> 
-         <item>centered_rect</item> 
-         <item>center</item> 
-         <item>dcenter</item> 
-         <item>shrink_rect</item> 
-         <item>grow_rect</item> 
-         <item>translate_rect</item> 
-         <item>resize_rect</item> 
-         <item>resize_rect_width</item> 
-         <item>resize_rect_height</item> 
-         <item>move_rect</item> 
-         <item>nearest_point</item> 
-         <item>distance_to_rect_edge</item> 
-      </section>
-
     </top>  
    </menu>
 
@@ -284,7 +258,7 @@
          <spec_file>dlib/general_hash/hash_abstract.h</spec_file>
          <description>
             This is a set of convenience functions for invoking <a href="#murmur_hash3">murmur_hash3</a>
-            on std::strings, std::vectors, std::maps, or <a href="containers.html#matrix">dlib::matrix</a> objects.
+            on std::strings, std::vectors, std::maps, or <a href="linear_algebra.html#matrix">dlib::matrix</a> objects.
             <p>
                As an aside, the hash() for matrix objects is defined <a href="dlib/matrix/matrix_utilities_abstract.h.html#hash">here</a>.
                It has the same interface as all the others.
@@ -305,54 +279,6 @@
          
       </component>
             
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>rectangle</name>
-         <file>dlib/geometry.h</file>
-         <spec_file>dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>
-            This object represents a rectangular region inside a Cartesian 
-            coordinate system.  It allows you to easily represent and manipulate
-            rectangles.
-         </description>
-      </component>
-            
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>border_enumerator</name>
-         <file>dlib/geometry.h</file>
-         <spec_file>dlib/geometry/border_enumerator_abstract.h</spec_file>
-         <description>
-            This object is an <a href="containers.html#enumerable">enumerator</a> 
-            over the border <a href="#point">points</a> of a 
-            <a href="#rectangle">rectangle</a>.
-         </description>
-      </component>
-            
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>vector</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
-         <description>
-            This object represents a two or three dimensional vector.
-         </description>
-      </component>
-      
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>point</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
-         <description>
-               This object represents a point inside a Cartesian coordinate system.
-         </description>
-      </component>
-      
    <!-- ************************************************************************* -->
       
       <component>
@@ -667,103 +593,6 @@
    <!-- ************************************************************************* -->
 
       <component>
-         <name>nearest_point</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This function takes a <a href="#rectangle">rectangle</a> and a 
-            <a href="#point">point</a> and returns the point in the given 
-            rectangle that is nearest to the given point.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>distance_to_rect_edge</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This function takes a <a href="#rectangle">rectangle</a> and a 
-            <a href="#point">point</a> and returns the Manhattan distance between
-            the rectangle's edge and the point.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>move_rect</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This function takes a <a href="#rectangle">rectangle</a> and moves
-            it so that it's upper left corner occupies the given location.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>resize_rect_height</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This function takes a <a href="#rectangle">rectangle</a> and 
-            returns a new rectangle with the given height but otherwise with the 
-            same edge points as the original rectangle. 
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>resize_rect_width</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This function takes a <a href="#rectangle">rectangle</a> and 
-            returns a new rectangle with the given width but otherwise with the 
-            same edge points as the original rectangle. 
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>resize_rect</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This function takes a <a href="#rectangle">rectangle</a> and 
-            returns a new rectangle with the given size but with the same upper
-            left corner as the original rectangle.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>translate_rect</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This function takes a <a href="#rectangle">rectangle</a> and moves
-            it by a given number of units along the x and y axis relative to
-            where it was before the move.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
          <name>quantum_register</name>
          <file>dlib/quantum_computing.h</file>
          <spec_file link="true">dlib/quantum_computing/quantum_computing_abstract.h</spec_file>
@@ -793,151 +622,6 @@
             <example>quantum_computing_ex.cpp.html</example>
          </examples>
                                  
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>center</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            Returns the center point of a <a href="#rectangle">rectangle</a>.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>dcenter</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            Returns the center point of a <a href="#rectangle">rectangle</a>.  This
-            is a version of <a href="#center">center()</a> which returns a double version 
-            of the point rather than one which uses integers to represent the 
-            result.  Therefore, it is slightly more accurate.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>centered_rect</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            There are various overloads of this function but the basic idea is
-            that it returns a <a href="#rectangle">rectangle</a> with a given 
-            width and height and centered about a given point.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>shrink_rect</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This function takes a <a href="#rectangle">rectangle</a> object, 
-            shrinks its borders by a given amount, and returns the result.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>grow_rect</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This function takes a <a href="#rectangle">rectangle</a> object, 
-            grows its borders by a given amount, and returns the result.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>rotate_point</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
-         <description>        
-            This is a function that rotates a 2D <a href="#vector">vector</a> or 
-            <a href="#point">point</a> object about a given point.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>point_rotator</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
-         <description>        
-            This is an object that rotates a 2D <a href="#vector">vector</a> or 
-            <a href="#point">point</a> object about the origin.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>point_transform</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
-         <description>        
-            This is an object that rotates a 2D <a href="#vector">vector</a> or 
-            <a href="#point">point</a> object about the origin and then adds a 
-            displacement vector.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>point_transform_affine</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
-         <description>        
-            This is an object that applies an affine transformation to a <a href="#vector">vector</a> or 
-            <a href="#point">point</a>.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>rotation_matrix</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
-         <description>        
-            This is a method for creating 2D rotation matrices.
-         </description>
-                                 
-      </component>
-
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>get_rect</name>
-         <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
-         <description>        
-            This is a simple template function that returns a rectangle 
-            representing the size of a 2D container (e.g. <a href="containers.html#matrix">matrix</a> or
-            <a href="containers.html#array2d">array2d</a>). 
-         </description>
       </component>
 
    <!-- ************************************************************************* -->

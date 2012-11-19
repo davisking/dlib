@@ -104,7 +104,7 @@
 
             <li><b>Numerical Algorithms</b>
                <ul>
-                  <li>A fast <a href="containers.html#matrix">matrix</a> object implemented using the expression 
+                  <li>A fast <a href="linear_algebra.html#matrix">matrix</a> object implemented using the expression 
                      templates technique and capable of using BLAS and LAPACK libraries when available.</li>
                   <li>Numerous linear algebra and mathematical operations are defined for the matrix object such as the 
                      <a href="dlib/matrix/matrix_la_abstract.h.html#svd">singular value decomposition</a>, 

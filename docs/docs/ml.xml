@@ -32,7 +32,7 @@
             programming approach using C++ templates. In particular, each algorithm is parameterized
             to allow a user to supply either one of the predefined dlib kernels (e.g. <a 
             href="#radial_basis_kernel">RBF</a> operating
-            on <a href="containers.html#matrix">column vectors</a>), or a new 
+            on <a href="linear_algebra.html#matrix">column vectors</a>), or a new 
             <a href="using_custom_kernels_ex.cpp.html">user defined kernel</a>. 
             Moreover, the implementations of the algorithms are totally separated from the data on 
             which they operate. This makes the dlib implementation generic enough to operate on 

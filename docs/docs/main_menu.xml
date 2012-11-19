@@ -26,6 +26,11 @@
             <chm_sub>ml.xml</chm_sub>
          </item>
          <item>
+            <name>Linear Algebra</name>
+            <link>linear_algebra.html</link>
+            <chm_sub>linear_algebra.xml</chm_sub>
+         </item>
+         <item>
             <name>Bayesian Nets</name>
             <link>bayes.html</link>
             <chm_sub>bayes.xml</chm_sub>

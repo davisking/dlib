@@ -233,7 +233,7 @@ Then <a href="mailto:davis@dlib.net">email me</a> the dlibchanges.hg file and I'
                   or any number of other objects that manage resources such as memory for you.  If you want
                   an array use std::vector (or the checked <a href="containers.html#std_vector_c">std_vector_c</a>).
                   If you want to make a lookup table use a <a href="containers.html#map">map</a>.  If you want
-                  a two dimensional array use <a href="containers.html#matrix">matrix</a> or 
+                  a two dimensional array use <a href="linear_algebra.html#matrix">matrix</a> or 
                   <a href="containers.html#array2d">array2d</a>.
                </p>
                <p>
