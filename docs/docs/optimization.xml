@@ -398,7 +398,7 @@ subject to the following constraint:
                   <li>Chang and Lin, Training {nu}-Support Vector Classifiers: Theory and Algorithms</li>
                   <li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
                      machines, 2001. Software available at 
-                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
                </ul>
 
          </description>
@@ -429,7 +429,7 @@ subject to the following constraint:
                <ul>
                   <li>Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector 
                      machines, 2001. Software available at 
-                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
+                     <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a></li>
                   <li>Working Set Selection Using Second Order Information for Training Support Vector Machines by
                      Fan, Chen, and Lin.  In the Journal of Machine Learning Research 2005.</li>
                </ul>

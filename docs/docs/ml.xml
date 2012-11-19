@@ -44,7 +44,7 @@
          <br/> 
          <h3>Paper Describing dlib Machine Learning</h3>
          <pre>
-Davis E. King. <a href="http://www.jmlr.org/papers/volume10/king09a/king09a.pdf">Dlib-ml: A Machine Learning Toolkit</a>. 
+Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09a.pdf">Dlib-ml: A Machine Learning Toolkit</a>. 
    <i>Journal of Machine Learning Research</i> 10, pp. 1755-1758, 2009
 
 @Article{dlib09,

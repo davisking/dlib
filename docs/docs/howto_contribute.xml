@@ -249,7 +249,7 @@ Then <a href="mailto:davis@dlib.net">email me</a> the dlibchanges.hg file and I'
                   unlock it for you.   Or suppose you have made a TCP <a href="api.html#sockets">connection</a> 
                   to another machine and you want to be certain the resources associated with that connection 
                   are always released.  You can easily accomplish this with RAII by using the scoped_ptr as
-                  shown in <a href="sockets_ex_2.cpp.html">this</a> example program.
+                  shown in <a href="sockstreambuf_ex.cpp.html">this</a> example program.
                </p>
                <p>
                   RAII is a trivial technique to use.  All you have to do is not call new and delete and

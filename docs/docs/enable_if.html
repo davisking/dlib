@@ -127,7 +127,7 @@ When valid, <TT>enable_if_c&lt;B, T&gt;::type</TT> equals <TT>T</TT>.
 The <TT>enable_if_c</TT> template can thus be used for controlling when functions are considered for
 overload resolution and when they are not. 
 For example, the following function is defined for all arithmetic types (according to the
-classification of the <A HREF="http://www.boost.org/libs/type_traits/index.html">Boost type_traits library</A>):
+classification of the <A HREF="http://www.boost.org/doc/libs/release/libs/type_traits/index.html">Boost type_traits library</A>):
 <PRE>template &lt;class T&gt;
 typename enable_if_c&lt;boost::is_arithmetic&lt;T&gt;::value, T&gt;::type 
 foo(T t) { return t; }

@@ -915,9 +915,11 @@
          </description>
 
          <examples>
+            <example>iosockstream_ex.cpp.html</example>
             <example>sockets_ex.cpp.html</example>
             <example>sockstreambuf_ex.cpp.html</example>
-            <example>sockets_ex_2.cpp.html</example>
+            <example>server_http_ex.cpp.html</example>
+            <example>server_iostream_ex.cpp.html</example>
          </examples>
          
          <implementations>

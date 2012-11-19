@@ -10,7 +10,6 @@
       <term_list>
 
 
-         <term file="dlib/rand/rand_float_abstract.h.html" name="get_random_float"/>
          <term link="compile.html" name="DLIB_REVISION"/>
 
          <term file="dlib/algs.h.html" name="stack_based_memory_block"/>
