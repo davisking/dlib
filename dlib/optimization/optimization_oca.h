@@ -114,18 +114,21 @@ namespace dlib
             unsigned long num_nonnegative = 0 
         ) const
         {
+            const unsigned long num_dims = problem.get_num_dimensions();
+
             // make sure requires clause is not broken
             DLIB_ASSERT(problem.get_c() > 0 &&
                         problem.get_num_dimensions() > 0,
                 "\t void oca::operator()"
                 << "\n\t The oca_problem is invalid"
                 << "\n\t problem.get_c():              " << problem.get_c() 
-                << "\n\t problem.get_num_dimensions(): " << problem.get_num_dimensions() 
+                << "\n\t problem.get_num_dimensions(): " << num_dims 
                 << "\n\t this: " << this
                 );
 
-            if (num_nonnegative > static_cast<unsigned long>(problem.get_num_dimensions()))
-                num_nonnegative = problem.get_num_dimensions();
+
+            if (num_nonnegative > num_dims)
+                num_nonnegative = num_dims;
 
             typedef typename matrix_type::type scalar_type;
             typedef typename matrix_type::layout_type layout_type;
@@ -139,7 +142,7 @@ namespace dlib
 
             vect_type new_plane, alpha;
 
-            w.set_size(problem.get_num_dimensions(), 1);
+            w.set_size(num_dims, 1);
             w = 0;
 
             // The current objective value.  Note also that w always contains 
