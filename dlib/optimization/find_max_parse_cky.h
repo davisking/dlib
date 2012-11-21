@@ -340,14 +340,14 @@ namespace dlib
     std::string parse_trees_to_string (
         const std::vector<parse_tree_element<T> >& tree,
         const std::vector<U>& words,
-        const unsigned long root_idx = 0
+        const T& tag_to_skip
     )
     {
-        if (root_idx >= tree.size())
+        if (tree.size() == 0)
             return "";
 
         std::ostringstream sout;
-        impl::print_parse_tree_helper<false,true>(tree, words, root_idx, tree[root_idx].tag, sout);
+        impl::print_parse_tree_helper<false,true>(tree, words, 0, tag_to_skip, sout);
         return sout.str();
     }
 
@@ -357,14 +357,14 @@ namespace dlib
     std::string parse_trees_to_string_tagged (
         const std::vector<parse_tree_element<T> >& tree,
         const std::vector<U>& words,
-        const unsigned long root_idx = 0
+        const T& tag_to_skip
     )
     {
-        if (root_idx >= tree.size())
+        if (tree.size() == 0)
             return "";
 
         std::ostringstream sout;
-        impl::print_parse_tree_helper<true,true>(tree, words, root_idx, tree[root_idx].tag, sout);
+        impl::print_parse_tree_helper<true,true>(tree, words, 0, tag_to_skip, sout);
         return sout.str();
     }
 

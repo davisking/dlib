@@ -298,7 +298,7 @@ namespace dlib
     std::string parse_trees_to_string (
         const std::vector<parse_tree_element<T> >& tree,
         const std::vector<U>& words,
-        const unsigned long root_idx = 0
+        const T& tag_to_skip
     );
     /*!
         requires
@@ -307,9 +307,9 @@ namespace dlib
         ensures
             - This function behaves just like parse_tree_to_string() except that it will
               not print the brackets (i.e. []) for the top most parts of the tree which
-              have tags equal to tree[root_idx].tag.  It will however print all the words.
+              have tags equal to tag_to_skip.  It will however print all the words.
               Therefore, this function only includes brackets on the subtrees which begin
-              with a tag other than tree[root_idx].tag.
+              with a tag other than tag_to_skip.
         throws
             - parse_tree_to_string_error
                 This exception is thrown if an invalid tree is detected.  This might happen
@@ -326,7 +326,7 @@ namespace dlib
     std::string parse_trees_to_string_tagged (
         const std::vector<parse_tree_element<T> >& tree,
         const std::vector<U>& words,
-        const unsigned long root_idx = 0
+        const T& tag_to_skip
     );
     /*!
         requires
@@ -336,9 +336,9 @@ namespace dlib
         ensures
             - This function behaves just like parse_tree_to_string_tagged() except that it
               will not print the brackets (i.e. []) for the top most parts of the tree
-              which have tags equal to tree[root_idx].tag.  It will however print all the
-              words.  Therefore, this function only includes brackets on the subtrees which
-              begin with a tag other than tree[root_idx].tag.
+              which have tags equal to tag_to_skip.  It will however print all the words.
+              Therefore, this function only includes brackets on the subtrees which begin
+              with a tag other than tag_to_skip.
         throws
             - parse_tree_to_string_error
                 This exception is thrown if an invalid tree is detected.  This might happen

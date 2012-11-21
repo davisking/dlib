@@ -131,10 +131,10 @@ namespace
 
         const std::string str3 = "[[The flight] [includes [a meal]]] [[The flight] [includes [a meal]]]";
         const std::string str4 = "[5 [3 The flight] [4 includes [3 a meal]]] [5 [3 The flight] [4 includes [3 a meal]]]";
-        dlog << LINFO << parse_trees_to_string(parse_tree, words);
-        DLIB_TEST(parse_trees_to_string(parse_tree, words) == str3);
-        dlog << LINFO << parse_trees_to_string_tagged(parse_tree, words);
-        DLIB_TEST(parse_trees_to_string_tagged(parse_tree, words) == str4);
+        dlog << LINFO << parse_trees_to_string(parse_tree, words, G);
+        DLIB_TEST(parse_trees_to_string(parse_tree, words, G) == str3);
+        dlog << LINFO << parse_trees_to_string_tagged(parse_tree, words, G);
+        DLIB_TEST(parse_trees_to_string_tagged(parse_tree, words, G) == str4);
 
         sequence.clear();
         find_max_parse_cky(sequence, user_defined_ruleset<true>, parse_tree);
