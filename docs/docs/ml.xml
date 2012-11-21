@@ -1348,7 +1348,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <description>
                 This object represents a tool for training a multiclass support 
                 vector machine.  It is optimized for the case where linear kernels 
-                are used and implemented using the <a href="optimization.html#structural_svm_problem">structural_svm_problem</a>
+                are used and implemented using the <a href="#structural_svm_problem">structural_svm_problem</a>
                 object.
          </description>
                                  
