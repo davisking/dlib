@@ -3,6 +3,7 @@
 #ifndef DLIB_SVm_HEADER
 #define DLIB_SVM_HEADER
 
+#include "svm/svm_rank_trainer.h"
 #include "svm/svm.h"
 #include "svm/krls.h"
 #include "svm/rls.h"
