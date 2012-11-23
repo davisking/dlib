@@ -130,6 +130,10 @@
                   <link>train_object_detector.cpp.html</link>
                </item>
                <item>
+                  <name>SVM-Rank</name>
+                  <link>svm_rank_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>BSP</name>
                   <link>bsp_ex.cpp.html</link>
                </item>
