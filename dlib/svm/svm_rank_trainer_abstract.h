@@ -208,6 +208,8 @@ namespace dlib
                     - F.alpha(0) == 1
                     - Given two vectors, A and B, then A is predicted to come before B 
                       in the learned ranking if and only if F(A) > F(B).
+                    - Based on the contents of samples, F will attempt to give relevant
+                      vectors higher scores than non-relevant vectors.
         !*/
 
         const decision_function<kernel_type> train (
