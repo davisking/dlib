@@ -181,6 +181,28 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename ranking_function,
+        typename T
+        >
+    double test_ranking_function (
+        const ranking_function& funct,
+        const ranking_pair<T>& sample
+    );
+    /*!
+        requires
+            - is_ranking_problem(std::vector<ranking_pair<T> >(1, sample)) == true
+            - ranking_function == some kind of decision function object (e.g. decision_function)
+        ensures
+            - This is just a convenience routine for calling the above
+              test_ranking_function() routine.  That is, it just copies sample into a
+              std::vector object and invokes the above test_ranking_function() routine.
+              This means that calling this function is equivalent to invoking: 
+                return test_ranking_function(funct, std::vector<ranking_pair<T> >(1, sample));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename trainer_type,
         typename T
         >

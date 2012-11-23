@@ -246,6 +246,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename ranking_function,
+        typename T
+        >
+    double test_ranking_function (
+        const ranking_function& funct,
+        const ranking_pair<T>& sample
+    )
+    {
+        return test_ranking_function(funct, std::vector<ranking_pair<T> >(1,sample));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename trainer_type,
         typename T
         >

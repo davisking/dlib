@@ -218,9 +218,9 @@ namespace dlib
                 - is_ranking_problem(std::vector<ranking_pair<sample_type> >(1, sample)) == true
             ensures
                 - This is just a convenience routine for calling the above train()
-                  function.  That is, it just copies sample into an appropriate std::vector
-                  object and invokes the above train() method.  That is, this function is
-                  equivalent to invoking: 
+                  function.  That is, it just copies sample into a std::vector object and
+                  invokes the above train() method.  This means that calling this function
+                  is equivalent to invoking: 
                     return train(std::vector<ranking_pair<sample_type> >(1, sample));
         !*/
 
