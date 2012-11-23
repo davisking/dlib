@@ -107,6 +107,7 @@ SRC += probabilistic.cpp
 SRC += pyramid_down.cpp
 SRC += queue.cpp
 SRC += rand.cpp
+SRC += ranking.cpp
 SRC += read_write_mutex.cpp
 SRC += reference_counter.cpp
 SRC += rls.cpp

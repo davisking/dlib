@@ -92,6 +92,7 @@ set (tests
    pyramid_down.cpp
    queue.cpp
    rand.cpp
+   ranking.cpp
    read_write_mutex.cpp
    reference_counter.cpp
    rls.cpp
