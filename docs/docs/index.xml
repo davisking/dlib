@@ -149,6 +149,7 @@
                   <li>Structural SVM tools for solving <a href="ml.html#structural_assignment_trainer">assignment problems</a> </li>  
                   <li>Structural SVM tools for <a href="ml.html#structural_object_detection_trainer">object detection</a> in images </li>  
                   <li>Structural SVM tools for <a href="ml.html#structural_graph_labeling_trainer">labeling nodes</a> in graphs </li>  
+                  <li>A large-scale <a href="ml.html#svm_rank_trainer">SVM-Rank</a> implementation</li>
                   <li>An online <a href="ml.html#krls">kernel RLS regression</a> algorithm</li>
                   <li>An online <a href="ml.html#svm_pegasos">SVM classification</a> algorithm</li>
                   <li>An online kernelized <a href="ml.html#kcentroid">centroid estimator</a>/novelty detector and

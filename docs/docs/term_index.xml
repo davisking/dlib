@@ -250,6 +250,7 @@
          <term name="max_index_plus_one">
             <term link="graph_tools.html#max_index_plus_one" name="for graphs"/>
             <term link="dlib/svm/sparse_vector_abstract.h.html#max_index_plus_one" name="for sparse vectors"/>
+            <term link="dlib/svm/ranking_tools_abstract.h.html#max_index_plus_one" name="for ranking_pairs"/>
          </term>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="sparse_matrix_vector_multiply"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="add_to"/>
@@ -278,6 +279,12 @@
          <term file="ml.html" name="svm_c_trainer"/>
          <term file="ml.html" name="svm_one_class_trainer"/>
          <term file="ml.html" name="svm_c_linear_trainer"/>
+         <term file="ml.html" name="svm_rank_trainer"/>
+         <term file="ml.html" name="ranking_pair"/>
+         <term file="ml.html" name="is_ranking_problem"/>
+         <term file="ml.html" name="count_ranking_inversions"/>
+         <term file="ml.html" name="test_ranking_function"/>
+         <term file="ml.html" name="cross_validate_ranking_trainer"/>
          <term file="ml.html" name="svm_c_ekm_trainer"/>
          <term file="ml.html" name="rvm_trainer"/>
          <term file="ml.html" name="krr_trainer"/>

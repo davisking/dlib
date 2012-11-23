@@ -13,7 +13,7 @@
             This page documents all the machine learning algorithms present in
             the library.  In particular, there are algorithms for performing 
             classification, regression, clustering, sequence labeling, assignment learning,
-            graph segmentation, object detection, anomaly detection, 
+            rank learning, graph segmentation, object detection, anomaly detection, 
             and feature ranking, as well as algorithms for doing more 
             specialized computations.
          </p>
@@ -116,6 +116,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>structural_sequence_labeling_trainer</item> 
          <item>structural_assignment_trainer</item> 
          <item>structural_graph_labeling_trainer</item> 
+         <item>svm_rank_trainer</item> 
       </section>
       <section>
          <name>Clustering</name>
@@ -158,6 +159,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>cross_validate_sequence_labeler</item> 
          <item>cross_validate_assignment_trainer</item> 
          <item>cross_validate_graph_labeling_trainer</item> 
+         <item>cross_validate_ranking_trainer</item> 
          <item>test_binary_decision_function</item> 
          <item>test_multiclass_decision_function</item> 
          <item>test_regression_function</item> 
@@ -165,6 +167,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>test_sequence_labeler</item>
          <item>test_assignment_function</item>
          <item>test_graph_labeling_function</item>
+         <item>test_ranking_function</item>
       </section>
 
       <section>
@@ -242,6 +245,9 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>compute_mean_squared_distance</item> 
          <item>kernel_matrix</item> 
          <item>sparse vectors</item>
+         <item>ranking_pair</item>
+         <item>is_ranking_problem</item>
+         <item>count_ranking_inversions</item>
 
          
 
@@ -338,6 +344,20 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
       
       <component>
+         <name>ranking_pair</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/ranking_tools_abstract.h</spec_file>
+         <description>
+                This object is used to contain a ranking example.  Therefore, ranking_pair
+                objects are used to represent training examples for learning-to-rank tasks,
+                such as those used by the <a href="#svm_rank_trainer">svm_rank_trainer</a>.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>kernel_matrix</name>
          <file>dlib/svm.h</file>
          <spec_file>dlib/svm/kernel_matrix_abstract.h</spec_file>
@@ -346,6 +366,34 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             object and a set of samples into a kernel matrix.  It takes these two
             things and returns a <a href="dlib/matrix/matrix_exp_abstract.h.html#matrix_exp">matrix expression</a>
             that represents the kernel matrix.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>is_ranking_problem</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/ranking_tools_abstract.h</spec_file>
+         <description>
+            This function takes a set of training data for a learning-to-rank problem
+            and reports back if it could possibly be a well formed problem.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>count_ranking_inversions</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/ranking_tools_abstract.h</spec_file>
+         <description>
+            Given two sets of objects, X and Y, and an ordering relationship defined
+            between their elements, this function counts how many times we see an element
+            in the set Y ordered before an element in the set X.   Additionally, this
+            routine executes efficiently in O(n*log(n)) time via the use of quick sort.
          </description>
                                  
       </component>
@@ -1089,6 +1137,28 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <examples>
             <example>svm_sparse_ex.cpp.html</example>
          </examples>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>svm_rank_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_rank_trainer_abstract.h</spec_file>
+         <description>
+                This object represents a tool for training a ranking support vector machine
+                using linear kernels.  In particular, this object is a tool for training
+                the Ranking SVM described in the paper: 
+                <blockquote>
+                    Optimizing Search Engines using Clickthrough Data by Thorsten Joachims
+                </blockquote>
+                Finally, note that the implementation of this object is done using the 
+                <a href="optimization.html#oca">oca</a> optimizer and 
+                <a href="#count_ranking_inversions">count_ranking_inversions</a> method.
+                This means that it runs in O(n*log(n)) time, making it suitable for use
+                with large datasets.
+         </description>
                                  
       </component>
       
@@ -2232,6 +2302,20 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
       
       <component>
+         <name>cross_validate_ranking_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/ranking_tools_abstract.h</spec_file>
+         <description>
+            Performs k-fold cross validation on a user supplied ranking trainer object such
+            as the <a href="#svm_rank_trainer">svm_rank_trainer</a>
+            and returns the fraction of ranking pairs ordered correctly. 
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>test_sequence_labeler</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/cross_validate_sequence_labeler_abstract.h</spec_file>
@@ -2270,6 +2354,19 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <description>
             Tests a <a href="#graph_labeler">graph_labeler</a> on a set of data 
             and returns the fraction of labels predicted correctly.
+         </description>
+                                 
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>test_ranking_function</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/ranking_tools_abstract.h</spec_file>
+         <description>
+            Tests a <a href="#decision_function">decision_function</a>'s ability to correctly 
+            rank a dataset and returns the resulting ranking accuracy.
          </description>
                                  
       </component>
