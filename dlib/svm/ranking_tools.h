@@ -10,6 +10,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include "sparse_vector.h"
 
 namespace dlib
 {
@@ -71,7 +72,29 @@ namespace dlib
     template <
         typename T
         >
-    bool is_ranking_problem (
+    typename disable_if<is_matrix<T>,bool>::type is_ranking_problem (
+        const std::vector<ranking_pair<T> >& samples
+    )
+    {
+        if (samples.size() == 0)
+            return false;
+
+
+        for (unsigned long i = 0; i < samples.size(); ++i)
+        {
+            if (samples[i].relevant.size() == 0)
+                return false;
+            if (samples[i].nonrelevant.size() == 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    template <
+        typename T
+        >
+    typename enable_if<is_matrix<T>,bool>::type is_ranking_problem (
         const std::vector<ranking_pair<T> >& samples
     )
     {
@@ -88,27 +111,24 @@ namespace dlib
         }
 
         // If these are dense vectors then they must all have the same dimensionality.
-        if (is_matrix<T>::value)
+        const long dims = max_index_plus_one(samples[0].relevant);
+        for (unsigned long i = 0; i < samples.size(); ++i)
         {
-            const long dims = max_index_plus_one(samples[0].relevant);
-            for (unsigned long i = 0; i < samples.size(); ++i)
+            for (unsigned long j = 0; j < samples[i].relevant.size(); ++j)
             {
-                for (unsigned long j = 0; j < samples[i].relevant.size(); ++j)
-                {
-                    if (is_vector(samples[i].relevant[j]) == false)
-                        return false;
+                if (is_vector(samples[i].relevant[j]) == false)
+                    return false;
 
-                    if (samples[i].relevant[j].size() != dims)
-                        return false;
-                }
-                for (unsigned long j = 0; j < samples[i].nonrelevant.size(); ++j)
-                {
-                    if (is_vector(samples[i].nonrelevant[j]) == false)
-                        return false;
+                if (samples[i].relevant[j].size() != dims)
+                    return false;
+            }
+            for (unsigned long j = 0; j < samples[i].nonrelevant.size(); ++j)
+            {
+                if (is_vector(samples[i].nonrelevant[j]) == false)
+                    return false;
 
-                    if (samples[i].nonrelevant[j].size() != dims)
-                        return false;
-                }
+                if (samples[i].nonrelevant[j].size() != dims)
+                    return false;
             }
         }
 
