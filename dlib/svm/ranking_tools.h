@@ -95,11 +95,17 @@ namespace dlib
             {
                 for (unsigned long j = 0; j < samples[i].relevant.size(); ++j)
                 {
+                    if (is_vector(samples[i].relevant[j]) == false)
+                        return false;
+
                     if (samples[i].relevant[j].size() != dims)
                         return false;
                 }
                 for (unsigned long j = 0; j < samples[i].nonrelevant.size(); ++j)
                 {
+                    if (is_vector(samples[i].nonrelevant[j]) == false)
+                        return false;
+
                     if (samples[i].nonrelevant[j].size() != dims)
                         return false;
                 }
@@ -108,6 +114,8 @@ namespace dlib
 
         return true;
     }
+
+// ----------------------------------------------------------------------------------------
 
     template <
         typename T
@@ -143,18 +151,6 @@ namespace dlib
         std::vector<unsigned long>& x_count,
         std::vector<unsigned long>& y_count
     )
-    /*!
-        ensures
-            - This function counts how many times we see a y value greater than or equal to
-              x value.  This is done efficiently in O(n*log(n)) time via the use of quick
-              sort.
-            - #x_count.size() == x.size()
-            - #y_count.size() == y.size()
-            - for all valid i:
-                - #x_count[i] == how many times a value in y was >= x[i].
-            - for all valid j:
-                - #y_count[j] == how many times a value in x was <= y[j].
-    !*/
     {
         x_count.assign(x.size(),0);
         y_count.assign(y.size(),0);
@@ -179,7 +175,7 @@ namespace dlib
         for (i = 0, j = 0; i < x_count.size(); ++i)
         {
             // Skip past y values that are in the correct order with respect to xsort[i].
-            while (j < ysort.size() && xsort[i].first > ysort[j].first) 
+            while (j < ysort.size() && ysort[j].first < xsort[i].first) 
                 ++j;
 
             x_count[xsort[i].second] = ysort.size() - j;
@@ -190,7 +186,7 @@ namespace dlib
         for (i = 0, j = 0; j < y_count.size(); ++j)
         {
             // Skip past x values that are in the incorrect order with respect to ysort[j].
-            while (i < xsort.size() && xsort[i].first <= ysort[j].first) 
+            while (i < xsort.size() && !(ysort[j].first < xsort[i].first)) 
                 ++i;
 
             y_count[ysort[j].second] = i;
@@ -207,11 +203,15 @@ namespace dlib
         const ranking_function& funct,
         const std::vector<ranking_pair<T> >& samples
     )
-    /*!
-        ensures
-            - returns the fraction of ranking pairs predicted correctly.
-    !*/
     {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(is_ranking_problem(samples),
+            "\t double test_ranking_function()"
+            << "\n\t invalid inputs were given to this function"
+            << "\n\t samples.size(): " << samples.size() 
+            << "\n\t is_ranking_problem(samples): " << is_ranking_problem(samples)
+            );
+
         unsigned long total_pairs = 0;
         unsigned long total_wrong = 0;
 
@@ -238,9 +238,6 @@ namespace dlib
             // Note that we don't need to look at nonrel_counts since it is redundant with
             // the information in rel_counts in this case.
             total_wrong += sum(vector_to_matrix(rel_counts));
-
-            // TODO, remove
-            DLIB_CASSERT(sum(vector_to_matrix(rel_counts)) == sum(vector_to_matrix(nonrel_counts)), "");
         }
 
         return static_cast<double>(total_pairs - total_wrong) / total_pairs;
@@ -259,7 +256,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(is_ranking_problem(samples) &&
+        DLIB_ASSERT(is_ranking_problem(samples) &&
                     1 < folds && folds <= static_cast<long>(samples.size()),
             "\t double cross_validate_ranking_trainer()"
             << "\n\t invalid inputs were given to this function"
