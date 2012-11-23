@@ -375,6 +375,13 @@ namespace dlib
             return df;
         }
 
+        const decision_function<kernel_type> train (
+            const ranking_pair<sample_type>& sample
+        ) const
+        {
+            return train(std::vector<ranking_pair<sample_type> >(1, sample));
+        }
+
     private:
 
         scalar_type C;
@@ -388,5 +395,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 }
+
 #endif // DLIB_SVM_RANK_TrAINER_H__
 
