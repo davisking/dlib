@@ -508,8 +508,8 @@ namespace dlib
             - v is an unsorted sparse vector
         ensures
             - returns a copy of v which is a sparse vector. 
-              (i.e. it will be properly sorted and not have any duplicate
-              key values).
+              (i.e. it will be properly sorted and not have any duplicate key values but
+              will still logically represent the same vector).
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -661,6 +661,7 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_SPARSE_VECTOR_ABSTRACT_
