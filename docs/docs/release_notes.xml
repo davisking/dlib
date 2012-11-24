@@ -12,6 +12,20 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+Other:
+   - Added a new documentation page for the various linear algebra tools in dlib.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="17.49" date="TODO, 2012">
+New Features:
    - Machine Learning
       - Added the ability to learn non-negative weight vectors to the
         structural_assignment_trainer object.
@@ -71,7 +85,7 @@ Other:
    - Set the default max number of connections a server will accept at a time to 1000
      rather than the previous default of infinity.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
