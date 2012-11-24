@@ -67,6 +67,50 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_sparse_matrix_vector_multiply1()
+    {
+        print_spinner();
+        std::map<unsigned long,double> sv;
+        sv[2] = 8;
+        sv[6] = 2.3;
+
+        matrix<double,10,1> v;
+        v = 0;
+        v(2) = 8;
+        v(6) = 2.3;
+
+
+        matrix<double,0,1> r1, r2;
+
+        r1 = gaussian_randm(4,10)*v;
+        r2 = sparse_matrix_vector_multiply(gaussian_randm(4,std::numeric_limits<long>::max()),sv);
+
+        DLIB_TEST(max(abs(r1-r2)) < 1e-15);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_sparse_matrix_vector_multiply2()
+    {
+        std::vector<std::pair<unsigned long,double> > sv;
+        sv.push_back(make_pair(6, 1.42));
+        sv.push_back(make_pair(3, 5));
+
+        matrix<double,9,1> v;
+        v = 0;
+        v(3) = 5;
+        v(6) = 1.42;
+
+
+        matrix<double,0,1> r1, r2;
+
+        r1 = gaussian_randm(3,9)*v;
+        r2 = sparse_matrix_vector_multiply(gaussian_randm(3,std::numeric_limits<long>::max()),sv);
+
+        DLIB_TEST(max(abs(r1-r2)) < 1e-15);
+    }
+
+// ----------------------------------------------------------------------------------------
 
     class sparse_vector_tester : public tester
     {
@@ -194,6 +238,8 @@ namespace
             }
 
             test_sparse_matrix_vector_multiplies();
+            test_sparse_matrix_vector_multiply1();
+            test_sparse_matrix_vector_multiply2();
 
         }
     };
