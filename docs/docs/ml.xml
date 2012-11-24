@@ -224,7 +224,6 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>save_image_dataset_metadata</item> 
          <item>load_libsvm_formatted_data</item> 
          <item>save_libsvm_formatted_data</item> 
-         <item>sparse_to_dense</item>
          <item>fix_nonzero_indexing</item>
       </section>
 
@@ -244,7 +243,6 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>find_gamma_with_big_centroid_gap</item> 
          <item>compute_mean_squared_distance</item> 
          <item>kernel_matrix</item> 
-         <item>sparse vectors</item>
          <item>ranking_pair</item>
          <item>is_ranking_problem</item>
          <item>count_ranking_inversions</item>
@@ -985,19 +983,6 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                                  
       </component>
       
-      
-   <!-- ************************************************************************* -->
-
-      <component>
-         <name>sparse vectors</name>
-         <file>dlib/sparse_vector.h</file>
-         <spec_file>dlib/svm/sparse_vector_abstract.h</spec_file>
-         <description>
-            In dlib, sparse vectors are represented using the container objects
-            in the C++ STL. This file defines various useful functions for operating 
-            on these sparse vectors.
-         </description>
-      </component>
       
    <!-- ************************************************************************* -->
 
@@ -1806,7 +1791,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             the LIBSVM format.  It loads the data into a std::vector of
             <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a>.
             If you want to load data into dense vectors (i.e.
-            dlib::matrix objects) then you can use the <a href="#sparse_to_dense">sparse_to_dense</a>
+            dlib::matrix objects) then you can use the <a href="linear_algebra.html#sparse_to_dense">sparse_to_dense</a>
             function to perform the conversion.  Also, some LIBSVM formatted files number
             their features beginning with 1 rather than 0.  If this bothers you, then you
             can fix it by using the <a href="#fix_nonzero_indexing">fix_nonzero_indexing</a> function
@@ -1825,19 +1810,6 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             This is actually a pair of overloaded functions.  Between the two of them
             they let you save <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse</a> 
             or dense data vectors to file using the LIBSVM format.  
-         </description>
-      </component>
-      
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>sparse_to_dense</name>
-         <file>dlib/sparse_vector.h</file>
-         <spec_file link="true">dlib/svm/sparse_vector_abstract.h</spec_file>
-         <description>
-            This is a simple function that takes a std::vector of 
-            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a> 
-            and returns to you the equivalent std::vector of dense vectors. 
          </description>
       </component>
       

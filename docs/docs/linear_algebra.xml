@@ -17,6 +17,19 @@
             can be found in
             the <a href="matrix_ex.cpp.html">matrix example program</a>.
          </p>
+
+         <p>
+            Most of the linear algebra tools deal with dense matrices.  However, there is also
+            a limited amount of support for working with sparse matrices and vectors.
+            In particular, the dlib tools represent sparse vectors using the container objects
+            in the C++ STL.  For details, see the notes at the top of 
+            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">dlib/svm/sparse_vector_abstract.h</a>.
+         </p>
+         <p>
+            Finally, note that all the dense matrix tools can be obtained by #including <tt>&lt;dlib/matrix.h&gt;</tt>
+            while the sparse vector tools can be obtained by #including <tt>&lt;dlib/sparse_vector.h&gt;</tt>.  The 
+            geometry tools can be used by #including <tt>&lt;dlib/geometry.h&gt;</tt>.
+         </p>
    
    </body>
 
@@ -26,7 +39,7 @@
     <top>
 
       <section>
-         <name>General Matrix Tools</name>
+         <name>Dense Matrix Tools</name>
          <item>matrix</item>
          <item nolink="true">
             <name>Basic_Math_Operators</name>
@@ -588,6 +601,72 @@
       </section>
 
 
+      <section>
+         <name>Sparse Vector Tools</name>
+         <item>sparse_to_dense</item> 
+
+         <item>
+            <name>distance_squared</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#distance_squared</link>
+         </item> 
+         <item>
+            <name>distance</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#distance</link>
+         </item> 
+         <item>
+            <name>assign</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#assign</link>
+         </item> 
+         <item>
+            <name>length_squared</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#length_squared</link>
+         </item> 
+         <item>
+            <name>length</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#length</link>
+         </item> 
+         <item>
+            <name>scale_by</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#scale_by</link>
+         </item> 
+         <item>
+            <name>add</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#add</link>
+         </item> 
+         <item>
+            <name>subtract</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#subtract</link>
+         </item> 
+         <item>
+            <name>max_index_plus_one</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#max_index_plus_one</link>
+         </item> 
+         <item>
+            <name>add_to</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#add_to</link>
+         </item> 
+         <item>
+            <name>subtract_from</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#subtract_from</link>
+         </item> 
+         <item>
+            <name>min</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#min</link>
+         </item> 
+         <item>
+            <name>max</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#max</link>
+         </item> 
+         <item>
+            <name>make_sparse_vector</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#make_sparse_vector</link>
+         </item> 
+         <item>
+            <name>sparse_matrix_vector_multiply</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#sparse_matrix_vector_multiply</link>
+         </item> 
+      </section>
+
     </top>
    </menu>
 
@@ -597,6 +676,20 @@
 
    <components>
    
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>sparse_to_dense</name>
+         <file>dlib/sparse_vector.h</file>
+         <spec_file link="true">dlib/svm/sparse_vector_abstract.h</spec_file>
+         <description>
+            This is a set of simple functions that take  
+            <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse vectors</a> 
+            and converts them into equivalent dense vectors.  
+         </description>
+      </component>
+      
+      
    <!-- ************************************************************************* -->
       
       <component>

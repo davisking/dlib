@@ -223,7 +223,7 @@
          <term file="ml.html" name="save_image_dataset_metadata"/>
          <term file="ml.html" name="load_libsvm_formatted_data"/>
          <term file="ml.html" name="save_libsvm_formatted_data"/>
-         <term file="ml.html" name="sparse_to_dense"/>
+         <term file="linear_algebra.html" name="sparse_to_dense"/>
          <term file="ml.html" name="fix_nonzero_indexing"/>
          <term link="ml.html#mlp" name="multi-layer perceptron"/>
          <term link="ml.html#mlp" name="neural network"/>
@@ -360,8 +360,8 @@
          <term file="ml.html" name="radial_basis_kernel"/>
 
 
-         <term link="ml.html#sparse vectors" name="unsorted sparse vectors"/>
-         <term file="ml.html" name="sparse vectors"/>
+         <term link="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors" name="unsorted sparse vectors"/>
+         <term link="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors" name="sparse vectors"/>
          <term file="ml.html" name="sparse_linear_kernel"/>
          <term file="ml.html" name="sparse_histogram_intersection_kernel"/>
          <term file="ml.html" name="sparse_polynomial_kernel"/>
