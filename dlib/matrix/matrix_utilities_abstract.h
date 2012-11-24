@@ -1619,6 +1619,33 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    inline const matrix_exp gaussian_randm (
+        long nr,
+        long nc,
+        unsigned long seed = 0
+    );
+    /*!
+        requires
+            - nr >= 0
+            - nc >= 0
+        ensures
+            - returns a matrix with its values filled with 0 mean unit variance Gaussian
+              random numbers.  
+            - Each setting of the seed results in a different random matrix.
+            - The returned matrix is lazily evaluated using the expression templates
+              technique.  This means that the returned matrix doesn't take up any memory
+              and is only an expression template.  The values themselves are computed on
+              demand using the gaussian_random_hash() routine.  
+            - returns a matrix M such that
+                - M::type == double
+                - M.nr() == nr
+                - M.nc() == nc
+                - for all valid i, j:
+                    - M(i,j) == gaussian_random_hash(i,j,seed) 
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 //                                 Pixel and Image Utilities
 // ----------------------------------------------------------------------------------------

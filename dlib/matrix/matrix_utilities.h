@@ -16,7 +16,7 @@
 #include "matrix_expressions.h"
 #include "matrix_math_functions.h"
 #include "matrix_op.h"
-#include "../general_hash/murmur_hash3.h"
+#include "../general_hash/random_hashing.h"
 
 
 namespace dlib
@@ -2062,6 +2062,43 @@ namespace dlib
         COMPILE_TIME_ASSERT(NR > 0 && NC > 0);
         typedef op_uniform_matrix<T,NR,NC,val> op;
         return matrix_op<op>(op());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct op_gaussian_randm : does_not_alias 
+    {
+        op_gaussian_randm (
+            long nr_,
+            long nc_,
+            unsigned long seed_
+        ) :_nr(nr_), _nc(nc_), seed(seed_){}
+
+        const long _nr;
+        const long _nc;
+        const unsigned long seed;
+
+        const static long cost = 100;
+        const static long NR = 0;
+        const static long NC = 0;
+        typedef default_memory_manager mem_manager_type;
+        typedef row_major_layout layout_type;
+        typedef double type;
+        typedef double const_ret_type;
+        const_ret_type apply ( long r, long c) const { return gaussian_random_hash(r,c,seed); }
+
+        long nr() const { return _nr; }
+        long nc() const { return _nc; }
+    };
+
+    inline const matrix_op<op_gaussian_randm> gaussian_randm (
+        long nr,
+        long nc,
+        unsigned long seed = 0
+    )
+    {
+        typedef op_gaussian_randm op;
+        return matrix_op<op>(op(nr,nc,seed));
     }
 
 // ----------------------------------------------------------------------------------------
