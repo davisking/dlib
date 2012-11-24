@@ -375,6 +375,10 @@
                   <name>randm</name>
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#randm</link>
                </item>
+               <item>
+                  <name>gaussian_randm</name>
+                  <link>dlib/matrix/matrix_utilities_abstract.h.html#gaussian_randm</link>
+               </item>
             </sub>
          </item>
          <item nolink="true">

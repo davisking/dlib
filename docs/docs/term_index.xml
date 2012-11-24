@@ -424,6 +424,7 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="logspace"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="cartesian_product"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="randm"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="gaussian_randm"/>
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="diag_exp"/>
