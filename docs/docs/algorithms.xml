@@ -76,6 +76,8 @@
          <item>hash</item> 
          <item>murmur_hash3</item> 
          <item>murmur_hash3_128bit</item> 
+         <item>gaussian_random_hash</item> 
+         <item>uniform_random_hash</item> 
          <item>projection_hash</item> 
          <item>create_random_projection_hash</item> 
       </section>
@@ -162,6 +164,31 @@
             
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>gaussian_random_hash</name>
+         <file>dlib/hash.h</file>
+         <spec_file link="true">dlib/general_hash/random_hashing_abstract.h</spec_file>
+         <description>
+              This function uses hashing to generate Gaussian distributed random values
+              with mean 0 and variance 1.  
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>uniform_random_hash</name>
+         <file>dlib/hash.h</file>
+         <spec_file link="true">dlib/general_hash/random_hashing_abstract.h</spec_file>
+         <description>
+              This function uses hashing to generate uniform random values in the range [0,1).
+         </description>
+         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
       <component>
          <name>murmur_hash3</name>
          <file>dlib/hash.h</file>

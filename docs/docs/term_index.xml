@@ -1016,6 +1016,8 @@
          <term file="algorithms.html" name="murmur_hash3"/>
          <term file="algorithms.html" name="murmur_hash3_128bit"/>
          <term file="algorithms.html" name="hash"/>
+         <term file="algorithms.html" name="gaussian_random_hash"/>
+         <term file="algorithms.html" name="uniform_random_hash"/>
 
 
          <term file="algorithms.html" name="md5"/>
