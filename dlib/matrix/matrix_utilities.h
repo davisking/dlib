@@ -2097,6 +2097,13 @@ namespace dlib
         unsigned long seed = 0
     )
     {
+        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+            "\tmatrix_exp gaussian_randm(nr, nc, seed)"
+            << "\n\tInvalid inputs to this function"
+            << "\n\tnr: " << nr 
+            << "\n\tnc: " << nc 
+            );
+
         typedef op_gaussian_randm op;
         return matrix_op<op>(op(nr,nc,seed));
     }
