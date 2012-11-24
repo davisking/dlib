@@ -110,6 +110,7 @@ namespace
 
     void test_murmur_hash_128_4()
     {
+        byte_orderer bo;
         dlib::rand rnd;
         for (int i = 0; i < 100; ++i)
         {
@@ -119,12 +120,37 @@ namespace
                 rnd.get_random_32bit_number()
             };
 
+            bo.host_to_little(buf);
             std::pair<uint64,uint64> temp1, temp2;
 
             // Make sure the 4 integer version of murmur hash does the same thing 
             // as the memory block version.
             temp1 = murmur_hash3_128bit(buf, sizeof(buf), 0);
             temp2 = murmur_hash3_128bit(buf[0], buf[1], buf[2], buf[3]);
+            DLIB_TEST( temp1.first == temp2.first);
+            DLIB_TEST( temp1.second == temp2.second);
+        }
+    }
+
+    void test_murmur_hash_128_3()
+    {
+        byte_orderer bo;
+        dlib::rand rnd;
+        for (int i = 0; i < 100; ++i)
+        {
+            uint64 buf[2] = { rnd.get_random_64bit_number(), 
+                rnd.get_random_64bit_number(),
+            };
+
+            const uint32 seed = rnd.get_random_32bit_number();
+
+            bo.host_to_little(buf);
+            std::pair<uint64,uint64> temp1, temp2;
+
+            // Make sure the 3 integer version of murmur hash does the same thing 
+            // as the memory block version.
+            temp1 = murmur_hash3_128bit(buf, sizeof(buf), seed);
+            temp2 = murmur_hash3_128bit_3(buf[0], buf[1], seed);
             DLIB_TEST( temp1.first == temp2.first);
             DLIB_TEST( temp1.second == temp2.second);
         }
@@ -207,6 +233,7 @@ namespace
             DLIB_TEST(murmur_hash3(&str1[0], str1.size(), 1) == 0xb17cea93);
 
             test_murmur_hash_128_4();
+            test_murmur_hash_128_3();
         }
     } a;
 

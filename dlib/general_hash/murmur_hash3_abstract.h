@@ -70,6 +70,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    std::pair<uint64,uint64> murmur_hash3_128bit_3 ( 
+        uint64 k1, 
+        uint64 k2,
+        uint64 k3 
+    );
+    /*!
+        ensures
+            - returns a 128bit hash (as two 64bit numbers) of the 3 integers given to this
+              function. 
+            - This function is machine architecture agnostic and should always give the
+              same hash value when presented with the same inputs.
+            - This hashing algorithm is Austin Appleby's excellent MurmurHash3_x64_128.  
+              See: http://code.google.com/p/smhasher/
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MURMUR_HAsH_3_ABSTRACT_H__
