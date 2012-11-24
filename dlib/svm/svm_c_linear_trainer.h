@@ -74,8 +74,8 @@ namespace dlib
         virtual bool optimization_status (
             scalar_type current_objective_value,
             scalar_type current_error_gap,
-            scalar_type ,
-            scalar_type ,
+            scalar_type current_risk_value,
+            scalar_type current_risk_gap,
             unsigned long num_cutting_planes,
             unsigned long num_iterations
         ) const 
@@ -83,20 +83,19 @@ namespace dlib
             if (be_verbose)
             {
                 using namespace std;
-                cout << "svm objective: " << current_objective_value << endl;
-                cout << "gap: " << current_error_gap << endl;
-                cout << "num planes: " << num_cutting_planes << endl;
-                cout << "iter: " << num_iterations << endl;
+                cout << "objective:     " << current_objective_value << endl;
+                cout << "objective gap: " << current_error_gap << endl;
+                cout << "risk:          " << current_risk_value << endl;
+                cout << "risk gap:      " << current_risk_gap << endl;
+                cout << "num planes:    " << num_cutting_planes << endl;
+                cout << "iter:          " << num_iterations << endl;
                 cout << endl;
             }
 
             if (num_iterations >= max_iterations)
                 return true;
 
-            if (current_objective_value == 0)
-                return true;
-
-            if (current_error_gap/current_objective_value < eps)
+            if (current_risk_gap < eps)
                 return true;
 
             return false;

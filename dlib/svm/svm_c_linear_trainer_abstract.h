@@ -88,8 +88,10 @@ namespace dlib
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but take longer 
-                  to execute.
+                  Smaller values may result in a more accurate solution but take longer to
+                  train.  You can think of this epsilon value as saying "solve the
+                  optimization problem until the probability of misclassification is within
+                  epsilon of its optimal value".  
         !*/
 
         void set_max_iterations (
