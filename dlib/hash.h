@@ -5,6 +5,7 @@
 
 
 #include "general_hash/hash.h"
+#include "general_hash/random_hashing.h"
 
 
 #endif // DLIB_HASh_
