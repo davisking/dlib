@@ -618,6 +618,49 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP, 
+        typename sparse_vector_type,
+        typename T,
+        long NR,
+        long NC,
+        typename MM,
+        typename L
+        >
+    void sparse_matrix_vector_multiply (
+        const matrix_exp<EXP>& m,
+        const sparse_vector_type& v,
+        matrix<T,NR,NC,MM,L>& result
+    );
+    /*!
+        requires
+            - max_index_plus_one(v) < m.nc()
+            - v == an unsorted sparse vector
+        ensures
+            - #result == m*v
+              (i.e. multiply m by the vector v and store the output in result)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP, 
+        typename sparse_vector_type
+        >
+    matrix<typename EXP::type,0,1> sparse_matrix_vector_multiply (
+        const matrix_exp<EXP>& m,
+        const sparse_vector_type& v
+    );
+    /*!
+        requires
+            - max_index_plus_one(v) < m.nc()
+            - v == an unsorted sparse vector
+        ensures
+            - returns m*v
+              (i.e. multiply m by the vector v and return the resulting vector)
+    !*/
+
+// ----------------------------------------------------------------------------------------
 }
 
 #endif // DLIB_SVm_SPARSE_VECTOR_ABSTRACT_

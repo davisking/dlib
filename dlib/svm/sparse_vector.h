@@ -1003,10 +1003,60 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP, 
+        typename sparse_vector_type,
+        typename T,
+        long NR,
+        long NC,
+        typename MM,
+        typename L
+        >
+    void sparse_matrix_vector_multiply (
+        const matrix_exp<EXP>& m,
+        const sparse_vector_type& v,
+        matrix<T,NR,NC,MM,L>& result
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(max_index_plus_one(v) <= (unsigned long)m.nc(),
+                    "\t void sparse_matrix_vector_multiply()"
+                    << "\n\t Invalid inputs were given to this function"
+                    << "\n\t max_index_plus_one(v): " << max_index_plus_one(v)
+                    << "\n\t m.size():              " << m.size() 
+        );
+
+        result.set_size(m.nr(),1);
+        result = 0;
+
+        for (typename sparse_vector_type::const_iterator i = v.begin(); i != v.end(); ++i)
+        {
+            for (long r = 0; r < result.nr(); ++r)
+            {
+                result(r) += m(r, i->first)*i->second;
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP, 
+        typename sparse_vector_type
+        >
+    matrix<typename EXP::type,0,1> sparse_matrix_vector_multiply (
+        const matrix_exp<EXP>& m,
+        const sparse_vector_type& v
+    )
+    {
+        matrix<typename EXP::type,0,1> result;
+        sparse_matrix_vector_multiply(m,v,result);
+        return result;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_SPARSE_VECTOR
-
-
-
 
