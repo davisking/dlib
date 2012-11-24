@@ -578,6 +578,46 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP
+        >
+    matrix<typename EXP::type,0,1> sparse_matrix_vector_multiply (
+        const std::vector<sample_pair>& edges,
+        const matrix_exp<EXP>& v
+    );
+    /*!
+        requires
+            - is_col_vector(v) == true
+            - max_index_plus_one(edges) <= v.size()
+        ensures
+            - This is just a convenience routine for invoking the above
+              sparse_matrix_vector_multiply() routine.  In particular, it just calls
+              sparse_matrix_vector_multiply() with a temporary result matrix and then
+              returns the result.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    matrix<typename EXP::type,0,1> sparse_matrix_vector_multiply (
+        const std::vector<ordered_sample_pair>& edges,
+        const matrix_exp<EXP>& v
+    );
+    /*!
+        requires
+            - is_col_vector(v) == true
+            - max_index_plus_one(edges) <= v.size()
+        ensures
+            - This is just a convenience routine for invoking the above
+              sparse_matrix_vector_multiply() routine.  In particular, it just calls
+              sparse_matrix_vector_multiply() with a temporary result matrix and then
+              returns the result.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_SVm_SPARSE_VECTOR_ABSTRACT_

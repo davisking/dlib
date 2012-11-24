@@ -944,6 +944,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP>
+    matrix<typename EXP::type,0,1> sparse_matrix_vector_multiply (
+        const std::vector<sample_pair>& edges,
+        const matrix_exp<EXP>& v
+    )
+    {
+        matrix<typename EXP::type,0,1> result;
+        sparse_matrix_vector_multiply(edges,v,result);
+        return result;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename EXP, typename T, long NR, long NC, typename MM, typename L>
     void sparse_matrix_vector_multiply (
         const std::vector<ordered_sample_pair>& edges,
@@ -973,6 +986,19 @@ namespace dlib
 
             result(i) += v(j)*d;
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP>
+    matrix<typename EXP::type,0,1> sparse_matrix_vector_multiply (
+        const std::vector<ordered_sample_pair>& edges,
+        const matrix_exp<EXP>& v
+    )
+    {
+        matrix<typename EXP::type,0,1> result;
+        sparse_matrix_vector_multiply(edges,v,result);
+        return result;
     }
 
 // ----------------------------------------------------------------------------------------
