@@ -203,7 +203,12 @@ namespace dlib
             - a is an unsorted sparse vector
             - is_vector(b) == true
         ensures
-            - returns the dot product between the vectors a and b
+            - returns the dot product between the vectors a and b.  
+            - if (max_index_plus_one(a) >= b.size()) then
+                - a's dimensionality is greater than b's dimensionality.  In this case we
+                  pretend b is padded by as many zeros as is needed to make the dot product
+                  work.  So this means that any elements in a that go beyond the length of
+                  b are simply ignored.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -219,6 +224,11 @@ namespace dlib
             - is_vector(a) == true
         ensures
             - returns the dot product between the vectors a and b
+            - if (max_index_plus_one(b) >= a.size()) then
+                - b's dimensionality is greater than a's dimensionality.  In this case we
+                  pretend a is padded by as many zeros as is needed to make the dot product
+                  work.  So this means that any elements in b that go beyond the length of
+                  a are simply ignored.
     !*/
 
 // ----------------------------------------------------------------------------------------
