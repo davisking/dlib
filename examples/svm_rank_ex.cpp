@@ -115,10 +115,10 @@ int main()
         // set of non-relevant web pages.  
         //
         // To handle cases like this, we can simply give multiple ranking_pair
-        // instances to the trainer.  Each ranking_pair representing the
-        // relevant/non-relevant sets for a particular query.  An example is
-        // shown below (for simplicity, we reuse our data from above to make 4
-        // identical "queries").
+        // instances to the trainer.  Therefore, each ranking_pair would
+        // represent the relevant/non-relevant sets for a particular query.  An
+        // example is shown below (for simplicity, we reuse our data from above
+        // to make 4 identical "queries").
 
         std::vector<ranking_pair<sample_type> > queries;
         queries.push_back(data);
