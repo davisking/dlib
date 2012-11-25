@@ -106,7 +106,7 @@ namespace
         // to connect to it.
         dlib::sleep(500);
 
-        for (int i = 0; i < 1001; ++i)
+        for (int i = 0; i < 200; ++i)
         {
             dlog << LINFO << "i: " << i;
             print_spinner();
@@ -142,7 +142,7 @@ namespace
         // to connect to it.
         dlib::sleep(500);
 
-        for (int i = 0; i < 1001; ++i)
+        for (int i = 0; i < 200; ++i)
         {
             dlog << LINFO << "i: " << i;
             print_spinner();
