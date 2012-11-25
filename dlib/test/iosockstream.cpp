@@ -97,12 +97,18 @@ namespace
 
     void test1()
     {
+        dlog << LINFO << "in test1()";
         serv theserv;
         theserv.set_listening_port(12345);
         theserv.start_async();
 
+        // wait a little bit to make sure the server has started listening before we try 
+        // to connect to it.
+        dlib::sleep(500);
+
         for (int i = 0; i < 1001; ++i)
         {
+            dlog << LINFO << "i: " << i;
             print_spinner();
             iosockstream stream("localhost:12345");
 
@@ -127,12 +133,18 @@ namespace
 
     void test2()
     {
+        dlog << LINFO << "in test2()";
         serv2 theserv;
         theserv.set_listening_port(12345);
         theserv.start_async();
 
+        // wait a little bit to make sure the server has started listening before we try 
+        // to connect to it.
+        dlib::sleep(500);
+
         for (int i = 0; i < 1001; ++i)
         {
+            dlog << LINFO << "i: " << i;
             print_spinner();
             iosockstream stream("localhost:12345");
 
