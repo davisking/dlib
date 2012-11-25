@@ -19,14 +19,17 @@ namespace dlib
     {
     public:
 
-        iosockstream()
+        iosockstream(
+        ) :
+            std::iostream(0)
         {
             tie(this);
         }
 
         iosockstream( 
             const network_address& addr
-        ) 
+        ) :
+            std::iostream(0)
         { 
             tie(this); 
             open(addr); 
@@ -35,7 +38,8 @@ namespace dlib
         iosockstream( 
             const network_address& addr,
             unsigned long timeout 
-        ) 
+        ) :
+            std::iostream(0)
         { 
             tie(this); 
             open(addr, timeout); 

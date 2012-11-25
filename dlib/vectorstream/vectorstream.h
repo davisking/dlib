@@ -10,6 +10,7 @@
 #include <streambuf>
 #include <vector>
 #include <cstdio>
+#include "../algs.h"
 
 namespace dlib
 {
