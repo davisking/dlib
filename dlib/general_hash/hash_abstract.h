@@ -161,6 +161,8 @@ namespace dlib
         uint32 seed = 0
     );
     /*!
+        requires
+            - hash() is defined for objects of type T and U
         ensures
             - returns a 32bit hash of the data stored in item.  
             - Each value of seed results in a different hash function being used.  
