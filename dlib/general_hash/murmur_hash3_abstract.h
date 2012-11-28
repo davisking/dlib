@@ -46,6 +46,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline uint32 murmur_hash3_3 ( 
+        const uint32 v1,
+        const uint32 v2,
+        const uint32 v3 
+    );
+    /*!
+        ensures
+            - returns a 32bit hash of the three integers given to this function.  
+            - This function is machine architecture agnostic and should always give the same
+              hash value when presented with the same inputs.
+            - This hashing algorithm is Austin Appleby's excellent MurmurHash3_x86_32.  
+              See: http://code.google.com/p/smhasher/
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     std::pair<uint64,uint64> murmur_hash3_128bit ( 
         const void* key, 
         const int len,
