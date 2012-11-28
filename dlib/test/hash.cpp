@@ -183,6 +183,28 @@ namespace
         }
     }
 
+    void test_murmur_hash_64_3()
+    {
+        byte_orderer bo;
+        dlib::rand rnd;
+        for (int i = 0; i < 100; ++i)
+        {
+            uint32 buf[2] = {rnd.get_random_32bit_number(), 
+                             rnd.get_random_32bit_number()};
+            const uint32 seed = rnd.get_random_32bit_number();
+
+
+            bo.host_to_little(buf);
+            uint32 temp1, temp2;
+
+            // Make sure the 2 integer version of murmur hash does the same thing 
+            // as the memory block version.
+            temp1 = murmur_hash3(&buf, sizeof(buf), seed);
+            temp2 = murmur_hash3_3(buf[0], buf[1], seed);
+            DLIB_TEST(temp1 == temp2);
+        }
+    }
+
     class test_hash : public tester
     {
     public:
@@ -236,6 +258,33 @@ namespace
             dlog << LINFO << "hash(mat):  "<< dlib::hash(mat);
             dlog << LINFO << "hash(mat2): "<< dlib::hash(mat2);
 
+            uint32 ui1 = 123485393;
+            uint64 ui2 = ui1;
+            ui2 *= ui2;
+            ui2 *= ui2;
+            dlog << LINFO << "hash(ui1):                  "<< dlib::hash(ui1);
+            dlog << LINFO << "hash(ui2):                  "<< dlib::hash(ui2);
+            dlog << LINFO << "hash(make_pair(ui2,ui1)):   "<< dlib::hash(make_pair(ui2,ui1));
+            dlog << LINFO << "hash(make_pair(ui2,ui2)):   "<< dlib::hash(make_pair(ui2,ui2));
+            dlog << LINFO << "hash(make_pair(ui1,ui1)):   "<< dlib::hash(make_pair(ui1,ui1));
+            dlog << LINFO << "hash(ui1,3):                "<< dlib::hash(ui1,3);
+            dlog << LINFO << "hash(ui2,3):                "<< dlib::hash(ui2,3);
+            dlog << LINFO << "hash(make_pair(ui2,ui1),3): "<< dlib::hash(make_pair(ui2,ui1),3);
+            dlog << LINFO << "hash(make_pair(ui2,ui2),3): "<< dlib::hash(make_pair(ui2,ui2),3);
+            dlog << LINFO << "hash(make_pair(ui1,ui1),3): "<< dlib::hash(make_pair(ui1,ui1),3);
+
+            DLIB_TEST(dlib::hash(ui1) == 0x63e272e4);
+            DLIB_TEST(dlib::hash(ui2) == 0xaf55561a);
+            DLIB_TEST(dlib::hash(make_pair(ui2,ui1)) == 0x52685376);
+            DLIB_TEST(dlib::hash(make_pair(ui2,ui2)) == 0xd25d6929);
+            DLIB_TEST(dlib::hash(make_pair(ui1,ui1)) == 0xeea3b63e);
+            DLIB_TEST(dlib::hash(ui1,3) == 0x95d1c4c0);
+            DLIB_TEST(dlib::hash(ui2,3) == 0x6ada728d);
+            DLIB_TEST(dlib::hash(make_pair(ui2,ui1),3) == 0x2f72a0ff);
+            DLIB_TEST(dlib::hash(make_pair(ui2,ui2),3) == 0xac1407f0);
+            DLIB_TEST(dlib::hash(make_pair(ui1,ui1),3) == 0x39ad637a);
+
+
             DLIB_TEST(dlib::hash(str1) == 0x3ffe6bf6);
             DLIB_TEST(dlib::hash(v)    == 0xf1af2ca6);
             DLIB_TEST(dlib::hash(v2)   == 0x63852afc);
@@ -262,6 +311,7 @@ namespace
             test_murmur_hash_128_4();
             test_murmur_hash_128_3();
             test_murmur_hash_64_2();
+            test_murmur_hash_64_3();
         }
     } a;
 
