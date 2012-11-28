@@ -162,6 +162,27 @@ namespace
         }
     }
 
+    void test_murmur_hash_64_2()
+    {
+        byte_orderer bo;
+        dlib::rand rnd;
+        for (int i = 0; i < 100; ++i)
+        {
+            uint32 val = rnd.get_random_32bit_number();
+            const uint32 seed = rnd.get_random_32bit_number();
+
+
+            bo.host_to_little(val);
+            uint32 temp1, temp2;
+
+            // Make sure the 2 integer version of murmur hash does the same thing 
+            // as the memory block version.
+            temp1 = murmur_hash3(&val, sizeof(val), seed);
+            temp2 = murmur_hash3_2(val, seed);
+            DLIB_TEST(temp1 == temp2);
+        }
+    }
+
     class test_hash : public tester
     {
     public:
@@ -240,6 +261,7 @@ namespace
 
             test_murmur_hash_128_4();
             test_murmur_hash_128_3();
+            test_murmur_hash_64_2();
         }
     } a;
 
