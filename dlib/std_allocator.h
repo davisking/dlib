@@ -91,6 +91,11 @@ namespace dlib
             return (pointer) pool.allocate_array(num*sizeof(T));
         }
 
+        // This function is not required by the C++ standard but some versions of the STL
+        // distributed with gcc erroneously require it.  See the bug report for further
+        // details: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=51626
+        void construct(pointer p) { return construct(p, value_type()); }
+
         //initialize elements of allocated storage p with value value
         void construct (pointer p, const T& value) 
         {
