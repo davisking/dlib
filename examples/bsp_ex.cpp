@@ -77,7 +77,7 @@ int main(int argc, char** argv)
         {
             // display all the command line options
             cout << "Usage: bsp_ex (-l port | <list of hosts>)\n";
-            parser.print_options(cout); 
+            parser.print_options(); 
             cout << endl;
             return 0;
         }
