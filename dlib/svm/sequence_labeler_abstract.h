@@ -146,6 +146,23 @@ namespace dlib
                 - This function only calls set_feature() with feature_index values < num_features()
         !*/
 
+        unsigned long num_nonnegative_weights (
+        ) const;
+        /*!
+            ensures
+                - returns the number of elements of the w parameter vector which should be
+                  non-negative.  That is, this feature extractor is intended to be used
+                  with w vectors where the first num_nonnegative_weights() elements of w
+                  are >= 0.  That is, it should be the case that w(i) >= 0 for all i <
+                  num_nonnegative_weights().
+                - Note that num_nonnegative_weights() is just an optional method to allow
+                  you to tell a tool like the structural_sequence_labeling_trainer that the
+                  learned w should have a certain number of non-negative elements.
+                  Therefore, if you do not provide a num_nonnegative_weights() method in
+                  your feature extractor then it will default to a value of 0, indicating
+                  that all elements of the w parameter vector may be any value.
+        !*/
+
     };
 
 // ----------------------------------------------------------------------------------------

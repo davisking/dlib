@@ -7,6 +7,7 @@
 #include "../algs.h"
 #include "../optimization.h"
 #include "structural_svm_sequence_labeling_problem.h"
+#include "num_nonnegative_weights.h"
 
 
 namespace dlib
@@ -219,7 +220,7 @@ namespace dlib
             for (unsigned long i = 0; i < loss_values.size(); ++i)
                 prob.set_loss(i,loss_values[i]);
 
-            solver(prob, weights);
+            solver(prob, weights, num_nonnegative_weights(fe));
 
             return sequence_labeler<feature_extractor>(weights,fe);
         }
