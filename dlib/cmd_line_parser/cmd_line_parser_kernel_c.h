@@ -75,10 +75,10 @@ namespace dlib
         // make sure requires clause is not broken
         DLIB_CASSERT( this->parsed_line() == true && N < number_of_arguments(),
                  "\tvoid cmd_line_parser::operator[](unsigned long N)"
-                 << "\n\tYou must specify a valid option and the parser must have run already."
+                 << "\n\tYou must specify a valid index N and the parser must have run already."
                  << "\n\tthis:                      " << this
                  << "\n\tN:                         " << N
-                 << "\n\tparsed_line():             " << ((this->parsed_line())?"true":"false")
+                 << "\n\tparsed_line():             " << this->parsed_line()
                  << "\n\tnumber_of_arguments():     " << number_of_arguments()
         );
 
