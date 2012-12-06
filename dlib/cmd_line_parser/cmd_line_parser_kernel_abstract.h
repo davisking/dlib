@@ -302,6 +302,18 @@ namespace dlib
                     it will have no effect on the state of #*this.
         !*/
 
+        void print_options (
+        ) const;
+        /*!
+            ensures
+                - prints all the command line options to cout.
+                - #at_start() == true
+            throws                
+                - any exception.
+                    if an exception is thrown then #at_start() == true but otherwise  
+                    it will have no effect on the state of #*this.
+        !*/
+
     // -------------------------------------------------------------
     //                    Input Validation Tools
     // -------------------------------------------------------------

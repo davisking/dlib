@@ -23,7 +23,13 @@ namespace dlib
 
             void print_options (
                 std::basic_ostream<typename clp_base::char_type>& out
-            );
+            ) const;
+
+            void print_options (
+            ) const
+            {
+                print_options(std::cout);
+            }
 
     };
 
@@ -47,7 +53,7 @@ namespace dlib
     void cmd_line_parser_print_1<clp_base>::
     print_options (
         std::basic_ostream<typename clp_base::char_type>& out
-    )
+    ) const
     {
         typedef typename clp_base::char_type ct;
         typedef std::basic_string<ct> string;
