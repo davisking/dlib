@@ -2,12 +2,16 @@
 
 /*
 
-    This is an example illustrating the use of the threading api from the 
-    dlib C++ Library.
+    This is an example illustrating the use of the threading api from the dlib
+    C++ Library.
 
 
     This is a very simple example.  It makes some threads and just waits for
-    them to terminate.
+    them to terminate.  It should be noted that this example shows how to use
+    the lowest level of the dlib threading API.  Often, other higher level tools
+    are more appropriate.  For examples of higher level tools see the
+    documentation on the pipe, thread_pool, thread_function, or 
+    threaded_object.
 */
 
 
