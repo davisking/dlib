@@ -984,6 +984,10 @@
             <example>threads_ex.cpp.html</example>
             <example>logger_ex_2.cpp.html</example>
             <example>pipe_ex.cpp.html</example>
+            <example>multithreaded_object_ex.cpp.html</example>
+            <example>threaded_object_ex.cpp.html</example>
+            <example>thread_function_ex.cpp.html</example>
+            <example>thread_pool_ex.cpp.html</example>
          </examples>
          
          <implementations>
