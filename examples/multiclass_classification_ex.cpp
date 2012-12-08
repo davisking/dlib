@@ -11,12 +11,12 @@
         - class 3: points that are on a circle of radius 4 but not around the origin at all
 */
 
-#include "dlib/svm.h"
+#include <dlib/svm.h>
 
 #include <iostream>
 #include <vector>
 
-#include "dlib/rand.h"
+#include <dlib/rand.h>
 
 using namespace std;
 using namespace dlib;

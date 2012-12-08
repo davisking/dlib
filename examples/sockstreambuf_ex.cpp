@@ -15,8 +15,8 @@
     http://www.jmarshall.com/easy/http/
 */
 
-#include "dlib/sockets.h"
-#include "dlib/sockstreambuf.h"
+#include <dlib/sockets.h>
+#include <dlib/sockstreambuf.h>
 #include <iostream>
 
 using namespace std;

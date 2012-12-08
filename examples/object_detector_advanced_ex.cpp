@@ -9,12 +9,12 @@
 */
 
 
-#include "dlib/svm_threaded.h"
-#include "dlib/gui_widgets.h"
-#include "dlib/array.h"
-#include "dlib/array2d.h"
-#include "dlib/image_keypoint.h"
-#include "dlib/image_processing.h"
+#include <dlib/svm_threaded.h>
+#include <dlib/gui_widgets.h>
+#include <dlib/array.h>
+#include <dlib/array2d.h>
+#include <dlib/image_keypoint.h>
+#include <dlib/image_processing.h>
 
 #include <iostream>
 #include <fstream>

@@ -14,9 +14,9 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include "dlib/std_allocator.h"
-#include "dlib/memory_manager.h"
-#include "dlib/memory_manager_stateless.h"
+#include <dlib/std_allocator.h>
+#include <dlib/memory_manager.h>
+#include <dlib/memory_manager_stateless.h>
 
 using namespace std;
 using namespace dlib;

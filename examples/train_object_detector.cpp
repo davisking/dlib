@@ -59,15 +59,15 @@
 */
 
 
-#include "dlib/svm_threaded.h"
-#include "dlib/string.h"
-#include "dlib/gui_widgets.h"
-#include "dlib/array.h"
-#include "dlib/array2d.h"
-#include "dlib/image_keypoint.h"
-#include "dlib/image_processing.h"
-#include "dlib/data_io.h"
-#include "dlib/cmd_line_parser.h"
+#include <dlib/svm_threaded.h>
+#include <dlib/string.h>
+#include <dlib/gui_widgets.h>
+#include <dlib/array.h>
+#include <dlib/array2d.h>
+#include <dlib/image_keypoint.h>
+#include <dlib/image_processing.h>
+#include <dlib/data_io.h>
+#include <dlib/cmd_line_parser.h>
 
 
 #include <iostream>

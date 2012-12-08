@@ -19,12 +19,12 @@
         "lower_right"
 */
 
-#include "dlib/svm.h"
+#include <dlib/svm.h>
 
 #include <iostream>
 #include <vector>
 
-#include "dlib/rand.h"
+#include <dlib/rand.h>
 
 using namespace std;
 using namespace dlib;

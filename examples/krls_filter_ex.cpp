@@ -10,8 +10,8 @@
 
 #include <iostream>
 
-#include "dlib/svm.h"
-#include "dlib/rand.h"
+#include <dlib/svm.h>
+#include <dlib/rand.h>
 
 using namespace std;
 using namespace dlib;

@@ -13,8 +13,8 @@
 
 
 #include <iostream>
-#include "dlib/threads.h"
-#include "dlib/ref.h"
+#include <dlib/threads.h>
+#include <dlib/ref.h>
 
 using namespace dlib;
 using namespace std;

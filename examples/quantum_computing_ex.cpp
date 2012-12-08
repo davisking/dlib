@@ -20,8 +20,8 @@
 #include <iostream>
 #include <complex>
 #include <ctime>
-#include "dlib/quantum_computing.h"
-#include "dlib/string.h"
+#include <dlib/quantum_computing.h>
+#include <dlib/string.h>
 
 
 using namespace std;

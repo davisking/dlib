@@ -12,8 +12,8 @@
 
 
 #include <iostream>
-#include "dlib/threads.h"
-#include "dlib/misc_api.h"  // for dlib::sleep
+#include <dlib/threads.h>
+#include <dlib/misc_api.h>  // for dlib::sleep
 
 using namespace std;
 using namespace dlib;

@@ -84,10 +84,10 @@
 
 */
 
-#include "dlib/manifold_regularization.h"
-#include "dlib/svm.h"
-#include "dlib/rand.h"
-#include "dlib/statistics.h"
+#include <dlib/manifold_regularization.h>
+#include <dlib/svm.h>
+#include <dlib/rand.h>
+#include <dlib/statistics.h>
 #include <iostream>
 #include <vector>
 #include <ctime>

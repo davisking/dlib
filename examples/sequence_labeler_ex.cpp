@@ -37,8 +37,8 @@
 
 
 #include <iostream>
-#include "dlib/svm_threaded.h"
-#include "dlib/rand.h"
+#include <dlib/svm_threaded.h>
+#include <dlib/rand.h>
 
 using namespace std;
 using namespace dlib;

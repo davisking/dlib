@@ -17,8 +17,8 @@
 #include <iostream>
 #include <vector>
 
-#include "dlib/svm.h"
-#include "dlib/statistics.h"
+#include <dlib/svm.h>
+#include <dlib/statistics.h>
 
 using namespace std;
 using namespace dlib;

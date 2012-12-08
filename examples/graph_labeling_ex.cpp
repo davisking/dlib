@@ -36,7 +36,7 @@
     structural_graph_labeling_trainer.
 */
 
-#include "dlib/svm_threaded.h"
+#include <dlib/svm_threaded.h>
 #include <iostream>
 
 using namespace std;

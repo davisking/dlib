@@ -25,8 +25,8 @@
 
 
 
-#include "dlib/compress_stream.h"
-#include "dlib/cmd_line_parser.h"
+#include <dlib/compress_stream.h>
+#include <dlib/cmd_line_parser.h>
 #include <iostream>
 #include <fstream>
 #include <string>

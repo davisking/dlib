@@ -8,7 +8,7 @@
 
 
 #include <iostream>
-#include "dlib/member_function_pointer.h"
+#include <dlib/member_function_pointer.h>
 
 using namespace dlib;
 using namespace std;

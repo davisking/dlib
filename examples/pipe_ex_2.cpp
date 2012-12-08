@@ -21,9 +21,9 @@
 */
 
 
-#include "dlib/threads.h"
-#include "dlib/pipe.h"
-#include "dlib/type_safe_union.h"
+#include <dlib/threads.h>
+#include <dlib/pipe.h>
+#include <dlib/type_safe_union.h>
 #include <iostream>
 
 using namespace dlib;

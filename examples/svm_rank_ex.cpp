@@ -21,7 +21,7 @@
     svm_sparse_ex.cpp for an example.
 */
 
-#include "dlib/svm.h"
+#include <dlib/svm.h>
 #include <iostream>
 
 

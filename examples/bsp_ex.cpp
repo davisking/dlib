@@ -41,9 +41,9 @@
 
 
 
-#include "dlib/cmd_line_parser.h"
-#include "dlib/bsp.h"
-#include "dlib/matrix.h"
+#include <dlib/cmd_line_parser.h>
+#include <dlib/bsp.h>
+#include <dlib/matrix.h>
 
 #include <iostream>
 

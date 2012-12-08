@@ -21,16 +21,16 @@
     examples and want to see a more in-depth example then by all means, continue reading. :)
 */
 
-#include "dlib/gui_widgets.h"
+#include <dlib/gui_widgets.h>
 #include <sstream>
 #include <string>
-#include "dlib/directed_graph.h"
-#include "dlib/string.h"
-#include "dlib/bayes_utils.h"
-#include "dlib/smart_pointers.h"
-#include "dlib/set.h"
-#include "dlib/graph_utils.h"
-#include "dlib/stl_checked.h"
+#include <dlib/directed_graph.h>
+#include <dlib/string.h>
+#include <dlib/bayes_utils.h>
+#include <dlib/smart_pointers.h>
+#include <dlib/set.h>
+#include <dlib/graph_utils.h>
+#include <dlib/stl_checked.h>
 
 
 using namespace std;

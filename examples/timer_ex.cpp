@@ -9,8 +9,8 @@
 */
 
 
-#include "dlib/timer.h"
-#include "dlib/misc_api.h" // for dlib::sleep
+#include <dlib/timer.h>
+#include <dlib/misc_api.h> // for dlib::sleep
 #include <iostream>
 
 using namespace dlib;

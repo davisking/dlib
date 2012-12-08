@@ -25,9 +25,9 @@
 */
 
 
-#include "dlib/logger.h"
-#include "dlib/misc_api.h"
-#include "dlib/threads.h"
+#include <dlib/logger.h>
+#include <dlib/misc_api.h>
+#include <dlib/threads.h>
 
 using namespace dlib;
 

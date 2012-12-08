@@ -9,7 +9,7 @@
 */
 
 
-#include "dlib/config_reader.h"
+#include <dlib/config_reader.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
