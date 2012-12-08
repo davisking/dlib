@@ -37,7 +37,7 @@
 
 <code_box>
 hg clone http://hg.code.sf.net/p/dclib/code dclib-code
-cd dclib
+cd dclib-code
 [make changes to dlib source code]
 hg commit -u "Your Name &lt;your.email@host.com&gt;"
 hg bundle dlibchanges.hg
