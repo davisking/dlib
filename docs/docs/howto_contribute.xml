@@ -36,7 +36,7 @@
          them to me as a bundle file.  An example is shown below.
 
 <code_box>
-hg clone http://dclib.hg.sourceforge.net:8000/hgroot/dclib/dclib
+hg clone http://hg.code.sf.net/p/dclib/code dclib-code
 cd dclib
 [make changes to dlib source code]
 hg commit -u "Your Name &lt;your.email@host.com&gt;"
