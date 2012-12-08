@@ -513,12 +513,12 @@ function BigToggle(node)
                <xsl:when test="spec_file/@link = 'true'">
                   <BR/>
                   <b><a href="{spec_file}.html#{name}">
-                     <font style='font-size:1.3em'>Detailed Documentation</font></a></b> 
+                     <font style='font-size:1.4em'>Detailed Documentation</font></a></b> 
                </xsl:when>
                <xsl:otherwise>
                   <BR/>
                   <b><a href="{spec_file}.html">
-                     <font style='font-size:1.3em'>Detailed Documentation</font></a></b>
+                     <font style='font-size:1.4em'>Detailed Documentation</font></a></b>
                </xsl:otherwise>
             </xsl:choose>
          </xsl:if>
@@ -555,11 +555,11 @@ function BigToggle(node)
                <xsl:choose>
                   <xsl:when test="spec_file/@link = 'true'">
                      <b><a href="{spec_file}.html#{name}">
-                        <font style='font-size:1.3em'>Detailed Documentation</font></a></b>
+                        <font style='font-size:1.4em'>Detailed Documentation</font></a></b>
                   </xsl:when>
                   <xsl:otherwise>
                      <b><a href="{spec_file}.html">
-                        <font style='font-size:1.3em'>Detailed Documentation</font></a></b>
+                        <font style='font-size:1.4em'>Detailed Documentation</font></a></b>
                   </xsl:otherwise>
                </xsl:choose>
 
@@ -582,7 +582,7 @@ function BigToggle(node)
    </xsl:template>      
 
    <xsl:template match="examples">
-    <BR/><b>Example Programs: </b>
+    <BR/>Example Programs: 
       <xsl:for-each select="example">
          <xsl:choose>
             <xsl:when test="position() = last()">
