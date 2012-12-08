@@ -504,8 +504,11 @@ function BigToggle(node)
          <BR/>
          <xsl:apply-templates select="description"/>
 
-         <xsl:if test="spec_file">
+         <xsl:if test="file">
             <BR/>
+            <BR/><B><font style='font-size:1.4em'><tt>#include &lt;<xsl:value-of select="file"/>&gt;</tt></font></B>
+         </xsl:if>
+         <xsl:if test="spec_file">
             <xsl:choose>
                <xsl:when test="spec_file/@link = 'true'">
                   <BR/>
@@ -518,9 +521,6 @@ function BigToggle(node)
                      <font style='font-size:1.3em'>Detailed Documentation</font></a></b>
                </xsl:otherwise>
             </xsl:choose>
-         </xsl:if>
-         <xsl:if test="file">
-            <BR/><B>File to include: </B><xsl:value-of select="file"/>
          </xsl:if>
          <xsl:if test="body_file">
             <BR/>
@@ -586,10 +586,10 @@ function BigToggle(node)
       <xsl:for-each select="example">
          <xsl:choose>
             <xsl:when test="position() = last()">
-               <a href="{.}"><xsl:value-of select="position()"/></a>
+               <a href="{.}"><xsl:value-of select="substring-before(.,'.html')"/></a>
             </xsl:when>
             <xsl:otherwise>
-               <a href="{.}"><xsl:value-of select="position()"/></a>, 
+               <a href="{.}"><xsl:value-of select="substring-before(.,'.html')"/></a>,
             </xsl:otherwise>
          </xsl:choose>              
       </xsl:for-each>
