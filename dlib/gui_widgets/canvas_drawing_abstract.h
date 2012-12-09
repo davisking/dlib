@@ -115,6 +115,31 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename pixel_type
+        >
+    void draw_solid_convex_polygon (
+        const canvas& c,
+        const std::vector<point>& polygon,
+        const pixel_type& pixel = rgb_pixel(0,0,0),
+        const rectangle& area = rectangle(-infinity,-infinity,infinity,infinity)
+    );
+    /*!
+        requires
+            - pixel_traits<pixel_type> is defined
+        ensures
+            - Interprets the given std::vector polygon object as defining a convex polygon
+              shape.  In particular, the polygon is given by taking the points and drawing
+              lines between them.  That is, imagine drawing a line connecting polygon[i]
+              and polygon[(i+1)%polygon.size()], for all valid i, and then filling in the
+              interior of the polygon.  That is what this function does.
+            - When drawing the polygon, only the part of the polygon which overlaps both
+              the given canvas and area rectangle is drawn.
+            - Uses the given pixel color to draw the polygon.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void draw_button_down (
         const canvas& c,
         const rectangle& btn,

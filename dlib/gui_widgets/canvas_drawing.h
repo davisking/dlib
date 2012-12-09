@@ -440,6 +440,234 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+
+        template <typename alloc>
+        void get_convex_polygon_shape (
+            const std::vector<point>& points,
+            const long top,
+            const long bottom,
+            std::vector<double,alloc>& left_boundary,
+            std::vector<double,alloc>& right_boundary
+        )
+        /*!
+            requires
+                - 0 <= top <= bottom 
+            ensures
+                - interprets points as the coordinates defining a convex polygon.  In
+                  particular, we interpret points as a list of the vertices of the polygon
+                  and assume they are ordered in clockwise order.
+                - #left_boundary.size() == bottom-top+1
+                - #right_boundary.size() == bottom-top+1
+                - for all top <= y <= bottom:
+                    - #left_boundary[y-top] == the x coordinate for the left most side of
+                      the polygon at coordinate y.
+                    - #right_boundary[y-top] == the x coordinate for the right most side of
+                      the polygon at coordinate y.
+        !*/
+        {
+            using std::min;
+            using std::max;
+
+            left_boundary.assign(bottom-top+1, std::numeric_limits<double>::infinity());
+            right_boundary.assign(bottom-top+1, -std::numeric_limits<double>::infinity());
+
+            // trace out the points along the edge of the polynomial and record them
+            for (unsigned long i = 0; i < points.size(); ++i)
+            {
+                const point p1 = points[i];
+                const point p2 = points[(i+1)%points.size()];
+
+                if (p1.y() == p2.y())
+                {
+                    if (top <= p1.y() && p1.y() <= bottom)
+                    {
+                        const long y = p1.y() - top;
+                        const double xmin = min(p1.x(), p2.x());
+                        const double xmax = min(p1.x(), p2.x());
+                        left_boundary[y]  = min(left_boundary[y], xmin);
+                        right_boundary[y] = max(right_boundary[y], xmax);
+                    }
+                }
+                else
+                {
+                    // Here we trace out the line from p1 to p2 and record where it hits.  
+
+                    // x = m*y + b
+                    const double m = (p2.x() - p1.x())/(double)(p2.y()-p1.y());
+                    const double b = p1.x() - m*p1.y(); // because: x1 = m*y1 + b
+
+                    const long ymin = max(top,min(p1.y(), p2.y()));
+                    const long ymax = min(bottom,max(p1.y(), p2.y()));
+                    for (long y = ymin; y <= ymax; ++y)
+                    {
+                        const double x = m*y + b;
+                        const unsigned long idx = y-top;
+                        left_boundary[idx]  = min(left_boundary[idx], x);
+                        right_boundary[idx] = max(right_boundary[idx], x);
+                    }
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+    }
+
+    template <typename pixel_type>
+    void draw_solid_convex_polygon (
+        const canvas& c,
+        const std::vector<point>& polygon,
+        const pixel_type& pixel,
+        const rectangle& area = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
+                                          std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
+    )
+    {
+        using std::max;
+        using std::min;
+        const rectangle valid_area(c.intersect(area));
+
+        rectangle bounding_box;
+        for (unsigned long i = 0; i < polygon.size(); ++i)
+            bounding_box += polygon[i];
+
+        // Don't do anything if the polygon is totally outside the area we can draw in
+        // right now.
+        if (bounding_box.intersect(valid_area).is_empty())
+            return;
+
+        rgb_alpha_pixel alpha_pixel;
+        assign_pixel(alpha_pixel, pixel);
+        const unsigned char max_alpha = alpha_pixel.alpha;
+
+        // we will only want to loop over the part of left_boundary that is part of the
+        // valid_area.
+        long top = max(valid_area.top(),bounding_box.top());
+        long bottom = min(valid_area.bottom(),bounding_box.bottom());
+
+        // Since we look at the adjacent rows of boundary information when doing the alpha
+        // blending, we want to make sure we always have some boundary information unless
+        // we are at the absolute edge of the polygon.
+        const long top_offset = (top == bounding_box.top()) ? 0 : 1;
+        const long bottom_offset = (bottom == bounding_box.bottom()) ? 0 : 1;
+        if (top != bounding_box.top())
+            top -= 1;
+        if (bottom != bounding_box.bottom())
+            bottom += 1;
+
+        std::vector<double> left_boundary;
+        std::vector<double> right_boundary;
+        impl::get_convex_polygon_shape(polygon, top, bottom, left_boundary, right_boundary);
+
+
+        // draw the polygon row by row
+        for (unsigned long i = top_offset; i < left_boundary.size(); ++i)
+        {
+            long left_x = std::ceil(left_boundary[i]);
+            long right_x = std::floor(right_boundary[i]);
+
+            left_x = max(left_x, valid_area.left());
+            right_x = min(right_x, valid_area.right());
+
+            if (i < left_boundary.size()-bottom_offset)
+            {
+                // draw the main body of the polygon
+                for (long x = left_x; x <= right_x; ++x)
+                {
+                    const long y = i+top;
+                    assign_pixel(c[y-c.top()][x-c.left()], pixel);
+                }
+            }
+
+            if (i == 0)
+                continue;
+
+            // Now alpha blend the edges so they don't look all pixely.
+
+            // Alpha blend the edges on the left side.
+            double delta = left_boundary[i-1] - left_boundary[i];
+            if (std::abs(delta) <= 1)
+            {
+                if (std::floor(left_boundary[i]) != left_x)
+                {
+                    const point p(std::floor(left_boundary[i]), i+top);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = max_alpha-static_cast<unsigned char>((left_boundary[i]-p.x())*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(c[p.y()-c.top()][p.x()-c.left()],temp);
+                }
+            }
+            else if (delta < 0)  // on the bottom side
+            {
+                for (long x = std::ceil(left_boundary[i-1]); x < left_x; ++x)
+                {
+                    const point p(x, i+top);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = static_cast<unsigned char>((x-left_boundary[i-1])/std::abs(delta)*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(c[p.y()-c.top()][p.x()-c.left()],temp);
+                }
+            }
+            else // on the top side
+            {
+                const long old_left_x = std::ceil(left_boundary[i-1]);
+                for (long x = left_x; x < old_left_x; ++x)
+                {
+                    const point p(x, i+top-1);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = static_cast<unsigned char>((x-left_boundary[i])/delta*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(c[p.y()-c.top()][p.x()-c.left()],temp);
+                }
+            }
+
+
+            // Alpha blend the edges on the right side
+            delta = right_boundary[i-1] - right_boundary[i];
+            if (std::abs(delta) <= 1)
+            {
+                if (std::ceil(right_boundary[i]) != right_x)
+                {
+                    const point p(std::ceil(right_boundary[i]), i+top);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = max_alpha-static_cast<unsigned char>((p.x()-right_boundary[i])*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(c[p.y()-c.top()][p.x()-c.left()],temp);
+                }
+            }
+            else if (delta < 0) // on the top side
+            {
+                for (long x = std::floor(right_boundary[i-1])+1; x <= right_x; ++x)
+                {
+                    const point p(x, i+top-1);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = static_cast<unsigned char>((right_boundary[i]-x)/std::abs(delta)*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(c[p.y()-c.top()][p.x()-c.left()],temp);
+                }
+            }
+            else // on the bottom side
+            {
+                const long old_right_x = std::floor(right_boundary[i-1]);
+                for (long x = right_x+1; x <= old_right_x; ++x)
+                {
+                    const point p(x, i+top);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = static_cast<unsigned char>((right_boundary[i-1]-x)/delta*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(c[p.y()-c.top()][p.x()-c.left()],temp);
+                }
+            }
+        }
+    }
+    inline void draw_solid_convex_polygon (
+        const canvas& c,
+        const std::vector<point>& polygon
+    ) { draw_solid_convex_polygon(c, polygon, 0); }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type 
         >
