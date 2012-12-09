@@ -295,7 +295,7 @@ namespace dlib
             if (current_risk_gap < eps)
                 should_stop = true;
 
-            if (should_stop && !skip_cache)
+            if (should_stop && !skip_cache && max_cache_size != 0)
             {
                 // Instead of stopping we shouldn't use the cache on the next iteration.  This way
                 // we can be sure to have the best solution rather than assuming the cache is up-to-date
