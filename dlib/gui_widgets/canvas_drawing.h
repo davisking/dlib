@@ -583,7 +583,7 @@ namespace dlib
             if (i == 0)
                 continue;
 
-            // Now alpha blend the edges so they don't look all pixely.
+            // Now draw anti-aliased edges edges so they don't look all pixely.
 
             // Alpha blend the edges on the left side.
             double delta = left_boundary[i-1] - left_boundary[i];
