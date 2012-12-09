@@ -905,6 +905,7 @@
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_circle"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_pixel"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_solid_circle"/>
+         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_solid_convex_polygon"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_button_down"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_sunken_rectangle"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_button_up"/>

@@ -298,6 +298,10 @@
                         <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_solid_circle</link>
                      </item>
                      <item>
+                        <name>draw_solid_convex_polygon</name>
+                        <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_solid_convex_polygon</link>
+                     </item>
+                     <item>
                         <name>draw_button_down</name>
                         <link>dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_button_down</link>
                      </item>
