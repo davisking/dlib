@@ -697,6 +697,37 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type 
+        >
+    void draw_image (
+        const canvas& c,
+        const rectangle& rect,
+        const image_type& img,
+        const rectangle& area_ = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
+                                          std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
+    )
+    {
+        const rectangle area = c.intersect(rect).intersect(area_);
+        if (area.is_empty() || img.size() == 0)
+            return;
+
+        const matrix<long,1> x = matrix_cast<long>(round(linspace(0, img.nc()-1, rect.width())));
+        const matrix<long,1> y = matrix_cast<long>(round(linspace(0, img.nr()-1, rect.height())));
+
+        for (long row = area.top(); row <= area.bottom(); ++row)
+        {
+            const long r = y(row-rect.top());
+            long cc = area.left() - rect.left();
+            for (long col = area.left(); col <= area.right(); ++col)
+            {
+                assign_pixel(c[row-c.top()][col-c.left()], img[r][x(cc++)]);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename pixel_type>
     void draw_rounded_rectangle (
         const canvas& c,

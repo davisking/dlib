@@ -243,6 +243,33 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type 
+        >
+    void draw_image (
+        const canvas& c,
+        const rectangle& rect,
+        const image_type& img,
+        const rectangle& area = rectangle(-infinity,-infinity,infinity,infinity)
+    );
+    /*!
+        requires
+            - image_type == an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type::type> is defined
+        ensures
+            - draws the given image object onto the canvas such that the upper left corner
+              of the image will appear at the point rect.tl_corner() in the canvas's window
+              and the lower right corner of the image will appear at rect.br_corner() in
+              the canvas's window.  (note that the upper left corner of the image is
+              assumed to be the pixel image[0][0] and the lower right corner of the image
+              is assumed to be image[image.nr()-1][image.nc()-1])
+            - only draws the part of the image that overlaps with the area rectangle
+            - Uses nearest neighbor interpolation when the given rect isn't the same size
+              as the input image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename pixel_type
         >
     void fill_rect (
