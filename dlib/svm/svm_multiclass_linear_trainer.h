@@ -96,7 +96,7 @@ namespace dlib
             {
                 // Compute the F(x,y) part:
                 // perform: temp == dot(relevant part of current solution, samples[idx]) - current_bias
-                scalar_type temp = dot(rowm(current_solution, range(i*dims, (i+1)*dims-2)), samples[idx]) - current_solution((i+1)*dims-1);
+                scalar_type temp = dot(pointer_to_column_vector(&current_solution(i*dims),dims-1), samples[idx]) - current_solution((i+1)*dims-1);
 
                 // Add the LOSS(idx,y) part:
                 if (labels[idx] != distinct_labels[i])
