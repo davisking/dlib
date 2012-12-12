@@ -584,6 +584,7 @@
          <item>point_rotator</item> 
          <item>point_transform</item> 
          <item>point_transform_affine</item> 
+         <item>find_affine_transform</item> 
          <item>rotation_matrix</item> 
          <item>get_rect</item> 
          <item>centered_rect</item> 
@@ -1002,6 +1003,20 @@
          <description>        
             This is an object that applies an affine transformation to a <a href="#vector">vector</a> or 
             <a href="#point">point</a>.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_affine_transform</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
+         <description>        
+            This is a routine that takes in two sets of points and finds the
+            best <a href="#point_transform_affine">affine transformation</a>
+            that maps between them.
          </description>
                                  
       </component>

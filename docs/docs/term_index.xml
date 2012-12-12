@@ -189,6 +189,7 @@
          <term file="linear_algebra.html" name="point_rotator"/>
          <term file="linear_algebra.html" name="point_transform"/>
          <term file="linear_algebra.html" name="point_transform_affine"/>
+         <term file="linear_algebra.html" name="find_affine_transform"/>
          <term file="linear_algebra.html" name="rotation_matrix"/>
          <term file="algorithms.html" name="running_stats"/>
          <term file="algorithms.html" name="running_scalar_covariance"/>
