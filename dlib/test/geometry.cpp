@@ -618,6 +618,36 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_find_affine_transform()
+    {
+        //typedef dlib::vector<double,2> vect;
+        typedef point vect;
+        std::vector<vect> from, to;
+
+        from.push_back(vect(0,0));
+        to.push_back(vect(0,1));
+
+        from.push_back(vect(0,1));
+        to.push_back(vect(1,1));
+
+        from.push_back(vect(1,1));
+        to.push_back(vect(1,0));
+
+        from.push_back(vect(1,0));
+        to.push_back(vect(0,0));
+
+        point_transform_affine t = find_affine_transform(from,to);
+
+        for (unsigned long i = 0; i < from.size(); ++i)
+        {
+            dlog << LINFO << "affine transformation error: "<< length(t(from[i])-to[i]);
+            DLIB_TEST(length(t(from[i])-to[i]) < 1e-14);
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class geometry_tester : public tester
     {
     public:
@@ -632,6 +662,7 @@ namespace
         {
             geometry_test();
             test_border_enumerator();
+            test_find_affine_transform();
         }
     } a;
 

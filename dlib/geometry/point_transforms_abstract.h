@@ -5,6 +5,7 @@
 
 #include "../matrix/matrix_abstract.h"
 #include "vector_abstract.h"
+#include <vector>
 
 namespace dlib
 {
@@ -39,6 +40,30 @@ namespace dlib
         !*/
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    point_transform_affine find_affine_transform (
+        const std::vector<dlib::vector<T,2> >& from_points,
+        const std::vector<dlib::vector<T,2> >& to_points
+    );
+    /*!
+        requires
+            - from_points.size() == to_points.size()
+            - from_points.size() >= 3
+        ensures
+            - returns a point_transform_affine object, T, such that for all valid i:
+                length(T(from_points[i]) - to_points[i])
+              is minimized as often as possible.  That is, this function finds the affine
+              transform that maps points in from_points to points in to_points.  If no
+              affine transform exists which performs this mapping exactly then the one
+              which minimizes the mean squared error is selected.  Additionally, if many
+              equally good transformations exist, then the transformation with the smallest
+              squared parameters is selected (i.e. if you wrote the transformation as a
+              matrix then we say we select the transform with minimum Frobenius norm among
+              all possible solutions).
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
