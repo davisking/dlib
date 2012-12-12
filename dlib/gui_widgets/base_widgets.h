@@ -2254,6 +2254,8 @@ namespace dlib
 
     protected:
 
+        virtual void on_view_changed () {}
+
         point graph_to_gui_space (
             const vector<double,2>& p
         ) const;
@@ -2498,6 +2500,8 @@ namespace dlib
         );
 
     protected:
+
+        virtual void on_view_changed () {}
 
         const rectangle& display_rect (
         ) const;

@@ -2297,11 +2297,15 @@ namespace dlib
         {
             point gui_p(lastx,lasty);
             point graph_p(gui_to_graph_space(gui_p));
+            const double old_scale = scale;
             scale *= zoom_increment_;
             if (scale < min_scale)
                 scale = min_scale;
             redraw_graph(); 
             adjust_origin(gui_p, graph_p);
+
+            if (scale != old_scale)
+                on_view_changed();
         }
     }
 
@@ -2317,11 +2321,15 @@ namespace dlib
         {
             point gui_p(lastx,lasty);
             point graph_p(gui_to_graph_space(gui_p));
+            const double old_scale = scale;
             scale /= zoom_increment_;
             if (scale > max_scale)
                 scale = max_scale;
             redraw_graph(); 
             adjust_origin(gui_p, graph_p);
+
+            if (scale != old_scale)
+                on_view_changed();
         }
     }
 
@@ -2338,6 +2346,7 @@ namespace dlib
         {
             adjust_origin(point(x,y), drag_screen_point);
             redraw_graph();
+            on_view_changed();
         }
 
         // check if the mouse isn't being dragged anymore
@@ -2396,6 +2405,8 @@ namespace dlib
     {
         gr_orig.x() = hsb.slider_pos();
         redraw_graph();
+
+        on_view_changed();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2406,6 +2417,8 @@ namespace dlib
     {
         gr_orig.y() = vsb.slider_pos();
         redraw_graph();
+
+        on_view_changed();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2984,6 +2997,7 @@ namespace dlib
             rectangle new_rect(translate_rect(display_rect(), drag_origin - current_delta));
             new_rect = centered_rect(new_rect, new_rect.width()-hscroll_bar_inc, new_rect.height()-vscroll_bar_inc);
             scroll_to_rect(new_rect);
+            on_view_changed();
         }
         else
         {
@@ -3112,6 +3126,8 @@ namespace dlib
     {
         total_rect_ = move_rect(total_rect_, display_rect_.left()-hscroll_bar_inc*hsb.slider_pos(), total_rect_.top());
         parent.invalidate_rectangle(display_rect_);
+        if (events_are_enabled())
+            on_view_changed();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3122,6 +3138,8 @@ namespace dlib
     {
         total_rect_ = move_rect(total_rect_, total_rect_.left(), display_rect_.top()-vscroll_bar_inc*vsb.slider_pos());
         parent.invalidate_rectangle(display_rect_);
+        if (events_are_enabled())
+            on_view_changed();
     }
 
 // ----------------------------------------------------------------------------------------
