@@ -958,7 +958,7 @@
       <component>
          <name>rotate_point</name>
          <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
          <description>        
             This is a function that rotates a 2D <a href="#vector">vector</a> or 
             <a href="#point">point</a> object about a given point.
@@ -971,7 +971,7 @@
       <component>
          <name>point_rotator</name>
          <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
          <description>        
             This is an object that rotates a 2D <a href="#vector">vector</a> or 
             <a href="#point">point</a> object about the origin.
@@ -984,7 +984,7 @@
       <component>
          <name>point_transform</name>
          <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
          <description>        
             This is an object that rotates a 2D <a href="#vector">vector</a> or 
             <a href="#point">point</a> object about the origin and then adds a 
@@ -998,7 +998,7 @@
       <component>
          <name>point_transform_affine</name>
          <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
          <description>        
             This is an object that applies an affine transformation to a <a href="#vector">vector</a> or 
             <a href="#point">point</a>.
@@ -1011,7 +1011,7 @@
       <component>
          <name>rotation_matrix</name>
          <file>dlib/geometry.h</file>
-         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <spec_file link="true">dlib/geometry/point_transforms_abstract.h</spec_file>
          <description>        
             This is a method for creating 2D rotation matrices.
          </description>

@@ -4,7 +4,7 @@
 #ifdef DLIB_POINT_TrANSFORMS_ABSTRACT_H__
 
 #include "../matrix/matrix_abstract.h"
-#include "../vector_abstract.h"
+#include "vector_abstract.h"
 
 namespace dlib
 {
