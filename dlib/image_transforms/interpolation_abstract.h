@@ -20,18 +20,25 @@ namespace dlib
 
     public:
 
-        template <typename image_type>
+        template <
+            typename image_type, 
+            typename pixel_type
+            >
         bool operator() (
             const image_type& img,
             const dlib::point& p,
-            typename image_type::type& result
+            pixel_type& result
         ) const;
         /*!
             requires
                 - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+                - pixel_traits<typename image_type::type>::has_alpha == false
+                - pixel_traits<pixel_type> is defined
             ensures
                 - if (p is located inside img) then
                     - #result == img[p.y()][p.x()]
+                      (This assignment is done using assign_pixel(#result, img[p.y()][p.x()]), 
+                      therefore any necessary color space conversion will be performed)
                     - returns true
                 - else
                     - returns false
@@ -55,24 +62,27 @@ namespace dlib
 
         template <
             typename T, 
-            typename image_type
+            typename image_type,
+            typename pixel_type
             >
         bool operator() (
             const image_type& img,
             const dlib::vector<T,2>& p,
-            typename image_type::type& result
+            pixel_type& result
         ) const;
         /*!
             requires
                 - image_type == is an implementation of array2d/array2d_kernel_abstract.h
                 - pixel_traits<typename image_type::type>::has_alpha == false
+                - pixel_traits<pixel_type> is defined
             ensures
                 - if (there is an interpolatable image location at point p in img) then
                     - #result == the interpolated pixel value from img at point p.
+                    - assign_pixel() will be used to write to #result, therefore any
+                      necessary color space conversion will be performed.
                     - returns true
-                    - if img contain RGB pixels then the interpolation will be in 
-                      color.  Otherwise, the interpolation will be performed in 
-                      a grayscale mode.
+                    - if img contains RGB pixels then the interpolation will be in color.
+                      Otherwise, the interpolation will be performed in a grayscale mode.
                 - else
                     - returns false
         !*/
@@ -93,24 +103,27 @@ namespace dlib
 
         template <
             typename T, 
-            typename image_type
+            typename image_type,
+            typename pixel_type
             >
         bool operator() (
             const image_type& img,
             const dlib::vector<T,2>& p,
-            typename image_type::type& result
+            pixel_type& result
         ) const;
         /*!
             requires
                 - image_type == is an implementation of array2d/array2d_kernel_abstract.h
                 - pixel_traits<typename image_type::type>::has_alpha == false
+                - pixel_traits<pixel_type> is defined
             ensures
                 - if (there is an interpolatable image location at point p in img) then
                     - #result == the interpolated pixel value from img at point p
+                    - assign_pixel() will be used to write to #result, therefore any
+                      necessary color space conversion will be performed.
                     - returns true
-                    - if img contain RGB pixels then the interpolation will be in 
-                      color.  Otherwise, the interpolation will be performed in 
-                      a grayscale mode.
+                    - if img contains RGB pixels then the interpolation will be in color.
+                      Otherwise, the interpolation will be performed in a grayscale mode.
                 - else
                     - returns false
         !*/
@@ -167,14 +180,15 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type,
         typename point_mapping_type,
         typename background_type
         >
     void transform_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const interpolation_type& interp,
         const point_mapping_type& map_point,
         const background_type& set_background,
@@ -182,13 +196,14 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
             - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
               interpolate_quadratic, or a type with a compatible interface.
             - map_point should be a function which takes dlib::vector<T,2> objects and
               returns dlib::vector<T,2> objects.  An example is point_transform_affine.
             - set_background should be a function which can take a single argument of
-              type image_type::type.  Examples are black_background, white_background,
+              type image_type2::type.  Examples are black_background, white_background,
               and no_background.
             - get_rect(out_img).contains(area) == true
             - is_same_object(in_img, out_img) == false
@@ -210,27 +225,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type,
         typename point_mapping_type,
         typename background_type
         >
     void transform_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const interpolation_type& interp,
         const point_mapping_type& map_point,
         const background_type& set_background
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
             - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
               interpolate_quadratic, or a type with a compatible interface.
             - map_point should be a function which takes dlib::vector<T,2> objects and
               returns dlib::vector<T,2> objects.  An example is point_transform_affine.
             - set_background should be a function which can take a single argument of
-              type image_type::type.  Examples are black_background, white_background,
+              type image_type2::type.  Examples are black_background, white_background,
               and no_background.
             - is_same_object(in_img, out_img) == false
         ensures
@@ -242,19 +259,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type,
         typename point_mapping_type
         >
     void transform_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const interpolation_type& interp,
         const point_mapping_type& map_point
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
             - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
               interpolate_quadratic, or a type with a compatible interface.
             - map_point should be a function which takes dlib::vector<T,2> objects and
@@ -270,18 +289,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type
         >
     void rotate_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         double angle,
         const interpolation_type& interp
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
             - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
               interpolate_quadratic, or a type with a compatible interface.
             - is_same_object(in_img, out_img) == false
@@ -297,17 +318,20 @@ namespace dlib
 
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
     void rotate_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         double angle
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename image_type::type>::has_alpha == false
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type1::type>::has_alpha == false
+            - pixel_traits<typename image_type2::type> is defined
             - is_same_object(in_img, out_img) == false
         ensures
             - #out_img == a copy of in_img which has been rotated angle radians counter clockwise.
@@ -319,17 +343,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type
         >
     void resize_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const interpolation_type& interp
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
             - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
               interpolate_quadratic, or a type with a compatible interface.
             - is_same_object(in_img, out_img) == false
@@ -347,16 +373,19 @@ namespace dlib
 
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
     void resize_image (
-        const image_type& in_img,
-        image_type& out_img
+        const image_type1& in_img,
+        image_type2& out_img
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename image_type::type>::has_alpha == false
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type1::type>::has_alpha == false
+            - pixel_traits<typename image_type2::type> is defined
             - is_same_object(in_img, out_img) == false
         ensures
             - #out_img == A copy of in_img which has been stretched so that it 
@@ -371,16 +400,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
     void flip_image_left_right (
-        const image_type& in_img,
-        image_type& out_img
+        const image_type1& in_img,
+        image_type2& out_img
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<image_type::type> is defined
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type1::type> is defined
+            - pixel_traits<typename image_type2::type> is defined
             - is_same_object(in_img, out_img) == false
         ensures
             - #out_img.nr() == in_img.nr()
@@ -392,16 +424,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
     void flip_image_up_down (
-        const image_type& in_img,
-        image_type& out_img
+        const image_type1& in_img,
+        image_type2& out_img
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<image_type::type> is defined
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
+            - pixel_traits<typename image_type1::type> is defined
+            - pixel_traits<typename image_type2::type> is defined
             - is_same_object(in_img, out_img) == false
         ensures
             - #out_img.nr() == in_img.nr()
@@ -412,20 +447,22 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename pyramid_type,
         typename interpolation_type
         >
     void pyramid_up (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const pyramid_type& pyr,
         unsigned int levels,
         const interpolation_type& interp
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
             - pyramid_type == a type compatible with the image pyramid objects defined 
               in dlib/image_transforms/image_pyramid_abstract.h
             - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
@@ -449,18 +486,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename pyramid_type
         >
     void pyramid_up (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const pyramid_type& pyr,
         unsigned int levels = 1
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type1 == is an implementation of array2d/array2d_kernel_abstract.h
+            - image_type2 == is an implementation of array2d/array2d_kernel_abstract.h
             - pyramid_type == a type compatible with the image pyramid objects defined 
               in dlib/image_transforms/image_pyramid_abstract.h
             - is_same_object(in_img, out_img) == false

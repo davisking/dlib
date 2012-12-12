@@ -17,16 +17,18 @@ namespace dlib
     {
     public:
 
-        template <typename image_type>
+        template <typename image_type, typename pixel_type>
         bool operator() (
             const image_type& img,
             const dlib::point& p,
-            typename image_type::type& result
+            pixel_type& result
         ) const
         {
+            COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
+
             if (get_rect(img).contains(p))
             {
-                result = img[p.y()][p.x()];
+                assign_pixel(result, img[p.y()][p.x()]);
                 return true;
             }
             else
@@ -49,11 +51,11 @@ namespace dlib
 
     public:
 
-        template <typename T, typename image_type>
+        template <typename T, typename image_type, typename pixel_type>
         typename disable_if<is_rgb_image<image_type>,bool>::type operator() (
             const image_type& img,
             const dlib::vector<T,2>& p,
-            typename image_type::type& result
+            pixel_type& result
         ) const
         {
             COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
@@ -85,11 +87,11 @@ namespace dlib
             return true;
         }
 
-        template <typename T, typename image_type>
+        template <typename T, typename image_type, typename pixel_type>
         typename enable_if<is_rgb_image<image_type>,bool>::type operator() (
             const image_type& img,
             const dlib::vector<T,2>& p,
-            typename image_type::type& result
+            pixel_type& result
         ) const
         {
             COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
@@ -130,9 +132,11 @@ namespace dlib
             const double blue = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
                                    tb_frac*((1-lr_frac)*bl + lr_frac*br);
                             
-            assign_pixel(result.red, red);
-            assign_pixel(result.green, green);
-            assign_pixel(result.blue, blue);
+            rgb_pixel temp;
+            assign_pixel(temp.red, red);
+            assign_pixel(temp.green, green);
+            assign_pixel(temp.blue, blue);
+            assign_pixel(result, temp);
             return true;
         }
     };
@@ -149,11 +153,11 @@ namespace dlib
 
     public:
 
-        template <typename T, typename image_type>
+        template <typename T, typename image_type, typename pixel_type>
         typename disable_if<is_rgb_image<image_type>,bool>::type operator() (
             const image_type& img,
             const dlib::vector<T,2>& p,
-            typename image_type::type& result
+            pixel_type& result
         ) const
         {
             COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
@@ -182,11 +186,11 @@ namespace dlib
             return true;
         }
 
-        template <typename T, typename image_type>
+        template <typename T, typename image_type, typename pixel_type>
         typename enable_if<is_rgb_image<image_type>,bool>::type operator() (
             const image_type& img,
             const dlib::vector<T,2>& p,
-            typename image_type::type& result
+            pixel_type& result
         ) const
         {
             COMPILE_TIME_ASSERT(pixel_traits<typename image_type::type>::has_alpha == false);
@@ -232,9 +236,11 @@ namespace dlib
                             img[r+1][c+1].blue);
 
 
-            assign_pixel(result.red, red);
-            assign_pixel(result.green, green);
-            assign_pixel(result.blue, blue);
+            rgb_pixel temp;
+            assign_pixel(temp.red, red);
+            assign_pixel(temp.green, green);
+            assign_pixel(temp.blue, blue);
+            assign_pixel(result, temp);
 
             return true;
         }
@@ -307,14 +313,15 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type,
         typename point_mapping_type,
         typename background_type
         >
     void transform_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const interpolation_type& interp,
         const point_mapping_type& map_point,
         const background_type& set_background,
@@ -346,14 +353,15 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type,
         typename point_mapping_type,
         typename background_type
         >
     void transform_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const interpolation_type& interp,
         const point_mapping_type& map_point,
         const background_type& set_background
@@ -372,13 +380,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type,
         typename point_mapping_type
         >
     void transform_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const interpolation_type& interp,
         const point_mapping_type& map_point
     )
@@ -397,12 +406,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type
         >
     void rotate_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         double angle,
         const interpolation_type& interp
     )
@@ -434,11 +444,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
     void rotate_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         double angle
     )
     {
@@ -481,12 +492,13 @@ namespace dlib
     }
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type
         >
     void resize_image (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const interpolation_type& interp
     )
     {
@@ -506,11 +518,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
     void resize_image (
-        const image_type& in_img,
-        image_type& out_img
+        const image_type1& in_img,
+        image_type2& out_img
     )
     {
         // make sure requires clause is not broken
@@ -526,11 +539,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
     void flip_image_left_right (
-        const image_type& in_img,
-        image_type& out_img
+        const image_type1& in_img,
+        image_type2& out_img
     )
     {
         // make sure requires clause is not broken
@@ -546,11 +560,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
     void flip_image_up_down (
-        const image_type& in_img,
-        image_type& out_img
+        const image_type1& in_img,
+        image_type2& out_img
     )
     {
         // make sure requires clause is not broken
@@ -596,13 +611,14 @@ namespace dlib
     }
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename pyramid_type,
         typename interpolation_type
         >
     void pyramid_up (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const pyramid_type& pyr,
         unsigned int levels,
         const interpolation_type& interp
@@ -646,12 +662,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename pyramid_type
         >
     void pyramid_up (
-        const image_type& in_img,
-        image_type& out_img,
+        const image_type1& in_img,
+        image_type2& out_img,
         const pyramid_type& pyr,
         unsigned int levels = 1
     )
