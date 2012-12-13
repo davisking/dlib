@@ -24,8 +24,9 @@ namespace dlib
                 or wchar_t)
 
             INITIAL VALUE
-                parsed_line() == false
-                option_is_defined(x) == false, for all values of x
+                - parsed_line() == false
+                - option_is_defined(x) == false, for all values of x
+                - get_group_name() == ""
 
             ENUMERATION ORDER   
                 The enumerator will enumerate over all the options defined in *this 
@@ -243,6 +244,7 @@ namespace dlib
                 - #option(name).count() == 0
                 - #option(name).description() == description 
                 - #option(name).number_of_arguments() == number_of_arguments
+                - #option(name).group_name() == get_group_name()
             throws
                 - std::bad_alloc
                     if this exception is thrown then the add_option() function has no 
@@ -312,6 +314,28 @@ namespace dlib
                 - any exception.
                     if an exception is thrown then #at_start() == true but otherwise  
                     it will have no effect on the state of #*this.
+        !*/
+
+        string_type get_group_name (
+        ) const;
+        /*!
+            ensures
+                - returns the current group name.  This is the group new options will be
+                  added into when added via add_option().  
+                - The group name of an option is used by print_options().  In particular,
+                  it groups all options with the same group name together and displays them
+                  under a title containing the text of the group name.  This allows you to
+                  group similar options together in the output of print_options().
+                - A group name of "" (i.e. the empty string) means that no group name is
+                  set.
+        !*/
+
+        void set_group_name (
+            const string_type& group_name
+        );
+        /*!
+            ensures
+                - #get_group_name() == group_name
         !*/
 
     // -------------------------------------------------------------
