@@ -13,13 +13,16 @@
         Options:
           -c            Indicates that we want to compress a file. 
           -d            Indicates that we want to decompress a file. 
-          -h            Display this help message. 
           --in <arg>    This option takes one argument which specifies the name of the 
                         file we want to compress/decompress. 
-          -l <arg>      Set the compression level [1-3], 3 is max compression, default 
-                        is 2. 
           --out <arg>   This option takes one argument which specifies the name of the 
                         output file. 
+
+        Miscellaneous Options:
+          -h            Display this help message. 
+          -l <arg>      Set the compression level [1-3], 3 is max compression, default 
+                        is 2. 
+
 */
 
 
@@ -55,6 +58,12 @@ int main(int argc, char** argv)
         parser.add_option("in","This option takes one argument which specifies the name of the file we want to compress/decompress.",1);
         // add a --out option that takes 1 argument
         parser.add_option("out","This option takes one argument which specifies the name of the output file.",1);
+        // In the code below, we use the parser.print_options() method to print all our
+        // options to the screen.  We can tell it that we would like some options to be
+        // grouped together by calling set_group_name() before adding those options.  In
+        // general, you can make as many groups as you like by calling set_group_name().
+        // However, here we make only one named group.
+        parser.set_group_name("Miscellaneous Options");
         parser.add_option("h","Display this help message.");
         parser.add_option("l","Set the compression level [1-3], 3 is max compression, default is 2.",1);
 
