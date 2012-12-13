@@ -151,6 +151,7 @@ namespace dlib
                 else
                     out << "\n" << wrap_string(this->element().description(),ml,ml);
             }
+            out << _dT(ct,"\n\n");
             this->reset();
         }
         catch (...)
