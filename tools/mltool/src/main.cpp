@@ -16,6 +16,7 @@
 #include <vector>
 
 
+#include "dlib/cmd_line_parser.h"
 #include "dlib/data_io.h"
 #include "dlib/svm.h"
 
@@ -24,7 +25,7 @@ using namespace dlib;
 // ----------------------------------------------------------------------------------------
 
 static void
-parse_args (clp& parser, int argc, char* argv[])
+parse_args (command_line_parser& parser, int argc, char* argv[])
 {
     try {
         // Algorithm-independent options
@@ -107,18 +108,16 @@ parse_args (clp& parser, int argc, char* argv[])
 int 
 main (int argc, char* argv[])
 {
-    clp parser;
+    command_line_parser parser;
 
     parse_args(parser, argc, argv);
 
-    const clp::option_type& option_alg = parser.option("a");
-    const clp::option_type& option_in = parser.option("in");
 
     std::vector<sparse_sample_type> sparse_samples;
     std::vector<double> labels;
 
     load_libsvm_formatted_data (
-        option_in.argument(), 
+        parser.option("in").argument(), 
         sparse_samples, 
         labels
     );
@@ -155,6 +154,7 @@ main (int argc, char* argv[])
     // Randomize the order of the samples, labels
     randomize_samples (dense_samples, labels);
 
+    const command_line_parser::option_type& option_alg = parser.option("a");
     if (!option_alg) {
         // Do KRR if user didn't specify an algorithm
         std::cout << "No algorithm specified, default to KRR\n";

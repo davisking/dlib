@@ -21,7 +21,7 @@ exp10_ (double m)
 
 void
 option_range::set_option (
-    clp& parser,
+    command_line_parser& parser,
     std::string const& option, 
     float default_val
 )

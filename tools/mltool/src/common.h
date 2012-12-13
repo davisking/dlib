@@ -12,8 +12,8 @@
 #include "dlib/matrix.h"
 
 
-typedef dlib::cmd_line_parser<char>::check_1a_c clp;
 
+using dlib::command_line_parser;
 typedef std::map<unsigned long, double> sparse_sample_type;
 typedef dlib::matrix<sparse_sample_type::value_type::second_type,0,1> dense_sample_type;
 

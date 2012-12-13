@@ -12,28 +12,28 @@
 
 void
 krr_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 );
 
 void
 krls_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 );
 
 void
 mlp_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 );
 
 void
 svr_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 );

@@ -20,7 +20,7 @@ using namespace std;
 
 static const char*
 get_kernel (
-    clp& parser
+    command_line_parser& parser
 )
 {
     const char* kernel = "rbk";
@@ -34,7 +34,7 @@ get_kernel (
 
 static void
 get_rbk_gamma (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     option_range& range
 ) {
@@ -47,7 +47,7 @@ get_rbk_gamma (
 
 static void
 get_krls_tolerance (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples, 
     option_range& range
 )
@@ -60,7 +60,7 @@ get_krls_tolerance (
 
 static double
 get_mlp_hidden_units (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples
 )
 {
@@ -75,7 +75,7 @@ get_mlp_hidden_units (
 
 static double
 get_mlp_num_iterations (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples
 )
 {
@@ -90,7 +90,7 @@ get_mlp_num_iterations (
 
 static void
 get_svr_c (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples, 
     option_range& range
 )
@@ -103,7 +103,7 @@ get_svr_c (
 
 static double
 get_svr_epsilon_insensitivity (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples
 )
 {
@@ -125,7 +125,7 @@ get_svr_epsilon_insensitivity (
 
 void
 krls_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 )
@@ -176,7 +176,7 @@ krls_test (
 
 static void
 krr_rbk_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 )
@@ -229,7 +229,7 @@ krr_rbk_test (
 
 static void
 krr_lin_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 )
@@ -250,7 +250,7 @@ krr_lin_test (
 
 void
 krr_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 )
@@ -271,7 +271,7 @@ krr_test (
 
 void
 mlp_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 )
@@ -321,7 +321,7 @@ mlp_test (
 
 void
 svr_test (
-    clp& parser,
+    command_line_parser& parser,
     std::vector<dense_sample_type>& dense_samples,
     std::vector<double>& labels
 )

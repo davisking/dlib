@@ -32,7 +32,7 @@ public:
         max_value = 100;
         incr = 10;
     }
-    void set_option (clp& parser, std::string const& option, 
+    void set_option (command_line_parser& parser, std::string const& option, 
                      float default_val);
     float get_min_value ();
     float get_max_value ();
