@@ -97,8 +97,6 @@ int main(int argc, char** argv)
             // This function prints out a nicely formatted list of
             // all the options the parser has
             parser.print_options(); 
-                                       
-            cout << endl;
             return 0;
         }
 

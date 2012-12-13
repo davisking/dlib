@@ -126,7 +126,6 @@ int main(int argc, char** argv)
             cout << "Usage: train_object_detector [options] <image dataset file|image file>\n";
             parser.print_options(); 
                                        
-            cout << endl;
             return EXIT_SUCCESS;
         }
 
