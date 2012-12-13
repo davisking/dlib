@@ -4,8 +4,6 @@
 #define DLIB_IMGLAB_COmMON_H__
 
 #include <string>
-#include <dlib/cmd_line_parser.h>
-typedef dlib::cmd_line_parser<char>::check_1a_c parser_type;
 
 // ----------------------------------------------------------------------------------------
 

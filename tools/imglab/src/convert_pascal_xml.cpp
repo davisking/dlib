@@ -5,6 +5,7 @@
 #include <dlib/xml_parser.h>
 #include <string>
 #include <dlib/dir_nav.h>
+#include <dlib/cmd_line_parser.h>
 
 using namespace std;
 using namespace dlib;
@@ -197,7 +198,7 @@ namespace
 }
 
 void convert_pascal_xml(
-    const parser_type& parser
+    const command_line_parser& parser
 )
 {
     cout << "Convert from PASCAL XML annotation format..." << endl;

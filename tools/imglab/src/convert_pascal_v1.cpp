@@ -137,7 +137,7 @@ namespace
 }
 
 void convert_pascal_v1(
-    const parser_type& parser
+    const command_line_parser& parser
 )
 {
     cout << "Convert from PASCAL v1.00 annotation format..." << endl;

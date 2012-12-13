@@ -5,6 +5,7 @@
 #include "convert_pascal_xml.h"
 #include "convert_pascal_v1.h"
 #include "convert_idl.h"
+#include <dlib/cmd_line_parser.h>
 
 #include <iostream>
 #include <fstream>
@@ -24,7 +25,7 @@ using namespace dlib;
 // ----------------------------------------------------------------------------------------
 
 void create_new_dataset (
-    const parser_type& parser
+    const command_line_parser& parser
 )
 {
     using namespace dlib::image_dataset_metadata;
@@ -118,7 +119,7 @@ int main(int argc, char** argv)
     try
     {
 
-        parser_type parser;
+        command_line_parser parser;
 
         parser.add_option("h","Displays this information.");
         parser.add_option("c","Create an XML file named <arg> listing a set of images.",1);
