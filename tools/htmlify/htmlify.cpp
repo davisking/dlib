@@ -18,9 +18,8 @@ using namespace dlib;
 
 typedef cpp_pretty_printer::kernel_1a cprinter;
 typedef cpp_pretty_printer::kernel_2a bprinter;
-typedef cmd_line_parser<char>::check_1a_c clp;
 typedef dlib::map<string,string>::kernel_1a map_string_to_string;
-typedef set<string>::kernel_1a set_of_string;
+typedef dlib::set<string>::kernel_1a set_of_string;
 typedef queue<file>::kernel_1a queue_of_files;
 typedef queue<directory>::kernel_1a queue_of_dirs;
 
@@ -92,7 +91,7 @@ int main(int argc, char** argv)
     string file;
     try
     {
-        clp parser;
+        command_line_parser parser;
         parser.add_option("b","Pretty print in black and white. The default is to pretty print in color.");
         parser.add_option("n","Number lines.");
         parser.add_option("h","Displays this information.");
@@ -137,20 +136,20 @@ int main(int argc, char** argv)
         const char* to_xml_sub_ops[] = {"t"};
         parser.check_sub_options("to-xml",to_xml_sub_ops);
 
-        const clp::option_type& b_opt       = parser.option("b");
-        const clp::option_type& n_opt       = parser.option("n");
-        const clp::option_type& h_opt       = parser.option("h");
-        const clp::option_type& index_opt   = parser.option("index");
-        const clp::option_type& v_opt       = parser.option("v");
-        const clp::option_type& o_opt       = parser.option("o");
-        const clp::option_type& man_opt     = parser.option("man");
-        const clp::option_type& f_opt       = parser.option("f");
-        const clp::option_type& cat_opt     = parser.option("cat");
-        const clp::option_type& i_opt       = parser.option("i");
-        const clp::option_type& flatten_opt = parser.option("flatten");
-        const clp::option_type& depth_opt   = parser.option("depth");
-        const clp::option_type& title_opt   = parser.option("title");
-        const clp::option_type& to_xml_opt  = parser.option("to-xml");
+        const command_line_parser::option_type& b_opt       = parser.option("b");
+        const command_line_parser::option_type& n_opt       = parser.option("n");
+        const command_line_parser::option_type& h_opt       = parser.option("h");
+        const command_line_parser::option_type& index_opt   = parser.option("index");
+        const command_line_parser::option_type& v_opt       = parser.option("v");
+        const command_line_parser::option_type& o_opt       = parser.option("o");
+        const command_line_parser::option_type& man_opt     = parser.option("man");
+        const command_line_parser::option_type& f_opt       = parser.option("f");
+        const command_line_parser::option_type& cat_opt     = parser.option("cat");
+        const command_line_parser::option_type& i_opt       = parser.option("i");
+        const command_line_parser::option_type& flatten_opt = parser.option("flatten");
+        const command_line_parser::option_type& depth_opt   = parser.option("depth");
+        const command_line_parser::option_type& title_opt   = parser.option("title");
+        const command_line_parser::option_type& to_xml_opt  = parser.option("to-xml");
 
 
         string filter = "cpp h c";
@@ -178,7 +177,7 @@ int main(int argc, char** argv)
         {
             cout << "This program pretty prints C or C++ source code to HTML.\n";
             cout << "Usage: htmlify [options] [file]...\n";
-            parser.print_options(cout);
+            parser.print_options();
             cout << "\n\n";
             no_run = true;
         }
