@@ -593,6 +593,12 @@ namespace dlib
             function(f.function)
         {}
 
+        const std::vector<result_type> get_labels(
+        ) const { return function.get_labels(); }
+
+        unsigned long number_of_classes (
+        ) const { return function.number_of_classes(); }
+
         normalized_function (
             const vector_normalizer<sample_type>& normalizer_,
             const function_type& funct 

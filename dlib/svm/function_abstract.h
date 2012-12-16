@@ -660,6 +660,20 @@ namespace dlib
                 - populates this object with the vector_normalizer and function object 
         !*/
 
+        const std::vector<result_type> get_labels(
+        ) const;
+        /*!
+            ensures
+                - returns function.get_labels()
+        !*/
+
+        unsigned long number_of_classes (
+        ) const;
+        /*!
+            ensures
+                - returns function.number_of_classes()
+        !*/
+
         result_type operator() (
             const sample_type& x
         ) const
