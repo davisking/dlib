@@ -123,8 +123,10 @@ int main()
 
 
 
-    // ---------------------------------  Comparison with MATLAB ---------------------------------
-    // Here I list a set of Matlab commands and their equivalent expressions using the dlib matrix.
+    // -----------------------------  Comparison with MATLAB ------------------------------
+    // Here I list a set of Matlab commands and their equivalent expressions using the dlib
+    // matrix.  Note that there are a lot more functions defined for the dlib::matrix.  See
+    // the HTML documentation for a full listing.
 
     matrix<double> A, B, C, D, E;
     matrix<int> Aint;
