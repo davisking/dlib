@@ -266,14 +266,14 @@ namespace dlib
                             // weight to the end of the resulting vector.
                             w = join_cols(join_cols(
                                     colm(w,0,dims), 
-                                    zeros_matrix<scalar_type>(1, new_dims-dims)), 
+                                    zeros_matrix<scalar_type>(new_dims-dims,1)), 
                                     uniform_matrix<scalar_type>(1,1,w(dims))
                                     );
                         }
                         else
                         {
                             // Just concatenate the right number of zeros.
-                            w = join_cols(w, zeros_matrix<scalar_type>(1, new_dims-dims));
+                            w = join_cols(w, zeros_matrix<scalar_type>(new_dims-dims,1));
                         }
                         dims = new_dims;
                     }
@@ -416,7 +416,7 @@ namespace dlib
                 << "\n\t y.size(): " << y.size() 
                 << "\n\t is_learning_problem(x,y): " << is_learning_problem(x,y)
                 );
-#if ENABLE_ASSERTS
+#ifdef ENABLE_ASSERTS
             for (long i = 0; i < x.size(); ++i)
             {
                 DLIB_ASSERT(y(i) == +1 || y(i) == -1,
