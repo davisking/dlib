@@ -46,7 +46,8 @@ namespace dlib
             max_iterations(10000),
             verbose(false),
             have_bias(true),
-            last_weight_1(false)
+            last_weight_1(false),
+            do_shrinking(true)
         {
         }
 
@@ -57,7 +58,8 @@ namespace dlib
             Cneg(C_),
             eps(0.1),
             max_iterations(10000),
-            verbose(false)
+            verbose(false),
+            do_shrinking(true)
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(0 < C_,
@@ -92,6 +94,13 @@ namespace dlib
         {
             last_weight_1 = should_last_weight_be_1;
         }
+
+        bool shrinking_enabled (
+        ) const { return do_shrinking; }
+
+        void enable_shrinking (
+            bool enabled
+        ) { do_shrinking = enabled; }
 
         void be_verbose (
         )
@@ -411,7 +420,7 @@ namespace dlib
                     PG_max_prev = std::numeric_limits<scalar_type>::infinity();
                     PG_min_prev = -std::numeric_limits<scalar_type>::infinity();
                 }
-                else
+                else if (do_shrinking)
                 {
                     PG_max_prev = PG_max;
                     PG_min_prev = PG_min;
@@ -466,6 +475,7 @@ namespace dlib
         bool verbose;
         bool have_bias; // having a bias means we pretend all x vectors have an extra element which is always -1.
         bool last_weight_1;
+        bool do_shrinking;
 
     }; // end of class svm_c_linear_dcd_trainer
 
