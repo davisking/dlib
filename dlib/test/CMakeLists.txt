@@ -116,6 +116,7 @@ set (tests
    std_vector_c.cpp
    string.cpp
    svm_c_linear.cpp
+   svm_c_linear_dcd.cpp
    svm.cpp
    svm_multiclass_linear.cpp
    svm_struct.cpp

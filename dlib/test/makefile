@@ -131,6 +131,7 @@ SRC += statistics.cpp
 SRC += std_vector_c.cpp
 SRC += string.cpp
 SRC += svm_c_linear.cpp
+SRC += svm_c_linear_dcd.cpp
 SRC += svm.cpp
 SRC += svm_multiclass_linear.cpp
 SRC += svm_struct.cpp
