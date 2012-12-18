@@ -233,10 +233,28 @@ namespace dlib
                 if (did_init)
                 {
                     DLIB_CASSERT(have_bias_ == have_bias &&
-                                 last_weight_1_ == last_weight_1, "");
+                                 last_weight_1_ == last_weight_1, 
+                                "\t decision_function svm_c_linear_dcd_trainer::train(x,y,state)"
+                                << "\n\t The given state object is invalid because the previous trainer was configured differently."
+                                << "\n\t have_bias_:     " << have_bias_
+                                << "\n\t have_bias:      " << have_bias
+                                << "\n\t last_weight_1_: " << last_weight_1_
+                                << "\n\t last_weight_1:  " << last_weight_1
+                                 );
 
-                    DLIB_CASSERT( new_dims >= dims,"");
-                    DLIB_CASSERT( x.size() >= static_cast<long>(alpha.size()),"");
+                    DLIB_CASSERT( new_dims >= dims,
+                                "\t decision_function svm_c_linear_dcd_trainer::train(x,y,state)"
+                                << "\n\t The given state object is invalid because the training data dimensions have shrunk."
+                                << "\n\t new_dims:  " << new_dims
+                                << "\n\t dims:      " << dims 
+                        );
+
+                    DLIB_CASSERT( x.size() >= static_cast<long>(alpha.size()),
+                                "\t decision_function svm_c_linear_dcd_trainer::train(x,y,state)"
+                                << "\n\t The given state object is invalid because the training data has fewer samples than previously."
+                                << "\n\t x.size():     " << x.size() 
+                                << "\n\t alpha.size(): " << alpha.size() 
+                        );
 
                     // make sure we amortize the cost of growing the alpha vector.
                     if (alpha.capacity() < static_cast<unsigned long>(x.size()))
@@ -258,7 +276,12 @@ namespace dlib
                         // have given too low of a result.  But for dense vectors it is
                         // definitely a user error if the dimensions don't match.
 
-                        DLIB_CASSERT(is_matrix<sample_type>::value == false, "");
+                        DLIB_CASSERT(is_matrix<sample_type>::value == false, 
+                                "\t decision_function svm_c_linear_dcd_trainer::train(x,y,state)"
+                                << "\n\t The given state object is invalid because the training data dimensions have changed."
+                                << "\n\t new_dims:  " << new_dims
+                                << "\n\t dims:      " << dims 
+                            );
 
                         // extend w by the right number of elements
                         if (have_bias)
