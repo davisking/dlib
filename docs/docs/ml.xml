@@ -70,6 +70,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>svm_nu_trainer</item> 
          <item>svm_c_trainer</item> 
          <item>svm_c_linear_trainer</item> 
+         <item>svm_c_linear_dcd_trainer</item> 
          <item>svm_c_ekm_trainer</item> 
          <item>rvm_trainer</item> 
          <item>svm_pegasos</item> 
@@ -1106,6 +1107,30 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
 
       <component>
+         <name>svm_c_linear_dcd_trainer</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/svm_c_linear_dcd_trainer_abstract.h</spec_file>
+         <description>
+                This object represents a tool for training the C formulation of 
+                a support vector machine to solve binary classification problems. 
+                It is optimized for the case where linear kernels are used and  
+                is implemented using the method described in the 
+                following paper:
+                <blockquote>
+                    A Dual Coordinate Descent Method for Large-scale Linear SVM
+                    by Cho-Jui Hsieh, Kai-Wei Chang, and Chih-Jen Lin
+                </blockquote>
+
+                This trainer has the ability to disable the bias term and also
+                to force the last element of the learned weight vector to be 1.
+                Additionally, it can be warm-started from the solution to a previous
+                training run.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>svm_c_linear_trainer</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/svm_c_linear_trainer_abstract.h</spec_file>
@@ -1121,6 +1146,9 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                       by  Vojtech Franc, Soren Sonnenburg; Journal of Machine Learning 
                       Research, 10(Oct):2157--2192, 2009. 
                 </blockquote>
+
+               This trainer has the ability to restrict the learned weights to non-negative
+               values.
          </description>
          <examples>
             <example>svm_sparse_ex.cpp.html</example>
