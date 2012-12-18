@@ -283,6 +283,8 @@ namespace dlib
 
         // optimizer_state is used to record the internal state of the SVM optimizer.  It
         // can be used with the following train() routine to warm-start the optimizer.
+        // Note, that optimizer_state objects are serializable but are otherwise completely
+        // opaque to the user.
         class optimizer_state;
 
         template <
