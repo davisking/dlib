@@ -24,7 +24,7 @@ Other:
 
 <!-- **************************************************************************************  -->
 
-<old name="17.49" date="TODO, 2012">
+<old name="17.49" date="Dec 18, 2012">
 New Features:
    - Machine Learning
       - Added the ability to learn non-negative weight vectors to the
