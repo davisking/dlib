@@ -59,6 +59,8 @@ namespace dlib
             eps(0.1),
             max_iterations(10000),
             verbose(false),
+            have_bias(true),
+            last_weight_1(false),
             do_shrinking(true)
         {
             // make sure requires clause is not broken
