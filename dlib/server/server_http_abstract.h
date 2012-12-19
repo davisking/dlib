@@ -353,7 +353,7 @@ namespace dlib
             Therefore, if you want to modify the behavior of the HTTP server, for example,
             to do some more complex data streaming requiring direct access to the
             iostreams, then you can do so by defining your own on_connect() routine.  In
-            particular, the default implementation shown below  is a good starting point.
+            particular, the default implementation shown below is a good starting point.
         !*/
         {
             try
