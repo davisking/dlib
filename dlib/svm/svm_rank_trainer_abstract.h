@@ -57,6 +57,7 @@ namespace dlib
                 - this object will not be verbose unless be_verbose() is called
                 - #get_max_iterations() == 10000
                 - #learns_nonnegative_weights() == false
+                - #forces_last_weight_to_1() == false
         !*/
 
         explicit svm_rank_trainer (
@@ -74,6 +75,7 @@ namespace dlib
                 - this object will not be verbose unless be_verbose() is called
                 - #get_max_iterations() == 10000
                 - #learns_nonnegative_weights() == false
+                - #forces_last_weight_to_1() == false
         !*/
 
         void set_epsilon (
@@ -127,6 +129,23 @@ namespace dlib
         /*!
             ensures
                 - this object will not print anything to standard out
+        !*/
+
+        bool forces_last_weight_to_1 (
+        ) const;
+        /*!
+            ensures
+                - returns true if this trainer has the constraint that the last weight in
+                  the learned parameter vector must be 1.  This is the weight corresponding
+                  to the feature in the training vectors with the highest dimension.
+        !*/
+
+        void force_last_weight_to_1 (
+            bool should_last_weight_be_1
+        );
+        /*!
+            ensures
+                - #forces_last_weight_to_1() == should_last_weight_be_1
         !*/
 
         void set_oca (

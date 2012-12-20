@@ -37,13 +37,15 @@ namespace dlib
             const std::vector<ranking_pair<sample_type> >& samples_,
             const bool be_verbose_,
             const scalar_type eps_,
-            const unsigned long max_iter
+            const unsigned long max_iter,
+            const bool last_weight_1_
         ) :
             samples(samples_),
             C(C_),
             be_verbose(be_verbose_),
             eps(eps_),
-            max_iterations(max_iter)
+            max_iterations(max_iter),
+            last_weight_1(last_weight_1_)
         {
         }
 
@@ -111,6 +113,9 @@ namespace dlib
             // rank flips.  So a risk of 0.1 would mean that rank flips happen < 10% of the
             // time.
 
+            if(last_weight_1)
+                w(w.size()-1) = 1;
+
             std::vector<double> rel_scores;
             std::vector<double> nonrel_scores;
             std::vector<unsigned long> rel_counts;
@@ -158,6 +163,9 @@ namespace dlib
 
             risk *= scale;
             subgradient = scale*subgradient;
+
+            if(last_weight_1)
+                subgradient(w.size()-1) = 0;
         }
 
     private:
@@ -172,6 +180,7 @@ namespace dlib
         const bool be_verbose;
         const scalar_type eps;
         const unsigned long max_iterations;
+        const bool last_weight_1;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -186,11 +195,12 @@ namespace dlib
         const std::vector<ranking_pair<sample_type> >& samples,
         const bool be_verbose,
         const scalar_type eps,
-        const unsigned long max_iterations
+        const unsigned long max_iterations,
+        const bool last_weight_1
     )
     {
         return oca_problem_ranking_svm<matrix_type, sample_type>(
-            C, samples, be_verbose, eps, max_iterations);
+            C, samples, be_verbose, eps, max_iterations, last_weight_1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -222,6 +232,7 @@ namespace dlib
             eps = 0.001;
             max_iterations = 10000;
             learn_nonnegative_weights = false;
+            last_weight_1 = false;
         }
 
         explicit svm_rank_trainer (
@@ -241,6 +252,7 @@ namespace dlib
             eps = 0.001;
             max_iterations = 10000;
             learn_nonnegative_weights = false;
+            last_weight_1 = false;
         }
 
         void set_epsilon (
@@ -281,6 +293,19 @@ namespace dlib
         )
         {
             verbose = false;
+        }
+
+        bool forces_last_weight_to_1 (
+        ) const
+        {
+            return last_weight_1;
+        }
+
+        void force_last_weight_to_1 (
+            bool should_last_weight_be_1
+        )
+        {
+            last_weight_1 = should_last_weight_be_1;
         }
 
         void set_oca (
@@ -357,7 +382,7 @@ namespace dlib
                 num_nonnegative = num_dims;
             }
 
-            solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations), 
+            solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, last_weight_1), 
                     w, 
                     num_nonnegative);
 
@@ -390,6 +415,7 @@ namespace dlib
         bool verbose;
         unsigned long max_iterations;
         bool learn_nonnegative_weights;
+        bool last_weight_1;
     }; 
 
 // ----------------------------------------------------------------------------------------
