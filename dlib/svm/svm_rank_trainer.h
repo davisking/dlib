@@ -165,7 +165,10 @@ namespace dlib
             subgradient = scale*subgradient;
 
             if(last_weight_1)
+            {
+                w(w.size()-1) = 0;
                 subgradient(w.size()-1) = 0;
+            }
         }
 
     private:
@@ -385,6 +388,9 @@ namespace dlib
             solver( make_oca_problem_ranking_svm<w_type>(C, samples, verbose, eps, max_iterations, last_weight_1), 
                     w, 
                     num_nonnegative);
+
+            if(last_weight_1)
+                w(w.size()-1) = 1;
 
             // put the solution into a decision function and then return it
             decision_function<kernel_type> df;
