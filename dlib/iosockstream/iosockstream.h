@@ -10,6 +10,13 @@
 #include "../smart_pointers_thread_safe.h"
 #include "../timeout.h"
 
+#ifdef _MSC_VER
+// Disable the warning about inheriting from std::iostream 'via dominance' since this warning is a warning about
+// visual studio conforming to the standard and is ignorable.  See http://connect.microsoft.com/VisualStudio/feedback/details/733720/inheriting-from-std-fstream-produces-c4250-warning
+// for further details if interested.
+#pragma warning(disable : 4250)
+#endif // _MSC_VER
+
 namespace dlib
 {
 
