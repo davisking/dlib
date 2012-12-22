@@ -13,6 +13,12 @@
 #define DLIB_ANY_FUNCTION_RETURN return
 #include "any_function_impl.h"
 #undef DLIB_ANY_FUNCTION_RETURN
+
+    private:
+        // You get a compiler error about this function being private if you try to assign
+        // or copy between any_functions with different types.  You must only copy between
+        // any_functions that represent functions with the same signature.
+        template <typename T, typename U> any_function(const any_function<T,U>&);
     };
 
 // The case where function_type has a void return type
@@ -22,6 +28,12 @@
 #define DLIB_ANY_FUNCTION_RETURN 
 #include "any_function_impl.h"
 #undef DLIB_ANY_FUNCTION_RETURN
+
+    private:
+        // You get a compiler error about this function being private if you try to assign
+        // or copy between any_functions with different types.  You must only copy between
+        // any_functions that represent functions with the same signature.
+        template <typename T> any_function(const any_function<T>&);
     };
 
 #undef DLIB_ANY_FUNCTION_ARG_LIST
