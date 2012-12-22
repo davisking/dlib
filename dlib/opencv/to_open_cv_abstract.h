@@ -15,7 +15,8 @@ namespace dlib
     );
     /*!
         requires
-            - image_type == an implementation of dlib/array2d/array2d_kernel_abstract.h
+            - image_type == an implementation of dlib/array2d/array2d_kernel_abstract.h or
+              a dlib::matrix object which uses a row_major_layout.
             - pixel_traits<typename image_type::type> is defined
         ensures
             - returns an OpenCV Mat object which represents the same image as img.  This
