@@ -266,25 +266,10 @@
          <item nolink="true">
             <name>Conversions</name>
             <sub>
+               <item>mat</item>
                <item>
                   <name>matrix_cast</name>
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#matrix_cast</link>
-               </item>
-               <item>
-                  <name>array_to_matrix</name>
-                  <link>dlib/matrix/matrix_utilities_abstract.h.html#array_to_matrix</link>
-               </item>
-               <item>
-                  <name>vector_to_matrix</name>
-                  <link>dlib/matrix/matrix_utilities_abstract.h.html#vector_to_matrix</link>
-               </item>
-               <item>
-                  <name>pointer_to_column_vector</name>
-                  <link>dlib/matrix/matrix_utilities_abstract.h.html#pointer_to_column_vector</link>
-               </item>
-               <item>
-                  <name>pointer_to_matrix</name>
-                  <link>dlib/matrix/matrix_utilities_abstract.h.html#pointer_to_matrix</link>
                </item>
                <item>
                   <name>pixel_to_vector</name>
@@ -690,7 +675,22 @@
          </description>
       </component>
       
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>mat</name>
+         <file>dlib/matrix.h</file>
+         <spec_file link="true">dlib/matrix/matrix_mat_abstract.h</spec_file>
+         <description>
+            This is a set of simple functions that take objects like std::vector or
+            <a href="containers.html#array2d">array2d</a> and convert them into 
+            <a href="#matrix">matrix</a> objects.  Note that the conversion is 
+            done using template expressions so there is no runtime cost associated
+            with calling mat().
+         </description>
+      </component>
       
+
    <!-- ************************************************************************* -->
       
       <component>

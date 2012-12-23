@@ -14,6 +14,7 @@
 
          <term file="dlib/algs.h.html" name="stack_based_memory_block"/>
 
+         <term file="linear_algebra.html" name="mat"/>
          <term file="linear_algebra.html" name="matrix"/>
          <term file="linear_algebra.html" name="move_rect"/>
          <term file="linear_algebra.html" name="translate_rect"/>
@@ -464,10 +465,6 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="matrix_cast"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="set_all_elements"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="tmp"/>
-         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="array_to_matrix"/>
-         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="vector_to_matrix"/>
-         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointer_to_column_vector"/>
-         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointer_to_matrix"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="reshape_to_column_vector"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="reshape"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="squared"/>
