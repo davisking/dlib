@@ -4,7 +4,6 @@
 #define DLIB_MATRIx_MAT_H__
 
 #include "matrix_mat_abstract.h"
-#include "matrix.h"
 #include "../stl_checked.h"
 #include <vector>
 #include "matrix_op.h"
@@ -144,7 +143,7 @@ namespace dlib
         typename value_type,
         typename alloc
         >
-    const matrix_op<op_std_vect_to_mat<std::vector<value_type,alloc> > > mat (
+    const matrix_op<op_std_vect_to_mat<std_vector_c<value_type,alloc> > > mat (
         const std_vector_c<value_type,alloc>& vector
     )
     {
