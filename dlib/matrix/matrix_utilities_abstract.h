@@ -458,102 +458,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename vector_type
-        >
-    const matrix_exp vector_to_matrix (
-        const vector_type& vector
-    );
-    /*!
-        requires
-            - vector_type is an implementation of array/array_kernel_abstract.h or
-              std::vector or dlib::std_vector_c or dlib::matrix
-        ensures
-            - if (vector_type is a dlib::matrix) then
-                - returns a reference to vector
-            - else
-                - returns a matrix R such that:
-                    - is_col_vector(R) == true 
-                    - R.size() == vector.size()
-                    - for all valid r:
-                      R(r) == vector[r]
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename array_type
-        >
-    const matrix_exp array_to_matrix (
-        const array_type& array
-    );
-    /*!
-        requires
-            - array_type is an implementation of array2d/array2d_kernel_abstract.h
-              or dlib::matrix
-        ensures
-            - if (array_type is a dlib::matrix) then
-                - returns a reference to array 
-            - else
-                - returns a matrix R such that:
-                    - R.nr() == array.nr() 
-                    - R.nc() == array.nc()
-                    - for all valid r and c:
-                      R(r, c) == array[r][c]
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T
-        >
-    const matrix_exp pointer_to_matrix (
-        const T* ptr,
-        long nr,
-        long nc
-    );
-    /*!
-        requires
-            - nr > 0
-            - nc > 0
-            - ptr == a pointer to at least nr*nc T objects
-        ensures
-            - returns a matrix M such that:
-                - M.nr() == nr
-                - m.nc() == nc 
-                - for all valid r and c:
-                  M(r,c) == ptr[r*nc + c]
-                  (i.e. the pointer is interpreted as a matrix laid out in memory
-                  in row major order)
-            - Note that the returned matrix doesn't take "ownership" of
-              the pointer and thus will not delete or free it.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T
-        >
-    const matrix_exp pointer_to_column_vector (
-        const T* ptr,
-        long nr
-    );
-    /*!
-        requires
-            - nr > 0
-            - ptr == a pointer to at least nr T objects
-        ensures
-            - returns a matrix M such that:
-                - M.nr() == nr
-                - m.nc() == 1
-                - for all valid i:
-                  M(i) == ptr[i]
-            - Note that the returned matrix doesn't take "ownership" of
-              the pointer and thus will not delete or free it.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     const matrix_exp reshape (
         const matrix_exp& m,
         long rows,
@@ -1548,7 +1452,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns std::sqrt(variance(m))
+            - returns sqrt(variance(m))
     !*/
 
 // ----------------------------------------------------------------------------------------

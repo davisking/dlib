@@ -1,0 +1,156 @@
+// Copyright (C) 2006  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
+#undef DLIB_MATRIx_MAT_ABSTRACT_H__
+#ifdef DLIB_MATRIx_MAT_ABSTRACT_H__
+
+#include "matrix_abstract.h"
+#inclue <vector>
+#include "../array/array_kernel_abstract.h"
+#include "../array2d/array2d_kernel_abstract.h"
+
+namespace dlib
+{
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    const matrix_exp<EXP>& mat (
+        const matrix_exp<EXP>& m
+    );
+    /*!
+        ensures
+            - returns m
+              (i.e. this function just returns the input matrix without any modifications)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename MM
+        >
+    const matrix_exp mat (
+        const array2d<T,MM>& array
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == array.nr() 
+                - R.nc() == array.nc()
+                - for all valid r and c:
+                  R(r, c) == array[r][c]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename MM
+        >
+    const matrix_exp mat (
+        const array<T,MM>& m 
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == m.size()
+                - for all valid r:
+                  R(r) == m[r]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename value_type,
+        typename alloc
+        >
+    const matrix_exp mat (
+        const std::vector<value_type,alloc>& vector
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == vector.size()
+                - for all valid r:
+                  R(r) == vector[r]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename value_type,
+        typename alloc
+        >
+    const matrix_exp mat (
+        const std_vector_c<value_type,alloc>& vector
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == vector.size()
+                - for all valid r:
+                  R(r) == vector[r]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const matrix_exp mat (
+        const T* ptr,
+        long nr
+    );
+    /*!
+        requires
+            - nr > 0
+            - ptr == a pointer to at least nr T objects
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == nr
+                - m.nc() == 1
+                - for all valid i:
+                  M(i) == ptr[i]
+            - Note that the returned matrix doesn't take "ownership" of
+              the pointer and thus will not delete or free it.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const matrix_exp mat (
+        const T* ptr,
+        long nr,
+        long nc
+    );
+    /*!
+        requires
+            - nr > 0
+            - nc > 0
+            - ptr == a pointer to at least nr*nc T objects
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == nr
+                - m.nc() == nc 
+                - for all valid r and c:
+                  M(r,c) == ptr[r*nc + c]
+                  (i.e. the pointer is interpreted as a matrix laid out in memory
+                  in row major order)
+            - Note that the returned matrix doesn't take "ownership" of
+              the pointer and thus will not delete or free it.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+}
+
+#endif // DLIB_MATRIx_MAT_ABSTRACT_H__
+
+
