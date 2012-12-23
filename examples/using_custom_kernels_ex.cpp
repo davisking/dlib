@@ -160,8 +160,8 @@ int main()
         }
     }
     cout << "samples generated: " << samples.size() << endl;
-    cout << "  number of +1 samples: " << sum(vector_to_matrix(labels) > 0) << endl;
-    cout << "  number of -1 samples: " << sum(vector_to_matrix(labels) < 0) << endl;
+    cout << "  number of +1 samples: " << sum(mat(labels) > 0) << endl;
+    cout << "  number of -1 samples: " << sum(mat(labels) < 0) << endl;
 
 
     // A valid kernel must always give rise to kernel matrices which are symmetric 

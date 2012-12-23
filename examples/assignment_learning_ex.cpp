@@ -177,8 +177,8 @@ int main()
         {
             // Predict the assignments for the LHS and RHS in samples[i].   
             std::vector<long> predicted_assignments = assigner(samples[i]);
-            cout << "true labels:      " << trans(vector_to_matrix(labels[i]));
-            cout << "predicted labels: " << trans(vector_to_matrix(predicted_assignments)) << endl;
+            cout << "true labels:      " << trans(mat(labels[i]));
+            cout << "predicted labels: " << trans(mat(predicted_assignments)) << endl;
         }
 
         // We can also use this tool to compute the percentage of assignments predicted correctly.

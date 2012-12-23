@@ -79,8 +79,8 @@ int main()
     // Here we normalize all the samples by subtracting their mean and dividing by their standard deviation.
     // This is generally a good idea since it often heads off numerical stability problems and also 
     // prevents one large feature from smothering others.
-    const sample_type m(mean(vector_to_matrix(samples)));  // compute a mean vector
-    const sample_type sd(reciprocal(sqrt(variance(vector_to_matrix(samples))))); // compute a standard deviation vector
+    const sample_type m(mean(mat(samples)));  // compute a mean vector
+    const sample_type sd(reciprocal(stddev(mat(samples)))); // compute a standard deviation vector
     // now normalize each sample
     for (unsigned long i = 0; i < samples.size(); ++i)
         samples[i] = pointwise_multiply(samples[i] - m, sd); 

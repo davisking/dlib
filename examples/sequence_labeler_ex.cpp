@@ -228,8 +228,8 @@ int main()
     // print out some of the randomly sampled sequences
     for (int i = 0; i < 10; ++i)
     {
-        cout << "hidden states:   " << trans(vector_to_matrix(labels[i]));
-        cout << "observed states: " << trans(vector_to_matrix(samples[i]));
+        cout << "hidden states:   " << trans(mat(labels[i]));
+        cout << "observed states: " << trans(mat(samples[i]));
         cout << "******************************" << endl;
     }
 
@@ -251,8 +251,8 @@ int main()
     // Test the learned labeler on one of the training samples.  In this
     // case it will give the correct sequence of labels.
     std::vector<unsigned long> predicted_labels = labeler(samples[0]);
-    cout << "true hidden states:      "<< trans(vector_to_matrix(labels[0]));
-    cout << "predicted hidden states: "<< trans(vector_to_matrix(predicted_labels));
+    cout << "true hidden states:      "<< trans(mat(labels[0]));
+    cout << "predicted hidden states: "<< trans(mat(predicted_labels));
 
 
 

@@ -118,9 +118,9 @@ public:
         }
 
         // divide by number of +1 samples
-        positive_center /= sum(vector_to_matrix(labels) == +1);
+        positive_center /= sum(mat(labels) == +1);
         // divide by number of -1 samples
-        negative_center /= sum(vector_to_matrix(labels) == -1);
+        negative_center /= sum(mat(labels) == -1);
 
         custom_decision_function df;
         df.positive_center = positive_center;

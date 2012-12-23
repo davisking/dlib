@@ -65,8 +65,8 @@ int main()
     }
 
     cout << "samples generated: " << samples.size() << endl;
-    cout << "  number of +1 samples: " << sum(vector_to_matrix(labels) > 0) << endl;
-    cout << "  number of -1 samples: " << sum(vector_to_matrix(labels) < 0) << endl;
+    cout << "  number of +1 samples: " << sum(mat(labels) > 0) << endl;
+    cout << "  number of -1 samples: " << sum(mat(labels) < 0) << endl;
 
     // Here we normalize all the samples by subtracting their mean and dividing by their standard deviation.
     // This is generally a good idea since it often heads off numerical stability problems and also 
