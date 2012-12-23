@@ -70,7 +70,7 @@ namespace
                 }
             }
             DLIB_TEST(equal(K, kernel_matrix(kern, vect1, vect2)));
-            DLIB_TEST(equal(K, kernel_matrix(kern, vector_to_matrix(vect1), vector_to_matrix(vect2))));
+            DLIB_TEST(equal(K, kernel_matrix(kern, mat(vect1), mat(vect2))));
 
 
             K.set_size(vect2.size(), vect1.size());
@@ -83,7 +83,7 @@ namespace
             }
             DLIB_TEST(equal(K, kernel_matrix(kern, vect2, vect1)));
             DLIB_TEST(equal(K, tmp(kernel_matrix(kern, vect2, vect1))));
-            DLIB_TEST(equal(K, kernel_matrix(kern, vector_to_matrix(vect2), vector_to_matrix(vect1))));
+            DLIB_TEST(equal(K, kernel_matrix(kern, mat(vect2), mat(vect1))));
 
 
             K.set_size(vect1.size(), vect1.size());
@@ -98,10 +98,10 @@ namespace
             DLIB_TEST(equal(K, tmp(kernel_matrix(kern, vect1, vect1))));
             DLIB_TEST(equal(K, kernel_matrix(kern, vect1)));
             DLIB_TEST(equal(K, tmp(kernel_matrix(kern, vect1))));
-            DLIB_TEST(equal(K, kernel_matrix(kern, vector_to_matrix(vect1), vector_to_matrix(vect1))));
-            DLIB_TEST(equal(K, tmp(kernel_matrix(kern, vector_to_matrix(vect1), vector_to_matrix(vect1)))));
-            DLIB_TEST(equal(K, kernel_matrix(kern, vector_to_matrix(vect1))));
-            DLIB_TEST(equal(K, tmp(kernel_matrix(kern, vector_to_matrix(vect1)))));
+            DLIB_TEST(equal(K, kernel_matrix(kern, mat(vect1), mat(vect1))));
+            DLIB_TEST(equal(K, tmp(kernel_matrix(kern, mat(vect1), mat(vect1)))));
+            DLIB_TEST(equal(K, kernel_matrix(kern, mat(vect1))));
+            DLIB_TEST(equal(K, tmp(kernel_matrix(kern, mat(vect1)))));
 
 
             K.set_size(vect1.size(),1);
@@ -113,7 +113,7 @@ namespace
                 }
             }
             DLIB_TEST(equal(K, kernel_matrix(kern, vect1, samp)));
-            DLIB_TEST(equal(K, kernel_matrix(kern, vector_to_matrix(vect1), samp)));
+            DLIB_TEST(equal(K, kernel_matrix(kern, mat(vect1), samp)));
 
 
             K.set_size(1, vect1.size());
@@ -125,9 +125,9 @@ namespace
                 }
             }
             DLIB_TEST(equal(K, kernel_matrix(kern, samp, vect1)));
-            DLIB_TEST(equal(K, kernel_matrix(kern, samp, vector_to_matrix(vect1))));
+            DLIB_TEST(equal(K, kernel_matrix(kern, samp, mat(vect1))));
             DLIB_TEST(equal(K, tmp(kernel_matrix(kern, samp, vect1))));
-            DLIB_TEST(equal(K, tmp(kernel_matrix(kern, samp, vector_to_matrix(vect1)))));
+            DLIB_TEST(equal(K, tmp(kernel_matrix(kern, samp, mat(vect1)))));
 
 
 

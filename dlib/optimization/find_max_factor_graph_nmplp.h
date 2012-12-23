@@ -301,7 +301,7 @@ namespace dlib
                 }
             }
 
-            map_assignment[id_i] = index_of_max(vector_to_matrix(b));
+            map_assignment[id_i] = index_of_max(mat(b));
         }
     }
 

@@ -307,8 +307,8 @@ namespace
         // print out some of the randomly sampled sequences
         for (int i = 0; i < 10; ++i)
         {
-            dlog << LINFO << "hidden states:   " << trans(vector_to_matrix(labels[i]));
-            dlog << LINFO << "observed states: " << trans(vector_to_matrix(samples[i].item));
+            dlog << LINFO << "hidden states:   " << trans(mat(labels[i]));
+            dlog << LINFO << "observed states: " << trans(mat(samples[i].item));
             dlog << LINFO << "******************************";
         }
 
@@ -325,10 +325,10 @@ namespace
         sequence_labeler<fe_type> labeler = trainer.train(samples, labels);
 
         std::vector<unsigned long> predicted_labels = labeler(samples[0]);
-        dlog << LINFO << "true hidden states:      "<< trans(vector_to_matrix(labels[0]));
-        dlog << LINFO << "predicted hidden states: "<< trans(vector_to_matrix(predicted_labels));
+        dlog << LINFO << "true hidden states:      "<< trans(mat(labels[0]));
+        dlog << LINFO << "predicted hidden states: "<< trans(mat(predicted_labels));
 
-        DLIB_TEST(vector_to_matrix(labels[0]) == vector_to_matrix(predicted_labels));
+        DLIB_TEST(mat(labels[0]) == mat(predicted_labels));
 
 
         print_spinner();

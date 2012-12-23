@@ -7,6 +7,7 @@
 #include <vector>
 #include "../algs.h"
 #include "../serialize.h"
+#include "../matrix/matrix_mat.h"
 
 namespace dlib
 {
@@ -207,6 +208,19 @@ namespace dlib
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type circular_buffer"); 
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const matrix_op<op_array_to_mat<circular_buffer<T> > > mat (
+        const circular_buffer<T>& m 
+    )
+    {
+        typedef op_array_to_mat<circular_buffer<T> > op;
+        return matrix_op<op>(op(m));
     }
 
 // ----------------------------------------------------------------------------------------

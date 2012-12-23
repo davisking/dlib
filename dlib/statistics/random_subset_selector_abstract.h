@@ -353,6 +353,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    const matrix_exp mat (
+        const random_subset_selector<T>& m 
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == m.size()
+                - for all valid r:
+                  R(r) == m[r]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RANDOM_SUBSeT_SELECTOR_ABSTRACT_H_

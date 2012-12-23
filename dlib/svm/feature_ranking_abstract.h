@@ -28,8 +28,8 @@ namespace dlib
     );
     /*!
         requires
-            - sample_matrix_type == a matrix or something convertible to a matrix via vector_to_matrix()
-            - label_matrix_type  == a matrix or something convertible to a matrix via vector_to_matrix()
+            - sample_matrix_type == a matrix or something convertible to a matrix via mat()
+            - label_matrix_type  == a matrix or something convertible to a matrix via mat()
             - is_binary_classification_problem(samples, labels) == true
             - kc.train(samples(0)) must be a valid expression.  This means that
               kc must use a kernel type that is capable of operating on the

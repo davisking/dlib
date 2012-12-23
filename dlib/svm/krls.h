@@ -182,7 +182,7 @@ namespace dlib
                     temp.swap(P);
 
                     // now update the alpha vector (equation 3.16)
-                    const scalar_type k_a = (y-trans(k)*vector_to_matrix(alpha))/delta;
+                    const scalar_type k_a = (y-trans(k)*mat(alpha))/delta;
                     for (unsigned long i = 0; i < alpha.size(); ++i)
                     {
                         alpha[i] -= a(i)*k_a;
@@ -198,7 +198,7 @@ namespace dlib
                     P -= q*temp_matrix;
 
                     // update the alpha vector (equation 3.13)
-                    const scalar_type k_a = y-trans(k)*vector_to_matrix(alpha);
+                    const scalar_type k_a = y-trans(k)*mat(alpha);
                     for (unsigned long i = 0; i < alpha.size(); ++i)
                     {
                         alpha[i] += (K_inv*q*k_a)(i);
@@ -232,10 +232,10 @@ namespace dlib
         ) const
         {
             return decision_function<kernel_type>(
-                vector_to_matrix(alpha),
-                -sum(vector_to_matrix(alpha))*tau, 
+                mat(alpha),
+                -sum(mat(alpha))*tau, 
                 kernel,
-                vector_to_matrix(dictionary)
+                mat(dictionary)
             );
         }
 
@@ -295,7 +295,7 @@ namespace dlib
 
             // now compute the updated alpha values to take account that we just removed one of 
             // our dictionary vectors
-            a = (K_inv*remove_row(K,i)*vector_to_matrix(alpha));
+            a = (K_inv*remove_row(K,i)*mat(alpha));
 
             // now copy over the new alpha values
             alpha.resize(alpha.size()-1);

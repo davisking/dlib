@@ -193,7 +193,7 @@ namespace dlib
         universe_set.top_min = 0;
         universe_set.bottom_max = mat.nr()-1;
         universe_set.top_max = mat.nr()-1;
-        universe_set.weight = sum(rowm(array_to_matrix(sum_pos),mat.nr()));
+        universe_set.weight = sum(rowm(dlib::mat(sum_pos),mat.nr()));
 
         q.push(universe_set);
 
@@ -247,7 +247,7 @@ namespace dlib
                 }
 
 
-                universe_set.weight = sum(rowm(array_to_matrix(sum_pos),mat.nr()));
+                universe_set.weight = sum(rowm(dlib::mat(sum_pos),mat.nr()));
                 if (universe_set.weight <= thresh)
                     break;
 

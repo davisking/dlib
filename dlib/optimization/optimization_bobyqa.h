@@ -874,7 +874,7 @@ L360:
                 //goto L720;
             }
             ++nf;
-            f = calfun(pointer_to_column_vector(&x[1], n));
+            f = calfun(mat(&x[1], n));
             if (ntrits == -1) {
                 fsave = f;
                 goto L720;
@@ -1946,7 +1946,7 @@ L50:
                 }
                 /* L60: */
             }
-            f = calfun(pointer_to_column_vector(&x[1],n));
+            f = calfun(mat(&x[1],n));
             fval[nf] = f;
             if (nf == 1) {
                 fbeg = f;
@@ -2572,7 +2572,7 @@ L260:
                     /* L290: */
                 }
                 ++(nf);
-                f = calfun(pointer_to_column_vector(&w[1],n));
+                f = calfun(mat(&w[1],n));
                 fval[kpt] = f;
                 if (f < fval[kopt]) {
                     kopt = kpt;

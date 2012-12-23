@@ -191,18 +191,18 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(is_vector(vector_to_matrix(list)) && list.size() > 0 && 
+        DLIB_ASSERT(is_vector(mat(list)) && list.size() > 0 && 
                     is_col_vector(x) && radius > 0,
             "\t double solve_least_squares()"
             << "\n\t invalid arguments were given to this function"
-            << "\n\t is_vector(list):  " << is_vector(vector_to_matrix(list)) 
+            << "\n\t is_vector(list):  " << is_vector(mat(list)) 
             << "\n\t list.size():      " << list.size() 
             << "\n\t is_col_vector(x): " << is_col_vector(x) 
             << "\n\t radius:           " << radius
             );
 
         return find_min_trust_region(stop_strategy,
-                                     least_squares_model<T>(f, der, vector_to_matrix(list)), 
+                                     least_squares_model<T>(f, der, mat(list)), 
                                      x, 
                                      radius);
     }
@@ -314,18 +314,18 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(is_vector(vector_to_matrix(list)) && list.size() > 0 && 
+        DLIB_ASSERT(is_vector(mat(list)) && list.size() > 0 && 
                     is_col_vector(x) && radius > 0,
             "\t double solve_least_squares_lm()"
             << "\n\t invalid arguments were given to this function"
-            << "\n\t is_vector(list):  " << is_vector(vector_to_matrix(list)) 
+            << "\n\t is_vector(list):  " << is_vector(mat(list)) 
             << "\n\t list.size():      " << list.size() 
             << "\n\t is_col_vector(x): " << is_col_vector(x) 
             << "\n\t radius:           " << radius
             );
 
         return find_min_trust_region(stop_strategy,
-                                     least_squares_lm_model<T>(f, der, vector_to_matrix(list)), 
+                                     least_squares_lm_model<T>(f, der, mat(list)), 
                                      x, 
                                      radius);
     }

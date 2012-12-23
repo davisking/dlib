@@ -550,7 +550,7 @@ namespace dlib
         const T& samples
     ) 
     {
-        return impl::max_index_plus_one(vector_to_matrix(samples));
+        return impl::max_index_plus_one(mat(samples));
     }
 
 // ------------------------------------------------------------------------------------

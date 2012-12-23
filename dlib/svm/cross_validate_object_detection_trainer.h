@@ -177,6 +177,18 @@ namespace dlib
             const array_type& array;
             const std::vector<unsigned long>& idx_set;
         };
+
+        template <
+            typename T 
+            >
+        const matrix_op<op_array_to_mat<array_subset_helper<T> > > mat (
+            const array_subset_helper<T>& m 
+        )
+        {
+            typedef op_array_to_mat<array_subset_helper<T> > op;
+            return matrix_op<op>(op(m));
+        }
+
     }
 
 // ----------------------------------------------------------------------------------------

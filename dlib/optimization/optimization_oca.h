@@ -225,9 +225,9 @@ namespace dlib
                 // Note that we warm start this optimization by using the alpha from the last
                 // iteration as the starting point.
                 if (num_nonnegative != 0)
-                    solve_qp4_using_smo(rowm(planes,range(0,num_nonnegative-1)), K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
+                    solve_qp4_using_smo(rowm(planes,range(0,num_nonnegative-1)), K, mat(bs), alpha, eps, sub_max_iter); 
                 else
-                    solve_qp_using_smo(K, vector_to_matrix(bs), alpha, eps, sub_max_iter); 
+                    solve_qp_using_smo(K, mat(bs), alpha, eps, sub_max_iter); 
 
                 // construct the w that minimized the subproblem.
                 w = -(planes*alpha);
@@ -245,14 +245,14 @@ namespace dlib
 
                 // Compute the lower bound on the true objective given to us by the cutting 
                 // plane subproblem.
-                cp_obj = -0.5*trans(w)*w + trans(alpha)*vector_to_matrix(bs);
+                cp_obj = -0.5*trans(w)*w + trans(alpha)*mat(bs);
 
 
                 // If it has been a while since a cutting plane was an active constraint then
                 // we should throw it away.
-                while (max(vector_to_matrix(miss_count)) >= inactive_thresh)
+                while (max(mat(miss_count)) >= inactive_thresh)
                 {
-                    const long idx = index_of_max(vector_to_matrix(miss_count));
+                    const long idx = index_of_max(mat(miss_count));
                     bs.erase(bs.begin()+idx);
                     miss_count.erase(miss_count.begin()+idx);
                     K = removerc(K, idx, idx);

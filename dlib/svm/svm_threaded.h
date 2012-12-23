@@ -237,8 +237,8 @@ namespace dlib
     )
     {
         return cross_validate_trainer_threaded_impl(trainer,
-                                           vector_to_matrix(x),
-                                           vector_to_matrix(y),
+                                           mat(x),
+                                           mat(y),
                                            folds,
                                            num_threads);
     }

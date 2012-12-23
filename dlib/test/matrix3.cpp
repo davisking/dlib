@@ -723,16 +723,16 @@ namespace
             std::vector<double> v(34, 8);
             std::vector<double> v2(34, 9);
 
-            DLIB_TEST(pointer_to_column_vector(&v[0], v.size()) == vector_to_matrix(v));
-            DLIB_TEST(pointer_to_column_vector(&v2[0], v.size()) != vector_to_matrix(v));
+            DLIB_TEST(mat(&v[0], v.size()) == mat(v));
+            DLIB_TEST(mat(&v2[0], v.size()) != mat(v));
         }
 
         {
             std::vector<long> v(1, 3);
             std::vector<long> v2(1, 2);
 
-            DLIB_TEST(pointer_to_column_vector(&v[0], v.size()) == vector_to_matrix(v));
-            DLIB_TEST(pointer_to_column_vector(&v2[0], v.size()) != vector_to_matrix(v));
+            DLIB_TEST(mat(&v[0], v.size()) == mat(v));
+            DLIB_TEST(mat(&v2[0], v.size()) != mat(v));
         }
 
         {
@@ -940,7 +940,7 @@ namespace
             a = 0, 1, 2, 
                 3, 4, 5;
 
-            DLIB_TEST(pointer_to_matrix(&v[0], 2, 3) == a);
+            DLIB_TEST(mat(&v[0], 2, 3) == a);
         }
 
         {

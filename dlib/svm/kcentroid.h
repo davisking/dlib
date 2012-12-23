@@ -337,10 +337,10 @@ namespace dlib
         ) const
         {
             refresh_bias();
-            return distance_function<kernel_type>(vector_to_matrix(alpha),
+            return distance_function<kernel_type>(mat(alpha),
                                                   bias, 
                                                   kernel, 
-                                                  vector_to_matrix(dictionary));
+                                                  mat(dictionary));
         }
 
     private:
@@ -352,7 +352,7 @@ namespace dlib
             {
                 bias_is_stale = false;
                 // recompute the bias term
-                bias = sum(pointwise_multiply(K, vector_to_matrix(alpha)*trans(vector_to_matrix(alpha))));
+                bias = sum(pointwise_multiply(K, mat(alpha)*trans(mat(alpha))));
             }
         }
 
@@ -396,7 +396,7 @@ namespace dlib
                 if (do_test)
                 {
                     refresh_bias();
-                    test_result = std::sqrt(kx + bias - 2*trans(vector_to_matrix(alpha))*k);
+                    test_result = std::sqrt(kx + bias - 2*trans(mat(alpha))*k);
                 }
 
                 // compute the error we would have if we approximated the new x sample
@@ -525,7 +525,7 @@ namespace dlib
 
             // now compute the updated alpha values to take account that we just removed one of 
             // our dictionary vectors
-            a = (K_inv*remove_row(K,i)*vector_to_matrix(alpha));
+            a = (K_inv*remove_row(K,i)*mat(alpha));
 
             // now copy over the new alpha values
             alpha.resize(alpha.size()-1);

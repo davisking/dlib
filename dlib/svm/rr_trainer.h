@@ -135,7 +135,7 @@ namespace dlib
         {
             std::vector<scalar_type> temp; 
             scalar_type temp2;
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), false, temp, temp2);
+            return do_train(mat(x), mat(y), false, temp, temp2);
         }
 
         template <
@@ -149,7 +149,7 @@ namespace dlib
         ) const
         {
             scalar_type temp;
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, loo_values, temp);
+            return do_train(mat(x), mat(y), true, loo_values, temp);
         }
 
         template <
@@ -163,7 +163,7 @@ namespace dlib
             scalar_type& lambda_used 
         ) const
         {
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, loo_values, lambda_used);
+            return do_train(mat(x), mat(y), true, loo_values, lambda_used);
         }
 
 

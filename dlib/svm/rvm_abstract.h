@@ -97,9 +97,9 @@ namespace dlib
         /*!
             requires
                 - is_binary_classification_problem(x,y) == true
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via mat().
                   Also, x should contain sample_type objects.
-                - y == a matrix or something convertible to a matrix via vector_to_matrix().
+                - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
                 - trains a relevance vector classifier given the training samples in x and 
@@ -219,9 +219,9 @@ namespace dlib
         ) const;
         /*!
             requires
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via mat().
                   Also, x should contain sample_type objects.
-                - y == a matrix or something convertible to a matrix via vector_to_matrix().
+                - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
                 - is_learning_problem(x,y) == true
                 - x.size() > 0

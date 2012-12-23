@@ -36,7 +36,7 @@ namespace dlib
                 - get_kernel() == kernel
                 - minimum_tolerance() == min_tolerance
                 - size() == dictionary.size()
-                - get_dictionary() == vector_to_matrix(dictionary)
+                - get_dictionary() == mat(dictionary)
                 - K.nr() == dictionary.size()
                 - K.nc() == dictionary.size()
                 - for all valid r,c:
@@ -302,7 +302,7 @@ namespace dlib
         const matrix<sample_type,0,1,mem_manager_type> get_dictionary (
         ) const
         { 
-            return vector_to_matrix(dictionary);
+            return mat(dictionary);
         }
 
         friend void serialize(const linearly_independent_subset_finder& item, std::ostream& out)
@@ -410,6 +410,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    const matrix_op<op_array_to_mat<linearly_independent_subset_finder<T> > > mat (
+        const linearly_independent_subset_finder<T>& m 
+    )
+    {
+        typedef op_array_to_mat<linearly_independent_subset_finder<T> > op;
+        return matrix_op<op>(op(m));
+    }
+
+// ----------------------------------------------------------------------------------------
     namespace impl
     {
         template <
@@ -485,7 +497,7 @@ namespace dlib
     )
     {   
         dlib::rand rnd;
-        impl::fill_lisf(lisf, vector_to_matrix(samples),rnd, 2000);
+        impl::fill_lisf(lisf, mat(samples),rnd, 2000);
     }
 
     template <
@@ -500,7 +512,7 @@ namespace dlib
         const int sampling_size = 2000
     )
     {   
-        impl::fill_lisf(lisf, vector_to_matrix(samples),rnd, sampling_size);
+        impl::fill_lisf(lisf, mat(samples),rnd, sampling_size);
     }
 
     template <
@@ -517,7 +529,7 @@ namespace dlib
     {   
         dlib::rand rnd;
         rnd.set_seed(cast_to_string(random_seed));
-        impl::fill_lisf(lisf, vector_to_matrix(samples), rnd, sampling_size);
+        impl::fill_lisf(lisf, mat(samples), rnd, sampling_size);
     }
 
 // ----------------------------------------------------------------------------------------

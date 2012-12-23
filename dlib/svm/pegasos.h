@@ -525,9 +525,9 @@ namespace dlib
         ) const
         {
             if (use_cache)
-                return do_train_cached(vector_to_matrix(x), vector_to_matrix(y));
+                return do_train_cached(mat(x), mat(y));
             else
-                return do_train(vector_to_matrix(x), vector_to_matrix(y));
+                return do_train(mat(x), mat(y));
         }
 
     private:

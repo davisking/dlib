@@ -264,9 +264,9 @@ namespace dlib
                 - is_learning_problem(x,y) == true
                   (Note that it is ok for x.size() == 1)
                 - All elements of y must be equal to +1 or -1
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via mat().
                   Also, x should contain sample_type objects.
-                - y == a matrix or something convertible to a matrix via vector_to_matrix().
+                - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
                 - Trains a C support vector classifier given the training samples in x and 
@@ -319,9 +319,9 @@ namespace dlib
                             - max_index_plus_one(x) == max_index_plus_one(X)
                         - else
                             - max_index_plus_one(x) >= max_index_plus_one(X)
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via mat().
                   Also, x should contain sample_type objects.
-                - y == a matrix or something convertible to a matrix via vector_to_matrix().
+                - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
                 - Trains a C support vector classifier given the training samples in x and 

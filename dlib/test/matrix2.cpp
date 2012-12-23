@@ -171,33 +171,33 @@ namespace
         for (long i = 0; i < 4; ++i)
             stdv[i] = stdv_c[i] = arr[i] = i+1;
 
-        DLIB_TEST(vector_to_matrix(stdv)(0) == 1);
-        DLIB_TEST(vector_to_matrix(stdv)(1) == 2);
-        DLIB_TEST(vector_to_matrix(stdv)(2) == 3);
-        DLIB_TEST(vector_to_matrix(stdv)(3) == 4);
-        DLIB_TEST(vector_to_matrix(stdv).nr() == 4);
-        DLIB_TEST(vector_to_matrix(stdv).nc() == 1);
-        DLIB_TEST(vector_to_matrix(stdv).size() == 4);
-        DLIB_TEST(equal(trans(vector_to_matrix(stdv))*vector_to_matrix(stdv), trans(v)*v));
-        DLIB_TEST(equal(trans(vector_to_matrix(stdv))*vector_to_matrix(stdv), tmp(trans(v)*v)));
+        DLIB_TEST(mat(stdv)(0) == 1);
+        DLIB_TEST(mat(stdv)(1) == 2);
+        DLIB_TEST(mat(stdv)(2) == 3);
+        DLIB_TEST(mat(stdv)(3) == 4);
+        DLIB_TEST(mat(stdv).nr() == 4);
+        DLIB_TEST(mat(stdv).nc() == 1);
+        DLIB_TEST(mat(stdv).size() == 4);
+        DLIB_TEST(equal(trans(mat(stdv))*mat(stdv), trans(v)*v));
+        DLIB_TEST(equal(trans(mat(stdv))*mat(stdv), tmp(trans(v)*v)));
 
-        DLIB_TEST(vector_to_matrix(stdv_c)(0) == 1);
-        DLIB_TEST(vector_to_matrix(stdv_c)(1) == 2);
-        DLIB_TEST(vector_to_matrix(stdv_c)(2) == 3);
-        DLIB_TEST(vector_to_matrix(stdv_c)(3) == 4);
-        DLIB_TEST(vector_to_matrix(stdv_c).nr() == 4);
-        DLIB_TEST(vector_to_matrix(stdv_c).nc() == 1);
-        DLIB_TEST(vector_to_matrix(stdv_c).size() == 4);
-        DLIB_TEST(equal(trans(vector_to_matrix(stdv_c))*vector_to_matrix(stdv_c), trans(v)*v));
+        DLIB_TEST(mat(stdv_c)(0) == 1);
+        DLIB_TEST(mat(stdv_c)(1) == 2);
+        DLIB_TEST(mat(stdv_c)(2) == 3);
+        DLIB_TEST(mat(stdv_c)(3) == 4);
+        DLIB_TEST(mat(stdv_c).nr() == 4);
+        DLIB_TEST(mat(stdv_c).nc() == 1);
+        DLIB_TEST(mat(stdv_c).size() == 4);
+        DLIB_TEST(equal(trans(mat(stdv_c))*mat(stdv_c), trans(v)*v));
 
-        DLIB_TEST(vector_to_matrix(arr)(0) == 1);
-        DLIB_TEST(vector_to_matrix(arr)(1) == 2);
-        DLIB_TEST(vector_to_matrix(arr)(2) == 3);
-        DLIB_TEST(vector_to_matrix(arr)(3) == 4);
-        DLIB_TEST(vector_to_matrix(arr).nr() == 4);
-        DLIB_TEST(vector_to_matrix(arr).nc() == 1);
-        DLIB_TEST(vector_to_matrix(arr).size() == 4);
-        DLIB_TEST(equal(trans(vector_to_matrix(arr))*vector_to_matrix(arr), trans(v)*v));
+        DLIB_TEST(mat(arr)(0) == 1);
+        DLIB_TEST(mat(arr)(1) == 2);
+        DLIB_TEST(mat(arr)(2) == 3);
+        DLIB_TEST(mat(arr)(3) == 4);
+        DLIB_TEST(mat(arr).nr() == 4);
+        DLIB_TEST(mat(arr).nc() == 1);
+        DLIB_TEST(mat(arr).size() == 4);
+        DLIB_TEST(equal(trans(mat(arr))*mat(arr), trans(v)*v));
 
         DLIB_TEST(v(0) == 1);
         DLIB_TEST(v(1) == 2);

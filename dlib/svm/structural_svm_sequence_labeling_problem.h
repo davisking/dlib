@@ -181,7 +181,7 @@ namespace dlib
             matrix<unsigned long,0,1> candidate_labeling; 
             for (unsigned long i = 0; i < sample.size(); ++i)
             {
-                candidate_labeling = rowm(vector_to_matrix(label), range(i, std::max((int)i-order,0)));
+                candidate_labeling = rowm(mat(label), range(i, std::max((int)i-order,0)));
 
                 fe_helpers::get_feature_vector(psi,fe,sample,candidate_labeling, i);
             }

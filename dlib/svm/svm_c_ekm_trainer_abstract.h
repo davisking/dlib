@@ -169,7 +169,7 @@ namespace dlib
         );
         /*!
             requires
-                - T must be a dlib::matrix type or something convertible to a matrix via vector_to_matrix()
+                - T must be a dlib::matrix type or something convertible to a matrix via mat()
                   (e.g. a std::vector)
                 - is_vector(basis_samples) == true
                 - basis_samples.size() > 0
@@ -324,9 +324,9 @@ namespace dlib
         /*!
             requires
                 - is_binary_classification_problem(x,y) == true
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via mat().
                   Also, x should contain sample_type objects.
-                - y == a matrix or something convertible to a matrix via vector_to_matrix().
+                - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
                 - trains a C support vector classifier given the training samples in x and 
@@ -355,9 +355,9 @@ namespace dlib
         /*!
             requires
                 - is_binary_classification_problem(x,y) == true
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via mat().
                   Also, x should contain sample_type objects.
-                - y == a matrix or something convertible to a matrix via vector_to_matrix().
+                - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
                 - trains a C support vector classifier given the training samples in x and 

@@ -123,7 +123,7 @@ namespace dlib
             - stop_strategy == an object that defines a stop strategy such as one of 
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
             - requirements on starting_basis
-                - T must be a dlib::matrix type or something convertible to a matrix via vector_to_matrix()
+                - T must be a dlib::matrix type or something convertible to a matrix via mat()
                   (e.g. a std::vector).  Additionally, starting_basis must contain K::sample_type
                   objects which can be supplied to the kernel function used by target.
                 - is_vector(starting_basis) == true

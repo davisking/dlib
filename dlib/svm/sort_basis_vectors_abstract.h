@@ -33,9 +33,9 @@ namespace dlib
             - basis.size() > 0
             - kernel_type is a kernel function object as defined in dlib/svm/kernel_abstract.h 
               It must be capable of operating on the elements of samples and basis.
-            - vect1_type == a matrix or something convertible to a matrix via vector_to_matrix()
-            - vect2_type == a matrix or something convertible to a matrix via vector_to_matrix()
-            - vect3_type == a matrix or something convertible to a matrix via vector_to_matrix()
+            - vect1_type == a matrix or something convertible to a matrix via mat()
+            - vect2_type == a matrix or something convertible to a matrix via mat()
+            - vect3_type == a matrix or something convertible to a matrix via mat()
         ensures
             - A kernel based learning method ultimately needs to select a set of basis functions
               represented by a particular choice of kernel and a set of basis vectors.  

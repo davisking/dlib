@@ -21,7 +21,7 @@ namespace dlib
     /*!
         requires
             - src_image_type == is an implementation of array2d/array2d_kernel_abstract.h or
-              a dlib::matrix or something convertible to a matrix via array_to_matrix()
+              a dlib::matrix or something convertible to a matrix via mat()
             - dest_image_type == is an implementation of array2d/array2d_kernel_abstract.h or
               is a dlib::matrix.
             - pixel_traits<typename src_image_type::type> is defined  
@@ -48,7 +48,7 @@ namespace dlib
     /*!
         requires
             - src_image_type == is an implementation of array2d/array2d_kernel_abstract.h or
-              a dlib::matrix or something convertible to a matrix via array_to_matrix()
+              a dlib::matrix or something convertible to a matrix via mat()
             - dest_image_type == is an implementation of array2d/array2d_kernel_abstract.h or
               is a dlib::matrix.
             - pixel_traits<typename src_image_type::type> is defined  
@@ -75,8 +75,8 @@ namespace dlib
                       deviation of src_img. Call the mean M and the standard deviation
                       D.  Then the scaling from src_img to dest_img is performed using
                       the following mapping:
-                        let SRC_UPPER  = min(M + thresh*D, max(array_to_matrix(src_img)))
-                        let SRC_LOWER  = max(M - thresh*D, min(array_to_matrix(src_img)))
+                        let SRC_UPPER  = min(M + thresh*D, max(mat(src_img)))
+                        let SRC_LOWER  = max(M - thresh*D, min(mat(src_img)))
                         let DEST_UPPER = pixel_traits<dest_image_type::type>::max()
                         let DEST_LOWER = pixel_traits<dest_image_type::type>::min()
 

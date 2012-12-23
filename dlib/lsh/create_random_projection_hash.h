@@ -87,7 +87,7 @@ namespace dlib
                 counts[h[i]] += 1;
             }
 
-            const unsigned long max_h = index_of_max(vector_to_matrix(counts));
+            const unsigned long max_h = index_of_max(mat(counts));
 
             temp.clear();
             for (unsigned long i = 0; i < v.size(); ++i)

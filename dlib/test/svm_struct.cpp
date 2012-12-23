@@ -69,7 +69,7 @@ namespace
             psi.push_back(std::make_pair(dims-1,static_cast<scalar_type>(-1)));
 
             // Find which distinct label goes with this psi.
-            const long label_idx = index_of_max(vector_to_matrix(distinct_labels) == labels[idx]);
+            const long label_idx = index_of_max(mat(distinct_labels) == labels[idx]);
 
             offset_feature_vector(psi, dims*label_idx);
         }

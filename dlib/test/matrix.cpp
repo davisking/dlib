@@ -422,26 +422,26 @@ namespace
 
 
 
-            DLIB_TEST(rowm(array_to_matrix(a),1).nr() == 1);
-            DLIB_TEST(rowm(array_to_matrix(a),1).nc() == a.nc());
-            DLIB_TEST(colm(array_to_matrix(a),1).nr() == a.nr());
-            DLIB_TEST(colm(array_to_matrix(a),1).nc() == 1);
+            DLIB_TEST(rowm(mat(a),1).nr() == 1);
+            DLIB_TEST(rowm(mat(a),1).nc() == a.nc());
+            DLIB_TEST(colm(mat(a),1).nr() == a.nr());
+            DLIB_TEST(colm(mat(a),1).nc() == 1);
 
             for (long c = 0; c < a.nc(); ++c)
             {
-                DLIB_TEST( rowm(array_to_matrix(a),1)(c) == 1*a.nc() + c);
+                DLIB_TEST( rowm(mat(a),1)(c) == 1*a.nc() + c);
             }
 
             for (long r = 0; r < a.nr(); ++r)
             {
-                DLIB_TEST( colm(array_to_matrix(a),1)(r) == r*a.nc() + 1);
+                DLIB_TEST( colm(mat(a),1)(r) == r*a.nc() + 1);
             }
 
             for (long r = 0; r < 2; ++r)
             {
                 for (long c = 0; c < 3; ++c)
                 {
-                    DLIB_TEST(subm(array_to_matrix(a),1,2,2,3)(r,c) == (r+1)*a.nc() + c+2);
+                    DLIB_TEST(subm(mat(a),1,2,2,3)(r,c) == (r+1)*a.nc() + c+2);
                 }
             }
 
@@ -461,11 +461,11 @@ namespace
             }
 
 
-            matrix<double> mi = pinv(cos(exp(array_to_matrix(m))) ); 
+            matrix<double> mi = pinv(cos(exp(mat(m))) ); 
             DLIB_TEST(mi.nr() == m.nc());
             DLIB_TEST(mi.nc() == m.nr());
-            DLIB_TEST((equal(round_zeros(mi*cos(exp(array_to_matrix(m))),0.000001) , identity_matrix<double,5>())));
-            DLIB_TEST((equal(round_zeros(cos(exp(array_to_matrix(m)))*mi,0.000001) , identity_matrix<double,5>())));
+            DLIB_TEST((equal(round_zeros(mi*cos(exp(mat(m))),0.000001) , identity_matrix<double,5>())));
+            DLIB_TEST((equal(round_zeros(cos(exp(mat(m)))*mi,0.000001) , identity_matrix<double,5>())));
         }
 
         {

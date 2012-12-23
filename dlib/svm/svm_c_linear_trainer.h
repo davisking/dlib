@@ -511,7 +511,7 @@ namespace dlib
         ) const
         {
             scalar_type obj;
-            return do_train(vector_to_matrix(x),vector_to_matrix(y),obj);
+            return do_train(mat(x),mat(y),obj);
         }
 
 
@@ -525,7 +525,7 @@ namespace dlib
             scalar_type& svm_objective
         ) const
         {
-            return do_train(vector_to_matrix(x),vector_to_matrix(y),svm_objective);
+            return do_train(mat(x),mat(y),svm_objective);
         }
 
     private:

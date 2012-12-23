@@ -9,6 +9,7 @@
 #include "../algs.h"
 #include "../string.h"
 #include "../serialize.h"
+#include "../matrix/matrix_mat.h"
 #include <iostream>
 
 namespace dlib
@@ -344,6 +345,19 @@ namespace dlib
         for (unsigned long i = 0; i < samples.size(); ++i)
             subset.add(samples[i]);
         return subset;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const matrix_op<op_array_to_mat<random_subset_selector<T> > > mat (
+        const random_subset_selector<T>& m 
+    )
+    {
+        typedef op_array_to_mat<random_subset_selector<T> > op;
+        return matrix_op<op>(op(m));
     }
 
 // ----------------------------------------------------------------------------------------

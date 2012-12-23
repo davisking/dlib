@@ -30,7 +30,7 @@ namespace dlib
         requires
             - stop_strategy == an object that defines a stop strategy such as one of 
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
-            - list == a matrix or something convertible to a matrix via vector_to_matrix()
+            - list == a matrix or something convertible to a matrix via mat()
               such as a std::vector.
             - is_vector(list) == true
             - list.size() > 0
@@ -78,7 +78,7 @@ namespace dlib
         requires
             - stop_strategy == an object that defines a stop strategy such as one of 
               the objects from dlib/optimization/optimization_stop_strategies_abstract.h
-            - list == a matrix or something convertible to a matrix via vector_to_matrix()
+            - list == a matrix or something convertible to a matrix via mat()
               such as a std::vector.
             - is_vector(list) == true
             - list.size() > 0

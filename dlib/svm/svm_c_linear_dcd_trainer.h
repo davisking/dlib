@@ -441,7 +441,7 @@ namespace dlib
         ) const
         {
             optimizer_state state;
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), state);
+            return do_train(mat(x), mat(y), state);
         }
 
         template <
@@ -454,7 +454,7 @@ namespace dlib
             optimizer_state& state 
         ) const
         {
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), state);
+            return do_train(mat(x), mat(y), state);
         }
 
     private:

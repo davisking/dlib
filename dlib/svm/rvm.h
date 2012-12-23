@@ -192,7 +192,7 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const
         {
-            return do_train(vector_to_matrix(x), vector_to_matrix(y));
+            return do_train(mat(x), mat(y));
         }
 
         void swap (
@@ -502,10 +502,10 @@ namespace dlib
                 }
             }
 
-            return decision_function<kernel_type> ( vector_to_matrix(final_weights),
-                                                    -sum(vector_to_matrix(final_weights))*tau, 
+            return decision_function<kernel_type> ( mat(final_weights),
+                                                    -sum(mat(final_weights))*tau, 
                                                     kernel,
-                                                    vector_to_matrix(dictionary));
+                                                    mat(dictionary));
 
         }
 
@@ -664,7 +664,7 @@ namespace dlib
             const in_scalar_vector_type& t
         ) const
         {
-            return do_train(vector_to_matrix(x), vector_to_matrix(t));
+            return do_train(mat(x), mat(t));
         }
 
         void swap (
@@ -906,10 +906,10 @@ namespace dlib
                 }
             }
 
-            return decision_function<kernel_type> ( vector_to_matrix(final_weights),
-                                                    -sum(vector_to_matrix(final_weights))*tau, 
+            return decision_function<kernel_type> ( mat(final_weights),
+                                                    -sum(mat(final_weights))*tau, 
                                                     kernel,
-                                                    vector_to_matrix(dictionary));
+                                                    mat(dictionary));
 
         }
 

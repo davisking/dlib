@@ -255,6 +255,22 @@ namespace dlib
         provides serialization support for linearly_independent_subset_finder objects
     !*/
 
+    template <
+        typename T
+        >
+    const matrix_exp mat (
+        const linearly_independent_subset_finder<T>& m 
+    );
+    /*!
+        ensures
+            - converts m into a matrix
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == m.size()
+                - for all valid r:
+                  R(r) == m[r]
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -271,8 +287,8 @@ namespace dlib
     /*!
         requires
             - vector_type == a dlib::matrix or something convertible to one via 
-              vector_to_matrix()
-            - is_vector(vector_to_matrix(samples)) == true
+              mat()
+            - is_vector(mat(samples)) == true
             - rand_type == an implementation of rand/rand_kernel_abstract.h or a type
               convertible to a string via cast_to_string()
             - sampling_size > 0
@@ -297,8 +313,8 @@ namespace dlib
     /*!
         requires
             - vector_type == a dlib::matrix or something convertible to one via 
-              vector_to_matrix()
-            - is_vector(vector_to_matrix(samples)) == true
+              mat()
+            - is_vector(mat(samples)) == true
         ensures
             - performs fill_lisf(lisf, samples, default_rand_generator, 2000)
     !*/

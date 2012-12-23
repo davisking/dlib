@@ -48,7 +48,7 @@ namespace dlib
         const U& x_labels
     )
     {
-        return is_learning_problem_impl(vector_to_matrix(x), vector_to_matrix(x_labels));
+        return is_learning_problem_impl(mat(x), mat(x_labels));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ namespace dlib
         const U& x_labels
     )
     {
-        return is_binary_classification_problem_impl(vector_to_matrix(x), vector_to_matrix(x_labels));
+        return is_binary_classification_problem_impl(mat(x), mat(x_labels));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -171,8 +171,8 @@ namespace dlib
     )
     {
         return test_binary_decision_function_impl(dec_funct,
-                                 vector_to_matrix(x_test),
-                                 vector_to_matrix(y_test));
+                                 mat(x_test),
+                                 mat(y_test));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -256,7 +256,7 @@ namespace dlib
         {
             for (unsigned long i = 0; i < samples.size(); ++i)
             {
-                const unsigned long N = sum(vector_to_matrix(labels[i]) != -1);
+                const unsigned long N = sum(mat(labels[i]) != -1);
                 if (std::min(samples[i].first.size(), samples[i].second.size()) != N)
                     return false;
             }
@@ -418,8 +418,8 @@ namespace dlib
     )
     {
         return cross_validate_trainer_impl(trainer,
-                                           vector_to_matrix(x),
-                                           vector_to_matrix(y),
+                                           mat(x),
+                                           mat(y),
                                            folds);
     }
 
@@ -600,8 +600,8 @@ namespace dlib
             );
 
         // count the number of positive and negative examples
-        const long num_pos = (long)sum(vector_to_matrix(y) > 0);
-        const long num_neg = (long)sum(vector_to_matrix(y) < 0);
+        const long num_pos = (long)sum(mat(y) > 0);
+        const long num_neg = (long)sum(mat(y) < 0);
 
         // figure out how many positive and negative examples we will have in each fold
         const long num_pos_test_samples = num_pos/folds; 

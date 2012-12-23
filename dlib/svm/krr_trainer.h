@@ -88,15 +88,15 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(basis_samples.size() > 0 && is_vector(vector_to_matrix(basis_samples)),
+            DLIB_ASSERT(basis_samples.size() > 0 && is_vector(mat(basis_samples)),
                 "\tvoid krr_trainer::set_basis(basis_samples)"
                 << "\n\t You have to give a non-empty set of basis_samples and it must be a vector"
                 << "\n\t basis_samples.size():                       " << basis_samples.size() 
-                << "\n\t is_vector(vector_to_matrix(basis_samples)): " << is_vector(vector_to_matrix(basis_samples)) 
+                << "\n\t is_vector(mat(basis_samples)): " << is_vector(mat(basis_samples)) 
                 << "\n\t this: " << this
                 );
 
-            basis = vector_to_matrix(basis_samples);
+            basis = mat(basis_samples);
             ekm_stale = true;
         }
 
@@ -191,7 +191,7 @@ namespace dlib
         {
             std::vector<scalar_type> temp;
             scalar_type temp2;
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), false, temp, temp2);
+            return do_train(mat(x), mat(y), false, temp, temp2);
         }
 
         template <
@@ -205,7 +205,7 @@ namespace dlib
         ) const
         {
             scalar_type temp;
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, loo_values, temp);
+            return do_train(mat(x), mat(y), true, loo_values, temp);
         }
 
         template <
@@ -219,7 +219,7 @@ namespace dlib
             scalar_type& lambda_used 
         ) const
         {
-            return do_train(vector_to_matrix(x), vector_to_matrix(y), true, loo_values, lambda_used);
+            return do_train(mat(x), mat(y), true, loo_values, lambda_used);
         }
 
 

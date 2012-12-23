@@ -139,7 +139,7 @@ namespace
                 strip = strip.intersect(get_rect(img));
                 if (!strip.is_empty())
                 {
-                    column_sums[i][j] = sum(matrix_cast<ptype>(subm(array_to_matrix(img),strip)));
+                    column_sums[i][j] = sum(matrix_cast<ptype>(subm(mat(img),strip)));
                 }
 
                 ++left;
@@ -434,8 +434,8 @@ namespace
                 sum_filter(img, test1_i, rect);
                 sum_filter(img, test2_i, rect);
 
-                DLIB_TEST(array_to_matrix(test1) == array_to_matrix(test1_i));
-                DLIB_TEST(array_to_matrix(test2) == array_to_matrix(test2_i));
+                DLIB_TEST(mat(test1) == mat(test1_i));
+                DLIB_TEST(mat(test2) == mat(test2_i));
             }
         }
     }
@@ -462,7 +462,7 @@ namespace
             for (long c = 0; c < img.nc(); ++c)
             {
                 const rectangle win = centered_rect(point(c,r),width,height).intersect(area);
-                out[r][c] += std::max(dlib::max(subm(array_to_matrix(img),win)), thresh);
+                out[r][c] += std::max(dlib::max(subm(mat(img),win)), thresh);
             }
         }
     }
@@ -492,7 +492,7 @@ namespace
         naive_max_filter(img, out2, rect.width(), rect.height(), thresh);
         max_filter(img, out, rect.width(), rect.height(), thresh);
 
-        DLIB_TEST_MSG(array_to_matrix(out) == array_to_matrix(out2),
+        DLIB_TEST_MSG(mat(out) == mat(out2),
                                 "rows: "<< rows 
                                 << "\ncols: "<< rows 
                                 << "\nwidth: "<< width 

@@ -75,7 +75,7 @@ namespace dlib
             psi.push_back(std::make_pair(dims-1,static_cast<scalar_type>(-1)));
 
             // Find which distinct label goes with this psi.
-            const long label_idx = index_of_max(vector_to_matrix(distinct_labels) == labels[idx]);
+            const long label_idx = index_of_max(mat(distinct_labels) == labels[idx]);
 
             offset_feature_vector(psi, dims*label_idx);
         }
@@ -96,7 +96,7 @@ namespace dlib
             {
                 // Compute the F(x,y) part:
                 // perform: temp == dot(relevant part of current solution, samples[idx]) - current_bias
-                scalar_type temp = dot(pointer_to_column_vector(&current_solution(i*dims),dims-1), samples[idx]) - current_solution((i+1)*dims-1);
+                scalar_type temp = dot(mat(&current_solution(i*dims),dims-1), samples[idx]) - current_solution((i+1)*dims-1);
 
                 // Add the LOSS(idx,y) part:
                 if (labels[idx] != distinct_labels[i])

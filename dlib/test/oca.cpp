@@ -66,7 +66,7 @@ namespace
             oca solver;
 
             // test the version without a non-negativity constraint on w.
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 0);
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, mat(x), mat(y), false, 1e-12, 40), w, 0);
             dlog << LINFO << trans(w);
             true_w = -0.5, 0.5, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
@@ -75,7 +75,7 @@ namespace
             print_spinner();
 
             // test the version with a non-negativity constraint on w.
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 9999);
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, mat(x), mat(y), false, 1e-12, 40), w, 9999);
             dlog << LINFO << trans(w);
             true_w = 0, 1, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
@@ -91,7 +91,7 @@ namespace
             print_spinner();
 
             // test the version with a non-negativity constraint on w.
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 2);
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, mat(x), mat(y), false, 1e-12, 40), w, 2);
             dlog << LINFO << trans(w);
             true_w = 0, 1, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
@@ -101,7 +101,7 @@ namespace
 
 
             // test the version with a non-negativity constraint on w.
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 1);
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, mat(x), mat(y), false, 1e-12, 40), w, 1);
             dlog << LINFO << trans(w);
             true_w = 0, 1, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
@@ -116,7 +116,7 @@ namespace
             y.push_back(+1);
 
 
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 0);
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, mat(x), mat(y), false, 1e-12, 40), w, 0);
             dlog << LINFO << trans(w);
             true_w = 0.5, -0.5, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
@@ -124,7 +124,7 @@ namespace
 
             print_spinner();
 
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 1);
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, mat(x), mat(y), false, 1e-12, 40), w, 1);
             dlog << LINFO << trans(w);
             true_w = 0.5, -0.5, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
@@ -132,7 +132,7 @@ namespace
 
             print_spinner();
 
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 2);
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, mat(x), mat(y), false, 1e-12, 40), w, 2);
             dlog << LINFO << trans(w);
             true_w = 1, 0, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
@@ -140,7 +140,7 @@ namespace
 
             print_spinner();
 
-            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, vector_to_matrix(x), vector_to_matrix(y), false, 1e-12, 40), w, 5);
+            solver(make_oca_problem_c_svm<w_type>(2.0, 3.0, mat(x), mat(y), false, 1e-12, 40), w, 5);
             dlog << LINFO << trans(w);
             true_w = 1, 0, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));

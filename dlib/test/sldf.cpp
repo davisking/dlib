@@ -114,7 +114,7 @@ namespace
                 for (unsigned long i = 0; i < samples.size(); ++i)
                     cur_vals.push_back(df(samples[i]));
 
-                const double err = max(abs(vector_to_matrix(cur_vals) - vector_to_matrix(prev_vals)));
+                const double err = max(abs(mat(cur_vals) - mat(prev_vals)));
                 dlog << LINFO << "simplify error: "<< err;
                 DLIB_TEST(err < 1e-13);
 
@@ -150,7 +150,7 @@ namespace
                 for (unsigned long i = 0; i < samples.size(); ++i)
                     cur_vals.push_back(df(samples[i]));
 
-                const double err = max(abs(vector_to_matrix(cur_vals) - vector_to_matrix(prev_vals)));
+                const double err = max(abs(mat(cur_vals) - mat(prev_vals)));
                 dlog << LINFO << "simplify error: "<< err;
                 DLIB_TEST(err < 1e-13);
 
@@ -189,7 +189,7 @@ namespace
                 for (unsigned long i = 0; i < dense_samples.size(); ++i)
                     cur_vals.push_back(dense_df(dense_samples[i]));
 
-                const double err = max(abs(vector_to_matrix(cur_vals) - vector_to_matrix(prev_vals)));
+                const double err = max(abs(mat(cur_vals) - mat(prev_vals)));
                 dlog << LINFO << "simplify error: "<< err;
                 DLIB_TEST(err < 1e-13);
             }
@@ -228,7 +228,7 @@ namespace
                 for (unsigned long i = 0; i < dense_samples.size(); ++i)
                     cur_vals.push_back(dense_df(dense_samples[i]));
 
-                const double err = max(abs(vector_to_matrix(cur_vals) - vector_to_matrix(prev_vals)));
+                const double err = max(abs(mat(cur_vals) - mat(prev_vals)));
                 dlog << LINFO << "simplify error: "<< err;
                 DLIB_TEST(err < 1e-13);
             }
@@ -275,7 +275,7 @@ namespace
                 for (unsigned long i = 0; i < dense_samples.size(); ++i)
                     cur_vals.push_back(simple_df(dense_samples[i]));
 
-                const double err = max(abs(vector_to_matrix(cur_vals) - vector_to_matrix(prev_vals)));
+                const double err = max(abs(mat(cur_vals) - mat(prev_vals)));
                 dlog << LINFO << "simplify error: "<< err;
                 DLIB_TEST(err < 1e-13);
 

@@ -102,7 +102,7 @@ namespace dlib
         {
             const typename image_array_type::type& img = images[rects[i].first];
             const rectangle rect = get_rect(img).intersect(translate_rect(rects[i].second,position));
-            temp += sum(matrix_cast<ptype>(subm(array_to_matrix(img), rect)));
+            temp += sum(matrix_cast<ptype>(subm(mat(img), rect)));
         }
 
         return static_cast<double>(temp);
@@ -161,7 +161,7 @@ namespace dlib
         {
             const typename image_array_type::type& img = images[fixed_rects[i].first];
             const rectangle rect = get_rect(img).intersect(translate_rect(fixed_rects[i].second,position));
-            temp += sum(matrix_cast<ptype>(subm(array_to_matrix(img), rect)));
+            temp += sum(matrix_cast<ptype>(subm(mat(img), rect)));
         }
 
         if (images.size() > 0)
@@ -176,7 +176,7 @@ namespace dlib
 
                 const rectangle rect = get_rect(tempimg).intersect(translate_rect(window,position));
                 if (rect.is_empty() == false)
-                    temp += std::max(0,max(matrix_cast<ptype>(subm(array_to_matrix(tempimg), rect))));
+                    temp += std::max(0,max(matrix_cast<ptype>(subm(mat(tempimg), rect))));
             }
         }
 

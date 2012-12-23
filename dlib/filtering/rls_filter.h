@@ -92,7 +92,7 @@ namespace dlib
 
             // predict next state
             for (long i = 0; i < next.size(); ++i)
-                next(i) = filter(vector_to_matrix(data[i]));
+                next(i) = filter(mat(data[i]));
         }
 
         template <typename EXP>
@@ -127,7 +127,7 @@ namespace dlib
                 // showing it to the rls filter so it can do its thing.
                 if (count >= 2)
                 {
-                    filter.train(vector_to_matrix(data[i]), z(i));
+                    filter.train(mat(data[i]), z(i));
                 }
 
                 // keep track of the measurements in our circular buffer
@@ -139,7 +139,7 @@ namespace dlib
             {
                 // predict next state
                 for (long i = 0; i < z.size(); ++i)
-                    next(i) = filter(vector_to_matrix(data[i]));
+                    next(i) = filter(mat(data[i]));
             }
             else
             {

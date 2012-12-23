@@ -554,7 +554,7 @@ namespace dlib
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
 
-        assign_image(out_img, fliplr(array_to_matrix(in_img)));
+        assign_image(out_img, fliplr(mat(in_img)));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -575,7 +575,7 @@ namespace dlib
             << "\n\t is_same_object(in_img, out_img):  " << is_same_object(in_img, out_img)
             );
 
-        assign_image(out_img, flipud(array_to_matrix(in_img)));
+        assign_image(out_img, flipud(mat(in_img)));
     }
 
 // ----------------------------------------------------------------------------------------

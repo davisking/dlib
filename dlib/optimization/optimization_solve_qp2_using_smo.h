@@ -74,7 +74,7 @@ namespace dlib
         const T& y
     )
     {
-        return maximum_nu_impl(vector_to_matrix(y));
+        return maximum_nu_impl(mat(y));
     }
 
     template <
@@ -84,7 +84,7 @@ namespace dlib
         const T& y
     )
     {
-        return maximum_nu_impl(vector_to_matrix(y));
+        return maximum_nu_impl(mat(y));
     }
 
 // ----------------------------------------------------------------------------------------

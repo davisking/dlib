@@ -541,7 +541,7 @@ namespace
         dlog << LINFO << "score MAP:   " << score2;
 
         DLIB_TEST(std::abs(score1 - score2) < 1e-10);
-        DLIB_TEST(vector_to_matrix(map_assignment1) == vector_to_matrix(map_assignment2));
+        DLIB_TEST(mat(map_assignment1) == mat(map_assignment2));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -568,10 +568,10 @@ namespace
 
         dlog << LINFO << "score NMPLP: " << score1;
         dlog << LINFO << "score MAP:   " << score2;
-        dlog << LINFO << "MAP assignment: "<< trans(vector_to_matrix(map_assignment1));
+        dlog << LINFO << "MAP assignment: "<< trans(mat(map_assignment1));
 
         DLIB_TEST(std::abs(score1 - score2) < 1e-10);
-        DLIB_TEST(vector_to_matrix(map_assignment1) == vector_to_matrix(map_assignment2));
+        DLIB_TEST(mat(map_assignment1) == mat(map_assignment2));
     }
 
 // ----------------------------------------------------------------------------------------

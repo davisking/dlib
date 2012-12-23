@@ -37,7 +37,7 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix object or an object convertible to a matrix via vector_to_matrix()
+            - T == a matrix object or an object convertible to a matrix via mat()
             - is_col_vector(y) == true
             - y.size() > 1
             - sum((y == +1) + (y == -1)) == y.size()

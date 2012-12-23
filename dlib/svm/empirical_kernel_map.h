@@ -69,7 +69,7 @@ namespace dlib
             const T& basis_samples
         )
         {
-            load_impl(kernel_, vector_to_matrix(basis_samples));
+            load_impl(kernel_, mat(basis_samples));
         }
 
         void load(
@@ -150,7 +150,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            return decision_function<kernel_type>(trans(weights)*vect, 0, kernel, vector_to_matrix(basis));
+            return decision_function<kernel_type>(trans(weights)*vect, 0, kernel, mat(basis));
         }
 
         template <typename EXP>
@@ -168,7 +168,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            return distance_function<kernel_type>(trans(weights)*vect, dot(vect,vect), kernel, vector_to_matrix(basis));
+            return distance_function<kernel_type>(trans(weights)*vect, dot(vect,vect), kernel, mat(basis));
         }
 
         const projection_function<kernel_type> get_projection_function (
@@ -181,7 +181,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            return projection_function<kernel_type>(weights, kernel, vector_to_matrix(basis));
+            return projection_function<kernel_type>(weights, kernel, mat(basis));
         }
 
         const matrix<scalar_type,0,0,mem_manager_type> get_transformation_to (
@@ -242,7 +242,7 @@ namespace dlib
             tmat = colm(target.weights, range(0,num1-1))*kernel_matrix(kernel, basis)*trans(weights);
 
             empirical_kernel_map temp_ekm;
-            temp_ekm.load(kernel, rowm(vector_to_matrix(target.basis), range(num1,num2-1)));
+            temp_ekm.load(kernel, rowm(mat(target.basis), range(num1,num2-1)));
 
             partial_projection = temp_ekm.get_projection_function();
 

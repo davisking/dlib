@@ -44,8 +44,8 @@ void test_pyramid_down_grayscale()
     overlap = rect1.intersect(rect2).area() / (double)(rect1 + rect2).area();
     DLIB_TEST(overlap > 0.95);
 
-    DLIB_TEST(min(array_to_matrix(down)) == 10);
-    DLIB_TEST(max(array_to_matrix(down)) == 10);
+    DLIB_TEST(min(mat(down)) == 10);
+    DLIB_TEST(max(mat(down)) == 10);
 }
 
 void test_pyramid_down_rgb()
@@ -169,11 +169,11 @@ void test_pyramid_down_rgb2()
     */
 
 
-    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect1)) - 255/3) < 3);
-    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect2)) - 255/3) < 3);
-    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect3)) - 255/3) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(mat(img2)),rect1)) - 255/3) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(mat(img2)),rect2)) - 255/3) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(mat(img2)),rect3)) - 255/3) < 3);
     assign_image(img4, img);
-    DLIB_TEST(std::abs((int)mean(array_to_matrix(img4)) - mean(array_to_matrix(img2))) < 2);
+    DLIB_TEST(std::abs((int)mean(mat(img4)) - mean(mat(img2))) < 2);
 
 
     rgb_pixel mean1 = mean_pixel(img3, rect1);
@@ -256,11 +256,11 @@ void test_pyramid_down_grayscale2()
     */
 
 
-    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect1)) - 255) < 3);
-    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect2)) - 170) < 3);
-    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(array_to_matrix(img2)),rect3)) - 100) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(mat(img2)),rect1)) - 255) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(mat(img2)),rect2)) - 170) < 3);
+    DLIB_TEST(std::abs((int)mean(subm(matrix_cast<long>(mat(img2)),rect3)) - 100) < 3);
     assign_image(img4, img);
-    DLIB_TEST(std::abs((int)mean(array_to_matrix(img4)) - mean(array_to_matrix(img2))) < 2);
+    DLIB_TEST(std::abs((int)mean(mat(img4)) - mean(mat(img2))) < 2);
 
 
     //my_window.wait_until_closed();

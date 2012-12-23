@@ -178,7 +178,7 @@ namespace dlib
             const in_scalar_vector_type& y
         ) const
         {
-            return do_train(vector_to_matrix(x), vector_to_matrix(y));
+            return do_train(mat(x), mat(y));
         }
 
         void swap (

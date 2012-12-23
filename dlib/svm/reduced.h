@@ -63,7 +63,7 @@ namespace dlib
                         "\t reduced_decision_function_trainer::train(x,y)"
                         << "\n\t You have tried to use an uninitialized version of this object"
                         << "\n\t num_bv: " << num_bv );
-            return do_train(vector_to_matrix(x), vector_to_matrix(y));
+            return do_train(mat(x), mat(y));
         }
 
     private:
@@ -438,7 +438,7 @@ namespace dlib
         // Now we compute the fist approximate distance function.  
         beta = pinv(kernel_matrix(kern,starting_basis)) *
             (kernel_matrix(kern,starting_basis,target.get_basis_vectors())*target.get_alpha());
-        matrix<sample_type,0,1,mem_manager_type> out_vectors(vector_to_matrix(starting_basis));
+        matrix<sample_type,0,1,mem_manager_type> out_vectors(mat(starting_basis));
 
 
         // Now setup to do a global optimization of all the parameters in the approximate 
@@ -529,7 +529,7 @@ namespace dlib
                         "\t reduced_decision_function_trainer2::train(x,y)"
                         << "\n\t You have tried to use an uninitialized version of this object"
                         << "\n\t num_bv: " << num_bv );
-            return do_train(vector_to_matrix(x), vector_to_matrix(y));
+            return do_train(mat(x), mat(y));
         }
 
     private:

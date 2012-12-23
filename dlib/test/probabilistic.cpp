@@ -58,8 +58,8 @@ namespace
             rx.set_max_size(x.size());
             ry.set_max_size(x.size());
 
-            dlog << LINFO << "pos labels: "<< sum(vector_to_matrix(y) == +1);
-            dlog << LINFO << "neg labels: "<< sum(vector_to_matrix(y) == -1);
+            dlog << LINFO << "pos labels: "<< sum(mat(y) == +1);
+            dlog << LINFO << "neg labels: "<< sum(mat(y) == -1);
 
             for (unsigned long i = 0; i < x.size(); ++i)
             {

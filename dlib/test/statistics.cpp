@@ -155,9 +155,9 @@ namespace
                     }
                     DLIB_TEST(cov.in_vector_size() == (long)dims);
 
-                    DLIB_TEST(equal(mean(vector_to_matrix(vects)), cov.mean()));
-                    DLIB_TEST_MSG(equal(covariance(vector_to_matrix(vects)), cov.covariance()),
-                              max(abs(covariance(vector_to_matrix(vects)) - cov.covariance()))
+                    DLIB_TEST(equal(mean(mat(vects)), cov.mean()));
+                    DLIB_TEST_MSG(equal(covariance(mat(vects)), cov.covariance()),
+                              max(abs(covariance(mat(vects)) - cov.covariance()))
                               << "   dims = " << dims << "   samps = " << samps
                               );
                 }
@@ -182,9 +182,9 @@ namespace
                     }
                     DLIB_TEST((cov+cov2).in_vector_size() == (long)dims);
 
-                    DLIB_TEST(equal(mean(vector_to_matrix(vects)), (cov+cov2).mean()));
-                    DLIB_TEST_MSG(equal(covariance(vector_to_matrix(vects)), (cov+cov2).covariance()),
-                              max(abs(covariance(vector_to_matrix(vects)) - (cov+cov2).covariance()))
+                    DLIB_TEST(equal(mean(mat(vects)), (cov+cov2).mean()));
+                    DLIB_TEST_MSG(equal(covariance(mat(vects)), (cov+cov2).covariance()),
+                              max(abs(covariance(mat(vects)) - (cov+cov2).covariance()))
                               << "   dims = " << dims << "   samps = " << samps
                               );
                 }
@@ -298,9 +298,9 @@ namespace
                 a.push_back(i);
             }
 
-            DLIB_TEST(std::abs(variance(vector_to_matrix(a)) - rs1.variance()) < 1e-13);
-            DLIB_TEST(std::abs(stddev(vector_to_matrix(a)) - rs1.stddev()) < 1e-13);
-            DLIB_TEST(std::abs(mean(vector_to_matrix(a)) - rs1.mean()) < 1e-13);
+            DLIB_TEST(std::abs(variance(mat(a)) - rs1.variance()) < 1e-13);
+            DLIB_TEST(std::abs(stddev(mat(a)) - rs1.stddev()) < 1e-13);
+            DLIB_TEST(std::abs(mean(mat(a)) - rs1.mean()) < 1e-13);
 
             for (int i = 10; i < 20; ++i)
             {
@@ -308,8 +308,8 @@ namespace
                 a.push_back(i);
             }
 
-            DLIB_TEST(std::abs(variance(vector_to_matrix(a)) - (rs1+rs2).variance()) < 1e-13);
-            DLIB_TEST(std::abs(mean(vector_to_matrix(a)) - (rs1+rs2).mean()) < 1e-13);
+            DLIB_TEST(std::abs(variance(mat(a)) - (rs1+rs2).variance()) < 1e-13);
+            DLIB_TEST(std::abs(mean(mat(a)) - (rs1+rs2).mean()) < 1e-13);
             DLIB_TEST((rs1+rs2).current_n() == 20);
 
             running_scalar_covariance<double> rc1, rc2, rc3;

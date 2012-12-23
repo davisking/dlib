@@ -257,7 +257,7 @@ namespace dlib
 
             // Note that we don't need to look at nonrel_counts since it is redundant with
             // the information in rel_counts in this case.
-            total_wrong += sum(vector_to_matrix(rel_counts));
+            total_wrong += sum(mat(rel_counts));
         }
 
         return static_cast<double>(total_pairs - total_wrong) / total_pairs;
@@ -359,7 +359,7 @@ namespace dlib
 
                 // Note that we don't need to look at nonrel_counts since it is redundant with
                 // the information in rel_counts in this case.
-                total_wrong += sum(vector_to_matrix(rel_counts));
+                total_wrong += sum(mat(rel_counts));
             }
 
         } // for (long i = 0; i < folds; ++i)

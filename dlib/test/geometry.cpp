@@ -344,7 +344,7 @@ namespace
 
             // This test is just to make sure the covariance function can compile when used
             // on a dlib::vector.  The actual test doesn't matter.
-            DLIB_TEST(sum(covariance(vector_to_matrix(a))) < 10); 
+            DLIB_TEST(sum(covariance(mat(a))) < 10); 
 
         }
 
@@ -446,7 +446,7 @@ namespace
                 DLIB_TEST(be.current_element_valid() == false);
                 DLIB_TEST(be.at_start() == false);
 
-                DLIB_TEST(array_to_matrix(img) == array_to_matrix(img2));
+                DLIB_TEST(mat(img) == mat(img2));
 
             }
         }
@@ -485,7 +485,7 @@ namespace
                 DLIB_TEST(be.current_element_valid() == false);
                 DLIB_TEST(be.at_start() == false);
 
-                DLIB_TEST(array_to_matrix(img) == array_to_matrix(img2));
+                DLIB_TEST(mat(img) == mat(img2));
 
             }
         }
@@ -521,7 +521,7 @@ namespace
                 DLIB_TEST(be.move_next() == false);
                 DLIB_TEST(be.current_element_valid() == false);
 
-                DLIB_TEST(array_to_matrix(img) == array_to_matrix(img2));
+                DLIB_TEST(mat(img) == mat(img2));
 
             }
         }

@@ -663,7 +663,7 @@ namespace dlib
             strip = strip.intersect(get_rect(img));
             if (!strip.is_empty())
             {
-                column_sum[j] = sum(matrix_cast<ptype>(subm(array_to_matrix(img),strip)));
+                column_sum[j] = sum(matrix_cast<ptype>(subm(mat(img),strip)));
             }
 
             ++left;
@@ -679,7 +679,7 @@ namespace dlib
         // Now do the bulk of the filtering work.
         for (long r = 0; r < img.nr(); ++r)
         {
-            // set to sum at point(-1,r). i.e. should be equal to sum(array_to_matrix(img), translate_rect(rect, point(-1,r)))
+            // set to sum at point(-1,r). i.e. should be equal to sum(mat(img), translate_rect(rect, point(-1,r)))
             // We compute it's value in the next loop.
             ptype cur_sum = 0; 
 

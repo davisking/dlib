@@ -110,13 +110,13 @@ namespace dlib
             if (loss.size() >= prob->get_max_cache_size())
             {
                 // find least recently used cache entry for idx-th sample
-                const long i       = index_of_min(vector_to_matrix(lru_count));
+                const long i       = index_of_min(mat(lru_count));
 
                 // save our new data in the cache
                 loss[i] = out_loss;
                 psi[i]  = out_psi;
 
-                const long max_use = max(vector_to_matrix(lru_count));
+                const long max_use = max(mat(lru_count));
                 // Make sure this new cache entry has the best lru count since we have used
                 // it most recently.
                 lru_count[i] = max_use + 1;
@@ -127,7 +127,7 @@ namespace dlib
                 psi.push_back(out_psi);
                 long max_use = 1;
                 if (lru_count.size() != 0)
-                    max_use = max(vector_to_matrix(lru_count)) + 1;
+                    max_use = max(mat(lru_count)) + 1;
                 lru_count.push_back(max_use);
             }
         }

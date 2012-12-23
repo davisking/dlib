@@ -101,7 +101,7 @@ namespace dlib
             - a.size() == b.size()
         ensures
             - returns the mean squared error between all the elements of a and b.
-              (i.e. mean(squared(vector_to_matrix(a)-vector_to_matrix(b))))
+              (i.e. mean(squared(mat(a)-mat(b))))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -584,7 +584,7 @@ namespace dlib
             requires
                 - samples.size() > 0
                 - samples == a column matrix or something convertible to a column 
-                  matrix via vector_to_matrix().  Also, x should contain 
+                  matrix via mat().  Also, x should contain 
                   matrix_type objects that represent nonempty column vectors.
             ensures
                 - #in_vector_size() == samples(0).nr()
@@ -742,7 +742,7 @@ namespace dlib
                 - 0 < eps <= 1
                 - samples.size() > 0
                 - samples == a column matrix or something convertible to a column 
-                  matrix via vector_to_matrix().  Also, x should contain 
+                  matrix via mat().  Also, x should contain 
                   matrix_type objects that represent nonempty column vectors.
             ensures
                 - This object has learned how to normalize vectors that look like

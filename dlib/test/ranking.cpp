@@ -68,8 +68,8 @@ namespace
             count_ranking_inversions(x, y, x_count, y_count);
             brute_force_count_ranking_inversions(x, y, x_count2, y_count2);
 
-            DLIB_TEST(vector_to_matrix(x_count) == vector_to_matrix(x_count2));
-            DLIB_TEST(vector_to_matrix(y_count) == vector_to_matrix(y_count2));
+            DLIB_TEST(mat(x_count) == mat(x_count2));
+            DLIB_TEST(mat(y_count) == mat(y_count2));
         }
     }
 

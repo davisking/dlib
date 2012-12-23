@@ -549,7 +549,7 @@ namespace dlib
                     << "\n\t b.size(): " << b.size()
         );
 
-        return mean(squared(matrix_cast<double>(vector_to_matrix(a))-matrix_cast<double>(vector_to_matrix(b))));
+        return mean(squared(matrix_cast<double>(mat(a))-matrix_cast<double>(mat(b))));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -737,8 +737,8 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
 
-            m = mean(vector_to_matrix(samples));
-            sd = reciprocal(sqrt(variance(vector_to_matrix(samples))));
+            m = mean(mat(samples));
+            sd = reciprocal(sqrt(variance(mat(samples))));
         }
 
         long in_vector_size (
@@ -900,7 +900,7 @@ namespace dlib
                 << "\n\tyou have to give a nonempty set of samples to this function"
                 << "\n\tthis: " << this
                 );
-            train_pca_impl(vector_to_matrix(samples),eps);
+            train_pca_impl(mat(samples),eps);
         }
 
         long in_vector_size (

@@ -160,7 +160,7 @@ namespace dlib
             requires
                 - x.size() > 0
                 - is_col_vector(x) == true
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via mat().
                   Also, x should contain sample_type objects.
             ensures
                 - trains a one-class support vector classifier given the training samples in x.

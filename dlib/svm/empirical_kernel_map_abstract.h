@@ -124,7 +124,7 @@ namespace dlib
         );
         /*!
             requires
-                - T must be a dlib::matrix type or something convertible to a matrix via vector_to_matrix()
+                - T must be a dlib::matrix type or something convertible to a matrix via mat()
                   (e.g. a std::vector)
                 - is_vector(basis_samples) == true
                 - basis_samples.size() > 0

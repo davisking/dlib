@@ -314,7 +314,7 @@ namespace dlib
         requires
             - samples == a single vector (either sparse or dense), or a container
               of vectors which is either a dlib::matrix of vectors or something 
-              convertible to a dlib::matrix via vector_to_matrix() (e.g. a std::vector)
+              convertible to a dlib::matrix via mat() (e.g. a std::vector)
               Valid types of samples include (but are not limited to):
                 - dlib::matrix<double,0,1>                      // A single dense vector 
                 - std::map<unsigned int, double>                // A single sparse vector

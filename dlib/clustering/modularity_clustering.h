@@ -367,7 +367,7 @@ namespace dlib
                 - #num_labels == the number of distinct values in labels.
                 - returns a vector V such that:
                     - V.size() == labels.size()
-                    - max(vector_to_matrix(V))+1 == num_labels.
+                    - max(mat(V))+1 == num_labels.
                     - for all valid i,j:
                         - if (labels[i] == labels[j]) then
                             - V[i] == V[j]

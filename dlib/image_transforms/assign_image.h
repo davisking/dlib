@@ -75,7 +75,7 @@ namespace dlib
         if (is_same_object(dest,src))
             return;
 
-        impl_assign_image(dest, array_to_matrix(src));
+        impl_assign_image(dest, mat(src));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ namespace dlib
         if (is_same_object(dest,src))
             return;
 
-        impl_assign_image_scaled(dest, array_to_matrix(src),thresh);
+        impl_assign_image_scaled(dest, mat(src),thresh);
     }
 
 // ----------------------------------------------------------------------------------------

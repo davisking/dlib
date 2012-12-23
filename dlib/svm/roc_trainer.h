@@ -63,7 +63,7 @@ namespace dlib
                         );
 
 
-            return do_train(vector_to_matrix(samples), vector_to_matrix(labels));
+            return do_train(mat(samples), mat(labels));
         }
 
     private:

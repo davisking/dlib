@@ -133,7 +133,7 @@ namespace dlib
             const in_sample_vector_type& x
         ) const
         {
-            return do_train(vector_to_matrix(x));
+            return do_train(mat(x));
         }
 
         void swap (

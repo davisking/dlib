@@ -315,9 +315,9 @@ namespace
         for (unsigned long i = 0; i < samples.size(); ++i)
         {
             std::vector<long> out = ass(samples[i]);
-            dlog << LINFO << "true labels: " << trans(vector_to_matrix(labels[i]));
-            dlog << LINFO << "pred labels: " << trans(vector_to_matrix(out));
-            DLIB_TEST(trans(vector_to_matrix(labels[i])) == trans(vector_to_matrix(out)));
+            dlog << LINFO << "true labels: " << trans(mat(labels[i]));
+            dlog << LINFO << "pred labels: " << trans(mat(out));
+            DLIB_TEST(trans(mat(labels[i])) == trans(mat(out)));
         }
 
         double accuracy;
@@ -343,9 +343,9 @@ namespace
         for (unsigned long i = 0; i < samples.size(); ++i)
         {
             std::vector<long> out = ass2(samples[i]);
-            dlog << LINFO << "true labels: " << trans(vector_to_matrix(labels[i]));
-            dlog << LINFO << "pred labels: " << trans(vector_to_matrix(out));
-            DLIB_TEST(trans(vector_to_matrix(labels[i])) == trans(vector_to_matrix(out)));
+            dlog << LINFO << "true labels: " << trans(mat(labels[i]));
+            dlog << LINFO << "pred labels: " << trans(mat(out));
+            DLIB_TEST(trans(mat(labels[i])) == trans(mat(out)));
         }
     }
 

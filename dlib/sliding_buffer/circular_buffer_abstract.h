@@ -224,6 +224,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    const matrix_exp mat (
+        const circular_buffer<T>& m 
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - is_col_vector(R) == true 
+                - R.size() == m.size()
+                - for all valid r:
+                  R(r) == m[r]
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_CIRCULAR_BuFFER_ABSTRACT_H__

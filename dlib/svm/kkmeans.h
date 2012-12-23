@@ -104,7 +104,7 @@ namespace dlib
             long max_iter = 1000
         )
         {
-            do_train(vector_to_matrix(samples),vector_to_matrix(initial_centers),max_iter);
+            do_train(mat(samples),mat(initial_centers),max_iter);
         }
 
         unsigned long operator() (

@@ -30,8 +30,8 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix or something convertible to a matrix via vector_to_matrix()
-            - U == a matrix or something convertible to a matrix via vector_to_matrix()
+            - T == a matrix or something convertible to a matrix via mat()
+            - U == a matrix or something convertible to a matrix via mat()
         ensures
             - returns true if all of the following are true and false otherwise:
                 - is_col_vector(x) == true
@@ -50,8 +50,8 @@ namespace dlib
     );
     /*!
         requires
-            - T == a matrix or something convertible to a matrix via vector_to_matrix()
-            - U == a matrix or something convertible to a matrix via vector_to_matrix()
+            - T == a matrix or something convertible to a matrix via mat()
+            - U == a matrix or something convertible to a matrix via mat()
         ensures
             - returns true if all of the following are true and false otherwise:
                 - is_learning_problem(x, x_labels) == true

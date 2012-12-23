@@ -112,7 +112,7 @@ namespace dlib
         /*!
             requires
                 - matrix_type and matrix_type2 must either be dlib::matrix objects or convertible to dlib::matrix
-                  via vector_to_matrix()
+                  via mat()
                 - matrix_type::type == sample_type  (i.e. matrix_type should contain sample_type objects)
                 - matrix_type2::type == sample_type (i.e. matrix_type2 should contain sample_type objects)
                 - initial_centers.nc() == 1         (i.e. must be a column vector)

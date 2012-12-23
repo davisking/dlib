@@ -170,9 +170,9 @@ namespace dlib
         /*!
             requires
                 - is_learning_problem(x,y) == true
-                - x == a matrix or something convertible to a matrix via vector_to_matrix().
+                - x == a matrix or something convertible to a matrix via mat().
                   Also, x should contain sample_type objects.
-                - y == a matrix or something convertible to a matrix via vector_to_matrix().
+                - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
                 - performs support vector regression given the training samples in x and 
