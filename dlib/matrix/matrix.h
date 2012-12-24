@@ -996,6 +996,8 @@ namespace dlib
         const static long NR = matrix_traits<matrix>::NR;
         const static long NC = matrix_traits<matrix>::NC;
         const static long cost = matrix_traits<matrix>::cost;
+        typedef T*          iterator;       
+        typedef const T*    const_iterator; 
 
         matrix () 
         {
@@ -1550,6 +1552,39 @@ namespace dlib
         bool destructively_aliases (
             const matrix_exp<U>& 
         ) const { return false; }
+
+
+        iterator begin() 
+        {
+            if (size() != 0)
+                return &data(0,0);
+            else
+                return 0;
+        }
+
+        iterator end()
+        {
+            if (size() != 0)
+                return &data(0,0)+size();
+            else
+                return 0;
+        }
+
+        const_iterator begin()  const
+        {
+            if (size() != 0)
+                return &data(0,0);
+            else
+                return 0;
+        }
+
+        const_iterator end() const
+        {
+            if (size() != 0)
+                return &data(0,0)+size();
+            else
+                return 0;
+        }
 
     private:
         struct literal_assign_helper

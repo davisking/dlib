@@ -54,6 +54,62 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP> class matrix_exp;
+    template <typename EXP>
+    class matrix_exp_iterator
+    {
+        friend class matrix_exp<EXP>;
+        matrix_exp_iterator(const EXP& m_, long r_, long c_)
+        {
+            r = r_;
+            c = c_;
+            nc = m_.nc();
+            m = &m_;
+        }
+
+    public:
+
+        matrix_exp_iterator() : r(0), c(0), nc(0), m(0) {}
+
+        typedef typename matrix_traits<EXP>::type type;
+        typedef type value_type;
+        typedef typename matrix_traits<EXP>::const_ret_type const_ret_type;
+
+
+        bool operator == ( const matrix_exp_iterator& itr) const
+        { return r == itr.r && c == itr.c; }
+
+        bool operator != ( const matrix_exp_iterator& itr) const
+        { return !(*this == itr); }
+
+        matrix_exp_iterator& operator++()
+        {
+            ++c;
+            if (c==nc)
+            {
+                c = 0;
+                ++r;
+            }
+            return *this;
+        }
+
+        matrix_exp_iterator operator++(int)
+        {
+            matrix_exp_iterator temp(*this);
+            ++(*this);
+            return temp;
+        }
+
+        const_ret_type operator* () const { return (*m)(r,c); }
+
+    private:
+        long r, c;
+        long nc;
+        const EXP* m;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename EXP
         >
@@ -77,6 +133,8 @@ namespace dlib
 
         typedef matrix<type,NR,NC,mem_manager_type,layout_type> matrix_type;
         typedef EXP exp_type;
+        typedef matrix_exp_iterator<EXP> iterator;
+        typedef matrix_exp_iterator<EXP> const_iterator;
 
         inline const_ret_type operator() (
             long r,
@@ -164,6 +222,9 @@ namespace dlib
             matrix<type,1,1,mem_manager_type,layout_type> temp(ref());
             return temp(0);
         }
+
+        const_iterator begin() const { return matrix_exp_iterator<EXP>(ref(),0,0); }
+        const_iterator end()   const { return matrix_exp_iterator<EXP>(ref(),nr(),0); }
 
     protected:
         matrix_exp() {}

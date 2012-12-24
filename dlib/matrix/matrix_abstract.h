@@ -253,6 +253,8 @@ namespace dlib
         const static long NR = num_rows;
         const static long NC = num_cols;
         const static long cost = 1;
+        typedef T*          iterator;       
+        typedef const T*    const_iterator; 
 
         matrix (
         );
@@ -600,6 +602,44 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
+        !*/
+
+        iterator begin(
+        );
+        /*!
+            ensures
+                - returns a random access iterator pointing to the first element in this
+                  matrix.
+                - The iterator will iterate over the elements of the matrix in row major
+                  order if layout is row_major_layout or in column major order if layout is
+                  column_major_layout.
+        !*/
+
+        iterator end(
+        );
+        /*!
+            ensures
+                - returns a random access iterator pointing to one past the end of the last
+                  element in this matrix.
+        !*/
+
+        const_iterator begin(
+        ) const;
+        /*!
+            ensures
+                - returns a random access iterator pointing to the first element in this
+                  matrix.  
+                - The iterator will iterate over the elements of the matrix in row major
+                  order if layout is row_major_layout or in column major order if layout is
+                  column_major_layout.
+        !*/
+
+        const_iterator end(
+        ) const;
+        /*!
+            ensures
+                - returns a random access iterator pointing to one past the end of the last
+                  element in this matrix.
         !*/
     };
 

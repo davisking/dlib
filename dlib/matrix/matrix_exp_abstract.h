@@ -57,6 +57,8 @@ namespace dlib
         const static long NC = EXP::NC;
         typedef matrix<type,NR,NC, mem_manager_type,layout_type> matrix_type;
         typedef EXP exp_type;
+        typedef matrix_exp_iterator<EXP> iterator;
+        typedef matrix_exp_iterator<EXP> const_iterator;
 
         const_ret_type operator() (
             long r,
@@ -165,6 +167,27 @@ namespace dlib
             ensures
                 - returns a reference to the expression contained in *this.
                   (i.e. returns *static_cast<const exp_type*>(this) )
+        !*/
+
+        const_iterator begin(
+        ) const;
+        /*!
+            ensures
+                - returns a forward access iterator pointing to the first element in this
+                  matrix expression.
+                - Since matrix_exp objects represent immutable views of a matrix, the
+                  returned iterator does not allow the user to modify the matrix
+                  expression's elements.
+                - The iterator will iterate over the elements of the matrix in row major
+                  order.
+        !*/
+
+        const_iterator end(
+        ) const;
+        /*!
+            ensures
+                - returns a forward access iterator pointing to one past the end of the
+                  last element in this matrix expression.
         !*/
 
     protected:
