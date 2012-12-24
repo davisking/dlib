@@ -290,6 +290,49 @@ namespace dlib
         typedef op_arma_Mat_to_mat< ::arma::Mat<T> > op;
         return matrix_op<op>(op(array));
     }
+}
+
+namespace Eigen
+{
+    template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
+    class Matrix;
+}
+
+namespace dlib
+{
+    template <typename T, int _Rows, int _Cols>
+    struct op_eigen_Matrix_to_mat : does_not_alias 
+    {
+        op_eigen_Matrix_to_mat( const T& array_) : m(array_){}
+
+        const T& m;
+
+        const static long cost = 1;
+        const static long NR = (_Rows > 0) ? _Rows : 0;
+        const static long NC = (_Cols > 0) ? _Cols : 0;
+        typedef typename T::Scalar type;
+        typedef typename T::Scalar const_ret_type;
+        typedef default_memory_manager mem_manager_type;
+        typedef row_major_layout layout_type;
+
+        const_ret_type apply (long r, long c ) const { return m(r,c); }
+
+        long nr () const { return m.rows(); }
+        long nc () const { return m.cols(); }
+    }; 
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols
+        >
+    const matrix_op<op_eigen_Matrix_to_mat< ::Eigen::Matrix<_Scalar,_Rows,_Cols,_Options,_MaxRows,_MaxCols>,_Rows,_Cols > > mat (
+        const ::Eigen::Matrix<_Scalar,_Rows,_Cols,_Options,_MaxRows,_MaxCols>& m
+    )
+    {
+        typedef op_eigen_Matrix_to_mat< ::Eigen::Matrix<_Scalar,_Rows,_Cols,_Options,_MaxRows,_MaxCols>,_Rows,_Cols > op;
+        return matrix_op<op>(op(m));
+    }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

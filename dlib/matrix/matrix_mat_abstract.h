@@ -167,6 +167,29 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename _Scalar, 
+        int _Rows, 
+        int _Cols, 
+        int _Options, 
+        int _MaxRows, 
+        int _MaxCols
+        >
+    const matrix_exp mat (
+        const ::Eigen::Matrix<_Scalar,_Rows,_Cols,_Options,_MaxRows,_MaxCols>& m
+    );
+    /*!
+        ensures
+            - Converts a matrix from the Eigen library into a dlib matrix.
+            - returns a matrix R such that:
+                - R.nr() == m.rows()
+                - R.nc() == m.cols()
+                - for all valid r:
+                  R(r,c) == m(r,c)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_MAT_ABSTRACT_H__
