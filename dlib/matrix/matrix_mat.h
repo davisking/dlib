@@ -248,6 +248,50 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+}
+
+namespace arma
+{
+    template <typename T> class Mat;
+}
+namespace dlib
+{
+    template <typename T>
+    struct op_arma_Mat_to_mat : does_not_alias 
+    {
+        op_arma_Mat_to_mat( const T& array_) : array(array_){}
+
+        const T& array;
+
+        const static long cost = 1;
+        const static long NR = 0;
+        const static long NC = 0;
+        typedef typename T::elem_type type;
+        typedef typename T::elem_type const_ret_type;
+        typedef default_memory_manager mem_manager_type;
+        typedef row_major_layout layout_type;
+
+        const_ret_type apply (long r, long c ) const { return array(r,c); }
+
+        long nr () const { return array.n_rows; }
+        long nc () const { return array.n_cols; }
+    }; 
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const matrix_op<op_arma_Mat_to_mat< ::arma::Mat<T> > > mat (
+        const ::arma::Mat<T>& array
+    )
+    {
+        typedef op_arma_Mat_to_mat< ::arma::Mat<T> > op;
+        return matrix_op<op>(op(array));
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 //                                  DEPRECATED FUNCTIONS
 // ----------------------------------------------------------------------------------------

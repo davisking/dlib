@@ -149,6 +149,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename T
+        >
+    const matrix_exp mat (
+        const ::arma::Mat<T>& m
+    );
+    /*!
+        ensures
+            - Converts a matrix from the Armadillo library into a dlib matrix.
+            - returns a matrix R such that:
+                - R.nr() == m.n_rows 
+                - R.nc() == m.n_cols
+                - for all valid r:
+                  R(r,c) == m(r,c)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_MAT_ABSTRACT_H__
