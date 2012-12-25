@@ -3,7 +3,7 @@
 #ifndef DLIB_ASSERt_
 #define DLIB_ASSERt_
 
-
+#include "config.h"
 #include <sstream>
 #include <iosfwd>
 #include "error.h"
@@ -49,11 +49,14 @@ namespace dlib
 
 // -----------------------------
 
-#if defined DEBUG || defined _DEBUG
+#if defined DLIB_DISABLE_ASSERTS
+    // if DLIB_DISABLE_ASSERTS is on then never enable DLIB_ASSERT no matter what.
+    #undef ENABLE_ASSERTS
+#endif
+
+#if !defined(DLIB_DISABLE_ASSERTS) && ( defined DEBUG || defined _DEBUG)
     // make sure ENABLE_ASSERTS is defined if we are indeed using them.
-    #ifndef ENABLE_ASSERTS
-        #define ENABLE_ASSERTS
-    #endif
+    #define ENABLE_ASSERTS
 #endif
 
 // -----------------------------
