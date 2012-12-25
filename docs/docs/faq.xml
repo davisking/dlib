@@ -61,7 +61,36 @@ row_vect.set_size(5);
          <b><font style='font-size:1.3em' color='#0000FF'>Detailed Documentation</font></b> links.   
       </question>
 
+
+      <!-- ****************************************** -->
+
+      <question text="How does dlib interface with other libraries/tools?">
+         There shouldn't ever be anything in dlib that prevents you from using or 
+         interacting with other libraries.  However, there are some additional tools
+         in dlib to make some interactions easier.  
+
+         <ul>
+            <li><b>BLAS and LAPACK libraries</b> are used by the <a href="linear_algebra.html#matrix">matrix</a>
+            automatically if you <tt>#define</tt> DLIB_USE_BLAS and/or DLIB_USE_LAPACK and link against
+            the appropriate library files.  Note that the CMakeLists.txt file that comes with dlib will
+            do this for you automatically in many instances.</li><br/>
+            <li><b>Armadillo and Eigen libraries</b> have matrix objects which can be converted into
+            dlib matrix objects by calling dlib::mat() on them.</li><br/>
+            <li><b>OpenCV</b> image objects can be converted into a form usable by dlib routines
+            by using <a href="imaging.html#cv_image">cv_image</a>.  You can also convert from a
+            dlib matrix or image to an OpenCV Mat using dlib::<a href="imaging.html#toMat">toMat</a>().</li><br/>
+            <li><b>Google Protocol Buffers</b> can be serialized by the dlib 
+            <a href="other.html#serialize">serialization</a> routines.  
+            This means that, for example, you can pass protocol buffer objects through a 
+            <a href="network.html#bridge">bridge</a>.
+            </li>
+         </ul>
+      </question>
+
    </questions>
+
+
+
 
    <!-- ************************************************************************* -->
 
