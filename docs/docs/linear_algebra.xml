@@ -726,10 +726,6 @@
               statements and thus can be enabled by #defining ENABLE_ASSERTS or DEBUG.  Doing
               this will cause your program to run slower but should catch any usage errors. 
            </p>
-           <p>
-              Finally, you don't need to #include anything to get the matrix extensions listed below.  
-              They are included by the <a href="dlib/matrix.h.html">dlib/matrix.h</a> file for you.
-            </p>
          </description>
          
          <examples>
