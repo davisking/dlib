@@ -229,6 +229,24 @@ namespace dlib
         !*/
     };
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const matrix_exp mat (
+        const cv_image<T>& img
+    );
+    /*!
+        ensures
+            - returns a matrix R such that:
+                - R.nr() == img.nr() 
+                - R.nc() == img.nc()
+                - for all valid r and c:
+                  R(r, c) == img[r][c]
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 

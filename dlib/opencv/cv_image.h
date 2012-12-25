@@ -6,6 +6,7 @@
 #include "cv_image_abstract.h"
 #include "../algs.h"
 #include "../pixel.h"
+#include "../matrix/matrix_mat.h"
 
 namespace dlib
 {
@@ -122,6 +123,21 @@ namespace dlib
         long _nr;
         long _nc;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const matrix_op<op_array2d_to_mat<cv_image<T> > > mat (
+        const cv_image<T>& m 
+    )
+    {
+        typedef op_array2d_to_mat<cv_image<T> > op;
+        return matrix_op<op>(op(m));
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 
