@@ -74,8 +74,10 @@ row_vect.set_size(5);
             automatically if you <tt>#define</tt> DLIB_USE_BLAS and/or DLIB_USE_LAPACK and link against
             the appropriate library files.  Note that the CMakeLists.txt file that comes with dlib will
             do this for you automatically in many instances.</li><br/>
+
             <li><b>Armadillo and Eigen libraries</b> have matrix objects which can be converted into
             dlib matrix objects by calling dlib::mat() on them.</li><br/>
+
             <li><b>OpenCV</b> image objects can be converted into a form usable by dlib routines
             by using <a href="imaging.html#cv_image">cv_image</a>.  You can also convert from a
             dlib matrix or image to an OpenCV Mat using dlib::<a href="imaging.html#toMat">toMat</a>().</li><br/>
@@ -83,7 +85,19 @@ row_vect.set_size(5);
             <a href="other.html#serialize">serialization</a> routines.  
             This means that, for example, you can pass protocol buffer objects through a 
             <a href="network.html#bridge">bridge</a>.
-            </li>
+            </li><br/>
+
+            <li><b>libpng and libjpeg</b> are used by <a
+            href="imaging.html#load_image">load_image</a> whenever
+            DLIB_PNG_SUPPORT and DLIB_JPEG_SUPPORT are defined respectively.
+            You must also tell your compiler to link against these libraries to
+            use them. However, CMake will try to link against them
+            automatically if they are installed.</li><br/>
+
+            <li><b>SQLite</b> is used by the <a href="other.html#database">database</a> object.  In
+            fact, it is just a wrapper around SQLite's C interface which simplifies its use (e.g. 
+            makes resource management use RAII).</li>
+
          </ul>
       </question>
 
