@@ -25,6 +25,7 @@ SRC += ../all/source.cpp
 SRC += example.cpp
 SRC += example_args.cpp
 
+SRC += active_learning.cpp
 SRC += any.cpp
 SRC += any_function.cpp
 SRC += array2d.cpp

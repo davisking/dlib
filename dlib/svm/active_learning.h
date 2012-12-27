@@ -78,7 +78,7 @@ namespace dlib
         temp_labels.resize(temp_labels.size()+1);
 
 
-        for (unsigned long i = 0; i < unlabeled_samples.size(); ++i)
+        for (long i = 0; i < unlabeled_samples.size(); ++i)
         {
             temp_samples.back() = unlabeled_samples(i);
             // figure out the margin for each possible labeling of this sample.

@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 2.6)
 # into the regression test suite.
 set (tests
    example.cpp
+   active_learning.cpp
    any.cpp
    any_function.cpp
    array2d.cpp
