@@ -47,6 +47,7 @@
 #include "svm/svm_multiclass_linear_trainer.h"
 #include "svm/sequence_labeler.h"
 #include "svm/assignment_function.h"
+#include "svm/active_learning.h"
 
 #endif // DLIB_SVm_HEADER
 
