@@ -7,6 +7,7 @@
 #include "../is_kind.h"
 #include "matrix_fwd.h"
 #include "matrix_exp_abstract.h"
+#include <iterator>
 
 namespace dlib
 {
@@ -56,7 +57,7 @@ namespace dlib
 
     template <typename EXP> class matrix_exp;
     template <typename EXP>
-    class matrix_exp_iterator
+    class matrix_exp_iterator : public std::iterator<std::forward_iterator_tag, typename matrix_traits<EXP>::type>
     {
         friend class matrix_exp<EXP>;
         matrix_exp_iterator(const EXP& m_, long r_, long c_)
