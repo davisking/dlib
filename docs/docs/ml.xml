@@ -147,6 +147,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <name>Feature Selection</name>
          <item>rank_features</item> 
          <item>sort_basis_vectors</item> 
+         <item>rank_unlabeled_training_samples</item> 
       </section>
 
       <center><h2><u>Other Tools</u></h2></center>
@@ -693,6 +694,25 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
               basis set selection.  In particular, you give it a candidate set of basis
               vectors and it sorts them according to how useful they are for solving
               a particular decision problem.
+         </description>
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>rank_unlabeled_training_samples</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/active_learning_abstract.h</spec_file>
+         <description>
+            This routine implements an active learning method for selecting the most
+            informative data sample to label out of a set of unlabeled samples. 
+            In particular, it implements the MaxMin Margin and Ratio Margin methods 
+            described in the paper:
+            <blockquote>
+                Support Vector Machine Active Learning with Applications to Text Classification
+                by Simon Tong and Daphne Koller.
+            </blockquote>
          </description>
       </component>
       
