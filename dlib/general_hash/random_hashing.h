@@ -18,7 +18,7 @@ namespace dlib
     )
     {
         const std::pair<uint64,uint64> h = murmur_hash3_128bit_3(k1,k2,k3);
-        const uint64 mask = 0xFFFFFFFFFFLLU; 
+        const uint64 mask = DLIB_BIG_CONSTANT(0xFFFFFFFFFF); 
         const double max = mask+1;
         return static_cast<double>(h.first&mask)/max;
     }
