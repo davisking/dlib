@@ -149,13 +149,13 @@ namespace
             dlog << LINFO << "samples.size(): "<< samples.size();
 
             // When we pick the best/front ranked element then the active learning method
-            // should do at least as well as random selection.
-            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, max_min_margin, 30, true) >= 1);
-            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, ratio_margin, 30, true) >= 1);
+            // shouldn't do much worse than random selection (and often much better).
+            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, max_min_margin, 25, true) >= 0.97);
+            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, ratio_margin, 25, true) >= 0.97);
             // However, picking the worst ranked element should do way worse than random
             // selection.
-            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, max_min_margin, 30, false) < 1);
-            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, ratio_margin, 30, false) < 1);
+            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, max_min_margin, 25, false) < 0.8);
+            DLIB_TEST(test_rank_unlabeled_training_samples(samples, labels, ratio_margin, 25, false) < 0.8);
         }
     } a;
 
