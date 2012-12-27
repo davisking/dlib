@@ -227,8 +227,8 @@ namespace dlib
         typedef row_major_layout layout_type;
     };
 
-    template <long start, long inc_, long end>
-    class matrix_range_static_exp : public matrix_exp<matrix_range_static_exp<start,inc_,end> > 
+    template <long start, long inc_, long end_>
+    class matrix_range_static_exp : public matrix_exp<matrix_range_static_exp<start,inc_,end_> > 
     {
     public:
         typedef typename matrix_traits<matrix_range_static_exp>::type type;
@@ -239,7 +239,7 @@ namespace dlib
         const static long cost = matrix_traits<matrix_range_static_exp>::cost;
         typedef typename matrix_traits<matrix_range_static_exp>::layout_type layout_type;
 
-        const static long inc = (start <= end)?inc_:-inc_;
+        const static long inc = (start <= end_)?inc_:-inc_;
 
 
         matrix_range_static_exp (
