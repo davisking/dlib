@@ -254,7 +254,7 @@ namespace
 
         svm_c_linear_dcd_trainer<kernel_type>::optimizer_state state;
 
-        const double C = 10;
+        const double C = 1;
         linear_trainer.set_epsilon(1e-10);
 
 
