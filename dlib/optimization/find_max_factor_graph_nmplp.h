@@ -40,8 +40,7 @@ namespace dlib
                     - #(*this)(a,b) == value
             !*/
             {
-                const unsigned long block[2] = {a,b};
-                const uint32 h = murmur_hash3(&block[0], sizeof(block))%(data.size()-scan_dist);
+                const uint32 h = murmur_hash3_2(a,b)%(data.size()-scan_dist);
 
                 const unsigned long empty_bucket = std::numeric_limits<unsigned long>::max();
 
@@ -85,8 +84,7 @@ namespace dlib
                 DLIB_ASSERT(a != b, "An invalid map_problem was given to find_max_factor_graph_nmplp()."
                             << "\nNode " << a << " is listed as being a neighbor with itself, which is illegal.");
 
-                const unsigned long block[2] = {a,b};
-                uint32 h = murmur_hash3(&block[0], sizeof(block))%(data.size()-scan_dist);
+                uint32 h = murmur_hash3_2(a,b)%(data.size()-scan_dist);
 
 
                 for (unsigned long i = 0; i < scan_dist; ++i)
