@@ -314,7 +314,7 @@ namespace
                 rs.add(labels[k]*df(samples[k]));
             }
         }
-        DLIB_TEST_MSG(std::abs(rs.min()-1) < 1e-7, std::abs(rs.min()-1));
+        DLIB_TEST_MSG(std::abs(rs.min()-1) < 1e-6, std::abs(rs.min()-1));
     }
 
 // ----------------------------------------------------------------------------------------
