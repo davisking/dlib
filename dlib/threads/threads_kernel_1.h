@@ -38,34 +38,26 @@ namespace dlib
 
     class mutex
     {
-        // give signaler access to hMutex
-        friend class signaler;
     public:
 
         mutex (
-        ) :
-            hMutex(CreateMutex(NULL,FALSE,NULL))
+        ) 
         {
-            if (hMutex == NULL)
-            {
-                throw dlib::thread_error(ECREATE_MUTEX,
-        "in function mutex::mutex() an error occurred making the mutex"
-                );           
-            }
+            InitializeCriticalSection(&cs);
         }
 
         ~mutex (
-        ) { CloseHandle(hMutex); }
+        ) { DeleteCriticalSection(&cs); }
 
         void lock (
-        ) const { WaitForSingleObject (hMutex,INFINITE); }
+        ) const { EnterCriticalSection(&cs); }
 
         void unlock (
-        ) const { ReleaseMutex(hMutex); }
+        ) const { LeaveCriticalSection(&cs); }
 
     private:
 
-        mutable HANDLE hMutex;
+        mutable CRITICAL_SECTION cs;
 
         // restricted functions
         mutex(mutex&);        // copy constructor
@@ -87,20 +79,14 @@ namespace dlib
         ) :
             hSemaphore(CreateSemaphore (NULL, 0, 100000000, NULL)),
             waiters(0),
-            hWaitersMutex(CreateMutex(NULL,FALSE,NULL)),
             hCountSema(CreateSemaphore (NULL,0,100000000,NULL)),
             m(associated_mutex)
         {           
-            if (hSemaphore == NULL || hWaitersMutex == NULL || hCountSema == NULL)
+            if (hSemaphore == NULL || hCountSema == NULL)
             {
                 if (hSemaphore != NULL)
                 {
                     CloseHandle(hSemaphore); 
-                }
-
-                if (hWaitersMutex != NULL)
-                {
-                    CloseHandle(hWaitersMutex); 
                 }
 
                 if (hCountSema != NULL)
@@ -115,20 +101,20 @@ namespace dlib
         }
 
         ~signaler (
-        ) { CloseHandle(hSemaphore); CloseHandle(hWaitersMutex); CloseHandle(hCountSema);}
+        ) { CloseHandle(hSemaphore); CloseHandle(hCountSema);}
 
         void wait (
         ) const
         { 
             // get a lock on the mutex for the waiters variable
-            WaitForSingleObject (hWaitersMutex,INFINITE);
+            waiters_mutex.lock();
             // mark that one more thread will be waiting on this signaler
             ++waiters;
             // release the mutex for waiters
-            ReleaseMutex(hWaitersMutex);
+            waiters_mutex.unlock();
 
-            // release the assocaited mutex
-            ReleaseMutex(m.hMutex);
+            // release the associated mutex
+            m.unlock();
 
             // wait for the semaphore to be signaled
             WaitForSingleObject (hSemaphore,INFINITE);
@@ -137,7 +123,7 @@ namespace dlib
             ReleaseSemaphore(hCountSema,(LONG)1,NULL);
 
             // relock the associated mutex 
-            WaitForSingleObject (m.hMutex,INFINITE);  
+            m.lock();
         }
 
         bool wait_or_timeout (
@@ -145,14 +131,14 @@ namespace dlib
         ) const
         { 
             // get a lock on the mutex for the waiters variable
-            WaitForSingleObject (hWaitersMutex,INFINITE);
+            waiters_mutex.lock();
             // mark that one more thread will be waiting on this signaler
             ++waiters;
             // release the mutex for waiters
-            ReleaseMutex(hWaitersMutex);
+            waiters_mutex.unlock();
 
-            // release the assocaited mutex
-            ReleaseMutex(m.hMutex);
+            // release the associated mutex
+            m.unlock();
 
             bool value;
 
@@ -165,12 +151,12 @@ namespace dlib
                 value = false;
 
                 // get a lock on the mutex for the waiters variable
-                WaitForSingleObject (hWaitersMutex,INFINITE);
+                waiters_mutex.lock();
                 // mark that one less thread will be waiting on this signaler. 
                 if (waiters != 0)
                     --waiters;
                 // release the mutex for waiters
-                ReleaseMutex(hWaitersMutex);
+                waiters_mutex.unlock();
             }
             else 
             {
@@ -181,7 +167,7 @@ namespace dlib
             ReleaseSemaphore(hCountSema,(LONG)1,NULL);
 
             // relock the associated mutex 
-            WaitForSingleObject (m.hMutex,INFINITE);  
+            m.lock();
 
             return value;
         }
@@ -190,7 +176,7 @@ namespace dlib
         ) const 
         { 
             // get a lock on the mutex for the waiters variable
-            WaitForSingleObject (hWaitersMutex,INFINITE);
+            waiters_mutex.lock();
             
             if (waiters > 0)
             {
@@ -203,14 +189,14 @@ namespace dlib
             }
 
             // release the mutex for waiters
-            ReleaseMutex(hWaitersMutex);             
+            waiters_mutex.unlock();
         }
 
         void broadcast (
         ) const 
         { 
             // get a lock on the mutex for the waiters variable
-            WaitForSingleObject (hWaitersMutex,INFINITE);
+            waiters_mutex.lock();
             
             if (waiters > 0)
             {   
@@ -227,7 +213,7 @@ namespace dlib
             }
 
             // release the mutex for waiters
-            ReleaseMutex(hWaitersMutex);               
+            waiters_mutex.unlock();
         }
 
         const mutex& get_mutex (
@@ -238,7 +224,7 @@ namespace dlib
         mutable HANDLE hSemaphore;
 
         mutable unsigned long waiters;
-        mutable HANDLE hWaitersMutex;
+        mutex waiters_mutex;
         
 
         mutable HANDLE hCountSema;
