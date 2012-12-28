@@ -393,7 +393,7 @@
         <p>
         In the library there are three kinds of objects with regards to threading:  
         <ul>
-           <li>Objects which are completely threadsafe.  This means that any pattern of access from 
+           <li>Objects which are completely thread safe.  This means that any pattern of access from 
            multiple threads is safe.</li>
            <li>Objects which are safe to use if no threads touch the same instance, but require access
            to a particular instance to be serialized via a mutex if it is shared among threads. </li>
