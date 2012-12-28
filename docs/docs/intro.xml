@@ -407,7 +407,7 @@
         the specification for the component doesn't mention threading or thread safety then 
         it is ok to use as long as you serialize access to shared instances.   If the component might have
         some global resources or be reference counted then the specifications will tell you this. 
-        Lastly if the component is completely thread safe then the specification will tell you this also.
+        Lastly if the component is completely thread safe then the specification will tell you this.
         </p>
         <p>
            Also note that global functions in dlib are always thread safe. 
