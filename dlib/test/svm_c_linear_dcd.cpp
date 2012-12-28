@@ -61,7 +61,7 @@ namespace
             for (int j = 0; j < 5; ++j)
             {
                 int idx = rnd.get_random_32bit_number()%10;
-                double value = static_cast<double>(std::rand())/RAND_MAX;
+                double value = rnd.get_random_double();
 
                 sample[idx] = label*value;
             }
@@ -106,7 +106,7 @@ namespace
 
         svm_c_linear_dcd_trainer<kernel_type>::optimizer_state state;
 
-        const double C = 0.1;
+        const double C = 1.0;
         linear_trainer.set_epsilon(1e-10);
         linear_trainer_cpa.set_epsilon(1e-10);
 
@@ -135,7 +135,7 @@ namespace
             for (int j = 0; j < 5; ++j)
             {
                 int idx = rnd.get_random_32bit_number()%9;
-                double value = static_cast<double>(std::rand())/RAND_MAX;
+                double value = rnd.get_random_double();
 
                 sample(idx) = label*value;
             }
@@ -210,7 +210,7 @@ namespace
             for (int j = 0; j < 5; ++j)
             {
                 int idx = rnd.get_random_32bit_number()%10;
-                double value = static_cast<double>(std::rand())/RAND_MAX;
+                double value = rnd.get_random_double();
 
                 sample(idx) = label*value;
             }
@@ -244,6 +244,7 @@ namespace
     void test_normal_force_last_weight(bool have_bias, bool force_weight)
     {
         typedef matrix<double,10,1> sample_type;
+        dlog << LINFO << "have_bias: "<< have_bias << "   force_weight: "<< force_weight;
 
 
         typedef linear_kernel<sample_type> kernel_type;
@@ -285,7 +286,7 @@ namespace
             for (int j = 0; j < 5; ++j)
             {
                 int idx = rnd.get_random_32bit_number()%9;
-                double value = static_cast<double>(std::rand())/RAND_MAX;
+                double value = rnd.get_random_double();
 
                 sample(idx) = label*value + label;
             }
@@ -314,7 +315,7 @@ namespace
                 rs.add(labels[k]*df(samples[k]));
             }
         }
-        DLIB_TEST_MSG(std::abs(rs.min()-1) < 1e-6, std::abs(rs.min()-1));
+        DLIB_TEST_MSG(std::abs(rs.min()-1) < 1e-7, std::abs(rs.min()-1));
     }
 
 // ----------------------------------------------------------------------------------------
