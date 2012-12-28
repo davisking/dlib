@@ -331,8 +331,23 @@
          <file>dlib/pipe.h</file>
          <spec_file>dlib/pipe/pipe_kernel_abstract.h</spec_file>
          <description>
-                This is a first in first out queue with a fixed maximum size containing items 
-                of type T.  It is suitable for passing objects between threads.
+                This is a first in first out queue with a fixed maximum size.  
+                It is suitable for passing objects between threads.
+
+               <p>
+                  This object is optimized for speed, therefore, it uses
+                  global <tt>swap()</tt> to create a zero-copy method for moving objects
+                  around.  For example, on a computer running Ubuntu 12.04 with
+                  a 2.67GHz Intel i7 920 CPU it is possible to pass over 4.4
+                  million <tt>std::vector&lt;int&gt;</tt> objects a second between two
+                  threads.  This is regardless of the number of ints in the <tt>std::vector</tt>
+                  objects.  In particular, this test was done with 100,000 
+                  ints in each <tt>std::vector</tt>.
+               </p>
+               <p>
+                  Finally, note that you can use the pipe as an efficient method to pass
+                  messages between two networked computers by using the <a href="network.html#bridge">bridge</a>.
+               </p>
          </description>
          
          <examples>

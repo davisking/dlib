@@ -73,6 +73,28 @@
          <description>
             This object is a tool for bridging a <a href="other.html#pipe">pipe</a> object between
             two network connected applications.  
+
+            <p>
+               The bridge object is designed to link two pipes together as efficiently as
+               possible.  To demonstrate its speed, I ran two experiments where a bridge was
+               used to connect a desktop PC to a laptop, both running Ubuntu 12.04 and
+               connected via gigabit ethernet.  The first experiment is to test its bulk
+               transfer speed while the second experiment measures how many separate objects
+               the bridge can transfer each second.
+            </p>
+            <p>
+               In the first experiment, 1-megapixel images, represented with
+               <tt>array&lt;rgb_pixel&gt;</tt> objects, were sent.  The transfer rate was
+               112 megabytes/second, saturating the gigabit ethernet link.  The second
+               experiment used a <tt>pipe&lt;char&gt;</tt> and <tt>bridge</tt> to send individual
+               <tt>char</tt> variables over the network.  In this experiment, I was able to
+               send 3.2 million objects a second (i.e. the receiving end was getting a char
+               back from pipe::dequeue() 3.2 million times each second).
+            </p>
+            <p>
+               For reference, these experiments were carried out on a desktop with a 2.67GHz
+               Intel Core-i7 CPU and a laptop with a 2.20GHz Intel Core-i7 CPU.
+            </p>
          </description>
          <examples>
             <example>bridge_ex.cpp.html</example>
