@@ -56,7 +56,9 @@ namespace dlib
 
 #if !defined(DLIB_DISABLE_ASSERTS) && ( defined DEBUG || defined _DEBUG)
     // make sure ENABLE_ASSERTS is defined if we are indeed using them.
-    #define ENABLE_ASSERTS
+    #ifndef ENABLE_ASSERTS
+        #define ENABLE_ASSERTS
+    #endif
 #endif
 
 // -----------------------------
