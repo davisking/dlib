@@ -30,6 +30,15 @@ namespace dlib
                 This object represents a classification or regression function that was 
                 learned by a kernel based learning algorithm.   Therefore, it is a function 
                 object that takes a sample object and returns a scalar value.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call operator() on this object from multiple threads so
+                    long as the kernel, K, is also threadsafe.  This is because operator()
+                    is a read-only operation.  However, any operation that modifies a
+                    decision_function is not threadsafe.
         !*/
 
         typedef K kernel_type;
@@ -131,6 +140,15 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS 
                 This object represents a binary decision function that returns an 
                 estimate of the probability that a given sample is in the +1 class.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call operator() on this object from multiple threads so
+                    long as decision_funct is also threadsafe.  This is because operator()
+                    is a read-only operation.  However, any operation that modifies a
+                    probabilistic_function is not threadsafe.
         !*/
 
         typedef typename function_type::scalar_type scalar_type;
@@ -233,6 +251,15 @@ namespace dlib
                 changed from being a function type to a kernel type.  Therefore, this
                 type is just a convenient version of probabilistic_function
                 for the case where the decision function is a dlib::decision_function<K>.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call operator() on this object from multiple threads so
+                    long as the kernel, K, is also threadsafe.  This is because operator()
+                    is a read-only operation.  However, any operation that modifies a
+                    probabilistic_decision_function is not threadsafe.
         !*/
 
         typedef K kernel_type;
@@ -348,6 +375,15 @@ namespace dlib
 
                 I.e.  It represents a linear combination of the basis vectors where 
                 the weights of the linear combination are stored in the alpha vector.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const members of this object from multiple
+                    threads so long as the kernel, K, is also threadsafe.  This is because
+                    the const members are purely read-only operations.  However, any
+                    operation that modifies a distance_function is not threadsafe.
         !*/
 
     public:
@@ -723,6 +759,14 @@ namespace dlib
                 This object represents a function that takes a data sample and projects
                 it into kernel feature space.  The result is a real valued column vector that 
                 represents a point in a kernel feature space.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    Instances of this object have a mutable cache which is used by const
+                    member functions.  Therefore, it is not safe to use one instance of
+                    this object from multiple threads (unless protected by a mutex).
         !*/
 
         typedef K kernel_type;
@@ -841,6 +885,15 @@ namespace dlib
                 if you have N classes then there will be N binary classifiers inside 
                 this object.  Additionally, this object is linear in the sense that
                 each of these binary classifiers is a simple linear plane.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const member functions of this object from
+                    multiple threads.  This is because the const members are purely
+                    read-only operations.  However, any operation that modifies a
+                    multiclass_linear_decision_function is not threadsafe.
         !*/
 
         typedef result_type_ result_type;

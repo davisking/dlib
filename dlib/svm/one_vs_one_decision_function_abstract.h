@@ -50,6 +50,16 @@ namespace dlib
                 within a one_vs_one_decision_function must be listed in the
                 template arguments if serialization and deserialization is to
                 be used.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const members of this object from multiple
+                    threads so long as all the decision functions contained in this object
+                    are also threadsafe.  This is because the const members are purely
+                    read-only operations.  However, any operation that modifies a
+                    one_vs_one_decision_function is not threadsafe.
         !*/
     public:
 

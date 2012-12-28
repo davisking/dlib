@@ -40,6 +40,15 @@ namespace dlib
                 to compute these score functions and then call find_max_factor_graph_potts().  
                 Additionally, this object uses linear functions to represent these score 
                 functions.    
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    It is safe to call the const members of this object from multiple
+                    threads.  This is because the const members are purely read-only
+                    operations.  However, any operation that modifies a graph_labeler is
+                    not threadsafe.
         !*/
 
     public:

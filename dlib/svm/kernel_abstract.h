@@ -37,6 +37,14 @@ namespace dlib
                 - an overloaded == operator that tells you if two kernels are
                   identical or not.
 
+        THREAD SAFETY
+            For a kernel function to be threadsafe it means that it must be safe to
+            evaluate an expression like val = kernel_function(sample1,sample2)
+            simultaneously from multiple threads, even when the threads operate on the same
+            object instances (i.e. kernel_function, sample1, and sample2).  The most common
+            way to make this safe is to ensure that the kernel function does not mutate any
+            data, either in itself or in its arguments.  
+
         For examples of kernel functions see the following objects
         (e.g. the radial_basis_kernel).
     !*/
@@ -52,6 +60,9 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a radial basis function kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
         !*/
 
         typedef typename T::type scalar_type;
@@ -153,6 +164,9 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a sigmoid kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
         !*/
 
         typedef typename T::type scalar_type;
@@ -260,6 +274,9 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a polynomial kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
         !*/
 
         typedef typename T::type scalar_type;
@@ -372,6 +389,9 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a linear function kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
         !*/
 
         typedef typename T::type scalar_type;
@@ -435,6 +455,9 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a histogram intersection kernel kernel
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
         !*/
 
         typedef typename T::type scalar_type;
@@ -501,6 +524,9 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents a kernel with a fixed value offset
                 added to it.
+
+            THREAD SAFETY
+                This kernel is threadsafe.  
         !*/
 
         typedef typename T::scalar_type scalar_type;
@@ -609,6 +635,15 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is a function object that computes the derivative of a kernel 
                 function object.
+
+            THREAD SAFETY
+                It is always safe to use distinct instances of this object in different
+                threads.  However, when a single instance is shared between threads then
+                the following rules apply:
+                    Instances of this object are allowed to have a mutable cache which is
+                    used by const member functions.  Therefore, it is not safe to use one
+                    instance of this object from multiple threads (unless protected by a
+                    mutex).
         !*/
 
         typedef typename kernel_type::scalar_type scalar_type;
