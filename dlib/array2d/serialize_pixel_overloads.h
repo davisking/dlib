@@ -35,10 +35,9 @@ namespace dlib
             serialize(item.nr(),out);
 
             COMPILE_TIME_ASSERT(sizeof(rgb_pixel) == 3);
-
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                out.write((char*)&item[r][0], sizeof(rgb_pixel)*item.nc());
+            
+            if (item.size() != 0)
+                out.write((char*)&item[0][0], sizeof(rgb_pixel)*item.size());
         }
         catch (serialization_error e)
         { 
@@ -64,9 +63,8 @@ namespace dlib
 
             item.set_size(nr,nc);
 
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                in.read((char*)&item[r][0], sizeof(rgb_pixel)*item.nc());
+            if (item.size() != 0)
+                in.read((char*)&item[0][0], sizeof(rgb_pixel)*item.size());
         }
         catch (serialization_error e)
         { 
@@ -92,9 +90,8 @@ namespace dlib
 
             COMPILE_TIME_ASSERT(sizeof(bgr_pixel) == 3);
 
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                out.write((char*)&item[r][0], sizeof(bgr_pixel)*item.nc());
+            if (item.size() != 0)
+                out.write((char*)&item[0][0], sizeof(bgr_pixel)*item.size());
         }
         catch (serialization_error e)
         { 
@@ -120,9 +117,8 @@ namespace dlib
 
             item.set_size(nr,nc);
 
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                in.read((char*)&item[r][0], sizeof(bgr_pixel)*item.nc());
+            if (item.size() != 0)
+                in.read((char*)&item[0][0], sizeof(bgr_pixel)*item.size());
         }
         catch (serialization_error e)
         { 
@@ -148,9 +144,8 @@ namespace dlib
 
             COMPILE_TIME_ASSERT(sizeof(hsi_pixel) == 3);
 
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                out.write((char*)&item[r][0], sizeof(hsi_pixel)*item.nc());
+            if (item.size() != 0)
+                out.write((char*)&item[0][0], sizeof(hsi_pixel)*item.size());
         }
         catch (serialization_error e)
         { 
@@ -176,9 +171,8 @@ namespace dlib
 
             item.set_size(nr,nc);
 
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                in.read((char*)&item[r][0], sizeof(hsi_pixel)*item.nc());
+            if (item.size() != 0)
+                in.read((char*)&item[0][0], sizeof(hsi_pixel)*item.size());
         }
         catch (serialization_error e)
         { 
@@ -204,9 +198,8 @@ namespace dlib
 
             COMPILE_TIME_ASSERT(sizeof(rgb_alpha_pixel) == 4);
 
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                out.write((char*)&item[r][0], sizeof(rgb_alpha_pixel)*item.nc());
+            if (item.size() != 0)
+                out.write((char*)&item[0][0], sizeof(rgb_alpha_pixel)*item.size());
         }
         catch (serialization_error e)
         { 
@@ -232,9 +225,8 @@ namespace dlib
 
             item.set_size(nr,nc);
 
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                in.read((char*)&item[r][0], sizeof(rgb_alpha_pixel)*item.nc());
+            if (item.size() != 0)
+                in.read((char*)&item[0][0], sizeof(rgb_alpha_pixel)*item.size());
         }
         catch (serialization_error e)
         { 
@@ -258,9 +250,8 @@ namespace dlib
             serialize(item.nc(),out);
             serialize(item.nr(),out);
 
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                out.write((char*)&item[r][0], sizeof(unsigned char)*item.nc());
+            if (item.size() != 0)
+                out.write((char*)&item[0][0], sizeof(unsigned char)*item.size());
         }
         catch (serialization_error e)
         { 
@@ -284,9 +275,8 @@ namespace dlib
 
             item.set_size(nr,nc);
 
-            // write each row 
-            for (long r = 0; r < item.nr(); ++r)
-                in.read((char*)&item[r][0], sizeof(unsigned char)*item.nc());
+            if (item.size() != 0)
+                in.read((char*)&item[0][0], sizeof(unsigned char)*item.size());
         }
         catch (serialization_error e)
         { 
