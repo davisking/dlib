@@ -77,6 +77,12 @@ private:
         if (hidden == false )
         {
             fill_rect(c,rect,rgb_pixel(red,green,blue));
+            std::vector<point> poly;
+            poly.push_back((rect.tl_corner()+rect.tr_corner())/2);
+            poly.push_back((rect.tr_corner()+rect.br_corner())/2);
+            poly.push_back((rect.br_corner()+rect.bl_corner())/2);
+            poly.push_back((rect.bl_corner()+rect.tl_corner())/2);
+            draw_solid_convex_polygon(c,poly,rgb_alpha_pixel(0,0,0,70));
         }
     }
 
