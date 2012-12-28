@@ -568,7 +568,7 @@ namespace dlib
                 to store intermediate results for normalization.  This avoids
                 needing to reallocate it every time this object performs normalization
                 but also makes it non-thread safe.  So make sure you don't share
-                this object between threads. 
+                instances of this object between threads. 
         !*/
 
     public:
@@ -724,7 +724,7 @@ namespace dlib
                 to store intermediate results for normalization.  This avoids
                 needing to reallocate it every time this object performs normalization
                 but also makes it non-thread safe.  So make sure you don't share
-                this object between threads. 
+                instances of this object between threads. 
         !*/
 
     public:
