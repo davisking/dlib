@@ -391,24 +391,27 @@
         <h1>Thread Safety</h1>
           
         <p>
-        In the library there are three kinds of objects with regards to threading.  There are objects 
-        that are completely thread safe.  Then there are objects that are not thread safe but can be 
-        used if access to them is serialized using a mutex.  Lastly, there are objects which share
-        some kind of global resource or are reference counted.  The last kind of object is
-        extremely thread unfriendly and can only be used in a threaded program with great care.
+        In the library there are three kinds of objects with regards to threading:  
+        <ul>
+           <li>Objects which are completely threadsafe.  This means that any pattern of access from 
+           multiple threads is safe.</li>
+           <li>Objects which are safe to use if no threads touch the same instance, but require access
+           to a particular instance to be serialized via a mutex if it is shared among threads. </li>
+           <li>Objects which share some kind of global resource or are reference counted.  This kind of object is
+               extremely thread unfriendly and can only be used in a threaded program with great care. </li>
+        </ul>
         </p>
 
         <p>
         How do you know which components/objects are thread safe and which aren't?   The rule is that if
         the specification for the component doesn't mention threading or thread safety then 
-        it is ok to use as long as you serialize access to it.   If the component might have
+        it is ok to use as long as you serialize access to shared instances.   If the component might have
         some global resources or be reference counted then the specifications will tell you this. 
-        And lastly if the component is thread safe then the specification will tell you this also.
+        Lastly if the component is completely thread safe then the specification will tell you this also.
         </p>
-
-
-
-
+        <p>
+           Also note that global functions in dlib are always thread safe. 
+        </p>
 
     
     </body>
