@@ -63,15 +63,29 @@ namespace dlib
             rw->lock();
         }
 
+        void unlock()
+        {
+            if (m != 0)
+            {
+                m->unlock();
+                m = 0;
+            }
+            else if (r != 0)
+            {
+                r->unlock();
+                r = 0;
+            }
+            else if (rw != 0)
+            {
+                rw->unlock();
+                rw = 0;
+            }
+        }
+
         ~auto_mutex (
         )
         {
-            if (m != 0)
-                m->unlock();
-            else if (r != 0)
-                r->unlock();
-            else
-                rw->unlock();
+            unlock();
         }
 
     private:

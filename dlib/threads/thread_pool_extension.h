@@ -182,7 +182,7 @@ namespace dlib
                 // aren't any other worker threads free so just perform the task right
                 // here
 
-                m.unlock();
+                M.unlock();
                 (obj.*funct)();
 
                 // return a task id that is both non-zero and also one
@@ -225,7 +225,7 @@ namespace dlib
                 // aren't any other worker threads free so just perform the task right
                 // here
 
-                m.unlock();
+                M.unlock();
                 (obj.*funct)(arg1);
 
                 // return a task id that is both non-zero and also one
@@ -270,7 +270,7 @@ namespace dlib
                 // aren't any other worker threads free so just perform the task right
                 // here
 
-                m.unlock();
+                M.unlock();
                 (obj.*funct)(arg1, arg2);
 
                 // return a task id that is both non-zero and also one

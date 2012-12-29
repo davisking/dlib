@@ -275,7 +275,7 @@ namespace dlib
             // aren't any other worker threads free so just perform the task right
             // here
 
-            m.unlock();
+            M.unlock();
             bfp();
 
             // return a task id that is both non-zero and also one
