@@ -133,20 +133,20 @@ namespace dlib
             T& operator() (
                 long r, 
                 long c
-            ) { return data[r][c]; }
+            ) { return *(data+r*num_cols + c); }
 
             const T& operator() (
                 long r, 
                 long c
-            ) const { return data[r][c]; }
+            ) const { return *(data+r*num_cols + c); }
 
             T& operator() (
                 long i 
-            ) { return *(*data + i); }
+            ) { return data[i]; }
 
             const T& operator() (
                 long i
-            ) const { return *(*data + i); }
+            ) const { return data[i]; }
 
             void swap(
                 layout& item
@@ -175,7 +175,7 @@ namespace dlib
             }
 
         private:
-            T data[num_rows][num_cols];
+            T data[num_rows*num_cols];
         };
 
     // ------------------------------------------------------------------------------------
@@ -546,20 +546,20 @@ namespace dlib
             T& operator() (
                 long r, 
                 long c
-            ) { return data[c][r]; }
+            ) { return *(data+c*num_rows + r); }
 
             const T& operator() (
                 long r, 
                 long c
-            ) const { return data[c][r]; }
+            ) const { return *(data+c*num_rows + r); }
 
             T& operator() (
                 long i 
-            ) { return *(*data + i); }
+            ) { return data[i]; }
 
             const T& operator() (
                 long i
-            ) const { return *(*data + i); }
+            ) const { return data[i]; }
 
             void swap(
                 layout& item
@@ -588,7 +588,7 @@ namespace dlib
             }
 
         private:
-            T data[num_cols][num_rows];
+            T data[num_cols*num_rows];
         };
 
     // ------------------------------------------------------------------------------------
