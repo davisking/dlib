@@ -86,7 +86,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a mechanism for automatically locking and unlocking
-                a read_write_mutex object.  In paricular, a readonly lock is used.
+                a read_write_mutex object.  In particular, a readonly lock is used.
         !*/
     public:
 
