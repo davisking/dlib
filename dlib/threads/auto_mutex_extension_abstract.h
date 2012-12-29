@@ -52,12 +52,21 @@ namespace dlib
                 - m will be locked via m.lock() (i.e. a write lock will be obtained)
         !*/
 
+        void unlock(
+        );
+        /*!
+            ensures
+                - if (unlock() has not already been called) then
+                    - The mutex associated with *this has been unlocked.  This is useful if
+                      you want to unlock a mutex before the auto_mutex destructor executes.
+        !*/
+
         ~auto_mutex (
         );
         /*!
             ensures
                 - all resources allocated by *this have been freed
-                - the mutex associated with *this has been unlocked
+                - calls unlock()
         !*/
 
     private:
