@@ -289,7 +289,7 @@ namespace dlib
             if (p.get() == 0)
             {
                 p.reset(new event_handler_thread());
-                global_mutex()->unlock();
+                M.unlock();
                 p->start_event_thread();
             }
             return p;
