@@ -5951,13 +5951,13 @@ namespace dlib
             if (overlay_rects[i].label.size() != 0)
             {
                 // make a rectangle that is at the spot we want to draw our string
-                rectangle r(orect.br_corner(),  
-                            orect.br_corner() + point(10000,10000));
+                rectangle r(orect.br_corner(),  c.br_corner());
                 mfont->draw_string(c, r, overlay_rects[i].label, overlay_rects[i].color, 0, 
                                    std::string::npos, area);
             }
 
 
+            // draw circles for each "part" in this overlay rectangle.
             std::map<std::string,point>::const_iterator itr;
             for (itr = overlay_rects[i].parts.begin(); itr != overlay_rects[i].parts.end(); ++itr)
             {
@@ -5975,7 +5975,7 @@ namespace dlib
 
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r((temp.br_corner() + temp.bl_corner())/2,  
-                            temp.br_corner() + point(10000,10000));
+                            c.br_corner());
                 mfont->draw_string(c, r, itr->first, overlay_rects[i].color, 0, 
                                    std::string::npos, area);
             }
@@ -6005,7 +6005,7 @@ namespace dlib
                 const point temp = center + point(0,radius);
 
                 // make a rectangle that is at the spot we want to draw our string
-                rectangle r(temp,  temp + point(10000,10000));
+                rectangle r(temp,  c.br_corner());
                 mfont->draw_string(c, r, overlay_circles[i].label, overlay_circles[i].color, 0, 
                                    std::string::npos, area);
             }
