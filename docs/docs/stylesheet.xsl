@@ -49,6 +49,7 @@
    <xsl:template match="/doc">
       <html>
          <head>
+         <link rel="shortcut icon" href="dlib-icon.ico"/>
 <!-- Verify with Google -->
 <meta name="verify-v1" content="{$google_verify_id}" />
 <meta name="google-site-verification" content="{$google_verify_id2}" />
@@ -286,6 +287,7 @@ function BigToggle(node)
          <body bgcolor="{$background_color}">
             <a name="top" />
             <div id="entire_page">
+            <a href="index.html"><img src="dlib-logo.png"/></a>
             <table bgcolor="white" height="100%" bordercolor="{$background_color}" CELLSPACING="0" CELLPADDING="10">
                <tr height="100%">
                   <xsl:apply-templates select="document($main_menu)/doc/menu"/>
