@@ -133,7 +133,9 @@ makedocs ()
     cp docs/*.html docs/web
     cp docs/*.html docs/chm/docs
     cp docs/*.png docs/web
+    cp docs/*.ico docs/web
     cp docs/*.png docs/chm/docs
+    cp docs/*.ico docs/chm/docs
 
     cd docs/chm/docs || report_failure 
     htmlify_cmake dlib/CMakeLists.txt;
