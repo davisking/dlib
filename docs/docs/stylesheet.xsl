@@ -287,7 +287,7 @@ function BigToggle(node)
          <body bgcolor="{$background_color}">
             <a name="top" />
             <div id="entire_page">
-            <a href="index.html"><img src="dlib-logo.png"/></a>
+            <a href="http://dlib.net"><img src="dlib-logo.png"/></a>
             <table bgcolor="white" height="100%" bordercolor="{$background_color}" CELLSPACING="0" CELLPADDING="10">
                <tr height="100%">
                   <xsl:apply-templates select="document($main_menu)/doc/menu"/>
