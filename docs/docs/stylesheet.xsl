@@ -292,7 +292,8 @@ function BigToggle(node)
                <a href="http://sourceforge.net/project/platformdownload.php?group_id=130373"><img style="float:right" src="download-dlib.png"/></a>
             </xsl:if>
 
-            <table bgcolor="white" height="100%" bordercolor="{$background_color}" CELLSPACING="0" CELLPADDING="10">
+            <table bgcolor="white" height="100%" bordercolor="{$background_color}" 
+                CELLSPACING="0" CELLPADDING="10" style="border:0px;margin-top:2px">
                <tr height="100%">
                   <xsl:apply-templates select="document($main_menu)/doc/menu"/>
 
