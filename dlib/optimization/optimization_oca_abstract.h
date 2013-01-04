@@ -154,7 +154,8 @@ namespace dlib
         typename matrix_type::type operator() (
             const oca_problem<matrix_type>& problem,
             matrix_type& w,
-            unsigned long num_nonnegative = 0 
+            unsigned long num_nonnegative = 0,
+            unsigned long force_weight_to_1 = std::numeric_limits<unsigned long>::max()
         ) const;
         /*!
             requires
@@ -171,6 +172,15 @@ namespace dlib
                       non-negative.  This includes the copies of w passed to get_risk()
                       in the form of the current_solution vector as well as the final
                       output of this function.
+                - if (force_weight_to_1 < problem.get_num_dimensions()) then
+                    - The optimizer enforces the following constraints:
+                        - #w(force_weight_to_1) == 1
+                        - for all i > force_weight_to_1:
+                            - #w(i) == 0 
+                        - That is, the element in the weight vector at the index indicated
+                          by force_weight_to_1 will have a value of 1 upon completion of
+                          this function, while all subsequent elements of w will have
+                          values of 0.
         !*/
 
         void set_subproblem_epsilon (

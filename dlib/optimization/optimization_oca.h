@@ -111,7 +111,8 @@ namespace dlib
         typename matrix_type::type operator() (
             const oca_problem<matrix_type>& problem,
             matrix_type& w,
-            unsigned long num_nonnegative = 0 
+            unsigned long num_nonnegative = 0,
+            unsigned long force_weight_to_1 = std::numeric_limits<unsigned long>::max()
         ) const
         {
             const unsigned long num_dims = problem.get_num_dimensions();
@@ -176,7 +177,23 @@ namespace dlib
 
                 // add the next cutting plane
                 scalar_type cur_risk;
+                if (force_weight_to_1 < (unsigned long)w.size())
+                    w(force_weight_to_1) = 1;
+
                 problem.get_risk(w, cur_risk, new_plane);
+
+                if (force_weight_to_1 < (unsigned long)w.size())
+                {
+                    // We basically arrange for the w(force_weight_to_1) element and all
+                    // subsequent elements of w to not be involved in the optimization at
+                    // all.  An easy way to do this is to just make sure the elements of w
+                    // corresponding elements in the subgradient are always set to zero
+                    // while we run the cutting plane algorithm.  The only time
+                    // w(force_weight_to_1) is 1 is when we pass it to the oca_problem.
+                    set_rowm(w, range(force_weight_to_1, w.size()-1)) = 0;
+                    set_rowm(new_plane, range(force_weight_to_1, new_plane.size()-1)) = 0;
+                }
+
                 if (planes.size() != 0)
                     planes = join_rows(planes, new_plane);
                 else 
@@ -262,6 +279,9 @@ namespace dlib
 
                 ++counter;
             }
+
+            if (force_weight_to_1 < (unsigned long)w.size())
+                w(force_weight_to_1) = 1;
 
             return cur_obj;
         }
