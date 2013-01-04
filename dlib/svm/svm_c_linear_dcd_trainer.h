@@ -284,7 +284,7 @@ namespace dlib
                             );
 
                         // extend w by the right number of elements
-                        if (have_bias)
+                        if (have_bias && !last_weight_1)
                         {
                             // Splice some zeros into the w vector so it will have the
                             // right length.  Here we are being careful to move the bias
@@ -316,7 +316,7 @@ namespace dlib
                     index.reserve(x.size());
                     Q.reserve(x.size());
 
-                    if (have_bias)
+                    if (have_bias && !last_weight_1)
                         w.set_size(dims+1);
                     else
                         w.set_size(dims);
@@ -328,7 +328,7 @@ namespace dlib
                 {
                     Q.push_back(length_squared(x(i)));
 
-                    if (have_bias)
+                    if (have_bias && !last_weight_1)
                     {
                         index.push_back(i);
                         Q.back() += 1;
@@ -570,7 +570,7 @@ namespace dlib
                         alpha[i] = std::min(std::max(alpha[i] - G/state.Q[i], (scalar_type)0.0), C);
                         const scalar_type delta = (alpha[i]-alpha_old)*y(i);
                         add_to(w, x(i), delta);
-                        if (have_bias)
+                        if (have_bias && !last_weight_1)
                             w(w.size()-1) -= delta;
 
                         if (last_weight_1)
@@ -618,7 +618,7 @@ namespace dlib
 
             // put the solution into a decision function and then return it
             decision_function<kernel_type> df;
-            if (have_bias)
+            if (have_bias && !last_weight_1)
                 df.b = w(w.size()-1);
             else
                 df.b = 0;
@@ -639,7 +639,7 @@ namespace dlib
             const sample_type& sample
         ) const
         {
-            if (have_bias)
+            if (have_bias && !last_weight_1)
             {
                 const long w_size_m1 = w.size()-1;
                 return dlib::dot(colm(w,0,w_size_m1), sample) - w(w_size_m1);

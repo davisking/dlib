@@ -110,7 +110,10 @@ namespace dlib
             ensures
                 - returns true if this trainer has the constraint that the last weight in
                   the learned parameter vector must be 1.  This is the weight corresponding
-                  to the feature in the training vectors with the highest dimension.
+                  to the feature in the training vectors with the highest dimension.  
+                - Forcing the last weight to 1 also disables the bias and therefore the b
+                  field of the learned decision_function will be 0 when forces_last_weight_to_1() == true.
+                  This is true regardless of the setting of #include_bias().
         !*/
 
         void force_last_weight_to_1 (
