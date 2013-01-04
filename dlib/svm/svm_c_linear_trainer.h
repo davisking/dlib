@@ -352,6 +352,7 @@ namespace dlib
             eps = 0.001;
             max_iterations = 10000;
             learn_nonnegative_weights = false;
+            last_weight_1 = false;
         }
 
         explicit svm_c_linear_trainer (
@@ -372,6 +373,7 @@ namespace dlib
             eps = 0.001;
             max_iterations = 10000;
             learn_nonnegative_weights = false;
+            last_weight_1 = false;
         }
 
         void set_epsilon (
@@ -441,6 +443,19 @@ namespace dlib
         )
         {
             learn_nonnegative_weights = value;
+        }
+
+        bool forces_last_weight_to_1 (
+        ) const
+        {
+            return last_weight_1;
+        }
+
+        void force_last_weight_to_1 (
+            bool should_last_weight_be_1
+        )
+        {
+            last_weight_1 = should_last_weight_be_1;
         }
 
         void set_c (
@@ -555,16 +570,26 @@ namespace dlib
             typedef matrix<scalar_type,0,1> w_type;
             w_type w;
 
+            const unsigned long num_dims = max_index_plus_one(x);
+
             unsigned long num_nonnegative = 0;
             if (learn_nonnegative_weights)
             {
-                num_nonnegative = max_index_plus_one(x);
+                num_nonnegative = num_dims;
             }
+
+            unsigned long force_weight_1_idx = std::numeric_limits<unsigned long>::max(); 
+            if (last_weight_1)
+            {
+                force_weight_1_idx = num_dims-1; 
+            }
+
 
             svm_objective = solver(
                 make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations), 
                 w,
-                num_nonnegative);
+                num_nonnegative,
+                force_weight_1_idx);
 
             // put the solution into a decision function and then return it
             decision_function<kernel_type> df;
@@ -589,6 +614,7 @@ namespace dlib
         bool verbose;
         unsigned long max_iterations;
         bool learn_nonnegative_weights;
+        bool last_weight_1;
     }; 
 
 // ----------------------------------------------------------------------------------------
