@@ -250,6 +250,7 @@ namespace
         typedef linear_kernel<sample_type> kernel_type;
 
 
+        svm_c_linear_trainer<kernel_type> linear_trainer_cpa;
 
         svm_c_linear_dcd_trainer<kernel_type> linear_trainer;
 
@@ -257,7 +258,9 @@ namespace
 
         const double C = 1;
         linear_trainer.set_epsilon(1e-10);
+        linear_trainer_cpa.set_epsilon(1e-11);
 
+        linear_trainer_cpa.force_last_weight_to_1(force_weight);
 
         linear_trainer.force_last_weight_to_1(force_weight);
         linear_trainer.include_bias(have_bias);
@@ -268,7 +271,7 @@ namespace
         // make an instance of a sample vector so we can use it below
         sample_type sample;
 
-        decision_function<kernel_type> df;
+        decision_function<kernel_type> df, df2;
 
         running_stats<double> rs;
 
@@ -299,11 +302,22 @@ namespace
             labels.push_back(label);
 
             linear_trainer.set_c(C);
+            linear_trainer_cpa.set_c(C*samples.size());
 
             df = linear_trainer.train(samples, labels, state);
 
             if (force_weight)
+            {
                 DLIB_TEST(std::abs(df.basis_vectors(0)(9) - 1) < 1e-8);
+                DLIB_TEST(std::abs(df.b) < 1e-8);
+
+                if (samples.size() > 1)
+                {
+                    df2 = linear_trainer_cpa.train(samples, labels);
+                    DLIB_TEST_MSG( max(abs(df.basis_vectors(0) - df2.basis_vectors(0))) < 1e-7, max(abs(df.basis_vectors(0) - df2.basis_vectors(0))));
+                    DLIB_TEST( std::abs(df.b - df2.b) < 1e-7);
+                }
+            }
 
             if (!have_bias)
                 DLIB_TEST(std::abs(df.b) < 1e-8);

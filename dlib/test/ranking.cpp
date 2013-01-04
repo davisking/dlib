@@ -223,7 +223,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename K>
+    template <typename K, bool use_dcd_trainer>
     class simple_rank_trainer
     {
     public:
@@ -250,18 +250,35 @@ namespace
                 }
             }
 
-            svm_c_linear_dcd_trainer<K> trainer;
-            trainer.set_c(1.0/samples.size());
-            trainer.set_epsilon(1e-10);
-            trainer.force_last_weight_to_1(true);
-            //trainer.be_verbose();
-            return trainer.train(samples, labels);
+            if (use_dcd_trainer)
+            {
+                svm_c_linear_dcd_trainer<K> trainer;
+                trainer.set_c(1.0/samples.size());
+                trainer.set_epsilon(1e-10);
+                trainer.force_last_weight_to_1(true);
+                //trainer.be_verbose();
+                return trainer.train(samples, labels);
+            }
+            else
+            {
+                svm_c_linear_trainer<K> trainer;
+                trainer.set_c(1.0);
+                trainer.set_epsilon(1e-13);
+                trainer.force_last_weight_to_1(true);
+                //trainer.be_verbose();
+                decision_function<K> df = trainer.train(samples, labels);
+                DLIB_TEST_MSG(df.b == 0, df.b);
+                return df;
+            }
         }
     };
 
+    template <bool use_dcd_trainer>
     void test_svmrank_weight_force_dense()
     {
         print_spinner();
+        dlog << LINFO << "use_dcd_trainer: "<< use_dcd_trainer;
+
         typedef matrix<double,10,1> sample_type;
         typedef linear_kernel<sample_type> kernel_type;
 
@@ -291,7 +308,7 @@ namespace
         dlog << LINFO << "ranking accuracy: " << acc1;
         DLIB_TEST(std::abs(acc1 - 1) == 0);
 
-        simple_rank_trainer<kernel_type> strainer;
+        simple_rank_trainer<kernel_type,use_dcd_trainer> strainer;
         decision_function<kernel_type> df2;
         df2 = strainer.train(pair);
         dlog << LINFO << "weights: "<< trans(df2.basis_vectors(0));
@@ -325,7 +342,8 @@ namespace
             test_count_ranking_inversions();
             dotest1();
             dotest_sparse_vectors();
-            test_svmrank_weight_force_dense();
+            test_svmrank_weight_force_dense<true>();
+            test_svmrank_weight_force_dense<false>();
 
         }
     } a;
