@@ -12,13 +12,71 @@
 
 <current>
 New Features:
+   - Machine Learning
+      - Added svm_rank_trainer, an optimized implementation of the SVM-Rank algorithm.
+      - Added rank_unlabeled_training_samples(), an implementation of the SVM Active
+        Learning algorithm.
+      - Added svm_c_linear_dcd_trainer, a warm-startable SVM solver using the dual 
+        coordinate descent algorithm used by liblinear.
+      - Added the ability to force the last element of a weight vector to 1 to the
+        following objects: svm_c_linear_trainer, svm_c_linear_dcd_trainer,
+        svm_rank_trainer, and oca.
+      - Added the ability to learn non-negative weight vectors to the
+        structural_sequence_labeling_trainer object.
+   - Networking
+      - Added an iosockstream object.
+      - Added a method to the server object that lets a user set the graceful close timeout
+        time to something other than the default of 500ms.
+   - Linear Algebra
+      - Added gaussian_randm()
+      - Added an overload of sparse_matrix_vector_multiply() that multiplies a dense matrix
+        with a sparse vector.
+      - Added the find_affine_transform() routine.
+      - Made toMat() work with matrix object in addition to array2d style images.
+      - Added the mat() function. It rolls the array_to_matrix(), vector_to_matrix(),
+        pointer_to_column_vector(), and pointer_to_matrix() methods all into one convenient
+        interface. Also made stddev() slightly more general. This change also deprecates the
+        previous matrix conversion functions.  mat() also works for Armadillo and Eigen matrices.
+      - Added STL style begin() and end() methods to matrix and matrix_exp.
+   - Graphical User Interface Tools
+      - Added draw_solid_convex_polygon()
+      - Added an overload of draw_image() that's useful for drawing images and doing
+        interpolation at the same time.
+      - Added on_view_changed() callback to zoomable_region and scrollable_region gui widgets.
+   - Added parse_trees_to_string() and parse_trees_to_string_tagged()
+   - Added lambda function support to the timeout object.
+   - Added the vectorstream object.
+   - Added the parse_xml() routines
+   - Added a group name feature to the command line parser. Now it is possible to make
+     print_options() print related options so that they are grouped together.
+   - Added the following new hashing functions: murmur_hash3_128bit_3(),
+     murmur_hash3_2(), murmur_hash3_3(), uniform_random_hash(), gaussian_random_hash() 
+     as well as hash() overloads for uint32, uint64, and std::pair.
 
 Non-Backwards Compatible Changes:
+   - Made the svm_c_linear_trainer use the risk gap to decide when to stop.  This was done
+     because it is how all the other OCA based SVM tools in dlib decide when to stop.  
+     However, it might cause the outputs to be slightly different in this version of dlib.  
+   - Switched the windows implementation of dlib::mutex to use a CRITICAL_SECTION instead
+     of a "mutex" (i.e. the thing made by CreateMutex()) since a critical section does the
+     same thing but faster.  Also changed the spec for mutex::unlock() to say that it is
+     illegal for a thread to unlock a dlib::mutex it doesn't own. This is technically a
+     non-backwards compatible change to the API but it has always been implemented in a way
+     that didn't allow this kind of double unlock() on non-Windows platforms. Additionally,
+     the recent change to the dlib::mutex implementation on windows also no longer allows
+     this kind of double unlock.
+   - Removed the structural_assignment_trainer::learns_nonnegative_weights() routine 
+     and moved its functionality into the feature extraction interface used by this object. 
 
 Bug fixes:
+   - Fixed a bug in find_max_factor_graph_nmplp() which caused it to not work properly on
+     some compilers.
 
 Other:
    - Added a new documentation page for the various linear algebra tools in dlib.
+   - The following objects were turned into single implementation components:
+     sockstreambuf, timeout, member_function_pointer, xml_parser, linker,
+     bound_function_pointer, and timer.
 
 </current>
 
